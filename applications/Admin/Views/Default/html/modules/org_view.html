@@ -1,0 +1,121 @@
+{% if viewsData.thisApplication.route and viewsData.thisApplication.route != '' %}
+	{% set route = viewsData.thisApplication.route|lower %}
+{% else %}
+	{% set route = viewsData.thisApplication.name|lower %}
+{% endif %}
+
+<div class="row">
+	<div class="col">
+		<div id="modules" class="card mt-2 mb-2">
+			<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase"></div>
+			<div class="card-body">
+				{% if viewsData.mode == 'true' %}
+					<div class="row">
+						<div class="col border-right">
+							<div class="btn-group btn-group-toggle" data-toggle="buttons">
+								<label class="btn btn-primary active">
+									<input type="radio" name="install-options" class="install-options" id="repositories-radio" checked>Install Modules From Repositories
+								</label>
+								<label class="btn btn-secondary">
+									<input type="radio" name="install-options" class="install-options" id="barebone-radio">Install Barebone Modules
+								</label>
+							</div>
+						</div>
+						<div id="barebone" class="col text-center" hidden>
+							{{include('Admin/Default/html/modules/barebone.html')}}
+						</div>
+						<div id="repo" class="col text-center">
+							{{include('Admin/Default/html/modules/repositories/view.html')}}
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div id="filter" class="col text-center">
+							{{include('Admin/Default/html/modules/filter.html')}}
+						</div>
+					</div>
+				{% else %}
+					<div class="row">
+						<div id="repo" class="col text-center">
+							{{include('Admin/Default/html/modules/repositories/view.html')}}
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div id="filter" class="col text-center">
+							{{include('Admin/Default/html/modules/filter.html')}}
+						</div>
+					</div>
+				{% endif %}
+				<div class="row mt-2" id="repo-loader" hidden>
+					<div class="col text-info">
+						<span id="repo-loader-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+					</div>
+				</div>
+				<div id="modules-body">
+					<div id="modules-data">
+						{{include('Admin/Default/html/modules/modules.html')}}
+					</div>
+				</div>
+				<div id="barebone-body" hidden>
+					{{include('Admin/Default/html/modules/barebone/view.html')}}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{{include('Admin/Default/html/modules/modal.html')}}
+{% if flash.has('success') %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			PNotify.success({
+				text		: "{{flash.get('success')|raw}}",
+				textTrusted	: true
+			});
+		});
+	</script>
+{% elseif flash.has('error') %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			PNotify.error({
+				text		: "{{flash.get('error')|raw}}",
+				textTrusted	: true
+			});
+		});
+	</script>
+{% endif %}
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('#modules').children('.card-header').html('Hello World Framework : Modules Management');
+	});
+</script>
+{% if viewsData.mode == 'true' %}
+	<script type="text/javascript">
+		$('.install-options').each(function(index, option) {
+			$($(option).parent()).click(function() {
+				var selectedOptionId = $(this).children()[0].id;
+
+				if (selectedOptionId === 'repositories-radio') {
+					$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+					$('#barebone-radio').parent().removeClass('btn-primary').addClass('btn-secondary');
+					$('#modules-body').attr('hidden', false);
+					$('#barebone').attr('hidden', true);
+					$('#repo').attr('hidden', false);
+					$('#filter').attr('hidden', false);
+					$('#barebone-body').attr('hidden', true);
+				}
+
+				if (selectedOptionId === 'barebone-radio') {
+					$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+					$('#repositories-radio').parent().removeClass('btn-primary').addClass('btn-secondary');
+					$('#barebone').attr('hidden', false);
+					$('#repo').attr('hidden', true);
+					$('#filter').attr('hidden', true);
+					$('#barebone-body').attr('hidden', false);
+					$('#modules-body').attr('hidden', true);
+				}
+			});
+		});
+	</script>
+{% endif %}

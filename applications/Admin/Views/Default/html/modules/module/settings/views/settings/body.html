@@ -1,0 +1,24 @@
+<div class="p-2">
+	<div class="row">
+		<div class="col">
+			<div class="form-group">
+				<label for="views-body">Body Parameters</label>
+				<div class="input-group">
+					<input type="text" name="views-body" id="views-body" class="form-control" value="{{viewsData.settings.body.params}}" placeholder="Body Parameters" disabled>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<div class="form-group">
+				<label for="body-jsscripts">Body Js Scripts</label>
+				<div class="input-group">
+					<textarea name="body-jsscripts" id="body-jsscripts" class="form-control" placeholder="Scripts" disabled>
+						{{viewsData.settings.body.jsscript|trim}}
+					</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

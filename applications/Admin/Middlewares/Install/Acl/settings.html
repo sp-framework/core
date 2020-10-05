@@ -1,0 +1,98 @@
+Settings file
+<script type="text/javascript">
+
+	$('body').on('settingsSave', function() {
+
+
+	});
+	// var postData = { };
+
+	// postData['type'] = 'applications';
+	// postData['id'] = $('#id').val();
+	// postData['is_default'] = $('#is-default')[0].checked;
+	// postData['force'] = '0';
+	// postData['name'] = $('#name').val();
+	// postData['route'] = $('#route').val();
+	// postData['display_name'] = $('#display-name').val();
+	// postData['description'] = $('#description').val();
+	// postData['repo'] = $('#application-repo').val();
+	// postData['settings'] = { };
+	// postData['settings']['component'] = $('#settings-application-component').val();
+	// postData['settings']['view'] = $('#settings-application-view').val();
+
+	// if ($('input[name=mode-options]:checked')[0].id === 'production') {
+	// 	postData['mode'] = 0;
+	// } else if ($('input[name=mode-options]:checked')[0].id === 'development') {
+	// 	postData['mode'] = 1;
+	// }
+
+	// if (typeof sortable !== 'undefined') {
+	// 	postData['middlewares_sequence'] = sortable.toArray();
+	// }
+
+	// if ($('#settings-application-component').val() === '0') {
+	// 	$('#settings-application-component').addClass('is-invalid');
+	// 	$('#settings-application-component').focus(function() {
+	// 		$(this).removeClass('is-invalid');
+	// 	});
+	// } else if ($('#settings-application-view').val() === '0') {
+	// 	$('#settings-application-view').addClass('is-invalid');
+	// 	$('#settings-application-view').focus(function() {
+	// 		$(this).removeClass('is-invalid');
+	// 	});
+	// } else {
+	// 	$.post('/{{route}}/modules/module/settings/edit', postData, function(data) {
+	// 		if (data.responseCode === 0) {
+	// 			location.reload();
+	// 		} else if (data.responseCode === 2) {
+	// 			Swal.fire({
+	// 				title 				: data.responseMessage,
+	// 				icon				: 'info',
+	// 				showCancelButton	: true,
+	// 				showDenyButton		: true,
+	// 				confirmButtonText	: 'Save & Make Default',
+	// 				denyButtonText		: 'Save & Don\'t Make Default',
+	// 				width				: '50%'
+	// 			}).then((result) => {
+	// 				if (result.isConfirmed) {
+
+	// 					postData['force'] = "1";
+
+	// 					$.post('/{{route}}/modules/module/settings/edit', postData, function(data) {
+	// 						if (data && data.responseCode === 0) {
+	// 							location.reload();
+	// 						} else if (data && data.responseCode === 1) {
+	// 							PNotify.error({
+	// 								text			: data.responseMessage,
+	// 							});
+	// 						}
+	// 					}, 'json');
+	// 				} else if (result.isDenied) {
+
+	// 					$('#is-default')[0].checked = false;
+	// 					postData['is_default'] = false;
+
+	// 					$.post('/{{route}}/modules/module/settings/edit', postData, function(data) {
+	// 						if (data && data.responseCode === 0) {
+	// 							location.reload();
+	// 						} else if (data && data.responseCode === 1) {
+	// 							PNotify.error({
+	// 								text			: data.responseMessage,
+	// 							});
+	// 						}
+	// 					}, 'json');
+	// 				}
+	// 			});
+	// 		} else if (data.responseCode === 3) {
+	// 			Swal.fire({
+	// 				icon: 'error',
+	// 				title: data.responseMessage,
+	// 			});
+	// 		} else {
+	// 			PNotify.error({
+	// 				text: data.responseMessage
+	// 			});
+	// 		}
+	// 	}, 'json');
+	// }
+</script>

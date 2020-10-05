@@ -1,0 +1,36 @@
+{
+	"name"			: "Home",
+	"displayName" 	: "Dashboard Home Package",
+	"description"	: "Package for Home component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-dashboard-home",
+	"path"			: "/",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Dashboard",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-dashboard"
+		},
+		"components"	:
+		[{
+			"name"		: "Home",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/component-dashboard-home"
+		}],
+		"packages"		: [],
+		"middlewares"	:
+		[{
+			"name"		: "Home",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/middleware-dashboard-home"
+		}],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

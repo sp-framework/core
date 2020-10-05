@@ -1,0 +1,80 @@
+{
+	"name"			: "DashboardDefaultHome",
+	"displayName" 	: "Dashboard Component Home View (Default)",
+	"description" 	: "Dashboard Component home view for Dashboard Default View",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/view-dashboard-default-home",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application"  : {
+			"name"		: "Dashboard",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-dashboard"
+		},
+		"components"	:
+		[{
+			"name"		: "Home",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/component-dashboard-home"
+		}],
+		"packages"		:
+		[{
+			"name"		: "Home",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/package-dashboard-home"
+		}],
+		"middlewares"	:
+		[{
+			"name"		: "Home",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/middleware-dashboard-home"
+		}],
+		"views"			:
+		[{
+			"name"		: "Default",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/view-dashboard-default"
+		}]
+	},
+	"settings"		: {
+		"cache" 	: false,
+		"layout" 	: "/layout/view.html",
+		"head"		: {
+			"title"		: "Blog - ",
+			"meta"		: {
+				"viewport" 		: "width=device-width, initial-scale=1, shrink-to-fit=no",
+				"description" 	: "Blog Views",
+				"author"		: "Guru",
+				"keywords"		: "HTML, CSS, JavaScript"
+			},
+			"link"		: {
+				"href"	:
+					[
+						"/views/Blog/Default/css/bootstrap.min.css"
+					]
+			},
+			"script"	: {
+				"src"	:
+					[
+						"/views/Blog/Default/js/jquery-3.5.1.min.js",
+						"/views/Blog/Default/js/bootstrap.min.js"
+					]
+			}
+		},
+		"body"		: {
+			"params"	: "id=\"body\" class=\"body\"",
+			"jsscript"	: "<script type=\"text/javascript\">var x = 10;</script>"
+		},
+		"footer"	: {
+			"params"	: "class=\"footer\"",
+			"script"	: {
+				"src"	: []
+			},
+			"jsscript"	: "<script type=\"text/javascript\">console.log(x);</script>"
+		}
+	}
+}

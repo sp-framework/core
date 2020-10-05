@@ -1,0 +1,60 @@
+{
+	"name"			: "Default",
+	"displayName" 	: "Barebone Application View (Default)",
+	"description" 	: "Barebone Application View (Default)",
+	"version"		: "0.0.1",
+	"repo"			: "https://",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application"  : {
+			"name"		: "Barebone",
+			"version"	: "0.0.1",
+			"repo"		: "https://"
+		},
+		"components"	: [],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+		"cache" 	: false,
+		"layout" 	: "/layout/view.html",
+		"head"		: {
+			"title"		: "Barebone - ",
+			"meta"		: {
+				"viewport" 		: "width=device-width, initial-scale=1, shrink-to-fit=no",
+				"description" 	: "Barebone Views",
+				"author"		: "Guru",
+				"keywords"		: "HTML, CSS, JavaScript"
+			},
+			"link"		: {
+				"href"	:
+					[
+						"/views/Barebone/Default/css/bootstrap.min.css"
+					]
+			},
+			"script"	: {
+				"src"	:
+					[
+						"/views/Barebone/Default/js/jquery-3.5.1.min.js",
+						"/views/Barebone/Default/js/bootstrap.min.js"
+					]
+			}
+		},
+		"body"		: {
+			"params"	: "id=\"body\" class=\"body\"",
+			"jsscript"	: ""
+		},
+		"footer"	: {
+			"params"	: "class=\"footer\"",
+			"script"	: {
+				"src"	: []
+			},
+			"jsscript"	: ""
+		}
+	}
+}

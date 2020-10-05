@@ -1,0 +1,12 @@
+.env
+.htaccess
+*.sublime-project
+*.sublime-workspace
+/vendor/*
+.backups
+.downloads
+Mee*
+Moo*
+Maa*
+Moomoo*
+composer.*

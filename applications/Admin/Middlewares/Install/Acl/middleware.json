@@ -1,0 +1,32 @@
+{
+	"name"			: "Acl",
+	"displayName" 	: "Admin Acl Middleware",
+	"description"	: "Admin Acl Middleware",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/middleware-admin-acl",
+	"path"			: "/",
+	"class"			: "Middlewares\\Admin\\Acl",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Admin",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-admin"
+		},
+		"components"	: [],
+		"packages"		:
+		[{
+			"name"		: "Acl",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/package-admin-acl"
+		}],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

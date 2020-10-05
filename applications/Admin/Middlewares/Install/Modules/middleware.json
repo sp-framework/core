@@ -1,0 +1,32 @@
+{
+	"name"			: "Modules",
+	"displayName" 	: "Admin Modules Middleware",
+	"description"	: "Admin Modules Middleware",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/middleware-admin-modules",
+	"path"			: "/",
+	"class"			: "Middlewares\\Admin\\Modules",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Admin",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-admin"
+		},
+		"components"	: [],
+		"packages"		:
+		[{
+			"name"		: "Acl",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/package-admin-modules"
+		}],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}
