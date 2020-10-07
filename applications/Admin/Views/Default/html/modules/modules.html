@@ -1,19 +1,20 @@
-{% if viewsData.thisApplication.route and viewsData.thisApplication.route != '' %}
-	{% set route = viewsData.thisApplication.route|lower %}
+{% if thisApplication['route'] and thisApplication['route'] != '' %}
+	{% set route = thisApplication['route']|lower %}
 {% else %}
-	{% set route = viewsData.thisApplication.name|lower %}
+	{% set route = thisApplication['name']|lower %}
 {% endif %}
-{% if viewsData.responseCode == 1 %}
+{% if responseCode == 1 %}
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-danger mt-2 mb-2">{{viewsData.responseMessage|raw}}</div>
+			<div class="alert alert-danger mt-2 mb-2">{{responseMessage|e}}</div>
 		</div>
 	</div>
 {% endif %}
-
-{% for modulesKey, modules in viewsData.modulesData %}
-	<input type="hidden" name="register-counter" id="register-counter" class="form-control" value="{{viewsData.counter.register}}">
-	<input type="hidden" name="update-counter" id="update-counter" class="form-control" value="{{viewsData.counter.update}}">
+{% if counter is defined %}
+	<input type="hidden" name="register-counter" id="register-counter" class="form-control" value="{{counter['register']}}">
+	<input type="hidden" name="update-counter" id="update-counter" class="form-control" value="{{counter['update']}}">
+{% endif %}
+{% for modulesKey, modules in modulesData %}
 	<div id="modules-data-{{modulesKey}}" class="card mb-2">
 		<div class="card-header bg-primary p-1 text-white text-center font-weight-bold text-uppercase">
 			{{modulesKey|upper}}
@@ -22,28 +23,28 @@
 			{% if modules|length != 0 %}
 				<div class="row">
 					{% for moduleKey, module in modules %}
-						{% if not module.error %}
+						{% if module['error'] is not defined %}
 							<div class="col-md-4 mb-3">
 								<div class="card">
 									<div class="card-header bg-info pl-2 p-1 text-white text-truncate">
-										{% if module.display_name %}
-											<label class="m-0 font-weight-bold">{{module.display_name}}
+										{% if module['display_name'] %}
+											<label class="m-0 font-weight-bold">{{module['display_name']}}
 										{% else %}
-											<label class="m-0 font-weight-bold">{{module.name}}
+											<label class="m-0 font-weight-bold">{{module['name']}}
 										{% endif %}
-										{% if module.is_default == 1 %}
+										{% if module['is_default'] is defined and module['is_default'] == 1 %}
 											(Default)
 										{% endif %}
 										</label>
 									</div>
 									<div class="card-body">
-										{% if module.display_name %}
+										{% if module['display_name'] %}
 											<div class="row">
 												<div class="col-md-4">
 													<p class="card-text">Name:</p>
 												</div>
 												<div class="col">
-													<p class="card-text">{{module.name}}</p>
+													<p class="card-text">{{module['name']}}</p>
 												</div>
 											</div>
 										{% endif %}
@@ -52,11 +53,11 @@
 												<p class="card-text">Version:</p>
 											</div>
 											<div class="col">
-												{% if module.update_available == true %}
-													<span class="badge badge-secondary">{{module.version}}</span>
-													<span class="badge badge-info">(Update Available: {{module.update_version}})</span>
+												{% if module['update_available'] == true %}
+													<span class="badge badge-secondary">{{module['version']}}</span>
+													<span class="badge badge-info">(Update Available: {{module['update_version']}})</span>
 												{% else %}
-													<span class="badge badge-secondary">{{module.version}}</span>
+													<span class="badge badge-secondary">{{module['version']}}</span>
 												{% endif %}
 											</div>
 										</div>
@@ -65,24 +66,24 @@
 												<p class="card-text">Description:</p>
 											</div>
 											<div class="col">
-												<p class="card-text text-truncate">{{module.description}}</p>
+												<p class="card-text text-truncate">{{module['description']}}</p>
 											</div>
 										</div>
-										{% if module.dependencies %}
+										{% if module['dependencies'] is defined %}
 											<div class="row">
 												<div class="col-md-4">
 													<p class="card-text">Dependencies:</p>
 												</div>
 												<div class="col text-truncate">
-												{% for dependenciesKey, dependencies in module.dependencies %}
+												{% for dependenciesKey, dependencies in module['dependencies'] %}
 													{% if dependenciesKey == 'core' or dependenciesKey == 'application' %}
 														<span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
-														<span>{{dependencies.name}} ({{dependencies.version}})</span>
+														<span>{{dependencies['name']}} ({{dependencies['version']}})</span>
 													{% else %}
 														{% if dependencies|length > 0 %}
 															<span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
 															{% for dependencyKey, dependency in dependencies %}
-																<span>{{dependency.name}} ({{dependency.version}})</span>
+																<span>{{dependency['name']}} ({{dependency['version']}})</span>
 															{% endfor %}
 														{% endif %}
 													{% endif %}
@@ -92,28 +93,28 @@
 										{% endif %}
 									</div>
 									<div class="card-footer" style="min-height:61.5px;">
-										{% if modulesKey != 'core' and module.installed == true %}
-											<a href="/{{route}}/modules/module/settings" data-type="{{modulesKey}}" data-name="{{module.display_name}}" data-process="settings" data-id="{{module.id}}" data-applicationid="{{module.application_id}}" class="btn-settings btn btn-sm btn-primary">
+										{% if modulesKey != 'core' and module['installed'] == true %}
+											<a href="/{{route}}/modules/module/settings" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="settings" data-id="{{module['id']}}" {% if module['application_id'] is defined %}data-applicationid="{{module['application_id']}}" {% endif %} class="btn-settings btn btn-sm btn-primary">
 												<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Settings
 											</a>
 										{% endif %}
-										{% if modulesKey != 'core' and module.installed == true %}
-											{% if module.application_id != 1 and module.name != 'Admin' %}
-											<a href="/{{route}}/modules/module/uninstall" data-type="{{modulesKey}}" data-name="{{module.display_name}}" data-process="uninstall" data-id="{{module.id}}" class="btn-uninstall btn btn-sm btn-danger float-right">
+										{% if modulesKey != 'core' and module['installed'] == true %}
+											{% if module['application_id'] is defined and module['application_id'] != 1 and module['name'] != 'Admin' %}
+											<a href="/{{route}}/modules/module/uninstall" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="uninstall" data-id="{{module['id']}}" class="btn-uninstall btn btn-sm btn-danger float-right">
 												<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Uninstall
 											</a>
 											{% endif %}
 										{% else %}
 											{% if modulesKey != 'core' %}
-												<a href="/{{route}}/modules/module/delete" data-type="{{modulesKey}}" data-name="{{module.display_name}}" data-process="delete" data-id="{{module.id}}" class="btn-delete btn btn-sm btn-danger">
+												<a href="/{{route}}/modules/module/delete" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="delete" data-id="{{module['id']}}" class="btn-delete btn btn-sm btn-danger">
 													<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Delete
 												</a>
-												<a href="/{{route}}/modules/module" data-type="{{modulesKey}}" data-name="{{module.display_name}}" data-process="view" data-subprocess="install" data-id="{{module.id}}" class="btn-view btn btn-sm btn-info float-right">Install
+												<a href="/{{route}}/modules/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view" data-subprocess="install" data-id="{{module['id']}}" class="btn-view btn btn-sm btn-info float-right">Install
 												</a>
 											{% endif %}
 										{% endif %}
-										{% if module.update_available == true %}
-											<a href="/{{route}}/modules/module" data-type="{{modulesKey}}" data-name="{{module.display_name}}" data-process="view"  data-subprocess="update" data-id="{{module.id}}" class="btn-update btn btn-sm btn-info float-right mr-2">Update
+										{% if module['update_available'] == true %}
+											<a href="/{{route}}/modules/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view"  data-subprocess="update" data-id="{{module['id']}}" class="btn-update btn btn-sm btn-info float-right mr-2">Update
 											</a>
 										{% endif %}
 									</div>

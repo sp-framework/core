@@ -48,29 +48,27 @@ class ModulesComponent extends BaseComponent
 				$this->viewFile = 'Admin/Default/html/modules/modules.html';
 			}
 
-			$this->viewsData->responseCode = 0;
+			$this->view->responseCode = 0;
 
-			$this->viewsData->mode = $this->mode;
+			$this->view->mode = $this->config->debug;
 
-			$this->viewsData->modulesData = $modulesData->packagesData['modulesData'];
+			$this->view->modulesData = $modulesData->packagesData['modulesData'];
 
 			if (!isset($this->getData()['filter'])) {
-				$this->viewsData->applications = $modulesData->packagesData['applications'];
+				$this->view->applications = $modulesData->packagesData['applications'];
 
-				$this->viewsData->repositories = $modulesData->packagesData['repositories'];
+				$this->view->repositories = $modulesData->packagesData['repositories'];
 			}
 
-			$this->viewsData->thisApplication = $this->applicationInfo;
+			$this->view->thisApplication = $modulesData->packagesData['applicationInfo'];
 
-			$this->viewsData->setup = isset($this->getData()['setup']) ? $this->getData()['setup'] : false;
-
-			return $this->generateView();
+			$this->view->setup = isset($this->getData()['setup']) ? $this->getData()['setup'] : false;
 
 		} else if ($modulesData->packagesData['responseCode'] === 1) {
 
-			$this->viewsData->responseCode = 1;
+			$this->view->responseCode = 1;
 
-			$this->viewsData->responseMessage = $modulesData->packagesData['responseMessage'];
+			$this->view->responseMessage = $modulesData->packagesData['responseMessage'];
 
 			return $this->generateView();
 		}

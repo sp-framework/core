@@ -57,9 +57,11 @@ class Packages extends BasePackage
 		}
 	}
 
-	public function getAllPackages()
+	public function getAllPackages($conditions = null)
 	{
-		$this->packages = PackagesModel::find(null, 'packages')->toArray();
+		if (!$this->packages) {
+			$this->packages = PackagesModel::find($conditions, 'packages')->toArray();
+		}
 
 		return $this;
 	}

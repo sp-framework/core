@@ -27,9 +27,19 @@ class Modules extends BasePackage
 
 	protected $module;
 
+	protected $core;
+
+	protected $applications;
+
+	protected $packages;
+
+	protected $middlewares;
+
+	protected $views;
+
 	public function syncRemoteWithLocal($id)
 	{
-		$this->repository = $this->repositories->getById($id)->getAllArr();
+		$this->repository = $this->repositories->getById($id);
 
 		$this->getLocalModules();
 
@@ -50,22 +60,31 @@ class Modules extends BasePackage
 		$this->packagesData->modulesData = $this->localModules;
 
 		$this->packagesData->repositories =
-			getAllArr($this->repositories->getAll());
+			$this->container->getShared('modules')
+				->repositories->repositories;
 
 		$this->packagesData->applications =
-			getAllArr($this->applications->getAll());
+			$this->container->getShared('modules')
+				->applications->applications;
+
+		$this->packagesData->applicationInfo =
+			$this->container->getShared('modules')
+				->applications->getApplicationInfo();
 
 		return $this->packagesData;
 	}
 
 	public function getLocalModules($filter = [], $includeCore = true)
 	{
+		$modulesContainer = $this->container->getShared('modules');
+
+		$this->core = $modulesContainer->core->getCoreInfo();
+
 		if ($includeCore) {
-			$this->localModules['core'] =
-				$this->container->getShared('modules')->core->getCoreInfo();
+			$this->localModules['core'][$this->core[0]['id']] = $this->core[0];
 		}
 
-		// dump($filter, $this->applications->getAll($filter));
+		// dump($filter, $this->applications);
 		if (!$includeCore) {
 			$applicationFilter = ['id' => $filter['application_id']];
 		} else if (isset($filter['installed']) || isset($filter['update_available'])) {
@@ -73,63 +92,80 @@ class Modules extends BasePackage
 		} else {
 			$applicationFilter = [];
 		}
+
+		$this->applications =
+			$modulesContainer->applications->applications;
+
+		$this->components =
+			$modulesContainer->components->components;
+
+		$this->packages =
+			$modulesContainer->packages->packages;
+
+		$this->middlewares =
+			$modulesContainer->middlewares->middlewares;
+
+		$this->views =
+			$modulesContainer->views->views;
+
+
 		// var_dump($filter);
 
-		if (count($this->applications->getAll($applicationFilter)) > 0) {
-			foreach ($this->applications->getAll($applicationFilter) as $applicationKey => $application) {
-				$this->localModules['applications'][$application->get('id')] = $application->getAllArr();
-				$this->localModules['applications'][$application->get('id')]['settings']
-					= json_decode($application->get('settings'), true);
-				$this->localModules['applications'][$application->get('id')]['dependencies']
-					= json_decode($application->get('dependencies'), true);
+		if (count($this->applications) > 0) {
+			foreach ($this->applications as $applicationKey => $application) {
+				$this->localModules['applications'][$application['id']] = $application;
+				$this->localModules['applications'][$application['id']]['settings']
+					= json_decode($application['settings'], true);
+				$this->localModules['applications'][$application['id']]['dependencies']
+					= json_decode($application['dependencies'], true);
 			}
 		} else {
 			$this->localModules['applications'] = [];
 		}
 
-		if (count($this->components->getAll($filter)) > 0) {
-			foreach ($this->components->getAll($filter) as $componentKey => $component) {
-				$this->localModules['components'][$component->get('id')] = $component->getAllArr();
-				$this->localModules['components'][$component->get('id')]['settings']
-					= json_decode($component->get('settings'), true);
-				$this->localModules['components'][$component->get('id')]['dependencies']
-					= json_decode($component->get('dependencies'), true);
+		if (count($this->components) > 0) {
+			foreach ($this->components as $componentKey => $component) {
+				$this->localModules['components'][$component['id']] = $component;
+				$this->localModules['components'][$component['id']]['settings']
+					= json_decode($component['settings'], true);
+				$this->localModules['components'][$component['id']]['dependencies']
+					= json_decode($component['dependencies'], true);
 			}
 		} else {
 			$this->localModules['components'] = [];
 		}
 
-		if (count($this->packages->getAll($filter)) > 0) {
-			foreach ($this->packages->getAll($filter) as $packageKey => $package) {
-				$this->localModules['packages'][$package->get('id')] = $package->getAllArr();
-				$this->localModules['packages'][$package->get('id')]['settings']
-					= json_decode($package->get('settings'), true);
-				$this->localModules['packages'][$package->get('id')]['dependencies']
-					= json_decode($package->get('dependencies'), true);
+		if (count($this->packages) > 0) {
+			foreach ($this->packages as $packageKey => $package) {
+				$this->localModules['packages'][$package['id']] = $package;
+				$this->localModules['packages'][$package['id']]['settings']
+					= json_decode($package['settings'], true);
+				$this->localModules['packages'][$package['id']]['dependencies']
+					= json_decode($package['dependencies'], true);
 			}
 		} else {
 			$this->localModules['packages'] = [];
 		}
 
-		if (count($this->middlewares->getAll($filter)) > 0) {
-			foreach ($this->middlewares->getAll($filter) as $middlewareKey => $middleware) {
-				$this->localModules['middlewares'][$middleware->get('id')] = $middleware->getAllArr();
-				$this->localModules['middlewares'][$middleware->get('id')]['settings']
-					= json_decode($middleware->get('settings'), true);
-				$this->localModules['middlewares'][$middleware->get('id')]['dependencies']
-					= json_decode($middleware->get('dependencies'), true);
+		if (count($this->middlewares) > 0) {
+			foreach ($this->middlewares as $middlewareKey => $middleware) {
+				$this->localModules['middlewares'][$middleware['id']] = $middleware;
+				$this->localModules['middlewares'][$middleware['id']]['settings']
+					= json_decode($middleware['settings'], true);
+				$this->localModules['middlewares'][$middleware['id']]['dependencies']
+					= json_decode($middleware['dependencies'], true);
 			}
 		} else {
 			$this->localModules['middlewares'] = [];
 		}
 
-		if (count($this->views->getAll($filter)) > 0) {
-			foreach ($this->views->getAll($filter) as $viewKey => $view) {
-				$this->localModules['views'][$view->get('id')] = $view->getAllArr();
-				$this->localModules['views'][$view->get('id')]['settings']
-					= json_decode($view->get('settings'), true);
-				$this->localModules['views'][$view->get('id')]['dependencies']
-					= json_decode($view->get('dependencies'), true);
+		if (count($this->views) > 0) {
+			foreach ($this->views as $viewKey => $view) {
+				$this->localModules['views'][$view['id']] = $view;
+				$this->localModules['views'][$view['id']]['settings']
+					= json_decode($view['settings'], true);
+				$this->localModules['views'][$view['id']]['dependencies']
+					= json_decode($view['dependencies'], true);
 			}
 		} else {
 			$this->localModules['views'] = [];
@@ -150,54 +186,54 @@ class Modules extends BasePackage
 	// public function getFilteredData($filter, $includeCore = true)
 	// {
 	// 	if ($includeCore) {
-	// 		if (count($this->container->getShared('core')->getAll($filter)) > 0) {
-	// 			foreach ($this->container->getShared('core')->getAll($filter) as $componentKey => $component) {
-	// 				$this->localModules['core'][$component->get('id')] = $component->getAllArr();
-	// 				$this->localModules['core'][$component->get('id')]['settings']
-	// 					= unserialize($component->get('settings'));
-	// 				$this->localModules['core'][$component->get('id')]['dependencies']
-	// 					// = unserialize($this->localModules['components'][$component->get('id')]['dependencies']);
-	// 					= unserialize($component->get('dependencies'));
+	// 		if (count($this->container->getShared('core')) > 0) {
+	// 			foreach ($this->container->getShared('core') as $componentKey => $component) {
+	// 				$this->localModules['core'][$component['id']] = $component;
+	// 				$this->localModules['core'][$component['id']]['settings']
+	// 					= unserialize($component['settings']);
+	// 				$this->localModules['core'][$component['id']]['dependencies']
+	// 					// = unserialize($this->localModules['components'][$component['id']]['dependencies']);
+	// 					= unserialize($component['dependencies']);
 	// 			}
 	// 		} else {
 	// 			$this->localModules['components'] = [];
 	// 		}
 	// 	}
 
-	// 	if (count($this->components->getAll($filter)) > 0) {
-	// 		foreach ($this->components->getAll($filter) as $componentKey => $component) {
-	// 			$this->localModules['components'][$component->get('id')] = $component->getAllArr();
-	// 			$this->localModules['components'][$component->get('id')]['settings']
-	// 				= unserialize($component->get('settings'));
-	// 			$this->localModules['components'][$component->get('id')]['dependencies']
-	// 				// = unserialize($this->localModules['components'][$component->get('id')]['dependencies']);
-	// 				= unserialize($component->get('dependencies'));
+	// 	if (count($this->components) > 0) {
+	// 		foreach ($this->components as $componentKey => $component) {
+	// 			$this->localModules['components'][$component['id']] = $component;
+	// 			$this->localModules['components'][$component['id']]['settings']
+	// 				= unserialize($component['settings']);
+	// 			$this->localModules['components'][$component['id']]['dependencies']
+	// 				// = unserialize($this->localModules['components'][$component['id']]['dependencies']);
+	// 				= unserialize($component['dependencies']);
 	// 		}
 	// 	} else {
 	// 		$this->localModules['components'] = [];
 	// 	}
 
-	// 	if (count($this->packages->getAll($filter)) > 0) {
-	// 		foreach ($this->packages->getAll($filter) as $packageKey => $package) {
-	// 			$this->localModules['packages'][$package->get('id')] = $package->getAllArr();
-	// 			$this->localModules['packages'][$package->get('id')]['settings']
-	// 				= unserialize($package->get('settings'));
-	// 			$this->localModules['packages'][$package->get('id')]['dependencies']
-	// 				// = unserialize($this->localModules['packages'][$package->get('id')]['dependencies']);
-	// 				= unserialize($package->get('dependencies'));
+	// 	if (count($this->packages) > 0) {
+	// 		foreach ($this->packages as $packageKey => $package) {
+	// 			$this->localModules['packages'][$package['id']] = $package;
+	// 			$this->localModules['packages'][$package['id']]['settings']
+	// 				= unserialize($package['settings']);
+	// 			$this->localModules['packages'][$package['id']]['dependencies']
+	// 				// = unserialize($this->localModules['packages'][$package['id']]['dependencies']);
+	// 				= unserialize($package['dependencies']);
 	// 		}
 	// 	} else {
 	// 		$this->localModules['packages'] = [];
 	// 	}
 
-	// 	if (count($this->views->getAll($filter)) > 0) {
-	// 		foreach ($this->views->getAll($filter) as $viewKey => $view) {
-	// 			$this->localModules['views'][$view->get('id')] = $view->getAllArr();
-	// 			$this->localModules['views'][$view->get('id')]['settings']
-	// 				= unserialize($view->get('settings'));
-	// 			$this->localModules['views'][$view->get('id')]['dependencies']
-	// 				// = unserialize($this->localModules['views'][$view->get('id')]['dependencies']);
-	// 				= unserialize($view->get('dependencies'));
+	// 	if (count($this->views) > 0) {
+	// 		foreach ($this->views as $viewKey => $view) {
+	// 			$this->localModules['views'][$view['id']] = $view;
+	// 			$this->localModules['views'][$view['id']]['settings']
+	// 				= unserialize($view['settings']);
+	// 			$this->localModules['views'][$view['id']]['dependencies']
+	// 				// = unserialize($this->localModules['views'][$view['id']]['dependencies']);
+	// 				= unserialize($view['dependencies']);
 	// 		}
 	// 	} else {
 	// 		$this->localModules['views'] = [];
@@ -726,7 +762,7 @@ class Modules extends BasePackage
 									);
 
 							if (count($applications) > 0) {
-								$applicationId = $applications[0]->get('id');
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}
@@ -789,7 +825,7 @@ class Modules extends BasePackage
 									);
 
 							if (count($applications) > 0) {
-								$applicationId = $applications[0]->get('id');
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}
@@ -852,7 +888,7 @@ class Modules extends BasePackage
 									);
 
 							if (count($applications) > 0) {
-								$applicationId = $applications[0]->get('id');
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}
@@ -925,7 +961,7 @@ class Modules extends BasePackage
 									);
 
 							if (count($applications) > 0) {
-								$applicationId = $applications[0]->get('id');
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}

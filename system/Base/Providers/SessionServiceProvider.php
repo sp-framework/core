@@ -2,22 +2,12 @@
 
 namespace System\Base\Providers;
 
-use League\Container\ServiceProvider\AbstractServiceProvider;
-use System\Base\Providers\SessionServiceProvider\Flash;
-use System\Base\Providers\SessionServiceProvider\Session;
-use System\Base\Providers\SessionServiceProvider\SessionStore;
+use Phalcon\Di\ServiceProviderInterface;
 
-class SessionServiceProvider extends AbstractServiceProvider
+class SessionServiceProvider extends ServiceProviderInterface
 {
-    protected $provides = [
-        SessionStore::class,
-        Flash::class
-    ];
-
-    public function register()
+    public function register(DiInterface $container) : void
     {
-        $container = $this->getContainer();
-
         $container->share(SessionStore::class, function () {
             return new Session();
         });

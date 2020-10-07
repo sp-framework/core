@@ -74,6 +74,16 @@ try {
 	exit;
 }
 
-// $profiler_data = $profiler->disable();
-// $profiler->save($profiler_data);
-// echo '<br><br><a href="http://phalcon.local" target="_blank">Profiler</a>';
+// try {
+
+// 	$profiler_data = $profiler->disable();
+// 	$profiler->save($profiler_data);
+// 	echo '<br><br><a href="http://phalcon.local" target="_blank">Profiler</a>';
+
+// } catch (Exception $e){
+// 	echo "Profiler Errors: " . get_class($e) . "<br>";
+// 	echo "Info: " . $e->getMessage() . "<br>";
+// 	echo "File: " . $e->getFile() . "<br>";
+// 	echo "Line: " . $e->getLine() . "<br>";
+// 	exit;
+// }

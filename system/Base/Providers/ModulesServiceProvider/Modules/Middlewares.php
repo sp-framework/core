@@ -3,48 +3,18 @@
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Model\Middlewares as MiddlewaresModel;
-use System\Base\Providers\ModulesServiceProvider\ModulesInterface;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\Middlewares as MiddlewaresModel;
 
 class Middlewares extends BasePackage
 {
-	// private $container;
+	protected $middlewares;
 
-	// protected $db;
+	public function getAllMiddlewares($conditions = null)
+	{
+		if (!$this->middlewares) {
+			$this->middlewares = MiddlewaresModel::find($conditions, 'middlewares')->toArray();
+		}
 
-	// protected $em;
-
-	// public function __construct(Container $container)
-	// {
-	// 	$this->container = $container;
-
-	// 	$this->db = $this->container->get('db');
-
-	// 	$this->em = $this->container->get('em');
-	// }
-
-	// public function getById($id)
-	// {
-	// 	return $this->db->getById(MiddlewaresModel::class, $id);
-	// }
-
-	// public function getAll($criteria = [], $sort = null, $limit = null, $offset = null)
-	// {
-	// 	return $this->db->getByData(MiddlewaresModel::class, $criteria, $sort, $limit, $offset);
-	// }
-
-	// public function register(array $data)
-	// {
-	// 	return $this->db->addToDb(MiddlewaresModel::class, $data);
-	// }
-
-	// public function update(array $data)
-	// {
-	// 	return $this->db->updateToDbById(MiddlewaresModel::class, $data);
-	// }
-
-	// public function remove($id)
-	// {
-	// 	//
-	// }
+		return $this;
+	}
 }

@@ -3,8 +3,8 @@
 		<div class="input-group">
 			<select class="custom-select" id="select-repo">
 				<option selected>Select Repository</option>
-				{% for repository in viewsData.repositories %}
-					<option value="{{repository.id}}" data-url="{{repository.url}}">{{repository.name}}</option>
+				{% for repository in repositories %}
+					<option value="{{repository['id']}}" data-url="{{repository['url']}}">{{repository['name']}}</option>
 				{% endfor %}
 			</select>
 			<div class="input-group-append">

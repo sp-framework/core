@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Di\DiInterface;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Applications as ApplicationsModel;
 
@@ -121,9 +120,11 @@ class Applications extends BasePackage
 		}
 	}
 
-	public function getAllApplications()
+	public function getAllApplications($conditions = null)
 	{
-		$this->applications = ApplicationsModel::find(null, 'applications')->toArray();
+		if (!$this->applications) {
+			$this->applications = ApplicationsModel::find($conditions, 'applications')->toArray();
+		}
 
 		return $this;
 	}

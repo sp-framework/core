@@ -1,15 +1,14 @@
 <?php
 
-namespace System\Base\Providers\ModulesServiceProvider\Model;
+namespace System\Base\Providers\ModulesServiceProvider\Modules\Model;
 
-use Doctrine\ORM\Mapping as ORM;
-use System\Base\Providers\DatabaseServiceProvider\Model;
+use System\Base\BaseModel;
 
 /**
  * @ORM\Entity
  * @ORM\Table(name="middlewares")
  */
-class Middlewares extends Model
+class Middlewares extends BaseModel
 {
     /**
      * @ORM\GeneratedValue(strategy="AUTO")

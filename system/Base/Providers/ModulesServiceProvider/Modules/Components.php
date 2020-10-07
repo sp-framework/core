@@ -2,56 +2,19 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Doctrine\ORM\Tools\SchemaTool;
-use League\Container\Container;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use System\Base\Providers\ModulesServiceProvider\Model\Components as ComponentsModel;
-use System\Base\Providers\ModulesServiceProvider\ModulesInterface;
+use System\Base\BasePackage;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\Components as ComponentsModel;
 
-class Components implements ModulesInterface
+class Components extends BasePackage
 {
-	private $container;
+	protected $components;
 
-	protected $componentInfo = null;
-
-	protected $allComponents = [];
-
-	protected $db;
-
-	protected $em;
-
-	public function __construct(Container $container)
+	public function getAllComponents($conditions = null)
 	{
-		$this->container = $container;
+		if (!$this->components) {
+			$this->components = ComponentsModel::find($conditions, 'components')->toArray();
+		}
 
-		$this->db = $this->container->get('db');
-
-		$this->em = $this->container->get('em');
-	}
-
-	public function getAll($criteria = [], $sort = null, $limit = null, $offset = null)
-	{
-		return $this->db->getByData(ComponentsModel::class, $criteria, $sort, $limit, $offset);
-	}
-
-	public function getById($id)
-	{
-		return $this->db->getById(ComponentsModel::class, $id);
-	}
-
-	public function register(array $data)
-	{
-		return $this->db->addToDb(ComponentsModel::class, $data);
-	}
-
-	public function update(array $data)
-	{
-		return $this->db->updateToDbById(ComponentsModel::class, $data);
-	}
-
-	public function remove($id)
-	{
-		//
+		return $this;
 	}
 }

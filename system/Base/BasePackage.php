@@ -3,16 +3,27 @@
 namespace System\Base;
 
 use Phalcon\Di\DiInterface;
+use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 abstract class BasePackage
 {
 	protected $container;
 
+	protected $packagesData = [];
+
 	public function __construct(DiInterface $container)
 	{
 		$this->container = $container;
+
+		$this->packagesData = new PackagesData;
 	}
 
+	public function __get($name)
+	{
+		if (isset($this->{$name})) {
+			return $this->{$name};
+		}
+	}
 	// public function onConstruct()
 	// {
 	// 	$this->setSource($this->source);

@@ -18,6 +18,10 @@ class PackagesData
 
 	public function __get($key)
 	{
-		return $this->packagesData[$key];
+		if (isset($this->packagesData[$key])) {
+			return $this->packagesData[$key];
+		} else {
+			throw new \Exception('PackageData Key does not exists!');
+		}
 	}
 }

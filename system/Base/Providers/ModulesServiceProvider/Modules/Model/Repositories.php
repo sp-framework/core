@@ -1,14 +1,14 @@
 <?php
 
-namespace System\Base\Providers\ModulesServiceProvider\Model;
+namespace System\Base\Providers\ModulesServiceProvider\Modules\Model;
 
-use Phalcon\Mvc\Model;
+use System\Base\BaseModel;
 
 /**
  * @Entity
  * @Table(name="repositories")
  */
-class Repositories extends Model
+class Repositories extends BaseModel
 {
     /**
      * @GeneratedValue(strategy="AUTO")

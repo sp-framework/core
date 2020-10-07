@@ -1,15 +1,14 @@
-{% if viewsData.thisApplication.route and viewsData.thisApplication.route != '' %}
-	{% set route = viewsData.thisApplication.route|lower %}
+{% if thisApplication['route'] and thisApplication['route'] != '' %}
+	{% set route = thisApplication['route']|lower %}
 {% else %}
-	{% set route = viewsData.thisApplication.name|lower %}
+	{% set route = thisApplication['name']|lower %}
 {% endif %}
-
 <div class="row">
 	<div class="col">
 		<div id="modules" class="card mt-2 mb-2">
 			<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase"></div>
 			<div class="card-body">
-				{% if viewsData.mode == 'true' %}
+				{% if mode == 'true' %}
 					<div class="row">
 						<div class="col border-right">
 							<div class="btn-group btn-group-toggle" data-toggle="buttons">
@@ -22,28 +21,28 @@
 							</div>
 						</div>
 						<div id="barebone" class="col text-center" hidden>
-							{{include('Admin/Default/html/modules/barebone.html')}}
+							{% include 'modules/barebone.html' %}
 						</div>
 						<div id="repo" class="col text-center">
-							{{include('Admin/Default/html/modules/repositories/view.html')}}
+							{% include 'modules/repositories/view.html' %}
 						</div>
 					</div>
 					<hr>
 					<div class="row">
 						<div id="filter" class="col text-center">
-							{{include('Admin/Default/html/modules/filter.html')}}
+							{% include 'modules/filter.html' %}
 						</div>
 					</div>
 				{% else %}
 					<div class="row">
 						<div id="repo" class="col text-center">
-							{{include('Admin/Default/html/modules/repositories/view.html')}}
+							{% include 'modules/repositories/view.html' %}
 						</div>
 					</div>
 					<hr>
 					<div class="row">
 						<div id="filter" class="col text-center">
-							{{include('Admin/Default/html/modules/filter.html')}}
+							{% include 'modules/filter.html' %}
 						</div>
 					</div>
 				{% endif %}
@@ -54,18 +53,18 @@
 				</div>
 				<div id="modules-body">
 					<div id="modules-data">
-						{{include('Admin/Default/html/modules/modules.html')}}
+						{% include 'modules/modules.html' %}
 					</div>
 				</div>
 				<div id="barebone-body" hidden>
-					{{include('Admin/Default/html/modules/barebone/view.html')}}
+					{% include 'modules/barebone/view.html' %}
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-{{include('Admin/Default/html/modules/modal.html')}}
-{% if flash.has('success') %}
+{% include 'modules/modal.html' %}
+{# {% if flash.has('success') %}
 	<script type="text/javascript">
 		$(document).ready(function() {
 			PNotify.success({
@@ -83,14 +82,14 @@
 			});
 		});
 	</script>
-{% endif %}
+{% endif %} #}
 
 <script type="text/javascript">
 	$(document).ready(function() {
 		$('#modules').children('.card-header').html('Hello World Framework : Modules Management');
 	});
 </script>
-{% if viewsData.mode == 'true' %}
+{% if mode == 'true' %}
 	<script type="text/javascript">
 		$('.install-options').each(function(index, option) {
 			$($(option).parent()).click(function() {

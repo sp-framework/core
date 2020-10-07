@@ -8,8 +8,8 @@
 			</div>
 			<select class="custom-select" id="filter-select">
 				<option value="0" selected>Show All</option>
-				{% for application in viewsData.applications %}
-					<option value="{{application.id}}">Modules of application - {{application.display_name}}</option>
+				{% for application in applications %}
+					<option value="{{application['id']}}">Modules of application - {{application['display_name']}}</option>
 				{% endfor %}
 					<option value="installed">Installed</option>
 					<option value="update_available">Upgradable</option>

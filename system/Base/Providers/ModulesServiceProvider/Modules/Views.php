@@ -43,6 +43,14 @@ class Views extends BasePackage
                 base_path('applications/' . $this->applicationInfo['name'] .
                           '/Views/' . $this->view['name'] .
                           '/html_compiled/');
+
+            if (!is_dir($this->voltCompiledPath)) {
+                mkdir(
+                    $this->voltCompiledPath,
+                    0777,
+                    true
+                );
+            }
         }
     }
 
@@ -107,9 +115,11 @@ class Views extends BasePackage
         }
     }
 
-    public function getAllViews()
+    public function getAllViews($conditions = null)
     {
-        $this->views = ViewsModel::find(null, 'views')->toArray();
+        if (!$this->views) {
+            $this->views = ViewsModel::find($conditions, 'views')->toArray();
+        }
 
         return $this;
     }
@@ -119,4 +129,6 @@ class Views extends BasePackage
         $this->view =
                 $this->views[array_search($id, array_column($this->views, 'application_id'))];
     }
+
+
 }

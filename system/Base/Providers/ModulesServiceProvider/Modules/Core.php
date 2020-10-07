@@ -17,7 +17,9 @@ class Core extends BasePackage
 
 	public function getAllCores()
 	{
-		$this->core = CoreModel::find(null, 'core')->toArray();
+		if (!$this->core) {
+			$this->core = CoreModel::find(null, 'core')->toArray();
+		}
 
 		return $this;
 	}
