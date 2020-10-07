@@ -16,6 +16,8 @@ class Config
 
     public function __construct(DiInterface $container)
     {
+        include('../system/Base/Helpers.php');
+
         $this->container = $container;
 
         $this->configsFolder = base_path('system/Configs/');

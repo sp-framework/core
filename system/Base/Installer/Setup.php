@@ -90,19 +90,17 @@ Class Setup
 						true)
 				);
 
-			$addAdmin = $this->setup->registerModule('applications', null);
+			$adminApplicationId = $this->setup->registerModule('applications', null);
 
-			if ($addAdmin) {
+			if ($adminApplicationId) {
 
-				$adminApplication = $this->setup->getAdminApplicationDetails();
+				$this->setup->registerModule('components', $adminApplicationId);
 
-				$this->setup->registerModule('components', $adminApplication['id']);
+				$this->setup->registerModule('packages', $adminApplicationId);
 
-				$this->setup->registerModule('packages', $adminApplication['id']);
+				$this->setup->registerModule('middlewares', $adminApplicationId);
 
-				$this->setup->registerModule('middlewares', $adminApplication['id']);
-
-				$this->setup->registerModule('views', $adminApplication['id']);
+				$this->setup->registerModule('views', $adminApplicationId);
 
 			}
 

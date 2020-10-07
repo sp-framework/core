@@ -17,6 +17,10 @@ class Dispatcher
         $this->container = $container;
 
         $this->dispatcher = new PhalconDispatcher();
+
+        $this->dispatcher->setControllerSuffix('Component');
+
+        $this->dispatcher->setDefaultAction('view');
     }
 
     public function dispatch()

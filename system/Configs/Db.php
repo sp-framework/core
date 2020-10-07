@@ -5,7 +5,7 @@ return
 		"db" =>
 			[
 				"host" 		=> "localhost",
-				"dbname" 	=> "sp",
+				"dbname" 	=> "framework",
 				"username" 	=> "guru",
 				"password" 	=> "123",
 				"port" 		=> "3306",

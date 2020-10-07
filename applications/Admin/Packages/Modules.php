@@ -1,6 +1,6 @@
 <?php
 
-namespace Packages\Admin;
+namespace Applications\Admin\Packages;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
@@ -61,11 +61,8 @@ class Modules extends BasePackage
 	public function getLocalModules($filter = [], $includeCore = true)
 	{
 		if ($includeCore) {
-			if ($this->core->getCoreInfo()) {
-				foreach ($this->core->getCoreInfo() as $coreKey => $core) {
-					$this->localModules['core'][$core->get('id')] = $core->getAllArr();
-				}
-			}
+			$this->localModules['core'] =
+				$this->container->getShared('modules')->core->getCoreInfo();
 		}
 
 		// dump($filter, $this->applications->getAll($filter));
@@ -153,8 +150,8 @@ class Modules extends BasePackage
 	// public function getFilteredData($filter, $includeCore = true)
 	// {
 	// 	if ($includeCore) {
-	// 		if (count($this->core->getAll($filter)) > 0) {
-	// 			foreach ($this->core->getAll($filter) as $componentKey => $component) {
+	// 		if (count($this->container->getShared('core')->getAll($filter)) > 0) {
+	// 			foreach ($this->container->getShared('core')->getAll($filter) as $componentKey => $component) {
 	// 				$this->localModules['core'][$component->get('id')] = $component->getAllArr();
 	// 				$this->localModules['core'][$component->get('id')]['settings']
 	// 					= unserialize($component->get('settings'));
@@ -639,7 +636,7 @@ class Modules extends BasePackage
 
 				if (count($remoteCore['update']) > 0) {
 					foreach ($remoteCore['update'] as $updateRemoteCoreKey => $updateRemoteCore) {
-						$this->core->updateCoreInfo($updateRemoteCore);
+						$this->container->getShared('core')->updateCoreInfo($updateRemoteCore);
 						$counter['update'] = $counter['update'] + 1;
 					}
 				}

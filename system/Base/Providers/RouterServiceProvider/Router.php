@@ -36,7 +36,7 @@ class Router
 	{
 		$this->container = $container;
 
-		$this->applications = $this->container->getShared('applications');
+		$this->applications = $this->container->getShared('modules')->applications;
 
 		$this->request = $this->container->getShared('request');
 

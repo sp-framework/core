@@ -4,11 +4,8 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
-use System\Base\Providers\ModulesServiceProvider\Core;
-use System\Base\Providers\ModulesServiceProvider\Applications;
-use System\Base\Providers\ModulesServiceProvider\Components;
-use System\Base\Providers\ModulesServiceProvider\Packages;
-use System\Base\Providers\ModulesServiceProvider\Views;
+use System\Base\Providers\ModulesServiceProvider\Modules;
+use System\Base\Providers\ViewServiceProvider\View;
 
 class ModulesServiceProvider implements ServiceProviderInterface
 {
@@ -19,32 +16,38 @@ class ModulesServiceProvider implements ServiceProviderInterface
         // });
 
         $container->setShared(
-            'core',
+            'modules',
             function () use ($container) {
-                return new Core($container);
+                return new Modules($container);
             }
         );
+        // $container->setShared(
+        //     'core',
+        //     function () use ($container) {
+        //         return new Core($container);
+        //     }
+        // );
 
-        $container->setShared(
-            'applications',
-            function () use ($container) {
-                return new Applications($container);
-            }
-        );
+        // $container->setShared(
+        //     'applications',
+        //     function () use ($container) {
+        //         return new Applications($container);
+        //     }
+        // );
 
-        $container->setShared(
-            'components',
-            function () use ($container) {
-                return new Components($container);
-            }
-        );
+        // $container->setShared(
+        //     'components',
+        //     function () use ($container) {
+        //         return new Components($container);
+        //     }
+        // );
 
-        $container->setShared(
-            'packages',
-            function () use ($container) {
-                return new Packages($container);
-            }
-        );
+        // $container->setShared(
+        //     'packages',
+        //     function () use ($container) {
+        //         return new Packages($container);
+        //     }
+        // );
 
         // $container->setShared(
         // 'middlewares',
@@ -53,19 +56,19 @@ class ModulesServiceProvider implements ServiceProviderInterface
             //
              // });
 
-        $container->setShared(
-            'views',
-            function () use ($container) {
-                return new Views($container);
-            }
-        );
+        // $container->setShared(
+        //     'views',
+        //     function () use ($container) {
+        //         return new Views($container);
+        //     }
+        // );
 
-        $container->setShared(
-            'view',
-            function () use ($container) {
-                return $container->getShared('views')->registerPhalconView();
-            }
-        );
+        // $container->setShared(
+        //     'view',
+        //     function () use ($container) {
+        //         return (new View($container))->registerPhalconView();
+        //     }
+        // );
 
         //     $config = $container->get('config');
 

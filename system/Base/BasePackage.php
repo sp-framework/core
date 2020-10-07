@@ -2,83 +2,73 @@
 
 namespace System\Base;
 
-use Doctrine\DBAL\ConnectionException;
-use Doctrine\ORM\Tools\SchemaTool;
-use System\Base\Providers\ContainerServiceProvider\Container;
-use System\Base\Providers\DatabaseServiceProvider\BaseDb;
-use System\Base\Providers\ModulesServiceProvider\Packages\PackagesData;
+use Phalcon\Di\DiInterface;
 
-abstract class BasePackage extends BaseDb
+abstract class BasePackage
 {
-	private $em;
+	protected $container;
 
-	protected $core;
-
-	protected $applications;
-
-	protected $components;
-
-	protected $packages;
-
-	protected $views;
-
-	protected $middlewares;
-
-	protected $packagesData;
-
-	public $mode;
-
-	public function __construct(Container $container)
+	public function __construct(DiInterface $container)
 	{
-		parent::__construct($container->contents->get('em'));
-
-		$this->mode = $container->contents->get('config')->get('base.debug');
-
-		$this->em = $container->contents->get('em');
-
-		$this->core = $container->contents->get('core');
-
-		$this->repositories = $container->contents->get('repositories');
-
-		$this->applications = $container->contents->get('applications');
-
-		$this->components = $container->contents->get('components');
-
-		$this->packages = $container->contents->get('packages');
-
-		$this->middlewares = $container->contents->get('middlewares');
-
-		$this->views = $container->contents->get('views');
-
-		$this->packagesData = $container->contents->get('packages')->getPackagesData();
+		$this->container = $container;
 	}
 
-	public function checkDBConnection()
-	{
-		try {
-			$this->em->getConnection()->ping();
-		} catch (ConnectionException $e) {
-			//
-		}
+	// public function onConstruct()
+	// {
+	// 	$this->setSource($this->source);
 
-		return true;
-	}
+	// 	$this->useDynamicUpdate(true);
 
-	public function getDBTables()
-	{
-		return $this->em->getConnection()->getSchemaManager()->listTableNames();
-	}
+	// }
 
-	public function createNewSchema(array $schema)
-	{
-		$schemaTool = new SchemaTool($this->em);
+	// public static function find($parameters = null)
+	// {
+	// 	$parameters = self::checkCacheParameters($parameters);
 
-		try {
-			$schemaTool->createSchema($schema);
-		} catch (ToolsException $e) {
-			//
-		}
+	// 	return parent::find($parameters);
+	// }
 
-		return true;
-	}
+	// public static function findFirst($parameters = null)
+	// {
+	// 	$parameters = self::checkCacheParameters($parameters);
+
+	// 	return parent::findFirst($parameters);
+	// }
+
+	// protected static function checkCacheParameters($parameters = null)
+	// {
+	// 	if (null !== $parameters) {
+	// 		if (true !== is_array($parameters)) {
+	// 			$parameters = [$parameters];
+	// 		}
+
+	// 		if (true !== isset($parameters['cache'])) {
+	// 			$parameters['cache'] = [
+	// 				'key'      => self::generateCacheKey($parameters),
+	// 				'lifetime' => 300,
+	// 			];
+	// 		}
+	// 	}
+
+	// 	return $parameters;
+	// }
+
+	// protected static function generateCacheKey(array $parameters)
+	// {
+	// 	$uniqueKey = [];
+
+	// 	foreach ($parameters as $key => $value) {
+	// 		if (true === is_scalar($value)) {
+	// 			$uniqueKey[] = $key . ':' . $value;
+	// 		} elseif (true === is_array($value)) {
+	// 			$uniqueKey[] = sprintf(
+	// 				'%s:[%s]',
+	// 				$key,
+	// 				self::generateCacheKey($value)
+	// 			);
+	// 		}
+	// 	}
+
+	// 	return join(',', $uniqueKey);
+	// }
 }

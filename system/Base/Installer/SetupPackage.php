@@ -98,7 +98,7 @@ class SetupPackage
 				new Column(
 					'id',
 					[
-						'type'          => Column::TYPE_INTEGER,
+						'type'          => Column::TYPE_TINYINTEGER,
 						'notNull'       => true,
 						'autoIncrement' => true,
 						'primary'       => true,
@@ -131,7 +131,7 @@ class SetupPackage
 				new Column(
 					'need_auth',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => false,
 					]
@@ -166,7 +166,7 @@ class SetupPackage
 				new Column(
 					'id',
 					[
-						'type'          => Column::TYPE_INTEGER,
+						'type'          => Column::TYPE_TINYINTEGER,
 						'notNull'       => true,
 						'autoIncrement' => true,
 						'primary'       => true,
@@ -215,7 +215,7 @@ class SetupPackage
 				new Column(
 					'installed',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -230,7 +230,7 @@ class SetupPackage
 				new Column(
 					'update_available',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => false,
 					]
@@ -257,7 +257,7 @@ class SetupPackage
 				new Column(
 					'id',
 					[
-						'type'          => Column::TYPE_INTEGER,
+						'type'          => Column::TYPE_TINYINTEGER,
 						'notNull'       => true,
 						'autoIncrement' => true,
 						'primary'       => true,
@@ -336,7 +336,7 @@ class SetupPackage
 				new Column(
 					'installed',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -351,7 +351,7 @@ class SetupPackage
 				new Column(
 					'update_available',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => false,
 					]
@@ -367,7 +367,7 @@ class SetupPackage
 				new Column(
 					'mode',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -386,7 +386,7 @@ class SetupPackage
 				new Column(
 					'id',
 					[
-						'type'          => Column::TYPE_INTEGER,
+						'type'          => Column::TYPE_SMALLINTEGER,
 						'notNull'       => true,
 						'autoIncrement' => true,
 						'primary'       => true,
@@ -464,7 +464,7 @@ class SetupPackage
 				new Column(
 					'installed',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -479,7 +479,7 @@ class SetupPackage
 				new Column(
 					'update_available',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => false,
 					]
@@ -506,7 +506,7 @@ class SetupPackage
 				new Column(
 					'id',
 					[
-						'type'          => Column::TYPE_INTEGER,
+						'type'          => Column::TYPE_SMALLINTEGER,
 						'notNull'       => true,
 						'autoIncrement' => true,
 						'primary'       => true,
@@ -584,7 +584,7 @@ class SetupPackage
 				new Column(
 					'installed',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -599,7 +599,7 @@ class SetupPackage
 				new Column(
 					'update_available',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => false,
 					]
@@ -626,7 +626,7 @@ class SetupPackage
 				new Column(
 					'id',
 					[
-						'type'          => Column::TYPE_INTEGER,
+						'type'          => Column::TYPE_SMALLINTEGER,
 						'notNull'       => true,
 						'autoIncrement' => true,
 						'primary'       => true,
@@ -720,7 +720,7 @@ class SetupPackage
 				new Column(
 					'installed',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -735,7 +735,7 @@ class SetupPackage
 				new Column(
 					'enabled',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -743,7 +743,7 @@ class SetupPackage
 				new Column(
 					'update_available',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => false,
 					]
@@ -770,7 +770,7 @@ class SetupPackage
 				new Column(
 					'id',
 					[
-						'type'          => Column::TYPE_INTEGER,
+						'type'          => Column::TYPE_SMALLINTEGER,
 						'notNull'       => true,
 						'autoIncrement' => true,
 						'primary'       => true,
@@ -840,7 +840,7 @@ class SetupPackage
 				new Column(
 					'installed',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
@@ -855,7 +855,7 @@ class SetupPackage
 				new Column(
 					'update_available',
 					[
-						'type'    => Column::TYPE_INTEGER,
+						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => false,
 					]
@@ -994,7 +994,7 @@ class SetupPackage
 	{
 		$installedFiles = $this->getInstalledFiles('applications/Admin/', false);
 
-		return $this->db->insertAsDict(
+		$insertApplication = $this->db->insertAsDict(
 			'applications',
 			[
 				'name' 					=> $applicationFile['name'],
@@ -1016,11 +1016,12 @@ class SetupPackage
 				'mode'					=> $this->postData['mode'] === 'true' ? 0 : 1
 			]
 		);
-	}
 
-	public function getAdminApplicationDetails()
-	{
-		return $this->db->fetchAll("SELECT * FROM `applications`")[0];
+		if ($insertApplication) {
+			return $this->db->lastInsertId();
+		} else {
+			return null;
+		}
 	}
 
 	protected function registerAdminComponent(array $componentFile, $newApplicationId)
@@ -1161,8 +1162,10 @@ return
 
 		if ($this->postData['mode'] === 'production') {
 			$debug = "false";
+			$cache = "true";
 		} else if ($this->postData['mode'] === 'development') {
 			$debug = "true";
+			$cache = "false";
 		}
 
 		$baseContent =
@@ -1170,7 +1173,9 @@ return
 
 return
 	[
-		"debug"					=> "' . $debug . '" //true - Development false - Production
+		"debug"					=> ' . $debug . ' //true - Development false - Production
+		"cache"					=> ' . $cache . ' //Global Cache value //true - Production false - Development
+		"cacheTimeout"			=> 60 //Global Cache timeout in seconds
 	];';
 
 		$this->container['fileSystem']->put('/system/Configs/Base.php', $baseContent);
