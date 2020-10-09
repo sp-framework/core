@@ -2,11 +2,9 @@
 
 namespace System\Base\Providers;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
-use System\Base\Providers\ConfigServiceProvider\Config;
+use System\Base\Providers\FileSystemServiceProvider\File;
 
 class FileSystemServiceProvider implements ServiceProviderInterface
 {
@@ -15,7 +13,7 @@ class FileSystemServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'fileSystem',
 			function () use ($container) {
-				return new Filesystem(new Local(base_path()));
+				return (new File($container))->init();
 			}
 		);
 	}

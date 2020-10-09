@@ -1,15 +1,15 @@
 <?php
 
-namespace Components\Admin\Modules;
+namespace Applications\Admin\Components\Modules;
 
-use Packages\Admin\Modules;
+use Applications\Admin\Packages\ModulesPackage;
 use System\Base\BaseComponent;
 
-class Module extends BaseComponent
+class ModuleComponent extends BaseComponent
 {
-	public function view()
+	public function viewAction()
 	{
-		$modules = $this->packages->use(Modules::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		$viewModule = $modules->viewModule($this->getData);
 
@@ -18,9 +18,9 @@ class Module extends BaseComponent
 		return $this->generateView();
 	}
 
-	public function install()
+	public function installAction()
 	{
-		$modules = $this->packages->use(Modules::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		$installModule = $modules->installModule($this->postData);
 
@@ -52,9 +52,9 @@ class Module extends BaseComponent
 		}
 	}
 
-	public function update()
+	public function updateAction()
 	{
-		$modules = $this->packages->use(Modules::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		$updateModule = $modules->installModule($this->postData);
 

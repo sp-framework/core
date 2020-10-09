@@ -23,7 +23,7 @@ class Dispatcher
         $this->dispatcher->setDefaultAction('view');
     }
 
-    public function dispatch()
+    public function init()
     {
         return $this->dispatcher;
     }

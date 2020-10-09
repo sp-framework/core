@@ -64,25 +64,25 @@
 	</div>
 </div>
 {% include 'modules/modal.html' %}
-{# {% if flash.has('success') %}
+{% if flashSession.has('success') %}
 	<script type="text/javascript">
 		$(document).ready(function() {
 			PNotify.success({
-				text		: "{{flash.get('success')|raw}}",
+				text		: '{{flashSession.output()}}',
 				textTrusted	: true
 			});
 		});
 	</script>
-{% elseif flash.has('error') %}
+{% elseif flashSession.has('error') %}
 	<script type="text/javascript">
 		$(document).ready(function() {
 			PNotify.error({
-				text		: "{{flash.get('error')|raw}}",
+				text		: '{{flashSession.output()}}',
 				textTrusted	: true
 			});
 		});
 	</script>
-{% endif %} #}
+{% endif %}
 
 <script type="text/javascript">
 	$(document).ready(function() {

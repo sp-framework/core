@@ -13,7 +13,7 @@ class ViewServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'view',
 			function () use ($container) {
-				return (new View($container))->registerPhalconView();
+				return (new View($container))->init();
 			}
 		);
 	}

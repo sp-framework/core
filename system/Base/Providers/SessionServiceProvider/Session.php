@@ -2,41 +2,52 @@
 
 namespace System\Base\Providers\SessionServiceProvider;
 
-use System\Base\Providers\SessionServiceProvider\SessionStore;
+use Phalcon\Di\DiInterface;
+use Phalcon\Session\Adapter\Stream;
+use Phalcon\Session\Manager;
 
-class Session implements SessionStore
+class Session
 {
-    public function get($key, $default = null)
-    {
-        if ($this->exists($key)) {
-            return $_SESSION[$key];
-        }
+    private $container;
 
-        return $default;
+    protected $session;
+
+    public function __construct(DiInterface $container)
+    {
+        $this->container = $container;
     }
 
-    public function set($key, $value = null)
+    public function init()
     {
-        if (is_array($key)) {
-            foreach ($key as $sessionKey => $sessionValue) {
-                $_SESSION[$sessionKey] = $sessionValue;
+        include('../system/Base/Helpers.php');
+
+        $this->session = new Manager();
+
+        if ($this->checkSavePath()) {
+            $savePath = base_path('var/storage/session/');
+        } else {
+            $savePath = 'tmp/';
+        }
+
+        $sessionFiles = new Stream(
+            [
+                'savePath'  => $savePath
+            ]
+        );
+
+        $this->session->setAdapter($sessionFiles);
+
+        return $this->session;
+    }
+
+    protected function checkSavePath()
+    {
+        if (!is_dir(base_path('var/storage/session/'))) {
+            if (!mkdir(base_path('var/storage/session/'), 0777, true)) {
+                return false;
             }
-
-            return;
         }
 
-        $_SESSION[$key] = $value;
-    }
-
-    public function exists($key)
-    {
-        return isset($_SESSION[$key]) && !empty($_SESSION[$key]);
-    }
-
-    public function clear(...$key)
-    {
-        foreach ($key as $sessionKey) {
-            unset($_SESSION[$sessionKey]);
-        }
+        return true;
     }
 }

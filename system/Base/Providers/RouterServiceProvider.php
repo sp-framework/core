@@ -13,7 +13,7 @@ class RouterServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'router',
 			function () use ($container) {
-				return (new Router($container))->setRoute();
+				return (new Router($container))->init();
 			}
 		);
 	}

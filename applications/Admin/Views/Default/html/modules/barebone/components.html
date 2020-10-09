@@ -1,3 +1,4 @@
+{{dump(applications)}}
 <div class="row">
 	<div class="col">
 		<h5 class="card-title">Install Component Barebone Module</h5>
@@ -8,9 +9,9 @@
 			</div>
 			<select class="custom-select" id="component-barebone-application">
 				<option value="0" selected>Select...</option>
-				{% for application in viewsData.applications %}
-					{% if application.name != 'Admin' %}
-						<option value="{{application.id}}" data-url="{{application.url}}">{{application.name}}</option>
+				{% for application in applications %}
+					{% if application['name'] != 'Admin' %}
+						<option value="{{application['id']}}">{{application['name']}}</option>
 					{% endif %}
 				{% endfor %}
 			</select>

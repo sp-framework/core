@@ -7,7 +7,7 @@ use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Di\DiInterface;
 use System\Base\Installer\Setup;
 
-class Db
+class Pdo
 {
 	private $container;
 
@@ -18,7 +18,7 @@ class Db
 		$this->dbConfig = $container->getShared('config')->db;
 	}
 
-	public function getPdo()
+	public function init()
 	{
 		if ($this->checkDbConfig()) {
 			return new Mysql($this->dbConfig->toArray());

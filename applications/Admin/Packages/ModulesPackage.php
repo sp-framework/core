@@ -15,7 +15,7 @@ use System\Base\BasePackage;
 use System\Base\Providers\CoreServiceProvider\Core;
 use System\Base\Providers\ModulesServiceProvider\Repositories;
 
-class Modules extends BasePackage
+class ModulesPackage extends BasePackage
 {
 	protected $repository;
 
@@ -73,9 +73,7 @@ class Modules extends BasePackage
 
 	public function getLocalModules($filter = [], $includeCore = true)
 	{
-		$modulesContainer = $this->modules;
-
-		$this->core = $modulesContainer->core->getCoreInfo();
+		$this->core = $this->modules->core->getCoreInfo();
 
 		if ($includeCore) {
 			$this->localModules['core'][$this->core[0]['id']] = $this->core[0];
@@ -91,19 +89,19 @@ class Modules extends BasePackage
 		}
 
 		$this->applications =
-			$modulesContainer->applications->applications;
+			$this->modules->applications->applications;
 
 		$this->components =
-			$modulesContainer->components->components;
+			$this->modules->components->components;
 
 		$this->packages =
-			$modulesContainer->packages->packages;
+			$this->modules->packages->packages;
 
 		$this->middlewares =
-			$modulesContainer->middlewares->middlewares;
+			$this->modules->middlewares->middlewares;
 
 		$this->views =
-			$modulesContainer->views->views;
+			$this->modules->views->views;
 
 
 		// var_dump($filter);
@@ -179,69 +177,6 @@ class Modules extends BasePackage
 			return $this->packagesData;
 		}
 	}
-
-	// public function getFilteredData($filter, $includeCore = true)
-	// {
-	// 	if ($includeCore) {
-	// 		if (count($this->container->getShared('core')) > 0) {
-	// 			foreach ($this->container->getShared('core') as $componentKey => $component) {
-	// 				$this->localModules['core'][$component['id']] = $component;
-	// 				$this->localModules['core'][$component['id']]['settings']
-	// 					= unserialize($component['settings']);
-	// 				$this->localModules['core'][$component['id']]['dependencies']
-	// 					// = unserialize($this->localModules['components'][$component['id']]['dependencies']);
-	// 					= unserialize($component['dependencies']);
-	// 			}
-	// 		} else {
-	// 			$this->localModules['components'] = [];
-	// 		}
-	// 	}
-
-	// 	if (count($this->components) > 0) {
-	// 		foreach ($this->components as $componentKey => $component) {
-	// 			$this->localModules['components'][$component['id']] = $component;
-	// 			$this->localModules['components'][$component['id']]['settings']
-	// 				= unserialize($component['settings']);
-	// 			$this->localModules['components'][$component['id']]['dependencies']
-	// 				// = unserialize($this->localModules['components'][$component['id']]['dependencies']);
-	// 				= unserialize($component['dependencies']);
-	// 		}
-	// 	} else {
-	// 		$this->localModules['components'] = [];
-	// 	}
-
-	// 	if (count($this->packages) > 0) {
-	// 		foreach ($this->packages as $packageKey => $package) {
-	// 			$this->localModules['packages'][$package['id']] = $package;
-	// 			$this->localModules['packages'][$package['id']]['settings']
-	// 				= unserialize($package['settings']);
-	// 			$this->localModules['packages'][$package['id']]['dependencies']
-	// 				// = unserialize($this->localModules['packages'][$package['id']]['dependencies']);
-	// 				= unserialize($package['dependencies']);
-	// 		}
-	// 	} else {
-	// 		$this->localModules['packages'] = [];
-	// 	}
-
-	// 	if (count($this->views) > 0) {
-	// 		foreach ($this->views as $viewKey => $view) {
-	// 			$this->localModules['views'][$view['id']] = $view;
-	// 			$this->localModules['views'][$view['id']]['settings']
-	// 				= unserialize($view['settings']);
-	// 			$this->localModules['views'][$view['id']]['dependencies']
-	// 				// = unserialize($this->localModules['views'][$view['id']]['dependencies']);
-	// 				= unserialize($view['dependencies']);
-	// 		}
-	// 	} else {
-	// 		$this->localModules['views'] = [];
-	// 	}
-
-	// 	$this->packagesData->responseCode = 0;
-
-	// 	$this->packagesData->modulesData = $this->localModules;
-
-	// 	return $this->packagesData;
-	// }
 
 	protected function getRemoteModules()
 	{
@@ -428,151 +363,6 @@ class Modules extends BasePackage
 
 		return $this->packagesData;
 	}
-
-	// protected function compareInstalledWithRemote()
-	// {
-	// 	foreach ($this->localModules as $installedPackageKey => $installedPackage) {
-	// 		if ($installedPackageKey === 'core') {
-	// 			foreach ($installedPackage as $coreKey => $core) {
-	// 				foreach ($this->modulesData[$installedPackageKey] as $repoCoreKey => $repoCore) {
-	// 					if ($repoCore) {
-	// 						if ($core['name'] === $repoCore['name'] &&
-	// 							$core['repo'] === $repoCore['repo']
-	// 						) {
-	// 							$this->modulesData[$installedPackageKey][$repoCoreKey]['installed'] = true;
-	// 							$this->modulesData[$installedPackageKey][$repoCoreKey]['installed_id']
-	// 								= $core['id'];
-
-	// 							if ($core['version'] !== $repoCore['version']) {
-	// 								$this->modulesData[$installedPackageKey][$repoCoreKey]['update'] = true;
-	// 								$this->modulesData[$installedPackageKey][$repoCoreKey]['installed_version']
-	// 									= $core['version'];
-	// 							} else {
-	// 								$this->modulesData[$installedPackageKey][$repoCoreKey]['update'] = false;
-	// 							}
-	// 						} else {
-	// 							$this->modulesData[$installedPackageKey][$repoCoreKey]['installed'] = false;
-	// 						}
-	// 					} else {
-	// 						$this->modulesData[$installedPackageKey][$repoCoreKey]['error'] = true;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-
-	// 		if ($installedPackageKey === 'applications') {
-	// 			foreach ($installedPackage as $applicationKey => $application) {
-	// 				foreach ($this->modulesData[$installedPackageKey] as $repoApplicationKey => $repoApplication) {
-	// 					if ($repoApplication) {
-	// 						if ($application['name'] === $repoApplication['name'] &&
-	// 							$application['repo'] === $repoApplication['repo']
-	// 						) {
-	// 							$this->modulesData[$installedPackageKey][$repoApplicationKey]['installed'] = true;
-	// 							$this->modulesData[$installedPackageKey][$repoApplicationKey]['installed_id']
-	// 								= $application['id'];
-
-	// 							if ($application['version'] !== $repoApplication['version']) {
-	// 								$this->modulesData[$installedPackageKey][$repoApplicationKey]['update'] = true;
-	// 								$this->modulesData[$installedPackageKey][$repoApplicationKey]['installed_version']
-	// 									= $application['version'];
-	// 							} else {
-	// 								$this->modulesData[$installedPackageKey][$repoApplicationKey]['update'] = false;
-	// 							}
-	// 						} else {
-	// 							$this->modulesData[$installedPackageKey][$repoApplicationKey]['installed'] = false;
-	// 						}
-	// 					} else {
-	// 						$this->modulesData[$installedPackageKey][$repoApplicationKey]['error'] = true;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-
-	// 		if ($installedPackageKey === 'components') {
-	// 			foreach ($installedPackage as $componentKey => $component) {
-	// 				foreach ($this->modulesData[$installedPackageKey] as $repoComponentKey => $repoComponent) {
-	// 					if ($repoComponent) {
-	// 						if ($component['name'] === $repoComponent['name'] &&
-	// 							$component['repo'] === $repoComponent['repo']
-	// 						) {
-	// 							$this->modulesData[$installedPackageKey][$repoComponentKey]['installed'] = true;
-	// 							$this->modulesData[$installedPackageKey][$repoComponentKey]['installed_id']
-	// 								= $component['id'];
-
-	// 							if ($component['version'] !== $repoComponent['version']) {
-	// 								$this->modulesData[$installedPackageKey][$repoComponentKey]['update'] = true;
-	// 								$this->modulesData[$installedPackageKey][$repoComponentKey]['installed_version']
-	// 									= $component['version'];
-	// 							} else {
-	// 								$this->modulesData[$installedPackageKey][$repoComponentKey]['update'] = false;
-	// 							}
-	// 						} else {
-	// 							$this->modulesData[$installedPackageKey][$repoComponentKey]['installed'] = false;
-	// 						}
-	// 					} else {
-	// 							$this->modulesData[$installedPackageKey][$repoComponentKey]['error'] = true;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-
-	// 		if ($installedPackageKey === 'packages') {
-	// 			foreach ($installedPackage as $packageKey => $package) {
-	// 				foreach ($this->modulesData[$installedPackageKey] as $repoPackageKey => $repoPackage) {
-	// 					if ($repoPackage) {
-	// 						if ($package['name'] === $repoPackage['name'] &&
-	// 							$package['repo'] === $repoPackage['repo']
-	// 						) {
-	// 							$this->modulesData[$installedPackageKey][$repoPackageKey]['installed'] = true;
-	// 							$this->modulesData[$installedPackageKey][$repoPackageKey]['installed_id']
-	// 								= $package['id'];
-
-	// 							if ($package['version'] !== $repoPackage['version']) {
-	// 								$this->modulesData[$installedPackageKey][$repoPackageKey]['update'] = true;
-	// 								$this->modulesData[$installedPackageKey][$repoPackageKey]['installed_version']
-	// 									= $package['version'];
-	// 							} else {
-	// 								$this->modulesData[$installedPackageKey][$repoPackageKey]['update'] = false;
-	// 							}
-	// 						} else {
-	// 							$this->modulesData[$installedPackageKey][$repoPackageKey]['installed'] = false;
-	// 						}
-	// 					} else {
-	// 						$this->modulesData[$installedPackageKey][$repoPackageKey]['error'] = true;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-
-	// 		if ($installedPackageKey === 'views') {
-	// 			foreach ($installedPackage as $viewKey => $view) {
-	// 				foreach ($this->modulesData[$installedPackageKey] as $repoViewKey => $repoView) {
-	// 					if ($repoView) {
-	// 						if ($view['name'] === $repoView['name'] &&
-	// 							$view['repo'] === $repoView['repo']
-	// 						) {
-	// 							$this->modulesData[$installedPackageKey][$repoViewKey]['installed'] = true;
-	// 							$this->modulesData[$installedPackageKey][$repoViewKey]['installed_id']
-	// 								= $view['id'];
-
-	// 							if ($view['version'] !== $repoView['version']) {
-	// 								$this->modulesData[$installedPackageKey][$repoViewKey]['update'] = true;
-	// 								$this->modulesData[$installedPackageKey][$repoViewKey]['installed_version']
-	// 									= $view['version'];
-	// 							} else {
-	// 								$this->modulesData[$installedPackageKey][$repoViewKey]['update'] = false;
-	// 							}
-	// 						} else {
-	// 							$this->modulesData[$installedPackageKey][$repoViewKey]['installed'] = false;
-	// 						}
-	// 					} else {
-	// 						$this->modulesData[$installedPackageKey][$repoViewKey]['error'] = true;
-	// 					}
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 
 	protected function findRemoteInLocal($remoteModules, $localModules)
 	{

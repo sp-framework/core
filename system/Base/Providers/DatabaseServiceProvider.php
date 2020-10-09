@@ -4,7 +4,7 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
-use System\Base\Providers\DatabaseServiceProvider\Db;
+use System\Base\Providers\DatabaseServiceProvider\Pdo;
 
 class DatabaseServiceProvider implements ServiceProviderInterface
 {
@@ -13,7 +13,7 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'db',
 			function () use ($container) {
-				return (new Db($container))->getPdo();
+				return (new Pdo($container))->init();
 			}
 		);
 	}

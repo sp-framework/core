@@ -1,15 +1,15 @@
 <?php
 
-namespace Components\Admin\Modules\Repositories;
+namespace Applications\Admin\Components\Modules\Repositories;
 
-use Packages\Admin\Modules;
+use Applications\Admin\Packages\ModulesPackage;
 use System\Base\BaseComponent;
 
-class Sync extends BaseComponent
+class SyncComponent extends BaseComponent
 {
 	public function view()
 	{
-		$modules = $this->packages->use(Modules::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		if (isset($this->getData['repoId'])) {
 
@@ -24,7 +24,7 @@ class Sync extends BaseComponent
 
 				$this->viewsData->responseMessage = $synced->packagesData['responseMessage'];
 
-				$this->viewFile = 'Admin/Default/html/modules/modules.html';
+				$this->viewFile = 'modules/modules.html';
 
 				return $this->generateView();
 			}
@@ -39,7 +39,7 @@ class Sync extends BaseComponent
 
 				$this->viewsData->thisApplication = $this->applicationInfo;
 
-				$this->viewFile = 'Admin/Default/html/modules/modules.html';
+				$this->viewFile = 'modules/modules.html';
 
 				return $this->generateView();
 			} else if ($modulesData->packagesData['responseCode'] === 1) {
@@ -48,7 +48,7 @@ class Sync extends BaseComponent
 
 				$this->viewsData->responseMessage = $modulesData->packagesData['responseMessage'];
 
-				$this->viewFile = 'Admin/Default/html/modules/modules.html';
+				$this->viewFile = 'modules/modules.html';
 
 				return $this->generateView();
 			}

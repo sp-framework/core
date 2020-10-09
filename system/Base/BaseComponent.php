@@ -88,12 +88,11 @@ abstract class BaseComponent extends Controller
 	protected function onConstruct()
 	{
 		if (!$this->isJson()) {
-
 			$this->checkLayout();
 		}
 	}
 
-	protected function afterExecuteRoute($dispatcher)
+	protected function afterExecuteRoute()
 	{
 		if ($this->isJson()) {
 
@@ -107,7 +106,23 @@ abstract class BaseComponent extends Controller
 
 				return $this->response->send();
 			}
+		} else {
+			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+			var_dump($this->view->getViewsDir());
 		}
+	}
+
+	protected function getURI()
+	{
+		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+
+		$firstKey = Arr::firstKey($url);
+		$lastKey = Arr::lastKey($url);
+
+		unset($url[$firstKey]);
+		unset($url[$lastKey]);
+
+		return join($url, '/');
 	}
 
 	protected function isJson()

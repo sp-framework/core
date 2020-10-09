@@ -2,20 +2,21 @@
 
 namespace System\Base\Providers;
 
+use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
+use System\Base\Providers\SessionServiceProvider\Session;
 
-class SessionServiceProvider extends ServiceProviderInterface
+class SessionServiceProvider implements ServiceProviderInterface
 {
-    public function register(DiInterface $container) : void
-    {
-        $container->share(SessionStore::class, function () {
-            return new Session();
-        });
+	public function register(DiInterface $container) : void
+	{
+		include('../system/Base/Providers/SessionServiceProvider/Session.php');
 
-        $container->share(Flash::class, function () use ($container) {
-            return new Flash(
-                $container->get(SessionStore::class)
-            );
-        });
-    }
+		$container->setShared(
+			'session',
+			function () use ($container) {
+				return (new Session($container))->init();
+			}
+		);
+	}
 }

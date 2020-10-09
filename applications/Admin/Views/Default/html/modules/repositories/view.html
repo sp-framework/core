@@ -90,13 +90,13 @@
 	$('#add-repo, #edit-repo').click(function () {
 		if ($(this)[0].id === 'add-repo') {
 
-			$.get('/{{route}}/modules/repositories/add', 'task=manage&layout=false', function(data) {
+			$.get('/{{route}}/modules/repositories/add/q/layout/0', function(data) {
 				$('#modal-title').html('Add New Repository');
 				$('#modal .modal-body').empty().html(data);
 				$('#modal').modal('show');
 			});
 		} else if ($(this)[0].id === 'edit-repo') {
-			$.get('/{{route}}/modules/repositories/edit', 'task=manage&layout=false&id=' + $('#select-repo option:selected').val(), function(data) {
+			$.get('/{{route}}/modules/repositories/edit/q/layout/0/id/'+ $('#select-repo option:selected').val(), function(data) {
 				$('#modal-title').html('Edit Repository');
 				$('#modal .modal-body').empty().html(data);
 				$('#modal').modal('show');

@@ -18,6 +18,17 @@ class Repositories extends BasePackage
 		return $this;
 	}
 
+	public function add(array $data)
+	{
+		if ($data) {
+			$repository = new RepositoriesModel();
+
+			return $repository->add($data);
+			//We need to add first
+			//Clear cache
+			//Renew cache
+		}
+	}
 	// public function remove($id)
 	// {
 	// 	if ($id !== '1') {

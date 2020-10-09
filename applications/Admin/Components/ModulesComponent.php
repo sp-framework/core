@@ -2,7 +2,7 @@
 
 namespace Applications\Admin\Components;
 
-use Applications\Admin\Packages\Modules as ModulesPackage;
+use Applications\Admin\Packages\ModulesPackage;
 use System\Base\BaseComponent;
 
 class ModulesComponent extends BaseComponent
@@ -45,7 +45,7 @@ class ModulesComponent extends BaseComponent
 		if ($modulesData->packagesData['responseCode'] === 0) {
 
 			if (isset($this->getData()['filter'])) { //Filtering
-				$this->viewFile = 'Admin/Default/html/modules/modules.html';
+				$this->viewFile = 'modules/modules.html';
 			}
 
 			$this->view->responseCode = 0;
@@ -69,8 +69,6 @@ class ModulesComponent extends BaseComponent
 			$this->view->responseCode = 1;
 
 			$this->view->responseMessage = $modulesData->packagesData['responseMessage'];
-
-			return $this->generateView();
 		}
 	}
 }

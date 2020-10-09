@@ -1,15 +1,15 @@
 <?php
 
-namespace Components\Admin\Modules\Repositories;
+namespace Applications\Admin\Components\Modules\Repositories;
 
-use Packages\Admin\Modules;
+use Applications\Admin\Packages\ModulesPackage;
 use System\Base\BaseComponent;
 
-class Delete extends BaseComponent
+class DeleteComponent extends BaseComponent
 {
-	public function Remove()
+	public function removeAction()
 	{
-		$modules = $this->packages->use(Modules::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		if ($modules->deleteRepository($this->postData['id'])) {
 

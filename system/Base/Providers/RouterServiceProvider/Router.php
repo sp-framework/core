@@ -32,6 +32,8 @@ class Router
 
 	protected $loopCount;
 
+	protected $uri;
+
 	public function __construct(DiInterface $container)
 	{
 		$this->container = $container;
@@ -47,37 +49,35 @@ class Router
 		$this->router->removeExtraSlashes(true);
 	}
 
-	public function setRoute()
+	public function init()
 	{
 		$this->setApplicationInfo();
 
 		$this->defaultNamespace =
 			'Applications\\' . ucfirst($this->applicationDefaults['application']) . '\\Components';
 
-		$uri = explode('/q/', trim($this->requestUri, '/'));
-
-		$this->getQuery = $uri[1] ?? null;
+		$this->getURI();
 
 		if ($this->applicationInfo && $this->applicationDefaults) {
 			if ($this->applicationInfo['name'] !== $this->applicationDefaults['application']) {
-				if ($uri[0] !== '' &&
-					$uri[0] !== strtolower($this->applicationInfo['name']) &&
-					$uri[0] !== strtolower($this->applicationInfo['route'])
+				if ($this->uri !== '' &&
+					$this->uri !== strtolower($this->applicationInfo['name']) &&
+					$this->uri !== strtolower($this->applicationInfo['route'])
 				) {
 
-					$this->registerRoute($uri[0]);
+					$this->registerRoute($this->uri);
 				}
 			} else {
-				if ($uri[0] !== '' &&
-					$uri[0] !== strtolower($this->applicationDefaults['application']) &&
-					$uri[0] !== strtolower($this->applicationInfo['route'])
+				if ($this->uri !== '' &&
+					$this->uri !== strtolower($this->applicationDefaults['application']) &&
+					$this->uri !== strtolower($this->applicationInfo['route'])
 				) {
 
-					$this->registerRoute($uri[0]);
+					$this->registerRoute($this->uri);
 
-				} else if ($uri[0] === '' ||
-						   $uri[0] === strtolower($this->applicationDefaults['application']) ||
-						   $uri[0] === strtolower($this->applicationInfo['route'])
+				} else if ($this->uri === '' ||
+						   $this->uri === strtolower($this->applicationDefaults['application']) ||
+						   $this->uri === strtolower($this->applicationInfo['route'])
 				) {
 					$this->registerHome();
 				}
@@ -176,5 +176,18 @@ class Router
 					$this->applications->getApplicationDefaults($this->applicationInfo['name']);
 			}
 		}
+	}
+
+	protected function getURI()
+	{
+		if (!$this->uri) {
+			$uri = explode('/q/', trim($this->requestUri, '/'));
+
+			$this->uri = $uri[0];
+
+			$this->getQuery = $uri[1] ?? null;
+		}
+
+		return $this->uri;
 	}
 }

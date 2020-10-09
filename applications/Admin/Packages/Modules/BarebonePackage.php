@@ -7,7 +7,7 @@ use League\Flysystem\Filesystem;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Model\Applications;
 
-class Barebone extends BasePackage
+class BarebonePackage extends BasePackage
 {
 	protected $postData;
 

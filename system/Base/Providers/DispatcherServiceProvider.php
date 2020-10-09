@@ -13,7 +13,7 @@ class DispatcherServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'dispatcher',
 			function () use ($container) {
-				return (new Dispatcher($container))->dispatch();
+				return (new Dispatcher($container))->init();
 			}
 		);
 	}

@@ -97,4 +97,11 @@ abstract class BaseModel extends Model
 
 		return join(',', $uniqueKey);
 	}
+
+	public function add(array $data)
+	{
+		$this->assign($data);
+
+		return $this->create();
+	}
 }

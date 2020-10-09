@@ -36,13 +36,19 @@ class View
 		$this->registerVoltTemplateService();
 	}
 
-	public function registerPhalconView()
+	public function init()
 	{
 		$this->phalconView = new PhalconView();
 
-		$this->phalconView->setViewsDir(
-			$this->container->getShared('modules')->views->init()->getPhalconViewPath()
-		);
+		$views = $this->container->getShared('modules')->views->init();
+
+		$this->phalconView->setViewsDir($views->getPhalconViewPath());
+
+		$this->phalconView->setLayoutsDir($views->getPhalconViewLayoutPath());
+
+		$this->phalconView->setMainView('view');
+
+		$this->phalconView->setLayout($views->getPhalconViewLayoutFile());
 
 		$this->phalconView->registerEngines(
 			[

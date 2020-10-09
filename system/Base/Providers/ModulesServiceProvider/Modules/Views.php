@@ -20,6 +20,10 @@ class Views extends BasePackage
 
     protected $phalconViewPath;
 
+    protected $phalconViewLayoutPath;
+
+    protected $phalconViewLayoutFile;
+
     protected $cache;
 
     public function init()
@@ -31,6 +35,10 @@ class Views extends BasePackage
         $this->setVoltCompiledPath();
 
         $this->setPhalconViewPath();
+
+        $this->setPhalconViewLayoutPath();
+
+        $this->setPhalconViewLayoutFile();
 
         return $this;
     }
@@ -64,6 +72,24 @@ class Views extends BasePackage
         }
     }
 
+    protected function setPhalconViewLayoutPath()
+    {
+        if (!isset($this->phalconViewLayoutPath)) {
+            $this->phalconViewLayoutPath =
+                base_path('applications/' . $this->applicationInfo['name'] .
+                          '/Views/' . $this->view['name'] .
+                          '/html/layouts/');
+        }
+    }
+
+    protected function setPhalconViewLayoutFile()
+    {
+        if (!isset($this->phalconViewLayoutFile)) {
+            $this->phalconViewLayoutFile =
+                json_decode($this->view['settings'], true)['layout'];
+        }
+    }
+
     public function getVoltCompiledPath()
     {
         return $this->voltCompiledPath;
@@ -72,6 +98,16 @@ class Views extends BasePackage
     public function getPhalconViewPath()
     {
         return $this->phalconViewPath;
+    }
+
+    public function getPhalconViewLayoutPath()
+    {
+        return $this->phalconViewLayoutPath;
+    }
+
+    public function getPhalconViewLayoutFile()
+    {
+        return $this->phalconViewLayoutFile;
     }
 
     public function getCache()

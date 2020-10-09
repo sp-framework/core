@@ -1,15 +1,15 @@
 <?php
 
-namespace Components\Admin\Modules\Module;
+namespace Applications\Admin\Components\Modules\Module;
 
-use Packages\Admin\Modules;
+use Applications\Admin\Packages\ModulesPackage;
 use System\Base\BaseComponent;
 
-class Settings extends BaseComponent
+class SettingsComponent extends BaseComponent
 {
-	public function view()
+	public function viewAction()
 	{
-		$modules = $this->packages->use(Modules::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		$settingsModule = $modules->getModuleSettings($this->getData);
 
@@ -75,9 +75,9 @@ class Settings extends BaseComponent
 		return $this->generateView();
 	}
 
-	public function edit()
+	public function editAction()
 	{
-		$modules = $this->packages->use(Modules::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		$settingsModule = $modules->updateModuleSettings($this->postData);
 
