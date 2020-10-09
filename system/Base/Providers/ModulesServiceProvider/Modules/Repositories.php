@@ -7,7 +7,7 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Model\Repositories as R
 
 class Repositories extends BasePackage
 {
-	protected $repositories;
+	public $repositories;
 
 	public function getAllRepositories($conditions = null)
 	{

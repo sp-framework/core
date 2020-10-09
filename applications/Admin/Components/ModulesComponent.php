@@ -9,7 +9,7 @@ class ModulesComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$modules = $this->modules->packages->usePackage(ModulesPackage::class);
+		$modules = $this->usePackage(ModulesPackage::class);
 
 		if (isset($this->getData()['filter']) && $this->getData()['filter'] !== '0') { //Filtering
 			if ($this->getData()['filter'] !== 'installed' && $this->getData()['filter'] !== 'update_available') {

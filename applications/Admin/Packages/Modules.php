@@ -60,23 +60,20 @@ class Modules extends BasePackage
 		$this->packagesData->modulesData = $this->localModules;
 
 		$this->packagesData->repositories =
-			$this->container->getShared('modules')
-				->repositories->repositories;
+			$this->modules->repositories->repositories;
 
 		$this->packagesData->applications =
-			$this->container->getShared('modules')
-				->applications->applications;
+			$this->modules->applications->applications;
 
 		$this->packagesData->applicationInfo =
-			$this->container->getShared('modules')
-				->applications->getApplicationInfo();
+			$this->modules->applications->getApplicationInfo();
 
 		return $this->packagesData;
 	}
 
 	public function getLocalModules($filter = [], $includeCore = true)
 	{
-		$modulesContainer = $this->container->getShared('modules');
+		$modulesContainer = $this->modules;
 
 		$this->core = $modulesContainer->core->getCoreInfo();
 

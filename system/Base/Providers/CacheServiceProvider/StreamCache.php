@@ -8,7 +8,7 @@ use Phalcon\Config\Adapter\Json;
 use Phalcon\Di\DiInterface;
 use Phalcon\Storage\SerializerFactory;
 
-class ModulesCache
+class StreamCache
 {
     private $container;
 
@@ -36,7 +36,7 @@ class ModulesCache
             $cacheOptions = [
                 'adapter'   => 'stream',
                 'options'   => [
-                    'prefix'            => 'modules',
+                    'prefix'            => 'sp',
                     'storageDir'        => base_path('var/storage/cache/')
                 ],
             ];

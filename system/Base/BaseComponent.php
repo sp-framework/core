@@ -224,6 +224,33 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	protected function usePackage($packageClass)
+	{
+		$this->application = $this->modules->applications->getApplicationInfo();
+
+		if ($this->checkPackage($packageClass)) {
+			return new $packageClass($this->container);
+		} else {
+			throw new \Exception(
+				'Package class : ' . $packageClass .
+				' not available for application ' . $this->application['name']
+			);
+		}
+	}
+
+	protected function checkPackage($packageClass)
+	{
+		$packageName = Arr::last(explode('\\', $packageClass));
+
+		$packageApplicationId =
+			$this->modules->packages->packages[array_search($packageName, array_column($this->modules->packages->packages, 'name'))]['application_id'];
+
+		if ($packageApplicationId === $this->application['id']) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
 	protected function generateView()
 	{

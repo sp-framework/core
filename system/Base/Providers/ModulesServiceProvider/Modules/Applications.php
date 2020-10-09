@@ -7,7 +7,7 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Model\Applications as A
 
 class Applications extends BasePackage
 {
-	protected $applications;
+	public $applications;
 
 	protected $applicationInfo = null;
 
@@ -28,7 +28,7 @@ class Applications extends BasePackage
 
 	protected function getApplicationName()
 	{
-		$uri = $this->container->getShared('request')->getURI();
+		$uri = $this->request->getURI();
 
 		$uri = explode('?', $uri);
 
@@ -123,7 +123,13 @@ class Applications extends BasePackage
 	public function getAllApplications($conditions = null)
 	{
 		if (!$this->applications) {
-			$this->applications = ApplicationsModel::find($conditions, 'applications')->toArray();
+			$this->applications =
+				ApplicationsModel::find(
+					$conditions,
+					'applications',
+					true,
+					$this->config
+				)->toArray();
 		}
 
 		return $this;

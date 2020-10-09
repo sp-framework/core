@@ -7,7 +7,7 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Model\Middlewares as Mi
 
 class Middlewares extends BasePackage
 {
-	protected $middlewares;
+	public $middlewares;
 
 	public function getAllMiddlewares($conditions = null)
 	{

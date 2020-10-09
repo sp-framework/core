@@ -7,7 +7,7 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Model\Components as Com
 
 class Components extends BasePackage
 {
-	protected $components;
+	public $components;
 
 	public function getAllComponents($conditions = null)
 	{

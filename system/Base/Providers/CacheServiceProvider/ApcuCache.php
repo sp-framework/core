@@ -7,7 +7,7 @@ use Phalcon\Cache\AdapterFactory;
 use Phalcon\Cache\CacheFactory;
 use Phalcon\Di\DiInterface;
 
-class ModelsCache
+class ApcuCache
 {
     private $container;
 
@@ -37,7 +37,7 @@ class ModelsCache
             $cacheOptions = [
                 'adapter' => 'apcu',
                 'options' => [
-                    'prefix' => 'modules-',
+                    'prefix' => 'sp-',
                 ],
             ];
 

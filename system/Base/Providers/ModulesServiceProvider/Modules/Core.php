@@ -8,7 +8,7 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Model\Core as CoreModel
 
 class Core extends BasePackage
 {
-	protected $core;
+	public $core;
 
 	public function getCoreInfo()
 	{

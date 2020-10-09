@@ -8,7 +8,7 @@ use System\Base\Providers\ModulesServiceProvider\Views\ViewsData;
 
 class Views extends BasePackage
 {
-    protected $views;
+    public $views;
 
     protected $view;
 
@@ -24,7 +24,7 @@ class Views extends BasePackage
 
     public function init()
     {
-        $this->applications = $this->container->getShared('modules')->applications;
+        $this->applications = $this->modules->applications;
 
         $this->setApplicationInfo();
 

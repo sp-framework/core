@@ -3,27 +3,53 @@
 namespace System\Base;
 
 use Phalcon\Di\DiInterface;
+use Phalcon\Mvc\Controller;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
-abstract class BasePackage
+abstract class BasePackage extends Controller
 {
 	protected $container;
 
 	protected $packagesData = [];
 
-	public function __construct(DiInterface $container)
+	public function onConstruct()
 	{
-		$this->container = $container;
-
 		$this->packagesData = new PackagesData;
 	}
 
-	public function __get($name)
+	protected function usePackage($packageClass)
 	{
-		if (isset($this->{$name})) {
-			return $this->{$name};
+		$this->application = $this->modules->applications->getApplicationInfo();
+
+		if ($this->checkPackage($packageClass)) {
+			return new $packageClass($this->container);
+		} else {
+			throw new \Exception(
+				'Package class : ' . $packageClass .
+				' not available for application ' . $this->application['name']
+			);
 		}
 	}
+
+	protected function checkPackage($packageClass)
+	{
+		$packageName = Arr::last(explode('\\', $packageClass));
+
+		$packageApplicationId =
+			$this->packages[array_search($packageName, array_column($this->packages, 'name'))]['application_id'];
+
+		if ($packageApplicationId === $this->application['id']) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	// public function __get($name)
+	// {
+	// 	if (isset($this->{$name})) {
+	// 		return $this->{$name};
+	// 	}
+	// }
 	// public function onConstruct()
 	// {
 	// 	$this->setSource($this->source);

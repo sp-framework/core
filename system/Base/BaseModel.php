@@ -15,26 +15,39 @@ abstract class BaseModel extends Model
 
 	}
 
-	public static function find($parameters = null, $customCacheKey = null, $cacheEnabled = true) : ResultsetInterface
+	public static function find(
+		$parameters = null,
+		$customCacheKey = null,
+		$cacheEnabled = true,
+		$config = null
+	) : ResultsetInterface
 	{
 		if ($cacheEnabled) {
-			$parameters = self::checkCacheParameters($parameters, $customCacheKey);
+			$parameters = self::checkCacheParameters($parameters, $customCacheKey, $config);
 		}
 
 		return parent::find($parameters);
 	}
 
-	public static function findFirst($parameters = null, $customCacheKey = null, $cacheEnabled = true) : ResultsetInterface
+	public static function findFirst(
+		$parameters = null,
+		$customCacheKey = null,
+		$cacheEnabled = true,
+		$config = null
+	) : ResultsetInterface
 	{
 		if ($cacheEnabled) {
-			$parameters = self::checkCacheParameters($parameters, $customCacheKey);
+			$parameters = self::checkCacheParameters($parameters, $customCacheKey, $config);
 		}
 
 		return parent::findFirst($parameters);
 	}
 
-	protected static function checkCacheParameters($parameters = null, $customCacheKey = null)
-	{
+	protected static function checkCacheParameters(
+		$parameters = null,
+		$customCacheKey = null,
+		$config = null
+	) {
 		if ($parameters) {
 			$cacheName = clone $parameters;
 		} else if ($customCacheKey) {
@@ -47,11 +60,19 @@ abstract class BaseModel extends Model
 			$cacheName = [$cacheName];
 		}
 
+		if ($config && ($config->cacheTimeout && $config->cacheService)) {
+			$cacheTimeout = $config->cacheTimeout;
+			$cacheService = $config->cacheService;
+		} else {
+			$cacheTimeout = 60;// Default seconds
+			$cacheService = 'streamCache';
+		}
+
 		if (!isset($parameters['cache'])) {
 			$parameters['cache'] = [
 				'key'      	=> self::generateCacheKey($cacheName),
-				'lifetime' 	=> 60,
-				'service' 	=> 'modulesCache',
+				'lifetime' 	=> $cacheTimeout,
+				'service' 	=> $cacheService,
 			];
 		}
 

@@ -14,7 +14,7 @@ class Packages extends BasePackage
 
 	// protected $application;
 
-	protected $packages;
+	public $packages;
 
 	// protected $db;
 
@@ -28,34 +28,6 @@ class Packages extends BasePackage
 
 	// 	$this->packages = $this->getAllPackages();
 	// }
-
-	public function usePackage($packageClass)
-	{
-		$this->application = $this->container->getShared('modules')->applications->getApplicationInfo();
-
-		if ($this->checkPackage($packageClass)) {
-			return new $packageClass($this->container);
-		} else {
-			throw new \Exception(
-				'Package class : ' . $packageClass .
-				' not available for application ' . $this->application['name']
-			);
-		}
-	}
-
-	protected function checkPackage($packageClass)
-	{
-		$packageName = Arr::last(explode('\\', $packageClass));
-
-		$packageApplicationId =
-			$this->packages[array_search($packageName, array_column($this->packages, 'name'))]['application_id'];
-
-		if ($packageApplicationId === $this->application['id']) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 	public function getAllPackages($conditions = null)
 	{
