@@ -81,7 +81,6 @@ abstract class BaseModel extends Model
 
 	protected static function generateCacheKey($cacheName)
 	{
-
 		$uniqueKey = [];
 
 		foreach ($cacheName as $key => $value) {
