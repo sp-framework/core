@@ -79,7 +79,7 @@ class Repositories extends BasePackage implements BasePackageInterface
 
 			$create = $repository->create();
 
-			$this->resetCacheKey($this->extractCacheKey());
+			$this->resetCacheKey();
 
 			if ($this->cacheKey) {
 				$this->cacheTools->deleteCache($this->cacheKey);
@@ -116,6 +116,8 @@ class Repositories extends BasePackage implements BasePackageInterface
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = 'Repository Updated!';
+
+				return true;
 			}
 		} catch (\Exception $e) {
 			throw $e;
@@ -146,13 +148,4 @@ class Repositories extends BasePackage implements BasePackageInterface
 			$this->packagesData->responseMessage = 'No Record Found with that ID!';
 		}
 	}
-
-	// public function remove($id)
-	// {
-	// 	if ($id !== '1') {
-	// 		return $this->db->deleteFromDbById(RepositoriesModel::class, $id);
-	// 	} else {
-	// 		return false;
-	// 	}
-	// }
 }

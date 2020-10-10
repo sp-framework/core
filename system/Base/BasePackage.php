@@ -15,7 +15,7 @@ abstract class BasePackage extends Controller
 		$this->packagesData = new PackagesData;
 
 		if (!$this->cacheKey) {
-			$this->resetCacheKey($this->extractCacheKey());
+			$this->resetCacheKey();
 		}
 	}
 
@@ -34,11 +34,11 @@ abstract class BasePackage extends Controller
 		return strtolower(join($key));
 	}
 
-	public function resetCacheKey($key)
+	public function resetCacheKey()
 	{
 		$this->cacheKeys = [];
 
-		$this->setCacheKey($key);
+		$this->setCacheKey($this->extractCacheKey());
 	}
 
 	public function setCacheKey($key)
@@ -116,7 +116,7 @@ abstract class BasePackage extends Controller
 
 	protected function resetCache(int $id)
 	{
-		$this->resetCacheKey($this->extractCacheKey());
+		$this->resetCacheKey();
 
 		array_push(
 			$this->cacheKeys,
@@ -132,7 +132,7 @@ abstract class BasePackage extends Controller
 	{
 		$this->resetCache($id);
 
-		$this->resetCacheKey($this->extractCacheKey());
+		$this->resetCacheKey();
 
 		$this->get($id);//Generate new Cache
 	}
