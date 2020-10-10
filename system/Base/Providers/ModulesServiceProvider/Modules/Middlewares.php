@@ -12,8 +12,6 @@ class Middlewares extends BasePackage implements BasePackageInterface
 
 	public $middlewares;
 
-	protected $cacheKey;
-
 	public function getAll($conditions = null)
 	{
 		if ($this->cacheKey) {

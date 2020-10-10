@@ -15,7 +15,7 @@ abstract class BaseComponent extends Controller
 
 	protected function onConstruct()
 	{
-		if (!$this->isJson()) {
+		if (!$this->isJson() || $this->request->isAjax()) {
 			$this->checkLayout();
 		}
 	}
@@ -67,6 +67,43 @@ abstract class BaseComponent extends Controller
 
 	protected function checkLayout()
 	{
+		if ($this->request->isAjax()) {
+			if (count($this->dispatcher->getParams()) > 0) {
+				$this->buildGetQueryParamsArr();
+
+				if (Arr::has($this->getQueryArr, 'layout')) {
+					if ($this->getQueryArr['layout'] === '1') {
+						$this->buildAssets();
+						return;
+					} else {
+						$this->view->disableLevel(
+										[
+											View::LEVEL_LAYOUT 		=> true,
+											View::LEVEL_MAIN_LAYOUT => true
+										]
+									);
+						return;
+					}
+				} else {
+					$this->view->disableLevel(
+										[
+											View::LEVEL_LAYOUT 		=> true,
+											View::LEVEL_MAIN_LAYOUT => true
+										]
+									);
+						return;
+				}
+			} else {
+				$this->view->disableLevel(
+								[
+									View::LEVEL_LAYOUT 		=> true,
+									View::LEVEL_MAIN_LAYOUT => true
+								]
+							);
+				return;
+			}
+		}
+
 		if ($this->request->isGet()) {
 			if (count($this->dispatcher->getParams()) > 0) {
 				$this->buildGetQueryParamsArr();
@@ -79,14 +116,18 @@ abstract class BaseComponent extends Controller
 								View::LEVEL_MAIN_LAYOUT => true
 							]
 						);
+						return;
 					} else {
 						$this->buildAssets();
+						return;
 					}
 				} else {
 					$this->buildAssets();
+					return;
 				}
 			} else {
 				$this->buildAssets();
+				return;
 			}
 		} else if ($this->request->isPost()) {
 
@@ -98,11 +139,14 @@ abstract class BaseComponent extends Controller
 							View::LEVEL_MAIN_LAYOUT => true
 						]
 					);
+					return;
 				} else {
 					$this->buildAssets();
+					return;
 				}
 			} else {
 				$this->buildAssets();
+				return;
 			}
 		}
 	}

@@ -5,15 +5,7 @@ namespace Applications\Admin\Packages;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
-use Packages\Admin\Modules\Barebone;
-use Packages\Admin\Modules\Module\Info;
-use Packages\Admin\Modules\Module\Install;
-use Packages\Admin\Modules\Module\Remove;
-use Packages\Admin\Modules\Module\Settings;
-use Packages\Admin\Modules\Module\Update;
 use System\Base\BasePackage;
-use System\Base\Providers\CoreServiceProvider\Core;
-use System\Base\Providers\ModulesServiceProvider\Repositories;
 
 class ModulesPackage extends BasePackage
 {
@@ -47,8 +39,6 @@ class ModulesPackage extends BasePackage
 
 			$this->updateRemoteModulesToDB();
 		}
-
-		return $this->packagesData;
 	}
 
 	public function getModulesData()
@@ -65,46 +55,20 @@ class ModulesPackage extends BasePackage
 		$this->packagesData->applications =
 			$this->modules->applications->applications;
 
-		$this->packagesData->applicationInfo =
-			$this->modules->applications->getApplicationInfo();
-
-		return $this->packagesData;
 	}
 
 	public function getLocalModules($filter = [], $includeCore = true)
 	{
+		$this->packagesData->applicationInfo =
+			$this->modules->applications->getApplicationInfo();
+
 		$this->core = $this->modules->core->getCoreInfo();
 
 		if ($includeCore) {
 			$this->localModules['core'][$this->core[0]['id']] = $this->core[0];
 		}
 
-		// dump($filter, $this->applications);
-		if (!$includeCore) {
-			$applicationFilter = ['id' => $filter['application_id']];
-		} else if (isset($filter['installed']) || isset($filter['update_available'])) {
-			$applicationFilter = $filter;
-		} else {
-			$applicationFilter = [];
-		}
-
-		$this->applications =
-			$this->modules->applications->applications;
-
-		$this->components =
-			$this->modules->components->components;
-
-		$this->packages =
-			$this->modules->packages->packages;
-
-		$this->middlewares =
-			$this->modules->middlewares->middlewares;
-
-		$this->views =
-			$this->modules->views->views;
-
-
-		// var_dump($filter);
+		$this->applyFilters($filter, $includeCore);
 
 		if (count($this->applications) > 0) {
 			foreach ($this->applications as $applicationKey => $application) {
@@ -172,10 +136,102 @@ class ModulesPackage extends BasePackage
 			$this->packagesData->responseCode = 0;
 
 			$this->packagesData->modulesData = $this->localModules;
-
-		// dump($this->localModules);
-			return $this->packagesData;
 		}
+	}
+
+	protected function applyFilters($filter = [], $includeCore = true)
+	{
+		$this->applications =
+			$this->modules->applications->applications;
+
+		$this->components =
+			$this->modules->components->components;
+
+		$this->packages =
+			$this->modules->packages->packages;
+
+		$this->middlewares =
+			$this->modules->middlewares->middlewares;
+
+		$this->views =
+			$this->modules->views->views;
+
+		if (count($filter) === 0) {
+			return;
+		}
+
+		if (isset($filter['application_id'])) {
+			$filterValue = $filter['application_id'];
+			$filterType = 'application_id';
+		} else if (isset($filter['installed']) && $filter['installed'] === 1) {
+			$filterValue = $filter['installed'];
+			$filterType = 'installed';
+		} else if (isset($filter['installed']) && $filter['installed'] === 0) {
+			$filterValue = $filter['installed'];
+			$filterType = 'installed';
+		} else if (isset($filter['update_available'])) {
+			$filterValue = $filter['update_available'];
+			$filterType = 'update_available';
+		} else {
+			$filterType = 'id';
+		}
+
+		if (!$includeCore && $filterValue) {
+			$this->applications =
+				[
+					$this->applications
+					[
+						array_search(
+							$filterValue,
+							array_column($this->applications, 'id')
+						)
+					]
+				];
+		} else {
+			$keys =
+				array_keys(array_column($this->applications, $filterType), $filterValue);
+			$applications  = [];
+			foreach ($keys as $key) {
+				$applications[] = $this->applications[$key];
+			}
+			$this->applications = $applications;
+		}
+
+		//Components
+		$keys =
+			array_keys(array_column($this->components, $filterType), $filterValue);
+		$components  = [];
+		foreach ($keys as $key) {
+			$components[] = $this->components[$key];
+		}
+		$this->components = $components;
+
+		//Packages
+		$keys =
+			array_keys(array_column($this->packages, $filterType), $filterValue);
+		$packages  = [];
+		foreach ($keys as $key) {
+			$packages[] = $this->packages[$key];
+		}
+		$this->packages = $packages;
+
+		//Middlewares
+		$keys =
+			array_keys(array_column($this->middlewares, $filterType), $filterValue);
+		$middlewares  = [];
+		foreach ($keys as $key) {
+			$middlewares[] = $this->middlewares[$key];
+		}
+		$this->middlewares = $middlewares;
+
+		//Views
+		$keys =
+			array_keys(array_column($this->views, $filterType), $filterValue);
+		$views  = [];
+		foreach ($keys as $key) {
+			$views[] = $this->views[$key];
+		}
+		$this->views = $views;
 	}
 
 	protected function getRemoteModules()
@@ -360,8 +416,6 @@ class ModulesPackage extends BasePackage
 		}
 
 		$this->packagesData->responseCode = 0;
-
-		return $this->packagesData;
 	}
 
 	protected function findRemoteInLocal($remoteModules, $localModules)
@@ -826,25 +880,5 @@ class ModulesPackage extends BasePackage
 	public function getApplicationComponentsViews($postData)
 	{
 		return $this->packages->use(Barebone::class)->getApplicationComponentsViews($postData);
-	}
-
-	public function getRepositoryById($id)
-	{
-		return $this->repositories->getById($id);
-	}
-
-	public function addRepository($postData)
-	{
-		return $this->repositories->register($postData);
-	}
-
-	public function updateRepository($postData)
-	{
-		return $this->repositories->update($postData);
-	}
-
-	public function deleteRepository($id)
-	{
-		return $this->repositories->remove($id);
 	}
 }

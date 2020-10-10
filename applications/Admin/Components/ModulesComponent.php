@@ -12,9 +12,12 @@ class ModulesComponent extends BaseComponent
 		$modules = $this->usePackage(ModulesPackage::class);
 
 		if (isset($this->getData()['filter']) && $this->getData()['filter'] !== '0') { //Filtering
-			if ($this->getData()['filter'] !== 'installed' && $this->getData()['filter'] !== 'update_available') {
+			if ($this->getData()['filter'] !== 'installed' &&
+				$this->getData()['filter'] !== 'not_installed' &&
+				$this->getData()['filter'] !== 'update_available'
+			) {
 
-				$modulesData = $modules->getLocalModules(
+				$modules->getLocalModules(
 					[
 						'application_id' 	=> $this->getData()['filter']
 					],
@@ -23,15 +26,24 @@ class ModulesComponent extends BaseComponent
 
 			} else if ($this->getData()['filter'] === 'installed') {
 
-				$modulesData = $modules->getLocalModules(
+				$modules->getLocalModules(
 					[
 						'installed'			=> 1
 					]
 				);
 
+			} else if ($this->getData()['filter'] === 'not_installed') {
+
+				$modules->getLocalModules(
+					[
+						'installed'			=> 0
+					],
+					false
+				);
+
 			} else if ($this->getData()['filter'] === 'update_available') {
 
-				$modulesData = $modules->getLocalModules(
+				$modules->getLocalModules(
 					[
 						'update_available'	=> 1
 					]
@@ -39,36 +51,36 @@ class ModulesComponent extends BaseComponent
 
 			}
 		} else {
-			$modulesData = $modules->getModulesData();
+			$modules->getModulesData();
 		}
 
-		if ($modulesData->packagesData['responseCode'] === 0) {
+		if ($modules->packagesData->responseCode === 0) {
 
 			if (isset($this->getData()['filter'])) { //Filtering
-				$this->viewFile = 'modules/modules.html';
+				$this->view->pick('modules/modules');
 			}
 
 			$this->view->responseCode = 0;
 
 			$this->view->mode = $this->config->debug;
 
-			$this->view->modulesData = $modulesData->packagesData['modulesData'];
+			$this->view->modulesData = $modules->packagesData->modulesData;
 
 			if (!isset($this->getData()['filter'])) {
-				$this->view->applications = $modulesData->packagesData['applications'];
+				$this->view->applications = $modules->packagesData->applications;
 
-				$this->view->repositories = $modulesData->packagesData['repositories'];
+				$this->view->repositories = $modules->packagesData->repositories;
 			}
 
-			$this->view->thisApplication = $modulesData->packagesData['applicationInfo'];
+			$this->view->thisApplication = $modules->packagesData->applicationInfo;
 
 			$this->view->setup = isset($this->getData()['setup']) ? $this->getData()['setup'] : false;
 
-		} else if ($modulesData->packagesData['responseCode'] === 1) {
+		} else if ($modules->packagesData->responseCode === 1) {
 
-			$this->view->responseCode = 1;
+			$this->view->responseCode = $modules->packagesData->responseCode;
 
-			$this->view->responseMessage = $modulesData->packagesData['responseMessage'];
+			$this->view->responseMessage = $modules->packagesData->responseMessage;
 		}
 	}
 }

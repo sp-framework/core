@@ -10,8 +10,6 @@ class Applications extends BasePackage implements BasePackageInterface
 {
 	private $model;
 
-	protected $cacheKey;
-
 	public $applications;
 
 	protected $applicationInfo = null;

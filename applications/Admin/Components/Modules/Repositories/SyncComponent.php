@@ -7,57 +7,54 @@ use System\Base\BaseComponent;
 
 class SyncComponent extends BaseComponent
 {
-	public function view()
+	public function viewAction()
 	{
 		$modules = $this->usePackage(ModulesPackage::class);
 
-		if (isset($this->getData['repoId'])) {
+		if (isset($this->request->getPost()['repoId'])) {
 
-			$synced = $modules->syncRemoteWithLocal($this->getData['repoId']);
+			$synced = $modules->syncRemoteWithLocal($this->request->getPost()['repoId']);
 
-			if ($synced->packagesData['responseCode'] === 0) {
+			if ($synced->packagesData->responseCode === 0) {
 
 				$modulesData = $modules->getModulesData();
 
 			} else {
-				$this->viewsData->responseCode = 1;
+				$this->view->responseCode = $synced->packagesData->responseCode;
 
-				$this->viewsData->responseMessage = $synced->packagesData['responseMessage'];
+				$this->view->responseMessage = $synced->packagesData->responseMessage;
 
-				$this->viewFile = 'modules/modules.html';
-
-				return $this->generateView();
+				$this->view->pick('modules/modules.html');
 			}
 
-			if ($modulesData->packagesData['responseCode'] === 0) {
+			if ($modulesData->packagesData->responseCode === 0) {
 
-				$this->viewsData->responseCode = 0;
+				$this->view->responseCode = $modulesData->packagesData->responseCode;
 
-				$this->viewsData->modulesData = $modulesData->packagesData['modulesData'];
+				$this->view->responseMessage = $modulesData->packagesData->responseMessage;
 
-				$this->viewsData->counter = $modulesData->packagesData['counter'];
+				$this->view->modulesData = $modulesData->packagesData->modulesData;
 
-				$this->viewsData->thisApplication = $this->applicationInfo;
+				$this->view->counter = $modulesData->packagesData->counter;
 
-				$this->viewFile = 'modules/modules.html';
+				$this->view->thisApplication = $this->modules->applications->applicationInfo;
 
-				return $this->generateView();
-			} else if ($modulesData->packagesData['responseCode'] === 1) {
+				$this->view->pick('modules/modules.html');
 
-				$this->viewsData->responseCode = 1;
+			} else if ($modulesData->packagesData->responseCode === 1) {
 
-				$this->viewsData->responseMessage = $modulesData->packagesData['responseMessage'];
+				$this->view->responseCode = $modulesData->packagesData->responseCode;
 
-				$this->viewFile = 'modules/modules.html';
+				$this->view->responseMessage = $modulesData->packagesData->responseMessage;
 
-				return $this->generateView();
+				$this->view->pick('modules/modules.html');
+
 			}
 		}
 
-		// $this->viewsData->repositories = $this->packages->use(Repositories::class)->getAllRepositories();
+		// $this->view->repositories = $this->packages->use(Repositories::class)->getAllRepositories();
 
-		// $this->viewsData->setup = isset($this->getData['setup']) ? $this->getData['setup'] : false;
+		// $this->view->setup = isset($this->getData['setup']) ? $this->getData['setup'] : false;
 
-		return $this->generateView();
 	}
 }

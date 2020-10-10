@@ -12,8 +12,6 @@ class Components extends BasePackage implements BasePackageInterface
 
 	public $components;
 
-	protected $cacheKey;
-
 	public function getAll($conditions = null)
 	{
 		if ($this->cacheKey) {

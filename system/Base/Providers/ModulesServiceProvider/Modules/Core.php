@@ -13,8 +13,6 @@ class Core extends BasePackage implements BasePackageInterface
 
 	public $core;
 
-	protected $cacheKey;
-
 	public function getCoreInfo()
 	{
 		return $this->core;

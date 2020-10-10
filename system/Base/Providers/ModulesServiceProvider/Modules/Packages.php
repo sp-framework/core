@@ -15,8 +15,6 @@ class Packages extends BasePackage implements BasePackageInterface
 
 	public $packages;
 
-	protected $cacheKey;
-
 	public function getAll($conditions = null)
 	{
 		if ($this->cacheKey) {

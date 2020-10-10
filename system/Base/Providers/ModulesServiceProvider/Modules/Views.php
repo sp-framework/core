@@ -28,8 +28,6 @@ class Views extends BasePackage
 
     protected $cache;
 
-    protected $cacheKey;
-
     public function init()
     {
         $this->applications = $this->modules->applications;
