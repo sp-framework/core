@@ -9,13 +9,17 @@ class EditComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$this->view->thisApplication = $this->modules->applications->getApplicationInfo();
-
 		$this->view->repository = $this->modules->repositories->get($this->getData()['id']);
 
-		$this->view->responseCode = $this->modules->repositories->packagesData->responseCode;
+		if (!$this->view->repository) {
 
-		$this->view->responseMessage = $this->modules->repositories->packagesData->responseMessage;
+			$this->view->responseCode = $this->modules->repositories->packagesData->responseCode;
+
+			$this->view->responseMessage = $this->modules->repositories->packagesData->responseMessage;
+
+			return $this->sendJson();
+		}
+		$this->view->thisApplication = $this->modules->applications->getApplicationInfo();
 		// $this->view->disable();
 	}
 

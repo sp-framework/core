@@ -10,6 +10,10 @@ abstract class BasePackage extends Controller
 {
 	public $packagesData;
 
+	protected $cacheKey;
+
+	protected $cacheKeys = [];
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -17,6 +21,18 @@ abstract class BasePackage extends Controller
 		if (!$this->cacheKey) {
 			$this->resetCacheKey();
 		}
+	}
+
+	protected function getIdParams(int $id)
+	{
+		return
+			[
+				'conditions'	=> 'id = :id:',
+				'bind'			=>
+					[
+						'id'	=> $id
+					]
+			];
 	}
 
 	protected function extractCacheKey()
@@ -86,7 +102,7 @@ abstract class BasePackage extends Controller
 		return $this->packagesData->getAllData();
 	}
 
-	protected function constructParameterWithCache(array $parameters)
+	protected function paramsWithCache(array $parameters)
 	{
 		if ($this->cacheKey) {
 			$parameters = $this->cacheTools->addModelCacheParameters($parameters, $this->getCacheKey());
@@ -97,35 +113,41 @@ abstract class BasePackage extends Controller
 		return $parameters;
 	}
 
-	protected function resetCachesWithId(int $id) //Very broad at the moment, we need to narrow down search and delete caching
+	//Very broad at the moment, we need to narrow down search and delete caching
+	protected function resetCaches(int $id = null)
 	{
-		// var_dump($id, $this->cacheKeys, $this->cacheKey);
 		foreach ($this->cacheKeys as $key => $cacheKey) {
 			$cache = $this->cacheTools->get($cacheKey);
 			if ($cache) {
-				$cache->filter(
-					function ($search) use ($id, $cacheKey) {
-						if ($search->id == $id) {
-							$this->cacheTools->deleteCache($cacheKey);
+				if ($id) {
+					$cache->filter(
+						function ($search) use ($id, $cacheKey) {
+							if ($search->id == $id) {
+								$this->cacheTools->deleteCache($cacheKey);
+							}
 						}
-					}
-				);
+					);
+				} else {
+					$this->cacheTools->deleteCache($cacheKey);
+				}
 			}
 		}
 	}
 
-	protected function resetCache(int $id)
+	protected function resetCache(int $id = null)
 	{
 		$this->resetCacheKey();
 
-		array_push(
-			$this->cacheKeys,
-			$this->constructParameterWithCache(
-				$this->getParams($id)
-			)['cache']['key']
-		);
+		if ($id) {
+			array_push(
+				$this->cacheKeys,
+				$this->paramsWithCache(
+					$this->getIdParams($id)
+				)['cache']['key']
+			);
+		}
 
-		$this->resetCachesWithId($id);
+		$this->resetCaches($id);
 	}
 
 	protected function updateCache(int $id)

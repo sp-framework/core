@@ -13,10 +13,6 @@ class Repositories extends BasePackage implements BasePackageInterface
 
 	public $repositories;
 
-	protected $cacheKey;
-
-	protected $cacheKeys = [];
-
 	public function getAll(array $conditions = null)
 	{
 		if ($this->cacheKey) {
@@ -32,21 +28,9 @@ class Repositories extends BasePackage implements BasePackageInterface
 		return $this;
 	}
 
-	protected function getParams(int $id)
-	{
-		return
-			[
-				'conditions'	=> 'id = :id:',
-				'bind'			=>
-					[
-						'id'	=> $id
-					]
-			];
-	}
-
 	public function get(int $id)
 	{
-		$parameters = $this->constructParameterWithCache($this->getParams($id));
+		$parameters = $this->paramsWithCache($this->getIdParams($id));
 
 		$this->model = RepositoriesModel::find($parameters);
 
@@ -66,8 +50,10 @@ class Repositories extends BasePackage implements BasePackageInterface
 			$this->packagesData->responseCode = 1;
 			$this->packagesData->responseMessage = 'No Record Found with that ID!';
 		}
+
 		$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
 
+		return false;
 	}
 
 	public function add(array $data)
@@ -79,11 +65,7 @@ class Repositories extends BasePackage implements BasePackageInterface
 
 			$create = $repository->create();
 
-			$this->resetCacheKey();
-
-			if ($this->cacheKey) {
-				$this->cacheTools->deleteCache($this->cacheKey);
-			}
+			$this->resetCache();
 
 			$this->packagesData->responseCode = 0;
 

@@ -25,10 +25,7 @@
 	</div>
 </div>
 <script type="text/javascript">
-
-	$('#select-repo').change(function() {
-		$('#sync').off();
-
+	function changeRepoButtons() {
 		if ($('#select-repo option:selected').val() === '1') {
 			$('#sync, #edit-repo').attr('disabled', false);
 			$('#delete-repo').attr('disabled', true);
@@ -37,6 +34,13 @@
 		} else if ($('#select-repo option:selected').val() !== '1') {
 			$('#sync, #edit-repo, #delete-repo').attr('disabled', false);
 		}
+	}
+	changeRepoButtons();
+
+	$('#select-repo').change(function() {
+		$('#sync').off();
+
+		changeRepoButtons();
 
 		$('#sync').click(function() {
 			$('#sync').attr('disabled', true);
@@ -97,9 +101,16 @@
 			});
 		} else if ($(this)[0].id === 'edit-repo') {
 			$.get('/{{route}}/modules/repositories/edit/q/layout/0/id/'+ $('#select-repo option:selected').val(), function(data) {
-				$('#modal-title').html('Edit Repository');
-				$('#modal .modal-body').empty().html(data);
-				$('#modal').modal('show');
+				if (data && data.responseCode === 0) {
+						$('#modal-title').html('Edit Repository');
+						$('#modal .modal-body').empty().html(data);
+						$('#modal').modal('show');
+					} else {
+						PNotify.error({
+							text		: data.responseMessage,
+							textTrusted	: true
+						});
+					}
 			});
 		}
 	});

@@ -20,20 +20,25 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	protected function sendJson()
+	{
+		$this->view->disable();
+
+		$this->response->setContentType('application/json', 'UTF-8');
+		$this->response->setHeader('Cache-Control', 'no-store');
+
+		if ($this->response->isSent() !== true) {
+			$this->response->setJsonContent($this->view->getParamsToView());
+
+			return $this->response->send();
+		}
+	}
+
 	protected function afterExecuteRoute()
 	{
 		if ($this->isJson()) {
 
-			$this->view->disable();
-
-			$this->response->setContentType('application/json', 'UTF-8');
-			$this->response->setHeader('Cache-Control', 'no-store');
-
-			if ($this->response->isSent() !== true) {
-				$this->response->setJsonContent($this->view->getParamsToView());
-
-				return $this->response->send();
-			}
+			return $this->sendJson();
 		} else {
 			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 		}
