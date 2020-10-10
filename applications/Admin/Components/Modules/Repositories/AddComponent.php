@@ -18,17 +18,25 @@ class AddComponent extends BaseComponent
 
 			if ($this->modules->repositories->add($this->request->getPost())) {
 
-				$this->flashSession->success('Repository Added!');
+				$this->flashSession->clear();
+
+				$this->view->responseCode =
+					$this->modules->repositories->packagesData->responseCode;
+
+				$this->flashSession->success(
+					$this->modules->repositories->packagesData->responseMessage);
 
 			} else {
 
-				$this->flashSession->error('Error! Could not add repository.');
+				$this->view->responseMessage = 'Error! Could not add repository.';
 
+				$this->view->responseCode = 1;
 			}
 		} else {
 
-			$this->flashSession->error('Request method not allowed.');
+			$this->view->responseMessage = 'Request method not allowed.';
 
+			$this->view->responseCode = 1;
 		}
 	}
 }

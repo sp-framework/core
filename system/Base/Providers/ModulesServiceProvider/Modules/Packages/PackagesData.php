@@ -21,7 +21,7 @@ class PackagesData
 		if (isset($this->packagesData[$key])) {
 			return $this->packagesData[$key];
 		} else {
-			throw new \Exception('PackageData Key does not exists!');
+			throw new \Exception('PackagesData Key ' . $key . ' does not exists!');
 		}
 	}
 }

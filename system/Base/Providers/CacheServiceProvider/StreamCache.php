@@ -29,14 +29,14 @@ class StreamCache
                 'lifetime'          => $this->container->getShared('config')->cacheTimeout
             ];
 
-            $adapter    = new AdapterFactory($serializerFactory, $options);
+            $adapter = new AdapterFactory($serializerFactory, $options);
 
             $cacheFactory = new CacheFactory($adapter);
 
             $cacheOptions = [
                 'adapter'   => 'stream',
                 'options'   => [
-                    'prefix'            => 'sp',
+                    'prefix'            => 'stream',
                     'storageDir'        => base_path('var/storage/cache/')
                 ],
             ];

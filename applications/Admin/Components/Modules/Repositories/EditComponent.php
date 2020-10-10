@@ -11,40 +11,39 @@ class EditComponent extends BaseComponent
 	{
 		$this->view->thisApplication = $this->modules->applications->getApplicationInfo();
 
-		$this->view->repository = $this->getRepositoryById($this->getData()['id']);
+		$this->view->repository = $this->modules->repositories->get($this->getData()['id']);
 
-		$this->view->responseCode = 0;
+		$this->view->responseCode = $this->modules->repositories->packagesData->responseCode;
+
+		$this->view->responseMessage = $this->modules->repositories->packagesData->responseMessage;
+		// $this->view->disable();
 	}
 
 	public function updateAction()
 	{
-		$modules = $this->usePackage(ModulesPackage::class);
+		if ($this->request->isPost()) {
+			if ($this->modules->repositories->update($this->request->getPost())) {
 
-		if ($this->requestMethod === 'POST') {
+				$this->flashSession->clear();
 
-			if ($modules->updateRepository($this->postData)) {
+				$this->view->responseCode =
+					$this->modules->repositories->packagesData->responseCode;
 
-				$this->flash->now('success', 'Repository Updated!');
-
-				$this->view->responseCode = 0;
-
-				$this->view->responseMessage = 'Repository Updated!';
-
+				$this->flashSession->success(
+					$this->modules->repositories->packagesData->responseMessage
+				);
 			} else {
+				$this->view->responseCode =
+					$this->modules->repositories->packagesData->responseCode;
 
-				$this->flash->now('error', 'Error! Could not update repository.');
-
-				$this->view->responseCode = 1;
-
-				$this->view->responseMessage = 'Error! Could not update repository.';
+				$this->view->responseMessage =
+					$this->modules->repositories->packagesData->responseMessage;
 			}
 		} else {
 
-			$this->flash->now('error', 'Request method not allowed.');
+			$this->view->responseMessage = 'Request method not allowed.';
 
 			$this->view->responseCode = 1;
-
-			$this->view->responseMessage = 'Request method not allowed.';
 		}
 	}
 

@@ -5,117 +5,50 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use System\Base\BasePackage;
+use System\Base\Interfaces\BasePackageInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Packages as PackagesModel;;
 use System\Base\Providers\ModulesServiceProvider\Packages\PackagesData;
 
-class Packages extends BasePackage
+class Packages extends BasePackage implements BasePackageInterface
 {
-	// private $container;
-
-	// protected $application;
+	private $model;
 
 	public $packages;
 
-	// protected $db;
+	protected $cacheKey;
 
-	// public function __construct(DiInterface $container)
-	// {
-	// 	$this->container = $container;
-
-	// 	$this->db = $this->container->getShared('db');
-
-	// 	$this->application = $this->container->getShared('applications')->getApplicationInfo();
-
-	// 	$this->packages = $this->getAllPackages();
-	// }
-
-	public function getAllPackages($conditions = null)
+	public function getAll($conditions = null)
 	{
+		if ($this->cacheKey) {
+			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+		}
+
 		if (!$this->packages) {
-			$this->packages = PackagesModel::find($conditions, 'packages')->toArray();
+
+			$this->model = PackagesModel::find($parameters);
+
+			$this->packages = $this->model->toArray();
 		}
 
 		return $this;
 	}
-	// public function getAll($criteria = [], $sort = null, $limit = null, $offset = null)
-	// {
-	// 	return $this->db->getByData(PackagesModel::class, $criteria, $sort, $limit, $offset);
-	// }
 
-	// public function getById($id)
-	// {
-	// 	return $this->db->getById(PackagesModel::class, $id);
-	// }
+	public function add(array $data)
+	{
+		if ($data) {
+			$package = new PackagesModel();
 
-	// public function register(array $data)
-	// {
-	// 	return $this->db->addToDb(PackagesModel::class, $data);
-	// }
+			return $package->add($data, $this->cacheKey);
+		}
+	}
 
-	// public function update(array $data)
-	// {
-	// 	return $this->db->updateToDbById(PackagesModel::class, $data);
-	// }
-
-	// public function remove($id)
-	// {
+	public function update(array $data)
+	{
 		//
-	// }
+	}
 
-	// protected function initPackages($packages)
-	// {
-	// 	$packages = $this->getAllPackages();
-
-	// 	if (count($packages) > 0 ) {
-	// 		$this->initPackages($packages);
-	// 	}
-
-	// 	foreach ($packages as $key => $package) {
-	// 		$apps = unserialize($package->get('apps'));
-	// 		if (array_key_exists($this->container->get('apps')->getAppInfo()['id'], $apps)) {
-	// 			if ($apps[$this->container->get('apps')->getAppInfo()['id']] === 1) {
-	// 				$packageClass = '\\Packages\\' . str_replace('/', '\\', $package->get('path') . 'Package');
-	// 				$initPackage = new $packageClass;
-	// 				$this->packages[$initPackage->name] = $initPackage;
-	// 				$this->addMiddleware($package->get('path'));
-	// 				$this->addRoutes($package->get('path'));
-	// 			}
-	// 		}
-	// 	}
-	// }
-	//
-	// 	protected function addMiddleware($path)
-	// {
-	// 	$fileSystem = $this->initFilesystem($path);
-
-	// 	if ($fileSystem->has('Middleware.php')) {
-	// 		$middlewareClass = '\\Packages\\' . str_replace('/', '\\', $path) . 'Middleware';
-	// 		array_push($this->middlewares, $middlewareClass);
-	// 	}
-	// }
-
-	// protected function addRoutes($path)
-	// {
-	// 	$fileSystem = $this->initFilesystem($path);
-
-	// 	if ($fileSystem->has('Routes.php')) {
-	// 		$routeClass = '\\Packages\\' . str_replace('/', '\\', $path) . 'Routes';
-	// 		array_push($this->routes, $routeClass);
-	// 	}
-	// }
-	//
-	// public function getMiddlewares()
-	// {
-	// 	return $this->middlewares;
-	// }
-
-	// public function getRoutes()
-	// {
-	// 	return $this->routes;
-	// }
-
-	// protected function initFilesystem($path)
-	// {
-	// 	return new Filesystem(new Local(base_path('packages/' . $path)));
-	// }
+	public function remove(int $id)
+	{
+		//
+	}
 }

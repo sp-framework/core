@@ -8,6 +8,8 @@ use System\Base\Providers\ModulesServiceProvider\Views\ViewsData;
 
 class Views extends BasePackage
 {
+    private $model;
+
     public $views;
 
     protected $view;
@@ -26,6 +28,8 @@ class Views extends BasePackage
 
     protected $cache;
 
+    protected $cacheKey;
+
     public function init()
     {
         $this->applications = $this->modules->applications;
@@ -42,7 +46,6 @@ class Views extends BasePackage
 
         return $this;
     }
-
 
     protected function setVoltCompiledPath()
     {
@@ -151,10 +154,21 @@ class Views extends BasePackage
         }
     }
 
-    public function getAllViews($conditions = null)
+    public function getAll($conditions = null)
     {
+        if (!$this->cacheKey) {
+            $this->setCacheKey();
+        }
+
+        if ($this->cacheKey) {
+            $parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+        }
+
         if (!$this->views) {
-            $this->views = ViewsModel::find($conditions, 'views')->toArray();
+
+            $this->model = ViewsModel::find($parameters);
+
+            $this->views = $this->model->toArray();
         }
 
         return $this;
@@ -166,5 +180,22 @@ class Views extends BasePackage
                 $this->views[array_search($id, array_column($this->views, 'application_id'))];
     }
 
+    public function add(array $data)
+    {
+        if ($data) {
+            $view = new ViewsModel();
 
+            return $view->add($data, $this->cacheKey);
+        }
+    }
+
+    public function update(array $data)
+    {
+        //
+    }
+
+    public function remove(int $id)
+    {
+        //
+    }
 }

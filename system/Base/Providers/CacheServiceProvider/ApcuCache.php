@@ -28,7 +28,7 @@ class ApcuCache
 
             $serializerFactory = new SerializerFactory();
 
-            $adapterFactory    = new AdapterFactory($serializerFactory, $options);
+            $adapterFactory = new AdapterFactory($serializerFactory, $options);
 
             $cacheFactory = new CacheFactory($adapterFactory);
 

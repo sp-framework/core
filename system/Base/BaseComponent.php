@@ -10,80 +10,8 @@ use Phalcon\Mvc\View;
 abstract class BaseComponent extends Controller
 {
 	protected $getQueryArr = [];
-	// protected $core;
-
-	// protected $applications;
-
-	// protected $components;
-
-	// protected $packages;
 
 	protected $views;
-
-	// protected $applicationInfo;
-
-	// protected $applicationDefaults;
-
-	// protected $session;
-
-	// protected $flash;
-
-	// protected $data;
-
-	// protected $packagesData = [];
-
-	// protected $request;
-
-	// protected $response;
-
-	// protected $viewFile;
-
-	// protected $defaultViewsName;
-
-	// protected $defaultComponentsName;
-
-	// protected $getData;
-
-	// protected $postData;
-
-	// public function __construct(DiInterface $container)
-	// {
-	// 	$this->request = $container->contents->get('request');
-
-	// 	$this->requestMethod = $this->request->getMethod();
-
-	// 	$this->requestUri = $this->request->getServerParams()['REQUEST_URI'];
-
-	// 	$this->getData = $this->request->getQueryParams();
-
-	// 	$this->postData = $this->request->getParsedBody();
-
-	// 	$this->response = $container->contents->get('response');
-
-	// 	$this->session = $container->contents->get(Session::class);
-
-	// 	$this->flash = $container->contents->get(Flash::class);
-
-	// 	$this->core = $container->contents->get('core');
-
-	// 	$this->applications = $container->contents->get('applications');
-
-	// 	$this->components = $container->contents->get('components');
-
-	// 	$this->packages = $container->contents->get('packages');
-
-	// 	$this->views = $container->contents->get('views');
-
-	// 	$this->applicationInfo = $container->contents->get('applications')->getApplicationInfo();
-
-	// 	$this->applicationDefaults = $container->contents->get('applications')->getApplicationDefaults();
-
-	// 	$this->viewsData = $container->contents->get('views')->getViewsData();
-
-	// 	$this->packagesData = $container->contents->get('packages')->getPackagesData();
-
-	// 	$this->mode = $container->contents->get('config')->get('base.debug');
-	// }
 
 	protected function onConstruct()
 	{
@@ -108,7 +36,6 @@ abstract class BaseComponent extends Controller
 			}
 		} else {
 			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
-			var_dump($this->view->getViewsDir());
 		}
 	}
 

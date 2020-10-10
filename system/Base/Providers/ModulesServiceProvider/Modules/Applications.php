@@ -3,10 +3,15 @@
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use System\Base\BasePackage;
+use System\Base\Interfaces\BasePackageInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Applications as ApplicationsModel;
 
-class Applications extends BasePackage
+class Applications extends BasePackage implements BasePackageInterface
 {
+	private $model;
+
+	protected $cacheKey;
+
 	public $applications;
 
 	protected $applicationInfo = null;
@@ -120,16 +125,21 @@ class Applications extends BasePackage
 		}
 	}
 
-	public function getAllApplications($conditions = null)
+	public function getAll($conditions = null)
 	{
+		// if (!$this->cacheKey) {
+		// 	$this->setCacheKey();
+		// }
+
+		if ($this->cacheKey) {
+			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+		}
+
 		if (!$this->applications) {
-			$this->applications =
-				ApplicationsModel::find(
-					$conditions,
-					'applications',
-					true,
-					$this->config
-				)->toArray();
+
+			$this->model = ApplicationsModel::find($parameters);
+
+			$this->applications = $this->model->toArray();
 		}
 
 		return $this;
@@ -157,5 +167,24 @@ class Applications extends BasePackage
 			[
 				array_search('1', array_column($this->applications, 'is_default'))
 			];
+	}
+
+	public function add(array $data)
+	{
+		if ($data) {
+			$application = new ApplicationsModel();
+
+			return $application->add($data, $this->cacheKey);
+		}
+	}
+
+	public function update(array $data)
+	{
+		//
+	}
+
+	public function remove(int $id)
+	{
+		//
 	}
 }

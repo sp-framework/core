@@ -7,6 +7,7 @@ use Phalcon\Di\ServiceProviderInterface;
 use System\Base\Providers\CacheServiceProvider\ApcuCache;
 use System\Base\Providers\CacheServiceProvider\OpCache;
 use System\Base\Providers\CacheServiceProvider\StreamCache;
+use System\Base\Providers\CacheServiceProvider\CacheTools;
 
 class CacheServiceProvider implements ServiceProviderInterface
 {
@@ -30,6 +31,13 @@ class CacheServiceProvider implements ServiceProviderInterface
             'opCache',
             function () use ($container) {
                 return (new OpCache($container))->initCache();
+            }
+        );
+
+        $container->setShared(
+            'cacheTools',
+            function () use ($container) {
+                return new CacheTools($container);
             }
         );
     }

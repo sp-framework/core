@@ -8,13 +8,49 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 abstract class BasePackage extends Controller
 {
-	protected $container;
-
-	protected $packagesData = [];
+	public $packagesData;
 
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
+
+		if (!$this->cacheKey) {
+			$this->resetCacheKey($this->extractCacheKey());
+		}
+	}
+
+	protected function extractCacheKey()
+	{
+		$reflection = new \ReflectionClass($this);
+
+		$class = explode('\\', $reflection->getName());
+
+		$key = [];
+
+		foreach ($class as $value) {
+			array_push($key, substr($value, 0, 3));
+		}
+
+		return strtolower(join($key));
+	}
+
+	public function resetCacheKey($key)
+	{
+		$this->cacheKeys = [];
+
+		$this->setCacheKey($key);
+	}
+
+	public function setCacheKey($key)
+	{
+		$this->cacheKey = $key;
+
+		$this->cacheKeys[0] = $this->cacheKey;
+	}
+
+	public function getCacheKey()
+	{
+		return $this->cacheKey;
 	}
 
 	protected function usePackage($packageClass)
@@ -44,68 +80,60 @@ abstract class BasePackage extends Controller
 			return false;
 		}
 	}
-	// public function __get($name)
-	// {
-	// 	if (isset($this->{$name})) {
-	// 		return $this->{$name};
-	// 	}
-	// }
-	// public function onConstruct()
-	// {
-	// 	$this->setSource($this->source);
 
-	// 	$this->useDynamicUpdate(true);
+	public function getPackagesData()
+	{
+		return $this->packagesData->getAllData();
+	}
 
-	// }
+	protected function constructParameterWithCache(array $parameters)
+	{
+		if ($this->cacheKey) {
+			$parameters = $this->cacheTools->addModelCacheParameters($parameters, $this->getCacheKey());
+		}
 
-	// public static function find($parameters = null)
-	// {
-	// 	$parameters = self::checkCacheParameters($parameters);
+		$this->cacheKey = $parameters['cache']['key'];
 
-	// 	return parent::find($parameters);
-	// }
+		return $parameters;
+	}
 
-	// public static function findFirst($parameters = null)
-	// {
-	// 	$parameters = self::checkCacheParameters($parameters);
+	protected function resetCachesWithId(int $id) //Very broad at the moment, we need to narrow down search and delete caching
+	{
+		// var_dump($id, $this->cacheKeys, $this->cacheKey);
+		foreach ($this->cacheKeys as $key => $cacheKey) {
+			$cache = $this->cacheTools->get($cacheKey);
+			if ($cache) {
+				$cache->filter(
+					function ($search) use ($id, $cacheKey) {
+						if ($search->id == $id) {
+							$this->cacheTools->deleteCache($cacheKey);
+						}
+					}
+				);
+			}
+		}
+	}
 
-	// 	return parent::findFirst($parameters);
-	// }
+	protected function resetCache(int $id)
+	{
+		$this->resetCacheKey($this->extractCacheKey());
 
-	// protected static function checkCacheParameters($parameters = null)
-	// {
-	// 	if (null !== $parameters) {
-	// 		if (true !== is_array($parameters)) {
-	// 			$parameters = [$parameters];
-	// 		}
+		array_push(
+			$this->cacheKeys,
+			$this->constructParameterWithCache(
+				$this->getParams($id)
+			)['cache']['key']
+		);
 
-	// 		if (true !== isset($parameters['cache'])) {
-	// 			$parameters['cache'] = [
-	// 				'key'      => self::generateCacheKey($parameters),
-	// 				'lifetime' => 300,
-	// 			];
-	// 		}
-	// 	}
+		$this->resetCachesWithId($id);
+	}
 
-	// 	return $parameters;
-	// }
+	protected function updateCache(int $id)
+	{
+		$this->resetCache($id);
 
-	// protected static function generateCacheKey(array $parameters)
-	// {
-	// 	$uniqueKey = [];
+		$this->resetCacheKey($this->extractCacheKey());
 
-	// 	foreach ($parameters as $key => $value) {
-	// 		if (true === is_scalar($value)) {
-	// 			$uniqueKey[] = $key . ':' . $value;
-	// 		} elseif (true === is_array($value)) {
-	// 			$uniqueKey[] = sprintf(
-	// 				'%s:[%s]',
-	// 				$key,
-	// 				self::generateCacheKey($value)
-	// 			);
-	// 		}
-	// 	}
-
-	// 	return join(',', $uniqueKey);
-	// }
+		$this->get($id);//Generate new Cache
+	}
 }

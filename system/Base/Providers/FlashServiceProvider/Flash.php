@@ -19,7 +19,7 @@ class Flash
 	{
 		$escaper = new Escaper();
 
-		$flash = new Session($escaper);
+		$flash = new Direct($escaper);
 
 		$cssClasses = [
 			'error'   	=> 'alert alert-danger',

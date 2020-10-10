@@ -9,26 +9,27 @@ class DeleteComponent extends BaseComponent
 {
 	public function removeAction()
 	{
-		$modules = $this->usePackage(ModulesPackage::class);
+		if ($this->request->isPost()) {
+			if ($this->modules->repositories->remove($this->request->getPost()['id'])) {
 
-		if ($modules->deleteRepository($this->postData['id'])) {
+				$this->view->responseCode =
+					$this->modules->repositories->packagesData->responseCode;
 
-			$this->viewsData->responseCode = 0;
+				$this->flashSession->success(
+					$this->modules->repositories->packagesData->responseMessage
+				);
+			} else {
+				$this->view->responseCode =
+					$this->modules->repositories->packagesData->responseCode;
 
-			$this->flash->now('success', 'Repository Deleted!');
-
-			$this->viewsData->responseMessage = 'Repository Deleted!';
-
+				$this->view->responseMessage =
+					$this->modules->repositories->packagesData->responseMessage;
+			}
 		} else {
 
-			$this->viewsData->responseCode = 1;
+			$this->view->responseMessage = 'Request method not allowed.';
 
-			$this->flash->now('error', 'Error! Could not delete repository.');
-
-			$this->viewsData->responseMessage = 'Error! Could not delete repository.';
-
+			$this->view->responseCode = 1;
 		}
-
-		return $this->generateView();
 	}
 }

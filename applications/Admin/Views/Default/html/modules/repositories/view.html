@@ -2,7 +2,7 @@
 	<div class="col">
 		<div class="input-group">
 			<select class="custom-select" id="select-repo">
-				<option selected>Select Repository</option>
+				<option value="0" selected>Select Repository</option>
 				{% for repository in repositories %}
 					<option value="{{repository['id']}}" data-url="{{repository['url']}}">{{repository['name']}}</option>
 				{% endfor %}
@@ -32,7 +32,7 @@
 		if ($('#select-repo option:selected').val() === '1') {
 			$('#sync, #edit-repo').attr('disabled', false);
 			$('#delete-repo').attr('disabled', true);
-		} else if ($('#select-repo option:selected').val() === 'Select Repository') {
+		} else if ($('#select-repo option:selected').val() === '0') {
 			$('#sync, #edit-repo, #delete-repo').attr('disabled', true);
 		} else if ($('#select-repo option:selected').val() !== '1') {
 			$('#sync, #edit-repo, #delete-repo').attr('disabled', false);

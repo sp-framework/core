@@ -47,49 +47,49 @@ class Modules
 
 	protected function initCore()
 	{
-		$this->core = (new Core($this->container))->getAllCores();
+		$this->core = (new Core($this->container))->getAll();
 
 		return $this->core;
 	}
 
 	protected function initApplications()
 	{
-		$this->applications = (new Applications($this->container))->getAllApplications();
+		$this->applications = (new Applications($this->container))->getAll();
 
 		return $this->applications;
 	}
 
 	protected function initComponents()
 	{
-		$this->components = (new Components($this->container))->getAllComponents();
+		$this->components = (new Components($this->container))->getAll();
 
 		return $this->components;
 	}
 
 	protected function initPackages()
 	{
-		$this->packages = (new Packages($this->container))->getAllPackages();
+		$this->packages = (new Packages($this->container))->getAll();
 
 		return $this->packages;
 	}
 
 	protected function initMiddlewares()
 	{
-		$this->middlewares = (new Middlewares($this->container))->getAllMiddlewares();
+		$this->middlewares = (new Middlewares($this->container))->getAll();
 
 		return $this->middlewares;
 	}
 
 	protected function initViews()
 	{
-		$this->views = (new Views($this->container))->getAllViews();
+		$this->views = (new Views($this->container))->getAll();
 
 		return $this->views;
 	}
 
 	protected function initRepositories()
 	{
-		$this->repositories = (new Repositories($this->container))->getAllRepositories();
+		$this->repositories = (new Repositories($this->container))->getAll();
 
 		return $this->repositories;
 	}
