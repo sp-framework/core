@@ -10,7 +10,7 @@ class DeleteComponent extends BaseComponent
 	public function removeAction()
 	{
 		if ($this->request->isPost()) {
-			if ($this->modules->repositories->remove($this->request->getPost()['id'])) {
+			if ($this->modules->repositories->remove($this->postData()['id'])) {
 
 				$this->view->responseCode =
 					$this->modules->repositories->packagesData->responseCode;

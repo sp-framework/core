@@ -3,18 +3,164 @@
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use System\Base\BasePackage;
-use System\Base\Interfaces\BasePackageInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Applications as ApplicationsModel;
 
-class Applications extends BasePackage implements BasePackageInterface
+class Applications extends BasePackage
 {
-	private $model;
+	protected $modelToUse = ApplicationsModel::class;
+
+	protected $packageName = 'applications';
 
 	public $applications;
 
 	protected $applicationInfo = null;
 
 	protected $defaults = null;
+
+	// public function getAll(bool $resetCache = false)
+	// {
+	// 	$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+
+	// 	if (!$this->applications || $resetCache) {
+
+	// 		$this->model = ApplicationsModel::find($parameters);
+
+	// 		$this->applications = $this->model->toArray();
+	// 	}
+
+	// 	return $this;
+	// }
+
+	// public function getById(int $id = null, bool $resetCache = false)
+	// {
+	// 	$parameters = $this->paramsWithCache($this->getIdParams($id));
+
+	// 	$this->model = ApplicationsModel::find($parameters);
+
+	// 	return $this->getDbData($parameters);
+	// }
+
+	// public function getByParams($params = null, bool $resetCache = false)
+	// {
+	// 	$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
+
+	// 	$this->model = ApplicationsModel::find($parameters);
+
+	// 	return $this->getDbData($parameters);
+	// }
+
+	// protected function getDbData($parameters)
+	// {
+	// 	if ($this->model->count() === 1) {
+	// 		$this->packagesData->responseCode = 0;
+	// 		$this->packagesData->responseMessage = 'Found';
+
+	// 		array_push($this->cacheKeys, $parameters['cache']['key']);
+
+	// 		return $this->model->toArray()[0];
+
+	// 	} else if ($this->model->count() > 1) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+
+	// 	} else if ($this->model->count() === 0) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'No Record Found!';
+	// 	}
+
+	// 	$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+
+	// 	return false;
+	// }
+
+	// public function add(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
+
+	// 		$application = new ApplicationsModel();
+
+	// 		$application->setTransaction($transaction);
+
+	// 		$application->assign($data);
+
+	// 		$create = $application->create();
+
+	// 		if (!$create) {
+	// 			$transaction->rollback('Could not add application.');
+	// 		}
+
+	// 		if ($transaction->commit()) {
+	// 			$this->resetCache();
+
+	// 			$this->packagesData->responseCode = 0;
+
+	// 			$this->packagesData->responseMessage = 'Added application!';
+
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
+
+	// public function update(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
+
+	// 		$application = new ApplicationsModel();
+
+	// 		$application->setTransaction($transaction);
+
+	// 		$application->assign($data);
+
+	// 		if (!$application->update()) {
+	// 			$transaction->rollback('Could not update application.');
+	// 		}
+
+	// 		if ($transaction->commit()) {
+	// 			//Delete Old cache if exists and generate new cache
+	// 			$this->updateCache($data['id']);
+
+	// 			$this->packagesData->responseCode = 0;
+
+	// 			$this->packagesData->responseMessage = 'Application Updated!';
+
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
+
+	// public function remove(int $id)
+	// {
+	// 	//Need to solve dependencies for removal
+	// 	// $this->get($id);
+
+	// 	// if ($this->model->count() === 1) {
+	// 	// 	if ($this->model->delete()) {
+
+	// 	// 		$this->resetCache($id);
+
+	// 	// 		$this->packagesData->responseCode = 0;
+	// 	// 		$this->packagesData->responseMessage = 'Application Deleted!';
+	// 	// 		return true;
+	// 	// 	} else {
+	// 	// 		$this->packagesData->responseCode = 1;
+	// 	// 		$this->packagesData->responseMessage = 'Could not delete application.';
+	// 	// 	}
+	// 	// } else if ($this->model->count() > 1) {
+	// 	// 	$this->packagesData->responseCode = 1;
+	// 	// 	$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+	// 	// } else if ($this->model->count() === 0) {
+	// 	// 	$this->packagesData->responseCode = 1;
+	// 	// 	$this->packagesData->responseMessage = 'No Record Found with that ID!';
+	// 	// }
+	// }
 
 	public function getApplicationInfo()
 	{
@@ -123,26 +269,6 @@ class Applications extends BasePackage implements BasePackageInterface
 		}
 	}
 
-	public function getAll($conditions = null)
-	{
-		// if (!$this->cacheKey) {
-		// 	$this->setCacheKey();
-		// }
-
-		if ($this->cacheKey) {
-			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
-		}
-
-		if (!$this->applications) {
-
-			$this->model = ApplicationsModel::find($parameters);
-
-			$this->applications = $this->model->toArray();
-		}
-
-		return $this;
-	}
-
 	protected function getNamedApplication($name)
 	{
 		return $this->applications
@@ -165,24 +291,5 @@ class Applications extends BasePackage implements BasePackageInterface
 			[
 				array_search('1', array_column($this->applications, 'is_default'))
 			];
-	}
-
-	public function add(array $data)
-	{
-		if ($data) {
-			$application = new ApplicationsModel();
-
-			return $application->add($data, $this->cacheKey);
-		}
-	}
-
-	public function update(array $data)
-	{
-		//
-	}
-
-	public function remove(int $id)
-	{
-		//
 	}
 }

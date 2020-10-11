@@ -15,9 +15,18 @@ abstract class BaseComponent extends Controller
 
 	protected function onConstruct()
 	{
+		$this->setDefaultViewResponse();
+
 		if (!$this->isJson() || $this->request->isAjax()) {
 			$this->checkLayout();
 		}
+	}
+
+	protected function setDefaultViewResponse()
+	{
+		$this->view->responseCode = '0';
+
+		$this->view->responseMessage = 'Default Response Message';
 	}
 
 	protected function sendJson()
@@ -41,6 +50,7 @@ abstract class BaseComponent extends Controller
 			return $this->sendJson();
 		} else {
 			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+			// var_dump($this->view->getViewsDir());
 		}
 	}
 
@@ -171,6 +181,11 @@ abstract class BaseComponent extends Controller
 	protected function getData()
 	{
 		return $this->getQueryArr;
+	}
+
+	protected function postData()
+	{
+		return $this->request->getPost();
 	}
 
 	protected function buildAssets()

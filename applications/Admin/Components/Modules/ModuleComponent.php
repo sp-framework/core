@@ -2,7 +2,7 @@
 
 namespace Applications\Admin\Components\Modules;
 
-use Applications\Admin\Packages\ModulesPackage;
+use Applications\Admin\Packages\Modules as ModulesPackage;
 use System\Base\BaseComponent;
 
 class ModuleComponent extends BaseComponent

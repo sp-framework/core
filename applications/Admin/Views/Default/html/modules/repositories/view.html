@@ -46,20 +46,20 @@
 		changeRepoButtons();
 
 		$('#sync').click(function() {
-			$('#sync').attr('disabled', true);
+			$('#sync, #edit-repo, #delete-repo, #add-repo').attr('disabled', true);
 			$('#repo-loader').attr('hidden', false);
 			$('.sync-icon').attr('hidden', false);
 			$('#modules-data').attr('hidden', true);
-			$('#modules-data').empty();
+
 			$.get(
 				'/{{route}}/modules/repositories/sync/q/' +
-				'repoId/' + $('#select-repo option:selected').val() + '/layout/0',
+				'repoId/' + $('#select-repo option:selected').val(),
 				function(data) {
-					if (data) {
+					if (typeof data === 'string') {
 						$('#modules-data').empty().html(data);
 						$('#modules-data').attr('hidden', false);
 						$('#repo-loader').attr('hidden', true);
-						$('#sync').attr('disabled', false);
+						$('#sync, #edit-repo, #delete-repo, #add-repo').attr('disabled', false);
 
 						var text, registerCounter, updateCounter;
 
@@ -88,6 +88,14 @@
 							});
 						}
 						initModuleButtons();
+					} else {
+						PNotify.error({
+								text		: data.responseMessage,
+								textTrusted	: true
+							});
+						$('#modules-data').attr('hidden', false);
+						$('#repo-loader').attr('hidden', true);
+						$('#sync, #edit-repo, #delete-repo, #add-repo').attr('disabled', false);
 					}
 				}
 			);
@@ -102,7 +110,7 @@
 		if ($(this)[0].id === 'add-repo') {
 
 			$.get(
-				  '/{{route}}/modules/repositories/add/q/layout/0',
+				  '/{{route}}/modules/repositories/add',
 				  function(data) {
 						$('#modal-title').html('Add New Repository');
 						$('#modal .modal-body').empty().html(data);
@@ -111,9 +119,9 @@
 				);
 		} else if ($(this)[0].id === 'edit-repo') {
 			$.get(
-					'/{{route}}/modules/repositories/edit/q/layout/0/id/' + $('#select-repo option:selected').val(),
+					'/{{route}}/modules/repositories/edit/q/id/' + $('#select-repo option:selected').val(),
 					function(data) {
-						if (data && data.responseCode === 0) {
+						if (data) {
 							$('#modal-title').html('Edit Repository');
 							$('#modal .modal-body').empty().html(data);
 							$('#modal').modal('show');

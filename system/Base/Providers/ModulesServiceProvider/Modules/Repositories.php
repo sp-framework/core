@@ -2,132 +2,145 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Mvc\Model\Transaction\Manager;
 use System\Base\BasePackage;
-use System\Base\Interfaces\BasePackageInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Repositories as RepositoriesModel;
 
-class Repositories extends BasePackage implements BasePackageInterface
+class Repositories extends BasePackage
 {
-	private $model;
+	protected $modelToUse = RepositoriesModel::class;
+
+	protected $packageNameS = 'Repository';
 
 	public $repositories;
 
-	public function getAll(array $conditions = null)
-	{
-		if ($this->cacheKey) {
-			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
-		}
+	// public function getAll($params = [], bool $resetCache = false)
+	// {
+	// 	if ($this->cacheKey) {
+	// 		$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
+	// 	}
 
-		if (!$this->repositories) {
-			$this->model = RepositoriesModel::find($parameters);
+	// 	if (!$this->repositories || $resetCache) {
+	// 		$this->model = RepositoriesModel::find($parameters);
 
-			$this->repositories = $this->model->toArray();
-		}
+	// 		$this->repositories = $this->model->toArray();
+	// 	}
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 
-	public function get(int $id)
-	{
-		$parameters = $this->paramsWithCache($this->getIdParams($id));
+	// public function get(int $id, bool $resetCache = false)
+	// {
+	// 	$parameters = $this->paramsWithCache($this->getIdParams($id));
 
-		$this->model = RepositoriesModel::find($parameters);
+	// 	$this->model = RepositoriesModel::find($parameters);
 
-		if ($this->model->count() === 1) {
-			$this->packagesData->responseCode = 0;
-			$this->packagesData->responseMessage = 'Found';
+	// 	if ($this->model->count() === 1) {
+	// 		$this->packagesData->responseCode = 0;
+	// 		$this->packagesData->responseMessage = 'Found';
 
-			array_push($this->cacheKeys, $parameters['cache']['key']);
+	// 		array_push($this->cacheKeys, $parameters['cache']['key']);
 
-			return $this->model->toArray()[0];
+	// 		return $this->model->toArray()[0];
 
-		} else if ($this->model->count() > 1) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+	// 	} else if ($this->model->count() > 1) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
 
-		} else if ($this->model->count() === 0) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'No Record Found with that ID!';
-		}
+	// 	} else if ($this->model->count() === 0) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'No Record Found with that ID!';
+	// 	}
 
-		$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+	// 	$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
 
-		return false;
-	}
+	// 	return false;
+	// }
 
-	public function add(array $data)
-	{
-		if ($data) {
-			$repository = new RepositoriesModel();
+	// public function add(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
 
-			$repository->assign($data);
+	// 		$repository = new RepositoriesModel();
 
-			$create = $repository->create();
+	// 		$repository->setTransaction($transaction);
 
-			$this->resetCache();
+	// 		$repository->assign($data);
 
-			$this->packagesData->responseCode = 0;
+	// 		$create = $repository->create();
 
-			$this->packagesData->responseMessage = 'Repository Updated!';
+	// 		if (!$create) {
+	// 			$transaction->rollback('Could not add repository.');
+	// 		}
 
-			return $create;
-		}
-	}
+	// 		if ($transaction->commit()) {
+	// 			$this->resetCache();
 
-	public function update(array $data)
-	{
-		try {
-			$txManager = new Manager();
-			$transaction = $txManager->get();
+	// 			$this->packagesData->responseCode = 0;
 
-			$repository = new RepositoriesModel();
+	// 			$this->packagesData->responseMessage = 'Added repository!';
 
-			$repository->setTransaction($transaction);
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
 
-			$repository->assign($data);
+	// public function update(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
 
-			if (!$repository->update()) {
-				$transaction->rollback('Could not update repository.');
-			}
+	// 		$repository = new RepositoriesModel();
 
-			if ($transaction->commit()) {
-				//Delete Old cache if exists and generate new cache
-				$this->updateCache($data['id']);
+	// 		$repository->setTransaction($transaction);
 
-				$this->packagesData->responseCode = 0;
+	// 		$repository->assign($data);
 
-				$this->packagesData->responseMessage = 'Repository Updated!';
+	// 		if (!$repository->update()) {
+	// 			$transaction->rollback('Could not update repository.');
+	// 		}
 
-				return true;
-			}
-		} catch (\Exception $e) {
-			throw $e;
-		}
-	}
+	// 		if ($transaction->commit()) {
+	// 			//Delete Old cache if exists and generate new cache
+	// 			$this->updateCache($data['id']);
 
-	public function remove(int $id)
-	{
-		$this->get($id);
+	// 			$this->packagesData->responseCode = 0;
 
-		if ($this->model->count() === 1) {
-			if ($this->model->delete()) {
+	// 			$this->packagesData->responseMessage = 'Repository Updated!';
 
-				$this->resetCache($id);
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
 
-				$this->packagesData->responseCode = 0;
-				$this->packagesData->responseMessage = 'Repository Deleted!';
-				return true;
-			} else {
-				$this->packagesData->responseCode = 1;
-				$this->packagesData->responseMessage = 'Could not delete repository.';
-			}
-		} else if ($this->model->count() > 1) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-		} else if ($this->model->count() === 0) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'No Record Found with that ID!';
-		}
-	}
+	// public function remove(int $id)
+	// {
+	// 	$this->getById($id);
+
+	// 	if ($this->model->count() === 1) {
+	// 		if ($this->model->delete()) {
+
+	// 			$this->resetCache($id);
+
+	// 			$this->packagesData->responseCode = 0;
+	// 			$this->packagesData->responseMessage = 'Repository Deleted!';
+	// 			return true;
+	// 		} else {
+	// 			$this->packagesData->responseCode = 1;
+	// 			$this->packagesData->responseMessage = 'Could not delete repository.';
+	// 		}
+	// 	} else if ($this->model->count() > 1) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+	// 	} else if ($this->model->count() === 0) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'No Record Found with that ID!';
+	// 	}
+	// }
 }

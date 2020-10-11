@@ -4,7 +4,13 @@ namespace System\Base\Interfaces;
 
 interface BasePackageInterface
 {
-	public function getAll(array $conditions);
+	public function getAll(bool $resetCache = false, bool $enableCache = true);
+
+	public function getById(int $id, bool $resetCache = false, bool $enableCache = true);
+
+	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true);
+
+	public function getDbData(array $parameters, bool $enableCache = true);
 
 	public function add(array $data);
 

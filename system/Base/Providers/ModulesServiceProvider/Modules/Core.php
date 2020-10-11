@@ -2,54 +2,124 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
-use Phalcon\Di\DiInterface;
 use System\Base\BasePackage;
-use System\Base\Interfaces\BasePackageInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Core as CoreModel;
 
-class Core extends BasePackage implements BasePackageInterface
+class Core extends BasePackage
 {
-	private $model;
+	protected $modelToUse = CoreModel::class;
 
 	public $core;
 
-	public function getCoreInfo()
-	{
-		return $this->core;
-	}
+	// public function getAll($params = [], bool $resetCache = false)
+	// {
+	// 	if ($this->cacheKey) {
+	// 		$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
+	// 	}
 
-	public function getAll(array $conditions = null)
-	{
-		if ($this->cacheKey) {
-			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
-		}
+	// 	if (!$this->core || $resetCache) {
 
-		if (!$this->core) {
+	// 		$this->model = CoreModel::find($parameters);
 
-			$this->model = CoreModel::find($parameters);
+	// 		$this->core = $this->model->toArray();
+	// 	}
 
-			$this->core = $this->model->toArray();
-		}
+	// 	return $this;
+	// }
 
-		return $this;
-	}
+	// public function get(int $id, bool $resetCache = false)
+	// {
+	// 	$parameters = $this->paramsWithCache($this->getIdParams($id));
 
-	public function add(array $data)
-	{
-		if ($data) {
-			$core = new CoreModel();
+	// 	$this->model = CoreModel::find($parameters);
 
-			return $core->add($data, $this->cacheKey);
-		}
-	}
+	// 	if ($this->model->count() === 1) {
+	// 		$this->packagesData->responseCode = 0;
+	// 		$this->packagesData->responseMessage = 'Found';
 
-	public function update(array $data)
-	{
-		//
-	}
+	// 		array_push($this->cacheKeys, $parameters['cache']['key']);
 
-	public function remove(int $id)
-	{
-		//
-	}
+	// 		return $this->model->toArray()[0];
+
+	// 	} else if ($this->model->count() > 1) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+
+	// 	} else if ($this->model->count() === 0) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'No Record Found with that ID!';
+	// 	}
+
+	// 	$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+
+	// 	return false;
+	// }
+
+	// public function add(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
+
+	// 		$repository = new CoreModel();
+
+	// 		$repository->setTransaction($transaction);
+
+	// 		$repository->assign($data);
+
+	// 		$create = $repository->create();
+
+	// 		if (!$create) {
+	// 			$transaction->rollback('Could not add core.');
+	// 		}
+
+	// 		if ($transaction->commit()) {
+	// 			$this->resetCache();
+
+	// 			$this->packagesData->responseCode = 0;
+
+	// 			$this->packagesData->responseMessage = 'Added core!';
+
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
+
+	// public function update(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
+
+	// 		$core = new CoreModel();
+
+	// 		$core->setTransaction($transaction);
+
+	// 		$core->assign($data);
+
+	// 		if (!$core->update()) {
+	// 			$transaction->rollback('Could not update core.');
+	// 		}
+
+	// 		if ($transaction->commit()) {
+	// 			//Delete Old cache if exists and generate new cache
+	// 			$this->updateCache($data['id']);
+
+	// 			$this->packagesData->responseCode = 0;
+
+	// 			$this->packagesData->responseMessage = 'Core Updated!';
+
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
+
+	// public function remove(int $id)
+	// {
+	// 	//
+	// }
 }

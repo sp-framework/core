@@ -5,80 +5,80 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules\Model;
 use System\Base\BaseModel;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="components")
+ * Entity
+ * Table(name="components")
  */
 class Components extends BaseModel
 {
     /**
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Id
-     * @ORM\Column(type="integer")
+     * GeneratedValue(strategy="AUTO")
+     * Id
+     * Column(type="integer")
      */
-    protected $id;
+    public $id;
 
     /**
-     * @ORM\Column(name="name", type="string", length=50)
+     * Column(name="name", type="string", length=50)
      */
-    protected $name;
+    public $name;
 
     /**
-     * @ORM\Column(name="display_name", type="string", length=50, nullable=true)
+     * Column(name="display_name", type="string", length=50, nullable=true)
      */
-    protected $display_name;
+    public $display_name;
 
     /**
-     * @ORM\Column(name="description", type="string", length=2048, nullable=true)
+     * Column(name="description", type="string", length=2048, nullable=true)
      */
-    protected $description;
+    public $description;
 
     /**
-     * @ORM\Column(name="version", type="string", length=15)
+     * Column(name="version", type="string", length=15)
      */
-    protected $version;
+    public $version;
 
     /**
-     * @ORM\Column(name="repo", type="string", length=2048)
+     * Column(name="repo", type="string", length=2048)
      */
-    protected $repo;
+    public $repo;
 
     /**
-     * @ORM\Column(name="path", type="string", length=2048)
+     * Column(name="path", type="string", length=2048)
      */
-    protected $path;
+    public $path;
 
     /**
-     * @ORM\Column(name="settings", type="text", length=65535, nullable=true)
+     * Column(name="settings", type="text", length=65535, nullable=true)
      */
-    protected $settings;
+    public $settings;
 
     /**
-     * @ORM\Column(name="dependencies", type="text", length=65535)
+     * Column(name="dependencies", type="text", length=65535)
      */
-    protected $dependencies;
+    public $dependencies;
 
     /**
-     * @ORM\Column(name="application_id", type="integer")
+     * Column(name="application_id", type="integer")
      */
-    protected $application_id;
+    public $application_id;
 
     /**
-     * @ORM\Column(name="installed", type="integer")
+     * Column(name="installed", type="integer")
      */
-    protected $installed;
+    public $installed;
 
     /**
-     * @ORM\Column(name="files", type="text", length=65535, nullable=true)
+     * Column(name="files", type="text", length=65535, nullable=true)
      */
-    protected $files;
+    public $files;
 
     /**
-     * @ORM\Column(name="update_available", type="integer", nullable=true)
+     * Column(name="update_available", type="integer", nullable=true)
      */
-    protected $update_available;
+    public $update_available;
 
     /**
-     * @ORM\Column(name="update_version", type="string", length=15, nullable=true)
+     * Column(name="update_version", type="string", length=15, nullable=true)
      */
-    protected $update_version;
+    public $update_version;
 }

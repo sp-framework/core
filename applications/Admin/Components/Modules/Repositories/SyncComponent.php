@@ -2,7 +2,7 @@
 
 namespace Applications\Admin\Components\Modules\Repositories;
 
-use Applications\Admin\Packages\ModulesPackage;
+use Applications\Admin\Packages\Modules as ModulesPackage;
 use System\Base\BaseComponent;
 
 class SyncComponent extends BaseComponent
@@ -11,47 +11,47 @@ class SyncComponent extends BaseComponent
 	{
 		$modules = $this->usePackage(ModulesPackage::class);
 
-		if (isset($this->request->getPost()['repoId'])) {
+		if (isset($this->getData()['repoId'])) {
 
-			$synced = $modules->syncRemoteWithLocal($this->request->getPost()['repoId']);
+			$synced = $modules->syncRemoteWithLocal($this->getData()['repoId']);
 
-			if ($synced->packagesData->responseCode === 0) {
+			if ($synced === true) {
 
-				$modulesData = $modules->getModulesData();
+				$modulesData = $modules->getModulesData(true);
 
 			} else {
-				$this->view->responseCode = $synced->packagesData->responseCode;
+				$this->view->responseCode = $modules->packagesData->responseCode;
 
-				$this->view->responseMessage = $synced->packagesData->responseMessage;
+				$this->view->responseMessage = $modules->packagesData->responseMessage;
 
-				$this->view->pick('modules/modules.html');
+				return $this->sendJson();
 			}
 
-			if ($modulesData->packagesData->responseCode === 0) {
+			if ($modulesData === true) {
+
+				$this->view->responseCode = $modules->packagesData->responseCode;
+
+				$this->view->responseMessage = $modules->packagesData->responseMessage;
+
+				$this->view->modulesData = $modules->packagesData->modulesData;
+
+				$this->view->counter = $modules->packagesData->counter;
+
+				$this->view->thisApplication = $modules->packagesData->applicationInfo;
+
+				$this->view->pick('../modules');
+			} else {
 
 				$this->view->responseCode = $modulesData->packagesData->responseCode;
 
 				$this->view->responseMessage = $modulesData->packagesData->responseMessage;
 
-				$this->view->modulesData = $modulesData->packagesData->modulesData;
-
-				$this->view->counter = $modulesData->packagesData->counter;
-
-				$this->view->thisApplication = $this->modules->applications->applicationInfo;
-
-				$this->view->pick('modules/modules.html');
-
-			} else if ($modulesData->packagesData->responseCode === 1) {
-
-				$this->view->responseCode = $modulesData->packagesData->responseCode;
-
-				$this->view->responseMessage = $modulesData->packagesData->responseMessage;
-
-				$this->view->pick('modules/modules.html');
-
+				return $this->sendJson();
 			}
 		}
+				// var_dump($this->view);
 
+		// $this->view->disable();
 		// $this->view->repositories = $this->packages->use(Repositories::class)->getAllRepositories();
 
 		// $this->view->setup = isset($this->getData['setup']) ? $this->getData['setup'] : false;

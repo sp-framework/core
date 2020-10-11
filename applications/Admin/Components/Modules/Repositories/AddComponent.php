@@ -16,7 +16,7 @@ class AddComponent extends BaseComponent
 	{
 		if ($this->request->isPost()) {
 
-			if ($this->modules->repositories->add($this->request->getPost())) {
+			if ($this->modules->repositories->add($this->postData())) {
 
 				$this->flashSession->clear();
 

@@ -3,12 +3,23 @@
 namespace System\Base;
 
 use Phalcon\Di\DiInterface;
+use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Controller;
+use Phalcon\Mvc\Model\Transaction\Manager;
+use System\Base\Interfaces\BasePackageInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
-abstract class BasePackage extends Controller
+abstract class BasePackage extends Controller implements BasePackageInterface
 {
 	public $packagesData;
+
+	protected $packageName;
+
+	protected $packageNameP;
+
+	protected $packageNameS;
+
+	protected $model;
 
 	protected $cacheKey;
 
@@ -18,9 +29,216 @@ abstract class BasePackage extends Controller
 	{
 		$this->packagesData = new PackagesData;
 
+		$this->setDefaultPackageResponse();
+
 		if (!$this->cacheKey) {
 			$this->resetCacheKey();
 		}
+
+		$this->setNames();
+	}
+
+	protected function setNames()
+	{
+		if (!$this->packageName) {
+			$this->packageName = strtolower(Arr::last($this->getClassName()));
+		}
+
+		if (!$this->packageNameP) {
+			$this->packageNameP = ucfirst($this->packageName);
+		}
+
+		if (!$this->packageNameS) {
+			$this->packageNameS = ucfirst(rtrim($this->packageName, 's'));
+		}
+	}
+
+	public function getAll(bool $resetCache = false, bool $enableCache = true)
+	{
+		if ($enableCache) {
+			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+		} else {
+			$parameters = [];
+		}
+
+		if (!$this->{$this->packageName} || $resetCache) {
+
+			$this->model = $this->modelToUse::find($parameters);
+
+			$this->{$this->packageName} = $this->model->toArray();
+		}
+
+		return $this;
+	}
+
+	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
+	{
+		if ($id) {
+			if ($enableCache) {
+				$parameters = $this->paramsWithCache($this->getIdParams($id));
+			} else {
+				$parameters = [];
+			}
+
+			$this->model = $this->modelToUse::find($parameters);
+
+			return $this->getDbData($parameters, $enableCache);
+		}
+
+		throw new \Exception('getById needs id parameter to be set.');
+	}
+
+	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
+	{
+		if ($params && $params['conditions']) {
+			if ($enableCache) {
+				$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
+			} else {
+				$parameters = $params;
+			}
+
+			$this->model = $this->modelToUse::find($parameters);
+
+			return $this->getDbData($parameters, $enableCache);
+		}
+
+		throw new \Exception('getByParams needs parameter condition to be set.');
+	}
+
+	public function getDbData($parameters, bool $enableCache = true)
+	{
+		if ($this->model->count() === 1) {
+			$this->packagesData->responseCode = 0;
+			$this->packagesData->responseMessage = 'Found';
+
+			if ($enableCache) {
+				array_push($this->cacheKeys, $parameters['cache']['key']);
+			}
+
+			return $this->model->toArray()[0];
+
+		} else if ($this->model->count() > 1) {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+
+		} else if ($this->model->count() === 0) {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = 'No Record Found!';
+		}
+
+		$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+
+		return false;
+	}
+
+	public function add(array $data)
+	{
+		if ($data) {
+			try {
+				$txManager = new Manager();
+				$transaction = $txManager->get();
+
+				${$this->packageName} = new $this->modelToUse();
+
+				${$this->packageName}->setTransaction($transaction);
+
+				${$this->packageName}->assign($data);
+
+				$create = ${$this->packageName}->create();
+
+				if (!$create) {
+					$transaction->rollback("Could not add {$this->packageNameS}.");
+				}
+
+				if ($transaction->commit()) {
+					$this->resetCache();
+
+					$this->packagesData->responseCode = 0;
+
+					$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
+
+					return true;
+				}
+			} catch (\Exception $e) {
+				throw $e;
+			}
+		}
+
+		throw new \Exception('Data array missing. Cannot add!');
+	}
+
+	public function update(array $data)
+	{
+		if ($data) {
+			try {
+				$txManager = new Manager();
+				$transaction = $txManager->get();
+
+				${$this->packageName} = new $this->modelToUse();
+
+				${$this->packageName}->setTransaction($transaction);
+
+				${$this->packageName}->assign($data);
+
+				if (!${$this->packageName}->update()) {
+					$transaction->rollback("Could not update {$this->packageNameS}.");
+				}
+
+				if ($transaction->commit()) {
+					//Delete Old cache if exists and generate new cache
+					$this->updateCache($data['id']);
+
+					$this->packagesData->responseCode = 0;
+
+					$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
+
+					return true;
+				}
+			} catch (\Exception $e) {
+				throw $e;
+			}
+		}
+
+		throw new \Exception('Data array missing. Cannot update!');
+	}
+
+	public function remove(int $id)
+	{
+		if ($this->packageName === 'core') {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = "Could not delete {$this->packageNameS}.";
+			return;
+		}
+
+		//Need to solve dependencies for removal
+		$this->getById($id);
+
+		if ($this->model->count() === 1) {
+			if ($this->model->delete()) {
+
+				$this->resetCache($id);
+
+				$this->packagesData->responseCode = 0;
+				$this->packagesData->responseMessage = "{$this->packageNameS} Deleted!";
+				return true;
+			} else {
+				$this->packagesData->responseCode = 1;
+				$this->packagesData->responseMessage = "Could not delete {$this->packageNameS}.";
+			}
+		} else if ($this->model->count() > 1) {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+		} else if ($this->model->count() === 0) {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = 'No Record Found with that ID!';
+		}
+	}
+
+	protected function setDefaultPackageResponse()
+	{
+		$this->packagesData->responseCode = '0';
+
+		$this->packagesData->responseMessage = 'Default Response Message';
 	}
 
 	protected function getIdParams(int $id)
@@ -35,11 +253,16 @@ abstract class BasePackage extends Controller
 			];
 	}
 
-	protected function extractCacheKey()
+	protected function getClassName()
 	{
 		$reflection = new \ReflectionClass($this);
 
-		$class = explode('\\', $reflection->getName());
+		return explode('\\', $reflection->getName());
+	}
+
+	protected function extractCacheKey()
+	{
+		$class = $this->getClassName();
 
 		$key = [];
 
@@ -155,7 +378,12 @@ abstract class BasePackage extends Controller
 		$this->resetCache($id);
 
 		$this->resetCacheKey();
-
-		$this->get($id);//Generate new Cache
 	}
+
+	// protected function regenerateCaches(int $id = null)
+	// {
+	// 	if ($id) {
+	// 		$this->get($id);
+	// 	}
+	// }
 }

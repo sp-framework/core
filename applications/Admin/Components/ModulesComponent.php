@@ -2,7 +2,7 @@
 
 namespace Applications\Admin\Components;
 
-use Applications\Admin\Packages\ModulesPackage;
+use Applications\Admin\Packages\Modules as ModulesPackage;
 use System\Base\BaseComponent;
 
 class ModulesComponent extends BaseComponent
@@ -67,7 +67,7 @@ class ModulesComponent extends BaseComponent
 			$this->view->modulesData = $modules->packagesData->modulesData;
 
 			if (!isset($this->getData()['filter'])) {
-				$this->view->applications = $modules->packagesData->applications;
+				$this->view->applications = $modules->packagesData->modulesData['applications'];
 
 				$this->view->repositories = $modules->packagesData->repositories;
 			}
@@ -82,5 +82,6 @@ class ModulesComponent extends BaseComponent
 
 			$this->view->responseMessage = $modules->packagesData->responseMessage;
 		}
+		// $this->view->disable();
 	}
 }
