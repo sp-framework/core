@@ -18,7 +18,7 @@ class OpCache
         $this->container = $container;
     }
 
-    public function initCache()
+    public function init()
     {
         if ($this->container->getShared('config')->cache) {
             //https://medium.com/@dylanwenzlau/500x-faster-caching-than-redis-memcache-apc-in-php-hhvm-dcd26e8447ad

@@ -9,7 +9,6 @@ use System\Base\Loader\Service;
 use Phalcon\Mvc\Application;
 
 $container = new FactoryDefault();
-
 include('../system/Base/Providers/SessionServiceProvider.php');
 $container->register(new SessionServiceProvider());
 $session = $container->getShared('session');

@@ -19,7 +19,7 @@ class StreamCache
         $this->container = $container;
     }
 
-    public function initCache()
+    public function init()
     {
         if ($this->container->getShared('config')->cache) {
             $serializerFactory = new SerializerFactory();

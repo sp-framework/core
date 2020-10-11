@@ -88,6 +88,7 @@ class SetupPackage
 		$this->buildPackagesSchema();
 		$this->buildMiddlewaresSchema();
 		$this->buildViewsSchema();
+		$this->buildCacheSchema();
 	}
 
 	protected function buildRepositorySchema()
@@ -155,7 +156,7 @@ class SetupPackage
 			]
 		];
 
-		$this->db->createTable('repositories', '',$columns);
+		$this->db->createTable('repositories', '', $columns);
 	}
 
 	protected function buildCoreSchema()
@@ -246,7 +247,7 @@ class SetupPackage
 			]
 		];
 
-		$this->db->createTable('core', '',$columns);
+		$this->db->createTable('core', '', $columns);
 	}
 
 	protected function buildApplicationsSchema()
@@ -375,7 +376,7 @@ class SetupPackage
 			]
 		];
 
-		$this->db->createTable('applications', '',$columns);
+		$this->db->createTable('applications', '', $columns);
 	}
 
 	protected function buildComponentsSchema()
@@ -495,7 +496,7 @@ class SetupPackage
 			]
 		];
 
-		$this->db->createTable('components', '',$columns);
+		$this->db->createTable('components', '', $columns);
 	}
 
 	protected function buildPackagesSchema()
@@ -615,7 +616,7 @@ class SetupPackage
 			]
 		];
 
-		$this->db->createTable('packages', '',$columns);
+		$this->db->createTable('packages', '', $columns);
 	}
 
 	protected function buildMiddlewaresSchema()
@@ -759,7 +760,7 @@ class SetupPackage
 			]
 		];
 
-		$this->db->createTable('middlewares', '',$columns);
+		$this->db->createTable('middlewares', '', $columns);
 	}
 
 	protected function buildViewsSchema()
@@ -871,7 +872,50 @@ class SetupPackage
 			]
 		];
 
-		$this->db->createTable('views', '',$columns);
+		$this->db->createTable('views', '', $columns);
+	}
+
+	protected function buildCacheSchema()
+	{
+		$columns =
+		[
+		   'columns' => [
+				new Column(
+					'id',
+					[
+						'type'          => Column::TYPE_INTEGER,
+						'notNull'       => true,
+						'autoIncrement' => true,
+						'primary'       => true,
+					]
+				),
+				new Column(
+					'key',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 2048,
+						'notNull' => true,
+					]
+				),
+				new Column(
+					'query',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'notNull' => true,
+					]
+				),
+				new Column(
+					'status',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'size'    => 1,
+						'notNull' => true,
+					]
+				)
+			]
+		];
+
+		$this->db->createTable('cache', '', $columns);
 	}
 
 	public function registerHWFRepository()
@@ -896,7 +940,7 @@ class SetupPackage
 		$installedFiles['files'] = [];
 
 		if ($directory) {
-			$contents = $this->container['fileSystem']->listContents($directory, $sub);
+			$contents = $this->container['localContent']->listContents($directory, $sub);
 
 			foreach ($contents as $contentKey => $content) {
 				if ($content['type'] === 'dir') {
@@ -938,7 +982,7 @@ class SetupPackage
 			return
 				$this->registerAdminApplication(
 					json_decode(
-						$this->container['fileSystem']->read('applications/Admin/application.json'),
+						$this->container['localContent']->read('applications/Admin/application.json'),
 						true
 					)
 				);
@@ -947,7 +991,7 @@ class SetupPackage
 
 			$this->registerAdminComponent(
 				json_decode(
-					$this->container['fileSystem']->read('applications/Admin/Components/Install/Modules/component.json'),
+					$this->container['localContent']->read('applications/Admin/Components/Install/Modules/component.json'),
 					true
 				),
 				$newApplicationId
@@ -957,7 +1001,7 @@ class SetupPackage
 
 			$this->registerAdminPackage(
 				json_decode(
-					$this->container['fileSystem']->read('applications/Admin/Packages/Install/Modules/package.json'),
+					$this->container['localContent']->read('applications/Admin/Packages/Install/Modules/package.json'),
 					true
 				),
 				$newApplicationId
@@ -965,13 +1009,13 @@ class SetupPackage
 
 		} else if ($type === 'middlewares') {
 
-			$adminMiddlewares = $this->container['fileSystem']->listContents('applications/Admin/Middlewares/Install/', true);
+			$adminMiddlewares = $this->container['localContent']->listContents('applications/Admin/Middlewares/Install/', true);
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
 					$this->registerAdminMiddleware(
 						json_decode(
-							$this->container['fileSystem']->read($adminMiddleware['path']),
+							$this->container['localContent']->read($adminMiddleware['path']),
 							true
 						),
 						$newApplicationId
@@ -982,7 +1026,7 @@ class SetupPackage
 
 			$this->registerAdminView(
 				json_decode(
-					$this->container['fileSystem']->read('applications/Admin/Views/Default/view.json'),
+					$this->container['localContent']->read('applications/Admin/Views/Default/view.json'),
 					true
 				),
 				$newApplicationId
@@ -1158,7 +1202,7 @@ return
 			]
 	];';
 
-		$this->container['fileSystem']->put('/system/Configs/Db.php', $configContent);
+		$this->container['localContent']->put('/system/Configs/Db.php', $configContent);
 
 		if ($this->postData['mode'] === 'production') {
 			$debug = "false";
@@ -1173,12 +1217,13 @@ return
 
 return
 	[
-		"debug"					=> ' . $debug . ' //true - Development false - Production
-		"cache"					=> ' . $cache . ' //Global Cache value //true - Production false - Development
-		"cacheTimeout"			=> 60 //Global Cache timeout in seconds
+		"debug"					=> ' . $debug . ', //true - Development false - Production
+		"cache"					=> ' . $cache . ', //Global Cache value //true - Production false - Development
+		"cacheTimeout"			=> 60, //Global Cache timeout in seconds
+		"cacheService"			=> "streamCache"
 	];';
 
-		$this->container['fileSystem']->put('/system/Configs/Base.php', $baseContent);
+		$this->container['localContent']->put('/system/Configs/Base.php', $baseContent);
 	}
 
 	public function removeSetup()
@@ -1186,8 +1231,8 @@ return
 		//If production delete setup file and rewrite DatabaseServiceProvider/Db File.
 		//Do the same when updating core via modules update
 		// if ($this->postData['mode'] === 'production') {
-		// 	$this->container['fileSystem']->delete(base_path('system/Base/Installer/Setup.php'));
-		// 	$this->container['fileSystem']->delete(base_path('system/Base/Installer/SetupPackage.php'));
+		// 	$this->container['localContent']->delete(base_path('system/Base/Installer/Setup.php'));
+		// 	$this->container['localContent']->delete(base_path('system/Base/Installer/SetupPackage.php'));
 		// 	$this->redoDatabaseServiceProviderFile();
 		// }
 	}
@@ -1221,6 +1266,6 @@ class Db
 	}
 }';
 
-		$this->container['fileSystem']->put('/system/Base/Providers/DatabaseServiceProvider/Db.php', $databaseServiceProviderContent);
+		$this->container['localContent']->put('/system/Base/Providers/DatabaseServiceProvider/Db.php', $databaseServiceProviderContent);
 	}
 }

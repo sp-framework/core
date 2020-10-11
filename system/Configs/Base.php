@@ -2,8 +2,8 @@
 
 return
 	[
-		"debug"					=> "true", //true - Development false - Production
-		"cache"					=> "true",
-		"cacheTimeout"			=> 60,
-		"cacheService"			=> 'streamCache'
+		"debug"					=> true, //true - Development false - Production
+		"cache"					=> true, //Global Cache value //true - Production false - Development
+		"cacheTimeout"			=> 60, //Global Cache timeout in seconds
+		"cacheService"			=> "streamCache"
 	];

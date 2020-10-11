@@ -22,7 +22,7 @@
     },
     "settings"      : {
         "cache": false,
-        "layout": "/layout/view.html",
+        "layout": "default",
         "head": {
             "title": "Admin - ",
             "meta": {

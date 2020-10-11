@@ -2,7 +2,6 @@
 
 namespace System\Base;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\Model\Transaction\Manager;
@@ -61,6 +60,10 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 			$parameters = [];
 		}
 
+		if (!$this->config->cache) {
+			$parameters = [];
+		}
+
 		if (!$this->{$this->packageName} || $resetCache) {
 
 			$this->model = $this->modelToUse::find($parameters);
@@ -80,6 +83,10 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				$parameters = [];
 			}
 
+			if (!$this->config->cache) {
+				$parameters = [];
+			}
+
 			$this->model = $this->modelToUse::find($parameters);
 
 			return $this->getDbData($parameters, $enableCache);
@@ -95,6 +102,10 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
 			} else {
 				$parameters = $params;
+			}
+
+			if (!$this->config->cache) {
+				$parameters = [];
 			}
 
 			$this->model = $this->modelToUse::find($parameters);
@@ -359,6 +370,10 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 	protected function resetCache(int $id = null)
 	{
+		if (!$this->config->cache) {
+			return;
+		}
+
 		$this->resetCacheKey();
 
 		if ($id) {
@@ -375,6 +390,9 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 	protected function updateCache(int $id)
 	{
+		if (!$this->config->cache) {
+			return;
+		}
 		$this->resetCache($id);
 
 		$this->resetCacheKey();

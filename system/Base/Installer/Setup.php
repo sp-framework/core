@@ -2,10 +2,9 @@
 
 namespace System\Base\Installer;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View\Simple;
+use System\Base\Providers\ContentServiceProvider\Local\Content as LocalContent;
 
 Class Setup
 {
@@ -31,9 +30,9 @@ Class Setup
 		);
 
 		$container->setShared(
-			'fileSystem',
+			'localContent',
 			function () use ($container) {
-				return new Filesystem(new Local(base_path()));
+				return (new LocalContent($container))->init();
 			}
 		);
 
@@ -86,7 +85,7 @@ Class Setup
 			$this->setup
 				->registerCore(
 					json_decode(
-						$this->container->getShared('fileSystem')->read('core.json'),
+						$this->container->getShared('localContent')->read('core.json'),
 						true)
 				);
 

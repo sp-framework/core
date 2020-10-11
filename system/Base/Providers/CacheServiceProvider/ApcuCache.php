@@ -18,7 +18,7 @@ class ApcuCache
         $this->container = $container;
     }
 
-    public function initCache()
+    public function init()
     {
         if ($this->container->getShared('config')->cache) {
             $options = [

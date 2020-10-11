@@ -82,6 +82,5 @@ class ModulesComponent extends BaseComponent
 
 			$this->view->responseMessage = $modules->packagesData->responseMessage;
 		}
-		// $this->view->disable();
 	}
 }

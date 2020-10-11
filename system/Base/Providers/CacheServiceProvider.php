@@ -16,21 +16,21 @@ class CacheServiceProvider implements ServiceProviderInterface
         $container->setShared(
             'streamCache',
             function () use ($container) {
-                return (new StreamCache($container))->initCache();
+                return (new StreamCache($container))->init();
             }
         );
 
         $container->setShared(
             'apcuCache',
             function () use ($container) {
-                return (new ApcuCache($container))->initCache();
+                return (new ApcuCache($container))->init();
             }
         );
 
         $container->setShared(
             'opCache',
             function () use ($container) {
-                return (new OpCache($container))->initCache();
+                return (new OpCache($container))->init();
             }
         );
 
