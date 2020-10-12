@@ -11,9 +11,9 @@ class Core extends BasePackage
 
 	public $core;
 
-	public function init()
+	public function init(bool $resetCache = false)
 	{
-		$this->getAll();
+		$this->getAll($resetCache);
 
 		return $this;
 	}

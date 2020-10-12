@@ -124,7 +124,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 			}
 
 			if (!$this->config->cache) {
-				$parameters = [];
+				$parameters = $params;
 			}
 
 			$this->model = $this->modelToUse::find($parameters);
@@ -149,7 +149,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				$this->packagesData->responseCode = 0;
 				$this->packagesData->responseMessage = 'Found';
 
-				if ($enableCache) {
+				if ($enableCache && $this->config->cache) {
 					array_push($this->cacheKeys, $parameters['cache']['key']);
 				}
 

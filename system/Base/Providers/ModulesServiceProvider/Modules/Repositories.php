@@ -13,9 +13,9 @@ class Repositories extends BasePackage
 
 	public $repositories;
 
-	public function init()
+	public function init(bool $resetCache = false)
 	{
-		$this->getAll();
+		$this->getAll($resetCache);
 
 		return $this;
 	}

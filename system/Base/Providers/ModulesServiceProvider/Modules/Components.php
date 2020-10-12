@@ -11,9 +11,9 @@ class Components extends BasePackage
 
 	public $components;
 
-	public function init()
+	public function init(bool $resetCache = false)
 	{
-		$this->getAll();
+		$this->getAll($resetCache);
 
 		return $this;
 	}

@@ -65,7 +65,7 @@ class Modules extends BasePackage
 			$this->modules->applications->getApplicationInfo();
 
 		if ($getFresh) {
-			$this->core = $this->modules->core->getAll(true)->core;
+			$this->core = $this->modules->core->init(true)->core;
 		} else {
 			$this->core = $this->modules->core->core;
 		}
@@ -149,7 +149,7 @@ class Modules extends BasePackage
 	{
 		if ($getFresh) {
 			$this->applications =
-				$this->modules->applications->getAll(true)->applications;
+				$this->modules->applications->init(true)->applications;
 		} else {
 			$this->applications =
 				$this->modules->applications->applications;
@@ -157,7 +157,7 @@ class Modules extends BasePackage
 
 		if ($getFresh) {
 			$this->components =
-				$this->modules->components->getAll(true)->components;
+				$this->modules->components->init(true)->components;
 		} else {
 			$this->components =
 				$this->modules->components->components;
@@ -165,7 +165,7 @@ class Modules extends BasePackage
 
 		if ($getFresh) {
 			$this->packages =
-				$this->modules->packages->getAll(true)->packages;
+				$this->modules->packages->init(true)->packages;
 		} else {
 			$this->packages =
 				$this->modules->packages->packages;
@@ -173,7 +173,7 @@ class Modules extends BasePackage
 
 		if ($getFresh) {
 			$this->middlewares =
-				$this->modules->middlewares->getAll(true)->middlewares;
+				$this->modules->middlewares->init(true)->middlewares;
 		} else {
 			$this->middlewares =
 				$this->modules->middlewares->middlewares;
@@ -181,7 +181,7 @@ class Modules extends BasePackage
 
 		if ($getFresh) {
 			$this->views =
-				$this->modules->views->getAll(true)->views;
+				$this->modules->views->init(true)->views;
 		} else {
 			$this->views =
 				$this->modules->views->views;
@@ -636,7 +636,7 @@ class Modules extends BasePackage
 									);
 
 							if ($applications) {
-								$applicationId = $applications['id'];
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}
@@ -707,7 +707,7 @@ class Modules extends BasePackage
 									);
 
 							if ($applications) {
-								$applicationId = $applications['id'];
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}
@@ -778,7 +778,7 @@ class Modules extends BasePackage
 									);
 
 							if ($applications) {
-								$applicationId = $applications['id'];
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}
@@ -859,7 +859,7 @@ class Modules extends BasePackage
 									);
 
 							if ($applications) {
-								$applicationId = $applications['id'];
+								$applicationId = $applications[0]['id'];
 							} else {
 								$applicationId = null;
 							}

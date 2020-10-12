@@ -159,12 +159,11 @@ class Views extends BasePackage
     //     //  $this->packagesData->responseMessage = 'No Record Found with that ID!';
     //     // }
     // }
-
-    public function init()
+    public function init(bool $resetCache = false)
     {
-        $this->applications = $this->modules->applications;
+        $this->getAll($resetCache);
 
-        $this->getAll();
+        $this->applications = $this->modules->applications;
 
         $this->setApplicationInfo();
 
