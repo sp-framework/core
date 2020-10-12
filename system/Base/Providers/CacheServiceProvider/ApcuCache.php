@@ -2,10 +2,10 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
+use Phalcon\Di\DiInterface;
 use Phalcon\Storage\SerializerFactory;
 use Phalcon\Cache\AdapterFactory;
 use Phalcon\Cache\CacheFactory;
-use Phalcon\Di\DiInterface;
 
 class ApcuCache
 {

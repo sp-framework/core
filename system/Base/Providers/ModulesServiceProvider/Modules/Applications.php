@@ -17,6 +17,13 @@ class Applications extends BasePackage
 
 	protected $defaults = null;
 
+	public function init()
+	{
+		$this->getAll();
+
+		return $this;
+	}
+
 	// public function getAll(bool $resetCache = false)
 	// {
 	// 	$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
@@ -180,9 +187,9 @@ class Applications extends BasePackage
 		$uri = $this->request->getURI();
 
 		$uri = explode('?', $uri);
-
 		if ($uri[0] === '/') {
 			if (!$this->defaults) {
+
 				$this->getDefaults();
 
 				if ($this->defaults) {
@@ -257,7 +264,7 @@ class Applications extends BasePackage
 
 		$route = $this->getRouteApplication($name);
 
-		if (count($application) > 0 || count($route) > 0) {
+		if (is_array($application) || is_array($route)) {
 			if ($application) {
 				$this->applicationInfo = $application;
 			} else if ($route) {
@@ -269,27 +276,64 @@ class Applications extends BasePackage
 		}
 	}
 
-	protected function getNamedApplication($name)
+	public function getNamedApplication($name)
 	{
-		return $this->applications
-			[
-				array_search(ucfirst($name), array_column($this->applications, 'name'))
-			];
+		$filter =
+			$this->model->filter(
+				function($application) use ($name) {
+					if ($application->name === ucfirst($name)) {
+						return $application;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate application name found for application ' . $name);
+		} else if (count($filter) > 0) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
 	}
 
-	protected function getRouteApplication($route)
+	public function getRouteApplication($route)
 	{
-		return $this->applications
-			[
-				array_search($route, array_column($this->applications, 'route'))
-			];
+		$filter =
+			$this->model->filter(
+				function($application) use ($route) {
+					if ($application->route === ($route)) {
+						return $application;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate application route found for application ' . $route);
+		} else if (count($filter) > 0) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
+
 	}
 
-	protected function getDefaultApplication()
+	public function getDefaultApplication()
 	{
-		return $this->applications
-			[
-				array_search('1', array_column($this->applications, 'is_default'))
-			];
+		$filter =
+			$this->model->filter(
+				function($application) {
+					if ($application->is_default === '1') {
+						return $application;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate default application for application ' . $name);
+		} else if (count($filter) > 0) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
 	}
 }

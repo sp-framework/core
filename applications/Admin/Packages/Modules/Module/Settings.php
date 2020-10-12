@@ -1,9 +1,7 @@
 <?php
 
-namespace Packages\Admin\Modules\Module;
+namespace Applications\Admin\Packages\Modules\Module;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use System\Base\BasePackage;
 
 class Settings extends BasePackage
@@ -16,33 +14,29 @@ class Settings extends BasePackage
 
 			$this->packagesData->type = 'applications';
 
+			$components = $this->modules->components->components;
+
 			$this->packagesData->components =
-				getAllArr(
-					$this->components
-					->getAll(['application_id' => $getData['id']])
-				);
+				[
+					$components[array_search($getData['id'], array_column($components, 'application_id'))]
+				];
+
+			$views = $this->modules->views->views;
 
 			$this->packagesData->views =
-				getAllArr(
-					$this->views
-					->getAll(['application_id' => $getData['id']])
-				);
+				[
+					$views[array_search($getData['id'], array_column($views, 'application_id'))]
+				];
 
 			$this->packagesData->application =
-				$this->applications
-				->getById($getData['id'])
-				->getAllArr();
+				$this->modules->applications->getById($getData['id']);
 
-			$this->packagesData->settings
-				= json_decode(
-					$this->applications
-					->getById($getData['id'])
-					->getAllArr()['settings'], true
+			$this->packagesData->settings =
+				json_decode(
+					$this->packagesData->application['settings'], true
 				);
 
 			$this->packagesData->responseCode = 0;
-
-			return $this->packagesData;
 
 		} else if ($getData['type'] === 'components') {
 
@@ -59,11 +53,11 @@ class Settings extends BasePackage
 			$this->packagesData->settings =
 				$thisComponent['settings'] ?? json_decode($thisComponent['settings'], true);
 
-			$fileSystem = new Filesystem(new Local('components/Admin/Install/' . $thisComponent['name'] . '/'));
+			$this->localContent->setPathPrefix('components/Admin/Install/' . $thisComponent['name'] . '/');
 
-			if ($fileSystem->has('settings.html')) {
+			if ($this->localContent->has('settings.html')) {
 				$this->packagesData->componentSettingsFileContent =
-					$fileSystem->read('settings.html');
+					$this->localContent->read('settings.html');
 			} else {
 				$this->packagesData->componentSettingsFileContent =
 					'This Component does not require any settings.';
@@ -86,11 +80,11 @@ class Settings extends BasePackage
 			$this->packagesData->settings =
 				$thisPackage['settings'] ?? json_decode($thisPackage['settings'], true);
 
-			$fileSystem = new Filesystem(new Local('packages/Admin/Install/' . $thisPackage['name'] . '/'));
+			$this->localContent->setPathPrefix('packages/Admin/Install/' . $thisPackage['name'] . '/');
 
-			if ($fileSystem->has('settings.html')) {
+			if ($this->localContent->has('settings.html')) {
 				$this->packagesData->packageSettingsFileContent =
-					$fileSystem->read('settings.html');
+					$this->localContent->read('settings.html');
 			} else {
 				$this->packagesData->packageSettingsFileContent =
 					'This Package does not require any settings.';
@@ -113,11 +107,11 @@ class Settings extends BasePackage
 			$this->packagesData->settings =
 				$thisMiddleware['settings'] ?? json_decode($thisMiddleware['settings'], true);
 
-			$fileSystem = new Filesystem(new Local('middlewares/Admin/Install/' . $thisMiddleware['name'] . '/'));
+			$this->localContent->setPathPrefix('middlewares/Admin/Install/' . $thisMiddleware['name'] . '/');
 
-			if ($fileSystem->has('settings.html')) {
+			if ($this->localContent->has('settings.html')) {
 				$this->packagesData->middlewareSettingsFileContent =
-					$fileSystem->read('settings.html');
+					$this->localContent->read('settings.html');
 			} else {
 				$this->packagesData->middlewareSettingsFileContent =
 					'This Middleware does not require any settings.';
@@ -148,81 +142,73 @@ class Settings extends BasePackage
 	{
 		if ($postData['type'] === 'applications') {
 
-			$thisApplication =
-				$this->applications
-					->getById($postData['id'])
-					->getAllArr();
+			$thisApplication = $this->modules->applications->getById($postData['id'], false, false);
 
-			if ($thisApplication['installed'] === 0) {
+			if ($thisApplication['installed'] === '0') {
 
 				$this->packagesData->responseCode = 1;
 
-				$this->packagesData->responseMessage = 'Application is not installed! Cannot edit settings.';
+				$this->packagesData->responseMessage =
+					'Application is not installed! Cannot edit settings.';
 
-				return $this->packagesData;
+				return false;
 			}
 
 			if (!ctype_alpha($postData['route']) && $postData['route'] !== '') {
 
 				$this->packagesData->responseCode = 1;
 
-				$this->packagesData->responseMessage = 'Route name cannot have spaces, special characters or numbers';
+				$this->packagesData->responseMessage =
+					'Route name cannot have spaces, special characters or numbers';
 
-				return $this->packagesData;
+				return false;
+			}
 
-			} else if ($postData['settings']['component'] === '0' ||
-					   $postData['settings']['view'] === '0'
-					  ) {
+			if ($postData['settings']['component'] === '0' ||
+				$postData['settings']['view'] === '0'
+			) {
+				if ($postData['settings']['component'] === '0') {
 
-					if ($postData['settings']['component'] === '0') {
+					$this->packagesData->responseMessage = 'Please select default component';
 
-						$this->packagesData->responseMessage = 'Please select default component';
+				} else if ($postData['settings']['view'] === '0') {
 
-					} else if ($postData['settings']['view'] === '0') {
+					$this->packagesData->responseMessage = 'Please select default view';
 
-						$this->packagesData->responseMessage = 'Please select default view';
+				}
 
-					}
+				$this->packagesData->responseCode = 1;
 
-					$this->packagesData->responseCode = 1;
+				return false;
+			}
 
-					return $this->packagesData;
+			if ($postData['is_default'] === 'true' && $postData['force'] !== '1') {
 
-			} else {
+				if ($this->checkDefaultApplication($postData)) {
 
-				if ($postData['is_default'] === 'true' &&
-					$postData['force'] !== '1'
-				   ) {
+					$this->packagesData->responseCode = 2;
 
-					if ($this->checkDefaultApplication($postData)) {
+					$this->packagesData->responseMessage =
+						$this->defaultApplication['name'] . ' application is already set to default.' .
+						' Make application ' . $postData['name'] . ' as default?';
 
-						$this->packagesData->responseCode = 2;
+					return false;
+				}
+
+				if ($postData['route'] !== '') {
+					if ($this->checkDuplicateRoute($postData)) {
+						$this->packagesData->responseCode = 3;
 
 						$this->packagesData->responseMessage =
-							$this->packagesData->defaultApplication->get('name') .
-							' application is already set to default. Make application ' . $postData['name'] .
-							' as default?';
+							$this->packagesData->duplicateApplicationNameRoute['name'] .
+							' application is already set to use this route. Please change route and try again.';
 
-						return $this->packagesData;
-					}
-
-					if ($postData['route'] !== '') {
-						if ($this->checkDuplicateRoute($postData)) {
-							$this->packagesData->responseCode = 3;
-
-							$this->packagesData->responseMessage =
-								$this->packagesData->duplicateApplicationNameRoute->get('name') .
-								' application is already set to use this route. Please change route and try again.';
-
-							return $this->packagesData;
-						}
+						return false;
 					}
 				}
 			}
 
-			if ($postData['is_default'] === 'true' &&
-				$postData['force'] === '1'
-				) {
+			if ($postData['is_default'] === 'true' && $postData['force'] === '1') {
 				$this->removeDefaultFlag();
 			}
 
@@ -234,21 +220,21 @@ class Settings extends BasePackage
 
 			$postData['is_default'] = $postData['is_default'] === 'true' ? 1 : 0;
 
-			$update = $this->applications->update($postData);
+			$update = $this->modules->applications->update($postData);
 
-			if (is_object($update)) {
+			if ($update) {
 
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = 'Application settings updated.';
 
-				return $this->packagesData;
+				return true;
 			} else {
 				$this->packagesData->responseCode = 1;
 
 				$this->packagesData->responseMessage = 'Error updating application settings.';
 
-				return $this->packagesData;
+				return false;
 			}
 
 		} else if ($postData['type'] === 'components') {
@@ -445,7 +431,8 @@ class Settings extends BasePackage
 	{
 		if (!$this->defaultApplication) {
 
-			$this->defaultApplication = $this->applications->getAll(["is_default" => 1]);
+			$this->defaultApplication =
+				$this->modules->applications->getDefaultApplication();
 
 			return $this->defaultApplication;
 		} else {
@@ -460,12 +447,9 @@ class Settings extends BasePackage
 
 		if (count($defaultApplication) > 0) {
 
-			$defaultApplication =
-				getAllArr($defaultApplication)[0];
-
 			$defaultApplication['is_default'] = 0;
 
-			$this->applications->update($defaultApplication);
+			$this->modules->applications->update($defaultApplication);
 		}
 	}
 
@@ -475,7 +459,7 @@ class Settings extends BasePackage
 
 		// Checking if same application is default
 		if ($defaultApplication) {
-			if (strval($defaultApplication[0]->get('id')) === $postData['id']) {
+			if (strval($defaultApplication['id']) === $postData['id']) {
 				return false;
 			}
 		} else {
@@ -484,7 +468,7 @@ class Settings extends BasePackage
 
 		if (count($defaultApplication) > 0) {
 
-			$this->packagesData->defaultApplication = $defaultApplication[0];
+			$this->packagesData->defaultApplication = $defaultApplication;
 
 			return true;
 		} else {
@@ -494,23 +478,23 @@ class Settings extends BasePackage
 
 	protected function checkDuplicateRoute($postData)
 	{
-		$duplicateApplicationRoute = $this->applications->getAll(["route" => $postData['route']]);
-		$duplicateApplicationName = $this->applications->getAll(["name" => $postData['route']]);
+		$duplicateApplicationRoute = $this->modules->applications->getRouteApplication($postData['route']);
+		$duplicateApplicationName = $this->modules->applications->getNamedApplication($postData['route']);
 
-		if (count($duplicateApplicationRoute) > 0 || count($duplicateApplicationName) > 0) {
-			if (count($duplicateApplicationRoute) > 0) {
+		if (is_array($duplicateApplicationRoute) || is_array($duplicateApplicationName)) {
+			if (is_array($duplicateApplicationRoute)) {
 
-				if ($postData['id'] == $duplicateApplicationRoute[0]->get('id')) {
+				if ($postData['id'] == $duplicateApplicationRoute['id']) {
 					return false;
 				} else {
-					$this->packagesData->duplicateApplicationNameRoute = $duplicateApplicationRoute[0];
+					$this->packagesData->duplicateApplicationNameRoute = $duplicateApplicationRoute;
 				}
 			} else if (count($duplicateApplicationName) > 0) {
 
-				if ($postData['id'] == $duplicateApplicationName[0]->get('id')) {
+				if ($postData['id'] == $duplicateApplicationName['id']) {
 					return false;
 				} else {
-					$this->packagesData->duplicateApplicationNameRoute = $duplicateApplicationName[0];
+					$this->packagesData->duplicateApplicationNameRoute = $duplicateApplicationName;
 				}
 			}
 

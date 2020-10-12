@@ -5,9 +5,10 @@ namespace System\Base\Providers;
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use System\Base\Providers\CacheServiceProvider\ApcuCache;
+use System\Base\Providers\CacheServiceProvider\CacheTools;
 use System\Base\Providers\CacheServiceProvider\OpCache;
 use System\Base\Providers\CacheServiceProvider\StreamCache;
-use System\Base\Providers\CacheServiceProvider\CacheTools;
+use System\Base\Providers\CacheServiceProvider\ModelsMetadataCache;
 
 class CacheServiceProvider implements ServiceProviderInterface
 {
@@ -40,5 +41,14 @@ class CacheServiceProvider implements ServiceProviderInterface
                 return new CacheTools($container);
             }
         );
+
+        if ($container->getShared('config')->cache) {
+            $container->setShared(
+                'modelsMetadata',
+                function () use ($container) {
+                    return (new ModelsMetadataCache($container))->init();
+                }
+            );
+        }
     }
 }

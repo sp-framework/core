@@ -3,19 +3,18 @@
 namespace Applications\Admin\Components\Modules;
 
 use Applications\Admin\Packages\Modules as ModulesPackage;
+use Applications\Admin\Packages\Modules\Module\Info;
 use System\Base\BaseComponent;
 
 class ModuleComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$modules = $this->usePackage(ModulesPackage::class);
+		$infoModule = $this->usePackage(Info::class);
 
-		$viewModule = $modules->viewModule($this->getData);
+		$infoModule->runProcess($this->getData());
 
-		$this->viewsData->module = $viewModule->packagesData['info'];
-
-		return $this->generateView();
+		$this->view->module = $infoModule->packagesData->info;
 	}
 
 	public function installAction()
@@ -26,9 +25,9 @@ class ModuleComponent extends BaseComponent
 
 		if ($installModule->packagesData['responseCode'] === 0) {
 
-			$this->viewsData->responseCode = 0;
+			$this->view->responseCode = 0;
 
-			$this->viewsData->responseMessage =
+			$this->view->responseMessage =
 				rtrim(ucfirst($this->postData['type'])) . ' ' . ucfirst($this->postData['name']) . ' Installed Successfully! ' .
 				'<br>Backup was successfully taken at location .backups/' . $installModule->packagesData['backupFile'];
 
@@ -44,9 +43,9 @@ class ModuleComponent extends BaseComponent
 
 		} else if ($installModule->packagesData['responseCode'] === 1) {
 
-			$this->viewsData->responseCode = 1;
+			$this->view->responseCode = 1;
 
-			$this->viewsData->responseMessage = $installModule->packagesData['responseMessage'];
+			$this->view->responseMessage = $installModule->packagesData['responseMessage'];
 
 			return $this->generateView();
 		}
@@ -60,9 +59,9 @@ class ModuleComponent extends BaseComponent
 
 		if ($updateModule->packagesData['responseCode'] === 0) {
 
-			$this->viewsData->responseCode = 0;
+			$this->view->responseCode = 0;
 
-			$this->viewsData->responseMessage =
+			$this->view->responseMessage =
 				rtrim(ucfirst($this->postData['type'])) . ' ' . ucfirst($this->postData['name']) . ' Updated Successfully! ' .
 				'<br>Backup was successfully taken at location .backups/' . $updateModule->packagesData['backupFile'];
 
@@ -78,9 +77,9 @@ class ModuleComponent extends BaseComponent
 
 		} else if ($updateModule->packagesData['responseCode'] === 1) {
 
-			$this->viewsData->responseCode = 1;
+			$this->view->responseCode = 1;
 
-			$this->viewsData->responseMessage = $updateModule->packagesData['responseMessage'];
+			$this->view->responseMessage = $updateModule->packagesData['responseMessage'];
 
 			return $this->generateView();
 		}

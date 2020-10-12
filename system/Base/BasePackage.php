@@ -4,6 +4,7 @@ namespace System\Base;
 
 use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Controller;
+use Phalcon\Mvc\Model\Transaction\Failed;
 use Phalcon\Mvc\Model\Transaction\Manager;
 use System\Base\Interfaces\BasePackageInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
@@ -24,6 +25,10 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 	protected $cacheKeys = [];
 
+	protected $manager = null;
+
+	protected $transaction = null;
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -35,6 +40,22 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 		}
 
 		$this->setNames();
+	}
+
+	public function init()
+	{
+		return $this;
+	}
+
+	protected function initTransaction()
+	{
+		if (!$this->manager) {
+			$this->manager = new Manager();
+		}
+
+		if (!$this->transaction) {
+			$this->transaction = $this->manager->get();
+		}
 	}
 
 	protected function setNames()
@@ -70,8 +91,6 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 			$this->{$this->packageName} = $this->model->toArray();
 		}
-
-		return $this;
 	}
 
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
@@ -80,19 +99,19 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 			if ($enableCache) {
 				$parameters = $this->paramsWithCache($this->getIdParams($id));
 			} else {
-				$parameters = [];
+				$parameters = $this->getIdParams($id);
 			}
 
 			if (!$this->config->cache) {
-				$parameters = [];
+				$parameters = $this->getIdParams($id);
 			}
 
 			$this->model = $this->modelToUse::find($parameters);
 
 			return $this->getDbData($parameters, $enableCache);
+		} else {
+			throw new \Exception('getById needs id parameter to be set.');
 		}
-
-		throw new \Exception('getById needs id parameter to be set.');
 	}
 
 	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
@@ -110,31 +129,45 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 			$this->model = $this->modelToUse::find($parameters);
 
-			return $this->getDbData($parameters, $enableCache);
+			return $this->getDbData($parameters, $enableCache, 'params');
 		}
 
 		throw new \Exception('getByParams needs parameter condition to be set.');
 	}
 
-	public function getDbData($parameters, bool $enableCache = true)
+	public function getDbData($parameters, bool $enableCache = true, string $type = 'id')
 	{
-		if ($this->model->count() === 1) {
-			$this->packagesData->responseCode = 0;
-			$this->packagesData->responseMessage = 'Found';
+		if ($this->model->count() === 0) {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = 'No Record Found!';
 
+			return;
+		}
+
+		if ($type === 'id') {
+			if ($this->model->count() === 1) {
+				$this->packagesData->responseCode = 0;
+				$this->packagesData->responseMessage = 'Found';
+
+				if ($enableCache) {
+					array_push($this->cacheKeys, $parameters['cache']['key']);
+				}
+
+				return $this->model->toArray()[0];
+
+			} else if ($this->model->count() > 1) {
+				$this->packagesData->responseCode = 1;
+				$this->packagesData->responseMessage =
+					'Duplicate Id found! Database Corrupt'; //Run package to fix database
+
+				return;
+			}
+		} else if ($type === 'params') {
 			if ($enableCache) {
 				array_push($this->cacheKeys, $parameters['cache']['key']);
 			}
 
-			return $this->model->toArray()[0];
-
-		} else if ($this->model->count() > 1) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-
-		} else if ($this->model->count() === 0) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'No Record Found!';
+			return $this->model->toArray();
 		}
 
 		$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
@@ -145,72 +178,70 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 	public function add(array $data)
 	{
 		if ($data) {
-			try {
-				$txManager = new Manager();
-				$transaction = $txManager->get();
+			${$this->packageName} = new $this->modelToUse();
 
-				${$this->packageName} = new $this->modelToUse();
+			${$this->packageName}->assign($data);
 
-				${$this->packageName}->setTransaction($transaction);
+			$create = ${$this->packageName}->create();
 
-				${$this->packageName}->assign($data);
+			if (!$create) {
+				$errMessages = [];
 
-				$create = ${$this->packageName}->create();
-
-				if (!$create) {
-					$transaction->rollback("Could not add {$this->packageNameS}.");
+				foreach (${$this->packageName}->getMessages() as $value) {
+					array_push($errMessages, $value->getMessage());
 				}
 
-				if ($transaction->commit()) {
-					$this->resetCache();
+				throw new \Exception(
+					"Could not update {$this->packageNameS}. Reasons: <br>" .
+					join(',', $errMessages)
+				);
+			} else {
+				$this->resetCache();
 
-					$this->packagesData->responseCode = 0;
+				$this->packagesData->responseCode = 0;
 
-					$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
+				$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
 
-					return true;
-				}
-			} catch (\Exception $e) {
-				throw $e;
+				return true;
 			}
+		} else {
+			throw new \Exception('Data array missing. Cannot add!');
 		}
-
-		throw new \Exception('Data array missing. Cannot add!');
 	}
 
 	public function update(array $data)
 	{
 		if ($data) {
-			try {
-				$txManager = new Manager();
-				$transaction = $txManager->get();
+			${$this->packageName} = $this->modelToUse::findFirstById($data['id']);
 
-				${$this->packageName} = new $this->modelToUse();
+			${$this->packageName}->assign($data);
 
-				${$this->packageName}->setTransaction($transaction);
+			$update = ${$this->packageName}->update();
 
-				${$this->packageName}->assign($data);
+			if (!$update) {
+				$errMessages = [];
 
-				if (!${$this->packageName}->update()) {
-					$transaction->rollback("Could not update {$this->packageNameS}.");
+				foreach (${$this->packageName}->getMessages() as $value) {
+					array_push($errMessages, $value->getMessage());
 				}
 
-				if ($transaction->commit()) {
-					//Delete Old cache if exists and generate new cache
-					$this->updateCache($data['id']);
+				throw new \Exception(
+					"Could not update {$this->packageNameS}. Reasons: <br>" .
+					join(',', $errMessages)
+				);
+			} else {
+				//Delete Old cache if exists and generate new cache
+				$this->updateCache($data['id']);
 
-					$this->packagesData->responseCode = 0;
+				$this->packagesData->responseCode = 0;
 
-					$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
+				$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
 
-					return true;
-				}
-			} catch (\Exception $e) {
-				throw $e;
+				return true;
 			}
+		} else {
+			throw new \Exception('Data array missing. Cannot update!');
 		}
-
-		throw new \Exception('Data array missing. Cannot update!');
 	}
 
 	public function remove(int $id)
@@ -247,7 +278,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 	protected function setDefaultPackageResponse()
 	{
-		$this->packagesData->responseCode = '0';
+		$this->packagesData->responseCode = 0;
 
 		$this->packagesData->responseMessage = 'Default Response Message';
 	}

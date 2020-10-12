@@ -23,8 +23,8 @@ class Session
 
         $this->session = new Manager();
 
-        if ($this->checkSavePath()) {
-            $savePath = base_path('var/storage/session/');
+        if ($this->checkCachePath()) {
+            $savePath = base_path('var/storage/cache/session/');
         } else {
             $savePath = 'tmp/';
         }
@@ -40,10 +40,10 @@ class Session
         return $this->session;
     }
 
-    protected function checkSavePath()
+    protected function checkCachePath()
     {
-        if (!is_dir(base_path('var/storage/session/'))) {
-            if (!mkdir(base_path('var/storage/session/'), 0777, true)) {
+        if (!is_dir(base_path('var/storage/cache/session/'))) {
+            if (!mkdir(base_path('var/storage/cache/session/'), 0777, true)) {
                 return false;
             }
         }

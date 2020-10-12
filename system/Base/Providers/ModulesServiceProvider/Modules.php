@@ -37,7 +37,7 @@ class Modules
 	public function __get($name)
 	{
 		if (!isset($this->{$name})) {
-			if (method_exists($this, $method = "init{$name}")) {
+			if (method_exists($this, $method = "init" . ucfirst("{$name}"))) {
 				return $this->{$method}();
 			}
 		}
@@ -47,49 +47,51 @@ class Modules
 
 	protected function initCore()
 	{
-		$this->core = (new Core($this->container))->getAll();
+		$this->core = (new Core())->init();
+
+		$this->core->getAll();
 
 		return $this->core;
 	}
 
 	protected function initApplications()
 	{
-		$this->applications = (new Applications($this->container))->getAll();
+		$this->applications = (new Applications())->init();
 
 		return $this->applications;
 	}
 
 	protected function initComponents()
 	{
-		$this->components = (new Components($this->container))->getAll();
+		$this->components = (new Components())->init();
 
 		return $this->components;
 	}
 
 	protected function initPackages()
 	{
-		$this->packages = (new Packages($this->container))->getAll();
+		$this->packages = (new Packages())->init();
 
 		return $this->packages;
 	}
 
 	protected function initMiddlewares()
 	{
-		$this->middlewares = (new Middlewares($this->container))->getAll();
+		$this->middlewares = (new Middlewares())->init();
 
 		return $this->middlewares;
 	}
 
 	protected function initViews()
 	{
-		$this->views = (new Views($this->container))->getAll();
+		$this->views = (new Views())->init();
 
 		return $this->views;
 	}
 
 	protected function initRepositories()
 	{
-		$this->repositories = (new Repositories($this->container))->getAll();
+		$this->repositories = (new Repositories())->init();
 
 		return $this->repositories;
 	}

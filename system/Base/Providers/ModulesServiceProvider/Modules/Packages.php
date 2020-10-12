@@ -11,6 +11,13 @@ class Packages extends BasePackage
 
 	public $packages;
 
+	public function init()
+	{
+		$this->getAll();
+
+		return $this;
+	}
+
 	// public function getAll($params = [], bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {

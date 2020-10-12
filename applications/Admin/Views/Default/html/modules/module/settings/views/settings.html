@@ -1,4 +1,4 @@
-{% if viewsData.settings.cache is defined and viewsData.settings.layout is defined %}
+{% if settings['cache'] is defined and settings['layout'] is defined %}
 	{% set general = '' %}
 	{% set generalActive = 'active' %}
 	{% set generalTabActive = 'show active' %}
@@ -28,16 +28,16 @@
 	</ul>
 	<div class="tab-content" id="viewSettingsTabContent">
 		<div class="tab-pane fade {{generalTabActive}}" id="settings-general" role="tabpanel" aria-labelledby="settings-general-tab" {{general}}>
-			{{include('Admin/Default/html/modules/module/settings/views/settings/general.html')}}
+			{% include 'settings/general.html' %}
 		</div>
 		<div class="tab-pane fade {{headTabActive}}" id="settings-head" role="tabpanel" aria-labelledby="settings-head-tab">
-			{{include('Admin/Default/html/modules/module/settings/views/settings/head.html')}}
+			{% include 'settings/head.html' %}
 		</div>
 		<div class="tab-pane fade" id="settings-body" role="tabpanel" aria-labelledby="settings-body-tab">
-			{{include('Admin/Default/html/modules/module/settings/views/settings/body.html')}}
+			{% include 'settings/body.html' %}
 		</div>
 		<div class="tab-pane fade" id="settings-footer" role="tabpanel" aria-labelledby="settings-footer-tab">
-			{{include('Admin/Default/html/modules/module/settings/views/settings/footer.html')}}
+			{% include 'settings/footer.html' %}
 		</div>
 	</div>
 </div>

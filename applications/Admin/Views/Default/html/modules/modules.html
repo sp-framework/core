@@ -178,7 +178,7 @@
 				submitData['layout'] = false;
 
 				if (submitData.subprocess === 'install') {
-					$.get(submitData.url, submitData, function(data) {
+					$.get(submitData.url + '/q/id/' + submitData.id + '/type/' + submitData.type, function(data) {
 						if (data) {
 							$('#modal-title').html(title + ' Information');
 							$('#modal .modal-body').empty().html(data);
@@ -251,7 +251,7 @@
 
 			} else if (submitData.process === 'settings') {
 				submitData['layout'] = false;
-				$.get(submitData.url, submitData, function(data) {
+				$.get(submitData.url + '/q/id/' + submitData.id + '/type/' + submitData.type, function(data) {
 					if (data) {
 						$('#modal-title').html(title + ' Settings');
 						$('#modal .modal-body').empty().html(data);

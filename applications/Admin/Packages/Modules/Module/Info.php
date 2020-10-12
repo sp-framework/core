@@ -1,6 +1,6 @@
 <?php
 
-namespace Packages\Admin\Modules\Module;
+namespace Applications\Admin\Packages\Modules\Module;
 
 use System\Base\BasePackage;
 
@@ -20,10 +20,10 @@ class Info extends BasePackage
 
 		} else {
 
-			$info = $this->{$this->getData['type']}->getById($this->getData['id'])->getAllArr();
+			$info = $this->modules->{$this->getData['type']}->getById($this->getData['id']);
 
 			$info['dependencies'] = json_decode($info['dependencies'], true);
-
+			var_dump($info);
 			$this->packagesData->info = $info;
 		}
 

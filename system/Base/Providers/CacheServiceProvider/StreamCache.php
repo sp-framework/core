@@ -2,11 +2,10 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
-use Phalcon\Cache\AdapterFactory;
-use Phalcon\Cache\CacheFactory;
-use Phalcon\Config\Adapter\Json;
 use Phalcon\Di\DiInterface;
 use Phalcon\Storage\SerializerFactory;
+use Phalcon\Cache\AdapterFactory;
+use Phalcon\Cache\CacheFactory;
 
 class StreamCache
 {
@@ -36,7 +35,7 @@ class StreamCache
             $cacheOptions = [
                 'adapter'   => 'stream',
                 'options'   => [
-                    'prefix'            => 'stream',
+                    'prefix'            => 'db',
                     'storageDir'        => base_path('var/storage/cache/')
                 ],
             ];

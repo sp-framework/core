@@ -13,6 +13,13 @@ class Repositories extends BasePackage
 
 	public $repositories;
 
+	public function init()
+	{
+		$this->getAll();
+
+		return $this;
+	}
+
 	// public function getAll($params = [], bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {

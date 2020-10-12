@@ -164,6 +164,8 @@ class Views extends BasePackage
     {
         $this->applications = $this->modules->applications;
 
+        $this->getAll();
+
         $this->setApplicationInfo();
 
         $this->setVoltCompiledPath();
@@ -271,7 +273,7 @@ class Views extends BasePackage
                 $viewsName = $applicationDefaults['view'];
 
                 if (!$this->view) {
-                    $this->getApplicationView($viewsName, $this->applicationInfo['id']);
+                    $this->view = $this->getApplicationView($this->applicationInfo['id']);
                 }
 
                 $this->cache = json_decode($this->view['settings'], true)['cache'];
@@ -279,9 +281,23 @@ class Views extends BasePackage
         }
     }
 
-    protected function getApplicationView($name, $id)
+    protected function getApplicationView($id)
     {
-        $this->view =
-                $this->views[array_search($id, array_column($this->views, 'application_id'))];
+        $filter =
+            $this->model->filter(
+                function($view) use ($id) {
+                    if ($view->application_id === $id) {
+                        return $view;
+                    }
+                }
+            );
+
+        if (count($filter) > 1) {
+            throw new \Exception('Duplicate default application for application ' . $name);
+        } else if (count($filter) > 0) {
+            return $filter[0]->toArray();
+        } else {
+            return false;
+        }
     }
 }

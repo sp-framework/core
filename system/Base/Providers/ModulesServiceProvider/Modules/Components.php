@@ -11,6 +11,13 @@ class Components extends BasePackage
 
 	public $components;
 
+	public function init()
+	{
+		$this->getAll();
+
+		return $this;
+	}
+
 	// public function getAll(bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {

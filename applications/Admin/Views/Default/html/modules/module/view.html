@@ -1,36 +1,36 @@
 <div class="row">
 	<div class="col">
 		<label class="font-weight-bold">Name:</label>
-		<p>{{viewsData.module.name}}</p>
+		<p>{{module['name']}}</p>
 	</div>
 	<div class="col">
 		<label class="font-weight-bold">Version:</label><br>
-		{% if viewsData.module.update_available == true %}
-			<span class="badge badge-secondary">{{viewsData.module.version}}</span>
-			<span class="badge badge-info">(Update Available: {{viewsData.module.update_version}})</span>
+		{% if module['update_available'] == true %}
+			<span class="badge badge-secondary">{{module['version']}}</span>
+			<span class="badge badge-info">(Update Available: {{module['update_version']}})</span>
 		{% else %}
-			<span class="badge badge-secondary">{{viewsData.module.version}}</span>
+			<span class="badge badge-secondary">{{module['version']}}</span>
 		{% endif %}
 	</div>
 </div>
 <div class="row">
 	<div class="col">
 		<label class="font-weight-bold">Description:</label>
-		<p>{{viewsData.module.description}}</p>
+		<p>{{module['description']}}</p>
 	</div>
-	{% if viewsData.module.dependencies %}
+	{% if module['dependencies'] %}
 		<div class="col">
 			<label class="font-weight-bold">Dependencies:</label>
 			<p>
-			{% for dependenciesKey, dependencies in viewsData.module.dependencies %}
+			{% for dependenciesKey, dependencies in module['dependencies'] %}
 				{% if dependenciesKey == 'core' or dependenciesKey == 'application' %}
 					<span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
-					<span>{{dependencies.name}} ({{dependencies.version}})</span>
+					<span>{{dependencies['name']}} ({{dependencies['version']}})</span>
 				{% else %}
 					{% if dependencies|length > 0 %}
 						<span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
 						{% for dependencyKey, dependency in dependencies %}
-							<span>{{dependency.name}} ({{dependency.version}})</span>
+							<span>{{dependency['name']}} ({{dependency['version']}})</span>
 						{% endfor %}
 					{% endif %}
 				{% endif %}
@@ -42,6 +42,6 @@
 <div class="row">
 	<div class="col">
 		<label class="font-weight-bold">Repository:</label>
-		<p>{{viewsData.module.repo}}</p>
+		<p>{{module['repo']}}</p>
 	</div>
 </div>

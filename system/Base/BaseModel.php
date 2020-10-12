@@ -8,5 +8,11 @@ abstract class BaseModel extends Model
 {
 	public function onConstruct()
 	{
+
+	}
+
+	public function initialize()
+	{
+		$this->useDynamicUpdate(true);
 	}
 }

@@ -2,126 +2,129 @@
 
 namespace Applications\Admin\Components\Modules\Module;
 
-use Applications\Admin\Packages\ModulesPackage;
+use Applications\Admin\Packages\Modules\Module\Settings;
 use System\Base\BaseComponent;
 
 class SettingsComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$modules = $this->usePackage(ModulesPackage::class);
+		$moduleSettings = $this->usePackage(Settings::class);
 
-		$settingsModule = $modules->getModuleSettings($this->getData);
+		$moduleSettings->get($this->getData());
 
-		if ($this->getData['type'] === 'applications') {
+		if ($this->getData()['type'] === 'applications') {
 
-			$this->viewsData->type = $settingsModule->packagesData['type'];
+			$this->view->application = $moduleSettings->packagesData->application;
 
-			$this->viewsData->application = $settingsModule->packagesData['application'];
+			$this->view->settings = $moduleSettings->packagesData->settings;
 
-			$this->viewsData->settings = $settingsModule->packagesData['settings'];
+			$this->view->components = $moduleSettings->packagesData->components;
 
-			$this->viewsData->components = $settingsModule->packagesData['components'];
+			$this->view->views = $moduleSettings->packagesData->views;
 
-			$this->viewsData->views = $settingsModule->packagesData['views'];
+		} else if ($this->getData()['type'] === 'components') {
 
-		} else if ($this->getData['type'] === 'components') {
+			$this->view->components = $settingsModule->packagesData->components;
 
-			$this->viewsData->type = $settingsModule->packagesData['type'];
+			$this->view->component = $settingsModule->packagesData->component;
 
-			$this->viewsData->components = $settingsModule->packagesData['components'];
+			$this->view->settings = $settingsModule->packagesData->settings;
 
-			$this->viewsData->component = $settingsModule->packagesData['component'];
+			$this->view->componentSettingsFileContent = $settingsModule->packagesData->componentSettingsFileContent;
 
-			$this->viewsData->settings = $settingsModule->packagesData['settings'];
+		} else if ($this->getData()['type'] === 'packages') {
 
-			$this->viewsData->componentSettingsFileContent = $settingsModule->packagesData['componentSettingsFileContent'];
+			$this->view->packages = $settingsModule->packagesData->packages;
 
-		} else if ($this->getData['type'] === 'packages') {
+			$this->view->package = $settingsModule->packagesData->package;
 
-			$this->viewsData->type = $settingsModule->packagesData['type'];
+			$this->view->settings = $settingsModule->packagesData->settings;
 
-			$this->viewsData->packages = $settingsModule->packagesData['packages'];
+			$this->view->packageSettingsFileContent = $settingsModule->packagesData->packageSettingsFileContent;
 
-			$this->viewsData->package = $settingsModule->packagesData['package'];
+		} else if ($this->getData()['type'] === 'middlewares') {
 
-			$this->viewsData->settings = $settingsModule->packagesData['settings'];
+			$this->view->middlewares = $settingsModule->packagesData->middlewares;
 
-			$this->viewsData->packageSettingsFileContent = $settingsModule->packagesData['packageSettingsFileContent'];
+			$this->view->middleware = $settingsModule->packagesData->middleware;
 
-		} else if ($this->getData['type'] === 'middlewares') {
+			$this->view->settings = $settingsModule->packagesData->settings;
 
-			$this->viewsData->type = $settingsModule->packagesData['type'];
+			$this->view->middlewareSettingsFileContent = $settingsModule->packagesData->middlewareSettingsFileContent;
 
-			$this->viewsData->middlewares = $settingsModule->packagesData['middlewares'];
+		} else if ($this->getData()['type'] === 'views') {
 
-			$this->viewsData->middleware = $settingsModule->packagesData['middleware'];
+			$this->view->view = $settingsModule->packagesData->view;
 
-			$this->viewsData->settings = $settingsModule->packagesData['settings'];
-
-			$this->viewsData->middlewareSettingsFileContent = $settingsModule->packagesData['middlewareSettingsFileContent'];
-
-		} else if ($this->getData['type'] === 'views') {
-
-			$this->viewsData->type = $settingsModule->packagesData['type'];
-
-			$this->viewsData->view = $settingsModule->packagesData['view'];
-
-			$this->viewsData->settings = $settingsModule->packagesData['settings'];
+			$this->view->settings = $settingsModule->packagesData->settings;
 		}
 
-		$this->viewsData->thisApplication = $this->applicationInfo;
+		$this->view->type = $moduleSettings->packagesData->type;
 
-		return $this->generateView();
+		$this->view->thisApplication = $this->modules->applications->getApplicationInfo();
+
 	}
 
 	public function editAction()
 	{
-		$modules = $this->usePackage(ModulesPackage::class);
+		$moduleSettings = $this->usePackage(Settings::class);
 
-		$settingsModule = $modules->updateModuleSettings($this->postData);
+		if ($moduleSettings->update($this->postData())) {
 
-		if ($this->postData['type'] === 'applications') {
+			$this->view->responseCode = $moduleSettings->packagesData->responseCode;
 
-			$this->viewsData->responseCode = $settingsModule->packagesData['responseCode'];
+			$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
 
-			$this->viewsData->responseMessage = $settingsModule->packagesData['responseMessage'];
+			$this->flashSession->success($moduleSettings->packagesData->responseMessage);
 
-			$this->flash->now('success', $settingsModule->packagesData['responseMessage']);
+		} else {
+			$this->view->responseCode = $moduleSettings->packagesData->responseCode;
 
-		} else if ($this->postData['type'] === 'components') {
+			$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
 
-			$this->viewsData->responseCode = $settingsModule->packagesData['responseCode'];
-
-			$this->viewsData->responseMessage = $settingsModule->packagesData['responseMessage'];
-
-			$this->flash->now('success', $settingsModule->packagesData['responseMessage']);
-
-		} else if ($this->postData['type'] === 'packages') {
-
-			$this->viewsData->responseCode = $settingsModule->packagesData['responseCode'];
-
-			$this->viewsData->responseMessage = $settingsModule->packagesData['responseMessage'];
-
-			$this->flash->now('success', $settingsModule->packagesData['responseMessage']);
-
-		} else if ($this->postData['type'] === 'middlewares') {
-
-			$this->viewsData->responseCode = $settingsModule->packagesData['responseCode'];
-
-			$this->viewsData->responseMessage = $settingsModule->packagesData['responseMessage'];
-
-			$this->flash->now('success', $settingsModule->packagesData['responseMessage']);
-
-		} else if ($this->postData['type'] === 'views') {
-
-			$this->viewsData->responseCode = $settingsModule->packagesData['responseCode'];
-
-			$this->viewsData->responseMessage = $settingsModule->packagesData['responseMessage'];
-
-			$this->flash->now('success', $settingsModule->packagesData['responseMessage']);
+			return $this->sendJson();
 		}
 
-		return $this->generateView();
+			// if ($this->postData()['type'] === 'applications') {
+
+			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
+
+			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
+
+			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
+
+			// } else if ($this->postData()['type'] === 'components') {
+
+			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
+
+			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
+
+			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
+
+			// } else if ($this->postData()['type'] === 'packages') {
+
+			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
+
+			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
+
+			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
+
+			// } else if ($this->postData()['type'] === 'middlewares') {
+
+			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
+
+			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
+
+			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
+
+			// } else if ($this->postData()['type'] === 'views') {
+
+			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
+
+			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
+
+			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
+			// }
 	}
 }
