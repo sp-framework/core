@@ -51,7 +51,7 @@ class SyncComponent extends BaseComponent
 		}
 				// var_dump($this->view);
 
-		$this->view->disable();
+		// $this->view->disable();
 		// $this->view->repositories = $this->packages->use(Repositories::class)->getAllRepositories();
 
 		// $this->view->setup = isset($this->getData['setup']) ? $this->getData['setup'] : false;
