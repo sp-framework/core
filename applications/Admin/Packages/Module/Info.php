@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Admin\Packages\Modules\Module;
+namespace Applications\Admin\Packages\Module;
 
 use System\Base\BasePackage;
 

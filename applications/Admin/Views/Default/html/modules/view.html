@@ -21,10 +21,10 @@
 							</div>
 						</div>
 						<div id="barebone" class="col text-center" hidden>
-							{% include 'modules/barebone.html' %}
+							{% include 'barebone/barebone.html' %}
 						</div>
 						<div id="repo" class="col text-center">
-							{% include 'modules/repositories/view.html' %}
+							{% include 'repositories/view.html' %}
 						</div>
 					</div>
 					<hr>
@@ -36,7 +36,7 @@
 				{% else %}
 					<div class="row">
 						<div id="repo" class="col text-center">
-							{% include 'modules/repositories/view.html' %}
+							{% include 'repositories/view.html' %}
 						</div>
 					</div>
 					<hr>
@@ -57,7 +57,7 @@
 					</div>
 				</div>
 				<div id="barebone-body" hidden>
-					{% include 'modules/barebone/view.html' %}
+					{% include 'barebone/view.html' %}
 				</div>
 			</div>
 		</div>

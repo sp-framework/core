@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Admin\Components\Modules\Repositories;
+namespace Applications\Admin\Components\Repositories;
 
 use Applications\Admin\Packages\Modules as ModulesPackage;
 use System\Base\BaseComponent;

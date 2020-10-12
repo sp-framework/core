@@ -51,40 +51,41 @@ class Router
 
 	public function init()
 	{
-		$this->setApplicationInfo();
+		if ($this->setApplicationInfo()) {
+			$this->defaultNamespace =
+				'Applications\\' . ucfirst($this->applicationDefaults['application']) . '\\Components';
 
-		$this->defaultNamespace =
-			'Applications\\' . ucfirst($this->applicationDefaults['application']) . '\\Components';
+			$this->router->setDefaultNamespace($this->defaultNamespace);
 
-		$this->getURI();
+			$this->getURI();
 
-		if ($this->applicationInfo && $this->applicationDefaults) {
-			if ($this->applicationInfo['name'] !== $this->applicationDefaults['application']) {
-				if ($this->uri !== '' &&
-					$this->uri !== strtolower($this->applicationInfo['name']) &&
-					$this->uri !== strtolower($this->applicationInfo['route'])
-				) {
+			if ($this->applicationInfo && $this->applicationDefaults) {
+				if ($this->applicationInfo['name'] !== $this->applicationDefaults['application']) {
+					if ($this->uri !== '' &&
+						$this->uri !== strtolower($this->applicationInfo['name']) &&
+						$this->uri !== strtolower($this->applicationInfo['route'])
+					) {
+						$this->registerRoute($this->uri);
+					}
+				} else {
+					if ($this->uri !== '' &&
+						$this->uri !== strtolower($this->applicationDefaults['application']) &&
+						$this->uri !== strtolower($this->applicationInfo['route'])
+					) {
 
-					$this->registerRoute($this->uri);
-				}
-			} else {
-				if ($this->uri !== '' &&
-					$this->uri !== strtolower($this->applicationDefaults['application']) &&
-					$this->uri !== strtolower($this->applicationInfo['route'])
-				) {
+						$this->registerRoute($this->uri);
 
-					$this->registerRoute($this->uri);
-
-				} else if ($this->uri === '' ||
-						   $this->uri === strtolower($this->applicationDefaults['application']) ||
-						   $this->uri === strtolower($this->applicationInfo['route'])
-				) {
-					$this->registerHome();
+					} else if ($this->uri === '' ||
+							   $this->uri === strtolower($this->applicationDefaults['application']) ||
+							   $this->uri === strtolower($this->applicationInfo['route'])
+					) {
+						$this->registerHome();
+					}
 				}
 			}
+		} else {
+			$this->registerDefaults();
 		}
-
-		$this->registerDefaults();
 
 		$this->regitserNotFound();
 
@@ -93,9 +94,30 @@ class Router
 
 	protected function registerHome()
 	{
-		$this->router->setDefaultNamespace($this->defaultNamespace);
-		$this->router->setDefaultController(strtolower($this->applicationDefaults['component']));
-		$this->router->setDefaultAction('view');
+		$this->router->add(
+			'/',
+			[
+				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'action'		=> 'view'
+			]
+		);
+
+		$this->router->add(
+			'/' . strtolower($this->applicationInfo['name']),
+			[
+				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'action'		=> 'view'
+			]
+		);
+
+		$this->router->add(
+			'/' . strtolower($this->applicationInfo['route']),
+			[
+				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'action'		=> 'view'
+			]
+		);
+
 	}
 
 	protected function registerRoute($givenRoute)
@@ -147,18 +169,33 @@ class Router
 
 	protected function registerDefaults()
 	{
-		// This will be defined per application errors
-		// $this->router->setDefaults();
+		$this->router->setDefaultNamespace(
+			'Applications\\Admin\\Components'
+		);
+
+		$this->router->setDefaultController('modules');
+
+		$this->router->setDefaultAction('view');
 	}
 
 	protected function regitserNotFound()
 	{
-		// $this->router->notFound(
-		// 	[
-		// 		'controller' => $this->applicationDefaults['errorController'],
-		// 		'action'     => 'view',
-		// 	]
-		// );
+		if ($this->applicationDefaults) {
+
+			$errorComponent =
+				$this->applicationDefaults['errorComponent']
+				?? 'Applications\Admin\Components\Errors';
+
+		} else {
+			$errorComponent = 'Errors';
+		}
+
+		$this->router->notFound(
+			[
+				'controller' => $errorComponent,
+				'action'     => 'notfound',
+			]
+		);
 	}
 
 	protected function setApplicationInfo()
@@ -175,7 +212,9 @@ class Router
 				$this->applicationDefaults =
 					$this->applications->getApplicationDefaults($this->applicationInfo['name']);
 			}
+			return true;
 		}
+		return false;
 	}
 
 	protected function getURI()

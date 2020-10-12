@@ -2,13 +2,11 @@
 
 namespace System\Base\Exceptions;
 
-use Throwable;
-use Psr\Http\Message\ResponseInterface;
+use Phalcon\Flash\Session;
+use Phalcon\Http\Response;
+use Phalcon\Mvc\View;
+use Phalcon\Session\Manager;
 use ReflectionClass;
-use System\Base\Providers\ModulesServiceProvider\Views;
-use System\Base\Providers\ModulesServiceProvider\Views\ViewsData;
-use System\Base\Providers\SessionServiceProvider\Flash;
-use System\Base\Providers\SessionServiceProvider\SessionStore;
 
 class Handler
 {
@@ -16,19 +14,18 @@ class Handler
 
     protected $session;
 
-    protected $views;
-
-    protected $viewsData;
-
     protected $response;
 
+    protected $view;
+
+    protected $flash;
+
     public function __construct(
-        Throwable $exception,
-        SessionStore $session,
-        ResponseInterface $response,
-        Views $views,
-        Flash $flash,
-        ViewsData $viewsData
+        \Exception $exception,
+        Manager $session,
+        Response $response,
+        View $view,
+        Session $flash
     ) {
         $this->exception = $exception;
 
@@ -36,9 +33,9 @@ class Handler
 
         $this->response = $response;
 
-        $this->views = $views;
+        $this->views = $view;
 
-        $this->viewsData = $viewsData;
+        $this->flash = $flash;
     }
 
     public function respond()
@@ -52,7 +49,7 @@ class Handler
         return $this->unhandledException($this->exception);
     }
 
-    protected function handleValidationException(Throwable $e)
+    protected function handleValidationException(Exception $e)
     {
         $this->session->set([
             'errors' => $e->getErrors(),
@@ -62,14 +59,14 @@ class Handler
         return redirect($e->getPath());
     }
 
-    protected function handleCsrfTokenException(Throwable $e)
+    protected function handleCsrfTokenException(\Exception $e)
     {
         $this->flash->now('warning', 'Session expired, please login again.');
 
         return redirect('/auth/login');
     }
 
-    protected function handleNotFoundException(Throwable $e)
+    protected function handleNotFoundException(\Exception $e)
     {
         return $this->views->render(
             $this->response,
@@ -79,7 +76,7 @@ class Handler
         );
     }
 
-    // protected function handleLoaderError(Throwable $e)
+    // protected function handleLoaderError(\Exception $e)
     // {
     //     return $this->views->render(
     //         $this->response,
@@ -89,18 +86,8 @@ class Handler
     //     );
     // }
 
-    protected function unhandledException(Throwable $e)
+    protected function unhandledException(\Exception $e)
     {
-        // if ($e->getCode() === 0) {
-        //     return $this->views->render(
-        //         $this->response,
-        //         $this->views->getApplicationName() . '/' .
-        //         $this->views->getViewsName() . '/html/errors/404.html',
-        //         $this->viewsData,
-        //         'Error'
-        //     );
-        // } else {
-            throw $e;
-        // }
+        throw $e;
     }
 }

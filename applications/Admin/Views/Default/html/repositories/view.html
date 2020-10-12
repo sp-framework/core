@@ -52,7 +52,7 @@
 			$('#modules-data').attr('hidden', true);
 
 			$.get(
-				'/{{route}}/modules/repositories/sync/q/' +
+				'/{{route}}/repositories/sync/q/' +
 				'repoId/' + $('#select-repo option:selected').val(),
 				function(data) {
 					if (typeof data === 'string') {
@@ -110,7 +110,7 @@
 		if ($(this)[0].id === 'add-repo') {
 
 			$.get(
-				  '/{{route}}/modules/repositories/add',
+				  '/{{route}}/repositories/add',
 				  function(data) {
 						$('#modal-title').html('Add New Repository');
 						$('#modal .modal-body').empty().html(data);
@@ -119,7 +119,7 @@
 				);
 		} else if ($(this)[0].id === 'edit-repo') {
 			$.get(
-					'/{{route}}/modules/repositories/edit/q/id/' + $('#select-repo option:selected').val(),
+					'/{{route}}/repositories/edit/q/id/' + $('#select-repo option:selected').val(),
 					function(data) {
 						if (data) {
 							$('#modal-title').html('Edit Repository');
@@ -148,7 +148,7 @@
 
 				postData['id'] = $('#select-repo option:selected').val();
 				$.post(
-						'/{{route}}/modules/repositories/delete/remove', postData,
+						'/{{route}}/repositories/delete/remove', postData,
 						function(data) {
 							if (data && data.responseCode === 0) {
 								location.reload();

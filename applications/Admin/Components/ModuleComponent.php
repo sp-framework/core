@@ -1,9 +1,9 @@
 <?php
 
-namespace Applications\Admin\Components\Modules;
+namespace Applications\Admin\Components;
 
+use Applications\Admin\Packages\Module\Info;
 use Applications\Admin\Packages\Modules as ModulesPackage;
-use Applications\Admin\Packages\Modules\Module\Info;
 use System\Base\BaseComponent;
 
 class ModuleComponent extends BaseComponent

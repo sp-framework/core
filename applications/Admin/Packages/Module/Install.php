@@ -1,6 +1,6 @@
 <?php
 
-namespace Packages\Admin\Modules\Module;
+namespace Applications\Admin\Packages\Module;
 
 use GuzzleHttp\Client;
 use League\Flysystem\Adapter\Local;

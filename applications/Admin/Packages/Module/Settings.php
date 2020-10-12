@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Admin\Packages\Modules\Module;
+namespace Applications\Admin\Packages\Module;
 
 use System\Base\BasePackage;
 
@@ -257,7 +257,7 @@ class Settings extends BasePackage
 
 			$update = $this->components->update($postData);
 
-			if (is_object($update)) {
+			if ($update) {
 
 				$this->packagesData->responseCode = 0;
 
@@ -298,7 +298,7 @@ class Settings extends BasePackage
 
 			$update = $this->packages->update($postData);
 
-			if (is_object($update)) {
+			if ($update) {
 
 				$this->packagesData->responseCode = 0;
 
@@ -345,7 +345,7 @@ class Settings extends BasePackage
 
 			$update = $this->middlewares->update($postData);
 
-			if (is_object($update)) {
+			if ($update) {
 
 				if ($middlewaresSequence) {
 
@@ -410,7 +410,7 @@ class Settings extends BasePackage
 
 			$update = $this->views->update($postData);
 
-			if (is_object($update)) {
+			if ($update) {
 
 				$this->packagesData->responseCode = 0;
 
@@ -427,35 +427,35 @@ class Settings extends BasePackage
 		}
 	}
 
-	protected function getDefaultApplication()
-	{
-		if (!$this->defaultApplication) {
+	// protected function getDefaultApplication()
+	// {
+	// 	if (!$this->defaultApplication) {
 
-			$this->defaultApplication =
-				$this->modules->applications->getDefaultApplication();
+	// 		$this->defaultApplication =
+	// 			$this->modules->applications->getDefaultApplication();
 
-			return $this->defaultApplication;
-		} else {
+	// 		return $this->defaultApplication;
+	// 	} else {
 
-			return $this->defaultApplication;
-		}
-	}
+	// 		return $this->defaultApplication;
+	// 	}
+	// }
 
-	protected function removeDefaultFlag()
-	{
-		$defaultApplication = $this->getDefaultApplication();
+	// protected function removeDefaultFlag()
+	// {
+	// 	$defaultApplication = $this->getDefaultApplication();
 
-		if (count($defaultApplication) > 0) {
+	// 	if (count($defaultApplication) > 0) {
 
-			$defaultApplication['is_default'] = 0;
+	// 		$defaultApplication['is_default'] = 0;
 
-			$this->modules->applications->update($defaultApplication);
-		}
-	}
+	// 		$this->modules->applications->update($defaultApplication);
+	// 	}
+	// }
 
 	protected function checkDefaultApplication($postData)
 	{
-		$defaultApplication = $this->getDefaultApplication();
+		$defaultApplication = $this->modules->applications->getDefaultApplication();
 
 		// Checking if same application is default
 		if ($defaultApplication) {
@@ -466,7 +466,7 @@ class Settings extends BasePackage
 			return false;
 		}
 
-		if (count($defaultApplication) > 0) {
+		if (is_array($defaultApplication)) {
 
 			$this->packagesData->defaultApplication = $defaultApplication;
 

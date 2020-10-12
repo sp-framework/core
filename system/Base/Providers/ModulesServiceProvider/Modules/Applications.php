@@ -329,11 +329,23 @@ class Applications extends BasePackage
 			);
 
 		if (count($filter) > 1) {
-			throw new \Exception('Duplicate default application for application ' . $name);
+			throw new \Exception('Duplicate default application for application. DB Corrupt');
 		} else if (count($filter) > 0) {
 			return $filter[0]->toArray();
 		} else {
 			return false;
+		}
+	}
+
+	public function removeDefaultFlag()
+	{
+		$defaultApplication = $this->getDefaultApplication();
+
+		if ($defaultApplication) {
+
+			$defaultApplication['is_default'] = 0;
+
+			$this->modules->applications->update($defaultApplication);
 		}
 	}
 }

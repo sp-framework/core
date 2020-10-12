@@ -190,7 +190,7 @@
 				$(this).removeClass('is-invalid');
 			});
 		} else {
-			$.post('/{{route}}/modules/module/settings/edit', postData, function(data) {
+			$.post('/{{route}}/module/settings/edit', postData, function(data) {
 				if (data.responseCode === 0) {
 					location.reload();
 				} else if (data.responseCode === 2) {
@@ -207,7 +207,7 @@
 
 							postData['force'] = "1";
 
-							$.post('/{{route}}/modules/module/settings/edit', postData, function(data) {
+							$.post('/{{route}}/module/settings/edit', postData, function(data) {
 								if (data && data.responseCode === 0) {
 									location.reload();
 								} else if (data && data.responseCode === 1) {
@@ -222,7 +222,7 @@
 							$('#is-default')[0].checked = false;
 							postData['is_default'] = false;
 
-							$.post('/{{route}}/modules/module/settings/edit', postData, function(data) {
+							$.post('/{{route}}/module/settings/edit', postData, function(data) {
 								if (data && data.responseCode === 0) {
 									location.reload();
 								} else if (data && data.responseCode === 1) {

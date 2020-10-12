@@ -1,4 +1,4 @@
-{% include '../../errors/flash.html' %}
+{% include '../errors/flash.html' %}
 {% if repository is defined %}
 	{% set formData = repository %}
 {% else %}
@@ -117,7 +117,7 @@
 		postData['token'] = $('#token').val();
 
 		if (postData['id'] !== '') {
-			$.post('/{{route}}/modules/repositories/edit/update', postData, function(data) {
+			$.post('/{{route}}/repositories/edit/update', postData, function(data) {
 				if (data && data.responseCode === 0) {
 					location.reload();
 				} else {
@@ -128,7 +128,7 @@
 				}
 			}, 'json');
 		} else {
-			$.post('/{{route}}/modules/repositories/add/insert', postData, function(data) {
+			$.post('/{{route}}/repositories/add/insert', postData, function(data) {
 				if (data && data.responseCode === 0) {
 					location.reload();
 				} else {

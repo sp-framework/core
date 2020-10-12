@@ -181,10 +181,15 @@ class Views extends BasePackage
     protected function setVoltCompiledPath()
     {
         if (!isset($this->voltCompiledPath)) {
-            $this->voltCompiledPath =
-                base_path('applications/' . $this->applicationInfo['name'] .
-                          '/Views/' . $this->view['name'] .
-                          '/html_compiled/');
+            if ($this->applicationInfo && $this->view) {
+                $this->voltCompiledPath =
+                    base_path('applications/' . $this->applicationInfo['name'] .
+                              '/Views/' . $this->view['name'] .
+                              '/html_compiled/');
+            } else {
+                $this->voltCompiledPath =
+                    base_path('applications/Admin/Views/Default/html_compiled/');
+            }
 
             if (!is_dir($this->voltCompiledPath)) {
                 mkdir(
@@ -199,28 +204,42 @@ class Views extends BasePackage
     protected function setPhalconViewPath()
     {
         if (!isset($this->phalconViewPath)) {
-            $this->phalconViewPath =
-                base_path('applications/' . $this->applicationInfo['name'] .
-                          '/Views/' . $this->view['name'] .
-                          '/html/');
+            if ($this->applicationInfo && $this->view) {
+                $this->phalconViewPath =
+                    base_path('applications/' . $this->applicationInfo['name'] .
+                              '/Views/' . $this->view['name'] .
+                              '/html/');
+            } else {
+                $this->phalconViewPath =
+                    base_path('applications/Admin/Views/Default/html/');
+            }
         }
     }
 
     protected function setPhalconViewLayoutPath()
     {
         if (!isset($this->phalconViewLayoutPath)) {
-            $this->phalconViewLayoutPath =
-                base_path('applications/' . $this->applicationInfo['name'] .
-                          '/Views/' . $this->view['name'] .
-                          '/html/layouts/');
+            if ($this->applicationInfo && $this->view) {
+                $this->phalconViewLayoutPath =
+                    base_path('applications/' . $this->applicationInfo['name'] .
+                              '/Views/' . $this->view['name'] .
+                              '/html/layouts/');
+            } else {
+                $this->phalconViewLayoutPath =
+                    base_path('applications/Admin/Views/Default/html/layouts/');
+            }
         }
     }
 
     protected function setPhalconViewLayoutFile()
     {
         if (!isset($this->phalconViewLayoutFile)) {
-            $this->phalconViewLayoutFile =
-                json_decode($this->view['settings'], true)['layout'];
+            if ($this->view) {
+                $this->phalconViewLayoutFile =
+                    json_decode($this->view['settings'], true)['layout'];
+            } else {
+                $this->phalconViewLayoutFile = 'default';
+            }
         }
     }
 
@@ -275,7 +294,11 @@ class Views extends BasePackage
                     $this->view = $this->getApplicationView($this->applicationInfo['id']);
                 }
 
-                $this->cache = json_decode($this->view['settings'], true)['cache'];
+                if ($this->view) {
+                    $this->cache = json_decode($this->view['settings'], true)['cache'];
+                } else {
+                    $this->cache = false;
+                }
             }
         }
     }

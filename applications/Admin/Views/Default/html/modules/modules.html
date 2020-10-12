@@ -94,27 +94,27 @@
 									</div>
 									<div class="card-footer" style="min-height:61.5px;">
 										{% if modulesKey != 'core' and module['installed'] == true %}
-											<a href="/{{route}}/modules/module/settings" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="settings" data-id="{{module['id']}}" {% if module['application_id'] is defined %}data-applicationid="{{module['application_id']}}" {% endif %} class="btn-settings btn btn-sm btn-primary">
+											<a href="/{{route}}/module/settings" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="settings" data-id="{{module['id']}}" {% if module['application_id'] is defined %}data-applicationid="{{module['application_id']}}" {% endif %} class="btn-settings btn btn-sm btn-primary">
 												<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Settings
 											</a>
 										{% endif %}
 										{% if modulesKey != 'core' and module['installed'] == true %}
 											{% if module['application_id'] is defined and module['application_id'] != 1 and module['name'] != 'Admin' %}
-											<a href="/{{route}}/modules/module/uninstall" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="uninstall" data-id="{{module['id']}}" class="btn-uninstall btn btn-sm btn-danger float-right">
+											<a href="/{{route}}/module/uninstall" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="uninstall" data-id="{{module['id']}}" class="btn-uninstall btn btn-sm btn-danger float-right">
 												<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Uninstall
 											</a>
 											{% endif %}
 										{% else %}
 											{% if modulesKey != 'core' %}
-												<a href="/{{route}}/modules/module/delete" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="delete" data-id="{{module['id']}}" class="btn-delete btn btn-sm btn-danger">
+												<a href="/{{route}}/module/delete" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="delete" data-id="{{module['id']}}" class="btn-delete btn btn-sm btn-danger">
 													<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Delete
 												</a>
-												<a href="/{{route}}/modules/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view" data-subprocess="install" data-id="{{module['id']}}" class="btn-view btn btn-sm btn-info float-right">Install
+												<a href="/{{route}}/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view" data-subprocess="install" data-id="{{module['id']}}" class="btn-view btn btn-sm btn-info float-right">Install
 												</a>
 											{% endif %}
 										{% endif %}
 										{% if module['update_available'] == true %}
-											<a href="/{{route}}/modules/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view"  data-subprocess="update" data-id="{{module['id']}}" class="btn-update btn btn-sm btn-info float-right mr-2">Update
+											<a href="/{{route}}/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view"  data-subprocess="update" data-id="{{module['id']}}" class="btn-update btn btn-sm btn-info float-right mr-2">Update
 											</a>
 										{% endif %}
 									</div>

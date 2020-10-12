@@ -901,10 +901,10 @@ class Modules extends BasePackage
 		return true;
 	}
 
-	public function viewModule($getData)
-	{
-		return $this->packages->use(Info::class)->runProcess($getData);
-	}
+	// public function viewModule($getData)
+	// {
+	// 	return $this->packages->use(Info::class)->runProcess($getData);
+	// }
 
 	public function installModule($postData)
 	{
@@ -921,23 +921,23 @@ class Modules extends BasePackage
 		return $this->packages->use(Remove::class)->runProcess($postData);
 	}
 
-	public function getModuleSettings($getData)
-	{
-		return $this->packages->use(Settings::class)->get($getData);
-	}
+	// public function getModuleSettings($getData)
+	// {
+	// 	return $this->packages->use(Settings::class)->get($getData);
+	// }
 
-	public function updateModuleSettings($postData)
-	{
-		return $this->packages->use(Settings::class)->update($postData);
-	}
+	// public function updateModuleSettings($postData)
+	// {
+	// 	return $this->packages->use(Settings::class)->update($postData);
+	// }
 
-	public function installBareboneModules($postData)
-	{
-		return $this->packages->use(Barebone::class)->runProcess($postData);
-	}
+	// public function installBareboneModules($postData)
+	// {
+	// 	return $this->packages->use(Barebone::class)->runProcess($postData);
+	// }
 
-	public function getApplicationComponentsViews($postData)
-	{
-		return $this->packages->use(Barebone::class)->getApplicationComponentsViews($postData);
-	}
+	// public function getApplicationComponentsViews($postData)
+	// {
+	// 	return $this->packages->use(Barebone::class)->getApplicationComponentsViews($postData);
+	// }
 }

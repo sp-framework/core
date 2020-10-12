@@ -1,9 +1,9 @@
 {
-	"name"			: "Modules",
-	"displayName" 	: "Admin Modules Management",
-	"description"	: "Manage admin modules via this component",
+	"name"			: "Repositories",
+	"displayName" 	: "Admin Repositories Management",
+	"description"	: "Manage admin repositories via this component",
 	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/component-admin-modules",
+	"repo"			: "https://github.com/h-w-f/component-admin-repositories",
 	"path"			: "/",
 	"dependencies"	: {
 		"core"			: {
@@ -18,20 +18,20 @@
 		},
 		"components"	:
 		[{
-			"name"		: "Repositories",
+			"name"		: "Modules",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/component-admin-repositories"
+			"repo"		: "https://github.com/h-w-f/component-admin-modules"
 		}],
 		"packages"		:
 		[{
-			"name"		: "Modules",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/package-admin-modules"
-		},
-		{
 			"name"		: "Repositories",
 			"version"	: "0.0.1",
 			"repo"		: "https://github.com/h-w-f/package-admin-repositories"
+		},
+		{
+			"name"		: "Modules",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/package-admin-modules"
 		}],
 		"middlewares"	: [],
 		"views"			: []

@@ -195,38 +195,40 @@ abstract class BaseComponent extends Controller
 		$headJs = $this->assets->collection('headJs');
 		$footerJs = $this->assets->collection('footerJs');
 
-		$settings = json_decode($this->modules->views->getViewInfo()['settings'], true);
+		if ($this->modules->views->getViewInfo()) {
+			$settings = json_decode($this->modules->views->getViewInfo()['settings'], true);
 
-		$links = $settings['head']['link']['href'];
-		$scripts = $settings['head']['script']['src'];
-		$inlineStyle = $settings['head']['style'] ?? null;
-		if (count($links) > 0) {
-			foreach ($links as $link) {
-				$headLinks->addCss($link);
+			$links = $settings['head']['link']['href'];
+			$scripts = $settings['head']['script']['src'];
+			$inlineStyle = $settings['head']['style'] ?? null;
+			if (count($links) > 0) {
+				foreach ($links as $link) {
+					$headLinks->addCss($link);
+				}
 			}
-		}
 
-		if (count($scripts) > 0) {
-			foreach ($scripts as $script) {
-				$headJs->addJs($script);
+			if (count($scripts) > 0) {
+				foreach ($scripts as $script) {
+					$headJs->addJs($script);
+				}
 			}
-		}
 
-		if ($inlineStyle) {
-			$this->assets->addInlineCss($inlineStyle);
-		}
-
-		$scripts = $settings['footer']['script']['src'];
-		if (count($scripts) > 0) {
-			foreach ($scripts as $script) {
-				$footerJs->addJs($script);
+			if ($inlineStyle) {
+				$this->assets->addInlineCss($inlineStyle);
 			}
-		}
 
-		$inlineScript = $settings['footer']['jsscript'] ?? null;
+			$scripts = $settings['footer']['script']['src'];
+			if (count($scripts) > 0) {
+				foreach ($scripts as $script) {
+					$footerJs->addJs($script);
+				}
+			}
 
-		if ($inlineScript && $inlineScript !== '') {
-			$this->assets->addInlineJs($inlineScript);
+			$inlineScript = $settings['footer']['jsscript'] ?? null;
+
+			if ($inlineScript && $inlineScript !== '') {
+				$this->assets->addInlineJs($inlineScript);
+			}
 		}
 	}
 
@@ -248,6 +250,7 @@ abstract class BaseComponent extends Controller
 	{
 		$packageName = Arr::last(explode('\\', $packageClass));
 
+		//Refactor to Filter
 		$packageApplicationId =
 			$this->modules->packages->packages[array_search($packageName, array_column($this->modules->packages->packages, 'name'))]['application_id'];
 
@@ -258,168 +261,168 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function generateView()
-	{
-		$this->getDefaults();
+	// protected function generateView()
+	// {
+	// 	$this->getDefaults();
 
-		// var_dump($this->getData);
-		// if ($this->getData === '') {
-		// 	if ($this->requestUri === '/' ||
-		// 		$this->requestUri === '/' .
-		// 			strtolower($this->applicationInfo['name']) . '/' ||
-		// 		$this->requestUri === '/' .
-		// 			strtolower($this->applicationInfo['name']) . '/' . $this->defaultComponentsName
-		// 		) {
-		// 		return $this->checkViewFile('default');
-		// 	} else {
-		// 		$path =
-		// 			str_replace(
-		// 				'/' . strtolower($this->applicationInfo['name']) . '/',
-		// 				'',
-		// 				$this->requestUri
-		// 			);
-		// 		return $this->checkViewFile($path);
-		// 	}
-		// } else {
-			$uri = explode('?', $this->requestUri);
-			// dump($uri, $this->applicationName);
-			if ($uri[0] === '/' ||
-				$uri[0] === '/' . strtolower($this->applicationName) ||
-				$uri[0] === '/' . strtolower($this->applicationName) . '/' ||
-				$uri[0] === '/' . strtolower($this->applicationInfo['route']) ||
-				$uri[0] === '/' . strtolower($this->applicationInfo['route']) . '/' ||
-				$uri[0] === '/' . strtolower($this->applicationInfo['route']) . '/' . $this->defaultComponentsName ||
-				$uri[0] === '/' . strtolower($this->applicationName) . '/' . $this->defaultComponentsName
-				) {
+	// 	// var_dump($this->getData);
+	// 	// if ($this->getData === '') {
+	// 	// 	if ($this->requestUri === '/' ||
+	// 	// 		$this->requestUri === '/' .
+	// 	// 			strtolower($this->applicationInfo['name']) . '/' ||
+	// 	// 		$this->requestUri === '/' .
+	// 	// 			strtolower($this->applicationInfo['name']) . '/' . $this->defaultComponentsName
+	// 	// 		) {
+	// 	// 		return $this->checkViewFile('default');
+	// 	// 	} else {
+	// 	// 		$path =
+	// 	// 			str_replace(
+	// 	// 				'/' . strtolower($this->applicationInfo['name']) . '/',
+	// 	// 				'',
+	// 	// 				$this->requestUri
+	// 	// 			);
+	// 	// 		return $this->checkViewFile($path);
+	// 	// 	}
+	// 	// } else {
+	// 		$uri = explode('?', $this->requestUri);
+	// 		// dump($uri, $this->applicationName);
+	// 		if ($uri[0] === '/' ||
+	// 			$uri[0] === '/' . strtolower($this->applicationName) ||
+	// 			$uri[0] === '/' . strtolower($this->applicationName) . '/' ||
+	// 			$uri[0] === '/' . strtolower($this->applicationInfo['route']) ||
+	// 			$uri[0] === '/' . strtolower($this->applicationInfo['route']) . '/' ||
+	// 			$uri[0] === '/' . strtolower($this->applicationInfo['route']) . '/' . $this->defaultComponentsName ||
+	// 			$uri[0] === '/' . strtolower($this->applicationName) . '/' . $this->defaultComponentsName
+	// 			) {
 
-				return $this->checkViewFile('default');
-			} else {
-				$explodeUri = explode('/', trim($uri[0], '/'));
+	// 			return $this->checkViewFile('default');
+	// 		} else {
+	// 			$explodeUri = explode('/', trim($uri[0], '/'));
 
-				if ($explodeUri[0] === strtolower($this->applicationInfo['route'])) {
-					$strToReplace =
-						'/' . strtolower($this->applicationInfo['route']) . '/';
+	// 			if ($explodeUri[0] === strtolower($this->applicationInfo['route'])) {
+	// 				$strToReplace =
+	// 					'/' . strtolower($this->applicationInfo['route']) . '/';
 
-				} else if ($explodeUri[0] === strtolower($this->applicationName)) {
-					$strToReplace =
-						'/' . strtolower($this->applicationName) . '/';
-				}
+	// 			} else if ($explodeUri[0] === strtolower($this->applicationName)) {
+	// 				$strToReplace =
+	// 					'/' . strtolower($this->applicationName) . '/';
+	// 			}
 
-				$componentName =
-					str_replace(
-						$strToReplace,
-						'',
-						$uri[0]
-					);
+	// 			$componentName =
+	// 				str_replace(
+	// 					$strToReplace,
+	// 					'',
+	// 					$uri[0]
+	// 				);
 
-			}
+	// 		}
 
-			return $this->checkViewFile($componentName);
-		// }
-	}
+	// 		return $this->checkViewFile($componentName);
+	// 	// }
+	// }
 
-	protected function checkViewFile($componentName)
-	{
-		if ($this->viewFile) {
-			$viewFile = $this->viewFile;
+	// protected function checkViewFile($componentName)
+	// {
+	// 	if ($this->viewFile) {
+	// 		$viewFile = $this->viewFile;
 
-			// return $this->modules->views->render(
-			// 	$this->response,
-			// 	$this->viewFile,
-			// 	$this->viewsData,
-			// 	$componentName
-			// );
-		} else {
-			if ($componentName === 'default') {
-				$viewFile =
-					'/' . $this->applicationName . '/' . $this->defaultViewsName .
-					'/html/' . $this->defaultComponentsName . '/view.html';
+	// 		// return $this->modules->views->render(
+	// 		// 	$this->response,
+	// 		// 	$this->viewFile,
+	// 		// 	$this->viewsData,
+	// 		// 	$componentName
+	// 		// );
+	// 	} else {
+	// 		if ($componentName === 'default') {
+	// 			$viewFile =
+	// 				'/' . $this->applicationName . '/' . $this->defaultViewsName .
+	// 				'/html/' . $this->defaultComponentsName . '/view.html';
 
-				$componentName = $this->defaultComponentsName;
+	// 			$componentName = $this->defaultComponentsName;
 
-				// return $this->modules->views->render(
-				// 	$this->response,
-				// 	'/' . $this->defaultViewsName . '/html/' . $this->defaultComponentsName . '/view.html',
-				// 	$this->viewsData,
-				// 	$this->defaultComponentsName
-				// );
-			} else {
-				if ($this->applicationInfo['name'] === 'Base') {
-					$viewFile = '/Base/Default/html/' . $componentName . '/view.html';
-					// return $this->modules->views->render(
-					// 	$this->response,
-					// 	'/Base/html/' . $componentName . '/view.html',
-					// 	$this->viewsData,
-					// 	$componentName
-					// );
-				} else {
-					$viewFile =
-						'/' . $this->applicationName . '/' . $this->defaultViewsName .
-						'/html/' . $componentName . '/view.html';
+	// 			// return $this->modules->views->render(
+	// 			// 	$this->response,
+	// 			// 	'/' . $this->defaultViewsName . '/html/' . $this->defaultComponentsName . '/view.html',
+	// 			// 	$this->viewsData,
+	// 			// 	$this->defaultComponentsName
+	// 			// );
+	// 		} else {
+	// 			if ($this->applicationInfo['name'] === 'Base') {
+	// 				$viewFile = '/Base/Default/html/' . $componentName . '/view.html';
+	// 				// return $this->modules->views->render(
+	// 				// 	$this->response,
+	// 				// 	'/Base/html/' . $componentName . '/view.html',
+	// 				// 	$this->viewsData,
+	// 				// 	$componentName
+	// 				// );
+	// 			} else {
+	// 				$viewFile =
+	// 					'/' . $this->applicationName . '/' . $this->defaultViewsName .
+	// 					'/html/' . $componentName . '/view.html';
 
-					// return $this->modules->views->render(
-					// 	$this->response,
-					// 	'/' . $this->defaultViewsName . '/html/' . $componentName . '/view.html',
-					// 	$this->viewsData,
-					// 	$componentName
-					// );
-				}
-			}
-		}
+	// 				// return $this->modules->views->render(
+	// 				// 	$this->response,
+	// 				// 	'/' . $this->defaultViewsName . '/html/' . $componentName . '/view.html',
+	// 				// 	$this->viewsData,
+	// 				// 	$componentName
+	// 				// );
+	// 			}
+	// 		}
+	// 	}
 
-		return $this->modules->views->render(
-			$this->response,
-			$viewFile,
-			$this->viewsData,
-			$componentName
-		);
-	}
+	// 	return $this->modules->views->render(
+	// 		$this->response,
+	// 		$viewFile,
+	// 		$this->viewsData,
+	// 		$componentName
+	// 	);
+	// }
 
-	protected function getDefaults()
-	{
-		// var_dump($this->applicationInfo, $this->applicationDefaults);
-		if ($this->applicationInfo && $this->applicationDefaults) {
+	// protected function getDefaults()
+	// {
+	// 	// var_dump($this->applicationInfo, $this->applicationDefaults);
+	// 	if ($this->applicationInfo && $this->applicationDefaults) {
 
-			$this->applicationName = $this->applicationDefaults['application'];
+	// 		$this->applicationName = $this->applicationDefaults['application'];
 
 
-			// foreach (unserialize($this->applicationInfo['dependencies'])['views'] as $viewsKey => $view) {
-			// 	if ($view['is_default'] === 'true') {
-			// 		$this->defaultViewsName = ucfirst($view['name']);
-			// 		break;
-			// 	}
-			// }
-			// foreach (unserialize($this->applicationInfo['dependencies'])['components'] as $componentsKey => $component) {
-			// 	if ($component['is_default'] === 'true') {
-			// 		$this->defaultComponentsName = strtolower($component['name']);
-			// 		break;
-			// 	}
-			// }
-			// if (unserialize($this->applicationInfo['settings'])['view']['is_default'] === 'true') {
-			// 	$this->defaultViewsName = ucfirst(unserialize($this->applicationInfo['settings'])['view']['name']);
-			// }
-			// if (unserialize($this->applicationInfo['settings'])['component']['is_default'] === 'true') {
-			// 	$this->defaultComponentsName =
-			// 		strtolower(unserialize($this->applicationInfo['settings'])['component']['name']);
-			// }
+	// 		// foreach (unserialize($this->applicationInfo['dependencies'])['views'] as $viewsKey => $view) {
+	// 		// 	if ($view['is_default'] === 'true') {
+	// 		// 		$this->defaultViewsName = ucfirst($view['name']);
+	// 		// 		break;
+	// 		// 	}
+	// 		// }
+	// 		// foreach (unserialize($this->applicationInfo['dependencies'])['components'] as $componentsKey => $component) {
+	// 		// 	if ($component['is_default'] === 'true') {
+	// 		// 		$this->defaultComponentsName = strtolower($component['name']);
+	// 		// 		break;
+	// 		// 	}
+	// 		// }
+	// 		// if (unserialize($this->applicationInfo['settings'])['view']['is_default'] === 'true') {
+	// 		// 	$this->defaultViewsName = ucfirst(unserialize($this->applicationInfo['settings'])['view']['name']);
+	// 		// }
+	// 		// if (unserialize($this->applicationInfo['settings'])['component']['is_default'] === 'true') {
+	// 		// 	$this->defaultComponentsName =
+	// 		// 		strtolower(unserialize($this->applicationInfo['settings'])['component']['name']);
+	// 		// }
 
-				$this->defaultComponentsName = strtolower($this->applicationDefaults['component']);
+	// 			$this->defaultComponentsName = strtolower($this->applicationDefaults['component']);
 
-				$this->defaultViewsName = $this->applicationDefaults['view'];
+	// 			$this->defaultViewsName = $this->applicationDefaults['view'];
 
-		} else {
-			$this->applicationInfo = ['name' => 'Base'];
+	// 	} else {
+	// 		$this->applicationInfo = ['name' => 'Base'];
 
-			$this->applicationName = 'Base';
+	// 		$this->applicationName = 'Base';
 
-			$this->applicationInfo['route'] = null;
-		}
-	}
+	// 		$this->applicationInfo['route'] = null;
+	// 	}
+	// }
 
-	protected function viewFile($viewFile)
-	{
-		$this->viewFile = $viewFile;
+	// protected function viewFile($viewFile)
+	// {
+	// 	$this->viewFile = $viewFile;
 
-		return $this;
-	}
+	// 	return $this;
+	// }
 }

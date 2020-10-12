@@ -1,9 +1,7 @@
 <?php
 
-namespace Packages\Admin\Modules;
+namespace Applications\Admin\Packages;
 
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Model\Applications;
 
@@ -19,40 +17,36 @@ class Barebone extends BasePackage
 
 	public function runProcess($postData)
 	{
-		$this->fileSystem = new Filesystem(new Local(base_path('/')));
-
 		$this->postData = $postData;
 
 		if ($this->postData['task'] === 'all') {
 
-			$this->taskAll();
+			return $this->taskAll();
 		} else if ($this->postData['task'] === 'component') {
 
-			$this->taskComponent();
+			return $this->taskComponent();
 		} else if ($this->postData['task'] === 'package') {
 
-			$this->taskPackage();
+			return $this->taskPackage();
 		} else if ($this->postData['task'] === 'middleware') {
 
-			$this->taskMiddleware();
+			return $this->taskMiddleware();
 		} else if ($this->postData['task'] === 'view') {
 
-			$this->taskView();
+			return $this->taskView();
 		}
-
-		return $this->packagesData;
 	}
 
 	protected function taskAll()
 	{
-		if ($this->applications->getAll(['name' => ucfirst($this->postData['applicationName'])])) {
+		if ($this->modules->applications->getNamedApplication($this->postData['applicationName'])) {
 
 			$this->packagesData->responseCode = 1;
 
 			$this->packagesData->responseMessage =
 				'Application ' . ucfirst($this->postData['applicationName']) . ' already exists. Please choose another name.' ;
 
-			return $this->packagesData;
+			return false;
 		}
 
 		if (!ctype_alpha($this->postData['applicationName'])) {
@@ -62,32 +56,36 @@ class Barebone extends BasePackage
 			$this->packagesData->responseMessage =
 				'Application name cannot have spaces, special characters or numbers';
 
-			return $this->packagesData;
+			return false;
+
 		} else {
 
 			if ($this->postData['default'] === 'true' &&
 				$this->postData['force'] !== '1'
 			   ) {
 
-				if ($this->checkDefaultApplication()) {
+				$this->packagesData->defaultApplication
+					= $this->modules->applications->getDefaultApplication();
+
+				if ($this->packagesData->defaultApplication) {
 
 					$this->packagesData->responseCode = 2;
 
 					$this->packagesData->responseMessage =
-						$this->packagesData->defaultApplication->get('name') .
+						$this->packagesData->defaultApplication['name'] .
 						' application is already set to default. Make application ' .
 						$this->postData['applicationName'] .
 						' as default?';
 
 
-					return $this->packagesData;
+					return false;
 				}
 			}
 
 			if ($this->postData['default'] === 'true' ||
 				$this->postData['force'] === '1'
 				) {
-				$this->removeApplicationDefaultFlag();
+				$this->modules->applications->removeDefaultFlag();
 			}
 
 			$this->applicationName =
@@ -141,7 +139,7 @@ class Barebone extends BasePackage
 
 				$this->packagesData->bareboneModule = $newApplication;
 
-				return $this->packagesData;
+				return true;
 			}
 		}
 	}
@@ -885,46 +883,46 @@ class Barebone extends BasePackage
 		);
 	}
 
-	protected function removeApplicationDefaultFlag()
-	{
-		$defaultApplication = $this->getDefaultApplication();
+	// protected function removeApplicationDefaultFlag()
+	// {
+	// 	$defaultApplication = $this->getDefaultApplication();
 
-		if (count($defaultApplication) > 0) {
-			$defaultApplication =
-				$defaultApplication[0]->getAllArr();
+	// 	if (count($defaultApplication) > 0) {
+	// 		$defaultApplication =
+	// 			$defaultApplication[0]->getAllArr();
 
-			$defaultApplication['is_default'] = 0;
+	// 		$defaultApplication['is_default'] = 0;
 
-			$this->applications->update($defaultApplication);
-		}
-	}
+	// 		$this->applications->update($defaultApplication);
+	// 	}
+	// }
 
-	protected function checkDefaultApplication()
-	{
-		$defaultApplication = $this->getDefaultApplication();
+	// protected function checkDefaultApplication()
+	// {
+	// 	$defaultApplication = $this->getDefaultApplication();
 
-		if (count($defaultApplication) > 0) {
+	// 	if (count($defaultApplication) > 0) {
 
-			$this->packagesData->defaultApplication = $defaultApplication[0];
+	// 		$this->packagesData->defaultApplication = $defaultApplication[0];
 
-			return true;
-		} else {
-			return false;
-		}
-	}
+	// 		return true;
+	// 	} else {
+	// 		return false;
+	// 	}
+	// }
 
-	protected function getDefaultApplication()
-	{
-		if (!$this->defaultApplication) {
+	// protected function getDefaultApplication()
+	// {
+	// 	if (!$this->defaultApplication) {
 
-			$this->defaultApplication = $this->applications->getAll(["is_default" => 1]);
+	// 		$this->defaultApplication = $this->applications->getAll(["is_default" => 1]);
 
-			return $this->defaultApplication;
-		} else {
+	// 		return $this->defaultApplication;
+	// 	} else {
 
-			return $this->defaultApplication;
-		}
-	}
+	// 		return $this->defaultApplication;
+	// 	}
+	// }
 
 	public function getApplicationComponentsViews($postData)
 	{

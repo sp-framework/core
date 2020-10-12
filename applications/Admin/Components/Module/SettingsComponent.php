@@ -1,8 +1,8 @@
 <?php
 
-namespace Applications\Admin\Components\Modules\Module;
+namespace Applications\Admin\Components\Module;
 
-use Applications\Admin\Packages\Modules\Module\Settings;
+use Applications\Admin\Packages\Module\Settings;
 use System\Base\BaseComponent;
 
 class SettingsComponent extends BaseComponent
