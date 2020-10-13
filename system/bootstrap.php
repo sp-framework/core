@@ -41,8 +41,8 @@ try {
 		$container->getShared('view'),
 		$container->getShared('flashSession')
 	);
-
-	$response = $handler->respond();
+	var_dump($e);
+	// $response = $handler->respond();
 }
 
 if (!$response->isSent()) {

@@ -170,10 +170,10 @@ class Router
 	protected function registerDefaults()
 	{
 		$this->router->setDefaultNamespace(
-			'Applications\\Admin\\Components'
+			'System\\Base\\Exceptions'
 		);
 
-		$this->router->setDefaultController('modules');
+		$this->router->setDefaultController('index');
 
 		$this->router->setDefaultAction('view');
 	}
@@ -187,7 +187,7 @@ class Router
 				?? 'Applications\Admin\Components\Errors';
 
 		} else {
-			$errorComponent = 'Errors';
+			$errorComponent = 'Error';
 		}
 
 		$this->router->notFound(
