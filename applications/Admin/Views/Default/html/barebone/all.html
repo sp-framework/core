@@ -93,7 +93,7 @@
 									$('#all-access').attr('disabled', false);
 									$('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
 									$('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
-								} else if (data && data.responseCode === 1){
+								} else if (data && data.responseCode === 1) {
 									PNotify.error({
 										text			: data.responseMessage,
 										textTrusted		: true
@@ -111,8 +111,6 @@
 								};
 
 							$.post('/{{route}}/barebone/install', postData, function(data) {
-								//eslint-disable-next-line
-								console.log(data);
 								if (data && data.responseCode === 0) {
 									PNotify.success({
 										text		: data.responseMessage,
