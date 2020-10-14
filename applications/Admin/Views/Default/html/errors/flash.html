@@ -1,0 +1,40 @@
+{% set messages = flashSession.getMessages() %}
+{% if messages['error'] is defined %}
+	{% if messages['error']|length > 1 %}
+		{% for messagesError in messages['error'] %}
+			<div class="alert alert-danger" role="alert">{{messagesError}}</div>
+		{% endfor %}
+	{% else %}
+		<div class="alert alert-danger" role="alert">{{messages['error'][0]}}</div>
+	{% endif %}
+{% endif %}
+
+{% if messages['success'] is defined %}
+	{% if messages['success']|length > 1 %}
+		{% for messagesSuccess in messages['success'] %}
+			<div class="alert alert-success" role="alert">{{messagesSuccess}}</div>
+		{% endfor %}
+	{% else %}
+		<div class="alert alert-success" role="alert">{{messages['success'][0]}}</div>
+	{% endif %}
+{% endif %}
+
+{% if messages['notice'] is defined %}
+	{% if messages['notice']|length > 1 %}
+		{% for messagesNotice in messages['notice'] %}
+			<div class="alert alert-info" role="alert">{{messagesNotice}}</div>
+		{% endfor %}
+	{% else %}
+		<div class="alert alert-info" role="alert">{{messages['notice'][0]}}</div>
+	{% endif %}
+{% endif %}
+
+{% if messages['warning'] is defined %}
+	{% if messages['warning']|length > 1 %}
+		{% for messagesWarning in messages['warning'] %}
+			<div class="alert alert-warning" role="alert">{{messagesWarning}}</div>
+		{% endfor %}
+	{% else %}
+		<div class="alert alert-warning" role="alert">{{messages['warning'][0]}}</div>
+	{% endif %}
+{% endif %}

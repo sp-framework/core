@@ -1,0 +1,12 @@
+public/.htaccess
+*.sublime-project
+*.sublime-workspace
+/vendor/*
+.backups
+.downloads
+composer.json
+composer.lock
+var/*
+*html_compiled
+.vscode*
+system/Configs/Db.php

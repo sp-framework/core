@@ -1,0 +1,7 @@
+{
+	"name" 			: "Core",
+	"displayName" 	: "Hello World Framework (Core)",
+	"description" 	: "Hello World Framework Core",
+	"version" 		: "0.0.1",
+	"repo" 			: "https://github.com/h-w-f/core"
+}

@@ -1,0 +1,143 @@
+{% include '../errors/flash.html' %}
+{% if repository is defined %}
+	{% set formData = repository %}
+{% else %}
+	{% set formData = null %}
+{% endif %}
+{% if thisApplication['route'] and thisApplication['route'] != '' %}
+	{% set route = thisApplication['route']|lower %}
+{% else %}
+	{% set route = thisApplication['name']|lower %}
+{% endif %}
+<input type="hidden" name="id" id="id" class="form-control" value="{{formData ? formData['id'] : null}}">
+<div class="form-group">
+	<label for="name">Repository Name *</label>
+	<div class="input-group">
+		<input type="text" name="name" id="name" class="form-control" value="{{formData ? formData['name'] : null}}" placeholder="Repository Name">
+	</div>
+</div>
+<div class="form-group">
+	<label for="description">Description</label>
+	<div class="input-group">
+		<textarea name="description" id="description" class="form-control" placeholder="Description">{{formData ? formData['description'] : null}}</textarea>
+	</div>
+</div>
+<div class="form-group">
+	<label for="url">Repository API URL *</label>
+	<div class="input-group">
+		<input type="text" name="url" id="url" class="form-control" placeholder="Eg: https://api.github.com/orgs/h-w-f/repos" value="{{formData ? formData['url'] : null}}">
+	</div>
+</div>
+{% if formData and formData['need_auth'] === '0' %}
+	{% set checked = null %}
+	{% set hidden = 'hidden' %}
+{% elseif formData and formData['need_auth'] === '1' %}
+	{% set checked = 'checked' %}
+	{% set hidden = null %}
+{% else %}
+	{% set checked = null %}
+	{% set hidden = 'hidden' %}
+{% endif %}
+<div class="form-group">
+	<div class="checkbox icheck-info">
+		<input type="checkbox" name="need-auth" id="need-auth" {{checked}}>
+		<label for="need-auth">
+			Repository Needs Authentication?
+		</label>
+	</div>
+</div>
+<div id="repo-auth-div" {{hidden}}>
+	<div class="form-group">
+		<label for="username">Username *</label>
+		<div class="input-group">
+			<input type="text" name="username" id="username" class="form-control" value="{{formData ? formData['username'] : null}}">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="token">Token *</label>
+		<div class="input-group">
+			<input type="text" name="token" id="token" class="form-control" value="{{formData ? formData['token'] : null}}">
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$('#need-auth').click(function() {
+		if ($(this)[0].checked === true) {
+			$('#repo-auth-div').attr('hidden', false);
+		} else {
+			$('#repo-auth-div').attr('hidden', true);
+			$('#username, #token').val('');
+		}
+	});
+
+	$('#modal-save').click(function() {
+		var postData = { };
+
+		if ($('#need-auth')[0].checked) {
+			postData['need_auth'] = '1';
+		} else {
+			postData['need_auth'] = '0';
+		}
+
+		if ($('#name').val() === '') {
+			$('#name').addClass('is-invalid');
+			$('#name').focus(function() {
+				$(this).removeClass('is-invalid');
+			});
+		} else if ($('#url').val() === '') {
+			$('#url').addClass('is-invalid');
+			$('#url').focus(function() {
+				$(this).removeClass('is-invalid');
+			});
+		} else if (postData['need_auth'] === '1') {
+			if ($('#username').val() === '') {
+				$('#username').addClass('is-invalid');
+				$('#username').focus(function() {
+					$(this).removeClass('is-invalid');
+				});
+			} else if ($('#token').val() === '') {
+				$('#token').addClass('is-invalid');
+				$('#token').focus(function() {
+					$(this).removeClass('is-invalid');
+				});
+			} else {
+				processPost(postData);
+			}
+		} else {
+			processPost(postData);
+		}
+	});
+
+	function processPost(postData) {
+		postData['id'] = $('#id').val();
+		postData['name'] = $('#name').val();
+		postData['description'] = $('#description').val();
+		postData['url'] = $('#url').val();
+		postData['username'] = $('#username').val();
+		postData['token'] = $('#token').val();
+
+		if (postData['id'] !== '') {
+			$.post('/{{route}}/repositories/edit/update', postData, function(data) {
+				if (data && data.responseCode === 0) {
+					location.reload();
+				} else {
+					PNotify.error({
+						text		: data.responseMessage,
+						textTrusted	: true
+					});
+				}
+			}, 'json');
+		} else {
+			$.post('/{{route}}/repositories/add/insert', postData, function(data) {
+				if (data && data.responseCode === 0) {
+					location.reload();
+				} else {
+					PNotify.error({
+						text		: data.responseMessage,
+						textTrusted	: true
+					});
+				}
+			}, 'json');
+		}
+	}
+</script>

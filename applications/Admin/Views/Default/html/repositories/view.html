@@ -1,0 +1,167 @@
+<div class="row">
+	<div class="col">
+		<div class="input-group">
+			<select class="custom-select" id="select-repo">
+				<option value="0" selected>Select Repository</option>
+				{% for repository in repositories %}
+					<option value="{{repository['id']}}" data-url="{{repository['url']}}">{{repository['name']}}</option>
+				{% endfor %}
+			</select>
+			<div class="input-group-append">
+				<button class="btn btn-primary" id="sync" type="button" disabled>
+					<i class="fa fa-sync-alt sync-icon"></i> Sync
+				</button>
+				<button type="button" id="edit-repo" class="btn btn-warning" disabled>
+					<i class="fa fa-edit"></i> Edit
+				</button>
+				<button type="button" id="delete-repo" class="btn btn-danger" disabled>
+					<i class="fa fa-trash"></i> Delete
+				</button>
+				<button type="button" id="add-repo" class="btn btn-success">
+					<i class="fa fa-plus"></i> Add
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	changeRepoButtons();
+
+	initSync();
+
+	function changeRepoButtons() {
+		if ($('#select-repo option:selected').val() === '1') {
+			$('#sync, #edit-repo').attr('disabled', false);
+			$('#delete-repo').attr('disabled', true);
+		} else if ($('#select-repo option:selected').val() === '0') {
+			$('#sync, #edit-repo, #delete-repo').attr('disabled', true);
+		} else if ($('#select-repo option:selected').val() !== '1') {
+			$('#sync, #edit-repo, #delete-repo').attr('disabled', false);
+		}
+	}
+
+	function initSync() {
+		$('#sync').off();
+
+		changeRepoButtons();
+
+		$('#sync').click(function() {
+			$('#sync, #edit-repo, #delete-repo, #add-repo').attr('disabled', true);
+			$('#repo-loader').attr('hidden', false);
+			$('.sync-icon').attr('hidden', false);
+			$('#modules-data').attr('hidden', true);
+
+			$.get(
+				'/{{route}}/repositories/sync/q/' +
+				'repoId/' + $('#select-repo option:selected').val(),
+				function(data) {
+					if (typeof data === 'string') {
+						$('#modules-data').empty().html(data);
+						$('#modules-data').attr('hidden', false);
+						$('#repo-loader').attr('hidden', true);
+						$('#sync, #edit-repo, #delete-repo, #add-repo').attr('disabled', false);
+
+						var text, registerCounter, updateCounter;
+
+						registerCounter = Number($('#register-counter').val());
+						updateCounter = Number($('#update-counter').val());
+
+						if (registerCounter > 0 || updateCounter > 0) {
+							if (registerCounter !== 0 && updateCounter === 0) {
+								text =
+									'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
+							} else if (registerCounter === 0 && updateCounter !== 0) {
+								text =
+									'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
+							} else if (registerCounter !== 0 && updateCounter !== 0) {
+								text =
+									'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
+							}
+							PNotify.info({
+								text		: text,
+								textTrusted	: true
+							});
+						} else {
+							PNotify.info({
+								text		: 'Sync Complete.<br>No new modules or updates available.',
+								textTrusted	: true
+							});
+						}
+						initModuleButtons();
+					} else {
+						PNotify.error({
+								text		: data.responseMessage,
+								textTrusted	: true
+							});
+						$('#modules-data').attr('hidden', false);
+						$('#repo-loader').attr('hidden', true);
+						$('#sync, #edit-repo, #delete-repo, #add-repo').attr('disabled', false);
+					}
+				}
+			);
+		});
+	}
+
+	$('#select-repo').change(function() {
+		initSync();
+	});
+
+	$('#add-repo, #edit-repo').click(function () {
+		if ($(this)[0].id === 'add-repo') {
+
+			$.get(
+				  '/{{route}}/repositories/add',
+				  function(data) {
+						$('#modal-title').html('Add New Repository');
+						$('#modal .modal-body').empty().html(data);
+						$('#modal').modal('show');
+					}
+				);
+		} else if ($(this)[0].id === 'edit-repo') {
+			$.get(
+					'/{{route}}/repositories/edit/q/id/' + $('#select-repo option:selected').val(),
+					function(data) {
+						if (data) {
+							$('#modal-title').html('Edit Repository');
+							$('#modal .modal-body').empty().html(data);
+							$('#modal').modal('show');
+						} else {
+							PNotify.error({
+								text		: data.responseMessage,
+								textTrusted	: true
+							});
+						}
+					}
+				);
+		}
+	});
+
+	$('#delete-repo').click(function() {
+		Swal.fire({
+			title 				: 'Delete Repository?',
+			showCancelButton	: true,
+			confirmButtonText	: 'Delete',
+			denyButtonText		: 'Cancel',
+		}).then((result) => {
+			if (result.isConfirmed) {
+				var postData = { };
+
+				postData['id'] = $('#select-repo option:selected').val();
+				$.post(
+						'/{{route}}/repositories/delete/remove', postData,
+						function(data) {
+							if (data && data.responseCode === 0) {
+								location.reload();
+							} else {
+								PNotify.error({
+									text		: data.responseMessage,
+									textTrusted	: true
+								});
+							}
+						},
+						'json'
+					);
+			}
+		});
+	});
+</script>

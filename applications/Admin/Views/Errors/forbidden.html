@@ -1,0 +1,30 @@
+{% set sectionId = '403' %}
+<div id="{{componentId}}-{{sectionId}}" hidden>
+    <div class="row">
+        <div class="col">
+            <div class="jumbotron text-center bg-warning">
+                <h1>
+                    <span class="text-white"><i class="fas fa-fw fa-ban"></i> Forbidden! (Error:403)</span>
+                </h1>
+                <p class="lead text-white">Sorry! You don't have permission to access this component.</p>
+                <p>
+                    <a href="{{link('home/view')}}" class="contentAjaxLink btn btn-primary btn-lg">
+                        <span class="text-uppercase">Goto Home</span>
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h2>What happened?</h2>
+            <p class="lead">A 403 error status indicates that you don't have permission to access this component.</p>
+        </div>
+        <div class="col">
+            <h2>What can I do?</h2>
+            <p class="lead">Please check that you're in the right place and
+                <a href="mailto:dev@company.com.au?Subject=Permission%20Denied%20Error" class="font-weight-bold">contact</a> the administrator if you believe this to be an error.
+            </p>
+        </div>
+    </div>
+</div>

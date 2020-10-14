@@ -1,0 +1,31 @@
+{
+	"name"			: "Modules",
+	"displayName" 	: "Admin Modules Package",
+	"description"	: "Package for Modules component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-modules",
+	"path"			: "/",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Admin",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-admin"
+		},
+		"components"	:
+		[{
+			"name"		: "Modules",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/component-admin-modules"
+		}],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

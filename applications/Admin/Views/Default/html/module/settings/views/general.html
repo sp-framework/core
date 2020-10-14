@@ -1,0 +1,41 @@
+<div class="p-2">
+	<input type="hidden" name="id" id="id" class="form-control" value="{{viewsData.view.id}}">
+	<div class="row">
+		<div class="col">
+			<div class="form-group">
+				<label for="name">View Name</label>
+				<div class="input-group">
+					<input type="text" name="name" id="name" class="form-control" value="{{viewsData.view.name}}" placeholder="View Name" disabled>
+				</div>
+			</div>
+		</div>
+		<div class="col">
+			<div class="form-group">
+				<label for="display-name">View Display Name</label>
+				<div class="input-group">
+					<input type="text" name="display-name" id="display-name" class="form-control" value="{{viewsData.view.display_name}}" placeholder="View Display Name">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<div class="form-group">
+				<label for="description">Description</label>
+				<div class="input-group">
+					<textarea name="description" id="description" class="form-control" placeholder="Description">{{viewsData.view.description}}</textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<div class="form-group">
+				<label for="views-repo">Repository URL</label>
+				<div class="input-group">
+					<input type="text" name="views-repo" id="views-repo" class="form-control" placeholder="Eg: https://api.github.com/orgs/h-w-f/view-repo" value="{{viewsData.view.repo}}">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

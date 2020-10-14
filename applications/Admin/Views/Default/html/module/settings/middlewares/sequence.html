@@ -1,0 +1,31 @@
+<div class="row p-2" style="max-height: 400px; overflow: scroll;">
+	<div class="col">
+		{% if viewsData.middlewares|length > 0 %}
+			<label>Middleware Sequence (Drag and drop to change sequence)</label>
+			<ul class="list-group" id="sortable-middleware">
+				{% for middleware in viewsData.middlewares %}
+					{% if middleware.enabled == 1 %}
+						{% set class = 'list-group-item list-group-item-secondary' %}
+						{% set area = 'false' %}
+					{% elseif middleware.enabled == 0 %}
+						{% set class = 'list-group-item list-group-item-secondary disabled' %}
+						{% set area = 'true' %}
+					{% endif %}
+					<li class="{{class}}" area-disabled="{{area}}" style="cursor: pointer" data-id="{{middleware.id}}">
+						<i class="fa fa-sort fa-fw handle"></i> {{middleware.display_name}}
+						<small class="form-text text-muted">{{middleware.description}}</small>
+					</li>
+				{% endfor %}
+			</ul>
+		{% else %}
+			<label>No middlewares installed for this application.</label>
+		{% endif %}
+	</div>
+</div>
+{% if viewsData.middlewares|length > 0 %}
+	<script type="text/javascript">
+		var el = document.getElementById("sortable-middleware");
+		var sortable = Sortable.create(el, {
+		});
+	</script>
+{% endif %}

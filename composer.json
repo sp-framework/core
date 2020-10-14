@@ -1,0 +1,17 @@
+{
+	"autoload": {
+		"psr-4": {
+			"System\\": "system/",
+			"Applications\\": "applications/"
+		}
+	},
+	"require": {
+		"phalcon/ide-stubs": "^4.0",
+		"phalcon/devtools": "^4.0",
+		"perftools/php-profiler": "^0.12.0",
+		"perftools/xhgui-collector": "^1.8"
+	},
+	"require-dev": {
+		"symfony/var-dumper": "^5.1"
+	}
+}
