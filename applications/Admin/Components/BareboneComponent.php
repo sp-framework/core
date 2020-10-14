@@ -19,7 +19,7 @@ class BareboneComponent extends BaseComponent
 		$bareboneModule = $barebonePackage->install($this->postData());
 
 		if ($bareboneModule) {
-			if (isset($barebonePackage->packagesData->bareboneModule)) {
+			if ($this->postData()['task'] !== 'view') {
 				$this->view->bareboneModule = $barebonePackage->packagesData->bareboneModule;
 			}
 
@@ -32,10 +32,10 @@ class BareboneComponent extends BaseComponent
 
 			$this->view->responseMessage = $barebonePackage->packagesData->responseMessage;
 
-			return $this->sendJson();
 		}
+		return $this->sendJson();
 
-		// $this->view->disable();
+		$this->view->disable();
 	}
 
 	public function getSelectedApplicationViewsComponentsAction()
