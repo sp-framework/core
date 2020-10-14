@@ -5,9 +5,9 @@ return
 		"db" =>
 			[
 				"host" 		=> "localhost",
-				"dbname" 	=> "sp",
-				"username" 	=> "guru",
-				"password" 	=> "123",
+				"dbname" 	=> "",
+				"username" 	=> "",
+				"password" 	=> "",
 				"port" 		=> "3306",
 			]
 	];
