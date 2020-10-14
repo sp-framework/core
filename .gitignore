@@ -12,3 +12,4 @@ Moomoo*
 composer.lock
 var/*
 *html_compiled
+.vscode*

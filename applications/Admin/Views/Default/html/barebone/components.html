@@ -1,4 +1,3 @@
-{{dump(applications)}}
 <div class="row">
 	<div class="col">
 		<h5 class="card-title">Install Component Barebone Module</h5>
@@ -48,7 +47,7 @@
 
 			$('#component-install-barebone-button').attr('disabled', true);
 
-			$.post('/{{route}}/modules/barebone/install', postData, function(data) {
+			$.post('/{{route}}/barebone/install', postData, function(data) {
 				if (data && data.responseCode === 0) {
 					PNotify.success({
 						text		: data.responseMessage,

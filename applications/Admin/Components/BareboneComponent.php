@@ -2,7 +2,7 @@
 
 namespace Applications\Admin\Components;
 
-use Applications\Admin\Packages\Modules\Barebone;
+use Applications\Admin\Packages\Barebone;
 use System\Base\BaseComponent;
 
 class BareboneComponent extends BaseComponent
@@ -16,13 +16,14 @@ class BareboneComponent extends BaseComponent
 	{
 		$barebonePackage = $this->usePackage(Barebone::class);
 
-		$bareboneModule = $barebonePackage->runProcess($this->postData());
+		$bareboneModule = $barebonePackage->install($this->postData());
 
 		if ($bareboneModule) {
+			if (isset($barebonePackage->packagesData->bareboneModule)) {
+				$this->view->bareboneModule = $barebonePackage->packagesData->bareboneModule;
+			}
 
 			$this->view->responseCode = $barebonePackage->packagesData->responseCode;
-
-			$this->view->bareboneModule = $barebonePackage->packagesData->bareboneModule;
 
 			$this->view->responseMessage = $barebonePackage->packagesData->responseMessage;
 		} else {
@@ -34,6 +35,7 @@ class BareboneComponent extends BaseComponent
 			return $this->sendJson();
 		}
 
+		// $this->view->disable();
 	}
 
 	public function getSelectedApplicationViewsComponentsAction()
@@ -54,7 +56,7 @@ class BareboneComponent extends BaseComponent
 
 			$this->view->responseCode = 1;
 
-			$this->view->responseMessage = 'Could not get applications components data.';
+			$this->view->responseMessage = 'Could not get applications components/views data.';
 
 			return $this->sendJson();
 		}

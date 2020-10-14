@@ -17,16 +17,12 @@ class Settings extends BasePackage
 			$components = $this->modules->components->components;
 
 			$this->packagesData->components =
-				[
-					$components[array_search($getData['id'], array_column($components, 'application_id'))]
-				];
+				$this->modules->components->getComponentsForApplication($getData['id']);
 
 			$views = $this->modules->views->views;
 
 			$this->packagesData->views =
-				[
-					$views[array_search($getData['id'], array_column($views, 'application_id'))]
-				];
+				$this->modules->views->getViewsForApplication($getData['id']);
 
 			$this->packagesData->application =
 				$this->modules->applications->getById($getData['id']);

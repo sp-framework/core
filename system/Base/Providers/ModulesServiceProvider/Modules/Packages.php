@@ -18,6 +18,27 @@ class Packages extends BasePackage
 		return $this;
 	}
 
+	public function getNamedPackageForApplication($name, $applicationId)
+	{
+		$filter =
+			$this->model->filter(
+				function($package) use ($name, $applicationId) {
+					if ($package->name === ucfirst($name) &&
+						$package->application_id === $applicationId
+					) {
+						return $package;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate package name found for package ' . $name);
+		} else if (count($filter) === 1) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
+	}
 	// public function getAll($params = [], bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {

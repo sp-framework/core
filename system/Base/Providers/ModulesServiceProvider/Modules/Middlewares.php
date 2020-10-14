@@ -18,6 +18,28 @@ class Middlewares extends BasePackage
 		return $this;
 	}
 
+	public function getNamedMiddlewareForApplication($name, $applicationId)
+	{
+		$filter =
+			$this->model->filter(
+				function($middleware) use ($name, $applicationId) {
+					if ($middleware->name === ucfirst($name) &&
+						$middleware->application_id === $applicationId
+					) {
+						return $middleware;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate middleware name found for middleware ' . $name);
+		} else if (count($filter) === 1) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
+	}
+
 	// public function getAll($params = [], bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {

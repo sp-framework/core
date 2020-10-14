@@ -839,6 +839,13 @@ class SetupPackage
 					]
 				),
 				new Column(
+					'view_id',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
 					'installed',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
@@ -989,23 +996,35 @@ class SetupPackage
 
 		} else if ($type === 'components') {
 
-			$this->registerAdminComponent(
-				json_decode(
-					$this->container['localContent']->read('applications/Admin/Components/Install/Modules/component.json'),
-					true
-				),
-				$newApplicationId
-			);
+			$adminComponents = $this->container['localContent']->listContents('applications/Admin/Components/Install/', true);
+
+			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
+				if ($adminComponent['basename'] === 'component.json') {
+					$this->registerAdminComponent(
+						json_decode(
+							$this->container['localContent']->read($adminComponent['path']),
+							true
+						),
+						$newApplicationId
+					);
+				}
+			}
 
 		} else if ($type === 'packages') {
 
-			$this->registerAdminPackage(
-				json_decode(
-					$this->container['localContent']->read('applications/Admin/Packages/Install/Modules/package.json'),
-					true
-				),
-				$newApplicationId
-			);
+			$adminPackages = $this->container['localContent']->listContents('applications/Admin/Packages/Install/', true);
+
+			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
+				if ($adminPackage['basename'] === 'package.json') {
+					$this->registerAdminPackage(
+						json_decode(
+							$this->container['localContent']->read($adminPackage['path']),
+							true
+						),
+						$newApplicationId
+					);
+				}
+			}
 
 		} else if ($type === 'middlewares') {
 

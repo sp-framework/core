@@ -1,9 +1,7 @@
 <div class="row p-2">
 	<div class="col">
 		<input type="hidden" name="id" id="id" class="form-control" value="{{application['id']}}">
-{# 		<input type="hidden" name="installed" id="installed" class="form-control" value="{{application['installed']}}">
-		<input type="hidden" name="dependencies" id="dependencies" class="form-control" value="{{application['dependencies']}}">
- #}		<div class="row">
+		<div class="row">
 			<div class="col">
 				<div class="form-group">
 					<label for="version">Version</label>
@@ -14,6 +12,7 @@
 			</div>
 			{% if application['is_default'] == 0 %}
 				{% set checked = '' %}
+				{% set disabled = '' %}
 			{% elseif application['is_default'] == 1 %}
 				{% set checked = 'checked' %}
 				{% set disabled = 'disabled' %}

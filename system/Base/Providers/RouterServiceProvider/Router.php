@@ -51,6 +51,7 @@ class Router
 
 	public function init()
 	{
+
 		if ($this->setApplicationInfo()) {
 			$this->defaultNamespace =
 				'Applications\\' . ucfirst($this->applicationDefaults['application']) . '\\Components';
@@ -117,7 +118,6 @@ class Router
 				'action'		=> 'view'
 			]
 		);
-
 	}
 
 	protected function registerRoute($givenRoute)
@@ -183,8 +183,8 @@ class Router
 		if ($this->applicationDefaults) {
 
 			$errorComponent =
-				$this->applicationDefaults['errorComponent']
-				?? 'Applications\Admin\Components\Errors';
+				$this->applicationInfo['settings']['errorComponent']
+				?? 'System\Base\Exceptions\Error';
 
 		} else {
 			$errorComponent = 'Error';

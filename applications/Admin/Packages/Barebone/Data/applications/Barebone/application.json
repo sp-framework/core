@@ -37,6 +37,7 @@
 	},
 	"settings"		: {
 		"view" 			: "Default",
-		"component" 	: "Hw"
+		"component" 	: "Hw",
+		"errorComponent": "Errors"
 	}
 }

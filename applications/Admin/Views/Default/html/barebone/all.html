@@ -52,7 +52,7 @@
 
 					$('#all-access-div').attr('hidden', false);
 					$('#all-access').attr('disabled', false);
-					$('#all-access').attr('href', '/' + data.name.toLowerCase() + '/');
+					$('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
 					$('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
 
 
@@ -91,7 +91,7 @@
 
 									$('#all-access-div').attr('hidden', false);
 									$('#all-access').attr('disabled', false);
-									$('#all-access').attr('href', '/' + data.name.toLowerCase() + '/');
+									$('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
 									$('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
 								} else if (data && data.responseCode === 1){
 									PNotify.error({
@@ -106,10 +106,13 @@
 								{
 									'task'						: 'all',
 									'applicationName'			: $('#all-barebone-name').val().trim(),
-									"default"          			: 'false'
+									"default"          			: 'false',
+									"force"						: "0"
 								};
 
 							$.post('/{{route}}/barebone/install', postData, function(data) {
+								//eslint-disable-next-line
+								console.log(data);
 								if (data && data.responseCode === 0) {
 									PNotify.success({
 										text		: data.responseMessage,
@@ -118,7 +121,7 @@
 
 									$('#all-access-div').attr('hidden', false);
 									$('#all-access').attr('disabled', false);
-									$('#all-access').attr('href', '/' + data.name.toLowerCase() + '/');
+									$('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
 									$('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
 								} else if (data && data.responseCode === 1){
 									PNotify.error({

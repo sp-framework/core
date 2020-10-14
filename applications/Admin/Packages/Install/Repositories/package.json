@@ -1,0 +1,31 @@
+{
+	"name"			: "Repositories",
+	"displayName" 	: "Admin Repositories Package",
+	"description"	: "Package for Repositories component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-repositories",
+	"path"			: "/",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Admin",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-admin"
+		},
+		"components"	:
+		[{
+			"name"		: "Repositories",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/component-admin-repositories"
+		}],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

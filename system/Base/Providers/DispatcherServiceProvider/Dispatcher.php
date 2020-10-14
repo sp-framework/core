@@ -25,7 +25,16 @@ class Dispatcher
 
         $this->dispatcher->setDefaultAction('view');
 
-        $this->dispatcher->setEventsManager($this->register404());
+        // $applicationInfo =
+        //     $this->container->getShared('modules')->applications->getApplicationInfo();
+
+        // if ($applicationInfo) {
+        //     $applicationDefaults = json_decode($applicationInfo['settings'], true);
+
+        //     if (isset($applicationDefaults['errorComponent'])) {
+        //         $this->dispatcher->setEventsManager($this->register404());
+        //     }
+        // }
     }
 
     public function init()
@@ -44,19 +53,31 @@ class Dispatcher
                 $dispatcher,
                 \Exception $exception
             ) {
-                if ($exception instanceof PhalconDispatcherException) {
-                    $dispatcher->forward(
-                        [
-                            'controller' => 'Errors',
-                            'action'     => 'notfound',
-                        ]
-                    );
+                switch ($exception->getCode()) {
+                    case PhalconDispatcherException::EXCEPTION_HANDLER_NOT_FOUND:
+                        $dispatcher->forward(
+                            [
+                                'controller' => 'Errors',
+                                'action'     => 'controllerNotFound',
+                            ]
+                        );
 
-                    return false;
+                        return false;
+
+                    case PhalconDispatcherException::EXCEPTION_ACTION_NOT_FOUND:
+                        $dispatcher->forward(
+                            [
+                                'controller' => 'Errors',
+                                'action'     => 'actionNotFound',
+                            ]
+                        );
+
+                        return false;
                 }
             }
         );
 
         return $eventsManager;
+
     }
 }

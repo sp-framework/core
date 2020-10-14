@@ -10,14 +10,13 @@ use System\Base\Providers\ConfigServiceProvider;
 use System\Base\Providers\SessionServiceProvider;
 
 $container = new FactoryDefault();
+
 include('../system/Base/Providers/SessionServiceProvider.php');
 $container->register(new SessionServiceProvider());
 $session = $container->getShared('session');
-
 $session->start();
 
 include('../system/Base/Providers/ConfigServiceProvider.php');
-
 $container->register(new ConfigServiceProvider());
 $config = $container->getShared('config');
 
@@ -32,8 +31,11 @@ foreach ($config->providers as $provider) {
 $application = new Application($container);
 
 try {
+
 	$response = $application->handle($_SERVER["REQUEST_URI"]);
+
 } catch (\Exception $e) {
+
 	$handler = new Handler(
 		$e,
 		$container->getShared('session'),
@@ -41,8 +43,8 @@ try {
 		$container->getShared('view'),
 		$container->getShared('flashSession')
 	);
-	var_dump($e);
-	// $response = $handler->respond();
+
+	$response = $handler->respond();
 }
 
 if (!$response->isSent()) {

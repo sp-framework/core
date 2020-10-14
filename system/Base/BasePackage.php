@@ -202,6 +202,8 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 				$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
 
+				$this->packagesData->last = ${$this->packageName};
+
 				return true;
 			}
 		} else {
@@ -236,6 +238,8 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
+
+				$this->packagesData->last = ${$this->packageName};
 
 				return true;
 			}

@@ -276,6 +276,26 @@ class Applications extends BasePackage
 		}
 	}
 
+	public function getIdApplication($id)
+	{
+		$filter =
+			$this->model->filter(
+				function($application) use ($id) {
+					if ($application->id === $id) {
+						return $application;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate application Id found for id ' . $id);
+		} else if (count($filter) === 1) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
+	}
+
 	public function getNamedApplication($name)
 	{
 		$filter =
@@ -289,7 +309,7 @@ class Applications extends BasePackage
 
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate application name found for application ' . $name);
-		} else if (count($filter) > 0) {
+		} else if (count($filter) === 1) {
 			return $filter[0]->toArray();
 		} else {
 			return false;
@@ -308,8 +328,8 @@ class Applications extends BasePackage
 			);
 
 		if (count($filter) > 1) {
-			throw new \Exception('Duplicate application route found for application ' . $route);
-		} else if (count($filter) > 0) {
+			throw new \Exception('Duplicate application route found for route ' . $route);
+		} else if (count($filter) === 1) {
 			return $filter[0]->toArray();
 		} else {
 			return false;
@@ -330,7 +350,7 @@ class Applications extends BasePackage
 
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate default application for application. DB Corrupt');
-		} else if (count($filter) > 0) {
+		} else if (count($filter) === 1) {
 			return $filter[0]->toArray();
 		} else {
 			return false;

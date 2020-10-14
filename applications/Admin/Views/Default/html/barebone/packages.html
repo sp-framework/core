@@ -47,7 +47,7 @@
 
 			$('#package-install-barebone-button').attr('disabled', true);
 
-			$.post('/{{route}}/modules/barebone/install', postData, function(data) {
+			$.post('/{{route}}/barebone/install', postData, function(data) {
 				if (data && data.responseCode === 0) {
 					PNotify.success({
 						text		: data.responseMessage,

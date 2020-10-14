@@ -291,7 +291,7 @@ class Views extends BasePackage
                 $viewsName = $applicationDefaults['view'];
 
                 if (!$this->view) {
-                    $this->view = $this->getApplicationView($this->applicationInfo['id']);
+                    $this->view = $this->getApplicationView($this->applicationInfo['id'], $viewsName);
                 }
 
                 if ($this->view) {
@@ -303,23 +303,43 @@ class Views extends BasePackage
         }
     }
 
-    protected function getApplicationView($id)
+    public function getApplicationView($id, $name)
     {
         $filter =
             $this->model->filter(
-                function($view) use ($id) {
-                    if ($view->application_id === $id) {
+                function($view) use ($id, $name) {
+                    if ($view->application_id === $id && $view->name === ucfirst($name)) {
                         return $view;
                     }
                 }
             );
 
         if (count($filter) > 1) {
-            throw new \Exception('Duplicate default application for application ' . $name);
-        } else if (count($filter) > 0) {
+            throw new \Exception('Duplicate default view for application ' . $name);
+        } else if (count($filter) === 1) {
             return $filter[0]->toArray();
         } else {
             return false;
         }
+    }
+
+    public function getViewsForApplication($id)
+    {
+        $views = [];
+
+        $filter =
+            $this->model->filter(
+                function($view) use ($id) {
+                    if ($view->application_id === $id && !$view->view_id) {
+                        return $view;
+                    }
+                }
+            );
+
+        foreach ($filter as $key => $value) {
+            array_push($views, $value->toArray());
+        }
+
+        return $views;
     }
 }
