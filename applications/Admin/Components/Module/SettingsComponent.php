@@ -2,14 +2,14 @@
 
 namespace Applications\Admin\Components\Module;
 
-use Applications\Admin\Packages\Module\Settings;
+use Applications\Admin\Packages\Module;
 use System\Base\BaseComponent;
 
 class SettingsComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$moduleSettings = $this->usePackage(Settings::class);
+		$moduleSettings = $this->usePackage(Module::class)->moduleSettings();
 
 		$moduleSettings->get($this->getData());
 
@@ -68,7 +68,7 @@ class SettingsComponent extends BaseComponent
 
 	public function editAction()
 	{
-		$moduleSettings = $this->usePackage(Settings::class);
+		$moduleSettings = $this->usePackage(Module::class)->moduleSettings();
 
 		if ($moduleSettings->update($this->postData())) {
 
