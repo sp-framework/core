@@ -12,6 +12,7 @@ class Service
 	private static $container;
 
 	protected static $base;
+
 	/**
 	 * @var null|\System\Base\Service Singleton instance.
 	 */
@@ -33,7 +34,13 @@ class Service
 
 	public function load()
 	{
-		self::$mode = self::$container->getShared('config')->debug;
+		try {
+			$config = include('../system/Configs/Base.php');
+		} catch (Exception $e) {
+			throw $e;
+		}
+
+		self::$mode = $config['debug'];
 
 		$files = include(self::$base . 'system/Base/Loader/Files.php');
 

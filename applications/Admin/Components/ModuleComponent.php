@@ -2,15 +2,14 @@
 
 namespace Applications\Admin\Components;
 
-use Applications\Admin\Packages\Module\Info;
-use Applications\Admin\Packages\Modules as ModulesPackage;
+use Applications\Admin\Packages\Module;
 use System\Base\BaseComponent;
 
 class ModuleComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$infoModule = $this->usePackage(Info::class);
+		$infoModule = $this->usePackage(Module::class)->moduleInfo();
 
 		$infoModule->runProcess($this->getData());
 

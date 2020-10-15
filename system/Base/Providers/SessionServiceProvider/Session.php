@@ -26,7 +26,7 @@ class Session
         if ($this->checkCachePath()) {
             $savePath = base_path('var/storage/cache/session/');
         } else {
-            $savePath = 'tmp/';
+            $savePath = '/tmp/';
         }
 
         $sessionFiles = new Stream(

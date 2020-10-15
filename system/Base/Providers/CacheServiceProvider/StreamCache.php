@@ -32,11 +32,17 @@ class StreamCache
 
             $cacheFactory = new CacheFactory($adapter);
 
+            if ($this->checkCachePath()) {
+                $savePath = base_path('var/storage/cache/');
+            } else {
+                $savePath = '/tmp/';
+            }
+
             $cacheOptions = [
                 'adapter'   => 'stream',
                 'options'   => [
                     'prefix'            => 'db',
-                    'storageDir'        => base_path('var/storage/cache/')
+                    'storageDir'        => $savePath
                 ],
             ];
 
@@ -46,5 +52,16 @@ class StreamCache
         } else {
             return false;
         }
+    }
+
+    protected function checkCachePath()
+    {
+        if (!is_dir(base_path('var/storage/cache/'))) {
+            if (!mkdir(base_path('var/storage/cache/'), 0777, true)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

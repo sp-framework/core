@@ -1,16 +1,17 @@
 <?php
 
-namespace System\Base\Installer;
+namespace System\Base\Installer\Components;
 
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View\Simple;
+use System\Base\Installer\Packages\Setup as SetupPackage;
 use System\Base\Providers\ContentServiceProvider\Local\Content as LocalContent;
 
 Class Setup
 {
 	private $container;
 
-	private $setup;
+	private $setupPackage;
 
 	private $view;
 
@@ -51,7 +52,7 @@ Class Setup
 	public function run()
 	{
 		try {
-			$this->setup = new SetupPackage($this->container);
+			$this->setupPackage = new SetupPackage($this->container);
 		} catch (\Exception $e) {
 			$this->view->responseCode = 1;
 			$this->view->responseMessage = $e->getMessage();
@@ -65,7 +66,7 @@ Class Setup
 
 		if ($this->request->isPost()) {
 
-			if (!$this->setup->checkDbEmpty()) {
+			if (!$this->setupPackage->checkDbEmpty()) {
 
 				$this->view->responseCode = 1;
 				$this->view->responseMessage =
@@ -79,33 +80,34 @@ Class Setup
 				}
 			}
 
-			$this->setup->buildSchema();
+			$this->setupPackage->buildSchema();
 
-			$this->setup->registerHWFRepository();
-			$this->setup
+			$this->setupPackage->registerRepository();
+
+			$this->setupPackage
 				->registerCore(
 					json_decode(
 						$this->container->getShared('localContent')->read('core.json'),
 						true)
 				);
 
-			$adminApplicationId = $this->setup->registerModule('applications', null);
+			$adminApplicationId = $this->setupPackage->registerModule('applications', null);
 
 			if ($adminApplicationId) {
 
-				$this->setup->registerModule('components', $adminApplicationId);
+				$this->setupPackage->registerModule('components', $adminApplicationId);
 
-				$this->setup->registerModule('packages', $adminApplicationId);
+				$this->setupPackage->registerModule('packages', $adminApplicationId);
 
-				$this->setup->registerModule('middlewares', $adminApplicationId);
+				$this->setupPackage->registerModule('middlewares', $adminApplicationId);
 
-				$this->setup->registerModule('views', $adminApplicationId);
+				$this->setupPackage->registerModule('views', $adminApplicationId);
 
 			}
 
-			$this->setup->writeDbConfig();
+			$this->setupPackage->writeConfigs();
 
-			// $this->setup->removeSetup();
+			// $this->setupPackage->removeInstaller();
 
 			$this->view->responseCode = 0;
 
