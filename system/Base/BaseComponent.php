@@ -248,17 +248,11 @@ abstract class BaseComponent extends Controller
 
 	protected function checkPackage($packageClass)
 	{
-		$packageName = Arr::last(explode('\\', $packageClass));
-
-		//Refactor to Filter
-		$packageApplicationId =
-			$this->modules->packages->packages[array_search($packageName, array_column($this->modules->packages->packages, 'name'))]['application_id'];
-
-		if ($packageApplicationId === $this->application['id']) {
-			return true;
-		} else {
-			return false;
-		}
+		return
+			$this->modules->packages->getNamedPackageForApplication(
+				Arr::last(explode('\\', $packageClass)),
+				$this->application['id']
+			);
 	}
 
 	// protected function generateView()
