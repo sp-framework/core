@@ -70,6 +70,10 @@ class Logger
 
             $this->log->getAdapter('system')->begin();
         }
+        //Email logging for Emergency, Critical & Alerts needs to be configured using phpmailer
+        //Emergency should be for Exceptions
+        //Critical for Performance Degrade (Need a method to calculate DB times, etc)
+        //Alert for any Disk related messages.
 
         return $this;
     }
