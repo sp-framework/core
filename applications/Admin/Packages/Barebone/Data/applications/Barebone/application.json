@@ -36,8 +36,19 @@
 		}]
 	},
 	"settings"		: {
-		"view" 			: "Default",
-		"component" 	: "Hw",
-		"errorComponent": "Errors"
+		"domain"			: "",
+		"view" 				: "Default",
+		"component" 		: "Hw",
+		"errorComponent"	: "Errors",
+		"email"				: {
+			"enabled"			: false,
+			"encryption"	 	: "",
+			"allow_html_body"	: "",
+			"host"				: "",
+			"port"				: "",
+			"auth" 				: "",
+			"username"			: "",
+			"password"			: ""
+		}
 	}
 }

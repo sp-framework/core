@@ -2,6 +2,7 @@
 
 namespace Applications\Admin\Packages\Module;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Settings extends BasePackage
@@ -10,7 +11,19 @@ class Settings extends BasePackage
 
 	public function get($getData)
 	{
-		if ($getData['type'] === 'applications') {
+		if ($getData['type'] === 'core') {
+
+			$this->packagesData->type = 'core';
+
+			$this->packagesData->core =
+				$this->modules->core->core[0];
+
+			$this->packagesData->settings =
+				Json::decode($this->modules->core->core[0]['settings'], true);
+
+			$this->packagesData->responseCode = 0;
+
+		} else if ($getData['type'] === 'applications') {
 
 			$this->packagesData->type = 'applications';
 
@@ -19,18 +32,23 @@ class Settings extends BasePackage
 			$this->packagesData->components =
 				$this->modules->components->getComponentsForApplication($getData['id']);
 
-			$views = $this->modules->views->views;
-
 			$this->packagesData->views =
 				$this->modules->views->getViewsForApplication($getData['id']);
 
 			$this->packagesData->application =
 				$this->modules->applications->getById($getData['id']);
 
+			$this->packagesData->domains = $this->modules->domains->domains;
+
 			$this->packagesData->settings =
 				json_decode(
 					$this->packagesData->application['settings'], true
 				);
+
+			$this->packagesData->email =
+				json_decode(
+					$this->packagesData->application['settings'], true
+				)['email'];
 
 			$this->packagesData->responseCode = 0;
 
@@ -161,7 +179,8 @@ class Settings extends BasePackage
 			}
 
 			if ($postData['settings']['component'] === '0' ||
-				$postData['settings']['view'] === '0'
+				$postData['settings']['view'] === '0' ||
+				$postData['settings']['errorComponent'] === '0'
 			) {
 				if ($postData['settings']['component'] === '0') {
 
@@ -170,6 +189,10 @@ class Settings extends BasePackage
 				} else if ($postData['settings']['view'] === '0') {
 
 					$this->packagesData->responseMessage = 'Please select default view';
+
+				} else if ($postData['settings']['errorComponent'] === '0') {
+
+					$this->packagesData->responseMessage = 'Please select default error component';
 
 				}
 
@@ -208,11 +231,11 @@ class Settings extends BasePackage
 				$this->removeDefaultFlag();
 			}
 
-			$settings = [];
-			$settings['component'] = $postData['settings']['component'];
-			$settings['view'] = $postData['settings']['view'];
+			// $settings = [];
+			// $settings['component'] = $postData['settings']['component'];
+			// $settings['view'] = $postData['settings']['view'];
 
-			$postData['settings'] = json_encode($settings);
+			$postData['settings'] = json_encode($postData['settings']);
 
 			$postData['is_default'] = $postData['is_default'] === 'true' ? 1 : 0;
 
@@ -422,32 +445,6 @@ class Settings extends BasePackage
 			}
 		}
 	}
-
-	// protected function getDefaultApplication()
-	// {
-	// 	if (!$this->defaultApplication) {
-
-	// 		$this->defaultApplication =
-	// 			$this->modules->applications->getDefaultApplication();
-
-	// 		return $this->defaultApplication;
-	// 	} else {
-
-	// 		return $this->defaultApplication;
-	// 	}
-	// }
-
-	// protected function removeDefaultFlag()
-	// {
-	// 	$defaultApplication = $this->getDefaultApplication();
-
-	// 	if (count($defaultApplication) > 0) {
-
-	// 		$defaultApplication['is_default'] = 0;
-
-	// 		$this->modules->applications->update($defaultApplication);
-	// 	}
-	// }
 
 	protected function checkDefaultApplication($postData)
 	{

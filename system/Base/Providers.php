@@ -14,7 +14,7 @@ return
 		'System\Base\Providers\DispatcherServiceProvider',
 		'System\Base\Providers\ViewServiceProvider',
 		'System\Base\Providers\FlashServiceProvider',
-		// 'System\Base\Providers\SessionServiceProvider',
+		'System\Base\Providers\EmailServiceProvider',
 		// 'System\Base\Providers\MiddlewaresServiceProvider',
 		// 'System\Base\Providers\SecurityServiceProvider'
 	];
