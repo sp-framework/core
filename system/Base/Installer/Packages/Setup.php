@@ -13,6 +13,7 @@ use System\Base\Installer\Packages\Setup\Schema\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Views;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Logs;
+use System\Base\Installer\Packages\Setup\Schema\Domains;
 use System\Base\Installer\Packages\Setup\Register\Repository;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplication;
@@ -20,6 +21,7 @@ use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent
 use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
+use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\DatabaseServiceProvider;
 
@@ -106,6 +108,7 @@ class Setup
 		$this->db->createTable('views', '', (new Views)->columns());
 		$this->db->createTable('cache', '', (new Cache)->columns());
 		$this->db->createTable('logs', '', (new Logs)->columns());
+		$this->db->createTable('domains', '', (new Domains)->columns());
 	}
 
 	public function registerRepository()//Change this to SP
@@ -233,6 +236,11 @@ class Setup
 		$installedFiles = array_merge($applicationInstalledFiles, $publicInstalledFiles);
 
 		return (new RegisterView())->register($this->db, $viewFile, $installedFiles, $newApplicationId);
+	}
+
+	public function registerDomain()
+	{
+		return (new RegisterDomain())->register($this->db, $this->request);
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true)

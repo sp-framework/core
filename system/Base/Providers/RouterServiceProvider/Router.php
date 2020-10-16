@@ -4,6 +4,7 @@ namespace System\Base\Providers\RouterServiceProvider;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use Phalcon\Mvc\Router as PhalconRouter;
 
 class Router
@@ -38,7 +39,11 @@ class Router
 	{
 		$this->container = $container;
 
+		$this->domains = $this->container->getShared('modules')->domains;
+
 		$this->applications = $this->container->getShared('modules')->applications;
+
+		$this->logger = $this->container->getShared('logger');
 
 		$this->request = $this->container->getShared('request');
 
@@ -51,7 +56,6 @@ class Router
 
 	public function init()
 	{
-
 		if ($this->setApplicationInfo()) {
 			$this->defaultNamespace =
 				'Applications\\' . ucfirst($this->applicationDefaults['application']) . '\\Components';
@@ -170,7 +174,7 @@ class Router
 	protected function registerDefaults()
 	{
 		$this->router->setDefaultNamespace(
-			'System\\Base\\Exceptions'
+			'System\Base\Exceptions'
 		);
 
 		$this->router->setDefaultController('index');
@@ -182,12 +186,28 @@ class Router
 	{
 		if ($this->applicationDefaults) {
 
-			$errorComponent =
-				$this->applicationInfo['settings']['errorComponent']
-				?? 'System\Base\Exceptions\Error';
+			$settings = Json::decode($this->applicationInfo['settings'], true);
+
+			if (isset($settings['errorComponent'])) {
+
+				$errorComponent = $settings['errorComponent'];
+
+			} else {
+				$this->router->setDefaultNamespace
+				(
+					'System\Base\Exceptions'
+				);
+
+				$errorComponent = 'Errors';
+			}
 
 		} else {
-			$errorComponent = 'Error';
+			$this->router->setDefaultNamespace
+			(
+				'System\Base\Exceptions'
+			);
+
+			$errorComponent = 'Errors';
 		}
 
 		$this->router->notFound(
@@ -202,6 +222,10 @@ class Router
 	{
 		$this->applicationInfo = $this->applications->getApplicationInfo();
 
+		if (!$this->validateDomain()) {
+			return false;
+		}
+
 		if ($this->applicationInfo) {
 
 			$this->applicationDefaults = $this->applications->getApplicationDefaults();
@@ -215,6 +239,37 @@ class Router
 			return true;
 		}
 		return false;
+	}
+
+	protected function validateDomain()
+	{
+		$applicationDomain = Json::decode($this->applicationInfo['settings'], true);
+
+		if (isset($applicationDomain['domain']) &&
+				($applicationDomain['domain'] !== '' && $applicationDomain['domain'] !== '0')
+		) {
+			if (!$this->domains->getNamedDomain($this->request->getHttpHost())) {
+				$this->logger->log->alert(
+					'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
+				);
+
+				return false;
+			}
+
+			if ($this->request->getHttpHost() === $applicationDomain['domain']) {
+				return true;
+			} else {
+				$this->logger->log->alert(
+					'Trying to access application ' . $this->applicationInfo['name'] .
+					' on domain ' . $this->request->getHttpHost() . '. Application is restricted to ' .
+					$applicationDomain['domain']
+				);
+
+				return false;
+			}
+		} else {
+			return true;
+		}
 	}
 
 	protected function getURI()
