@@ -28,10 +28,18 @@ class Logs
 					]
 				),
 				new Column(
-					'typeName',
+					'type_name',
 					[
 						'type'    => Column::TYPE_VARCHAR,
 						'size'    => 10,
+						'notNull' => true,
+					]
+				),
+				new Column(
+					'client_ip',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 50,
 						'notNull' => true,
 					]
 				),

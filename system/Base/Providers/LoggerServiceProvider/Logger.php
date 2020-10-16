@@ -16,59 +16,62 @@ class Logger
 
     public $log;
 
-    protected $config;
+    protected $logsConfig;
 
     protected $customFormatter;
+
+    protected $dbEntryCount = true;//True to make only 1 DB Entry
 
     public function __construct(DiInterface $container)
     {
         $this->container = $container;
 
-        $this->config = $this->container->getShared('config');
+        $this->logsConfig = $this->container->getShared('config')->logs;
     }
 
     public function init()
     {
-        if ($this->checkLogPath()) {
-            $savePath = base_path('var/log/');
-        } else {
-            $savePath = '/tmp/';
-        }
-
         $this->customFormatter =
             new CustomFormat(
                 'c',
                 $this->container->getShared('session')->getId(),
-                $this->container->getShared('config')->debug,
+                $this->container->getShared('request')->getClientAddress()
             );
 
-        $debugAdapter = new Stream($savePath . 'debug.log');
-        $debugAdapter->setFormatter($this->customFormatter);
+        if ($this->logsConfig->service === 'streamLogs') {
+            if ($this->checkLogPath()) {
+                $savePath = base_path('var/log/');
+            } else {
+                $savePath = '/tmp/';
+            }
 
-        $dbAdapter = new Adapter($this->container);
-        $dbAdapter->setFormatter($this->customFormatter);
+            $streamAdapter = new Stream($savePath . 'debug.log');
+            $streamAdapter->setFormatter($this->customFormatter);
 
-        if ($this->config->debug) {
             $this->log = new PhalconLogger(
                 'messages',
                 [
-                    'debug'     => $debugAdapter
+                    'stream'     => $streamAdapter
                 ]
             );
 
-            $this->log->getAdapter('debug')->begin();
+            $this->log->getAdapter('stream')->begin();
 
-        } else {
+        } else if ($this->logsConfig->service === 'dbLogs') {
+
+            $dbAdapter = new Adapter($this->container, $this->dbEntryCount);
+            $dbAdapter->setFormatter($this->customFormatter);
+
             $this->log = new PhalconLogger(
                 'messages',
                 [
-                    'system'    => $dbAdapter
+                    'db'    => $dbAdapter
                 ]
             );
 
-            $this->log->setLogLevel($this->log::INFO);
+            $this->setLogLevel();
 
-            $this->log->getAdapter('system')->begin();
+            $this->log->getAdapter('db')->begin();
         }
         //Email logging for Emergency, Critical & Alerts needs to be configured using phpmailer
         //Emergency should be for Exceptions
@@ -91,15 +94,63 @@ class Logger
 
     public function commit()
     {
-        if ($this->config->debug) {
-            $this->log->getAdapter('debug')->commit();
-        } else {
-            $this->log->getAdapter('system')->commit();
+        if ($this->logsConfig->service === 'streamLogs') {
+
+            $this->log->getAdapter('stream')->commit();
+
+        } else if ($this->logsConfig->service === 'dbLogs') {
+
+            if ($this->dbEntryCount) {
+
+                $this->log->getAdapter('db')->commit();
+                $this->log->getAdapter('db')->addToDb();
+
+            } else {
+
+                $this->log->getAdapter('db')->commit();
+
+            }
         }
     }
 
     public function getConnectionId()
     {
         return $this->customFormatter->getConnectionId();
+    }
+
+    protected function setLogLevel()
+    {
+        switch ($this->logsConfig->level) {
+            case 'EMERGENCY':
+                $this->log->setLogLevel($this->log::EMERGENCY);
+                break;
+            case 'CRITICAL':
+                $this->log->setLogLevel($this->log::CRITICAL);
+                break;
+            case 'ALERT':
+                $this->log->setLogLevel($this->log::ALERT);
+                break;
+            case 'ERROR':
+                $this->log->setLogLevel($this->log::ERROR);
+                break;
+            case 'WARNING':
+                $this->log->setLogLevel($this->log::WARNING);
+                break;
+            case 'NOTICE':
+                $this->log->setLogLevel($this->log::NOTICE);
+                break;
+            case 'INFO':
+                $this->log->setLogLevel($this->log::INFO);
+                break;
+            case 'DEBUG':
+                $this->log->setLogLevel($this->log::DEBUG);
+                break;
+            case 'CUSTOM':
+                $this->log->setLogLevel($this->log::CUSTOM);
+                break;
+            default:
+                $this->log->setLogLevel($this->log::INFO);
+                break;
+        }
     }
 }

@@ -20,11 +20,11 @@ class CacheTools
 	{
 		$this->container = $container;
 
-		$this->config = $this->container->getShared('config');
+		$this->cacheConfig = $this->container->getShared('config')->cache;
 
-		if ($this->config->cacheTimeout && $this->config->cacheService) {
-			$this->cacheTimeout = $this->config->cacheTimeout;
-			$this->cacheService = $this->config->cacheService;
+		if ($this->cacheConfig->timeout && $this->cacheConfig->service) {
+			$this->cacheTimeout = $this->cacheConfig->timeout;
+			$this->cacheService = $this->cacheConfig->service;
 		} else {
 			$this->cacheTimeout = 3600;// Default seconds
 			$this->cacheService = 'streamCache';

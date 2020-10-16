@@ -24,9 +24,7 @@ $session->start();
 
 $logger = $container->getShared('logger');
 
-$logger->log->info(
-	'Session ID: ' . $session->getId() . '. Connection ID: ' . $logger->getConnectionId()
-);
+$logger->log->info('Session Start');
 
 $application = new Application($container);
 
@@ -36,7 +34,12 @@ try {
 	$logger->log->debug('Dispatched');
 } catch (\Exception $e) {
 
-	$logger->log->debug('Dispatched Problem');
+	$logger->log->emergency(
+		"Bootstrap Errors: " . get_class($e) . "<br>" .
+		"Info: " . $e->getMessage() . "<br>" .
+		"File: " . $e->getFile() . "<br>" .
+		"Line: " . $e->getLine() . "<br>"
+	);
 
 	$handler = new Handler(
 		$e,
@@ -52,14 +55,14 @@ try {
 if (!$response->isSent()) {
 	$response->send();
 
-	$logger->log->debug('Response Sent');
+	$logger->log->debug('Response Sent. Session End');
 
 } else {
 	echo $response->getContent();
 
-	$logger->log->debug('Response Echoed');
+	$logger->log->debug('Response Echoed. Session End');
 }
 
-$logger->log->info('Connection end');
+$logger->log->info('Session End');
 
 $logger->commit();

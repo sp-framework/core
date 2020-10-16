@@ -3,7 +3,15 @@
 return
 	[
 		"debug"					=> true, //true - Development false - Production
-		"cache"					=> false, //Global Cache value //true - Production false - Development
-		"cacheTimeout"			=> 60, //Global Cache timeout in seconds
-		"cacheService"			=> "streamCache"
+		"cache"					=>
+		[
+			"enabled"			=> false, //Global Cache value //true - Production false - Development
+			"timeout"			=> 60, //Global Cache timeout in seconds
+			"service"			=> "streamCache"
+		],
+		"logs"					=>
+		[
+			"service"			=> "dbLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
+			"level"				=> "INFO"
+		]
 	];

@@ -13,19 +13,23 @@ class StreamCache
 
     protected $cache;
 
+    protected $cacheConfig;
+
     public function __construct(DiInterface $container)
     {
         $this->container = $container;
+
+        $this->cacheConfig = $this->container->getShared('config')->cache;
     }
 
     public function init()
     {
-        if ($this->container->getShared('config')->cache) {
+        if ($this->cacheConfig->enabled) {
             $serializerFactory = new SerializerFactory();
 
             $options = [
                 'defaultSerializer' => 'Json',
-                'lifetime'          => $this->container->getShared('config')->cacheTimeout
+                'lifetime'          => $this->cacheConfig->timeout
             ];
 
             $adapter = new AdapterFactory($serializerFactory, $options);

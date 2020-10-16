@@ -13,13 +13,17 @@ class CustomFormat extends AbstractFormatter
 
 	public $connectionId;
 
-	public function __construct(string $dateFormat = 'c', $sessionId, $debug)
+	protected $sessionId;
+
+	protected $clientIpAddress;
+
+	public function __construct(string $dateFormat = 'c', $sessionId, $clientIpAddress)
 	{
 		$this->dateFormat = $dateFormat;
 
 		$this->sessionId = $sessionId;
 
-		$this->debug = $debug;
+		$this->clientIpAddress = $clientIpAddress;
 	}
 
 	public function format(Item $item) : string
@@ -40,6 +44,7 @@ class CustomFormat extends AbstractFormatter
 					"message"   	=> $message,
 					"session"   	=> $this->sessionId,
 					"connection" 	=> $this->addConnectionId(),
+					"client_ip"		=> $this->clientIpAddress,
 					"timestamp" 	=> $this->getFormattedDate(),
 					"mseconds" 		=> microtime()
 				];

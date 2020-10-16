@@ -6,7 +6,13 @@ class Configs
 {
 	public function write($container, $postData)
 	{
-		$configContent =
+		$this->writeDbConfig($container, $postData);
+		$this->writeBaseConfig($container, $postData);
+	}
+
+	protected function writeDbConfig($container, $postData)
+	{
+		$dbContent =
 '<?php
 
 return
@@ -21,14 +27,19 @@ return
 			]
 	];';
 
-		$container['localContent']->put('/system/Configs/Db.php', $configContent);
+		$container['localContent']->put('/system/Configs/Db.php', $dbContent);
+	}
 
+	protected function writeBaseConfig($container, $postData)
+	{
 		if ($postData['mode'] === 'production') {
 			$debug = "false";
 			$cache = "true";
+			$logLevel = 6;
 		} else if ($postData['mode'] === 'development') {
 			$debug = "true";
 			$cache = "false";
+			$logLevel = 7;
 		}
 
 		$baseContent =
@@ -37,9 +48,17 @@ return
 return
 	[
 		"debug"					=> ' . $debug . ', //true - Development false - Production
-		"cache"					=> ' . $cache . ', //Global Cache value //true - Production false - Development
-		"cacheTimeout"			=> 60, //Global Cache timeout in seconds
-		"cacheService"			=> "streamCache"
+		"cache"					=>
+		[
+			"enabled"			=> ' . $cache . ', //Global Cache value //true - Production false - Development
+			"timeout"			=> 60, //Global Cache timeout in seconds
+			"service"			=> "streamCache"
+		],
+		"logs"					=>
+		[
+			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
+			"level"			=> ' . $logLevel . ',
+		]
 	];';
 
 		$container['localContent']->put('/system/Configs/Base.php', $baseContent);

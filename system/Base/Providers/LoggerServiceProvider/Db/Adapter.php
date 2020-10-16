@@ -16,22 +16,52 @@ class Adapter extends AbstractAdapter
 
     protected $logs;
 
-    public function __construct(DiInterface $container)
+    protected $messages = [];
+
+    protected $entryCount;//True to make only 1 DB Entry
+
+    public function __construct(DiInterface $container, $entryCount)
     {
         $this->container = $container;
 
         $this->logs = new Logs($container);
+
+        $this->entryCount = $entryCount;
     }
 
     public function process(Item $item): void
     {
-        $message = Json::decode($this->formatter->format($item), true);
+        if (!$this->entryCount) {
+            $message = Json::decode($this->formatter->format($item), true);
 
-        $this->logs->add($message);
+            $this->logs->add($message);
+
+        } else if ($this->entryCount) {
+
+            $this->messages[] = Json::decode($this->formatter->format($item), true);
+        }
     }
 
     public function close(): bool
     {
         return true;
+    }
+
+    public function addToDb()
+    {
+        $data = [];
+        $data['type'] = 8;
+        $data['type_name'] = 'bulk';
+        $data['client_ip'] = $this->messages[0]['client_ip'];
+        $data['session'] = $this->messages[0]['session'];
+        $data['connection'] = $this->messages[0]['connection'];
+        $data['mseconds'] = $this->messages[0]['mseconds'];
+        $data['message'] = '';
+
+        foreach ($this->messages as $msg) {
+            $data['message'] .= Json::encode($msg);
+        }
+
+        $this->logs->add($data);
     }
 }
