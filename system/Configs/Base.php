@@ -11,7 +11,7 @@ return
 		],
 		"logs"					=>
 		[
-			"service"			=> "dbLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
-			"level"				=> "INFO"
+			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
+			"level"				=> "DEBUG",
 		]
 	];

@@ -103,6 +103,8 @@ Class Setup
 
 				$this->setupPackage->registerModule('views', $adminApplicationId);
 
+				$this->setupPackage->registerDomain();
+
 			}
 
 			$this->setupPackage->writeConfigs();

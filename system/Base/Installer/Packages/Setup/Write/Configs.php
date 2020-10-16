@@ -35,11 +35,11 @@ return
 		if ($postData['mode'] === 'production') {
 			$debug = "false";
 			$cache = "true";
-			$logLevel = 6;
+			$logLevel = "INFO";
 		} else if ($postData['mode'] === 'development') {
 			$debug = "true";
 			$cache = "false";
-			$logLevel = 7;
+			$logLevel = "DEBUG";
 		}
 
 		$baseContent =
@@ -57,7 +57,7 @@ return
 		"logs"					=>
 		[
 			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
-			"level"			=> ' . $logLevel . ',
+			"level"				=> "' . $logLevel . '",
 		]
 	];';
 
