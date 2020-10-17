@@ -15,6 +15,13 @@
 			"username" 		: "",
 			"password" 		: "",
 			"port" 			: ""
+		},
+		"logging"			: {
+			"enabled"			: true,
+			"email"				: false,
+			"service"			: "streamLogs",
+			"level"				: "DEBUG",
+			"emergencyEmails"	: ""
 		}
 	}
 }

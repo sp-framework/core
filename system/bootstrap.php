@@ -4,53 +4,35 @@ namespace System;
 
 use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\Application;
-use System\Base\Exceptions\Handler;
 use System\Base\Loader\Service;
-use System\Base\Providers\ConfigServiceProvider;
-use System\Base\Providers\LoggerServiceProvider;
 use System\Base\Providers\SessionServiceProvider;
+
+include('../system/Base/Loader/Service.php');
+Service::Instance(__DIR__ . '/../')->load();
 
 $container = new FactoryDefault();
 
-include('../system/Base/Loader/Service.php');
-Service::Instance($container, __DIR__ . '/../')->load();
+include('../system/Base/Providers/SessionServiceProvider.php');
+$container->register(new SessionServiceProvider());
+$session = $container->getShared('session');
+$session->start();
 
 foreach (include(base_path('system/Base/Providers.php')) as $provider) {
 	$container->register(new $provider());
 }
 
-$session = $container->getShared('session');
-$session->start();
-
+$error = $container->getShared('error');
 $logger = $container->getShared('logger');
 
-$logger->log->info('Session Start');
+$logger->log->info(
+	'Session ID: ' . $session->getId() . '. Connection ID: ' . $logger->getConnectionId()
+);
 
 $application = new Application($container);
 
-try {
-	$response = $application->handle($_SERVER["REQUEST_URI"]);
+$response = $application->handle($_SERVER["REQUEST_URI"]);
 
-	$logger->log->debug('Dispatched');
-} catch (\Exception $e) {
-
-	$logger->log->emergency(
-		"Bootstrap Errors: " . get_class($e) . "<br>" .
-		"Info: " . $e->getMessage() . "<br>" .
-		"File: " . $e->getFile() . "<br>" .
-		"Line: " . $e->getLine() . "<br>"
-	);
-
-	$handler = new Handler(
-		$e,
-		$container->getShared('session'),
-		$container->getShared('response'),
-		$container->getShared('view'),
-		$container->getShared('flashSession')
-	);
-
-	$response = $handler->respond();
-}
+$logger->log->debug('Dispatched');
 
 if (!$response->isSent()) {
 	$response->send();

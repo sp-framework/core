@@ -2,14 +2,11 @@
 
 namespace System\Base\Loader;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Loader;
 
 class Service
 {
 	private static $mode;
-
-	private static $container;
 
 	protected static $base;
 
@@ -18,15 +15,13 @@ class Service
 	 */
 	protected static $instance = null;
 
-	public static function Instance(DiInterface $container, $base = null)
+	public static function Instance($base = null)
 	{
-		self::$container = $container;
-
 		self::$base = $base;
 
 		if (self::$instance === null) {
 
-			self::$instance = new self(self::$container, $base);
+			self::$instance = new self($base);
 		}
 
 		return self::$instance;

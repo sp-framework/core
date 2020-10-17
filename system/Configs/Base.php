@@ -11,7 +11,9 @@ return
 		],
 		"logs"					=>
 		[
+			"enabled"			=> true,
+			"email"				=> false,
 			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
-			"level"				=> "DEBUG",
+			"level"				=> "DEBUG"
 		]
 	];
