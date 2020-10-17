@@ -2,24 +2,19 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Storage\SerializerFactory;
 use Phalcon\Cache\AdapterFactory;
 use Phalcon\Cache\CacheFactory;
 
 class StreamCache
 {
-    private $container;
-
     protected $cache;
 
     protected $cacheConfig;
 
-    public function __construct(DiInterface $container)
+    public function __construct($cacheConfig)
     {
-        $this->container = $container;
-
-        $this->cacheConfig = $this->container->getShared('config')->cache;
+        $this->cacheConfig = $cacheConfig;
     }
 
     public function init()

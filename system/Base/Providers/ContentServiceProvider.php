@@ -13,15 +13,15 @@ class ContentServiceProvider implements ServiceProviderInterface
 	{
 		$container->setShared(
 			'localContent',
-			function () use ($container) {
-				return (new LocalContent($container))->init();
+			function () {
+				return (new LocalContent())->init();
 			}
 		);
 
 		$container->setShared(
 			'remoteContent',
-			function () use ($container) {
-				return (new RemoteContent($container))->init();
+			function () {
+				return (new RemoteContent())->init();
 			}
 		);
 	}

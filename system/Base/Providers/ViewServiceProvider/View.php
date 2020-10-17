@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ViewServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Mvc\View as PhalconView;
 use Phalcon\Mvc\ViewBaseInterface;
 use Phalcon\Mvc\View\Engine\Php as PhpTemplateService;
@@ -11,8 +10,6 @@ use System\Base\Providers\ModulesServiceProvider\Views\ViewsData;
 
 class View
 {
-	private $container;
-
 	protected $phalconView;
 
 	protected $views;
@@ -29,26 +26,22 @@ class View
 
 	protected $cache;
 
-	public function __construct(DiInterface $container)
+	public function __construct($views)
 	{
-		$this->container = $container;
-
-		$this->registerVoltTemplateService();
+		$this->views = $views;
 	}
 
 	public function init()
 	{
 		$this->phalconView = new PhalconView();
 
-		$views = $this->container->getShared('modules')->views->init();
+		$this->phalconView->setViewsDir($this->views->getPhalconViewPath());
 
-		$this->phalconView->setViewsDir($views->getPhalconViewPath());
-
-		$this->phalconView->setLayoutsDir($views->getPhalconViewLayoutPath());
+		$this->phalconView->setLayoutsDir($this->views->getPhalconViewLayoutPath());
 
 		$this->phalconView->setMainView('view');
 
-		$this->phalconView->setLayout($views->getPhalconViewLayoutFile());
+		$this->phalconView->setLayout($this->views->getPhalconViewLayoutFile());
 
 		$this->phalconView->registerEngines(
 			[
@@ -59,97 +52,4 @@ class View
 
 		return $this->phalconView;
 	}
-
-	protected function registerVoltTemplateService()
-	{
-		$this->container->setShared(
-			'voltTemplateService',
-			function(ViewBaseInterface $view) {
-
-				$this->volt = new Volt($view, $this);
-
-				if ($this->getShared('modules')->views->getCache()) {
-					$always = false;
-				} else {
-					$always = true;
-				}
-
-				$this->volt->setOptions(
-					[
-						'always'        => $always,
-						'separator'     => '-',
-						'stat'          => true,
-						'path'          => $this->getShared('modules')->views->getVoltCompiledPath()
-					]
-				);
-
-				return $this->volt;
-			}
-		);
-
-		return $this;
-	}
-
-	// protected function setPath()
-	// {
-	// 	$this->path =
-	// 		base_path('applications/' . $this->applicationInfo['name'] .
-	// 				  '/Views/' . $this->view['name'] .
-	// 				  '/html_compiled/');
-	// }
-
-	// public function getPath()
-	// {
-	// 	return $this->path;
-	// }
-
-	// public function getCache()
-	// {
-	// 	return $this->cache;
-	// }
-
-	// public function getViewInfo()
-	// {
-	// 	return $this->view;
-	// }
-
-	// public function getViewsData()
-	// {
-	// 	return $this->viewsData;
-	// }
-
-	// protected function setApplicationInfo()
-	// {
-	// 	$this->applicationInfo = $this->applications->getApplicationInfo();
-
-	// 	if ($this->applicationInfo) {
-
-	// 		$applicationDefaults = $this->applications->getApplicationDefaults($this->applicationInfo['name']);
-	// 	} else {
-	// 		$applicationDefaults = null;
-	// 	}
-	// 	if ($this->applicationInfo && $applicationDefaults) {
-
-	// 		$applicationName = $applicationDefaults['application'];
-
-	// 		$viewsName = $applicationDefaults['view'];
-
-	// 		if (!$this->view) {
-	// 			$this->getApplicationView($viewsName, $this->applicationInfo['id']);
-	// 		}
-
-	// 		$this->cache = json_decode($this->view['settings'], true)['cache'];
-	// 	}
-	// }
-
-	// protected function getAllViews()
-	// {
-	// 	return $this->db->fetchAll("SELECT * FROM `views`");
-	// }
-
-	// protected function getApplicationView($name, $id)
-	// {
-	// 	$this->view =
-	// 			$this->views[array_search($id, array_column($this->views, 'application_id'))];
-	// }
 }

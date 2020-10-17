@@ -13,15 +13,15 @@ class FlashServiceProvider implements ServiceProviderInterface
 	{
 		$container->setShared(
 			'flash',
-			function () use ($container) {
-				return (new Flash($container))->init();
+			function () {
+				return (new Flash())->init();
 			}
 		);
 
 		$container->setShared(
 			'flashSession',
-			function () use ($container) {
-				return (new FlashSession($container))->init();
+			function () {
+				return (new FlashSession())->init();
 			}
 		);
 	}

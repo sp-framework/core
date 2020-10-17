@@ -2,12 +2,8 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
-use Phalcon\Di\DiInterface;
-
 class CacheTools
 {
-	private $container;
-
 	protected $config;
 
 	protected $cacheTimeout;
@@ -16,11 +12,11 @@ class CacheTools
 
 	protected $cache;
 
-	public function __construct(DiInterface $container)
-	{
-		$this->container = $container;
+	protected $cacheConfig;
 
-		$this->cacheConfig = $this->container->getShared('config')->cache;
+	public function __construct($cacheConfig, array $caches)
+	{
+		$this->cacheConfig = $cacheConfig;
 
 		if ($this->cacheConfig->timeout && $this->cacheConfig->service) {
 			$this->cacheTimeout = $this->cacheConfig->timeout;
@@ -30,7 +26,7 @@ class CacheTools
 			$this->cacheService = 'streamCache';
 		}
 
-		$this->cache = $this->container->getShared($this->cacheService);
+		$this->cache = $caches[$this->cacheService];
 	}
 
 	public function addModelCacheParameters($parameters = null, $cacheName = null) {

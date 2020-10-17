@@ -5,12 +5,12 @@ namespace System\Base\Providers\EmailServiceProvider;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
-use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Json;
+use System\Base\Providers\EmailServiceProvider\EmailException;
 
 class Email
 {
-    private $container;
+    protected $application;
 
     protected $email;
 
@@ -32,15 +32,13 @@ class Email
 
     protected $debugOutput = [];
 
-    public function __construct(DiInterface $container)
+    protected $emailSettings;
+
+    public function __construct($application)
     {
         include (__DIR__ . '/vendor/autoload.php');
 
-        $this->container = $container;
-
-        $this->logger = $container->getShared('logger');
-
-        $this->application = $container->getShared('modules')->applications->getApplicationInfo();
+        $this->application = $application;
     }
 
     public function init()
@@ -50,61 +48,55 @@ class Email
         return $this;
     }
 
+    public function getEmailSettings()
+    {
+        return $this->emailSettings;
+    }
+
     public function setup()
     {
-        $emailSettings = Json::decode($this->application['settings'], true)['email'];
+        $this->emailSettings = Json::decode($this->application['settings'], true)['email'];
 
-        if ($emailSettings['enabled'] === 'true') {
+        if ($this->emailSettings['enabled'] === 'true') {
             $this->email->isSMTP();
 
-            if ($emailSettings['host'] === '' || $emailSettings['port'] === '') {
-                $this->logger->log->error(
+            if ($this->emailSettings['host'] === '' || $this->emailSettings['port'] === '') {
+                throw new EmailException(
                     'Email is enabled but host and port configuration missing. Cannot perform setup.'
                 );
-
-                return false;
             } else {
-                $this->email->Host          = $emailSettings['host'];
-                $this->email->Port          = $emailSettings['port'];
+                $this->email->Host          = $this->emailSettings['host'];
+                $this->email->Port          = $this->emailSettings['port'];
             }
 
-            if ($emailSettings['auth'] === 'true' &&
-                ($emailSettings['username'] === '' || $emailSettings['password'] == '')
+            if ($this->emailSettings['auth'] === 'true' &&
+                ($this->emailSettings['username'] === '' || $this->emailSettings['password'] == '')
             ) {
-                $this->logger->log->error(
+                throw new EmailException(
                     'Email auth configuration missing. Cannot perform setup.'
                 );
-
-                return false;
             } else {
                 $this->email->SMTPAuth      = true;
-                $this->email->Username      = $emailSettings['username'];
-                $this->email->Password      = $emailSettings['password'];
+                $this->email->Username      = $this->emailSettings['username'];
+                $this->email->Password      = $this->emailSettings['password'];
             }
 
             $this->email->SMTPSecure =
-                isset($emailSettings['encryption']) && $emailSettings['encryption'] === 'true' ?
+                isset($this->emailSettings['encryption']) && $this->emailSettings['encryption'] === 'true' ?
                 PHPMailer::ENCRYPTION_SMTPS :
                 '';
 
             $this->email->isHTML(
-                isset($emailSettings['allow_html_body']) ?
-                $emailSettings['allow_html_body'] :
+                isset($this->emailSettings['allow_html_body']) ?
+                $this->emailSettings['allow_html_body'] :
                 ''
             );
 
             return $this;
 
         } else {
-            $this->logger->log->error('Email is not enabled. Cannot perform setup.');
-
             return false;
         }
-
-        var_dump($emailSettings);
-        die();
-
-
     }
 
     public function sendNewEmail()

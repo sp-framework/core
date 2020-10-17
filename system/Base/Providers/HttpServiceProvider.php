@@ -14,22 +14,22 @@ class HttpServiceProvider implements ServiceProviderInterface
     {
         $container->setShared(
             'request',
-            function () use ($container) {
-                return (new RequestService($container))->init();
+            function () {
+                return (new RequestService())->init();
             }
         );
 
         $container->setShared(
             'response',
-            function () use ($container) {
-                return (new ResponseService($container))->init();
+            function () {
+                return (new ResponseService())->init();
             }
         );
 
         $container->setShared(
             'cookies',
-            function () use ($container) {
-                return (new CookiesService($container))->init();
+            function () {
+                return (new CookiesService())->init();
             }
         );
     }

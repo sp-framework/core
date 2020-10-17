@@ -10,10 +10,12 @@ class EmailServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
+		$application = $container->getShared('modules')->applications->getApplicationInfo();
+
 		$container->setShared(
 			'email',
-			function () use ($container) {
-				return (new Email($container))->init();
+			function () use ($application) {
+				return (new Email($application))->init();
 			}
 		);
 	}

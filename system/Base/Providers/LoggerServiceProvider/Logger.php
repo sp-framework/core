@@ -2,76 +2,114 @@
 
 namespace System\Base\Providers\LoggerServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Logger as PhalconLogger;
+use Phalcon\Logger\Adapter\Noop;
 use Phalcon\Logger\Adapter\Stream;
 use Phalcon\Logger\Formatter\Json;
 use Phalcon\Logger\Formatter\Line;
 use System\Base\Providers\LoggerServiceProvider\CustomFormat;
-use System\Base\Providers\LoggerServiceProvider\Db\Adapter;
+use System\Base\Providers\LoggerServiceProvider\Db\Adapter as DbAdapter;
+use System\Base\Providers\LoggerServiceProvider\Email\Adapter as EmailAdapter;
 
 class Logger
 {
-    private $container;
-
     public $log;
 
     protected $logsConfig;
 
+    protected $session;
+
+    protected $request;
+
+    protected $email;
+
+    protected $core;
+
     protected $customFormatter;
 
-    protected $dbEntryCount = true;//True to make only 1 DB Entry
+    protected $oneDbEntry = true;//True to make only 1 DB Entry
 
-    public function __construct(DiInterface $container)
+    public function __construct($logsConfig, $session, $request, $email, $core)
     {
-        $this->container = $container;
+        $this->logsConfig = $logsConfig;
 
-        $this->logsConfig = $this->container->getShared('config')->logs;
+        $this->session = $session;
+
+        $this->request = $request;
+
+        $this->email = $email;
+
+        $this->core = $core;
     }
 
     public function init()
     {
-        $this->customFormatter =
-            new CustomFormat(
-                'c',
-                $this->container->getShared('session')->getId(),
-                $this->container->getShared('request')->getClientAddress()
-            );
+        if ($this->logsConfig->enabled) {
+            //Custom Formatter
+            $this->customFormatter =
+                new CustomFormat(
+                    'c',
+                    $this->session->getId(),
+                    $this->request->getClientAddress()
+                );
 
-        if ($this->logsConfig->service === 'streamLogs') {
-            if ($this->checkLogPath()) {
-                $savePath = base_path('var/log/');
-            } else {
-                $savePath = '/tmp/';
+            //Email Adapter
+            $emailAdapter = new EmailAdapter($this->email, $this->core);
+            $emailAdapter->setFormatter($this->customFormatter);
+
+            $emailLogs = ['email'         => $emailAdapter];
+
+            if ($this->logsConfig->service === 'streamLogs') {
+                if ($this->checkLogPath()) {
+                    $savePath = base_path('var/log/');
+                } else {
+                    $savePath = '/tmp/';
+                }
+
+                $streamAdapter = new Stream($savePath . 'debug.log');
+                $streamAdapter->setFormatter($this->customFormatter);
+
+                $adapter = ['stream'        => $streamAdapter];
+
+                if ($this->logsConfig->email) {
+                    $adapter = array_merge($adapter, $emailLogs);
+                }
+
+                $this->log = new PhalconLogger('messages', $adapter);
+
+                $this->log->getAdapter('stream')->begin();
+
+            } else if ($this->logsConfig->service === 'dbLogs') {
+
+                $dbAdapter = new DbAdapter($this->oneDbEntry);
+                $dbAdapter->setFormatter($this->customFormatter);
+
+                $adapter = ['db'            => $dbAdapter];
+
+                if ($this->logsConfig->email) {
+                    $adapter = array_merge($adapter, $emailLogs);
+                }
+
+                $this->log = new PhalconLogger('messages', $adapter);
+
+                $this->log->getAdapter('db')->begin();
             }
-
-            $streamAdapter = new Stream($savePath . 'debug.log');
-            $streamAdapter->setFormatter($this->customFormatter);
-
-            $this->log = new PhalconLogger(
-                'messages',
-                [
-                    'stream'     => $streamAdapter
-                ]
-            );
-
-            $this->log->getAdapter('stream')->begin();
-
-        } else if ($this->logsConfig->service === 'dbLogs') {
-
-            $dbAdapter = new Adapter($this->container, $this->dbEntryCount);
-            $dbAdapter->setFormatter($this->customFormatter);
-
-            $this->log = new PhalconLogger(
-                'messages',
-                [
-                    'db'    => $dbAdapter
-                ]
-            );
-
             $this->setLogLevel();
 
-            $this->log->getAdapter('db')->begin();
+            if ($this->logsConfig->email) {
+                $this->log->getAdapter('email')->begin();
+            }
+
+        } else {
+            //Blackhole
+            $noopAdapter = new Noop();
+
+            $this->log = new PhalconLogger(
+                'messages',
+                [
+                    'noop'  => $noopAdapter
+                ]
+            );
         }
         //Email logging for Emergency, Critical & Alerts needs to be configured using phpmailer
         //Emergency should be for Exceptions
@@ -96,20 +134,32 @@ class Logger
     {
         if ($this->logsConfig->service === 'streamLogs') {
 
-            $this->log->getAdapter('stream')->commit();
+            if ($this->log->getAdapter('stream')->inTransaction()) {
+                $this->log->getAdapter('stream')->commit();
+            }
 
         } else if ($this->logsConfig->service === 'dbLogs') {
 
-            if ($this->dbEntryCount) {
+            if ($this->oneDbEntry) {
 
-                $this->log->getAdapter('db')->commit();
-                $this->log->getAdapter('db')->addToDb();
-
+                if ($this->log->getAdapter('db')->inTransaction()) {
+                    $this->log->getAdapter('db')->commit();
+                    $this->log->getAdapter('db')->addToDb();
+                }
             } else {
 
-                $this->log->getAdapter('db')->commit();
-
+                if ($this->log->getAdapter('db')->inTransaction()) {
+                    $this->log->getAdapter('db')->commit();
+                }
             }
+        }
+
+        if ($this->logsConfig->email) {
+            if ($this->log->getAdapter('email')->inTransaction()) {
+                $this->log->getAdapter('email')->commit();
+            }
+
+            $this->log->getAdapter('email')->sendEmail();
         }
     }
 

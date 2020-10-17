@@ -2,15 +2,12 @@
 
 namespace System\Base\Providers\RouterServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Router as PhalconRouter;
 
 class Router
 {
-	private $container;
-
 	protected $router;
 
 	protected $applications;
@@ -35,17 +32,15 @@ class Router
 
 	protected $uri;
 
-	public function __construct(DiInterface $container)
+	public function __construct($domains, $applications, $logger, $request)
 	{
-		$this->container = $container;
+		$this->domains = $domains;
 
-		$this->domains = $this->container->getShared('modules')->domains;
+		$this->applications = $applications;
 
-		$this->applications = $this->container->getShared('modules')->applications;
+		$this->logger = $logger;
 
-		$this->logger = $this->container->getShared('logger');
-
-		$this->request = $this->container->getShared('request');
+		$this->request = $request;
 
 		$this->requestUri = $this->request->getURI();
 

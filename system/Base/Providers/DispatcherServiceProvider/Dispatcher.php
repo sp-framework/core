@@ -11,13 +11,13 @@ use Phalcon\Mvc\Dispatcher\Exception as PhalconDispatcherException;
 
 class Dispatcher
 {
-    private $container;
-
     protected $dispatcher;
 
-    public function __construct(DiInterface $container)
+    protected $applicationsInfo;
+
+    public function __construct($applicationsInfo)
     {
-        $this->container = $container;
+        $this->applicationsInfo = $applicationsInfo;
 
         $this->dispatcher = new PhalconDispatcher();
 
@@ -25,10 +25,7 @@ class Dispatcher
 
         $this->dispatcher->setDefaultAction('view');
 
-        // $applicationInfo =
-        //     $this->container->getShared('modules')->applications->getApplicationInfo();
-
-        // if ($applicationInfo) {
+        // if ($this->applicationInfo) {
         //     $applicationDefaults = json_decode($applicationInfo['settings'], true);
 
         //     if (isset($applicationDefaults['errorComponent'])) {

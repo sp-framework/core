@@ -4,22 +4,15 @@ namespace System\Base\Providers\ConfigServiceProvider;
 
 use Phalcon\Config as PhalconConfig;
 use Phalcon\Config\Adapter\Grouped;
-use Phalcon\Di\DiInterface;
 
 class Config
 {
-    private $container;
-
     protected $configs = [];
 
     protected $configsFolder;
 
-    public function __construct(DiInterface $container)
+    public function __construct()
     {
-        include('../system/Base/Helpers.php');
-
-        $this->container = $container;
-
         $this->configsFolder = base_path('system/Configs/');
 
         $this->scanDirForConfigs();

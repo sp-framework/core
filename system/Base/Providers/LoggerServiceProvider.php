@@ -10,14 +10,20 @@ class LoggerServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-		include('../system/Base/Providers/LoggerServiceProvider/Logger.php');
+		$logsConfig = $container->getShared('config')->logs;
+
+		$session = $container->getShared('session');
+
+		$request = $container->getShared('request');
+
+		$email = $container->getShared('email');
+
+		$core = $container->getShared('modules')->core->core[0];
 
 		$container->setShared(
 			'logger',
-			function () use ($container) {
-				$logger = (new Logger($container))->init();
-
-				return $logger;
+			function () use ($logsConfig, $session, $request, $email, $core) {
+				return (new Logger($logsConfig, $session, $request, $email, $core))->init();
 			}
 		);
 	}

@@ -5,38 +5,32 @@ namespace System\Base\Providers\LoggerServiceProvider\Db;
 use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Json;
 use Phalcon\Logger\Adapter\AbstractAdapter;
-use Phalcon\Logger\Adapter\AdapterInterface;
-use Phalcon\Logger\Formatter\FormatterInterface;
 use Phalcon\Logger\Item;
 use System\Base\Providers\LoggerServiceProvider\Db\Logs;
 
 class Adapter extends AbstractAdapter
 {
-    protected $container;
-
     protected $logs;
 
     protected $messages = [];
 
-    protected $entryCount;//True to make only 1 DB Entry
+    protected $oneDbEntry;//True to make only 1 DB Entry
 
-    public function __construct(DiInterface $container, $entryCount)
+    public function __construct($oneDbEntry)
     {
-        $this->container = $container;
+        $this->logs = new Logs;
 
-        $this->logs = new Logs($container);
-
-        $this->entryCount = $entryCount;
+        $this->oneDbEntry = $oneDbEntry;
     }
 
     public function process(Item $item): void
     {
-        if (!$this->entryCount) {
+        if (!$this->oneDbEntry) {
             $message = Json::decode($this->formatter->format($item), true);
 
             $this->logs->add($message);
 
-        } else if ($this->entryCount) {
+        } else if ($this->oneDbEntry) {
 
             $this->messages[] = Json::decode($this->formatter->format($item), true);
         }

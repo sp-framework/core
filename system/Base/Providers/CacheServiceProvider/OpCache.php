@@ -2,22 +2,20 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
-use Phalcon\Di\DiInterface;
-
 class OpCache
 {
-    private $container;
-
     protected $cache;
 
-    public function __construct(DiInterface $container)
+    protected $cacheConfig;
+
+    public function __construct($cacheConfig)
     {
-        $this->container = $container;
+        $this->cacheConfig = $cacheConfig;
     }
 
     public function init()
     {
-        if ($this->container->getShared('config')->cache) {
+        if ($this->cacheConfig) {
             //https://medium.com/@dylanwenzlau/500x-faster-caching-than-redis-memcache-apc-in-php-hhvm-dcd26e8447ad
             //
             //Tried and tested, works great.

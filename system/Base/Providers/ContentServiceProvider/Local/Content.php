@@ -2,19 +2,14 @@
 
 namespace System\Base\Providers\ContentServiceProvider\Local;
 
-use Phalcon\Di\DiInterface;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 
 class Content
 {
-	private $container;
-
-	public function __construct(DiInterface $container)
+	public function __construct()
 	{
 		include (__DIR__ . '/vendor/autoload.php');
-
-		$this->container = $container;
 	}
 
 	public function init()
