@@ -29,13 +29,19 @@ class Service
 
 	public function load()
 	{
-		try {
-			$config = include('../system/Configs/Base.php');
-		} catch (Exception $e) {
-			throw $e;
-		}
+		include('../system/Base/Helpers.php');
 
-		self::$mode = $config['debug'];
+		// try {
+			$config = include('../system/Configs/Base.php');
+		// } catch (\ErrorException $e) {
+		// 	throw new \Exception("Base.php file in configs directory missing");
+		// }
+
+		if (isset($config['debug'])) {
+			self::$mode = $config['debug'];
+		} else {
+			self::$mode = true;
+		}
 
 		$files = include(self::$base . 'system/Base/Loader/Files.php');
 

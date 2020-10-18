@@ -5,20 +5,22 @@
 	"version" 		: "0.0.1",
 	"repo" 			: "https://github.com/h-w-f/core",
 	"settings"      : {
-		"debug"			: false,
-		"cache"			: false,
-		"cacheTimeout"	: 60,
-		"cacheService"	: "streamCache",
-		"db"				: {
+		"debug"			: "",
+		"db"			: {
 			"host" 			: "",
 			"dbname" 		: "",
 			"username" 		: "",
 			"password" 		: "",
 			"port" 			: ""
 		},
-		"logging"			: {
-			"enabled"			: true,
-			"email"				: false,
+		"cache"			: {
+			"enabled"		: "",
+			"timeout"		: 60,
+			"service"		: "streamCache"
+		},
+		"logs"			: {
+			"enabled"			: "true",
+			"email"				: "false",
 			"service"			: "streamLogs",
 			"level"				: "DEBUG",
 			"emergencyEmails"	: ""

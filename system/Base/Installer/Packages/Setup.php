@@ -266,9 +266,9 @@ class Setup
 		}
 	}
 
-	public function writeConfigs()
+	public function writeConfigs($coreJson)
 	{
-		(new Configs())->write($this->container, $this->postData);
+		(new Configs())->write($this->container, $this->postData, $coreJson);
 	}
 
 	public function removeInstaller()

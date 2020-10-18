@@ -4,33 +4,12 @@ namespace System\Base\Installer\Packages\Setup\Write;
 
 class Configs
 {
-	public function write($container, $postData)
+	public function write($container, $postData, $coreJson)
 	{
-		$this->writeDbConfig($container, $postData);
-		$this->writeBaseConfig($container, $postData);
+		$this->writeBaseConfig($container, $postData, $coreJson);
 	}
 
-	protected function writeDbConfig($container, $postData)
-	{
-		$dbContent =
-'<?php
-
-return
-	[
-		"db" =>
-			[
-				"host" 		=> "' . $postData['host'] . '",
-				"dbname" 	=> "' . $postData['database_name'] . '",
-				"username" 	=> "' . $postData['username'] . '",
-				"password" 	=> "' . $postData['password'] . '",
-				"port" 		=> "' . $postData['port'] . '",
-			]
-	];';
-
-		$container['localContent']->put('/system/Configs/Db.php', $dbContent);
-	}
-
-	protected function writeBaseConfig($container, $postData)
+	protected function writeBaseConfig($container, $postData, $coreJson)
 	{
 		if ($postData['mode'] === 'production') {
 			$debug = "false";
@@ -47,19 +26,28 @@ return
 
 return
 	[
-		"debug"					=> ' . $debug . ', //true - Development false - Production
-		"cache"					=>
+		"debug"			=> ' . $debug . ', //true - Development false - Production
+		"db" 			=>
+		[
+			"host" 				=> "' . $postData['host'] . '",
+			"dbname" 			=> "' . $postData['database_name'] . '",
+			"username" 			=> "' . $postData['username'] . '",
+			"password" 			=> "' . $postData['password'] . '",
+			"port" 				=> "' . $postData['port'] . '",
+		],
+		"cache"			=>
 		[
 			"enabled"			=> ' . $cache . ', //Global Cache value //true - Production false - Development
-			"timeout"			=> 60, //Global Cache timeout in seconds
-			"service"			=> "streamCache"
+			"timeout"			=> ' . $coreJson['settings']['cache']['timeout'] . ', //Global Cache timeout in seconds
+			"service"			=> "' . $coreJson['settings']['cache']['service'] . '"
 		],
-		"logs"					=>
+		"logs"			=>
 		[
 			"enabled"			=> true,
 			"email"				=> false,
-			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
+			"service"			=> "' . $coreJson['settings']['logs']['service'] . '", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"level"				=> "' . $logLevel . '",
+			"emergencyEmails"	=> "' . $coreJson['settings']['logs']['emergencyEmails'] . '",
 		]
 	];';
 

@@ -27,13 +27,11 @@ class Logger
 
     protected $email;
 
-    protected $core;
-
     protected $customFormatter;
 
     protected $oneDbEntry = true;//True to make only 1 DB Entry
 
-    public function __construct($logsConfig, $session, $connection, $request, $email, $core)
+    public function __construct($logsConfig, $session, $connection, $request, $email)
     {
         $this->logsConfig = $logsConfig;
 
@@ -44,14 +42,12 @@ class Logger
         $this->request = $request;
 
         $this->email = $email;
-
-        $this->core = $core;
     }
 
     public function init()
     {
         if ($this->logsConfig->enabled) {
-            //Custom Formatter
+
             $this->customFormatter =
                 new CustomFormat(
                     'c',
@@ -70,12 +66,6 @@ class Logger
                 $streamAdapter = new Stream($savePath . 'debug.log');
                 $streamAdapter->setFormatter($this->customFormatter);
 
-                // $adapter = ['stream'        => $streamAdapter];
-
-                // if ($this->logsConfig->email) {
-                //     $adapter = array_merge($adapter, $emailLogs);
-                // }
-
                 $this->log = new PhalconLogger(
                     'messages',
                     ['stream'        => $streamAdapter]
@@ -88,12 +78,6 @@ class Logger
                 $dbAdapter = new DbAdapter($this->oneDbEntry);
                 $dbAdapter->setFormatter($this->customFormatter);
 
-                // $adapter = ['db'            => $dbAdapter];
-
-                // if ($this->logsConfig->email) {
-                //     $adapter = array_merge($adapter, $emailLogs);
-                // }
-
                 $this->log = new PhalconLogger(
                     'messages',
                     ['db'            => $dbAdapter]
@@ -104,7 +88,7 @@ class Logger
             $this->setLogLevel();
 
             if ($this->logsConfig->email) {
-                $emailAdapter = new EmailAdapter($this->email, $this->core);
+                $emailAdapter = new EmailAdapter($this->email, $this->logsConfig);
                 $emailAdapter->setFormatter($this->customFormatter);
 
                 $this->logEmail = new PhalconLogger(

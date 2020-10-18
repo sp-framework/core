@@ -12,15 +12,15 @@ class Adapter extends AbstractAdapter
 {
     protected $email;
 
-    protected $core;
+    protected $logsConfig;
 
     protected $messages = [];
 
-    public function __construct($email, $core)
+    public function __construct($email, $logsConfig)
     {
         $this->email = $email;
 
-        $this->core = $core;
+        $this->logsConfig = $logsConfig;
     }
 
     public function process(Item $item): void
@@ -41,9 +41,11 @@ class Adapter extends AbstractAdapter
 
     public function sendEmail()
     {
-        $settings = Json::decode($this->core['settings'], true);
+        if (!$this->logsConfig->enabled) {
+            throw new EmailException('Email not enabled');
+        }
 
-        if ($settings['logging']['emergencyEmails'] !== '') {
+        if ($this->logsConfig->emergencyEmails !== '') {
 
             if ($this->email->setup()) {
                 $emailSettings = $this->email->getEmailSettings();
@@ -53,7 +55,7 @@ class Adapter extends AbstractAdapter
                     $emailSettings['username']
                 );
 
-                foreach (explode(',', $settings['logging']['emergencyEmails']) as $key => $emailAddress) {
+                foreach (explode(',', $this->logsConfig->emergencyEmails) as $key => $emailAddress) {
                     $this->email->setRecipientTo(trim($emailAddress), trim($emailAddress));
                 }
 
@@ -67,6 +69,8 @@ class Adapter extends AbstractAdapter
                     throw new EmailException($sendNewEmail);
                 }
             }
+        } else {
+            throw new EmailException('Email enabled but, missing emergency emails recipients.');
         }
     }
 
