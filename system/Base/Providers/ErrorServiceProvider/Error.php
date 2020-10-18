@@ -19,6 +19,8 @@ class Error
 
 	protected $class;
 
+	protected $newException = null;
+
 	public function __construct($applicationInfo, $config, $logger)
 	{
 		$this->applicationInfo = $applicationInfo;
@@ -59,11 +61,15 @@ class Error
 
 		$this->class = (new \ReflectionClass($this->exception))->getShortName();
 
-		if ($this->class ==='Exception' || !$this->emailClass($this->class)) {
-			$this->emailMessage();
-		}
+		if ($this->config->logs->enabled) {
+			if ($this->config->logs->email &&
+				($this->class === 'Exception' || !$this->emailClass($this->class))
+			) {
+				$this->emailMessage();
+			}
 
-		$this->logMessage();
+			$this->logMessage();
+		}
 
 		$customHandler = $this->customHandler($this->class);
 
@@ -98,51 +104,71 @@ class Error
 
 	protected function logMessage()
 	{
-		$this->logger->log->emergency($this->buildMessage());
+		$this->logger->log->emergency($this->buildMessage(false, false));
+
+		if ($this->newException) {
+			$this->logger->log->emergency($this->buildMessage(false, false, true));
+		}
+
+		$this->logger->commit();
 	}
 
 	protected function showOnScreen()
 	{
-		echo $this->buildMessage();
+		if ($this->config->debug) {
+			echo $this->buildMessage();
+
+			if ($this->newException) {
+				echo '<br>' . $this->buildMessage(true, true, true);
+			}
+		}
 	}
 
 	protected function emailMessage()
 	{
 		try {
 
-			$this->logger->log->emergency($this->buildMessage(false));
-
-			$this->logger->commit();
+			$this->logger->commitEmail($this->buildMessage(true, false));
 
 		} catch (\Exception $exception) {
-
-			$this->exception = $exception;
+			$this->newException = $exception;
 
 			$this->class = 'EmailException';
 		}
 	}
 
-	protected function buildMessage($style = true)
+	protected function buildMessage($template = true, $style = true, $new = false)
 	{
+		if ($new) {
+			$exception = $this->newException;
+		} else {
+			$exception = $this->exception;
+		}
+
+		if (!$template) {
+			return $exception->getMessage();
+		}
+
 		$traces = [];
 
-		foreach ($this->exception->getTrace() as $key => $trace) {
+		foreach ($exception->getTrace() as $key => $trace) {
 			$traces[] =
 				isset($trace['file']) ?
 				$trace['line'] . ' - ' . $trace['file'] . ' - Class: ' . $trace['function'] . ' - Function: ' . $trace['function'] :
 				'Class: ' . $trace['function'] . ' - Function: ' . $trace['function'];
 		}
 
-		if ($style) {
-			return $this->buildStyle() . $this->buildTable($traces);
-		} else {
-			return $this->buildTable($traces);
+		if (!$style) {
+			return $this->buildTable($traces, $exception);
 		}
+
+		return $this->buildStyle() . $this->buildTable($traces, $exception);
 	}
 
 	protected function buildStyle()
 	{
-		return '<style type="text/css">
+		return
+			'<style type="text/css">
 				.tg  {border-collapse:collapse;border-spacing:0;width:100%;}
 				.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
 				  overflow:hidden;padding:10px 5px;word-break:normal;}
@@ -154,35 +180,35 @@ class Error
 			</style>';
 	}
 
-	protected function buildTable($traces)
+	protected function buildTable($traces, $exception)
 	{
 		return '
 			<table class="tg" style="width:100%">
 				<thead>
-				<tr>
-					<th class="tg-6kns" colspan="2">
-						<span style="font-weight:bold; text-align:center;">Exception Thrown: "' . get_class($this->exception) . '"</span>
-					</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td class="tg-orf0"><span>Info</span></td>
-					<td class="tg-0lax">' . $this->exception->getMessage() . '</td>
-				</tr>
-				<tr>
-					<td class="tg-0lax"><span>File</span></td>
-					<td class="tg-0lax">' . $this->exception->getFile() . '</td>
-				</tr>
-				<tr>
-					<td class="tg-0lax"><span>Line</span></td>
-					<td class="tg-0lax">' . $this->exception->getLine() . '</td>
-				</tr>
-				<tr>
-					<td class="tg-0lax"><span>Trace</span></td>
-					<td class="tg-0lax">' . join('<br>', array_reverse($traces)) . '</td>
-				</tr>
-			</tbody>
+					<tr>
+						<th class="tg-6kns" colspan="2">
+							<span style="font-weight:bold; text-align:center;">Exception Thrown: "' . get_class($exception) . '"</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td class="tg-orf0"><span>Info</span></td>
+						<td class="tg-0lax">' . $exception->getMessage() . '</td>
+					</tr>
+					<tr>
+						<td class="tg-0lax"><span>File</span></td>
+						<td class="tg-0lax">' . $exception->getFile() . '</td>
+					</tr>
+					<tr>
+						<td class="tg-0lax"><span>Line</span></td>
+						<td class="tg-0lax">' . $exception->getLine() . '</td>
+					</tr>
+					<tr>
+						<td class="tg-0lax"><span>Trace</span></td>
+						<td class="tg-0lax">' . join('<br>', array_reverse($traces)) . '</td>
+					</tr>
+				</tbody>
 			</table>';
 	}
 }

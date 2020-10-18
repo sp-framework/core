@@ -13,10 +13,12 @@ class DispatcherServiceProvider implements ServiceProviderInterface
 		$applicationInfo =
 			$container->getShared('modules')->applications->getApplicationInfo();
 
+		$config = $container->getShared('config');
+
 		$container->setShared(
 			'dispatcher',
-			function () use ($applicationInfo) {
-				return (new Dispatcher($applicationInfo))->init();
+			function () use ($applicationInfo, $config) {
+				return (new Dispatcher($applicationInfo, $config))->init();
 			}
 		);
 	}

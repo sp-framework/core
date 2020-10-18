@@ -169,7 +169,7 @@ class Router
 	protected function registerDefaults()
 	{
 		$this->router->setDefaultNamespace(
-			'System\Base\Exceptions'
+			'System\Base\Providers\ErrorServiceProvider'
 		);
 
 		$this->router->setDefaultController('index');
@@ -190,7 +190,7 @@ class Router
 			} else {
 				$this->router->setDefaultNamespace
 				(
-					'System\Base\Exceptions'
+					'System\Base\Providers\ErrorServiceProvider'
 				);
 
 				$errorComponent = 'Errors';
@@ -199,7 +199,7 @@ class Router
 		} else {
 			$this->router->setDefaultNamespace
 			(
-				'System\Base\Exceptions'
+				'System\Base\Providers\ErrorServiceProvider'
 			);
 
 			$errorComponent = 'Errors';
@@ -208,7 +208,7 @@ class Router
 		$this->router->notFound(
 			[
 				'controller' => $errorComponent,
-				'action'     => 'notfound',
+				'action'     => 'routenotfound',
 			]
 		);
 	}
@@ -217,11 +217,11 @@ class Router
 	{
 		$this->applicationInfo = $this->applications->getApplicationInfo();
 
-		if (!$this->validateDomain()) {
-			return false;
-		}
-
 		if ($this->applicationInfo) {
+
+			if (!$this->validateDomain()) {
+				return false;
+			}
 
 			$this->applicationDefaults = $this->applications->getApplicationDefaults();
 

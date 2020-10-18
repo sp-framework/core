@@ -15,9 +15,13 @@ class Logger
 {
     public $log;
 
+    public $logEmail;
+
     protected $logsConfig;
 
     protected $session;
+
+    protected $connection;
 
     protected $request;
 
@@ -29,11 +33,13 @@ class Logger
 
     protected $oneDbEntry = true;//True to make only 1 DB Entry
 
-    public function __construct($logsConfig, $session, $request, $email, $core)
+    public function __construct($logsConfig, $session, $connection, $request, $email, $core)
     {
         $this->logsConfig = $logsConfig;
 
         $this->session = $session;
+
+        $this->connection = $connection;
 
         $this->request = $request;
 
@@ -50,14 +56,9 @@ class Logger
                 new CustomFormat(
                     'c',
                     $this->session->getId(),
+                    $this->connection->getId(),
                     $this->request->getClientAddress()
                 );
-
-            //Email Adapter
-            $emailAdapter = new EmailAdapter($this->email, $this->core);
-            $emailAdapter->setFormatter($this->customFormatter);
-
-            $emailLogs = ['email'         => $emailAdapter];
 
             if ($this->logsConfig->service === 'streamLogs') {
                 if ($this->checkLogPath()) {
@@ -69,13 +70,16 @@ class Logger
                 $streamAdapter = new Stream($savePath . 'debug.log');
                 $streamAdapter->setFormatter($this->customFormatter);
 
-                $adapter = ['stream'        => $streamAdapter];
+                // $adapter = ['stream'        => $streamAdapter];
 
-                if ($this->logsConfig->email) {
-                    $adapter = array_merge($adapter, $emailLogs);
-                }
+                // if ($this->logsConfig->email) {
+                //     $adapter = array_merge($adapter, $emailLogs);
+                // }
 
-                $this->log = new PhalconLogger('messages', $adapter);
+                $this->log = new PhalconLogger(
+                    'messages',
+                    ['stream'        => $streamAdapter]
+                );
 
                 $this->log->getAdapter('stream')->begin();
 
@@ -84,20 +88,31 @@ class Logger
                 $dbAdapter = new DbAdapter($this->oneDbEntry);
                 $dbAdapter->setFormatter($this->customFormatter);
 
-                $adapter = ['db'            => $dbAdapter];
+                // $adapter = ['db'            => $dbAdapter];
 
-                if ($this->logsConfig->email) {
-                    $adapter = array_merge($adapter, $emailLogs);
-                }
+                // if ($this->logsConfig->email) {
+                //     $adapter = array_merge($adapter, $emailLogs);
+                // }
 
-                $this->log = new PhalconLogger('messages', $adapter);
+                $this->log = new PhalconLogger(
+                    'messages',
+                    ['db'            => $dbAdapter]
+                );
 
                 $this->log->getAdapter('db')->begin();
             }
             $this->setLogLevel();
 
             if ($this->logsConfig->email) {
-                $this->log->getAdapter('email')->begin();
+                $emailAdapter = new EmailAdapter($this->email, $this->core);
+                $emailAdapter->setFormatter($this->customFormatter);
+
+                $this->logEmail = new PhalconLogger(
+                    'messages',
+                    ['email'         => $emailAdapter]
+                );
+
+                $this->logEmail->getAdapter('email')->begin();
             }
 
         } else {
@@ -111,10 +126,6 @@ class Logger
                 ]
             );
         }
-        //Email logging for Emergency, Critical & Alerts needs to be configured using phpmailer
-        //Emergency should be for Exceptions
-        //Critical for Performance Degrade (Need a method to calculate DB times, etc)
-        //Alert for any Disk related messages.
 
         return $this;
     }
@@ -132,40 +143,48 @@ class Logger
 
     public function commit()
     {
-        if ($this->logsConfig->service === 'streamLogs') {
+        if ($this->logsConfig->enabled) {
+            if ($this->logsConfig->service === 'streamLogs') {
 
-            if ($this->log->getAdapter('stream')->inTransaction()) {
-                $this->log->getAdapter('stream')->commit();
-            }
-
-        } else if ($this->logsConfig->service === 'dbLogs') {
-
-            if ($this->oneDbEntry) {
-
-                if ($this->log->getAdapter('db')->inTransaction()) {
-                    $this->log->getAdapter('db')->commit();
-                    $this->log->getAdapter('db')->addToDb();
+                if ($this->log->getAdapter('stream')->inTransaction()) {
+                    $this->log->getAdapter('stream')->commit();
                 }
-            } else {
 
-                if ($this->log->getAdapter('db')->inTransaction()) {
-                    $this->log->getAdapter('db')->commit();
+            } else if ($this->logsConfig->service === 'dbLogs') {
+
+                if ($this->oneDbEntry) {
+
+                    if ($this->log->getAdapter('db')->inTransaction()) {
+                        $this->log->getAdapter('db')->commit();
+                        $this->log->getAdapter('db')->addToDb();
+                    }
+                } else {
+
+                    if ($this->log->getAdapter('db')->inTransaction()) {
+                        $this->log->getAdapter('db')->commit();
+                    }
                 }
             }
-        }
-
-        if ($this->logsConfig->email) {
-            if ($this->log->getAdapter('email')->inTransaction()) {
-                $this->log->getAdapter('email')->commit();
-            }
-
-            $this->log->getAdapter('email')->sendEmail();
         }
     }
 
-    public function getConnectionId()
+    public function commitEmail($message = null)
     {
-        return $this->customFormatter->getConnectionId();
+        if ($this->logsConfig->enabled) {
+            if ($this->logsConfig->email) {
+                if ($message) {
+                    $this->logEmail->emergency($message);
+                }
+
+                if ($this->logEmail->getAdapter('email')->inTransaction()) {
+                    $this->logEmail->getAdapter('email')->commit();
+                }
+
+                $this->logEmail->getAdapter('email')->sendEmail();
+            }
+        } else {
+            return 'logging is disabled';
+        }
     }
 
     protected function setLogLevel()

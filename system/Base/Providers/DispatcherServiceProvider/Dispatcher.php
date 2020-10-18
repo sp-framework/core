@@ -15,7 +15,7 @@ class Dispatcher
 
     protected $applicationsInfo;
 
-    public function __construct($applicationsInfo)
+    public function __construct($applicationsInfo, $config)
     {
         $this->applicationsInfo = $applicationsInfo;
 
@@ -25,13 +25,17 @@ class Dispatcher
 
         $this->dispatcher->setDefaultAction('view');
 
-        // if ($this->applicationInfo) {
-        //     $applicationDefaults = json_decode($applicationInfo['settings'], true);
+        if ($this->applicationsInfo && !$config->debug) {
+            $applicationDefaults = json_decode($applicationsInfo['settings'], true);
 
-        //     if (isset($applicationDefaults['errorComponent'])) {
-        //         $this->dispatcher->setEventsManager($this->register404());
-        //     }
-        // }
+            if (isset($applicationDefaults['errorComponent'])) {
+                $this->dispatcher->setEventsManager(
+                    $this->register404(
+                        $applicationDefaults['errorComponent']
+                    )
+                );
+            }
+        }
     }
 
     public function init()
@@ -39,7 +43,7 @@ class Dispatcher
         return $this->dispatcher;
     }
 
-    protected function register404()
+    protected function register404($errorComponent)
     {
         $eventsManager = new Manager();
 
@@ -49,12 +53,13 @@ class Dispatcher
                 Event $event,
                 $dispatcher,
                 \Exception $exception
-            ) {
+            ) use ($errorComponent) {
+
                 switch ($exception->getCode()) {
                     case PhalconDispatcherException::EXCEPTION_HANDLER_NOT_FOUND:
                         $dispatcher->forward(
                             [
-                                'controller' => 'Errors',
+                                'controller' => $errorComponent,
                                 'action'     => 'controllerNotFound',
                             ]
                         );
@@ -64,7 +69,7 @@ class Dispatcher
                     case PhalconDispatcherException::EXCEPTION_ACTION_NOT_FOUND:
                         $dispatcher->forward(
                             [
-                                'controller' => 'Errors',
+                                'controller' => $errorComponent,
                                 'action'     => 'actionNotFound',
                             ]
                         );

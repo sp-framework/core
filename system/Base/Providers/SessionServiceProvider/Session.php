@@ -44,4 +44,9 @@ class Session
 
         return true;
     }
+
+    public function getConnectionId()
+    {
+        return $this->customFormatter->getConnectionId();
+    }
 }

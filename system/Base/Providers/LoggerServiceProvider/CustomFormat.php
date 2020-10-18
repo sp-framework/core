@@ -11,13 +11,13 @@ class CustomFormat extends AbstractFormatter
 {
 	protected $dateFormat;
 
-	public $connectionId;
-
 	protected $sessionId;
+
+	protected $connectionId;
 
 	protected $clientIpAddress;
 
-	public function __construct(string $dateFormat = 'c', $sessionId, $clientIpAddress)
+	public function __construct(string $dateFormat = 'c', $sessionId, $connectionId, $clientIpAddress)
 	{
 		$this->dateFormat = $dateFormat;
 
@@ -43,26 +43,12 @@ class CustomFormat extends AbstractFormatter
 					"typeName"     	=> $item->getName(),
 					"message"   	=> $message,
 					"session"   	=> $this->sessionId,
-					"connection" 	=> $this->addConnectionId(),
+					"connection" 	=> $this->connectionId,
 					"client_ip"		=> $this->clientIpAddress,
 					"timestamp" 	=> $this->getFormattedDate(),
 					"mseconds" 		=> microtime()
 				];
 
 		return Json::encode($toLog);
-	}
-
-	public function addConnectionId()
-	{
-		if (!$this->connectionId) {
-			$this->connectionId = Str::random(Str::RANDOM_ALNUM);
-		}
-
-		return $this->connectionId;
-	}
-
-	public function getConnectionId()
-	{
-		return $this->addConnectionId();
 	}
 }

@@ -9,17 +9,19 @@ class SettingsComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$moduleSettings = $this->usePackage(Module::class)->moduleSettings();
-
-		$moduleSettings->get($this->getData());
+		$modulePackage = $this->usePackage(Module::class);
 
 		if ($this->getData()['type'] === 'core') {
+
+			$moduleSettings = $modulePackage->moduleSettings('Core')->get();
 
 			$this->view->core = $moduleSettings->packagesData->core;
 
 			$this->view->settings = $moduleSettings->packagesData->settings;
 
 		} else if ($this->getData()['type'] === 'applications') {
+
+			$moduleSettings = $modulePackage->moduleSettings('Applications')->get($this->getData());
 
 			$this->view->application = $moduleSettings->packagesData->application;
 
@@ -34,6 +36,8 @@ class SettingsComponent extends BaseComponent
 			$this->view->views = $moduleSettings->packagesData->views;
 
 		} else if ($this->getData()['type'] === 'components') {
+
+			$moduleSettings = $modulePackage->moduleSettings('Components')->get($this->getData());
 
 			$this->view->components = $settingsModule->packagesData->components;
 
@@ -70,7 +74,7 @@ class SettingsComponent extends BaseComponent
 			$this->view->settings = $settingsModule->packagesData->settings;
 		}
 
-		$this->view->type = $moduleSettings->packagesData->type;
+		$this->view->type = $this->getData()['type'];
 
 		$this->view->thisApplication = $this->modules->applications->getApplicationInfo();
 

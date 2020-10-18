@@ -25,7 +25,7 @@ $error = $container->getShared('error');
 $logger = $container->getShared('logger');
 
 $logger->log->info(
-	'Session ID: ' . $session->getId() . '. Connection ID: ' . $logger->getConnectionId()
+	'Session ID: ' . $session->getId() . '. Connection ID: ' . $session->getId()
 );
 
 $application = new Application($container);
