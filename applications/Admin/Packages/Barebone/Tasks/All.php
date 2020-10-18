@@ -57,9 +57,9 @@ class All extends BasePackage
 
 			$names = [];
 			$names['applicationName'] = ucfirst(strtolower($postData['applicationName']));
-			$names['componentName'] = 'Hw';
-			$names['packageName'] = 'Hw';
-			$names['middlewareName'] = 'Hw';
+			$names['componentName'] = 'Home';
+			$names['packageName'] = 'Home';
+			$names['middlewareName'] = 'Home';
 			$names['viewName'] = 'Default';
 
 			$installedFiles = $copy->copyModuleStructure('applications', $names, $postData);

@@ -1,8 +1,3 @@
-<script type="text/javascript">
-		var postData = { };
-		postData['settings'] = { };
-</script>
-
 <ul class="nav nav-tabs" id="component-settings-tab" role="tablist">
 	<li class="nav-item" role="presentation">
 		<a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
@@ -23,6 +18,9 @@
 	$('#modal-save').click(function() {
 
 		$('body').trigger('settingsSave');
+
+		var postData = { };
+		postData['settings'] = { };
 
 		postData['type'] = 'components';
 		postData['id'] = $('#id').val();

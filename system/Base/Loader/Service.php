@@ -2,30 +2,26 @@
 
 namespace System\Base\Loader;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Loader;
 
 class Service
 {
 	private static $mode;
 
-	private static $container;
-
 	protected static $base;
+
 	/**
 	 * @var null|\System\Base\Service Singleton instance.
 	 */
 	protected static $instance = null;
 
-	public static function Instance(DiInterface $container, $base = null)
+	public static function Instance($base = null)
 	{
-		self::$container = $container;
-
 		self::$base = $base;
 
 		if (self::$instance === null) {
 
-			self::$instance = new self(self::$container, $base);
+			self::$instance = new self($base);
 		}
 
 		return self::$instance;
@@ -33,7 +29,19 @@ class Service
 
 	public function load()
 	{
-		self::$mode = self::$container->getShared('config')->debug;
+		include('../system/Base/Helpers.php');
+
+		try {
+			$config = include('../system/Configs/Base.php');
+		} catch (\ErrorException $e) {
+			throw new \Exception("Base.php file in configs directory missing");
+		}
+
+		if (isset($config['debug'])) {
+			self::$mode = $config['debug'];
+		} else {
+			self::$mode = true;
+		}
 
 		$files = include(self::$base . 'system/Base/Loader/Files.php');
 

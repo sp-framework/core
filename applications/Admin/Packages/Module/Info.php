@@ -23,7 +23,7 @@ class Info extends BasePackage
 			$info = $this->modules->{$this->getData['type']}->getById($this->getData['id']);
 
 			$info['dependencies'] = json_decode($info['dependencies'], true);
-			var_dump($info);
+
 			$this->packagesData->info = $info;
 		}
 

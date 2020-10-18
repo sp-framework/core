@@ -4,18 +4,15 @@ namespace System\Base\Providers\DatabaseServiceProvider;
 
 use Phalcon\Db\Adapter\PdoFactory;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Di\DiInterface;
-use System\Base\Installer\Setup;
+use System\Base\Installer\Components\Setup;
 
 class Pdo
 {
-	private $container;
+	protected $dbConfig;
 
-	public function __construct(DiInterface $container)
+	public function __construct($dbConfig)
 	{
-		$this->container = $container;
-
-		$this->dbConfig = $container->getShared('config')->db;
+		$this->dbConfig = $dbConfig;
 	}
 
 	public function init()
@@ -33,7 +30,7 @@ class Pdo
 			!$this->dbConfig->password 	||
 			!$this->dbConfig->port
 		) {
-			require_once base_path('system/Base/Installer/Setup.php');
+			require_once base_path('system/Base/Installer/Components/Setup.php');
 
 			(new Setup())->run();
 

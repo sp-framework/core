@@ -1,142 +1,17 @@
-<div class="row p-2">
-	<div class="col">
-		<input type="hidden" name="id" id="id" class="form-control" value="{{application['id']}}">
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="version">Version</label>
-					<div class="input-group">
-						<input type="text" name="version" id="version" class="form-control" value="{{application['version']}}" placeholder="Version" disabled>
-					</div>
-				</div>
-			</div>
-			{% if application['is_default'] == 0 %}
-				{% set checked = '' %}
-				{% set disabled = '' %}
-			{% elseif application['is_default'] == 1 %}
-				{% set checked = 'checked' %}
-				{% set disabled = 'disabled' %}
-			{% endif %}
-			<div class="col">
-				<label>Application is default?</label>
-				<div class="form-group">
-					<div class="checkbox icheck-success">
-						<input type="checkbox" name="is-default" id="is-default" {{checked}} {{disabled}}>
-						<label for="is-default"></label>
-					</div>
-				</div>
-			</div>
-			{% if application['mode'] == 0 %}
-				{% set production = 'checked' %}
-				{% set development = '' %}
-				{% set developmentactive = '' %}
-				{% set productionactive = 'btn-primary active' %}
-				{% set productioninactive = '' %}
-				{% set developmentactive = '' %}
-				{% set developmentinactive = 'btn-secondary' %}
-			{% elseif application['mode'] == 1 %}
-				{% set production = '' %}
-				{% set development = 'checked' %}
-				{% set developmentactive = 'btn-primary active' %}
-				{% set developmentinactive = '' %}
-				{% set productionactive = '' %}
-				{% set productioninactive = 'btn-secondary' %}
-			{% endif %}
-			<div class="col">
-				<label>Mode</label><br>
-				<div class="btn-group btn-group-toggle" data-toggle="buttons">
-					<label class="btn {{productionactive}}{{productioninactive}}">
-						<input type="radio" name="mode-options" class="mode-options" id="production" {{production}}>Production
-					</label>
-					<label class="btn {{developmentactive}}{{developmentinactive}}">
-						<input type="radio" name="mode-options" class="mode-options" id="development" {{development}}>Development
-					</label>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="name">Application Name</label>
-					<div class="input-group">
-						<input type="text" name="name" id="name" class="form-control" value="{{application['name']}}" placeholder="Application Name" disabled>
-					</div>
-				</div>
-			</div>
-			<div class="col">
-				<div class="form-group">
-					<label for="route">Route</label>
-					<div class="input-group">
-						<input type="text" name="route" id="route" class="form-control" value="{{application['route']}}" placeholder="Route">
-					</div>
-				</div>
-			</div>
-			<div class="col">
-				<div class="form-group">
-					<label for="display-name">Application Display Name</label>
-					<div class="input-group">
-						<input type="text" name="display-name" id="display-name" class="form-control" value="{{application['display_name']}}" placeholder="Application Display Name">
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="description">Description</label>
-					<div class="input-group">
-						<textarea name="description" id="description" class="form-control" placeholder="Description">{{application['description']}}</textarea>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="application-repo">Repository URL</label>
-					<div class="input-group">
-						<input type="text" name="application-repo" id="application-repo" class="form-control" placeholder="Eg: https://api.github.com/orgs/h-w-f/application-repo" value="{{application['repo']}}">
-					</div>
-				</div>
-			</div>
-		</div>
-		<label>Defaults</label>
-		<div class="row">
-			<div class="col">
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<label class="input-group-text" for="components">Component</label>
-					</div>
-					<select class="custom-select" id="settings-application-component">
-						<option value="0">Select Component</option>
-						{% for component in components %}
-							{% if component['name'] == settings['component'] %}
-								<option value="{{component['name']}}" selected>{{component['display_name']}}</option>
-							{% else %}
-								<option value="{{component['name']}}">{{component['display_name']}}</option>
-							{% endif %}
-						{% endfor %}
-					</select>
-				</div>
-			</div>
-			<div class="col">
-				<div class="input-group mb-3">
-					<div class="input-group-prepend">
-						<label class="input-group-text" for="views">View</label>
-					</div>
-					<select class="custom-select" id="settings-application-view">
-						<option value="0">Select View</option>
-						{% for view in views %}
-							{% if view['name'] == settings['view'] %}
-								<option value="{{view['name']}}" selected>{{view['display_name']}}</option>
-							{% else %}
-								<option value="{{view['name']}}">{{view['display_name']}}</option>
-							{% endif %}
-						{% endfor %}
-					</select>
-				</div>
-			</div>
-		</div>
+<ul class="nav nav-tabs" id="application-settings-tab" role="tablist">
+	<li class="nav-item" role="presentation">
+		<a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+	</li>
+	<li class="nav-item" role="presentation">
+		<a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false">Email</a>
+	</li>
+</ul>
+<div class="tab-content" id="application-settings-tab-content">
+	<div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+		{% include 'settings/applications/general.html' %}
+	</div>
+	<div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+		{% include 'settings/applications/email.html' %}
 	</div>
 </div>
 <script type="text/javascript">
@@ -169,8 +44,19 @@
 		postData['description'] = $('#description').val();
 		postData['repo'] = $('#application-repo').val();
 		postData['settings'] = { };
+		postData['settings']['domain'] = $('#settings-application-domain').val();
 		postData['settings']['component'] = $('#settings-application-component').val();
 		postData['settings']['view'] = $('#settings-application-view').val();
+		postData['settings']['errorComponent'] = $('#settings-application-error-component').val();
+		postData['settings']['email'] = { };
+		postData['settings']['email']['enabled'] = $('#email-enabled')[0].checked;
+		postData['settings']['email']['host'] = $('#email-host').val();
+		postData['settings']['email']['port'] = $('#email-port').val();
+		postData['settings']['email']['auth'] = $('#email-auth')[0].checked;
+		postData['settings']['email']['encryption'] = $('#email-encryption')[0].checked;
+		postData['settings']['email']['allow_html_body'] = $('#email-allow-html-body')[0].checked;
+		postData['settings']['email']['username'] = $('#email-username').val();
+		postData['settings']['email']['password'] = $('#email-password').val();
 
 		if ($('input[name=mode-options]:checked')[0].id === 'production') {
 			postData['mode'] = 0;

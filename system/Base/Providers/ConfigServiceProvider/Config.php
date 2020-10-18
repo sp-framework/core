@@ -4,22 +4,16 @@ namespace System\Base\Providers\ConfigServiceProvider;
 
 use Phalcon\Config as PhalconConfig;
 use Phalcon\Config\Adapter\Grouped;
-use Phalcon\Di\DiInterface;
+use System\Base\Installer\Components\Setup;
 
 class Config
 {
-    private $container;
-
     protected $configs = [];
 
     protected $configsFolder;
 
-    public function __construct(DiInterface $container)
+    public function __construct()
     {
-        include('../system/Base/Helpers.php');
-
-        $this->container = $container;
-
         $this->configsFolder = base_path('system/Configs/');
 
         $this->scanDirForConfigs();
@@ -27,7 +21,11 @@ class Config
 
     public function getConfigs()
     {
-        return new PhalconConfig($this->getGroupedConfigs()->toArray());
+        if (isset($this->getGroupedConfigs()->toArray()['debug'])) {
+            return new PhalconConfig($this->getGroupedConfigs()->toArray());
+        } else {
+            $this->runSetup();
+        }
     }
 
     protected function getGroupedConfigs()
@@ -46,5 +44,14 @@ class Config
                 }
             }
         }
+    }
+
+    protected function runSetup()
+    {
+        require_once base_path('system/Base/Installer/Components/Setup.php');
+
+        (new Setup())->run();
+
+        exit;
     }
 }

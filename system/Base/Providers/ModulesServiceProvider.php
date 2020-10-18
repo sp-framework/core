@@ -8,13 +8,13 @@ use System\Base\Providers\ModulesServiceProvider\Modules;
 
 class ModulesServiceProvider implements ServiceProviderInterface
 {
-    public function register(DiInterface $container) : void
-    {
-        $container->setShared(
-            'modules',
-            function () use ($container) {
-                return new Modules($container);
-            }
-        );
-    }
+	public function register(DiInterface $container) : void
+	{
+		$container->setShared(
+			'modules',
+			function () {
+				return new Modules();
+			}
+		);
+	}
 }

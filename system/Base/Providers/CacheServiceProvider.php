@@ -14,39 +14,47 @@ class CacheServiceProvider implements ServiceProviderInterface
 {
     public function register(DiInterface $container) : void
     {
+        $cacheConfig = $container->getShared('config')->cache;
+
         $container->setShared(
             'streamCache',
-            function () use ($container) {
-                return (new StreamCache($container))->init();
+            function () use ($cacheConfig) {
+                return (new StreamCache($cacheConfig))->init();
             }
         );
 
         $container->setShared(
             'apcuCache',
-            function () use ($container) {
-                return (new ApcuCache($container))->init();
+            function () use ($cacheConfig) {
+                return (new ApcuCache($cacheConfig))->init();
             }
         );
 
         $container->setShared(
             'opCache',
-            function () use ($container) {
-                return (new OpCache($container))->init();
+            function () use ($cacheConfig) {
+                return (new OpCache($cacheConfig))->init();
             }
         );
 
+        $caches = [];
+        $caches['streamCache'] = $container->getShared('streamCache');
+        $caches['apcuCache'] = $container->getShared('apcuCache');
+        $caches['opCache'] = $container->getShared('opCache');
+
+
         $container->setShared(
             'cacheTools',
-            function () use ($container) {
-                return new CacheTools($container);
+            function () use ($cacheConfig, $caches) {
+                return new CacheTools($cacheConfig, $caches);
             }
         );
 
         if ($container->getShared('config')->cache) {
             $container->setShared(
                 'modelsMetadata',
-                function () use ($container) {
-                    return (new ModelsMetadataCache($container))->init();
+                function () {
+                    return (new ModelsMetadataCache())->init();
                 }
             );
         }

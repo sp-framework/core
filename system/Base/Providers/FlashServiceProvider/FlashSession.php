@@ -2,17 +2,13 @@
 
 namespace System\Base\Providers\FlashServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Escaper;
 use Phalcon\Flash\Session;
 
 class FlashSession
 {
-	private $container;
-
-	public function __construct(DiInterface $container)
+	public function __construct()
 	{
-		$this->container = $container;
 	}
 
 	public function init()

@@ -24,7 +24,12 @@
 				<div class="row">
 					{% for moduleKey, module in modules %}
 						{% if module['error'] is not defined %}
-							<div class="col-md-4 mb-3">
+							{% if modulesKey == 'core' %}
+								{% set colSize = '12' %}
+							{% else %}
+								{% set colSize = '4' %}
+							{% endif %}
+							<div class="col-md-{{colSize}} mb-3">
 								<div class="card">
 									<div class="card-header bg-info pl-2 p-1 text-white text-truncate">
 										{% if module['display_name'] %}
@@ -93,7 +98,7 @@
 										{% endif %}
 									</div>
 									<div class="card-footer" style="min-height:61.5px;">
-										{% if modulesKey != 'core' and module['installed'] == true %}
+										{% if module['installed'] == true %}
 											<a href="/{{route}}/module/settings" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="settings" data-id="{{module['id']}}" {% if module['application_id'] is defined %}data-applicationid="{{module['application_id']}}" {% endif %} class="btn-settings btn btn-sm btn-primary">
 												<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Settings
 											</a>
@@ -121,7 +126,7 @@
 								</div>
 							</div>
 						{% else %}
-							<div class="col-md-6 mb-2">
+							<div class="col-md-4 mb-2">
 								<div class="card">
 									<div class="card-header bg-danger">
 										<label class="m-0 font-weight-bold">Error with - {{moduleKey}}

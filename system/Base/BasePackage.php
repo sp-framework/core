@@ -81,7 +81,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 			$parameters = [];
 		}
 
-		if (!$this->config->cache) {
+		if (!$this->config->cache->enabled) {
 			$parameters = [];
 		}
 
@@ -102,7 +102,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				$parameters = $this->getIdParams($id);
 			}
 
-			if (!$this->config->cache) {
+			if (!$this->config->cache->enabled) {
 				$parameters = $this->getIdParams($id);
 			}
 
@@ -123,7 +123,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				$parameters = $params;
 			}
 
-			if (!$this->config->cache) {
+			if (!$this->config->cache->enabled) {
 				$parameters = $params;
 			}
 
@@ -149,7 +149,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				$this->packagesData->responseCode = 0;
 				$this->packagesData->responseMessage = 'Found';
 
-				if ($enableCache && $this->config->cache) {
+				if ($enableCache && $this->config->cache->enabled) {
 					array_push($this->cacheKeys, $parameters['cache']['key']);
 				}
 
@@ -405,7 +405,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 	protected function resetCache(int $id = null)
 	{
-		if (!$this->config->cache) {
+		if (!$this->config->cache->enabled) {
 			return;
 		}
 
@@ -425,7 +425,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 	protected function updateCache(int $id)
 	{
-		if (!$this->config->cache) {
+		if (!$this->config->cache->enabled) {
 			return;
 		}
 		$this->resetCache($id);

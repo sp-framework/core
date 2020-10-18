@@ -2,18 +2,14 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Mvc\Model\MetaData\Stream;
 
 class ModelsMetadataCache
 {
-    private $container;
-
     protected $cache;
 
-    public function __construct(DiInterface $container)
+    public function __construct()
     {
-        $this->container = $container;
     }
 
     public function init()

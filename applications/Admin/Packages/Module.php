@@ -5,8 +5,9 @@ namespace Applications\Admin\Packages;
 use Applications\Admin\Packages\Module\Info;
 use Applications\Admin\Packages\Module\Install;
 use Applications\Admin\Packages\Module\Remove;
-use Applications\Admin\Packages\Module\Settings;
+use Applications\Admin\Packages\Module\TestEmail;
 use Applications\Admin\Packages\Module\Update;
+
 use System\Base\BasePackage;
 
 class Module extends BasePackage
@@ -16,9 +17,11 @@ class Module extends BasePackage
 		return new Info;
 	}
 
-	public function moduleSettings()
+	public function moduleSettings($module)
 	{
-		return new Settings;
+		$module = 'Applications\\Admin\\Packages\\Module\\Settings\\' . $module;
+
+		return new $module;
 	}
 
 	public function installModule()
@@ -34,5 +37,10 @@ class Module extends BasePackage
 	public function removeModule()
 	{
 		return new Remove;
+	}
+
+	public function testEmail()
+	{
+		return new TestEmail;
 	}
 }

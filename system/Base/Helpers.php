@@ -126,3 +126,10 @@ if (!function_exists('msort')) {
         return $array;
     }
 }
+
+//Convert Warnings to Exceptions
+set_error_handler(function ($severity, $message, $file, $line) {
+    throw new \ErrorException($message, $severity, $severity, $file, $line);
+});
+//To restore defaults
+//restore_error_handler();

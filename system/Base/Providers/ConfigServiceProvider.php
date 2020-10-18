@@ -10,12 +10,10 @@ class ConfigServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-		include('../system/Base/Providers/ConfigServiceProvider/Config.php');
-
 		$container->setShared(
 			'config',
-			function () use ($container) {
-				return (new Config($container))->getConfigs();
+			function () {
+				return (new Config())->getConfigs();
 			}
 		);
 	}

@@ -44,6 +44,11 @@ class Core extends BaseModel
     public $installed;
 
     /**
+     * Column(name="settings", type="text", length=65535, nullable=true)
+     */
+    public $settings;
+
+    /**
      * @Column(column="files", type="text", length=65535, nullable=true)
      */
     public $files;

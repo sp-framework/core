@@ -64,7 +64,7 @@ abstract class BaseComponent extends Controller
 		unset($url[$firstKey]);
 		unset($url[$lastKey]);
 
-		return join($url, '/');
+		return implode('/', $url);
 	}
 
 	protected function isJson()

@@ -9,11 +9,19 @@ class SettingsComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		$moduleSettings = $this->usePackage(Module::class)->moduleSettings();
+		$modulePackage = $this->usePackage(Module::class);
 
-		$moduleSettings->get($this->getData());
+		if ($this->getData()['type'] === 'core') {
 
-		if ($this->getData()['type'] === 'applications') {
+			$moduleSettings = $modulePackage->moduleSettings('Core')->get();
+
+			$this->view->core = $moduleSettings->packagesData->core;
+
+			$this->view->settings = $moduleSettings->packagesData->settings;
+
+		} else if ($this->getData()['type'] === 'applications') {
+
+			$moduleSettings = $modulePackage->moduleSettings('Applications')->get($this->getData());
 
 			$this->view->application = $moduleSettings->packagesData->application;
 
@@ -21,9 +29,15 @@ class SettingsComponent extends BaseComponent
 
 			$this->view->components = $moduleSettings->packagesData->components;
 
+			$this->view->domains = $moduleSettings->packagesData->domains;
+
+			$this->view->email = $moduleSettings->packagesData->email;
+
 			$this->view->views = $moduleSettings->packagesData->views;
 
 		} else if ($this->getData()['type'] === 'components') {
+
+			$moduleSettings = $modulePackage->moduleSettings('Components')->get($this->getData());
 
 			$this->view->components = $settingsModule->packagesData->components;
 
@@ -60,7 +74,7 @@ class SettingsComponent extends BaseComponent
 			$this->view->settings = $settingsModule->packagesData->settings;
 		}
 
-		$this->view->type = $moduleSettings->packagesData->type;
+		$this->view->type = $this->getData()['type'];
 
 		$this->view->thisApplication = $this->modules->applications->getApplicationInfo();
 
@@ -85,46 +99,18 @@ class SettingsComponent extends BaseComponent
 
 			return $this->sendJson();
 		}
+	}
 
-			// if ($this->postData()['type'] === 'applications') {
+	public function testEmailAction()
+	{
+		$emailTest = $this->usePackage(Module::class)->testEmail();
 
-			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
+		if ($emailTest->runTest($this->postData())) {
+			$this->view->responseCode = $emailTest->packagesData->responseCode;
 
-			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
+			$this->view->responseMessage = $emailTest->packagesData->responseMessage;
 
-			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
-
-			// } else if ($this->postData()['type'] === 'components') {
-
-			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
-
-			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
-
-			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
-
-			// } else if ($this->postData()['type'] === 'packages') {
-
-			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
-
-			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
-
-			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
-
-			// } else if ($this->postData()['type'] === 'middlewares') {
-
-			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
-
-			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
-
-			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
-
-			// } else if ($this->postData()['type'] === 'views') {
-
-			// 	$this->view->responseCode = $moduleSettings->packagesData->responseCode;
-
-			// 	$this->view->responseMessage = $moduleSettings->packagesData->responseMessage;
-
-			// 	$this->flashSession->success($moduleSettings->packagesData->responseMessage);
-			// }
+			return $this->sendJson();
+		}
 	}
 }

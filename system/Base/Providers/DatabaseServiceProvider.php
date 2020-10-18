@@ -10,10 +10,12 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
+		$dbConfig = $container->getShared('config')->db;
+
 		$container->setShared(
 			'db',
-			function () use ($container) {
-				return (new Pdo($container))->init();
+			function () use ($dbConfig) {
+				return (new Pdo($dbConfig))->init();
 			}
 		);
 	}

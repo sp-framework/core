@@ -2,28 +2,27 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use Phalcon\Storage\SerializerFactory;
 use Phalcon\Cache\AdapterFactory;
 use Phalcon\Cache\CacheFactory;
 
 class ApcuCache
 {
-    private $container;
-
     protected $cache;
 
-    public function __construct(DiInterface $container)
+    protected $cacheConfig;
+
+    public function __construct($cacheConfig)
     {
-        $this->container = $container;
+        $this->cacheConfig = $cacheConfig;
     }
 
     public function init()
     {
-        if ($this->container->getShared('config')->cache) {
+        if ($this->cacheConfig) {
             $options = [
                 'defaultSerializer' => 'Json',
-                'lifetime'          => $this->container->getShared('config')->cacheTimeout
+                'lifetime'          => $this->cacheConfig->timeout
             ];
 
             $serializerFactory = new SerializerFactory();

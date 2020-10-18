@@ -31,7 +31,19 @@
 		}]
 	},
 	"settings"		: {
-		"view" 			: "Default",
-		"component" 	: "Modules"
+		"domain"			: "",
+		"view" 				: "Default",
+		"component" 		: "Modules",
+		"errorComponent"	: "Errors",
+		"email"				: {
+			"enabled"			: false,
+			"encryption"	 	: "",
+			"allow_html_body"	: "",
+			"host"				: "",
+			"port"				: "",
+			"auth" 				: "",
+			"username"			: "",
+			"password"			: ""
+		}
 	}
 }

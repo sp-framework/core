@@ -12,19 +12,19 @@
 		},
 		"components"	:
 		[{
-			"name"		: "Hw",
+			"name"		: "Home",
 			"version"	: "0.0.1",
 			"repo"		: "https://"
 		}],
 		"packages"		:
 		[{
-			"name"		: "Hw",
+			"name"		: "Home",
 			"version"	: "0.0.1",
 			"repo"		: "https://"
 		}],
 		"middlewares"	:
 		[{
-			"name"		: "Hw",
+			"name"		: "Home",
 			"version"	: "0.0.1",
 			"repo"		: "https://"
 		}],
@@ -36,8 +36,19 @@
 		}]
 	},
 	"settings"		: {
-		"view" 			: "Default",
-		"component" 	: "Hw",
-		"errorComponent": "Errors"
+		"domain"			: "",
+		"view" 				: "Default",
+		"component" 		: "Home",
+		"errorComponent"	: "Errors",
+		"email"				: {
+			"enabled"			: false,
+			"encryption"	 	: "",
+			"allow_html_body"	: "",
+			"host"				: "",
+			"port"				: "",
+			"auth" 				: "",
+			"username"			: "",
+			"password"			: ""
+		}
 	}
 }

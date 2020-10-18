@@ -4,7 +4,9 @@
 	{% set route = thisApplication['name']|lower %}
 {% endif %}
 
-{% if type == 'applications' %}
+{% if type == 'core' %}
+	{% include 'settings/core.html' %}
+{% elseif type == 'applications' %}
 	{% include 'settings/applications.html' %}
 {# {% elseif type == 'components' %}
 	{% include 'settings/components.html' %}

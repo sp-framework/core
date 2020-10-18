@@ -2,19 +2,17 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
-use Phalcon\Di\DiInterface;
 use System\Base\Providers\ModulesServiceProvider\Modules\Applications;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Core;
+use System\Base\Providers\ModulesServiceProvider\Modules\Domains;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
-use System\Base\Providers\ModulesServiceProvider\Modules\Views;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
+use System\Base\Providers\ModulesServiceProvider\Modules\Views;
 
 class Modules
 {
-	private $container;
-
 	protected $core;
 
 	protected $applications;
@@ -29,9 +27,10 @@ class Modules
 
 	protected $repositories;
 
-	public function __construct(DiInterface $container)
+	protected $domains;
+
+	public function __construct()
 	{
-		$this->container = $container;
 	}
 
 	public function __get($name)
@@ -94,5 +93,12 @@ class Modules
 		$this->repositories = (new Repositories())->init();
 
 		return $this->repositories;
+	}
+
+	protected function initDomains()
+	{
+		$this->domains = (new Domains())->init();
+
+		return $this->domains;
 	}
 }

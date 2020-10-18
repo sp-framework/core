@@ -1,0 +1,31 @@
+{
+	"name"			: "Home",
+	"displayName" 	: "Component Home (Barebone)",
+	"description"	: "Component Home (Barebone)",
+	"version"		: "0.0.1",
+	"repo"			: "https://",
+	"path"			: "/",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Barebone",
+			"version"	: "0.0.1",
+			"repo"		: "https://"
+		},
+		"components"	: [],
+		"packages"		:
+		[{
+			"name"		: "Barebone",
+			"version"	: "0.0.1",
+			"repo"		: "https://"
+		}],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

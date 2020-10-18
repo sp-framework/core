@@ -3,5 +3,37 @@
 	"displayName" 	: "Hello World Framework (Core)",
 	"description" 	: "Hello World Framework Core",
 	"version" 		: "0.0.1",
-	"repo" 			: "https://github.com/h-w-f/core"
+	"repo" 			: "https://github.com/h-w-f/core",
+	"settings"      : {
+		"debug"			: "",
+		"db"			: {
+			"host" 			: "",
+			"dbname" 		: "",
+			"username" 		: "",
+			"password" 		: "",
+			"port" 			: ""
+		},
+		"cache"			: {
+			"enabled"		: "",
+			"timeout"		: 60,
+			"service"		: "streamCache"
+		},
+		"logs"			: {
+			"enabled"			: "true",
+			"level"				: "DEBUG",
+			"service"			: "streamLogs",
+			"email"				: "false",
+			"emergencyEmails"	: ""
+		},
+		"email"			: {
+			"enabled"			: false,
+			"encryption"	 	: "",
+			"allow_html_body"	: "",
+			"host"				: "",
+			"port"				: "",
+			"auth" 				: "",
+			"username"			: "",
+			"password"			: ""
+		}
+	}
 }

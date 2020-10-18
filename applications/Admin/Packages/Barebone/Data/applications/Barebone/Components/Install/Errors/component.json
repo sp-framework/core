@@ -1,7 +1,7 @@
 {
 	"name"			: "Errors",
-	"displayName" 	: "Component Hello World (Barebone)",
-	"description"	: "Component Hello World (Barebone)",
+	"displayName" 	: "Component Errors (Barebone)",
+	"description"	: "Component Errors (Barebone)",
 	"version"		: "0.0.1",
 	"repo"			: "https://",
 	"path"			: "/",
