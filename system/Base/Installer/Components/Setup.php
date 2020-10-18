@@ -84,9 +84,12 @@ Class Setup
 
 			$this->setupPackage->registerRepository();
 
-			$coreJson = json_decode($this->container->getShared('localContent')->read('core.json'), true);
+			$baseConfig =
+				$this->setupPackage->writeConfigs(
+					json_decode($this->container->getShared('localContent')->read('core.json'), true)
+				);
 
-			$this->setupPackage->registerCore($coreJson);
+			$this->setupPackage->registerCore($baseConfig);
 
 			$adminApplicationId = $this->setupPackage->registerModule('applications', null);
 
@@ -104,7 +107,6 @@ Class Setup
 
 			}
 
-			$this->setupPackage->writeConfigs($coreJson);
 
 			// $this->setupPackage->removeInstaller();
 

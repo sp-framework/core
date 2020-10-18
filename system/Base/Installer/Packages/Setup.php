@@ -116,13 +116,13 @@ class Setup
 		(new Repository())->register($this->db);
 	}
 
-	public function registerCore(array $coreFile)
+	public function registerCore(array $baseConfig)
 	{
 		$installedFiles = $this->getInstalledFiles('system/');
 
 		array_push($installedFiles['files'], 'index.php', 'core.json');
 
-		(new RegisterCore())->register($installedFiles, $coreFile, $this->db, $this->postData);
+		(new RegisterCore())->register($installedFiles, $baseConfig, $this->db);
 	}
 
 	public function registerModule($type, $newApplicationId)
@@ -268,7 +268,7 @@ class Setup
 
 	public function writeConfigs($coreJson)
 	{
-		(new Configs())->write($this->container, $this->postData, $coreJson);
+		return (new Configs())->write($this->container, $this->postData, $coreJson);
 	}
 
 	public function removeInstaller()

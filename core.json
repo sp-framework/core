@@ -20,10 +20,20 @@
 		},
 		"logs"			: {
 			"enabled"			: "true",
-			"email"				: "false",
-			"service"			: "streamLogs",
 			"level"				: "DEBUG",
+			"service"			: "streamLogs",
+			"email"				: "false",
 			"emergencyEmails"	: ""
+		},
+		"email"			: {
+			"enabled"			: false,
+			"encryption"	 	: "",
+			"allow_html_body"	: "",
+			"host"				: "",
+			"port"				: "",
+			"auth" 				: "",
+			"username"			: "",
+			"password"			: ""
 		}
 	}
 }

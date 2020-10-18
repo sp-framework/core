@@ -7,7 +7,7 @@ use System\Base\BaseComponent;
 
 class ModulesComponent extends BaseComponent
 {
-	public function viewActio()
+	public function viewAction()
 	{
 		$modules = $this->usePackage(ModulesPackage::class);
 

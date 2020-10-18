@@ -6,7 +6,7 @@ class Configs
 {
 	public function write($container, $postData, $coreJson)
 	{
-		$this->writeBaseConfig($container, $postData, $coreJson);
+		return $this->writeBaseConfig($container, $postData, $coreJson);
 	}
 
 	protected function writeBaseConfig($container, $postData, $coreJson)
@@ -44,13 +44,35 @@ return
 		"logs"			=>
 		[
 			"enabled"			=> true,
-			"email"				=> false,
-			"service"			=> "' . $coreJson['settings']['logs']['service'] . '", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"level"				=> "' . $logLevel . '",
+			"service"			=> "' . $coreJson['settings']['logs']['service'] . '", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
+			"email"				=> false,
 			"emergencyEmails"	=> "' . $coreJson['settings']['logs']['emergencyEmails'] . '",
+		],
+		"email"			=>
+		[
+			"enabled"			=> false,
+			"encryption"	 	=> "",
+			"allow_html_body"	=> "",
+			"host"				=> "",
+			"port"				=> "",
+			"auth" 				=> "",
+			"username"			=> "",
+			"password"			=> ""
 		]
 	];';
 
 		$container['localContent']->put('/system/Configs/Base.php', $baseContent);
+
+		$coreJson['settings']['debug'] = $debug;
+		$coreJson['settings']['db']['host'] = $postData['host'];
+		$coreJson['settings']['db']['dbname'] = $postData['database_name'];
+		$coreJson['settings']['db']['username'] = $postData['username'];
+		$coreJson['settings']['db']['password'] = $postData['password'];
+		$coreJson['settings']['db']['port'] = $postData['port'];
+		$coreJson['settings']['cache']['enabled'] = $cache;
+		$coreJson['settings']['logs']['level'] = $logLevel;
+
+		return $coreJson;
 	}
 }

@@ -31,11 +31,11 @@ class Service
 	{
 		include('../system/Base/Helpers.php');
 
-		// try {
+		try {
 			$config = include('../system/Configs/Base.php');
-		// } catch (\ErrorException $e) {
-		// 	throw new \Exception("Base.php file in configs directory missing");
-		// }
+		} catch (\ErrorException $e) {
+			throw new \Exception("Base.php file in configs directory missing");
+		}
 
 		if (isset($config['debug'])) {
 			self::$mode = $config['debug'];
