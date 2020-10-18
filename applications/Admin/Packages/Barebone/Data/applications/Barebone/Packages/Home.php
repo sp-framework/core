@@ -4,7 +4,7 @@ namespace Packages\Barebone;
 
 use System\Base\BasePackage;
 
-class Hw extends BasePackage
+class Home extends BasePackage
 {
 
 }

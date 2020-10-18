@@ -1,7 +1,7 @@
 {
-	"name"			: "Hw",
-	"displayName" 	: "Hello World Package (Barebone)",
-	"description"	: "Hello World Package (Barebone)",
+	"name"			: "Home",
+	"displayName" 	: "Home Package (Barebone)",
+	"description"	: "Home Package (Barebone)",
 	"version"		: "0.0.1",
 	"repo"			: "https://",
 	"path"			: "/",

@@ -29,7 +29,7 @@ class Modify extends BasePackage
 				$componentFile = str_replace('Barebone', $names['applicationName'], $componentFile);
 
 				if ($postData['task'] === 'component') {
-					$componentFile = str_replace('Hw', $names['componentName'], $componentFile);
+					$componentFile = str_replace('Home', $names['componentName'], $componentFile);
 				}
 
 				$this->localContent->put($file, $componentFile);
@@ -46,7 +46,7 @@ class Modify extends BasePackage
 				$componentFile = str_replace('Barebone', $names['applicationName'], $componentFile);
 
 				if ($postData['task'] === 'component') {
-					$componentFile = str_replace('Hw', $names['componentName'], $componentFile);
+					$componentFile = str_replace('Home', $names['componentName'], $componentFile);
 					$componentFile = str_replace('Hello World', $names['componentName'], $componentFile);
 				}
 
@@ -65,7 +65,7 @@ class Modify extends BasePackage
 				$packageFile = str_replace('Barebone', $names['applicationName'], $packageFile);
 
 				if ($postData['task'] === 'package') {
-					$packageFile = str_replace('Hw', $names['packageName'], $packageFile);
+					$packageFile = str_replace('Home', $names['packageName'], $packageFile);
 				}
 
 				$this->localContent->put($file, $packageFile);
@@ -83,7 +83,7 @@ class Modify extends BasePackage
 				$packageFile = str_replace('Barebone', $names['applicationName'], $packageFile);
 
 				if ($postData['task'] === 'package') {
-					$packageFile = str_replace('Hw', $names['packageName'], $packageFile);
+					$packageFile = str_replace('Home', $names['packageName'], $packageFile);
 					$packageFile = str_replace('Hello World', $names['packageName'], $packageFile);
 				}
 
@@ -103,7 +103,7 @@ class Modify extends BasePackage
 				$middlewareFile = str_replace('Barebone', $names['applicationName'], $middlewareFile);
 
 				if ($postData['task'] === 'middleware') {
-					$middlewareFile = str_replace('Hw', $names['middlewareName'], $middlewareFile);
+					$middlewareFile = str_replace('Home', $names['middlewareName'], $middlewareFile);
 				}
 
 				$this->localContent->put($file, $middlewareFile);
@@ -122,7 +122,7 @@ class Modify extends BasePackage
 				$middlewareFile = str_replace('Barebone', $names['applicationName'], $middlewareFile);
 
 				if ($postData['task'] === 'middleware') {
-					$middlewareFile = str_replace('Hw', $names['middlewareName'], $middlewareFile);
+					$middlewareFile = str_replace('Home', $names['middlewareName'], $middlewareFile);
 					$middlewareFile = str_replace('Hello World', $names['middlewareName'], $middlewareFile);
 				}
 

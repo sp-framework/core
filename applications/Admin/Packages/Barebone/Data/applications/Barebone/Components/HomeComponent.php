@@ -4,10 +4,10 @@ namespace Applications\Barebone\Components;
 
 use System\Base\BaseComponent;
 
-class HwComponent extends BaseComponent
+class HomeComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		echo "Hw Component";
+		echo "Home Component";
 	}
 }

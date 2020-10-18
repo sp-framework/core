@@ -8,7 +8,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use System\Base\BaseMiddleware;
 
-class Hw extends BaseMiddleware implements MiddlewareInterface
+class Home extends BaseMiddleware implements MiddlewareInterface
 {
 	public function process(ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface
 	{

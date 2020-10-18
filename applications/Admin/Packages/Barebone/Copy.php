@@ -39,42 +39,42 @@ class Copy extends BasePackage
 			}
 
 			if ($postData['task'] === 'component') {
-				if (strpos($content['basename'], 'Hw') !== false) {
+				if (strpos($content['basename'], 'Home') !== false) {
 					$content['basename'] =
-						str_replace('Hw', $names['componentName'], $content['basename']);
+						str_replace('Home', $names['componentName'], $content['basename']);
 				}
-				if (strpos($content['dirname'], 'Hw') !== false) {
+				if (strpos($content['dirname'], 'Home') !== false) {
 					$content['dirname'] =
-						str_replace('Hw', $names['componentName'], $content['dirname']);
+						str_replace('Home', $names['componentName'], $content['dirname']);
 				}
 
-				$destDir = str_replace('Hw', $names['componentName'], $destDir);
+				$destDir = str_replace('Home', $names['componentName'], $destDir);
 			}
 			// var_dump($content);
 			if ($postData['task'] === 'package') {
-				if (strpos($content['basename'], 'Hw') !== false) {
+				if (strpos($content['basename'], 'Home') !== false) {
 					$content['basename'] =
-						str_replace('Hw', $names['packageName'], $content['basename']);
+						str_replace('Home', $names['packageName'], $content['basename']);
 				}
-				if (strpos($content['dirname'], 'Hw') !== false) {
+				if (strpos($content['dirname'], 'Home') !== false) {
 					$content['dirname'] =
-						str_replace('Hw', $names['packageName'], $content['dirname']);
+						str_replace('Home', $names['packageName'], $content['dirname']);
 				}
 
-				$destDir = str_replace('Hw', $names['packageName'], $destDir);
+				$destDir = str_replace('Home', $names['packageName'], $destDir);
 			}
 
 			if ($postData['task'] === 'middleware') {
-				if (strpos($content['basename'], 'Hw') !== false) {
+				if (strpos($content['basename'], 'Home') !== false) {
 					$content['basename'] =
-						str_replace('Hw', $names['middlewareName'], $content['basename']);
+						str_replace('Home', $names['middlewareName'], $content['basename']);
 				}
-				if (strpos($content['dirname'], 'Hw') !== false) {
+				if (strpos($content['dirname'], 'Home') !== false) {
 					$content['dirname'] =
-						str_replace('Hw', $names['middlewareName'], $content['dirname']);
+						str_replace('Home', $names['middlewareName'], $content['dirname']);
 				}
 
-				$destDir = str_replace('Hw', $names['middlewareName'], $destDir);
+				$destDir = str_replace('Home', $names['middlewareName'], $destDir);
 			}
 
 			if ($postData['task'] === 'view') {

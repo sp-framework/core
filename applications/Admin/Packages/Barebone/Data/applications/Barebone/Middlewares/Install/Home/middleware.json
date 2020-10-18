@@ -1,10 +1,11 @@
 {
-	"name"			: "Hw",
-	"displayName" 	: "Component Hello World (Barebone)",
-	"description"	: "Component Hello World (Barebone)",
+	"name"			: "Home",
+	"displayName" 	: "Home Middleware (Barebone)",
+	"description"	: "Home Middleware (Barebone)",
 	"version"		: "0.0.1",
 	"repo"			: "https://",
 	"path"			: "/",
+	"class"			: "Middlewares\\Barebone\\Home",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
@@ -17,12 +18,7 @@
 			"repo"		: "https://"
 		},
 		"components"	: [],
-		"packages"		:
-		[{
-			"name"		: "Barebone",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		}],
+		"packages"		: [],
 		"middlewares"	: [],
 		"views"			: []
 	},
