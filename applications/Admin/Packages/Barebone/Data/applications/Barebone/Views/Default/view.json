@@ -10,7 +10,7 @@
 			"version"   : "0.0.1",
 			"repo"      : "https://github.com/h-w-f/core"
 		},
-		"application"  : {
+		"application"  	: {
 			"name"      : "Barebone",
 			"version"   : "0.0.1",
 			"repo"      : "https://github.com/h-w-f/application-admin"
@@ -21,18 +21,19 @@
 		"views"         : []
 	},
 	"settings"      : {
-		"cache": false,
-		"layout": "default",
+		"cache"		: false,
+		"layout"	: "default",
 		"head": {
-			"title": "Barebone - ",
-			"meta": {
-				"viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
-				"description": "Barebone Views",
-				"author": "Guru",
-				"keywords": "HTML, CSS, JavaScript"
+			"title"		: "Barebone - ",
+			"meta"		: {
+				"charset"		: "UTF-8",
+				"viewport"		: "width=device-width, initial-scale=1, shrink-to-fit=no",
+				"description"	: "Barebone Views",
+				"author"		: "Guru",
+				"keywords"		: "HTML, CSS, JavaScript"
 			},
-			"link": {
-				"href": [
+			"link"		: {
+				"href"	: [
 					"Barebone/Default/css/bootstrap.min.css",
 					"Barebone/Default/css/font-awesome.min.css",
 					"Barebone/Default/css/PNotify.min.css",
@@ -40,27 +41,27 @@
 					"Barebone/Default/css/core.css"
 				]
 			},
-			"script": {
-				"src": [
+			"script"	: {
+				"src"	: [
 					"Barebone/Default/js/jquery-3.5.1.min.js",
 					"Barebone/Default/js/bootstrap.min.js"
 				]
 			}
 		},
 		"body": {
-			"params": "id=\"body\" class=\"body\"",
-			"jsscript": ""
+			"params"	: "id=\"body\" class=\"body\"",
+			"jsscript"	: ""
 		},
 		"footer": {
-			"params": "class=\"footer\"",
-			"script": {
-				"src": [
+			"params"	: "class=\"footer\"",
+			"script"	: {
+				"src"	: [
 					"Barebone/Default/js/PNotify.min.js",
 					"Barebone/Default/js/sortable.min.js",
 					"Barebone/Default/js/swal2.min.js"
 				]
 			},
-			"jsscript": "PNotify.defaultModules.set(PNotifyBootstrap4, {});PNotify.defaultModules.set(PNotifyFontAwesome5, {});"
+			"jsscript"	: "PNotify.defaultModules.set(PNotifyBootstrap4, {});PNotify.defaultModules.set(PNotifyFontAwesome5, {});"
 		}
 	}
 }

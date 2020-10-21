@@ -2,6 +2,8 @@
 
 namespace System\Base;
 
+use Phalcon\Assets\Collection;
+use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Controller;
@@ -190,33 +192,72 @@ abstract class BaseComponent extends Controller
 
 	protected function buildAssets()
 	{
-		$headLinks = $this->assets->collection('headLinks');
-		$headStyle = $this->assets->collection('headStyle');
-		$headJs = $this->assets->collection('headJs');
-		$footerJs = $this->assets->collection('footerJs');
-
 		if ($this->modules->views->getViewInfo()) {
+
 			$settings = json_decode($this->modules->views->getViewInfo()['settings'], true);
 
+			//Meta
+			$meta = $this->assets->collection('meta');
+
+			if (isset($settings['head']['meta']['charset'])) {
+				$charset = $settings['head']['meta']['charset'];
+			} else {
+				$charset = 'UTF-8';
+			}
+
+			$meta->addInline(new Inline('charset', $charset));
+
+			$meta->addInline(
+				new Inline('description', $settings['head']['meta']['description'])
+			);
+			$meta->addInline(
+				new Inline('keywords', $settings['head']['meta']['keywords'])
+			);
+			$meta->addInline(
+				new Inline('author', $settings['head']['meta']['author'])
+			);
+			$meta->addInline(
+				new Inline('viewport', $settings['head']['meta']['viewport'])
+			);
+
+			//Head - Css
+			$headLinks = $this->assets->collection('headLinks');
 			$links = $settings['head']['link']['href'];
-			$scripts = $settings['head']['script']['src'];
-			$inlineStyle = $settings['head']['style'] ?? null;
 			if (count($links) > 0) {
 				foreach ($links as $link) {
 					$headLinks->addCss($link);
 				}
 			}
 
+			//Head - Style
+			$headStyle = $this->assets->collection('headStyle');
+			$inlineStyle = $settings['head']['style'] ?? null;
+			if ($inlineStyle) {
+				$this->assets->addInlineCss($inlineStyle);
+			}
+
+			//Head - Js
+			$headJs = $this->assets->collection('headJs');
+			$scripts = $settings['head']['script']['src'];
 			if (count($scripts) > 0) {
 				foreach ($scripts as $script) {
 					$headJs->addJs($script);
 				}
 			}
 
-			if ($inlineStyle) {
-				$this->assets->addInlineCss($inlineStyle);
-			}
+			//Body
+			$body = $this->assets->collection('body');
+			$body->addInline(new Inline('bodyParams', $settings['body']['params']));
 
+			//Body - Js Scripts right after Body tag
+			$body->addInline(new Inline('bodyScript', $settings['body']['jsscript']));
+
+			//Footer - <footer tag parameters>
+			$footer = $this->assets->collection('footer');
+			$footer->addInline(new Inline('footerParams', $settings['footer']['params']));
+
+			//Footer - Js Scripts
+			$footerJs = $this->assets->collection('footerJs');
 			$scripts = $settings['footer']['script']['src'];
 			if (count($scripts) > 0) {
 				foreach ($scripts as $script) {
@@ -224,8 +265,8 @@ abstract class BaseComponent extends Controller
 				}
 			}
 
+			// Footer inline scripts
 			$inlineScript = $settings['footer']['jsscript'] ?? null;
-
 			if ($inlineScript && $inlineScript !== '') {
 				$this->assets->addInlineJs($inlineScript);
 			}
