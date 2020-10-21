@@ -3,28 +3,13 @@
 namespace System\Base\Providers\ViewServiceProvider;
 
 use Phalcon\Mvc\View as PhalconView;
-use Phalcon\Mvc\ViewBaseInterface;
 use Phalcon\Mvc\View\Engine\Php as PhpTemplateService;
-use Phalcon\Mvc\View\Engine\Volt;
-use System\Base\Providers\ModulesServiceProvider\Views\ViewsData;
 
 class View
 {
 	protected $phalconView;
 
 	protected $views;
-
-	protected $view;
-
-	protected $applications;
-
-	protected $applicationInfo;
-
-	protected $db;
-
-	protected $path;
-
-	protected $cache;
 
 	public function __construct($views)
 	{
@@ -45,7 +30,7 @@ class View
 
 		$this->phalconView->registerEngines(
 			[
-				'.html'     => 'voltTemplateService',
+				'.html'     => 'volt',
 				'.phtml'    => PhpTemplateService::class
 			]
 		);

@@ -5,35 +5,20 @@ namespace System\Base\Providers;
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Mvc\ViewBaseInterface;
-use Phalcon\Mvc\View\Engine\Volt;
 use System\Base\Providers\ViewServiceProvider\View;
+use System\Base\Providers\ViewServiceProvider\Volt;
 
 class ViewServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
+		$cache = $container->getShared('modules')->views->getCache();
+		$compiledPath = $container->getShared('modules')->views->getVoltCompiledPath();
+
 		$container->setShared(
-			'voltTemplateService',
-			function(ViewBaseInterface $view) {
-
-				$this->volt = new Volt($view, $this);
-
-				if ($this->getShared('modules')->views->getCache()) {
-					$always = false;
-				} else {
-					$always = true;
-				}
-
-				$this->volt->setOptions(
-					[
-						'always'        => $always,
-						'separator'     => '-',
-						'stat'          => true,
-						'path'          => $this->getShared('modules')->views->getVoltCompiledPath()
-					]
-				);
-
-				return $this->volt;
+			'volt',
+			function(ViewBaseInterface $view) use ($container, $cache, $compiledPath) {
+				return (new Volt($view))->init($container, $cache, $compiledPath);
 			}
 		);
 
