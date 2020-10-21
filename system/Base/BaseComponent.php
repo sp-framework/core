@@ -22,6 +22,8 @@ abstract class BaseComponent extends Controller
 		if (!$this->isJson() || $this->request->isAjax()) {
 			$this->checkLayout();
 		}
+
+		$this->view->widget = $this->widget;
 	}
 
 	protected function setDefaultViewResponse()
