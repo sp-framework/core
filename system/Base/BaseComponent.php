@@ -116,9 +116,7 @@ abstract class BaseComponent extends Controller
 							);
 				return;
 			}
-		}
-
-		if ($this->request->isGet()) {
+		} else if ($this->request->isGet()) {
 			if (count($this->dispatcher->getParams()) > 0) {
 				$this->buildGetQueryParamsArr();
 
@@ -162,6 +160,14 @@ abstract class BaseComponent extends Controller
 				$this->buildAssets();
 				return;
 			}
+		} else {
+			$this->view->disableLevel(
+							[
+								View::LEVEL_LAYOUT 		=> true,
+								View::LEVEL_MAIN_LAYOUT => true
+							]
+						);
+			return;
 		}
 	}
 
@@ -280,7 +286,7 @@ abstract class BaseComponent extends Controller
 		$this->application = $this->modules->applications->getApplicationInfo();
 
 		if ($this->checkPackage($packageClass)) {
-			return new $packageClass($this->container);
+			return new $packageClass();
 		} else {
 			throw new \Exception(
 				'Package class : ' . $packageClass .
@@ -298,6 +304,56 @@ abstract class BaseComponent extends Controller
 			);
 	}
 
+	protected function useComponent($componentClass)
+	{
+		$this->application = $this->modules->applications->getApplicationInfo();
+
+		if ($this->checkComponent($componentClass)) {
+			return new $componentClass();
+		} else {
+			throw new \Exception(
+				'Component class : ' . $componentClass .
+				' not available for application ' . $this->application['name']
+			);
+		}
+	}
+
+	protected function checkComponent($componentClass)
+	{
+		return
+			$this->modules->components->getNamedComponentForApplication(
+				str_replace('Component', '', Arr::last(explode('\\', $componentClass))),
+				$this->application['id']
+			);
+	}
+
+	protected function useComponentWithView($componentClass, $action = 'view')
+	{
+		//To Use from Component - $this->useComponentWithView(HomeComponent::class);
+		//This will generate 2 view variables 1) {{home}} & {{homeTemplate}}
+		$this->application = $this->modules->applications->getApplicationInfo();
+
+		$component = $this->checkComponent($componentClass);
+
+		if ($component) {
+			$componentName = strtolower($component['name']);
+			$componentAction = $action . 'Action';
+			$componentViewName = strtolower($component['name']) . 'Template';
+
+			var_dump($componentName,$componentAction,$componentViewName);
+
+			$this->view->{$componentName} =
+				$this->useComponent($componentClass)->{$componentAction}();
+
+			$this->view->setRenderLevel(View::LEVEL_ACTION_VIEW);
+
+			$this->view->{$componentViewName} =
+				$this->view->render($componentName, $action)->getContent();
+
+			$this->view->setRenderLevel(View::LEVEL_MAIN_LAYOUT);
+		}
+
+	}
 	// protected function generateView()
 	// {
 	// 	$this->getDefaults();
