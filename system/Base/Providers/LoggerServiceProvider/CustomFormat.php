@@ -23,6 +23,8 @@ class CustomFormat extends AbstractFormatter
 
 		$this->sessionId = $sessionId;
 
+		$this->connectionId = $connectionId;
+
 		$this->clientIpAddress = $clientIpAddress;
 	}
 

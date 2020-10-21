@@ -15,6 +15,7 @@ $container = new FactoryDefault();
 include('../system/Base/Providers/SessionServiceProvider.php');
 $container->register(new SessionServiceProvider());
 $session = $container->getShared('session');
+$connection = $container->getShared('connection');
 $session->start();
 
 foreach (include(base_path('system/Base/Providers.php')) as $provider) {
@@ -25,7 +26,7 @@ $error = $container->getShared('error');
 $logger = $container->getShared('logger');
 
 $logger->log->info(
-	'Session ID: ' . $session->getId() . '. Connection ID: ' . $session->getId()
+	'Session ID: ' . $session->getId() . '. Connection ID: ' . $connection->getId()
 );
 
 $application = new Application($container);
@@ -37,12 +38,12 @@ $logger->log->debug('Dispatched');
 if (!$response->isSent()) {
 	$response->send();
 
-	$logger->log->debug('Response Sent. Session End');
+	$logger->log->debug('Response Sent.');
 
 } else {
 	echo $response->getContent();
 
-	$logger->log->debug('Response Echoed. Session End');
+	$logger->log->debug('Response Echoed.');
 }
 
 $logger->log->info('Session End');

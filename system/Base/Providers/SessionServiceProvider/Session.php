@@ -17,6 +17,7 @@ class Session
     {
         $this->session = new Manager();
 
+
         if ($this->checkCachePath()) {
             $savePath = base_path('var/storage/cache/session/');
         } else {
@@ -43,10 +44,5 @@ class Session
         }
 
         return true;
-    }
-
-    public function getConnectionId()
-    {
-        return $this->customFormatter->getConnectionId();
     }
 }
