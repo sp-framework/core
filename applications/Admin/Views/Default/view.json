@@ -24,7 +24,7 @@
         "cache": false,
         "layout": "default",
         "head": {
-            "title": "Admin - ",
+            "title": "Admin",
             "meta": {
                 "viewport": "width=device-width, initial-scale=1, shrink-to-fit=no",
                 "description": "Admin Views",

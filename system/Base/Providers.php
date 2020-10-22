@@ -3,11 +3,11 @@
 return
 	[
 		'System\Base\Providers\ConfigServiceProvider',
-		'System\Base\Providers\HttpServiceProvider',
 		'System\Base\Providers\SessionServiceProvider',
 		'System\Base\Providers\DatabaseServiceProvider',
 		'System\Base\Providers\CacheServiceProvider',
 		'System\Base\Providers\ModulesServiceProvider',
+		'System\Base\Providers\HttpServiceProvider',
 		'System\Base\Providers\EmailServiceProvider',
 		'System\Base\Providers\LoggerServiceProvider',
 		'System\Base\Providers\ContentServiceProvider',

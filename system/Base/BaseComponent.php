@@ -8,6 +8,7 @@ use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
+use Phalcon\Tag;
 
 abstract class BaseComponent extends Controller
 {
@@ -24,6 +25,13 @@ abstract class BaseComponent extends Controller
 		}
 
 		$this->view->widget = $this->widget;
+
+		$this->reflection = new \ReflectionClass($this);
+
+		$this->componentName =
+			str_replace('Component', '', $this->reflection->getShortName());
+
+		$this->view->componentName = $this->componentName;
 	}
 
 	protected function setDefaultViewResponse()
@@ -203,6 +211,18 @@ abstract class BaseComponent extends Controller
 		if ($this->modules->views->getViewInfo()) {
 
 			$settings = json_decode($this->modules->views->getViewInfo()['settings'], true);
+
+			$this->tag::setDocType(Tag::XHTML5);
+
+			if (isset($settings['head']['title'])) {
+				Tag::setTitle($settings['head']['title']);
+
+				if (isset($this->componentName)) {
+					Tag::appendTitle(' - ' . $this->componentName);
+				}
+			} else {
+				Tag::setTitle('Title Missing In Application Configuration');
+			}
 
 			//Meta
 			$meta = $this->assets->collection('meta');

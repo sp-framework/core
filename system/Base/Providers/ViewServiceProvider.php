@@ -5,6 +5,7 @@ namespace System\Base\Providers;
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Mvc\ViewBaseInterface;
+use System\Base\Providers\ViewServiceProvider\Tag;
 use System\Base\Providers\ViewServiceProvider\View;
 use System\Base\Providers\ViewServiceProvider\Volt;
 
@@ -28,6 +29,13 @@ class ViewServiceProvider implements ServiceProviderInterface
 			'view',
 			function () use ($views) {
 				return (new View($views))->init();
+			}
+		);
+
+		$container->setShared(
+			'tag',
+			function () {
+				return (new Tag())->init();
 			}
 		);
 	}
