@@ -231,7 +231,7 @@ class Views extends BasePackage
         }
     }
 
-    protected function setPhalconViewLayoutFile()
+    public function setPhalconViewLayoutFile()
     {
         if (!isset($this->phalconViewLayoutFile)) {
             if ($this->view) {
