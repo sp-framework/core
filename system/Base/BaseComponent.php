@@ -14,7 +14,11 @@ abstract class BaseComponent extends Controller
 {
 	protected $getQueryArr = [];
 
-	protected $views;
+	protected $applicationName;
+
+	protected $componentName;
+
+	protected $viewName;
 
 	protected function onConstruct()
 	{
@@ -26,12 +30,18 @@ abstract class BaseComponent extends Controller
 
 		$this->view->widget = $this->widget;
 
+		$this->view->applicationName =
+			$this->modules->applications->getApplicationInfo()['name'];
+
 		$this->reflection = new \ReflectionClass($this);
 
 		$this->componentName =
 			str_replace('Component', '', $this->reflection->getShortName());
 
 		$this->view->componentName = $this->componentName;
+
+		$this->view->viewName =
+			$this->modules->views->getViewInfo()['name'];
 	}
 
 	protected function setDefaultViewResponse()
