@@ -1,29 +1,34 @@
-<!DOCTYPE html>
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+{{get_doctype()}}
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<meta name="description" content="">
-		<meta name="author" content="">
-		<title>Soaring Phalcon Framework</title>
-		{{assets.outputCss('headLinks')}}
-		{{assets.outputJs('headJs')}}
-		{{assets.outputInlineCss()}}
-	</head>
-	<body>
-		<div class="main-content">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col">
-						<div id="alert" class="alert mt-2 mb-2" hidden></div>
-					</div>
-				</div>
-				{{content()}}
-			</div>
-		</div>
-		<footer class="footer">
-			{{assets.outputJs('footerJs')}}
-			{{assets.outputInlineJs()}}
-		</footer>
-	</body>
+    <head>
+        {% for meta in assets.get('meta').getCodes() %}
+            {% if meta.getType() === 'charset' %}
+                <meta charset="{{meta.getContent()}}">
+            {% else %}
+                <meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
+            {% endif %}
+        {% endfor %}
+        {{renderTitle()}}
+        {{assets.outputCss('headLinks')}}
+        {{assets.outputJs('headJs')}}
+        {{assets.outputInlineCss()}}
+    </head>
+    {% if assets.get('body').getCodes()[0].getContent() !== '' %}
+        <body {{assets.get('body').getCodes()[0].getContent()}}>
+    {% else %}
+        <body id="body" class="sidebar-mini layout-fixed layout-navbar-fixed layout-footer-fixed text-sm">
+    {% endif %}
+        <script type="text/javascript" charset="utf-8">
+            {{assets.get('body').getCodes()[1].getContent()}}
+        </script>
+        <div class="wrapper">
+            {% include("layouts/default/header/view") %}
+            {% include("layouts/default/sidebar/view") %}
+            {% include("layouts/default/content/view") %}
+            {% include("layouts/default/controlsidebar/view") %}
+            {% include("layouts/default/footer/view") %}
+        </div>
+    </body>
 </html>
+<!-- htmlmin:ignore -->

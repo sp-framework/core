@@ -9,7 +9,7 @@ class BareboneComponent extends BaseComponent
 {
 	public function viewAction()
 	{
-		//
+		$this->view->applications = $this->modules->applications->applications;
 	}
 
 	public function installAction()

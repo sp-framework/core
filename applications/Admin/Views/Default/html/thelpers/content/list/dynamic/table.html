@@ -1,0 +1,81 @@
+{% if not sectionsListDatatableTableLengthMenu %}
+    {% set sectionsListDatatableTableLengthMenu = [ [20, 40, -1], [20, 40, "All"] ] %}
+{% endif %}
+{% if sectionsListDatatablePrimaryButtons %}
+    <div id="{{componentId}}-{{sectionId}}-primary-buttons" class="row mb-2">
+        <div class="col">
+            {{include('thelpers/buttons.html', sectionsListDatatablePrimaryButtons)}}
+        </div>
+    </div>
+{% endif %}
+{% if sectionsListDatatableTableStriped %}
+    {% set hasTableStriped = 'table-striped' %}
+{% endif %}
+{% if sectionsListDatatableTableBordered %}
+    {% set hasTableBordered = 'table-bordered' %}
+{% endif %}
+<div id="{{componentId}}-{{sectionId}}" class="row">
+    <div class="col">
+        <div class="row m-2 text-center" id="list-data-loader">
+            <div class="col">
+                <div class="fa-2x">
+                    <i class="fa fa-cog fa-spin"></i> Loading...
+                </div>
+            </div>
+        </div>
+        <table id="{{componentId}}-{{sectionId}}-table" class="table {{hasTableStriped}} {{hasTableBordered}}" style="margin:0 !important;" width="100%" cellspacing="0">
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<script>
+if (!window['bazDataCollection']['{{componentId}}']) {
+    window['bazDataCollection']['{{componentId}}'] = { };
+}
+window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
+    $.extend(window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'], {
+        '{{componentId}}-{{sectionId}}-table' : {
+            'listOptions'       : {
+                'componentName'         : '{{componentName}}',
+                'tableName'             : '{{componentId}}-{{sectionId}}-table',
+                'postURL'               : '{{table.ajax.url}}',
+                'postParams'            : {
+                    'operation'             : 'load',
+                    'results'               : '{{sectionsListDatatableTableNoOfResultsToShow|default(20)}}'
+                },
+                'datatable'     : {
+                    'columns'                           : JSON.parse('{{sectionsListDatatableTableColumns|json_encode|raw}}'),
+                    'NoOfColumnsToShow'                 : '{{sectionsListDatatableTableNoOfColumnsToShow|default("3")}}',
+                    'hasIdColumn'                       : '{{sectionsListDatatableTableHasIdColumn|default("true")}}',
+                    'hideIdColumn'                      : '{{sectionsListDatatableTableHideIdColumn|default("true")}}',
+                    'showHideColumnsButton'             : '{{sectionsListDatatableTableShowHideColumnsButton|default("true")}}',
+                    'showHideExportButton'              : '{{sectionsListDatatableTableShowHideExportButton|default("true")}}',
+                    'colReorder'                        : '{{sectionsListDatatableTableColReorder|default("false")}}',
+                    'stateSave'                         : '{{sectionsListDatatableTableStateSave|default("false")}}',
+                    'fixedHeader'                       : '{{sectionsListDatatableTableFixedHeader|default("true")}}',
+                    'searching'                         : '{{sectionsListDatatableTableSearching|default("true")}}',
+                    'responsive'                        : '{{sectionsListDatatableTableResponsive|default("true")}}',
+                    'paging'                            : '{{sectionsListDatatableTablePaging|default("false")}}',
+                    'lengthMenu'                        : JSON.parse('{{sectionsListDatatableTableLengthMenu|json_encode|e("js")}}'),
+                    'select'                            : '{{sectionsListDatatableTableSelect|default("false")}}',
+                    'selectAll'                         : '{{sectionsListDatatableTableSelectAll|default("false")}}',
+                    'selectStyle'                       : '{{sectionsListDatatableTableSelectStyle|default("single")}}',
+                    'disableColumnsOrdering'            : '{{sectionsListDatatableTableDisableColumnsOrdering|json_encode|e("js")}}',
+                    'zeroRecords'                       : '{{sectionsListDatatableTableZeroRecords|default("missing sectionsListDatatableTableZeroRecords")}}',
+                    'notificationTextFromColumn'        : '{{sectionsListDatatableTableNotificationTextFromColumn|default("name")}}',//What text to show on delete message
+                    'sendConfirmRemove'                 : '{{sectionsListDatatableTableSendConfirmRemove|default("false")}}'
+                }
+            },
+            'customFunctions' : {
+                'beforeTableInit'   : function() { 'use strict'; },
+                'afterTableInit'    : function() { 'use strict'; },
+                'beforeRedraw'      : function() { 'use strict'; },
+                'afterRedraw'       : function() { 'use strict'; }
+            }
+        }
+    });
+window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-table']['listOptions']['postParams'] =
+    $.extend(window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-table']['listOptions']['postParams'],
+        JSON.parse('{{table.ajax.params|json_encode|raw}}')
+    );
+</script>

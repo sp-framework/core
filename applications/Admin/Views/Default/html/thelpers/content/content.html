@@ -1,0 +1,168 @@
+{% if cardParams['componentId'] is defined and cardParams['parentComponentId'] is defined %}
+    {% if cardParams['contentType'] is defined %}
+        {% if cardParams['contentType'] === 'section' %}
+            <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="section">
+                {% include 'thelpers/card/card' with ['cardParams' : cardParams] %}
+            </section>
+            <script>
+                window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
+                window['dataCollection']['env']['parentComponentId'] = '{{cardParams['parentComponentId']}}';
+            </script>
+        {% elseif contentType === 'sectionWithForm' %}
+            <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" data-bazdevmodetools="{{devModeTools|default('true')}}" class="sectionWithForm">
+                {% include 'thelpers/card/card.html' with
+                    [
+                        'cardFooterContent'   : view.partial('thelpers/buttons',
+                                                [
+                                                    'cardParams'    : cardParams,
+                                                    'buttonType'    : 'sectionWithForm-buttons'
+                                                ])
+                    ]
+                %}
+            </section>
+            <script>
+                window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
+                window['dataCollection']['env']['parentComponentId'] = '{{parentComponentId}}';
+            </script>
+        {% elseif contentType === 'sectionWithWizard' %}
+            <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithWizard">
+                {% include 'thelpers/card/card.html' with
+                    [
+                        'cardFooterContent' : view.partial('thelpers/buttons',
+                                                [
+                                                    'buttonType'    : 'sectionWithWizard-buttons'
+                                                ]),
+                        'cardBodyInclude'   : 'thelpers/content/wizard/wizard'
+                    ]
+                %}
+            </section>
+            <script>
+                window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
+                window['dataCollection']['env']['parentComponentId'] = '{{parentComponentId}}';
+            </script>
+        {% elseif contentType === 'sectionsGroup' %}
+                {% set content = '<div id="' ~ componentId ~ '-sections-group" class="row">' %}
+                {% if cardParams['sectionsGroupJstree'] %}
+                    {% set content = content ~ view.partial('thelpers/content/sectionsgroup/jstree') %}
+                    {% set col = 10 %}
+                {% else %}
+                    {% set col = 12 %}
+                {% endif %}
+                {% set content = content ~ view.partial('thelpers/content/sectionsgroup/group') ~ '</div>' %}
+                {% include 'thelpers/card/card.html' with
+                    [
+                        'cardBodyContent'       : content,
+                        'cardFooterContent'     : view.partial('thelpers/buttons',
+                                                    [
+                                                        'buttonType'  : 'sectionWithForm-buttons'
+                                                    ])
+                    ]
+                %}
+                <script>
+                    window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
+                    window['dataCollection']['env']['parentComponentId'] = '{{parentComponentId}}';
+                </script>
+        {% elseif contentType === 'sectionsList' %}
+            {% if cardParams['table'] or rows %}
+                {% if cardParams['sectionsListFilter'] %}
+                    {% set sectionId = 'sections-list-filter' %}
+                    <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithListFilter mb-1">
+                        {% include 'thelpers/card/card.html' with
+                            [
+                                'cardType'            : sectionsListFilterCardType|default('primary'),
+                                'cardHeader'          : sectionsListFilterCardHeader|default(true),
+                                'cardCollapsed'       : sectionsListFilterCardCollapsed|default(false),
+                                'cardIcon'            : 'filter',
+                                'cardTitle'           : 'Filters',
+                                'cardShowTools'       : ['collapse'],
+                                'cardBodyInclude'     : 'thelpers/content/list/filter'
+                            ]
+                        %}
+                    </section>
+                {% endif %}
+                {% set sectionId = 'sections-list-datatable' %}
+                <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithListDatatable">
+                    {% include 'thelpers/card/card.html' with
+                        [
+                            'cardType'                    : sectionsListDatatableCardType|default('primary'),
+                            'cardHeader'                  : sectionsListDatatableCardHeader,
+                            'cardCollapsed'               : sectionsListDatatableCardCollapsed,
+                            'cardIcon'                    : sectionsListDatatableCardIcon,
+                            'cardTitle'                   : sectionsListDatatableCardTitle,
+                            'cardShowTools'               : sectionsListDatatableCardShowTools,
+                            'cardFooter'                  : sectionsListDatatableCardFooter,
+                            'cardBodyInclude'             : 'thelpers/content/list/list',
+                            'cardBodyIncludeParams'       : sectionsListDatatableCardBodyIncludeParams,
+                            'cardBodyRoute'               : sectionsListDatatableCardBodyRoute,
+                            'cardBodyContent'             : sectionsListDatatableCardBodyContent,
+                            'cardFooterInclude'           : sectionsListDatatableCardFooterInclude,
+                            'cardFooterIncludeParams'     : sectionsListDatatableCardFooterIncludeParams,
+                            'cardAdditionalClass'         : sectionsListDatatableCardAdditionalClass,
+                            'cardHeaderAdditionalClass'   : sectionsListDatatableCardHeaderAdditionalClass,
+                            'cardBodyAdditionalClass'     : sectionsListDatatableCardBodyAdditionalClass,
+                            'cardFooterAdditionalClass'   : sectionsListDatatableCardFooterAdditionalClass
+                        ]
+                    %}
+                </section>
+            {% else %}
+                {% set sectionId = 'sections-list-datatable' %}
+                <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithListDatatable">
+                    {% include 'thelpers/card/card.html' with
+                        [
+                            'cardType'                    : sectionsListDatatableCardType|default('primary'),
+                            'cardHeader'                  : sectionsListDatatableCardHeader,
+                            'cardCollapsed'               : sectionsListDatatableCardCollapsed,
+                            'cardIcon'                    : sectionsListDatatableCardIcon,
+                            'cardTitle'                   : sectionsListDatatableCardTitle,
+                            'cardShowTools'               : sectionsListDatatableCardShowTools,
+                            'cardFooter'                  : sectionsListDatatableCardFooter,
+                            'cardBodyInclude'             : 'thelpers/content/list/list',
+                            'cardBodyIncludeParams'       : sectionsListDatatableCardBodyIncludeParams,
+                            'cardBodyRoute'               : sectionsListDatatableCardBodyRoute,
+                            'cardBodyContent'             : sectionsListDatatableCardBodyContent,
+                            'cardFooterInclude'           : sectionsListDatatableCardFooterInclude,
+                            'cardFooterIncludeParams'     : sectionsListDatatableCardFooterIncludeParams,
+                            'cardAdditionalClass'         : sectionsListDatatableCardAdditionalClass,
+                            'cardHeaderAdditionalClass'   : sectionsListDatatableCardHeaderAdditionalClass,
+                            'cardBodyAdditionalClass'     : sectionsListDatatableCardBodyAdditionalClass,
+                            'cardFooterAdditionalClass'   : sectionsListDatatableCardFooterAdditionalClass
+                        ]
+                    %}
+                </section>
+            {% endif %}
+            <script>
+                window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
+                window['dataCollection']['env']['parentComponentId'] = '{{parentComponentId}}';
+            </script>
+        {% elseif contentType === 'sectionWithStorage' %}
+            {% if cardParams['sectionWithStorageMode'] == 'full' %}
+                {% set sectionId = 'full' %}
+                <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithStorage">
+                    {% include 'thelpers/card/card.html' with
+                        [
+                            'cardIcon'            : 'hdd',
+                            'cardTitle'           : 'Storage',
+                            'cardShowTools'       : ['collapse'],
+                            'cardBodyInclude'     : 'thelpers/content/storage/full'
+                        ]
+                    %}
+                </section>
+            {% elseif sectionWithStorageMode === 'mini' %}
+                {% set sectionId = 'mini' %}
+                <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithStorage">
+                    {% include 'thelpers/content/storage/mini.html' %}
+                </section>
+            {% else %}
+                <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: sectionWithStorageMode missing')}}</span>
+            {% endif %}
+            <script>
+                window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
+                window['dataCollection']['env']['parentComponentId'] = '{{parentComponentId}}';
+            </script>
+        {% endif %}
+    {% else %}
+        <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: contentType missing')}}</span>
+    {% endif %}
+{% else %}
+    <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: componentId OR parentComponentId missing')}}</span>
+{% endif %}

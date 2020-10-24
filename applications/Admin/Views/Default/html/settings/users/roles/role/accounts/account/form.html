@@ -1,0 +1,98 @@
+<form data-validateon="sections" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                {{include('thelpers/fields/fields.html', {
+                    fieldId                             : 'role_id',
+                    fieldLabel                          : 'Role ID',
+                    fieldType                           : 'input',
+                    fieldHelp                           : true,
+                    fieldHelpTooltipContent             : 'ID of this Role',
+                    fieldRequired                       : true,
+                    fieldBazScan                        : true,
+                    fieldBazPostOnCreate                : false,
+                    fieldBazPostOnUpdate                : true,
+                    fieldDataMinLength                  : 1,
+                    fieldDataMaxLength                  : 3,
+                    fieldHidden                         : true,
+                    fieldDisabled                       : true,
+                    fieldValue                          : role.id
+                    }
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                {{include('thelpers/fields/fields.html', {
+                    fieldId                             : 'account_id',
+                    fieldLabel                          : 'Select Account',
+                    fieldType                           : 'select2',
+                    fieldHelp                           : true,
+                    fieldHelpTooltipContent             : 'Select Account',
+                    fieldBazScan                        : true,
+                    fieldBazPostOnCreate                : true,
+                    fieldBazPostOnUpdate                : true,
+                    fieldRequired                       : true,
+                    fieldDataSelect2Options             : '',
+                    fieldDataSelect2OptionsKey          : '',
+                    fieldDataSelect2OptionsValue        : '',
+                    fieldDataSelect2OptionsSelected     : '',
+                    }
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+//Variables
+var searchUserURL = window.bazDataCollection.env.rootPath + 'index.php?route=' + 'settings/users/roles/role/accounts/account/search';
+
+if (!window['bazDataCollection']['{{componentId}}']) {
+    window['bazDataCollection']['{{componentId}}'] = { };
+}
+window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] = $.extend(window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'], {
+    '{{componentId}}-role_id' : { },
+    '{{componentId}}-account_id' : {
+        placeholder: "SELECT ACCOUNT",
+        ajax: {
+            url             : searchUserURL,
+            dataType        : 'json',
+            method          : 'post',
+            data            : function(params) {
+                                'use strict';
+                                return {
+                                    username: params.term
+                                }
+            },
+            processResults  : function(data) {
+                                'use strict';
+                                if (data.account) {
+                                    var accountsData = [];
+                                    for (var item of data.account) {
+                                        accountsData.push({
+                                            'id' : item['id'],
+                                            'text' : item['username']
+                                        });
+                                    }
+                                    return {
+                                        results: accountsData
+                                    }
+                                }
+            },
+            cache: true
+        },
+        minimumInputLength : 2
+    },
+    //Validation
+    '{{componentId}}-{{sectionId}}-form' : {
+        rules: {
+            '{{componentId}}-role_id' : 'required',
+            '{{componentId}}-account_id' : 'required'
+        },
+        messages: {
+            '{{componentId}}-role_id' : 'Role is required',
+            '{{componentId}}-account_id' : 'Account is required',
+        }
+    }
+});
+</script>

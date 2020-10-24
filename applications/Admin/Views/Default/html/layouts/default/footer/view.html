@@ -1,0 +1,29 @@
+
+{% if assets.get('footer').getCodes()[0].getContent() !== '' %}
+    <footer {{assets.get('footer').getCodes()[0].getContent()}}>
+{% else %}
+    <footer class="main-footer">
+{% endif %}
+    <strong>Copyright &copy;
+        {% if orgFrom is defined %}
+            {{orgFrom ~ '-'|default('')}}
+            {{date("Y")}}
+        {% endif %}
+        {% if orgSite is defined and orgName is defined %}
+            <a target="_blank" href="{{orgSite}}">{{orgName}}</a>.
+        {% elseif perName is defined %}
+            {{perName}}
+        {% endif %}
+    </strong> All rights reserved.
+    {{assets.outputJs('footerJs')}}
+    {{assets.outputInlineJs()}}
+</footer>
+<script>
+/* globals PNotify PNotifyBootstrap4 PNotifyFontAwesome5 */
+// $.fn.select2.defaults.set("theme", "bootstrap4");
+PNotify.defaultModules.set(PNotifyBootstrap4, {});
+PNotify.defaultModules.set(PNotifyFontAwesome5, {});
+// BazCore.footer({
+//  loadFooterAt : '{{componentId}}'
+// });
+</script>

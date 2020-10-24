@@ -1,0 +1,202 @@
+{% set componentId = 'login' %}
+<script>
+/* globals BazCore */
+BazCore.header({
+	loadHeaderAt : '{{componentId}}'
+});
+</script>
+<div class="pace-loading-text ml-1 fixed-top text-orange" hidden>
+    <span>Loading... </span>
+    <span></span>
+</div>
+<div id="baz-content" class="container-fluid">
+    <div id="{{componentId}}" class="login-box">
+        <div class="login-box-body">
+            <div class="login-logo">
+                <img src="{{template_img}}baz/logo/fulllogo168x30.png" data-rjs="3" alt="Bazaari Logo">
+            </div>
+            <div id="{{componentId}}-regular" hidden>
+                <div class="form">
+                    <p class="login-box-msg">Login to start dashboard session</p>
+                    <form action="{{link(form.url)}}" id="{{componentId}}-form">
+                        <div class="input-group">
+                            <input type="text" name="user" class="form-control loginform rounded-0" placeholder="USERNAME">
+                            <div class="input-group-append">
+                                <div class="input-group-text rounded-0">
+                                    <span class="fas fa-fw fa-user"></span>
+                                </div>
+                            </div>
+                        </div>                       
+                        <br>
+                        <div class="input-group">
+                            <input type="password" name="pass" class="form-control loginform rounded-0" placeholder="PASSWORD">
+                            <div class="input-group-append">
+                                <div class="input-group-text rounded-0">
+                                    <span class="fas fa-fw fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-8">
+    {#                             <a class="text-info" href="{{link('directory/authentication/reset')}}">
+                                    <span>Forgot password?</span>
+                                </a> #}
+                            </div>
+                            <div class="col-4">
+                                <a id="{{componentId}}-submit" type="submit" class="btn btn-info float-right">
+                                    <span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true" hidden></span>
+                                    <span class="sr-only">Loading...</span>
+                                    <span class="text-uppercase">Login</span>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="login-footer text-sm text-center">
+                    <b>
+                        <a class="text-info" href="https://www.bazaari.com.au">Bazaari E Trade Pty. Ltd.</a>
+                    </b><br>
+                    Copyright © 2014-{{ 'now'|date('Y') }}. All rights reserved.
+                </div>            
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+/*global Pace BazContentLoader BazCore */
+// Pace
+$(document).ready(function(){
+    'use strict';
+    $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
+    $('input[name=user]').focus();
+    BazCore.footer({
+        loadFooterAt : '{{componentId}}'
+    });
+});
+
+// Slideshow
+(function () {
+    'use strict';
+    $('body').vegas({
+        delay: 300000,
+        timer: false,
+        shuffle: true,
+        slides: [
+        { src: '{{template_img}}vegas/2.4.4/images/wp1.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp2.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp3.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp4.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp5.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp6.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp7.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp8.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp9.jpg' },
+        { src: '{{template_img}}vegas/2.4.4/images/wp10.jpg' }
+        ],
+        overlay: '{{template_img}}vegas/2.4.4/overlays/01.png'
+    });
+})();
+
+// Process login on click of login button or pressing enter
+$('#{{componentId}}-submit').click(function(e) {
+    'use strict';
+    e.preventDefault();
+    processLogin();
+});
+$('body').keyup(function(e) {
+    'use strict';
+    e.preventDefault();
+    if (e.keyCode === 13) {
+        processLogin();
+    }
+});
+
+function processLogin() {
+    'use strict';
+    $('.spinner-grow').attr('hidden', false);
+
+    function loginFailed() {
+        $('.spinner-grow').attr('hidden', true);
+        $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated flash text-bold');
+        $('#{{componentId}}-form :input').prop('disabled', false);
+        $('#{{componentId}}-form :input').val('');
+        $('input[name=user]').focus();
+        setTimeout(function () {
+            $('.login-box-msg').removeClass('text-danger animated flash text-bold');
+            $('.login-box-msg').text('Login to start dashboard session');
+            $('.login-box-msg').addClass('animated fadeIn');
+        }, 3000);
+    }
+
+    function loginSuccess() {
+        $('body').vegas('destroy');
+        $('.spinner-grow').attr('hidden', true);
+        $('.login-box-msg').removeClass('text-danger').addClass('text-success text-bold');
+        $('body').load('{{link("layout/view")}}', function() {
+            BazContentLoader.loadAjax(null, {
+                ajaxLoadLink          : '{{link("home/view")}}',// This link will come from controller after auth where to go?
+                ajaxBefore            : function () {
+                                                    Pace.restart();
+                                                    $('#baz-content').empty();
+                                                    $('#loader').attr('hidden', false);
+                                                },
+                ajaxFinished          : function () {
+                                                    BazCore.updateBreadcrumb();
+                                                    $('#loader').attr('hidden', true);
+                                                },
+                ajaxError             : function () {
+                                                    $('#loader').attr('hidden', true);
+                                                    BazCore.updateBreadcrumb();
+                                                }
+            });
+        });
+    }
+
+    // function loginTwofa() {
+    //      $('.spinner-grow').attr('hidden', true);
+    //     $.get('index.php?route=directory/authentication/twofa', function(data) {
+    //         $(".form").html(data);
+    //     });
+    // }
+
+    if (!$('input[name="user"]').val() || !$('input[name="pass"]').val()) {
+        $('.spinner-grow').attr('hidden', true);
+        $(".login-box-msg").removeClass('fadeIn').addClass('text-danger animated flash text-bold');
+        $('.login-box-msg').text('Please enter username and password.');
+        setTimeout(function () {
+            $(".login-box-msg").removeClass('text-danger animated flash text-bold');
+            $('.login-box-msg').text('Login to start dashboard session');
+            $(".login-box-msg").addClass('animated fadeIn');
+        }, 3000);
+    } else {
+        $.ajax({
+            url             : $('#{{componentId}}-form').attr('action'),
+            data            : {'user' : $('input[name="user"]').val().trim(), 'pass' : $('input[name="pass"]').val()},
+            method          : 'post',
+            dataType        : 'json',
+            beforeSend      : function() {
+                                    $("#{{componentId}}-form :input").prop("disabled", true);
+                                },
+            error           : function() {
+                                    $('.login-box-msg').text('Error! Please contact administrator.');
+                                    loginFailed();
+                                    },
+            success         : function(data) {
+                                if (data.status === '1') {
+                                    $('.login-box-msg').text('Authenticated! Redirecting...');
+                                    loginSuccess();
+                                } else if (data.status === '2') {
+                                    $('.login-box-msg').text('Account Disabled. Please contact administrator.');
+                                    loginFailed();
+                                // }
+                                // else if (data.status == 3) {
+                                //     loginTwofa();
+                                } else {
+                                    $('.login-box-msg').text('Login Failed. Please try again.');
+                                    loginFailed();
+                                }
+                            }
+        });
+    }
+}
+</script>

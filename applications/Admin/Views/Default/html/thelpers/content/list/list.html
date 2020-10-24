@@ -1,0 +1,16 @@
+{% if table or rows %}
+    {% if table %}
+        {{include('thelpers/content/list/dynamic/table.html', {
+            }
+        )}}
+    {% elseif rows %}
+        {% set sectionId = 'sections-list-datatable' %}
+        {{include('thelpers/content/list/dynamic/rows.html', {
+            }
+        )}}
+    {% endif %}
+{% else %}
+    {{include('thelpers/content/list/static/table.html', {
+        }
+    )}}
+{% endif %}

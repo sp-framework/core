@@ -1,0 +1,82 @@
+
+{% if modalId %}
+    {% if modalTrigger == 'button' %}
+        {{include('thelpers/buttons.html', {
+            buttonType                              : buttonType|default('button'),
+            buttons                                 : {
+                'modalButton' : {
+                    modalButton                     : true,
+                    id                              : modalId ~ '-button',
+                    title                           : modalButtonTitle|default('Open Modal'),
+                    position                        : modalButtonPosition,
+                    size                            : modalButtonSize,
+                    type                            : modalButtonType,
+                    style                           : modalButtonStyle,
+                    flat                            : modalButtonFlat,
+                    icon                            : modalButtonIcon,
+                    hidden                          : modalButtonHidden,
+                    disabled                        : modalButtonDisabled,
+                    block                           : modalButtonBlock,
+                    buttonAdditionalClass           : modalButtonAdditionalClass
+                }
+            }
+        })}}
+    {% elseif modalTrigger == 'link' %}
+        <a href="#" class="{{modalLinkAdditionalClass}}" data-toggle="modal" data-target="#{{modalId}}-modal">{{modalLinkTitle|raw}}</a>
+    {% elseif modalTrigger == 'js' %}
+        {# DO NOTHING - MODAL IS TRIGGERED USING JS #}
+    {% endif %}
+    {% if modalScrollable %}
+        {% set hasModalScrollable = 'modal-dialog-scrollable' %}
+    {% endif %}
+    {% if modalCentered %}
+        {% set hasModalCentered = 'modal-dialog-centered' %}
+    {% endif %}
+    {% if modalSize %}
+        {% set hasModalSize = 'modal-' ~ modalSize %}
+    {% endif %}
+    <!-- Modal -->
+    <div class="modal fade {{modalAdditionalClasses}}" id="{{modalId}}" tabindex="-1" role="dialog" aria-labelledby="{{modalId}}-label" aria-hidden="true" data-backdrop="static" data-keyboard="{{modalEscClose|default('true')}}">
+        <div class="modal-dialog {{hasModalScrollable}} {{hasModalCentered}} {{hasModalSize}}" role="document">
+            <div class="modal-content rounded-0 {{modalContentAdditionalClasses}}">
+                {% if modalHeader %}
+                    <div class="modal-header bg-{{modalType|default('primary')}} rounded-0">
+                        <h5 class="modal-title" id="{{modalId}}-label">{{modalTitle}}</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+                <div class="modal-body {{modalBodyAdditionalClasses}}">
+                    {% if modalBodyIncludeParams %}
+                        {% set hasModalBodyIncludeParams = modalBodyIncludeParams %}
+                    {% else %}
+                        {% set hasModalBodyIncludeParams = {} %}
+                    {% endif %}
+                    {% if modalBodyRouteParams %}
+                        {% set hasModalBodyRouteParams = modalBodyRouteParams %}
+                    {% else %}
+                        {% set hasModalBodyRouteParams = {} %}
+                    {% endif %}
+                    {% if modalBodyInclude %}
+                        {{include(modalBodyInclude, hasModalBodyIncludeParams)}}
+                    {% elseif modalBodyRoute %}
+                        {{route(modalBodyRoute, hasModalBodyRouteParams)}}
+                    {% elseif modalBodyContent %}
+                        {{modalBodyContent|raw}}
+                    {% endif %}
+                </div>
+                {% if modalFooter %}
+                    <div class="modal-footer {{modalFooterAdditionalClasses}}">
+                        <button type="button" id="{{modalId}}-button-close" class="btn btn-secondary" data-dismiss="modal">{{modalButtonSecondaryTitle|default('CLOSE')}}</button>
+                        {% if modalFooterButtonSubmitTitle %}
+                            <button type="button" id="{{modalId}}-button-submit" class="btn btn-primary">{{modalFooterButtonSubmitTitle}}</button>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: modalId MISSING')}}</span>
+{% endif %}

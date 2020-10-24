@@ -29,8 +29,8 @@ class Widget
 	{
 		$widgetRoute =
 			$this->request->getScheme() . '://' .
-			$this->request->getHttpHost() . '/' . $route .
-			'/ses/0/' . $this->session->getId() . '/' . $this->connection->getId();
+			$this->request->getHttpHost() . '/' . $route . '/q/layout/0/';
+			// '/ses/0/' . $this->session->getId() . '/' . $this->connection->getId();
 
 		$this->logger->log->debug('Making widget connection for connection ID: ' . $this->connection->getId());
 

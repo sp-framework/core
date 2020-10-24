@@ -1,0 +1,259 @@
+
+{# tabs #}
+{% if tabsId %}
+    {# tabsHidden - If true, field has class "hidden" #}
+    {% if tabsHidden %}
+        {% set hasTabsHidden = 'hidden' %}
+    {% else %}
+        {% set hasTabsHidden = '' %}
+    {% endif %}
+
+    {# Horizontal #}
+    {% if tabsData %}
+        {% if tabsStyle == 'vertical-left' or tabsStyle == 'vertical-right' %}
+            {% if tabsStyle == 'vertical-left' %}
+                {# Vertical (Left) #}
+                <div class="row">
+                    <div class="col-1 col-sm-2">
+                        <div class="nav flex-column nav-tabs h-100" role="tablist" id="{{sectionId}}-{{tabsId}}-tabLinks" aria-orientation="vertical">
+                            {% for tabLinkKey, tabLinkData in tabsData %}
+                                {% if tabActiveOnInit %}
+                                    {% if tabLinkKey == tabActiveOnInit %}
+                                        {% set aria = 'aria-selected=true' %}
+                                        {% set active = 'active' %}
+                                    {% else %}
+                                        {% set aria = 'aria-selected=false' %}
+                                        {% set active = '' %}
+                                    {% endif %}
+                                {% elseif loop.first %}
+                                    {% set aria = 'aria-selected=true' %}
+                                    {% set active = 'active' %}
+                                {% else %}
+                                    {% set aria = 'aria-selected=false' %}
+                                    {% set active = '' %}
+                                {% endif %}
+                                <a class="nav-link text-uppercase {{active}}" data-toggle="pill" href="#{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" role="tab" aria-controls="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" {{aria}}>{{tabLinkData.title|default('title Missing')}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-11 col-sm-10">
+                        <div class="tab-content" id="{{sectionId}}-{{tabsId}}-tabContent">
+                            {% for tabLinkKey, tabLinkData in tabsData %}
+                                {% if (tabLinkData.include) or (tabLinkData.route) or (tabLinkData.content) %}
+                                    {% if tabActiveOnInit %}
+                                        {% if tabLinkKey == tabActiveOnInit %}
+                                            {% set aria = 'aria-selected=true' %}
+                                            {% set active = 'active show' %}
+                                        {% else %}
+                                            {% set aria = 'aria-selected=false' %}
+                                            {% set active = '' %}
+                                        {% endif %}
+                                    {% elseif loop.first %}
+                                        {% set aria = 'aria-selected=true' %}
+                                        {% set active = 'active show' %}
+                                    {% else %}
+                                        {% set aria = 'aria-selected=false' %}
+                                        {% set active = '' %}
+                                    {% endif %}
+                                    <div class="tab-pane fade {{active}}" id="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" role="tabpanel" aria-labelledby="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}-tab" {{aria}}>
+                                        {% if tabLinkData.includeParams %}
+                                            {% set hasTabIncludeParams = tabLinkData.includeParams %}
+                                        {% else %}
+                                            {% set hasTabIncludeParams = {} %}
+                                        {% endif %}
+                                        {% if tabLinkData.include %}
+                                            {{include(tabLinkData.include, hasTabIncludeParams)}}
+                                        {% elseif tabLinkData.route %}
+                                            {{route(tabLinkData.route)}}
+                                        {% elseif tabLinkData.content %}
+                                            {{tabLinkData.content|raw}}
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: tabsDataInclude/Route/Content missing')}}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% elseif tabsStyle == 'vertical-right'%}
+                {# Vertical (right) #}
+                <div class="row">
+                    <div class="col-11 col-sm-10">
+                        <div class="tab-content" id="{{sectionId}}-{{tabsId}}-tabContent">
+                            {% for tabLinkKey, tabLinkData in tabsData %}
+                                {% if tabActiveOnInit %}
+                                    {% if tabLinkKey == tabActiveOnInit %}
+                                        {% set aria = 'aria-selected=true' %}
+                                        {% set active = 'active show' %}
+                                    {% else %}
+                                        {% set aria = 'aria-selected=false' %}
+                                        {% set active = '' %}
+                                    {% endif %}
+                                {% elseif loop.first %}
+                                    {% set aria = 'aria-selected=true' %}
+                                    {% set active = 'active show' %}
+                                {% else %}
+                                    {% set aria = 'aria-selected=false' %}
+                                    {% set active = '' %}
+                                {% endif %}
+                                {% if (tabLinkData.include) or (tabLinkData.route) or (tabLinkData.content) %}
+                                    <div class="tab-pane fade {{active}}" id="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" role="tabpanel" aria-labelledby="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}-tab" {{aria}}>
+                                        {% if tabLinkData.includeParams %}
+                                            {% set hasTabIncludeParams = tabLinkData.includeParams %}
+                                        {% else %}
+                                            {% set hasTabIncludeParams = {} %}
+                                        {% endif %}
+                                        {% if tabLinkData.include %}
+                                            {{include(tabLinkData.include, hasTabIncludeParams)}}
+                                        {% elseif tabLinkData.route %}
+                                            {{route(tabLinkData.route)}}
+                                        {% elseif tabLinkData.content %}
+                                            {{tabLinkData.content|raw}}
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: tabsDataInclude/Route/Content missing')}}</span>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-1 col-sm-2">
+                        <div class="nav flex-column nav-tabs nav-tabs-right h-100" role="tablist" id="{{sectionId}}-{{tabsId}}-tabLinks" aria-orientation="vertical">
+                            {% for tabLinkKey, tabLinkData in tabsData %}
+                                {% if tabActiveOnInit %}
+                                    {% if tabLinkKey == tabActiveOnInit %}
+                                        {% set aria = 'aria-selected=true' %}
+                                        {% set active = 'active' %}
+                                    {% else %}
+                                        {% set aria = 'aria-selected=false' %}
+                                        {% set active = '' %}
+                                    {% endif %}
+                                {% elseif loop.first %}
+                                    {% set aria = 'aria-selected=true' %}
+                                    {% set active = 'active' %}
+                                {% else %}
+                                    {% set aria = 'aria-selected=false' %}
+                                    {% set active = '' %}
+                                {% endif %}
+                                <a class="nav-link text-uppercase {{active}}" data-toggle="pill" href="#{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" role="tab" aria-controls="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" {{aria}}>{{tabLinkData.title|default('title Missing')}}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% else %}
+            {% if tabsStyle == 'card-tabs' %}
+                <div class="card card-{{tabsType|default('primary')}} card-tabs">
+                    <div class="card-header p-0 pt-1">
+            {% elseif tabsStyle == 'card-outline' %}
+                <div class="card card-{{tabsType|default('primary')}} card-tabs card-outline">
+                    <div class="card-header p-0 pt-1 border-bottom-0">
+            {% elseif tabsStyle == 'card-outline-tabs' %}
+                <div class="card card-{{tabsType|default('primary')}} card-outline card-outline-tabs ">
+                    <div class="card-header p-0 border-bottom-0">
+            {% else %}
+                <div class="row {{hasTabsHidden}}" id="{{sectionId}}-{{tabsId}}">
+                    <div class="col">
+            {% endif %}
+                    <ul class="nav nav-tabs" role="tablist" id="{{sectionId}}-{{tabsId}}-tabLinks">
+                        {% for tabLinkKey, tabLinkData in tabsData %}
+                            {% if tabActiveOnInit %}
+                                {% if tabLinkKey == tabActiveOnInit %}
+                                    {% set aria = 'aria-selected=true' %}
+                                    {% set active = 'active' %}
+                                {% else %}
+                                    {% set aria = 'aria-selected=false' %}
+                                    {% set active = '' %}
+                                {% endif %}
+                            {% elseif loop.first %}
+                                {% set aria = 'aria-selected=true' %}
+                                {% set active = 'active' %}
+                            {% else %}
+                                {% set aria = 'aria-selected=false' %}
+                                {% set active = '' %}
+                            {% endif %}
+                            <li class="nav-item">
+                                <a class="nav-link text-uppercase {{active}}" data-toggle="pill" href="#{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" role="tab" aria-controls="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" {{aria}}>{{tabLinkData.title|default('title Missing')}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+            {% if tabsStyle == 'card-tabs' %}
+                </div>
+            {% elseif tabsStyle == 'card-outline' %}
+                </div>
+            {% elseif tabsStyle == 'card-outline-tabs' %}
+                </div>
+            {% endif %}
+                    {# Tabs Content Above #}
+                    {% if tabsAboveContent %}
+                    <div id="{{sectionId}}-{{tabsId}}-above-content" class="tab-custom-content">
+                        <p class="lead mb-0">{{tabsAboveContent}}</p>
+                    </div>
+                    {% endif %}
+                    {% if (tabsStyle == 'card-tabs') or (tabsStyle == 'card-outline') or (tabsStyle == 'card-outline-tabs') %}
+                        <div class="card-body">
+                    {% endif %}
+                        <div class="tab-content mt-2 mb-2" id="{{sectionId}}-{{tabsId}}-tabContent">
+                        {% for tabLinkKey, tabLinkData in tabsData %}
+                            {% if tabActiveOnInit %}
+                                {% if tabLinkKey == tabActiveOnInit %}
+                                    {% set aria = 'aria-selected=true' %}
+                                    {% set active = 'active show' %}
+                                {% else %}
+                                    {% set aria = 'aria-selected=false' %}
+                                    {% set active = '' %}
+                                {% endif %}
+                            {% elseif loop.first %}
+                                {% set aria = 'aria-selected=true' %}
+                                {% set active = 'active show' %}
+                            {% else %}
+                                {% set aria = 'aria-selected=false' %}
+                                {% set active = '' %}
+                            {% endif %}
+                            {% if (tabLinkData.include) or (tabLinkData.route) or (tabLinkData.content) %}
+                                <div class="tab-pane fade {{active}}" id="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}" role="tabpanel" aria-labelledby="{{sectionId}}-{{tabsId}}-{{tabLinkKey}}-tab" {{aria}}>
+                                    {% if tabLinkData.includeParams %}
+                                        {% set hasTabIncludeParams = tabLinkData.includeParams %}
+                                    {% else %}
+                                        {% set hasTabIncludeParams = {} %}
+                                    {% endif %}
+                                    {% if tabLinkData.include %}
+                                        {{include(tabLinkData.include, hasTabIncludeParams)}}
+                                    {% elseif tabLinkData.route %}
+                                        {{route(tabLinkData.route)}}
+                                    {% elseif tabLinkData.content %}
+                                        {{tabLinkData.content|raw}}
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: tabInclude/Route/Content missing')}}</span>
+                            {% endif %}
+                        {% endfor %}
+                    {% if (tabsStyle == 'card-tabs') or (tabsStyle == 'card-outline') or (tabsStyle == 'card-outline-tabs') %}
+                        </div>
+                    {% endif %}
+                        </div>
+                    {# Tabs Content Below #}
+                    {% if tabsBelowContent %}
+                    <div id="{{sectionId}}-{{tabsId}}-below-content" class="tab-custom-content">
+                        <p class="lead mb-0">{{tabsBelowContent}}</p>
+                    </div>
+                    {% endif %}
+            {% if tabsStyle == 'card-tabs' %}
+                </div>
+            {% elseif tabsStyle == 'card-outline' %}
+                </div>
+            {% elseif tabsStyle == 'card-outline-tabs' %}
+                </div>
+            {% else %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: tabsData missing')}}</span>
+    {% endif %}
+{% else %}
+    <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: tabsId missing')}}</span>
+{% endif %}

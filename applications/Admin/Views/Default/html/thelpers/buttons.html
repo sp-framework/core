@@ -1,0 +1,672 @@
+
+{# button #}
+{% if buttonType == 'button' %}
+    {% if buttonLabel %}
+        <label style="display:block;">{{buttonLabel|upper}}</label>
+    {% endif %}
+    {% if buttons %}
+        {% if buttons|length > 1 %}
+            {% set hasButtonMargin = 'mr-1' %}
+        {% else %}
+            {% set hasButtonMargin = '' %}
+        {% endif %}
+        {% for buttonKey, button in buttons %}
+            {% if not button.title == false %}
+                {% if button.title %}
+                    {% set hasButtonTitle = button.title %}
+                {% else %}
+                    {% set hasButtonTitle = ' missing_button_title' %}
+                {% endif %}
+            {% elseif button.title == false %}
+                    {% set hasButtonTitle = '' %}
+            {% endif %}
+            {% if button.hidden == true %}
+                {% set hasButtonHidden = 'hidden' %}
+            {% else %}
+                {% set hasButtonHidden = '' %}
+            {% endif %}
+            {% if button.disabled == true %}
+                {% set hasButtonDisabled = 'disabled' %}
+            {% else %}
+                {% set hasButtonDisabled = '' %}
+            {% endif %}
+            {% if button.position %}
+                {% set hasButtonPosition = 'float-' ~ button.position %}
+            {% else %}
+                {% set hasButtonPosition = '' %}
+            {% endif %}
+            {% if button.size %}
+                {% set hasButtonSize = 'btn-' ~ button.size %}
+            {% else %}
+                {% set hasButtonSize = '' %}
+            {% endif %}
+            {% if button.block == true %}
+                {% set hasButtonBlock = 'btn-block' %}
+            {% endif %}
+            {% if button.flat == true %}
+                {% set hasButtonFlat = 'btn-flat' %}
+            {% endif %}
+            {% if button.type %}
+                {% set hasButtonType = 'btn-' ~ button.type %}
+            {% else %}
+                {% set hasButtonType = 'btn-primary' %}
+            {% endif %}
+            {% if button.style == 'outline' %}
+                {% set hasButtonType = 'btn-outline-' ~ button.type %}
+            {% elseif button.style == 'gradient' %}
+                {% set hasButtonType = 'bg-gradient-' ~ button.type %}
+            {% endif %}
+            {% if button.icon %}
+                {% if button.title %}
+                    {% if button.iconPosition == 'after' %}
+                        {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ ' ml-1"></i>' %}
+                    {% else %}
+                        {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ ' mr-1"></i>' %}
+                    {% endif %}
+                {% else %}
+                    {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ '"></i>' %}
+                {% endif %}
+            {% else %}
+                {% set hasButtonIcon = '' %}
+            {% endif %}
+            {% if componentId and sectionId %}
+                {% set hasButtonId = componentId ~ '-' ~ sectionId ~ '-' ~ buttonKey %}
+            {% else %}
+                {% set hasButtonId = buttonKey %}
+            {% endif %}
+            {% if button.modalButton %}
+                {% set isModalButton = 'data-toggle=modal data-target=#' ~ modalId ~ '-modal' %}
+                {% set hasButtonId = button.id %}
+            {% endif %}
+
+            {# For SectionsWithForm #}
+            {% if buttonKey == 'create' and button.actionUrl %}
+                {% set hasCreateActionUrl = 'actionurl=' ~ button.actionUrl %}
+            {% else %}
+                {% set hasCreateActionUrl = '' %}
+            {% endif %}
+            {% if buttonKey == 'edit' and button.actionUrl %}
+                {% set hasUpdateActionUrl = 'actionurl=' ~ button.actionUrl %}
+                {% if updateButtonId %}
+                    {% set hasUpdateActionUrl = hasUpdateActionUrl ~ '&id=' ~ updateButtonId %}
+                {% endif %}
+            {% else %}
+                {% set hasUpdateActionUrl = '' %}
+            {% endif %}
+            {% if buttonKey == 'cancel' and button.actionUrl %}
+                {% set hasCancelActionUrl = 'href=' ~ button.actionUrl %}
+                {% set hasAjax = 'contentAjaxLink' %}
+            {% else %}
+                {% set hasCancelActionUrl = '' %}
+            {% endif %}
+            {% if buttonKey == 'close' and button.actionUrl %}
+                {% set hasCloseActionUrl = 'href=' ~ button.actionUrl %}
+                {% set hasAjax = 'contentAjaxLink' %}
+            {% else %}
+                {% set hasCloseActionUrl = '' %}
+            {% endif %}
+
+            {% if buttonKey == 'create' and button.successRedirectUrl %}
+                {% set hasCreateSuccessRedirectUrl = 'href=' ~ button.successRedirectUrl %}
+                {% set hasAjax = 'methodPost' %}
+            {% else %}
+                {% set hasCreateSuccessRedirectUrl = '' %}
+            {% endif %}
+            {% if buttonKey == 'edit' and button.successRedirectUrl %}
+                {% set hasUpdateSuccessRedirectUrl = 'href=' ~ button.successRedirectUrl %}
+                {% set hasAjax = 'methodPost' %}
+            {% else %}
+                {% set hasUpdateSuccessRedirectUrl = '' %}
+            {% endif %}
+            {% if button.actionTarget %}
+                {% set hasActionTarget = 'data-actiontarget=' ~ button.actionTarget %}
+            {% else %}
+                {% set hasActionTarget = '' %}
+            {% endif %}
+            {% if button.successNotifyMessage != '' %}
+                {% set hasSuccessNotificationTitle = 'data-notificationtitle=' ~ button.title|url_encode %}
+                {% set hasSuccessNotificationMessage = 'data-notificationmessage=' ~ button.successNotifyMessage|url_encode %}
+            {% else %}
+                {% set hasSuccessNotificationTitle = '' %}
+                {% set hasSuccessNotificationMessage = '' %}
+            {% endif %}
+            {# For SectionWithForm End #}
+            {% if button.url %}
+                <a href="{{button.url|default('#')}}" class="btn {{hasButtonSize}} {{hasButtonFlat}} {{hasButtonBlock}} {{hasButtonType}} {{hasButtonMargin}} {{hasButtonPosition}} {{hasAjax}} {{button.buttonAdditionalClass}}" {{hasCreateActionUrl}} {{hasUpdateActionUrl}} {{hasCancelActionUrl}} {{hasCloseActionUrl}} {{hasCreateSuccessRedirectUrl}} {{hasUpdateSuccessRedirectUrl}} {{hasActionTarget}} {{hasSuccessNotificationTitle}} {{hasSuccessNotificationMessage}} id="{{hasButtonId}}" {{hasButtonDisabled}} {{hasButtonHidden}} {{isModalButton}} role="button">
+                    {% if button.iconPosition %}
+                        {% if button.iconPosition == 'after' %}
+                            {{buttonIdMissing|upper}}{{hasButtonTitle|upper}} {{hasButtonIcon|raw}}
+                        {% else %}
+                            {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                        {% endif %}
+                    {% else %}
+                        {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                    {% endif %}
+                </a>
+            {% else %}
+                <button type="button" class="btn {{hasButtonSize}} {{hasButtonFlat}} {{hasButtonBlock}} {{hasButtonType}} {{hasButtonMargin}} {{hasButtonPosition}} {{hasAjax}} {{button.buttonAdditionalClass}}" {{hasCreateActionUrl}} {{hasUpdateActionUrl}} {{hasCancelActionUrl}} {{hasCloseActionUrl}} {{hasCreateSuccessRedirectUrl}} {{hasUpdateSuccessRedirectUrl}} {{hasActionTarget}} {{hasSuccessNotificationTitle}} {{hasSuccessNotificationMessage}} id="{{hasButtonId}}" {{hasButtonDisabled}} {{hasButtonHidden}} {{isModalButton}}>
+                    {% if button.iconPosition %}
+                        {% if button.iconPosition == 'after' %}
+                            {{buttonIdMissing|upper}}{{hasButtonTitle|upper}} {{hasButtonIcon|raw}}
+                        {% else %}
+                            {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                        {% endif %}
+                    {% else %}
+                        {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                    {% endif %}
+                </button>
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: buttons (ARRAY) MISSING')}}</span>
+    {% endif %}
+{# button-split #}
+{% elseif buttonType == 'button-split' %}
+    {% if buttonLabel %}
+        <label style="display:block;">{{buttonLabel|upper}}</label>
+    {% endif %}
+
+    {% if splitMainButtonId %}
+        {% if componentId and sectionId %}
+            {% set hasMainSplitButtonId = componentId ~ '-' ~ sectionId ~ '-' ~ splitMainButtonId %}
+        {% elseif sectionId %}
+            {% set hasMainSplitButtonId = sectionId ~ '-' ~ splitMainButtonId %}
+        {% endif %}
+    {% else %}
+        {% set splitButtonIdMissing = 'missing_split_main_button_id' %}
+    {% endif %}
+    {% if splitMainButtonTitle %}
+        {% set hasSplitMainButtonTitle = splitMainButtonTitle %}
+    {% else %}
+        {% set hasSplitMainButtonTitle = ' missing_split_main_button_title' %}
+    {% endif %}
+    {% if splitButtonSize %}
+        {% set hasSplitButtonSize = splitButtonSize %}
+    {% else %}
+        {% set hasSplitButtonSize = 'sm' %}
+    {% endif %}
+
+    {% if splitMainButtonHidden == true %}
+        {% set hasSplitMainButtonHidden = 'hidden' %}
+    {% else %}
+        {% set hasSplitMainButtonHidden = '' %}
+    {% endif %}
+    {% if splitMainButtonDisabled == true %}
+        {% set hasSplitMainButtonDisabled = 'disabled' %}
+    {% else %}
+        {% set hasSplitMainButtonDisabled = '' %}
+    {% endif %}
+    {% if splitMainButtonIcon %}
+        {% set hasSplitMainButtonIcon = '<i class="fas fa-fw fa-' ~ splitMainButtonIcon ~ ' mr-1"></i>' %}
+    {% else %}
+        {% set hasSplitMainButtonIcon = '' %}
+    {% endif %}
+    {% if splitDropdownButtonHover %}
+        {% set hasSplitDropdownButtonHover = 'dropdown-hover' %}
+    {% endif %}
+    {% if splitDropdownButtonHidden == true %}
+        {% set hasSplitDropdownButtonHidden = 'hidden' %}
+    {% else %}
+        {% set hasSplitDropdownButtonHidden = '' %}
+    {% endif %}
+    {% if splitDropdownButtonDisabled == true %}
+        {% set hasSplitDropdownButtonDisabled = 'disabled' %}
+    {% else %}
+        {% set hasSplitDropdownButtonDisabled = '' %}
+    {% endif %}
+    {% if splitDropdownDirection %}
+        {% set hasSplitDropdownDirection = 'drop' ~ splitDropdownDirection %}
+    {% else %}
+        {% set hasSplitDropdownDirection = '' %}
+    {% endif %}
+    {% if splitDropdownPosition %}
+        {% set hasSplitDropdownPosition = 'float-' ~ splitDropdownPosition %}
+    {% else %}
+        {% set hasSplitDropdownPosition = '' %}
+    {% endif %}
+    {% if splitDropdownAlign == 'right' %}
+        {% set hasSplitDropdownAlign = 'dropdown-menu-right' %}
+    {% else %}
+        {% set hasSplitDropdownAlign = '' %}
+    {% endif %}
+    <div class="btn-group {{hasSplitDropdownDirection}} {{hasSplitDropdownPosition}}">
+        {% if splitMainButtonUrl %}
+            <a href="{{splitMainButtonUrl}}" id="{{hasMainSplitButtonId}}" class="text-white btn btn-{{splitMainButtonType|default('primary')}} btn-{{hasSplitButtonSize}} {{splitMainButtonAdditionalClass}}" {{hasSplitMainButtonDisabled}} {{hasSplitMainButtonHidden}} role="button" {{hasButtonHidden}}>
+                {{hasSplitMainButtonIcon|raw}} {{splitButtonIdMissing|upper}}{{hasSplitMainButtonTitle|upper}}
+            </a>
+        {% else %}
+            <button type="button" id="{{hasMainSplitButtonId}}" class="text-white btn btn-{{splitMainButtonType|default('primary')}} btn-{{hasSplitButtonSize}} {{splitMainButtonAdditionalClass}}" {{hasSplitMainButtonDisabled}} {{hasSplitMainButtonHidden}} {{hasButtonHidden}}>
+                {{hasSplitMainButtonIcon|raw}} {{splitButtonIdMissing|upper}}{{hasSplitMainButtonTitle|upper}}
+            </button>
+        {% endif %}
+        <button type="button" id="{{hasMainSplitButtonId}}-split-dropdown" class="btn btn-{{splitDropdownButtonType|default('default')}} btn-{{hasSplitButtonSize}} dropdown-toggle {{hasSplitDropdownButtonHover}} dropdown-icon {{splitDropdownButtonAdditionalClass}}" data-toggle="dropdown" {{hasSplitDropdownButtonDisabled}} {{hasSplitDropdownButtonHidden}}>
+            <div class="dropdown-menu {{hasSplitDropdownAlign}}" role="menu">
+            {% for index, links in splitDropdownButtonListLinks %}
+                {% if links.icon %}
+                    {% set hasLinkIcon = '<i class="fas fa-fw fa-' ~ links.icon ~ ' mr-1"></i>' %}
+                {% else %}
+                    {% set hasLinkIcon = '' %}
+                {% endif %}
+                {% if componentId and sectionId %}
+                    {% set hasLinkId = componentId ~ '-' ~ sectionId ~ '-' ~ index %}
+                {% elseif sectionId %}
+                    {% set hasLinkId = sectionId ~ '-' ~ index %}
+                {% else %}
+                    {% set hasLinkId = index %}
+                {% endif %}
+                {% if index == 'divider' %}
+                    <div class="dropdown-divider"></div>
+                {% else %}
+                    <a id="{{hasLinkId}}" class="dropdown-item {{links.additionalClass}}" href="{{links.url|default('#')}}">{{hasLinkIcon|raw}} {{links.title}}</a>
+                {% endif %}
+            {% endfor %}
+            </div>
+        </button>
+    </div>
+{# Radio Button Group #}
+{% elseif buttonType == 'button-radio-group' %}
+    {% if buttonLabel %}
+        <label style="display:block;">{{buttonLabel|upper}}</label>
+    {% endif %}
+    {% if buttons %}
+        {% if buttonBlock == true %}
+            {% set hasButtonBlock = 'btn-block' %}
+        {% endif %}
+        {% if buttonPosition %}
+            {% set hasButtonPosition = 'float-' ~ buttonPosition %}
+        {% else %}
+            {% set hasButtonPosition = '' %}
+        {% endif %}
+        <div class="btn-group btn-group-toggle btn-group-{{buttonGroupSize|default('sm')}} {{hasButtonBlock}} {{hasButtonPosition}}" data-toggle="buttons">
+        {% for buttonKey, button in buttons %}
+            {% if not button.title == false %}
+                {% if button.title %}
+                    {% set hasButtonTitle = button.title %}
+                {% else %}
+                    {% set hasButtonTitle = ' missing_button_title' %}
+                {% endif %}
+            {% elseif button.title == false %}
+                    {% set hasButtonTitle = '' %}
+            {% endif %}
+            {% if button.size %}
+                {% set hasButtonSize = 'btn-' ~ button.size %}
+            {% else %}
+                {% set hasButtonSize = 'btn-sm' %}
+            {% endif %}
+            {% if button.flat == true %}
+                {% set hasButtonFlat = 'btn-flat' %}
+            {% endif %}
+            {% if button.type %}
+                {% set hasButtonType = 'btn-' ~ button.type %}
+            {% else %}
+                {% set hasButtonType = 'btn-primary' %}
+            {% endif %}
+            {% if button.style == 'outline' %}
+                {% set hasButtonType = 'btn-outline-' ~ button.type %}
+            {% elseif button.style == 'gradient' %}
+                {% set hasButtonType = 'bg-gradient-' ~ button.type %}
+            {% endif %}
+            {% if button.icon %}
+                {% if button.title %}
+                    {% if button.iconPosition == 'after' %}
+                        {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ ' ml-1"></i>' %}
+                    {% else %}
+                        {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ ' mr-1"></i>' %}
+                    {% endif %}
+                {% else %}
+                    {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ '"></i>' %}
+                {% endif %}
+            {% else %}
+                {% set hasButtonIcon = '' %}
+            {% endif %}
+            {% if fieldRadioButtonGroupButtonChecked %}
+                {% if fieldRadioButtonGroupButtonChecked == button.dataValue %}
+                    {% set hasButtonChecked = 'checked' %}
+                    {% set hasButtonCheckedClasses = 'active focus' %}
+                    {% set hasButtonCheckedBgClass = 'bg-' ~ button.type %}
+                {% else %}
+                    {% set hasButtonChecked = '' %}
+                    {% set hasButtonCheckedClasses = '' %}
+                    {% set hasButtonCheckedBgClass = '' %}
+                {% endif %}
+            {% else %}
+                {% if button.checked %}
+                    {% set hasButtonChecked = 'checked' %}
+                    {% set hasButtonCheckedClasses = 'active focus' %}
+                {% else %}
+                    {% set hasButtonChecked = '' %}
+                    {% set hasButtonCheckedClasses = '' %}
+                {% endif %}
+            {% endif %}
+            {% if button.hidden == true %}
+                {% set hasButtonHidden = 'hidden' %}
+            {% else %}
+                {% set hasButtonHidden = '' %}
+            {% endif %}
+            {% if button.disabled == true %}
+                {% set hasButtonDisabled = 'disabled' %}
+                {% set hasButtonCursor = 'style=cursor:default;' %}
+            {% else %}
+                {% set hasButtonDisabled = '' %}
+                {% set hasButtonCursor = 'style=cursor:pointer;' %}
+            {% endif %}
+            {% if componentId and sectionId %}
+                {% set hasButtonId = componentId ~ '-' ~ sectionId ~ '-' ~ buttonKey %}
+            {% else %}
+                {% set hasButtonId = buttonKey %}
+            {% endif %}
+            <label class="btn {{hasButtonSize}} {{hasButtonFlat}} {{hasButtonType}} {{hasButtonCheckedClasses}} {{hasButtonDisabled}} {{button.buttonAdditionalClass}} {{hasButtonCheckedBgClass}}" {{hasButtonCursor}} {{hasButtonHidden}}>
+                <input type="radio" name="options" id="{{hasButtonId}}" autocomplete="off" data-value="{{button.dataValue}}" {{hasButtonChecked}}>
+                {% if button.iconPosition %}
+                    {% if button.iconPosition == 'after' %}
+                        {{buttonIdMissing|upper}}{{hasButtonTitle|upper}} {{hasButtonIcon|raw}}
+                    {% else %}
+                        {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                    {% endif %}
+                {% else %}
+                    {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                {% endif %}
+            </label>
+        {% endfor %}
+        </div>
+    {% else %}
+        <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: buttons (ARRAY) MISSING')}}</span>
+    {% endif %}
+{# button-group #}
+{% elseif buttonType == 'button-group' %}
+    {% if buttonLabel %}
+        <label style="display:block;">{{buttonLabel|upper}}</label>
+    {% endif %}
+    {% if buttonBlock == true %}
+        {% set hasButtonBlock = 'btn-block' %}
+    {% endif %}
+    {% if buttonGroupType == 'vertical' %}
+        <div class="btn-group-vertical">
+    {% else %}
+        <div class="btn-group {{hasButtonBlock}}">
+    {% endif %}
+        {% for buttonKey, button in buttons %}
+            {% if button.modalButton %}
+                {% set isModalButton = 'data-toggle=modal data-target=#' ~ modalId ~ '-modal' %}
+            {% endif %}
+            {% if not button.title == false %}
+                {% if button.title %}
+                    {% set hasButtonTitle = button.title %}
+                {% else %}
+                    {% set hasButtonTitle = ' missing_button_title' %}
+                {% endif %}
+            {% elseif button.title == false %}
+                    {% set hasButtonTitle = '' %}
+            {% endif %}
+            {% if button.hidden == true %}
+                {% set hasButtonHidden = 'hidden' %}
+            {% else %}
+                {% set hasButtonHidden = '' %}
+            {% endif %}
+            {% if button.disabled == true %}
+                {% set hasButtonDisabled = 'disabled' %}
+            {% else %}
+                {% set hasButtonDisabled = '' %}
+            {% endif %}
+            {% if button.position %}
+                {% set hasButtonPosition = 'float-' ~ button.position %}
+            {% else %}
+                {% set hasButtonPosition = '' %}
+            {% endif %}
+            {% if button.size %}
+                {% set hasButtonSize = 'btn-' ~ button.size %}
+            {% else %}
+                {% set hasButtonSize = '' %}
+            {% endif %}
+            {% if button.flat == true %}
+                {% set hasButtonFlat = 'btn-flat' %}
+            {% endif %}
+            {% if button.type %}
+                {% set hasButtonType = 'btn-' ~ button.type %}
+            {% else %}
+                {% set hasButtonType = 'btn-primary' %}
+            {% endif %}
+            {% if button.style == 'outline' %}
+                {% set hasButtonType = 'btn-outline-' ~ button.type %}
+            {% elseif button.style == 'gradient' %}
+                {% set hasButtonType = 'bg-gradient-' ~ button.type %}
+            {% endif %}
+            {% if button.icon %}
+                {% if button.title %}
+                    {% if button.iconPosition == 'after' %}
+                        {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ ' ml-1"></i>' %}
+                    {% else %}
+                        {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ ' mr-1"></i>' %}
+                    {% endif %}
+                {% else %}
+                    {% set hasButtonIcon = '<i class="fas fa-fw fa-' ~ button.icon ~ '"></i>' %}
+                {% endif %}
+            {% else %}
+                {% set hasButtonIcon = '' %}
+            {% endif %}
+            {% if componentId and sectionId %}
+                {% set hasButtonId = componentId ~ '-' ~ sectionId ~ '-' ~ buttonKey %}
+            {% else %}
+                {% set hasButtonId = buttonKey %}
+            {% endif %}
+            <button type="button" class="btn {{hasButtonSize}} {{hasButtonFlat}} {{hasButtonType}} {{hasButtonMargin}} {{hasButtonPosition}} {{button.buttonAdditionalClass}}" id="{{hasButtonId}}" {{hasButtonDisabled}} {{hasButtonHidden}} {{isModalButton}}>
+                {% if button.iconPosition %}
+                    {% if button.iconPosition == 'after' %}
+                        {{buttonIdMissing|upper}}{{hasButtonTitle|upper}} {{hasButtonIcon|raw}}
+                    {% else %}
+                        {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                    {% endif %}
+                {% else %}
+                    {{hasButtonIcon|raw}} {{buttonIdMissing|upper}}{{hasButtonTitle|upper}}
+                {% endif %}
+            </button>
+        {% endfor %}
+    {% if buttonGroupType == 'vertical' %}
+        </div>
+    {% else %}
+        </div>
+    {% endif %}
+{# button-app #}
+{% elseif buttonType == 'button-app' %}
+    {% if buttonLabel %}
+        <label style="display:block;">{{buttonLabel|upper}}</label>
+    {% endif %}
+    {% for buttonKey, button in buttons %}
+        {% if button.modalButton %}
+            {% set isModalButton = 'data-toggle=modal data-target=#' ~ modalId ~ '-modal' %}
+        {% endif %}
+        {% if button.hidden %}
+            {% set hasButtonHidden = 'hidden' %}
+        {% endif %}
+        {% if button.disabled %}
+            {% set hasButtonDisabled = 'disabled' %}
+        {% endif %}
+        {% if button.position %}
+            {% set hasButtonPosition = 'float-' ~ button.position %}
+        {% endif %}
+        {% if button.block == true %}
+            {% set hasButtonBlock = 'btn-block' %}
+        {% endif %}
+        {% if componentId and sectionId %}
+            {% set hasButtonId = componentId ~ '-' ~ sectionId ~ '-' ~ buttonKey %}
+        {% else %}
+            {% set hasButtonId = buttonKey %}
+        {% endif %}
+        <button type="button" id="{{hasButtonId}}" class="btn btn-app {{hasButtonPosition}} {{hasButtonBlock}}" {{hasButtonDisabled}} {{hasButtonHidden}} {{isModalButton}}>
+            <span class="badge bg-{{button.badgeType|default('primary')}}">{{button.badgeText}}</span>
+            <i class="fas fa-{{button.icon}}"></i> {{button.title|upper}}
+        </button>
+    {% endfor %}
+{# datatable-buttons #}
+{% elseif buttonType == 'datatable-buttons' %}
+    {{include('thelpers/buttons.html', {
+        buttonType      : 'button',
+        buttons         : {
+                            'update-button'    : {
+                                'title'     : 'Update',
+                                'position'  : 'right',
+                                'icon'      : 'plus',
+                                'hidden'    : true
+                            },
+                            'cancel-button' : {
+                                'title'     : 'Cancel',
+                                'type'      : 'default',
+                                'position'  : 'right',
+                                'icon'      : 'times',
+                                'hidden'    : true
+                            },
+                            'assign-button' : {
+                                'title'     : 'Assign',
+                                'position'  : 'right',
+                                'icon'      : 'plus',
+                                'hidden'    : false,
+                            }
+                        }
+        }
+    )}}
+{# SectionWithWizard Buttons #}
+{% elseif buttonType == 'sectionWithWizard-buttons' %}
+    {{include('thelpers/buttons.html', {
+        buttonType      : 'button',
+        buttons         : {
+                            'previous'    : {
+                                'title'                 : 'Previous',
+                                'position'              : 'left',
+                                'icon'                  : 'angle-left',
+                                'size'                  : 'xs',
+                                'hidden'                : true
+                            },
+                            'cancel' : {
+                                'title'                 : 'Cancel Wizard',
+                                'type'                  : 'danger',
+                                'position'              : 'center',
+                                'icon'                  : 'times',
+                                'size'                  : 'xs',
+                                'hidden'                : true,
+                                'url'                   : link(wizardCancelUrl),
+                                'buttonAdditionalClass' : 'contentAjaxLink'
+                            },
+                            'next' : {
+                                'title'                 : 'Next',
+                                'position'              : 'right',
+                                'icon'                  : 'angle-right',
+                                'size'                  : 'xs',
+                                'iconPosition'          : 'after',
+                                'hidden'                : true
+                            },
+                            'submit' : {
+                                'title'                 : 'Submit',
+                                'position'              : 'right',
+                                'size'                  : 'xs',
+                                'iconPosition'          : 'after',
+                                'hidden'                : true
+                            },
+                            'done' : {
+                                'title'                 : 'Done',
+                                'position'              : 'right',
+                                'size'                  : 'xs',
+                                'iconPosition'          : 'after',
+                                'hidden'                : true,
+                                'url'                   : link(wizardDoneUrl),
+                                'buttonAdditionalClass' : 'contentAjaxLink'
+                            }
+                        }
+        }
+    )}}
+{% elseif buttonType == 'sectionWithForm-buttons' %}
+    <div id="{{componentId}}-{{sectionId}}-action-buttons">
+        {% if createActionUrl %}
+            {{include('thelpers/buttons.html', {
+                buttonType: 'button',
+                buttons           : {
+                                    'create' : {
+                                        'title'                 : 'Add',
+                                        'icon'                  : 'plus',
+                                        'type'                  : 'primary',
+                                        'position'              : 'right',
+                                        'size'                  : 'sm',
+                                        'buttonAdditionalClass' : 'mr-1 ml-1',
+                                        'action'                : 'post',
+                                        'actionTarget'          : actionTarget|default('mainContent'),
+                                        'actionUrl'             : link(createActionUrl),
+                                        'successRedirectUrl'    : link(createSuccessRedirectUrl),
+                                        'successNotifyMessage'  : createSuccessNotifyMessage
+                                    }
+                                }
+                            }
+            )}}
+            {% if cancelActionUrl %}
+                {{include('thelpers/buttons.html', {
+                    buttonType: 'button',
+                    buttons           : {
+                                        'cancel' : {
+                                            'title'                 : 'Cancel',
+                                            'icon'                  : 'times',
+                                            'type'                  : 'default',
+                                            'position'              : 'right',
+                                            'size'                  : 'sm',
+                                            'buttonAdditionalClass' : 'mr-1 ml-1',
+                                            'actionUrl'             : link(cancelActionUrl)
+                                        }
+                                    }
+                                }
+                )}}
+            {% endif %}
+        {% elseif editActionUrl %}
+            {{include('thelpers/buttons.html', {
+                buttonType: 'button',
+                buttons           : {
+                                    'edit' : {
+                                        'title'                 : 'Update',
+                                        'icon'                  : 'plus',
+                                        'type'                  : 'warning',
+                                        'position'              : 'right',
+                                        'size'                  : 'sm',
+                                        'buttonAdditionalClass' : 'mr-1 ml-1',
+                                        'action'                : 'post',
+                                        'actionTarget'          : actionTarget|default('mainContent'),
+                                        'actionUrl'             : link(editActionUrl),
+                                        'successRedirectUrl'    : link(editSuccessRedirectUrl),
+                                        'successNotifyMessage'  : editSuccessNotifyMessage
+                                    }
+                                }
+                            }
+            )}}
+            {% if cancelActionUrl %}
+                {{include('thelpers/buttons.html', {
+                    buttonType: 'button',
+                    buttons           : {
+                                        'cancel' : {
+                                            'title'                 : 'Cancel',
+                                            'icon'                  : 'times',
+                                            'type'                  : 'default',
+                                            'position'              : 'right',
+                                            'size'                  : 'sm',
+                                            'buttonAdditionalClass' : 'mr-1 ml-1',
+                                            'actionUrl'             : link(cancelActionUrl)
+                                        }
+                                    }
+                                }
+                )}}
+            {% endif %}
+        {% elseif closeActionUrl %}
+            {{include('thelpers/buttons.html', {
+                buttonType: 'button',
+                buttons           : {
+                                    'close' : {
+                                        'title'                     : 'Close',
+                                        'icon'                      : 'times',
+                                        'type'                      : 'default',
+                                        'position'                  : 'right',
+                                        'size'                      : 'sm',
+                                        'buttonAdditionalClass'     : 'mr-1 ml-1',
+                                        'actionUrl'                 : link(closeActionUrl)
+                                    }
+                                }
+                            }
+            )}}
+        {% endif %}
+    </div>
+{% else %}
+    <span class="text-uppercase text-danger">{{('TEMPLATE ERROR: buttonType MISSING')}}</span>
+{% endif %}

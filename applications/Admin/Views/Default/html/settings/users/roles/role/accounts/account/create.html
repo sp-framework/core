@@ -1,0 +1,6 @@
+{{include('settings/users/roles/role/accounts/account/view.html', {
+    createActionUrl             : 'settings/users/roles/role/accounts/account/create',
+    createSuccessRedirectUrl    : 'settings/users/roles/role/accounts/view&id=' ~ role.id,
+    createSuccessNotifyMessage  : 'Account added to role.',
+    cancelActionUrl             : 'settings/users/roles/view'
+})}}

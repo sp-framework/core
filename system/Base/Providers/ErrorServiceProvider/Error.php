@@ -28,8 +28,6 @@ class Error
 		$this->config = $config;
 
 		$this->logger = $logger;
-
-		$this->exceptionHandler = new ExceptionHandlers;
 	}
 
 	public function init()
@@ -84,8 +82,10 @@ class Error
 
 	public function customHandler()
 	{
-		if (method_exists($this->exceptionHandler, $method = "handle{$this->class}")) {
-			return $this->exceptionHandler->{$method}($this->exception);
+		$exceptionHandler = new ExceptionHandlers;
+
+		if (method_exists($exceptionHandler, $method = "handle{$this->class}")) {
+			return $exceptionHandler->{$method}($this->exception);
 		} else {
 			return false;
 		}

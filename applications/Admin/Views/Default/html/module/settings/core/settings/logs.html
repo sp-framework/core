@@ -1,84 +1,84 @@
 {% if settings['logs']['enabled'] == 'true' %}
-	{% set logsChecked = 'checked' %}
+    {% set logsChecked = 'checked' %}
 {% endif %}
 {% if settings['logs']['email'] == 'true' %}
-	{% set logsChecked = 'checked' %}
+    {% set logsChecked = 'checked' %}
 {% endif %}
 {% set logLevels =
-	{
-		"0" : "EMERGENCY",
-		"1" : "CRITICAL",
-		"2" : "ALERT",
-		"3" : "ERROR",
-		"4" : "WARNING",
-		"5" : "NOTICE",
-		"6" : "INFO",
-		"7" : "DEBUG",
-		"8" : "CUSTOM"
-	}
+    {
+        "0" : "EMERGENCY",
+        "1" : "CRITICAL",
+        "2" : "ALERT",
+        "3" : "ERROR",
+        "4" : "WARNING",
+        "5" : "NOTICE",
+        "6" : "INFO",
+        "7" : "DEBUG",
+        "8" : "CUSTOM"
+    }
 %}
 {% set logServices =
-	{
-		"streamLogs" 	: "Stream Logs",
-		"dbLogs" 		: "Database Logs"
-	}
+    {
+        "streamLogs"    : "Stream Logs",
+        "dbLogs"        : "Database Logs"
+    }
 %}
 <div class="row p-2">
-	<div class="col">
-		<legend>Logs</legend>
-		<div class="row">
-			<div class="form-group col">
-				<label for="logs-enabled">Logs Enabled?</label>
-				<div class="checkbox icheck-info">
-					<input type="checkbox" name="logs-enabled" id="logs-enabled" {{logsChecked|default('')}}>
-					<label for="logs-enabled"></label>
-				</div>
-			</div>
-			<div class="form-group col-md-8">
-				<label for="log-level">Log At Level</label>
-				<select class="custom-select" id="log-level">
-					{% for logLevelKey, logLevel in logLevels %}
-						{% if settings['logs']['level'] == logLevel %}
-							<option value="{{logLevelKey}}" selected>{{logLevel}}</option>
-						{% else %}
-							<option value="{{logLevelKey}}">{{logLevel}}</option>
-						{% endif %}
-					{% endfor %}
-				</select>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col form-group">
-				<label for="logs-service">Cache Service</label>
-				<select class="custom-select" id="logs-service">
-					<option value="0">Select Log Service</option>
-					{% for logServiceKey, logService in logServices %}
-						{% if settings['logs']['service'] == logServiceKey %}
-							<option value="{{logServiceKey}}" selected>{{logService}}</option>
-						{% else %}
-							<option value="{{logServiceKey}}">{{logService}}</option>
-						{% endif %}
-					{% endfor %}
-				</select>
-			</div>
-		</div>
-		<div class="row">
-			<div class="form-group col">
-				<label for="email-logs-enabled">Email Logs Enabled?</label>
-				<div class="checkbox icheck-info">
-					<input type="checkbox" name="email-logs-enabled" id="email-logs-enabled" {{emailLogsChecked|default('')}}>
-					<label for="email-logs-enabled"></label>
-				</div>
-			</div>
-		</div>
-		<div class="row" id="email-logs-recipients-textarea">
-			<div class="form-group col">
-				<label for="email-logs-recipients">Emergency Logs Recipients</label>
-				<textarea class="form-control" rows="3" id="email-logs-recipients" placeholder="email1,email2,email3,..." value="{{settings['logs']['emergencyEmails']}}"></textarea>
-			</div>
-		</div>
-		<small class="text-info">
-			Note: Emails are only sent for Emergency, Critical & Alert Logs. Core email settings required for this to work. If there are logs pertaining to Email service, they will be logged in var/log/debug.log file.
-		</small>
-	</div>
+    <div class="col">
+        <legend>Logs</legend>
+        <div class="row">
+            <div class="form-group col">
+                <label for="logs-enabled">Logs Enabled?</label>
+                <div class="checkbox icheck-info">
+                    <input type="checkbox" name="logs-enabled" id="logs-enabled" {{logsChecked|default('')}}>
+                    <label for="logs-enabled"></label>
+                </div>
+            </div>
+            <div class="form-group col-md-8">
+                <label for="log-level">Log At Level</label>
+                <select class="custom-select" id="log-level">
+                    {% for logLevelKey, logLevel in logLevels %}
+                        {% if settings['logs']['level'] == logLevel %}
+                            <option value="{{logLevelKey}}" selected>{{logLevel}}</option>
+                        {% else %}
+                            <option value="{{logLevelKey}}">{{logLevel}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col form-group">
+                <label for="logs-service">Cache Service</label>
+                <select class="custom-select" id="logs-service">
+                    <option value="0">Select Log Service</option>
+                    {% for logServiceKey, logService in logServices %}
+                        {% if settings['logs']['service'] == logServiceKey %}
+                            <option value="{{logServiceKey}}" selected>{{logService}}</option>
+                        {% else %}
+                            <option value="{{logServiceKey}}">{{logService}}</option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col">
+                <label for="email-logs-enabled">Email Logs Enabled?</label>
+                <div class="checkbox icheck-info">
+                    <input type="checkbox" name="email-logs-enabled" id="email-logs-enabled" {{emailLogsChecked|default('')}}>
+                    <label for="email-logs-enabled"></label>
+                </div>
+            </div>
+        </div>
+        <div class="row" id="email-logs-recipients-textarea">
+            <div class="form-group col">
+                <label for="email-logs-recipients">Emergency Logs Recipients</label>
+                <textarea class="form-control" rows="3" id="email-logs-recipients" placeholder="email1,email2,email3,..." value="{{settings['logs']['emergencyEmails']}}"></textarea>
+            </div>
+        </div>
+        <small class="text-info">
+            Note: Emails are only sent for Emergency, Critical & Alert Logs. Core email settings required for this to work. If there are logs pertaining to Email service, they will be logged in var/log/debug.log file.
+        </small>
+    </div>
 </div>

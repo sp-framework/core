@@ -1,0 +1,9 @@
+.sectionWithListDatatable .custom-select {
+	-webkit-appearance  : none;
+}
+.table th, .table td {
+	padding: 0.5rem !important;
+}
+.dataTable-pointer {
+	cursor: pointer;
+}

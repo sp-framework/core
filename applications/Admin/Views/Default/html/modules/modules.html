@@ -1,272 +1,317 @@
-{% if thisApplication['route'] and thisApplication['route'] != '' %}
-	{% set route = thisApplication['route']|lower %}
-{% else %}
-	{% set route = thisApplication['name']|lower %}
-{% endif %}
+{% set route = cardBodyIncludeParams['route'] %}
+<div class="row vdivide">
+    <div id="filter" class="col text-center">
+        {% include 'modules/filter.html' %}
+    </div>
+    <div id="repo" class="col text-center">
+        {% include 'repositories/view.html' %}
+    </div>
+</div>
+<hr>
 {% if responseCode == 1 %}
-	<div class="row">
-		<div class="col">
-			<div class="alert alert-danger mt-2 mb-2">{{responseMessage|e}}</div>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-danger mt-2 mb-2">{{responseMessage|e}}</div>
+        </div>
+    </div>
 {% endif %}
 {% if counter is defined %}
-	<input type="hidden" name="register-counter" id="register-counter" class="form-control" value="{{counter['register']}}">
-	<input type="hidden" name="update-counter" id="update-counter" class="form-control" value="{{counter['update']}}">
+    <input type="hidden" name="register-counter" id="register-counter" class="form-control" value="{{counter['register']}}">
+    <input type="hidden" name="update-counter" id="update-counter" class="form-control" value="{{counter['update']}}">
 {% endif %}
-{% for modulesKey, modules in modulesData %}
-	<div id="modules-data-{{modulesKey}}" class="card mb-2">
-		<div class="card-header bg-primary p-1 text-white text-center font-weight-bold text-uppercase">
-			{{modulesKey|upper}}
-		</div>
-		<div class="card-body">
-			{% if modules|length != 0 %}
-				<div class="row">
-					{% for moduleKey, module in modules %}
-						{% if module['error'] is not defined %}
-							{% if modulesKey == 'core' %}
-								{% set colSize = '12' %}
-							{% else %}
-								{% set colSize = '4' %}
-							{% endif %}
-							<div class="col-md-{{colSize}} mb-3">
-								<div class="card">
-									<div class="card-header bg-info pl-2 p-1 text-white text-truncate">
-										{% if module['display_name'] %}
-											<label class="m-0 font-weight-bold">{{module['display_name']}}
-										{% else %}
-											<label class="m-0 font-weight-bold">{{module['name']}}
-										{% endif %}
-										{% if module['is_default'] is defined and module['is_default'] == 1 %}
-											(Default)
-										{% endif %}
-										</label>
-									</div>
-									<div class="card-body">
-										{% if module['display_name'] %}
-											<div class="row">
-												<div class="col-md-4">
-													<p class="card-text">Name:</p>
-												</div>
-												<div class="col">
-													<p class="card-text">{{module['name']}}</p>
-												</div>
-											</div>
-										{% endif %}
-										<div class="row">
-											<div class="col-md-4">
-												<p class="card-text">Version:</p>
-											</div>
-											<div class="col">
-												{% if module['update_available'] == true %}
-													<span class="badge badge-secondary">{{module['version']}}</span>
-													<span class="badge badge-info">(Update Available: {{module['update_version']}})</span>
-												{% else %}
-													<span class="badge badge-secondary">{{module['version']}}</span>
-												{% endif %}
-											</div>
-										</div>
-										<div class="row">
-											<div class="col-md-4">
-												<p class="card-text">Description:</p>
-											</div>
-											<div class="col">
-												<p class="card-text text-truncate">{{module['description']}}</p>
-											</div>
-										</div>
-										{% if module['dependencies'] is defined %}
-											<div class="row">
-												<div class="col-md-4">
-													<p class="card-text">Dependencies:</p>
-												</div>
-												<div class="col text-truncate">
-												{% for dependenciesKey, dependencies in module['dependencies'] %}
-													{% if dependenciesKey == 'core' or dependenciesKey == 'application' %}
-														<span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
-														<span>{{dependencies['name']}} ({{dependencies['version']}})</span>
-													{% else %}
-														{% if dependencies|length > 0 %}
-															<span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
-															{% for dependencyKey, dependency in dependencies %}
-																<span>{{dependency['name']}} ({{dependency['version']}})</span>
-															{% endfor %}
-														{% endif %}
-													{% endif %}
-												{% endfor %}
-												</div>
-											</div>
-										{% endif %}
-									</div>
-									<div class="card-footer" style="min-height:61.5px;">
-										{% if module['installed'] == true %}
-											<a href="/{{route}}/module/settings" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="settings" data-id="{{module['id']}}" {% if module['application_id'] is defined %}data-applicationid="{{module['application_id']}}" {% endif %} class="btn-settings btn btn-sm btn-primary">
-												<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Settings
-											</a>
-										{% endif %}
-										{% if modulesKey != 'core' and module['installed'] == true %}
-											{% if module['application_id'] is defined and module['application_id'] != 1 and module['name'] != 'Admin' %}
-											<a href="/{{route}}/module/uninstall" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="uninstall" data-id="{{module['id']}}" class="btn-uninstall btn btn-sm btn-danger float-right">
-												<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Uninstall
-											</a>
-											{% endif %}
-										{% else %}
-											{% if modulesKey != 'core' %}
-												<a href="/{{route}}/module/delete" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="delete" data-id="{{module['id']}}" class="btn-delete btn btn-sm btn-danger">
-													<span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Delete
-												</a>
-												<a href="/{{route}}/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view" data-subprocess="install" data-id="{{module['id']}}" class="btn-view btn btn-sm btn-info float-right">Install
-												</a>
-											{% endif %}
-										{% endif %}
-										{% if module['update_available'] == true %}
-											<a href="/{{route}}/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view"  data-subprocess="update" data-id="{{module['id']}}" class="btn-update btn btn-sm btn-info float-right mr-2">Update
-											</a>
-										{% endif %}
-									</div>
-								</div>
-							</div>
-						{% else %}
-							<div class="col-md-4 mb-2">
-								<div class="card">
-									<div class="card-header bg-danger">
-										<label class="m-0 font-weight-bold">Error with - {{moduleKey}}
-									</div>
-									<div class="card-body">
-										<div class="row">
-											<div class="col">
-												<p class="card-text">
-													There seems to be an error while downloading module information for {{moduleKey}}.<br>
-													Please check with the module developer. <br><br>
-													Common reason: <b>Incorrect XML file.</b>
-												</p>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						{% endif %}
-					{% endfor %}
-				</div>
-			{% elseif modules|length == 0 %}
-				<div class="row">
-					<div class="col">
-						<span class="text-warning">
-							No {{modulesKey}} registered. Install Barebone {{modulesKey}} (development mode) or sync with remote repository.
-						</span>
-					</div>
-				</div>
-			{% endif %}
-		</div>
-	</div>
+{% for modulesKey, modules in cardBodyIncludeParams['modulesData'] %}
+    <div id="modules-data-{{modulesKey}}" class="card mb-2">
+        <div class="card-header bg-primary p-1 text-white text-center font-weight-bold text-uppercase">
+            {{modulesKey|upper}}
+        </div>
+        <div class="card-body">
+            {% if modules|length != 0 %}
+                <div class="row">
+                    {% for moduleKey, module in modules %}
+                        {% if module['error'] is not defined %}
+                            {% if modulesKey == 'core' %}
+                                {% set colSize = '12' %}
+                            {% else %}
+                                {% set colSize = '4' %}
+                            {% endif %}
+                            <div class="col-md-{{colSize}} mb-3">
+                                <div class="card">
+                                    <div class="card-header bg-info pl-2 p-1 text-white text-truncate">
+                                        {% if module['display_name'] %}
+                                            <label class="m-0 font-weight-bold">{{module['display_name']}}</label>
+                                        {% else %}
+                                            <label class="m-0 font-weight-bold">{{module['name']}}</label>
+                                        {% endif %}
+                                        {% if module['is_default'] is defined and module['is_default'] == 1 %}
+                                            <label class="m-0 font-weight-bold">(Default)</label>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-body">
+                                        {% if module['display_name'] %}
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <p class="card-text">Name:</p>
+                                                </div>
+                                                <div class="col">
+                                                    <p class="card-text">{{module['name']}}</p>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <p class="card-text">Version:</p>
+                                            </div>
+                                            <div class="col">
+                                                {% if module['update_available'] == true %}
+                                                    <span class="badge badge-secondary">{{module['version']}}</span>
+                                                    <span class="badge badge-info">(Update Available: {{module['update_version']}})</span>
+                                                {% else %}
+                                                    <span class="badge badge-secondary">{{module['version']}}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <p class="card-text">Description:</p>
+                                            </div>
+                                            <div class="col">
+                                                <p class="card-text text-truncate">{{module['description']}}</p>
+                                            </div>
+                                        </div>
+                                        {% if module['dependencies'] is defined %}
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <p class="card-text">Dependencies:</p>
+                                                </div>
+                                                <div class="col text-truncate">
+                                                {% for dependenciesKey, dependencies in module['dependencies'] %}
+                                                    {% if dependenciesKey == 'core' or dependenciesKey == 'application' %}
+                                                        <span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
+                                                        <span>{{dependencies['name']}} ({{dependencies['version']}})</span>
+                                                    {% else %}
+                                                        {% if dependencies|length > 0 %}
+                                                            <span class="font-weight-bold">{{dependenciesKey|capitalize}} : </span>
+                                                            {% for dependencyKey, dependency in dependencies %}
+                                                                <span>{{dependency['name']}} ({{dependency['version']}})</span>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="card-footer" style="min-height:61.5px;">
+                                        {% if module['installed'] == true %}
+                                            {% if module['application_id'] is defined %}
+                                                {% set applicationId = 'data-applicationid="' ~ module['application_id'] ~ '"' %}
+                                            {% endif %}
+                                            <a href="/{{route}}/module/settings" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="settings" data-id="{{module['id']}}" {{applicationid|default(0)}} class="btn-settings btn btn-sm btn-primary">
+                                                <span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Settings
+                                            </a>
+                                        {% endif %}
+                                        {% if modulesKey != 'core' and module['installed'] == true %}
+                                            {% if module['application_id'] is defined and module['application_id'] != 1 and module['name'] != 'Admin' %}
+                                            <a href="/{{route}}/module/uninstall" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="uninstall" data-id="{{module['id']}}" class="btn-uninstall btn btn-sm btn-danger float-right">
+                                                <span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Uninstall
+                                            </a>
+                                            {% endif %}
+                                        {% else %}
+                                            {% if modulesKey != 'core' %}
+                                                <a href="/{{route}}/module/delete" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="delete" data-id="{{module['id']}}" class="btn-delete btn btn-sm btn-danger">
+                                                    <span class="spinner spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span> Delete
+                                                </a>
+                                                <a href="/{{route}}/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view" data-subprocess="install" data-id="{{module['id']}}" class="btn-view btn btn-sm btn-info float-right">Install
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% if module['update_available'] == true %}
+                                            <a href="/{{route}}/module" data-type="{{modulesKey}}" data-name="{{module['display_name']}}" data-process="view" data-subprocess="update" data-id="{{module['id']}}" class="btn-update btn btn-sm btn-info float-right mr-2">Update
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col-md-4 mb-2">
+                                <div class="card">
+                                    <div class="card-header bg-danger">
+                                        <label class="m-0 font-weight-bold">Error with - {{moduleKey}}</label>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <p class="card-text">
+                                                    There seems to be an error while downloading module information for {{moduleKey}}.<br>
+                                                    Please check with the module developer. <br><br>
+                                                    Common reason: <b>Incorrect XML file.</b>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% elseif modules|length == 0 %}
+                <div class="row">
+                    <div class="col">
+                        <span class="text-warning">
+                            No {{modulesKey}} registered. Install Barebone {{modulesKey}} (development mode) or sync with remote repository.
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endfor %}
-<script type="text/javascript">
-	function initModuleButtons() {
-		$('.btn-settings, .btn-update, .btn-view, .btn-uninstall').off();
+<script>
+/*global PNotify */
+function initModuleButtons() {
+    'use strict';
+    $('.btn-settings, .btn-update, .btn-view, .btn-uninstall').off();
 
-		$('.btn-settings, .btn-update, .btn-view, .btn-uninstall').click(function(e) {
-			e.preventDefault();
+    $('.btn-settings, .btn-update, .btn-view, .btn-uninstall').click(function(e) {
+        e.preventDefault();
 
-			$('#modal-save').off();
+        $('#modal-save').off();
 
-			var title = $(this).parents('.card-footer').siblings('.card-header').children('label').html();
+        var title = $(this).parents('.card-footer').siblings('.card-header').children('label').html();
 
-			var submitData;
-			var that = this;
+        var submitData;
+        var that = this;
 
-			submitData = $(this).data();
-			submitData['url'] = $(this).attr('href');
+        submitData = $(this).data();
+        submitData['url'] = $(this).attr('href');
 
-			//eslint-disable-next-line
-			console.log(submitData);
-			if (submitData.process === 'view') {
+        if (submitData.process === 'view') {
 
-				submitData['layout'] = false;
+            submitData['layout'] = false;
 
-				if (submitData.subprocess === 'install') {
-					$.get(submitData.url + '/q/id/' + submitData.id + '/type/' + submitData.type, function(data) {
-						if (data) {
-							$('#modal-title').html(title + ' Information');
-							$('#modal .modal-body').empty().html(data);
-							$('#modal').modal('show');
-							$('#modal-save-text').html('Install ' + submitData['name'] + ' & its dependencies');
+            if (submitData.subprocess === 'install') {
+                $.get(submitData.url + '/q/id/' + submitData.id + '/type/' + submitData.type, function(data) {
+                    if (data) {
+                        $('#modal-title').html(title + ' Information');
+                        $('#modal .modal-body').empty().html(data);
+                        $('#modal').modal('show');
+                        $('#modal-save-text').html('Install ' + submitData['name'] + ' & its dependencies');
 
-							$('#modal-save').click(function() {
-								$('#modal-save-spinner').attr('hidden', false);
-								submitData.process = 'install';
-								delete submitData.subprocess;
-								$.post(submitData.url + '/install', submitData, function(data) {
-									if (data && data.responseCode === 0) {
-										location.reload();
-									} else if (data && data.responseCode === 1) {
-										PNotify.error({
-										  text			: data.responseMessage,
-										  textTrusted	: true
-										});
-										$('#modal-save-spinner').attr('hidden', true);
-										submitData.process = 'view';
-										submitData.subprocess = 'install';
-									}
-								}, 'json');
-							});
-						} else {
-							//
-						}
-					});
-				} else if (submitData.subprocess === 'update') {
-					$.get(submitData.url, submitData, function(data) {
-						if (data) {
-							$('#modal-title').html(title + ' Information');
-							$('#modal .modal-body').empty().html(data);
-							$('#modal').modal('show');
-							if (submitData.type === 'core') {
-								$('#modal-save-text').html('Update ' + submitData['name']);
-							} else {
-								$('#modal-save-text').html('Update ' + submitData['name'] + ' & its dependencies');
-							}
+                        $('#modal-save').click(function() {
+                            $('#modal-save-spinner').attr('hidden', false);
+                            submitData.process = 'install';
+                            delete submitData.subprocess;
+                            $.post(submitData.url + '/install', submitData, function(data) {
+                                if (data && data.responseCode === 0) {
+                                    location.reload();
+                                } else if (data && data.responseCode === 1) {
+                                    PNotify.error({
+                                      text          : data.responseMessage,
+                                      textTrusted   : true
+                                    });
+                                    $('#modal-save-spinner').attr('hidden', true);
+                                    submitData.process = 'view';
+                                    submitData.subprocess = 'install';
+                                }
+                            }, 'json');
+                        });
+                    } else {
+                        //
+                    }
+                });
+            } else if (submitData.subprocess === 'update') {
+                $.get(submitData.url, submitData, function(data) {
+                    if (data) {
+                        $('#modal-title').html(title + ' Information');
+                        $('#modal .modal-body').empty().html(data);
+                        $('#modal').modal('show');
+                        if (submitData.type === 'core') {
+                            $('#modal-save-text').html('Update ' + submitData['name']);
+                        } else {
+                            $('#modal-save-text').html('Update ' + submitData['name'] + ' & its dependencies');
+                        }
 
-							$('#modal-save').click(function() {
-								$('#modal-save-spinner').attr('hidden', false);
-								submitData.process = 'update';
-								delete submitData.subprocess;
-								$.post(submitData.url + '/update', submitData, function(data) {
-									console.log(data);
-									if (data && data.responseCode === 0) {
-										PNotify.success({
-										  text			: data.responseMessage,
-										  textTrusted	: true
-										});
-										location.reload();
-									} else if (data && data.responseCode === 1) {
-										PNotify.error({
-										  text			: data.responseMessage,
-										  textTrusted	: true
-										});
-										$('#modal-save-spinner').attr('hidden', true);
-										submitData.process = 'view';
-										submitData.subprocess = 'update';
-									}
-								}, 'json');
-							});
-						} else {
-							//
-						}
-					});
-				}
-			} else if (submitData.process === 'uninstall') {
-
-			} else if (submitData.process === 'settings') {
-				submitData['layout'] = false;
-				$.get(submitData.url + '/q/id/' + submitData.id + '/type/' + submitData.type, function(data) {
-					if (data) {
-						$('#modal-title').html(title + ' Settings');
-						$('#modal .modal-body').empty().html(data);
-						$('#modal').modal('show');
-					} else {
-						//
-					}
-				});
-			}
-		});
-	}
-	initModuleButtons();
+                        $('#modal-save').click(function() {
+                            $('#modal-save-spinner').attr('hidden', false);
+                            submitData.process = 'update';
+                            delete submitData.subprocess;
+                            $.post(submitData.url + '/update', submitData, function(data) {
+                                if (data && data.responseCode === 0) {
+                                    PNotify.success({
+                                      text          : data.responseMessage,
+                                      textTrusted   : true
+                                    });
+                                    location.reload();
+                                } else if (data && data.responseCode === 1) {
+                                    PNotify.error({
+                                      text          : data.responseMessage,
+                                      textTrusted   : true
+                                    });
+                                    $('#modal-save-spinner').attr('hidden', true);
+                                    submitData.process = 'view';
+                                    submitData.subprocess = 'update';
+                                }
+                            }, 'json');
+                        });
+                    } else {
+                        //
+                    }
+                });
+            }
+        } else if (submitData.process === 'uninstall') {
+            //
+        } else if (submitData.process === 'settings') {
+            submitData['layout'] = false;
+            $.get(submitData.url + '/q/id/' + submitData.id + '/type/' + submitData.type, function(data) {
+                if (data) {
+                    $('#modal-title').html(title + ' Settings');
+                    $('#modal .modal-body').empty().html(data);
+                    $('#modal').modal('show');
+                } else {
+                    //
+                }
+            });
+        }
+    });
+}
+initModuleButtons();
 </script>
+<div class="row">
+    <div class="col">
+        <div id="modules" class="card mt-2 mb-2">
+            <div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase"></div>
+            <div class="card-body">
+                <div class="row mt-2" id="repo-loader" hidden>
+                    <div class="col text-info">
+                        <span id="repo-loader-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% include 'modules/modal.html' %}
+
+{% if flashSession.has('success') %}
+    <script>
+/*global PNotify */
+$(document).ready(function() {
+    'use strict';
+    PNotify.success({
+        text        : '{{flashSession.output()}}',
+        textTrusted : true
+    });
+});
+</script>
+{% elseif flashSession.has('error') %}
+    <script>
+/*global PNotify */
+$(document).ready(function() {
+    'use strict';
+    PNotify.error({
+        text        : '{{flashSession.output()}}',
+        textTrusted : true
+    });
+});
+</script>
+{% endif %}

@@ -9,4 +9,6 @@ composer.lock
 var/*
 *html_compiled
 .vscode*
-system/Configs/Db.php
+linter-backup*
+public/Tms/*
+applications/Tms/*

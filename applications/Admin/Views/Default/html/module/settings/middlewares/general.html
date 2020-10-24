@@ -1,76 +1,76 @@
 <div class="row p-2">
-	<div class="col">
-		<input type="hidden" name="id" id="id" class="form-control" value="{{viewsData.middleware.id}}">
-		<input type="hidden" name="installed" id="installed" class="form-control" value="{{viewsData.middleware.installed}}">
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="version">Version</label>
-					<div class="input-group">
-						<input type="text" name="version" id="version" class="form-control" value="{{viewsData.middleware.version}}" placeholder="Version" disabled>
-					</div>
-				</div>
-			</div>
-			{% if viewsData.middleware.enabled == 0 %}
-				{% set checked = '' %}
-			{% elseif viewsData.middleware.enabled == 1 %}
-				{% set checked = 'checked' %}
-			{% endif %}
-			<div class="col">
-				<label>Enabled?</label>
-				<div class="form-group">
-					<div class="checkbox icheck-success">
-						<input type="checkbox" name="enabled" id="enabled" {{checked}}>
-						<label for="enabled"></label>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-8">
-				<div class="form-group">
-					<label for="class">Class</label>
-					<div class="input-group">
-						<input type="text" name="class" id="class" class="form-control" value="{{viewsData.middleware.class}}" placeholder="Version" disabled>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="name">Middleware Name</label>
-					<div class="input-group">
-						<input type="text" name="name" id="name" class="form-control" value="{{viewsData.middleware.name}}" placeholder="Middleware Name" disabled>
-					</div>
-				</div>
-			</div>
-			<div class="col-md-8">
-				<div class="form-group">
-					<label for="display-name">Middleware Display Name</label>
-					<div class="input-group">
-						<input type="text" name="display-name" id="display-name" class="form-control" value="{{viewsData.middleware.display_name}}" placeholder="Middleware Display Name">
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="description">Description</label>
-					<div class="input-group">
-						<textarea name="description" id="description" class="form-control" placeholder="Description">{{viewsData.middleware.description}}</textarea>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="form-group">
-					<label for="middleware-repo">Repository URL</label>
-					<div class="input-group">
-						<input type="text" name="middleware-repo" id="middleware-repo" class="form-control" placeholder="Eg: https://api.github.com/orgs/h-w-f/middleware-repo" value="{{viewsData.middleware.repo}}">
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="col">
+        <input type="hidden" name="id" id="id" class="form-control" value="{{viewsData.middleware.id}}">
+        <input type="hidden" name="installed" id="installed" class="form-control" value="{{viewsData.middleware.installed}}">
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="version">Version</label>
+                    <div class="input-group">
+                        <input type="text" name="version" id="version" class="form-control" value="{{viewsData.middleware.version}}" placeholder="Version" disabled>
+                    </div>
+                </div>
+            </div>
+            {% if viewsData.middleware.enabled == 0 %}
+                {% set checked = '' %}
+            {% elseif viewsData.middleware.enabled == 1 %}
+                {% set checked = 'checked' %}
+            {% endif %}
+            <div class="col">
+                <label>Enabled?</label>
+                <div class="form-group">
+                    <div class="checkbox icheck-success">
+                        <input type="checkbox" name="enabled" id="enabled" {{checked}}>
+                        <label for="enabled"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="class">Class</label>
+                    <div class="input-group">
+                        <input type="text" name="class" id="class" class="form-control" value="{{viewsData.middleware.class}}" placeholder="Version" disabled>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="name">Middleware Name</label>
+                    <div class="input-group">
+                        <input type="text" name="name" id="name" class="form-control" value="{{viewsData.middleware.name}}" placeholder="Middleware Name" disabled>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="display-name">Middleware Display Name</label>
+                    <div class="input-group">
+                        <input type="text" name="display-name" id="display-name" class="form-control" value="{{viewsData.middleware.display_name}}" placeholder="Middleware Display Name">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <div class="input-group">
+                        <textarea name="description" id="description" class="form-control" placeholder="Description">{{viewsData.middleware.description}}</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="middleware-repo">Repository URL</label>
+                    <div class="input-group">
+                        <input type="text" name="middleware-repo" id="middleware-repo" class="form-control" placeholder="Eg: https://api.github.com/orgs/h-w-f/middleware-repo" value="{{viewsData.middleware.repo}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
