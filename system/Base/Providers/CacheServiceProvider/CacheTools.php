@@ -4,8 +4,6 @@ namespace System\Base\Providers\CacheServiceProvider;
 
 class CacheTools
 {
-	protected $config;
-
 	protected $cacheTimeout;
 
 	protected $cacheService;
@@ -91,12 +89,23 @@ class CacheTools
 		}
 	}
 
-	public function get($cacheKey)
+	public function getCache($cacheKey)
 	{
-		if ($this->cache->has($cacheKey)) {
-			return $this->cache->get($cacheKey);
+		if ($this->cacheConfig->enabled) {
+			if ($this->cache->has($cacheKey)) {
+				return $this->cache->get($cacheKey);
+			}
 		}
 
 		return null;
+	}
+
+	public function setCache(string $cacheKey, array $data)
+	{
+		if ($this->cacheConfig->enabled) {
+			$this->cache->set($cacheKey, $data);
+
+			return true;
+		}
 	}
 }

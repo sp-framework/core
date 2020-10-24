@@ -1,0 +1,61 @@
+
+{% if treeMode == 'jstree' %}
+    {% if items['type'] == 'pdf' %}
+        {% set itemIcon = '{"icon" : "fas fa-fw fa-file-pdf text-sm"}' %}
+    {% elseif (items['type'] == 'jpg') or (items['type'] == 'png') %}
+        {% set itemIcon = '{"icon" : "fas fa-fw fa-file-image text-sm"}' %}
+    {% endif %}
+    {% if itemIcon %}
+        <li class="{{itemAdditionalClass}}" data-id="{{items['id']}}" data-file-type="{{items['type']}}" data-jstree="{{itemIcon}}">
+            {% if items['title'] %}
+                {{items['title']}}
+            {% elseif items['name'] %}
+                {{items['name']}}
+            {% elseif items['entry'] %}
+                {{items['entry']}}
+            {% endif %}
+        </li>
+    {% else %}
+        <li class="{{itemAdditionalClass}}" data-id="{{items['id']}}" data-file-type="{{items['type']}}" data-jstree="">
+            {% if items['title'] %}
+                {{items['title']}}
+            {% elseif items['name'] %}
+                {{items['name']}}
+            {% elseif items['entry'] %}
+                {{items['entry']}}
+            {% endif %}
+        </li>
+    {% endif %}
+{% elseif treeMode === 'sideMenu' %}
+    <li class="nav-item">
+        <a class="nav-link contentAjaxLink" href="{{links.url(items['link'])}}">
+            {% if items['icon'] is defined %}
+                {% set icon = items['icon'] %}
+            {% else %}
+                {% set icon = 'circle' %}
+            {% endif %}
+            <i class="fas fa-fw fa-{{icon}} nav-icon"></i>
+            <p class="text-uppercase">
+                {{items['title']}}
+            </p>
+        </a>
+    </li>
+{% elseif treeMode == 'select2' %}
+    {% set hasKeyValue = '' %}
+    {% set hasValue = '' %}
+    {% set hasValueText = '' %}
+    {% for itemKey, itemValue in items %}
+        {% if itemKey == fieldDataSelect2OptionsKey %}
+            {% set hasKeyValue = itemValue %}
+        {% endif %}
+        {% if itemKey == fieldDataSelect2OptionsValue %}
+            {% set hasValue = itemValue %}
+            {% set hasValueText = itemValue %}
+        {% endif %}
+    {% endfor %}
+        {% if hasKeyValue == fieldDataSelect2OptionsSelected %}
+            <option data-value="{{hasValue}}" value="{{hasKeyValue}}" selected>{{hasValueText}}</option>
+        {% else %}
+            <option data-value="{{hasValue}}" value="{{hasKeyValue}}">{{hasValueText}}</option>
+        {% endif %}
+{% endif %}

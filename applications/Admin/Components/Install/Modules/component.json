@@ -36,6 +36,13 @@
 		"middlewares"	: [],
 		"views"			: []
 	},
+	"menus"				: {
+		"modules"		: {
+			"title"		: "modules",
+			"icon"		: "th-large",
+			"link"		: "modules"
+		}
+	},
 	"settings"		: {
 	}
 }

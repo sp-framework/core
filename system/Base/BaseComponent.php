@@ -6,6 +6,7 @@ use Phalcon\Assets\Collection;
 use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\View;
 use Phalcon\Tag;
@@ -30,8 +31,15 @@ abstract class BaseComponent extends Controller
 
 		$this->view->widget = $this->widget;
 
-		$this->view->applicationName =
-			$this->modules->applications->getApplicationInfo()['name'];
+		$thisApplication = $this->modules->applications->getApplicationInfo();
+
+		$this->view->applicationName = $thisApplication['name'];
+
+		if (isset($thisApplication['route']) && $thisApplication['route'] !== '') {
+			$this->view->route = strtolower($thisApplication['route']);
+		} else {
+			$this->view->route = strtolower($thisApplication['name']);
+		}
 
 		$this->reflection = new \ReflectionClass($this);
 
@@ -42,6 +50,9 @@ abstract class BaseComponent extends Controller
 
 		$this->view->viewName =
 			$this->modules->views->getViewInfo()['name'];
+
+		$this->view->menus =
+			$this->modules->components->buildMenuFromComponents($thisApplication['id']);
 	}
 
 	protected function setDefaultViewResponse()

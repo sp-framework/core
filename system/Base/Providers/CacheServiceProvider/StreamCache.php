@@ -40,7 +40,7 @@ class StreamCache
             $cacheOptions = [
                 'adapter'   => 'stream',
                 'options'   => [
-                    'prefix'            => 'db',
+                    'prefix'            => 'stream',
                     'storageDir'        => $savePath
                 ],
             ];

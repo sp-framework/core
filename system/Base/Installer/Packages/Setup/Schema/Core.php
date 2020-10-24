@@ -78,7 +78,7 @@ class Core
 					new Column(
 						'files',
 						[
-							'type'    => Column::TYPE_TEXT,
+							'type'    => Column::TYPE_MEDIUMTEXT,
 							'notNull' => false,
 						]
 					),

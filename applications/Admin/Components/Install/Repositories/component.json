@@ -36,6 +36,7 @@
 		"middlewares"	: [],
 		"views"			: []
 	},
-	"settings"		: {
+	"menus"				: false,
+	"settings"			: {
 	}
 }

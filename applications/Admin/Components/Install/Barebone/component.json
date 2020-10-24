@@ -26,6 +26,13 @@
 		"middlewares"	: [],
 		"views"			: []
 	},
-	"settings"		: {
+	"menus"				: {
+		"barebone"		: {
+			"title"		: "barebone",
+			"icon"		: "wrench",
+			"link"		: "barebone"
+		}
+	},
+	"settings"			: {
 	}
 }

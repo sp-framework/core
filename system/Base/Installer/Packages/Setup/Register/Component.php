@@ -23,6 +23,10 @@ class Component
 					isset($componentFile['dependencies']) ?
 					json_encode($componentFile['dependencies']) :
 					null,
+				'menus'		 	=>
+					isset($componentFile['menus']) ?
+					json_encode($componentFile['menus']) :
+					null,
 				'application_id'		=> $newApplicationId,
 				'installed'				=> 1,
 				'files'					=> json_encode($installedFiles)

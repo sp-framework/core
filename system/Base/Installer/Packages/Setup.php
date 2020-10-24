@@ -128,26 +128,34 @@ class Setup
 	public function registerModule($type, $newApplicationId)
 	{
 		if ($type === 'applications') {
-			return
-				$this->registerAdminApplication(
-					json_decode(
-						$this->localContent->read('applications/Admin/application.json'),
-						true
-					)
+			$jsonFile =
+				json_decode(
+					$this->localContent->read('applications/Admin/application.json'),
+					true
 				);
+
+			if (!$jsonFile) {
+				throw new \Exception('Problem reading application.json');
+			}
+
+			return $this->registerAdminApplication($jsonFile);
 		} else if ($type === 'components') {
 
 			$adminComponents = $this->localContent->listContents('applications/Admin/Components/Install/', true);
 
 			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
 				if ($adminComponent['basename'] === 'component.json') {
-					$this->registerAdminComponent(
+					$jsonFile =
 						json_decode(
 							$this->localContent->read($adminComponent['path']),
 							true
-						),
-						$newApplicationId
-					);
+						);
+
+					if (!$jsonFile) {
+						throw new \Exception('Problem reading component.json at location ' . $adminComponent['path']);
+					}
+
+					$this->registerAdminComponent($jsonFile, $newApplicationId);
 				}
 			}
 
@@ -157,13 +165,17 @@ class Setup
 
 			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
 				if ($adminPackage['basename'] === 'package.json') {
-					$this->registerAdminPackage(
+					$jsonFile =
 						json_decode(
 							$this->localContent->read($adminPackage['path']),
 							true
-						),
-						$newApplicationId
-					);
+						);
+
+					if (!$jsonFile) {
+						throw new \Exception('Problem reading package.json at location ' . $adminPackage['path']);
+					}
+
+					$this->registerAdminPackage($jsonFile, $newApplicationId);
 				}
 			}
 		} else if ($type === 'middlewares') {
@@ -173,24 +185,31 @@ class Setup
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
-					$this->registerAdminMiddleware(
+					$jsonFile =
 						json_decode(
 							$this->localContent->read($adminMiddleware['path']),
 							true
-						),
-						$newApplicationId
-					);
+						);
+
+					if (!$jsonFile) {
+						throw new \Exception('Problem reading middleware.json at location ' . $adminMiddleware['path']);
+					}
+
+					$this->registerAdminMiddleware($jsonFile, $newApplicationId);
 				}
 			}
 		} else if ($type === 'views') {
-
-			$this->registerAdminView(
+			$jsonFile =
 				json_decode(
 					$this->localContent->read('applications/Admin/Views/Default/view.json'),
 					true
-				),
-				$newApplicationId
-			);
+				);
+
+			if (!$jsonFile) {
+				throw new \Exception('Problem reading view.json');
+			}
+
+			$this->registerAdminView($jsonFile, $newApplicationId);
 		}
 	}
 

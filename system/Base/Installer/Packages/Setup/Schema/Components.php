@@ -83,6 +83,14 @@ class Components
 						]
 					),
 					new Column(
+						'menus',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 2048,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'application_id',
 						[
 							'type'    => Column::TYPE_INTEGER,

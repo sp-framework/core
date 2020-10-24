@@ -386,7 +386,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 	protected function resetCaches(int $id = null)
 	{
 		foreach ($this->cacheKeys as $key => $cacheKey) {
-			$cache = $this->cacheTools->get($cacheKey);
+			$cache = $this->cacheTools->getCache($cacheKey);
 			if ($cache) {
 				if ($id) {
 					$cache->filter(

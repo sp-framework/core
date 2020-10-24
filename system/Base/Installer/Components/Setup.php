@@ -107,7 +107,6 @@ Class Setup
 
 			}
 
-
 			// $this->setupPackage->removeInstaller();
 
 			$this->view->responseCode = 0;

@@ -1,0 +1,78 @@
+
+{% for key, items in treeData %}
+    {% if items['childs'] is defined %}
+        {% include 'thelpers/tree/treegroup.html' %}
+    {% else %}
+        {% include 'thelpers/tree/treeitem.html' %}
+    {% endif %}
+{% endfor %}
+{#
+    MENU Examples
+{
+    "modules" :
+        {
+            "title" : "modules",
+            "icon"  : "th-large",
+            "link"  : "modules"
+        }
+}
+
+{
+    "home" : {
+        "childs" : {
+            "modules": {
+                "childs" : {
+                    "module": {
+                        "title" : "module",
+                        "icon"  : "circle",
+                        "link"  : "admin/modules/modules/module"
+                    }
+                }
+            }
+        }
+    }
+}
+
+{
+    "home" : {
+        "childs" : {
+            "modules": {
+                "childs" : {
+                    "modulees": {
+                        "childs" : {
+                            "modulessss": {
+                                "title" : "modulessss",
+                                "icon"  : "circle",
+                                "link"  : "admin/modules/modules/modulees"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+{
+    "modules" : {
+        "childs" : {
+            "moduless" : {
+                "title" : "moduless",
+                "icon"  : "circle",
+                "link"  : "admin/modules/moduless"
+            }
+        }
+    }
+}
+
+{
+    "home" : {
+        "childs" : {
+            "barebone" : {
+                "title" : "barebone",
+                "icon"  : "circle",
+                "link"  : "admin/barebone"
+            }
+        }
+    }
+} #}

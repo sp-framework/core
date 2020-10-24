@@ -133,3 +133,92 @@ set_error_handler(function ($severity, $message, $file, $line) {
 });
 //To restore defaults
 //restore_error_handler();
+
+if (!function_exists('array_merge_recursive_ex')) {
+    function array_merge_recursive_ex(array $array1, array $array2)
+    {
+        $merged = $array1;
+
+        foreach ($array2 as $key => & $value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = array_merge_recursive_ex($merged[$key], $value);
+            } else if (is_numeric($key)) {
+                 if (!in_array($value, $merged)) {
+                    $merged[] = $value;
+                 }
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+
+        return $merged;
+    }
+}
+
+if (!function_exists('array_merge_recursive_distinct')) {
+    function array_merge_recursive_distinct()
+    {
+        $arrays = func_get_args();
+        $base = array_shift($arrays);
+        if (!is_array($base)) {
+            $base = empty($base) ? array() : array($base);
+        }
+        foreach ($arrays as $append) {
+            if (!is_array($append)) {
+                $append = array($append);
+            }
+            foreach ($append as $key => $value) {
+                if (!array_key_exists($key, $base) and !is_numeric($key)) {
+                    $base[$key] = $append[$key];
+                    continue;
+                }
+                if (is_array($value) or is_array($base[$key])) {
+                    $base[$key] = array_merge_recursive_distinct($base[$key], $append[$key]);
+                } else {
+                    if (is_numeric($key)) {
+                        if (!in_array($value, $base)) {
+                            $base[] = $value;
+                        }
+                    } else {
+                        $base[$key] = $value;
+                    }
+                }
+            }
+        }
+        return $base;
+    }
+}
+
+if (!function_exists('drupal_array_merge_deep')) {
+    function drupal_array_merge_deep() {
+      $args = func_get_args();
+      return drupal_array_merge_deep_array($args);
+    }
+}
+
+// source : https://api.drupal.org/api/drupal/includes%21bootstrap.inc/function/drupal_array_merge_deep_array/7.x
+if (!function_exists('drupal_array_merge_deep_array')) {
+    function drupal_array_merge_deep_array($arrays) {
+        $result = array();
+        foreach ($arrays as $array) {
+            foreach ($array as $key => $value) {
+                // Renumber integer keys as array_merge_recursive() does. Note that PHP
+                // automatically converts array keys that are integer strings (e.g., '1')
+                // to integers.
+                if (is_integer($key)) {
+                    $result[] = $value;
+                }
+                elseif (isset($result[$key]) && is_array($result[$key]) && is_array($value)) {
+                    $result[$key] = drupal_array_merge_deep_array(array(
+                        $result[$key],
+                        $value,
+                    ));
+                }
+                else {
+                    $result[$key] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+}

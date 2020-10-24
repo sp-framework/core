@@ -53,6 +53,11 @@ class Components extends BaseModel
     public $settings;
 
     /**
+     * Column(name="menus", type="text", length=65535, nullable=true)
+     */
+    public $menus;
+
+    /**
      * Column(name="dependencies", type="text", length=65535)
      */
     public $dependencies;

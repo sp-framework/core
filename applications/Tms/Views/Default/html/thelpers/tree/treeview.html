@@ -1,0 +1,9 @@
+<!-- htmlmin:ignore -->
+{% for items in treeData %}
+    {% if items.childs %}
+        {{ include('thelpers/tree/treegroup.html') }}
+    {% else %}
+        {{ include('thelpers/tree/treeitem.html') }}
+    {% endif %}
+{% endfor %}
+<!-- htmlmin:ignore -->
