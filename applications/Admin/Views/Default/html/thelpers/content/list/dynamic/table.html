@@ -1,20 +1,20 @@
-{% if not sectionsListDatatableTableLengthMenu %}
-    {% set sectionsListDatatableTableLengthMenu = [ [20, 40, -1], [20, 40, "All"] ] %}
+{% if dtParams['dtLengthMenu'] is not defined %}
+    {% set dtParams['dtLengthMenu'] = [ [20, 40, -1], [20, 40, "All"] ] %}
 {% endif %}
-{% if sectionsListDatatablePrimaryButtons %}
-    <div id="{{componentId}}-{{sectionId}}-primary-buttons" class="row mb-2">
+{% if dtParams['dtPrimaryButtons'] is defined %}
+    <div id="{{dtParams['componentId']}}-{{dtParams['sectionId']}}-primary-buttons" class="row mb-2">
         <div class="col">
-            {{include('thelpers/buttons.html', sectionsListDatatablePrimaryButtons)}}
+            {% include 'thelpers/buttons' with ['dtPrimaryButtons' : dtParams['dtPrimaryButtons']] %}
         </div>
     </div>
 {% endif %}
-{% if sectionsListDatatableTableStriped %}
+{% if dtParams['Striped'] is defined %}
     {% set hasTableStriped = 'table-striped' %}
 {% endif %}
-{% if sectionsListDatatableTableBordered %}
+{% if dtParams['Bordered'] is defined %}
     {% set hasTableBordered = 'table-bordered' %}
 {% endif %}
-<div id="{{componentId}}-{{sectionId}}" class="row">
+<div id="{{dtParams['componentId']}}-{{dtParams['sectionId']}}" class="row">
     <div class="col">
         <div class="row m-2 text-center" id="list-data-loader">
             <div class="col">
@@ -23,47 +23,47 @@
                 </div>
             </div>
         </div>
-        <table id="{{componentId}}-{{sectionId}}-table" class="table {{hasTableStriped}} {{hasTableBordered}}" style="margin:0 !important;" width="100%" cellspacing="0">
+        <table id="{{dtParams['componentId']}}-{{dtParams['sectionId']}}-table" class="table {{hasTableStriped}} {{hasTableBordered}}" style="margin:0 !important;" width="100%" cellspacing="0">
             <tbody></tbody>
         </table>
     </div>
 </div>
 <script>
-if (!window['bazDataCollection']['{{componentId}}']) {
-    window['bazDataCollection']['{{componentId}}'] = { };
+if (!window['dataCollection']['{{dtParams["componentId"]}}']) {
+    window['dataCollection']['{{dtParams["componentId"]}}'] = { };
 }
-window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
-    $.extend(window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'], {
-        '{{componentId}}-{{sectionId}}-table' : {
+window['dataCollection']['{{dtParams["componentId"]}}']['{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}'] =
+    $.extend(window['dataCollection']['{{dtParams["componentId"]}}']['{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}'], {
+        '{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}-table' : {
             'listOptions'       : {
-                'componentName'         : '{{componentName}}',
-                'tableName'             : '{{componentId}}-{{sectionId}}-table',
-                'postURL'               : '{{table.ajax.url}}',
+                'componentName'         : '{{dtParams["componentName"]}}',
+                'tableName'             : '{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}-table',
+                'postURL'               : '{{dtParams["table"]["ajax"]["url"]}}',
                 'postParams'            : {
                     'operation'             : 'load',
-                    'results'               : '{{sectionsListDatatableTableNoOfResultsToShow|default(20)}}'
+                    'results'               : '{{dtParams["NoOfResultsToShow"]|default(20)}}'
                 },
                 'datatable'     : {
-                    'columns'                           : JSON.parse('{{sectionsListDatatableTableColumns|json_encode|raw}}'),
-                    'NoOfColumnsToShow'                 : '{{sectionsListDatatableTableNoOfColumnsToShow|default("3")}}',
-                    'hasIdColumn'                       : '{{sectionsListDatatableTableHasIdColumn|default("true")}}',
-                    'hideIdColumn'                      : '{{sectionsListDatatableTableHideIdColumn|default("true")}}',
-                    'showHideColumnsButton'             : '{{sectionsListDatatableTableShowHideColumnsButton|default("true")}}',
-                    'showHideExportButton'              : '{{sectionsListDatatableTableShowHideExportButton|default("true")}}',
-                    'colReorder'                        : '{{sectionsListDatatableTableColReorder|default("false")}}',
-                    'stateSave'                         : '{{sectionsListDatatableTableStateSave|default("false")}}',
-                    'fixedHeader'                       : '{{sectionsListDatatableTableFixedHeader|default("true")}}',
-                    'searching'                         : '{{sectionsListDatatableTableSearching|default("true")}}',
-                    'responsive'                        : '{{sectionsListDatatableTableResponsive|default("true")}}',
-                    'paging'                            : '{{sectionsListDatatableTablePaging|default("false")}}',
-                    'lengthMenu'                        : JSON.parse('{{sectionsListDatatableTableLengthMenu|json_encode|e("js")}}'),
-                    'select'                            : '{{sectionsListDatatableTableSelect|default("false")}}',
-                    'selectAll'                         : '{{sectionsListDatatableTableSelectAll|default("false")}}',
-                    'selectStyle'                       : '{{sectionsListDatatableTableSelectStyle|default("single")}}',
-                    'disableColumnsOrdering'            : '{{sectionsListDatatableTableDisableColumnsOrdering|json_encode|e("js")}}',
-                    'zeroRecords'                       : '{{sectionsListDatatableTableZeroRecords|default("missing sectionsListDatatableTableZeroRecords")}}',
-                    'notificationTextFromColumn'        : '{{sectionsListDatatableTableNotificationTextFromColumn|default("name")}}',//What text to show on delete message
-                    'sendConfirmRemove'                 : '{{sectionsListDatatableTableSendConfirmRemove|default("false")}}'
+                    'columns'                           : '{{dtParams["dtColumns"]}}',
+                    'NoOfColumnsToShow'                 : '{{dtParams["dtNoOfColumnsToShow"]|default("3")}}',
+                    'hasIdColumn'                       : '{{dtParams["dtHasIdColumn"]|default("true")}}',
+                    'hideIdColumn'                      : '{{dtParams["dtHideIdColumn"]|default("true")}}',
+                    'showHideColumnsButton'             : '{{dtParams["dtShowHideColumnsButton"]|default("true")}}',
+                    'showHideExportButton'              : '{{dtParams["dtShowHideExportButton"]|default("true")}}',
+                    'colReorder'                        : '{{dtParams["dtColReorder"]|default("false")}}',
+                    'stateSave'                         : '{{dtParams["dtStateSave"]|default("false")}}',
+                    'fixedHeader'                       : '{{dtParams["dtFixedHeader"]|default("true")}}',
+                    'searching'                         : '{{dtParams["dtSearching"]|default("true")}}',
+                    'responsive'                        : '{{dtParams["dtResponsive"]|default("true")}}',
+                    'paging'                            : '{{dtParams["dtPaging"]|default("false")}}',
+                    'lengthMenu'                        : '{{dtParams["dtLengthMenu"]|json_encode|e("js")}}',
+                    'select'                            : '{{dtParams["dtSelect"]|default("false")}}',
+                    'selectAll'                         : '{{dtParams["dtSelectAll"]|default("false")}}',
+                    'selectStyle'                       : '{{dtParams["dtSelectStyle"]|default("single")}}',
+                    'disableColumnsOrdering'            : '{{dtParams["dtDisableColumnsOrdering"]|json_encode|e("js")}}',
+                    'zeroRecords'                       : '{{dtParams["dtZeroRecords"]|default("missing dtZeroRecords")}}',
+                    'notificationTextFromColumn'        : '{{dtParams["dtNotificationTextFromColumn"]|default("name")}}',//What text to show on delete message
+                    'sendConfirmRemove'                 : '{{dtParams["dtSendConfirmRemove"]|default("false")}}'
                 }
             },
             'customFunctions' : {
@@ -74,8 +74,7 @@ window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] 
             }
         }
     });
-window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-table']['listOptions']['postParams'] =
-    $.extend(window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-table']['listOptions']['postParams'],
-        JSON.parse('{{table.ajax.params|json_encode|raw}}')
-    );
+
+window['dataCollection']['{{dtParams["componentId"]}}']['{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}']['{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}-table']['listOptions']['postParams'] =
+    $.extend(window['dataCollection']['{{dtParams["componentId"]}}']['{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}']['{{dtParams["componentId"]}}-{{dtParams["sectionId"]}}-table']['listOptions']['postParams'], '{{table["ajax"]["params"]}}');
 </script>

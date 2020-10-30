@@ -66,7 +66,7 @@
                     dataCollection[componentId][sectionId] = { };
                 }
 
-                if ($(this._element).is('.sectionWithListFilter')) {
+                if ($(this._element).is('.sectionWithListingFilter')) {
                     $(this._element).BazContentFields();
 
                     BazContentFieldsValidator.initValidator({
@@ -76,7 +76,7 @@
                     });
                 }
 
-                if ($(this._element).is('.sectionWithListDatatable')) {
+                if ($(this._element).is('.sectionWithListingDatatable')) {
                     this._buildListDatatable(options);
                 }
             };
@@ -745,13 +745,13 @@
         }();
 
     $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentWizardAjaxComplete', function() {
-        if ($('.sectionWithListFilter').length > 0) {
-            $('.sectionWithListFilter').each(function() {
+        if ($('.sectionWithListingFilter').length > 0) {
+            $('.sectionWithListingFilter').each(function() {
                 BazContentSectionsList._jQueryInterface.call($(this));
             });
         }
-        if ($('.sectionWithListDatatable').length > 0) {
-            $('.sectionWithListDatatable').each(function() {
+        if ($('.sectionWithListingDatatable').length > 0) {
+            $('.sectionWithListingDatatable').each(function() {
                 BazContentSectionsList._jQueryInterface.call($(this));
             });
         }

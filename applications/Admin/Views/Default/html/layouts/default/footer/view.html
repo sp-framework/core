@@ -19,11 +19,6 @@
     {{assets.outputInlineJs()}}
 </footer>
 <script>
-/* globals PNotify PNotifyBootstrap4 PNotifyFontAwesome5 */
-// $.fn.select2.defaults.set("theme", "bootstrap4");
-PNotify.defaultModules.set(PNotifyBootstrap4, {});
-PNotify.defaultModules.set(PNotifyFontAwesome5, {});
-// BazCore.footer({
-//  loadFooterAt : '{{componentId}}'
-// });
+/* globals BazCore */
+BazCore.footer({loadFooterAt : '{{componentId}}'});
 </script>

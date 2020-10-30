@@ -23,6 +23,7 @@
     "settings"      : {
         "cache"     : false,
         "layout"    : "default",
+        "tags"      : "AdminLTETags",
         "head"      : {
             "title" : "Admin",
             "meta"  : {
@@ -34,8 +35,8 @@
             },
             "link"      : {
                 "href"      : [
-                    "Admin/Default/css/core.css",
-                    "Admin/Default/css/plugins.css"
+                    "Admin/Default/css/plugins.css",
+                    "Admin/Default/css/core.css"
                 ]
             },
             "script"    : {
@@ -54,9 +55,7 @@
             "params"    : "",
             "script"    : {
                 "src"   : [
-                    "Admin/Default/js/footer/jsFooterDependencies.js",
-                    "Admin/Default/js/footer/jsFooterCore.js",
-                    "Admin/Default/js/footer/jsFooterPlugins.js"
+                    "Admin/Default/js/footer/jsFooterDependencies.js"
                 ]
             },
             "jsscript"  : ""

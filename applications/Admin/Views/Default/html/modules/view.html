@@ -1,7 +1,9 @@
-{% set componentId = 'modules' %}
-{% set parentComponentId = 'modules' %}
-{% set sectionId = 'all' %}
-{% set cardParams =
+{% set componentName = 'modules' %}
+{% set componentId = 'admin-modules' %}
+{% set parentComponentId = componentId %}
+{% set sectionId = 'list' %}
+
+{{adminltetags.useTag('content',
     [
         'componentId'                 : componentId,
         'parentComponentId'           : parentComponentId,
@@ -16,18 +18,15 @@
         'cardCollapsed'               : false,
         'cardBodyInclude'             : 'modules/modules',
         'cardBodyIncludeParams'       :
-            [
-                'cardBodyIncludeParams' :
-                    [
-                        'route'         : route,
-                        'repositories'  : repositories,
-                        'modulesData'   : modulesData
-                    ]
-            ],
+                                        [
+                                            'route'         : route,
+                                            'repositories'  : repositories,
+                                            'modulesData'   : modulesData
+                                        ],
         'cardShowTools'               : []
     ]
-%}
-<div id="{{componentId}}" class="component">
+)}}
+{# <div id="{{componentId}}" class="component">
     <div id="{{componentId}}-content">
         <div class="row">
             <div class="col">
@@ -35,4 +34,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> #}

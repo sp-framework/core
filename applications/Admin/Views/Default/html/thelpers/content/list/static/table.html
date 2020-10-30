@@ -1,18 +1,18 @@
-<!-- htmlmin:ignore -->
-{% if not sectionsListDatatableTableLengthMenu %}
-    {% set sectionsListDatatableTableLengthMenu = [ [10, 20, -1], [10, 20, "All"] ] %}
+
+{# {% if not dtParams['LengthMenu'] %}
+    {% set dtParams['LengthMenu'] = [ [10, 20, -1], [10, 20, "All"] ] %}
 {% endif %}
-{% if sectionsListDatatablePrimaryButtons %}
+{% if dtParams['PrimaryButtons'] %}
     <div id="{{componentId}}-{{sectionId}}-primary-buttons" class="row mb-2">
         <div class="col">
-            {{include('thelpers/buttons.html', sectionsListDatatablePrimaryButtons)}}
+            {% include 'thelpers/buttons.html' with dtParams['PrimaryButtons'] %}
         </div>
     </div>
 {% endif %}
-{% if sectionsListDatatableTableStriped %}
+{% if dtParams['Striped'] %}
     {% set hasTableStriped = 'table-striped' %}
 {% endif %}
-{% if sectionsListDatatableTableBordered %}
+{% if dtParams['Bordered'] %}
     {% set hasTableBordered = 'table-bordered' %}
 {% endif %}
 <div id="{{componentId}}-{{sectionId}}" class="row">
@@ -29,14 +29,14 @@
         </table>
     </div>
 </div>
-{% set sectionsListDatatableTableRowControls = false %}
+{% set dtParams['RowControls'] = false %}
 {% set rowsData = [] %}
 {% if component %}
     {% for rowId, columns in component %}
         {% set rowData = [] %}
         {% for columnKey, column in columns %}
-            {% if sectionsListDatatableTableReplaceColumns %}
-                {% for replaceColumnKey, replaceColumn in sectionsListDatatableTableReplaceColumns %}
+            {% if dtParams['ReplaceColumns'] %}
+                {% for replaceColumnKey, replaceColumn in dtParams['ReplaceColumns'] %}
                     {% if replaceColumnKey == columnKey %}
                         {% for replaceValueKey, replaceValue in replaceColumn %}
                             {% if replaceValueKey == 'customSwitch' %}
@@ -50,7 +50,7 @@
                                 {% set customswitch =
                                     '<div class="form-group">' ~
                                         '<div class="custom-control custom-switch ' ~ offSwitchType ~ ' ' ~ onSwitchType ~ '">
-                                            <input type="checkbox" class="custom-control-input" id="' ~ componentId ~ '-sections-list-datatable-' ~ columnKey ~ '-' ~ rowId ~ '" data-switchactionurl="' ~ replaceValue.actionUrl ~ '" data-switchactionincludecolumnsdata="' ~ replaceValue.actionIncludeColumnsData ~ '" data-notificationtextfromcolumn="' ~ sectionsListDatatableTableNotificationTextFromColumn|default('name') ~ '" data-columnid="' ~ columnKey ~ '" ' ~ checked ~ '>
+                                            <input type="checkbox" class="custom-control-input" id="' ~ componentId ~ '-sections-list-datatable-' ~ columnKey ~ '-' ~ rowId ~ '" data-switchactionurl="' ~ replaceValue.actionUrl ~ '" data-switchactionincludecolumnsdata="' ~ replaceValue.actionIncludeColumnsData ~ '" data-notificationtextfromcolumn="' ~ dtParams['NotificationTextFromColumn']|default('name') ~ '" data-columnid="' ~ columnKey ~ '" ' ~ checked ~ '>
                                             <label class="custom-control-label" for="' ~ componentId ~ '-sections-list-datatable-' ~ columnKey ~ '-' ~ rowId ~ '"></label>
                                         </div>
                                     </div>' %}
@@ -69,7 +69,7 @@
                                         {% endif %}
                                         {% set radiobuttons = radiobuttons ~
                                             '<label class="btn btn-' ~ value.buttonSize|default('xs') ~ ' btn-outline-' ~ value.buttonType|default('primary') ~ ' ' ~ focusActive ~ '" style="cursor: pointer;">
-                                            <input type="radio" name="' ~ columnKey ~ '-options" id="' ~ componentId ~ '-sections-list-datatable-' ~ columnKey ~ '-' ~ rowId ~ '-' ~ valueKey ~ '" autocomplete="off" ' ~ checked ~ ' data-radiobuttonsactionurl="' ~ replaceValue.actionUrl ~ '" data-radiobuttonsactionincludecolumnsdata="' ~ replaceValue.actionIncludeColumnsData ~ '" data-notificationtextfromcolumn="' ~ sectionsListDatatableTableNotificationTextFromColumn|default('name') ~ '" data-columnid="' ~ columnKey ~ '" data-value="' ~ valueKey ~ '">' ~ value.buttonTitle|raw ~ '</label>' %}
+                                            <input type="radio" name="' ~ columnKey ~ '-options" id="' ~ componentId ~ '-sections-list-datatable-' ~ columnKey ~ '-' ~ rowId ~ '-' ~ valueKey ~ '" autocomplete="off" ' ~ checked ~ ' data-radiobuttonsactionurl="' ~ replaceValue.actionUrl ~ '" data-radiobuttonsactionincludecolumnsdata="' ~ replaceValue.actionIncludeColumnsData ~ '" data-notificationtextfromcolumn="' ~ dtParams['NotificationTextFromColumn']|default('name') ~ '" data-columnid="' ~ columnKey ~ '" data-value="' ~ valueKey ~ '">' ~ value.buttonTitle|raw ~ '</label>' %}
                                     {% endif %}
                                 {% endfor %}
                                 {% set radiobuttons = radiobuttons ~ '</div>' %}
@@ -114,7 +114,7 @@
                         {% set controlButtons = controlButtons|merge({
                             (controlKey) : {
                                 'title'             : 'VIEW',
-                                'additionalClass'   : 'rowView ' ~ sectionsListDatatableTableControlsLinkClass|default('contentAjaxLink'),
+                                'additionalClass'   : 'rowView ' ~ dtParams['ControlsLinkClass']|default('contentAjaxLink'),
                                 'icon'              : 'eye',
                                 'buttonType'        : 'info',
                                 'link'              : control
@@ -124,7 +124,7 @@
                         {% set controlButtons = controlButtons|merge({
                             (controlKey) : {
                                 'title'             : 'EDIT',
-                                'additionalClass'   : 'rowEdit ' ~ sectionsListDatatableTableControlsLinkClass|default('contentAjaxLink'),
+                                'additionalClass'   : 'rowEdit ' ~ dtParams['ControlsLinkClass']|default('contentAjaxLink'),
                                 'icon'              : 'edit',
                                 'buttonType'        : 'warning',
                                 'link'              : control
@@ -144,7 +144,7 @@
                         {% set controlButtons = controlButtons|merge({
                             'divider'   : '<div class="dropdown-divider"></div>'
                         }) %}
-                        {% for additionControlButtonKey, additionControlButton in sectionsListDatatableAdditionControlButtons %}
+                        {% for additionControlButtonKey, additionControlButton in dtParams['AdditionControlButtons'] %}
                             {% if additionControlButtonKey == controlKey %}
                                 {% set controlButtons = controlButtons|merge({
                                     (controlKey) : {
@@ -161,25 +161,25 @@
                 {% endfor %}
                 {% if controlButtons|length == 1 %}
                     {% for controlButtonKey, controlButton in controlButtons %}
-                        {% set controlbuttons = controlbuttons ~ '<a href="' ~ link(controlButton.link) ~ '" id="' ~ componentId ~ '-' ~ controlButtonKey ~ '-' ~ columnKey ~ '-' ~ rowId ~ '" type="button" data-id="' ~ columns.id ~ '" data-rowid="' ~ rowId ~ '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-' ~ controlButton.buttonType ~ ' btn-xs ' ~ controlButton.additionalClass ~ '" data-notificationtextfromcolumn="' ~ sectionsListDatatableTableNotificationTextFromColumn|default('name') ~ '"><i class="mr-1 fas fa-fw fa-xs fa-' ~ controlButton.icon ~ '"></i>' ~ controlButton.title|upper ~ '</a>' %}
+                        {% set controlbuttons = controlbuttons ~ '<a href="' ~ link(controlButton.link) ~ '" id="' ~ componentId ~ '-' ~ controlButtonKey ~ '-' ~ columnKey ~ '-' ~ rowId ~ '" type="button" data-id="' ~ columns.id ~ '" data-rowid="' ~ rowId ~ '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-' ~ controlButton.buttonType ~ ' btn-xs ' ~ controlButton.additionalClass ~ '" data-notificationtextfromcolumn="' ~ dtParams['NotificationTextFromColumn']|default('name') ~ '"><i class="mr-1 fas fa-fw fa-xs fa-' ~ controlButton.icon ~ '"></i>' ~ controlButton.title|upper ~ '</a>' %}
                     {% endfor %}
                 {% elseif controlButtons|length > 1 %}
                     {% for controlButtonKey, controlButton in controlButtons %}
                         {% if loop.first %}
                             {% set controlbuttons = controlbuttons ~
-                            '<div class="btn-group"><a href="' ~ link(controlButton.link) ~ '" id="' ~ componentId ~ '-' ~ controlButtonKey ~ '-' ~ columnKey ~ '-' ~ rowId ~ '" type="button" data-id="' ~ columns.id ~ '" data-rowid="' ~ rowId ~ '" class="pl-2 pr-2 text-white btn btn-' ~ controlButton.buttonType ~ ' btn-xs ' ~ controlButton.additionalClass ~ '" data-notificationtextfromcolumn="' ~ sectionsListDatatableTableNotificationTextFromColumn|default('name') ~ '"><i class="mr-1 fas fa-fw fa-xs fa-' ~ controlButton.icon ~ '"></i> ' ~ controlButton.title|upper ~ '</a><button type="button" class="pl-2 pr-2 btn btn-default btn-xs dropdown-toggle dropdown-icon" data-toggle="dropdown"><span class="sr-only">Toggle Dropdown</span><div class="dropdown-menu dropdown-menu-right" role="menu">' %}
+                            '<div class="btn-group"><a href="' ~ link(controlButton.link) ~ '" id="' ~ componentId ~ '-' ~ controlButtonKey ~ '-' ~ columnKey ~ '-' ~ rowId ~ '" type="button" data-id="' ~ columns.id ~ '" data-rowid="' ~ rowId ~ '" class="pl-2 pr-2 text-white btn btn-' ~ controlButton.buttonType ~ ' btn-xs ' ~ controlButton.additionalClass ~ '" data-notificationtextfromcolumn="' ~ dtParams['NotificationTextFromColumn']|default('name') ~ '"><i class="mr-1 fas fa-fw fa-xs fa-' ~ controlButton.icon ~ '"></i> ' ~ controlButton.title|upper ~ '</a><button type="button" class="pl-2 pr-2 btn btn-default btn-xs dropdown-toggle dropdown-icon" data-toggle="dropdown"><span class="sr-only">Toggle Dropdown</span><div class="dropdown-menu dropdown-menu-right" role="menu">' %}
                         {% else %}
                             {% if controlButtonKey == 'divider' %}
                                 {% set controlbuttons = controlbuttons ~ controlButton %}
                             {% else %}
-                                {% set controlbuttons = controlbuttons ~ '<a href="' ~ link(controlButton.link) ~ '" id="' ~ componentId ~ '-' ~ controlButtonKey ~ '-' ~ columnKey ~ '-' ~ rowId ~ '" data-id="' ~ columns.id ~ '" data-rowid="' ~ rowId ~ '" class="dropdown-item text-' ~ controlButton.buttonType ~ ' ' ~ controlButton.additionalClass ~ '" data-notificationtextfromcolumn="' ~ sectionsListDatatableTableNotificationTextFromColumn|default('name') ~ '"><i class="mr-1 fas fa-fw fa-xs fa-' ~ controlButton.icon ~ '"></i> ' ~ controlButton.title|upper ~ '</a>' %}
+                                {% set controlbuttons = controlbuttons ~ '<a href="' ~ link(controlButton.link) ~ '" id="' ~ componentId ~ '-' ~ controlButtonKey ~ '-' ~ columnKey ~ '-' ~ rowId ~ '" data-id="' ~ columns.id ~ '" data-rowid="' ~ rowId ~ '" class="dropdown-item text-' ~ controlButton.buttonType ~ ' ' ~ controlButton.additionalClass ~ '" data-notificationtextfromcolumn="' ~ dtParams['NotificationTextFromColumn']|default('name') ~ '"><i class="mr-1 fas fa-fw fa-xs fa-' ~ controlButton.icon ~ '"></i> ' ~ controlButton.title|upper ~ '</a>' %}
                             {% endif %}
                         {% endif %}
                     {% endfor %}
                         {% set controlbuttons = controlbuttons ~ '</div></button></div>' %}
                 {% endif %}
                 {% set column = controlbuttons %}
-                {% set sectionsListDatatableTableRowControls = true %}
+                {% set dtParams['RowControls'] = true %}
             {% endif %}
             {% set rowData = rowData|merge({(columnKey): column}) %}
         {% endfor %}
@@ -232,5 +232,4 @@ window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] 
             }
         }
     });
-</script>
-<!-- htmlmin:ignore -->
+</script> #}

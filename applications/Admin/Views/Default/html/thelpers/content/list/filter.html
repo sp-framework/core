@@ -1,11 +1,11 @@
 {% set sectionId = 'sections-list-filter' %}
-<form data-validateon="datatable" id="{{componentId}}-{{sectionId}}-filter-form">
-    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-        <div id="{{componentId}}-{{sectionId}}-datatable" data-bazscan="scan" data-bazscantype="datatable" class="row vdivide">
-            <div id="{{componentId}}-{{sectionId}}-fields" class="col-md-4 mt-1">
+<form data-validateon="datatable" id="' . $this->params['componentId'] .'-sections-list-filter-filter-form">
+    <fieldset id="' . $this->params['componentId'] .'-sections-list-filter-fieldset">
+        <div id="' . $this->params['componentId'] .'-sections-list-filter-datatable" data-bazscan="scan" data-bazscantype="datatable" class="row vdivide">
+            <div id="' . $this->params['componentId'] .'-sections-list-filter-fields" class="col-md-4 mt-1">
                 <div class="row">
                     <div class="col">
-                        {{include('thelpers/fields/fields.html', {
+{#                         {{include('thelpers/fields/fields.html', {
                             fieldId                             : sectionId ~ '-columns',
                             fieldLabel                          : 'Columns',
                             fieldType                           : 'select2',
@@ -20,10 +20,10 @@
                             fieldDataSelect2OptionsKey          : 'name',
                             fieldDataSelect2OptionsValue        : 'value'
                             }
-                        )}}
+                        )}} #}
                     </div>
                     <div class="col">
-                        {{include('thelpers/fields/fields.html', {
+{#                         {{include('thelpers/fields/fields.html', {
                             fieldId                             : sectionId ~ '-operator',
                             fieldLabel                          : 'Operator',
                             fieldType                           : 'select2',
@@ -63,12 +63,12 @@
                             fieldDataSelect2OptionsKey          : 'id',
                             fieldDataSelect2OptionsValue        : 'name'
                             }
-                        )}}
+                        )}} #}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col">
-                        {{include('thelpers/fields/fields.html', {
+{#                         {{include('thelpers/fields/fields.html', {
                             fieldId                             : sectionId ~ '-value',
                             fieldLabel                          : 'Filter Value',
                             fieldType                           : 'input-text',
@@ -83,12 +83,12 @@
                             fieldDataMinLength                  : 1,
                             fieldDataMaxLength                  : 45
                             }
-                        )}}
+                        )}} #}
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        {{include('thelpers/fields/fields.html', {
+{#                         {{include('thelpers/fields/fields.html', {
                             fieldId                             : sectionId ~ '-condition',
                             fieldLabel                          : 'Condition',
                             fieldType                           : 'select2',
@@ -112,28 +112,28 @@
                             fieldDataSelect2OptionsKey          : 'id',
                             fieldDataSelect2OptionsValue        : 'name'
                             }
-                        )}}
+                        )}} #}
                     </div>
                     <div class="col-md-8">
-                        {{include('thelpers/buttons.html', {
+{#                         {{include('thelpers/buttons.html', {
                             buttonType : 'datatable-buttons'
                             }
-                        )}}
+                        )}} #}
                     </div>
                 </div>
             </div>
-            <div id="{{componentId}}-{{sectionId}}-table" class="col-md-8"></div>
+            <div id="' . $this->params['componentId'] .'-sections-list-filter-table" class="col-md-8"></div>
         </div>
     </fieldset>
 </form>
 <hr>
-<form data-validateon="sections" id="{{sectionId}}-options-form">
-    <fieldset id="{{sectionId}}-options">
+<form data-validateon="sections" id="sections-list-filter-options-form">
+    <fieldset id="sections-list-filter-options">
         <div class="row">
             <div class="col-md-9">
                 <div class="row vdivide">
                     <div class="col-md-6">
-                        {{include('thelpers/fields/fields.html', {
+{#                         {{include('thelpers/fields/fields.html', {
                             fieldId                             : sectionId ~ '-saved-filters',
                             fieldLabel                          : 'Saved Filters',
                             fieldType                           : 'select2',
@@ -157,10 +157,10 @@
                             fieldDataSelect2OptionsKey          : 'id',
                             fieldDataSelect2OptionsValue        : 'name'
                             }
-                        )}}
+                        )}} #}
                     </div>
                     <div class="col-md-6">
-                        {{include('thelpers/fields/fields.html', {
+{#                         {{include('thelpers/fields/fields.html', {
                             fieldId                             : sectionId ~ '-name',
                             fieldLabel                          : 'Filter Name',
                             fieldType                           : 'input-text',
@@ -175,12 +175,12 @@
                             fieldDataMinLength                  : 1,
                             fieldDataMaxLength                  : 45
                             }
-                        )}}
+                        )}} #}
                     </div>
                 </div>
             </div>
             <div class="col-md-3" style="margin-top:23px;">
-                {{include("thelpers/buttons.html", {
+{#                 {{include("thelpers/buttons.html", {
                         buttonType : 'button',
                         buttons : {
                             'save' : {
@@ -200,7 +200,7 @@
                             }
                         }
                     }
-                )}}
+                )}} #}
             </div>
         </div>
     </fieldset>

@@ -257,19 +257,12 @@ var BazContentLoader = function() {
     }
 
     function getCurrentRoute(url) {
-        var splitUrl = url.split('?');
-        var splitArgs = splitUrl[1].split('&');
-        var routeIndex;
-        $.each(splitArgs, function(index,arg){
-            if (arg.match(/route.*/g)) {
-                routeIndex = index;
-                return;
-            }
-        });
-
-        var routeArg = splitArgs[routeIndex].split('=');
-        return routeArg[1];
+        var dataCollection = window.dataCollection;
+        var uri = url.replace(dataCollection.env.rootPath, '');
+        var splitUri = uri.split('/q/');
+        return splitUri[0];
     }
+
     function bazContentLoaderConstructor() {
         // if something needs to be constructed
         return null;

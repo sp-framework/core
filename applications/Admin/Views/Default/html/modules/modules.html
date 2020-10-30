@@ -1,4 +1,3 @@
-{% set route = cardBodyIncludeParams['route'] %}
 <div class="row vdivide">
     <div id="filter" class="col text-center">
         {% include 'modules/filter.html' %}
@@ -19,7 +18,7 @@
     <input type="hidden" name="register-counter" id="register-counter" class="form-control" value="{{counter['register']}}">
     <input type="hidden" name="update-counter" id="update-counter" class="form-control" value="{{counter['update']}}">
 {% endif %}
-{% for modulesKey, modules in cardBodyIncludeParams['modulesData'] %}
+{% for modulesKey, modules in modulesData %}
     <div id="modules-data-{{modulesKey}}" class="card mb-2">
         <div class="card-header bg-primary p-1 text-white text-center font-weight-bold text-uppercase">
             {{modulesKey|upper}}

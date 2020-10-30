@@ -1,5 +1,5 @@
 /* exported BazCore */
-/* globals PNotify Pace BazContentLoader */
+/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 */
 /*
 * @title                    : BazCore
 * @description              : Baz Core Lib
@@ -15,7 +15,7 @@ var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1
 var BazCore = function() {
     'use strict';
     var BazCore = void 0;
-    var dataCollection, params;
+    var dataCollection;
 
     // Error
     // function error(errorMsg) {
@@ -24,29 +24,7 @@ var BazCore = function() {
 
     //Header
     function bazHeader() {
-        if (!window.dataCollection) {
-            //For all data collection. Section Data collection, has list of fields, whole section HTML, section fields data
-            window.dataCollection = { };
-            dataCollection = window.dataCollection;
-            dataCollection.env = { };
-            //Paths
-            dataCollection.env.rootPath = window.location.pathname;
-            dataCollection.env.rootPath = window.location.origin + dataCollection.env.rootPath.match(/.*\//g);
-            dataCollection.env.jsPath = dataCollection.env.rootPath + 'Tms/Default/js/';
-            dataCollection.env.cssPath = dataCollection.env.rootPath + 'Tms/Default/css/';
-            dataCollection.env.imagesPath = dataCollection.env.rootPath + 'Tms/Default/images/';
-            dataCollection.env.soundPath = dataCollection.env.rootPath + 'Tms/Default/sounds/';
-            dataCollection.env.fontsPath = dataCollection.env.rootPath + 'Tms/Default/fonts/';
-            dataCollection.env.libsLoaded = false;
-            //Parameters
-            params = new URLSearchParams(window.location.search.substring(1));
-            dataCollection.env.currentRoute = params.get("route");
-            dataCollection.env.currentId = params.get("id");
-        }
-
-        if (localStorage.getItem('bazDevMode') === null) {
-            localStorage.setItem('bazDevMode', null);
-        }
+        //
     }
 
     //Load Footer - load scripts if not loaded
@@ -58,14 +36,14 @@ var BazCore = function() {
                 $('.pace-loading-text').attr('hidden', false);
                 $($('.pace-loading-text span')[1]).text(' core libs');
                 $.ajax({
-                    url: window.dataCollection.env.jsPath + 'footer/jsFooterCore.js',
+                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js',
                     dataType: 'script',
                     async: true,
                     cache: true
                 }).done(function() {
                     $($('.pace-loading-text span')[1]).text(' plugins');
                     $.ajax({
-                        url: window.dataCollection.env.jsPath + 'footer/jsFooterPlugins.js',
+                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js',
                         dataType: 'script',
                         async: true,
                         cache: true
@@ -77,13 +55,13 @@ var BazCore = function() {
                 });
             } else {
                 $.ajax({
-                    url: window.dataCollection.env.jsPath + 'footer/jsFooterCore.js',
+                    url: dataCollection.env.jsPath + 'footer/jsFooterCore.js',
                     dataType: 'script',
                     async: true,
                     cache: true
                 }).done(function() {
                     $.ajax({
-                        url: window.dataCollection.env.jsPath + 'footer/jsFooterPlugins.js',
+                        url: dataCollection.env.jsPath + 'footer/jsFooterPlugins.js',
                         dataType: 'script',
                         async: true,
                         cache: true
@@ -113,8 +91,9 @@ var BazCore = function() {
     //Footer
     function bazFooterFunctions() {
         // PNotify, global defaults override
-        PNotify.defaults.styling = 'bootstrap4';
-        PNotify.defaults.icons = 'fontawesome5';
+        // $.fn.select2.defaults.set("theme", "bootstrap4");
+        PNotify.defaultModules.set(PNotifyBootstrap4, {});
+        PNotify.defaultModules.set(PNotifyFontAwesome5, {});
         bazContent();
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();
@@ -140,7 +119,7 @@ var BazCore = function() {
                 $.each(componentArr, function(index,component) {
                     titleComponentArr.push('<li class="breadcrumb-item text-uppercase">' + component + '</li>');
                 });
-                mainBreadcrumb = '<li class="breadcrumb-item"><i class="fa fa-home"></i></li>' + titleComponentArr.join('');
+                mainBreadcrumb = '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' + titleComponentArr.join('');
                 $('#content-header-breadcrumb ol.breadcrumb').append(mainBreadcrumb);
                 $('#content-header-breadcrumb ol.breadcrumb').append('<li class="breadcrumb-item text-uppercase font-weight-bolder">' + titleText + '</li>');
             } else {
@@ -148,38 +127,40 @@ var BazCore = function() {
             }
         } else {
             $('#content-header-breadcrumb ol.breadcrumb').empty().append(
-                '<li class="breadcrumb-item"><i class="fas fa-fw fa-home"></i></li>' +
+                '<li class="breadcrumb-item"><i class="fas fa-fw fa-home" style="position: relative;top: 4px;"></i></li>' +
                 '<li class="breadcrumb-item text-uppercase">ERROR</li>'
             );
         }
     }
 
     function openMenu() {
-        var currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + 'index.php?route=' + dataCollection.env.currentRoute + '"]');
+        var currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + dataCollection.env.currentRoute + '"]');
 
         if (currentActiveLocation.length === 0) {
             if (dataCollection.env['parentComponentId']) {
                 currentActiveLocation =
-                    $('a[href="' + dataCollection.env.rootPath + 'index.php?route=' +
-                        dataCollection.env['parentComponentId'].replace(/-/g, '/') + '/view"]');
+                    $('a[href="' + dataCollection.env.rootPath + dataCollection.env['parentComponentId'].replace(/-/g, '/') + '"]');
             } else {
-                currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + 'index.php?route=home/view"]');
+                currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + '/"]');
             }
         }
+
         if ($(currentActiveLocation).parents().is('.nav-treeview')) {
             $(currentActiveLocation).addClass('active');
             $(currentActiveLocation).parents('.nav-treeview').show();
             $(currentActiveLocation).parents('.nav-treeview').siblings('a').addClass('active');
             $(currentActiveLocation).parents('.has-treeview').addClass('menu-open');
+        } else {
+            $(currentActiveLocation).addClass('active');
         }
     }
 
     //PageParser
     function bazContent() {
         BazContentLoader.init({
-            ajaxLinkClass                   : '.contentAjaxLink',
-            ajaxContainer                   : $("#baz-content"),
-            ajaxBefore                      : function () {
+            'ajaxLinkClass'                 : '.contentAjaxLink',
+            'ajaxContainer'                 : $("#baz-content"),
+            'ajaxBefore'                    : function () {
                                                 window.dataCollection.env['currentComponentId'] = null;
                                                 $('#baz-error').attr('hidden', true);
                                                 $('#baz-error-content').children().attr('hidden', true);
@@ -187,20 +168,20 @@ var BazCore = function() {
                                                 $("#baz-content").empty();
                                                 $("#loader").attr('hidden', false);
                                             },
-            ajaxFinished                    : function () {
+            'ajaxFinished'                  : function () {
                                                 bazUpdateBreadcrumb();
                                                 toolTipsAndPopovers();
                                                 $("#loader").attr('hidden', true);
                                             },
-            ajaxError                       : function () {
+            'ajaxError'                     : function () {
                                                 bazUpdateBreadcrumb();
                                                 toolTipsAndPopovers();
                                                 $("#loader").attr('hidden', true);
                                                 $('#baz-error').attr('hidden', false);
                                                 $('#baz-error-' + this).attr('hidden', false);
                                             },
-            modalLinkClass                  : '.contentModalLink',
-            modalFinished                   : function() {
+            'modalLinkClass'                : '.contentModalLink',
+            'modalFinished'                 : function() {
                                                 toolTipsAndPopovers();
                                             }
         });

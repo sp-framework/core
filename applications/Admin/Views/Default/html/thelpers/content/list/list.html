@@ -1,16 +1,10 @@
-{% if table or rows %}
-    {% if table %}
-        {{include('thelpers/content/list/dynamic/table.html', {
-            }
-        )}}
-    {% elseif rows %}
+{% if dtParams['table'] is defined or dtParams['rows'] is defined %}
+    {% if dtParams['table'] is defined %}
+        {% include 'thelpers/content/list/dynamic/table.html' %}
+    {% elseif dtParams['rows'] is defined %}
         {% set sectionId = 'sections-list-datatable' %}
-        {{include('thelpers/content/list/dynamic/rows.html', {
-            }
-        )}}
+        {% include 'thelpers/content/list/dynamic/rows.html' %}
     {% endif %}
 {% else %}
-    {{include('thelpers/content/list/static/table.html', {
-        }
-    )}}
+    {% include 'thelpers/content/list/static/table.html' %}
 {% endif %}

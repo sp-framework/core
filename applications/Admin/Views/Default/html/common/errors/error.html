@@ -1,7 +1,6 @@
 {# {% set component =  %} #}
-{% set componentId = 'baz-error' %}
-<div id="{{componentId}}" class="component container-fluid" hidden>
-    <div id="{{componentId}}-content">
+<div id="baz-errors" class="component container-fluid" hidden>
+    <div id="baz-errors-content">
         {% include('common/errors/networkerror') %} {# ErrorCode = 0 #}
         {% include('common/errors/ratelimit') %} {# ErrorCode = 114 #}
         {% include('common/errors/forbidden') %} {# ErrorCode = 403 #}
