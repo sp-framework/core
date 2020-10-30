@@ -84,13 +84,14 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 		if (!$this->config->cache->enabled) {
 			$parameters = [];
 		}
-
 		if (!$this->{$this->packageName} || $resetCache) {
 
 			$this->model = $this->modelToUse::find($parameters);
 
 			$this->{$this->packageName} = $this->model->toArray();
 		}
+
+		return $this;
 	}
 
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
@@ -109,9 +110,9 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 			$this->model = $this->modelToUse::find($parameters);
 
 			return $this->getDbData($parameters, $enableCache);
-		} else {
-			throw new \Exception('getById needs id parameter to be set.');
 		}
+
+		throw new \Exception('getById needs id parameter to be set.');
 	}
 
 	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
@@ -135,7 +136,7 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 		throw new \Exception('getByParams needs parameter condition to be set.');
 	}
 
-	public function getDbData($parameters, bool $enableCache = true, string $type = 'id')
+	protected function getDbData($parameters, bool $enableCache = true, string $type = 'id')
 	{
 		if ($this->model->count() === 0) {
 			$this->packagesData->responseCode = 1;
@@ -433,6 +434,38 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 		$this->resetCacheKey();
 	}
 
+	public function getModel()
+	{
+		return $this->model;
+	}
+
+	public function getModelToUse()
+	{
+		return $this->modelToUse;
+	}
+
+	protected function getModelsMetaData()
+	{
+		if ($this->modelToUse) {
+			$model = new $this->modelToUse();
+
+			return $model->getModelsMetaData();
+		}
+
+		return false;
+
+	}
+
+	public function getModelsColumnMap()
+	{
+		$metaData = $this->getModelsMetaData();
+
+		if ($metaData) {
+			return $metaData->getAttributes(new $this->modelToUse());
+		}
+
+		return false;
+	}
 	// protected function regenerateCaches(int $id = null)
 	// {
 	// 	if ($id) {
