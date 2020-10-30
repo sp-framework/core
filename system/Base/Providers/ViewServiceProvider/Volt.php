@@ -11,6 +11,8 @@ class Volt
 
 	protected $volt;
 
+	protected $compiler;
+
 	public function __construct(ViewBaseInterface $view)
 	{
 		$this->view = $view;
@@ -29,6 +31,29 @@ class Volt
 			]
 		);
 
+		$this->compiler = $this->volt->getCompiler();
+
+		$this->registerFunctions();
+
+		$this->registerFilters();
+
 		return $this->volt;
+	}
+
+	protected function registerFunctions()
+	{
+		$enabledFunctions = get_defined_functions(true);
+
+		foreach ($enabledFunctions['internal'] as $internalFunction) {
+			$this->compiler->addFunction($internalFunction, $internalFunction);
+		}
+		foreach ($enabledFunctions['user'] as $userFunction) {
+			$this->compiler->addFunction($userFunction, $userFunction);
+		}
+	}
+
+	protected function registerFilters()
+	{
+		//
 	}
 }
