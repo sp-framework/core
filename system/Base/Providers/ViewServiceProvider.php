@@ -8,6 +8,7 @@ use Phalcon\Mvc\ViewBaseInterface;
 use System\Base\Providers\ViewServiceProvider\Tag;
 use System\Base\Providers\ViewServiceProvider\View;
 use System\Base\Providers\ViewServiceProvider\Volt;
+use System\Base\Providers\ViewServiceProvider\VoltTools;
 
 class ViewServiceProvider implements ServiceProviderInterface
 {
@@ -33,10 +34,36 @@ class ViewServiceProvider implements ServiceProviderInterface
 		);
 
 		$container->setShared(
+			'voltTools',
+			function () use ($container) {
+				return new VoltTools($container);
+			}
+		);
+
+		$container->setShared(
 			'tag',
 			function () {
 				return (new Tag())->init();
 			}
 		);
+
+		$application = $container->getShared('modules')->applications->getApplicationInfo();
+		$tags = $container->getShared('modules')->views->getViewTags();
+		$view = $container->getShared('view');
+		$tag = $container->getShared('tag');
+		$links = $container->getShared('links');
+
+		if ($tags) {
+			$tagsName = strtolower($tags['name']);
+
+			$package = 'Applications\\' . ucfirst($application['name']) . '\\' . 'Packages\\' . $tags['name'];
+
+			$container->setShared(
+				$tagsName,
+				function () use ($package, $view, $tag, $links) {
+					return new $package($view, $tag, $links);
+				}
+			);
+		}
 	}
 }
