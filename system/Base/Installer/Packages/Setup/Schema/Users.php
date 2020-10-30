@@ -32,7 +32,7 @@ class Users
                         'password',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
+                            'size'    => 2048,
                             'notNull' => true,
                         ]
                     ),
@@ -40,7 +40,7 @@ class Users
                         'can_login',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),

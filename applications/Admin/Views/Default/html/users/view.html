@@ -1,0 +1,87 @@
+{# {% set componentName = 'users' %}
+{% set componentId = 'admin-users' %}
+{% set parentComponentId = componentId %}
+{% set sectionId = 'all' %}
+
+{{adminltetags.useTag('content',
+    [
+        'componentId'                 : componentId,
+        'parentComponentId'           : parentComponentId,
+        'sectionId'                   : sectionId,
+        'contentType'                 : 'section',
+        'cardId'                      : sectionId ~ '-card',
+        'cardHeader'                  : true,
+        'cardType'                    : 'primary',
+        'cardIcon'                    : 'users',
+        'cardTitle'                   : 'Users',
+        'cardAdditionalClass'         : 'rounded-0',
+        'cardCollapsed'               : false,
+        'cardBodyInclude'             : 'users/users',
+        'cardShowTools'               : []
+    ]
+)}} #}
+{% set componentName = 'users' %}
+{% set componentId = 'admin-users' %}
+{% set parentComponentId = componentId %}
+{% set sectionId = 'listing' %}
+
+{% if table is defined %}
+    {{adminltetags.useTag('content',
+        [
+            'componentName'         : componentName,
+            'componentId'           : componentId,
+            'parentComponentId'     : parentComponentId,
+            'sectionId'             : sectionId,
+            'contentType'           : 'sectionsListing',
+            'cardHeader'            : true,
+            'cardType'              : 'primary',
+            'cardIcon'              : 'users',
+            'cardTitle'             : componentName,
+            'cardAdditionalClass'   : 'rounded-0',
+            'cardShowTools'         : ['maximize', 'collapse'],
+            'dtFilter'              : true,
+            'dtPrimaryButtons'      : {
+                                        'buttonType'                      : 'button',
+                                        'buttons' : {
+                                            'add-user' : {
+                                                'title'                   : 'Add New User',
+                                                'size'                    : 'sm',
+                                                'type'                    : 'primary',
+                                                'icon'                    : 'plus',
+                                                'buttonAdditionalClass'   : 'contentAjaxLink',
+                                                'position'                : 'right',
+                                                'url'                     : links.url('users/user/add')
+                                            }
+                                        }
+                                    },
+            'dtStriped'             : true,
+            'dtBordered'            : false,
+            'dtColumns'             : table,
+            'dtZeroRecords'         : 'No users data available. Add user by clicking the Add new user button.',
+            'dtReplaceColumns'      : {'status' : 'html'}
+        ]
+    )}}
+{% elseif rows is defined %}
+    {% set dtParams =
+        [
+            'dtNotificationTextFromColumn'  : 'name',
+            'dtReplaceColumns'              : {
+                                                'status' : {
+                                                    'html'  : {
+                                                        '0'     : '<span class="badge badge-danger">DISABLED</span>',
+                                                        '1'     : '<span class="badge badge-success">ENABLED</span>'
+                                                    }
+                                                }
+                                            },
+            'dtAdditionControlButtons'      : {
+                                                'view_role_accounts' : {
+                                                    'title'             : 'View Role Accounts',
+                                                    'additionalClass'   : 'contentAjaxLink',
+                                                    'icon'              : 'user-friends',
+                                                    'buttonType'        : 'info'
+                                                }
+                                            }
+        ]
+    %}
+    {% include '/thelpers/content/list/list' with ['dtParams' : dtParams] %}
+{% endif %}

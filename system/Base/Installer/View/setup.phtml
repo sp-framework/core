@@ -25,8 +25,9 @@
 						<div class="card mt-2 mb-2">
 							<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase"></div>
 							<div class="card-body bg-white">
-								<div class="row justify-content-center p-3">
-									<div class="col-6">
+								<div class="row vdivide">
+									<div class="col-6 p-3">
+										<legend>Database</legend>
 										<div class="form-group">
 											<label for="host">Host *</label>
 											<div class="input-group">
@@ -79,15 +80,32 @@
 												</div>
 											</div>
 										</div>
-										<hr>
-										<button id="submit" class="btn btn-primary">
-											<span id="submit-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
-											Create Schema
-										</button>
+									</div>
+									<div class="col-6 p-3">
+										<legend>Admin User</legend>
+										<div class="form-group">
+											<label for="email">Email *</label>
+											<div class="input-group">
+												<input type="text" name="email" id="email" class="form-control">
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="pass">Password *</label>
+											<div class="input-group">
+												<input type="password" name="pass" id="pass" class="form-control">
+											</div>
+										</div>
 									</div>
 								</div>
-								<div class="row text-center m-2" id="next-div" hidden>
-									<div class="col">
+								<hr>
+								<div class="row text-center p-3">
+									<div class="col" id="submit-div">
+										<button id="submit" class="btn btn-primary">
+											<span id="submit-spinner" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" hidden></span>
+											Setup
+										</button>
+									</div>
+									<div class="col" id="next-div" hidden>
 										<a href='/admin/modules' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Install Modules</a>
 									</div>
 								</div>
@@ -106,13 +124,14 @@
 		</div>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$('.card-header').html('Soaring Phalcon Setup : MySQL Database Schema');
+				$('.card-header').html('Soaring Phalcon Setup');
 			});
 
 			$('#submit').click(function() {
 				$(this).attr('disabled', true);
 				$('#submit-spinner').attr('hidden', false);
 				$('#alert').attr('hidden', true);
+
 				if ($('#host').val() === '') {
 					$('#host').addClass('is-invalid');
 					$('#host').focus(function() {
@@ -148,6 +167,20 @@
 					});
 					$('#submit-spinner').attr('hidden', true);
 					$('#submit').attr('disabled', false);
+				} else if ($('#email').val() === '') {
+					$('#email').addClass('is-invalid');
+					$('#email').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
+				} else if ($('#pass').val() === '') {
+					$('#pass').addClass('is-invalid');
+					$('#pass').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
 				} else {
 					$.ajax({
 						type    : 'POST',
@@ -160,7 +193,9 @@
 								"username"      : $('#username').val(),
 								"password"      : $('#password').val(),
 								"drop"          : $('#drop')[0].checked,
-								"mode"          : $("input[name='mode-options']:checked")[0].id
+								"mode"          : $("input[name='mode-options']:checked")[0].id,
+								"email"      	: $('#email').val(),
+								"pass"      	: $('#pass').val(),
 							},
 						dataType: 'json',
 						success: function (data) {
@@ -172,6 +207,7 @@
 								}).addClass('alert-success').html(data.responseMessage);
 								$('#next').attr('disabled', false);
 								$('#next-div').attr('hidden', false);
+								$('#submit-div').attr('hidden', true);
 							} else if (data.responseCode === 1) {
 								$('#alert').attr('hidden', false);
 								$('#alert').html('');

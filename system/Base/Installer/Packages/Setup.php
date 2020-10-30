@@ -4,24 +4,28 @@ namespace System\Base\Installer\Packages;
 
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Db\Column;
-use System\Base\Installer\Packages\Setup\Schema\Repositories;
-use System\Base\Installer\Packages\Setup\Schema\Core;
-use System\Base\Installer\Packages\Setup\Schema\Applications;
-use System\Base\Installer\Packages\Setup\Schema\Components;
-use System\Base\Installer\Packages\Setup\Schema\Packages;
-use System\Base\Installer\Packages\Setup\Schema\Middlewares;
-use System\Base\Installer\Packages\Setup\Schema\Views;
-use System\Base\Installer\Packages\Setup\Schema\Cache;
-use System\Base\Installer\Packages\Setup\Schema\Logs;
-use System\Base\Installer\Packages\Setup\Schema\Domains;
-use System\Base\Installer\Packages\Setup\Register\Repository;
-use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
+use Phalcon\Validation\Validator\Email;
+use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplication;
 use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent;
-use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
-use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
-use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
+use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
+use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
+use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
+use System\Base\Installer\Packages\Setup\Register\Repository as RegisterRepository;
+use System\Base\Installer\Packages\Setup\Register\User as RegisterUser;
+use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
+use System\Base\Installer\Packages\Setup\Schema\Applications;
+use System\Base\Installer\Packages\Setup\Schema\Cache;
+use System\Base\Installer\Packages\Setup\Schema\Components;
+use System\Base\Installer\Packages\Setup\Schema\Core;
+use System\Base\Installer\Packages\Setup\Schema\Domains;
+use System\Base\Installer\Packages\Setup\Schema\Logs;
+use System\Base\Installer\Packages\Setup\Schema\Middlewares;
+use System\Base\Installer\Packages\Setup\Schema\Packages;
+use System\Base\Installer\Packages\Setup\Schema\Repositories;
+use System\Base\Installer\Packages\Setup\Schema\Users;
+use System\Base\Installer\Packages\Setup\Schema\Views;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\DatabaseServiceProvider;
 
@@ -46,6 +50,10 @@ class Setup
 		$this->request = $this->container->getShared('request');
 
 		$this->postData = $this->request->getPost();
+
+		$this->validation = $this->container->getShared('validation');
+
+		$this->security = $this->container->getShared('security');
 
 		if ($this->request->isPost()) {
 			$conn =
@@ -109,11 +117,12 @@ class Setup
 		$this->db->createTable('cache', '', (new Cache)->columns());
 		$this->db->createTable('logs', '', (new Logs)->columns());
 		$this->db->createTable('domains', '', (new Domains)->columns());
+		$this->db->createTable('users', '', (new Users)->columns());
 	}
 
 	public function registerRepository()//Change this to SP
 	{
-		(new Repository())->register($this->db);
+		(new RegisterRepository())->register($this->db);
 	}
 
 	public function registerCore(array $baseConfig)
@@ -260,6 +269,32 @@ class Setup
 	public function registerDomain()
 	{
 		return (new RegisterDomain())->register($this->db, $this->request);
+	}
+
+	public function validateData()
+	{
+		$this->validation->add('email', Email::class, ["message" => "Please enter valid email address."]);
+		$this->validation->add('pass', PresenceOf::class, ["message" => "Please enter a password."]);
+
+		$validated = $this->validation->validate($this->postData)->jsonSerialize();
+
+		if (count($validated) > 0) {
+			$messages = 'Error: ';
+
+			foreach ($validated as $key => $value) {
+				$messages .= $value['message'];
+			}
+			return $messages;
+		} else {
+			return true;
+		}
+	}
+
+	public function registerAdminUser($newApplicationId)
+	{
+		$password = $this->security->hash($this->postData['pass']);
+
+		return (new RegisterUser())->register($this->db, $this->postData['email'], $password, $newApplicationId);
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true)
