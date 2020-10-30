@@ -25,6 +25,11 @@ class Widget
 		$this->logger = $logger;
 	}
 
+	public function init()
+	{
+		return $this;
+	}
+
 	public function get(string $route)
 	{
 		$widgetRoute =

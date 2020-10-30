@@ -2,24 +2,35 @@
 
 namespace System\Base\Providers;
 
-use League\Container\ServiceProvider\AbstractServiceProvider;
-use System\Base\Providers\SecurityServiceProvider\Csrf;
-use System\Base\Providers\SessionServiceProvider\SessionStore;
+use Phalcon\Di\DiInterface;
+use Phalcon\Di\ServiceProviderInterface;
+use System\Base\Providers\SecurityServiceProvider\Crypt;
+use System\Base\Providers\SecurityServiceProvider\Random;
+use System\Base\Providers\SecurityServiceProvider\Security;
 
-class SecurityServiceProvider extends AbstractServiceProvider
+class SecurityServiceProvider implements ServiceProviderInterface
 {
-    protected $provides = [
-        Csrf::class
-    ];
-
-    public function register()
+    public function register(DiInterface $container) : void
     {
-        $container = $this->getContainer();
+        $container->setShared(
+            'security',
+            function () {
+                return (new Security())->init();
+            }
+        );
 
-        $container->share(Csrf::class, function () use ($container) {
-            return new Csrf(
-                $container->get(SessionStore::class)
-            );
-        });
+        $container->setShared(
+            'random',
+            function () {
+                return (new Random())->init();
+            }
+        );
+
+        $container->setShared(
+            'crypt',
+            function () {
+                return (new Crypt())->init();
+            }
+        );
     }
 }

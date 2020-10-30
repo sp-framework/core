@@ -29,8 +29,6 @@ class Service
 
 	public function load()
 	{
-		include('../system/Base/Helpers.php');
-
 		try {
 			$config = include('../system/Configs/Base.php');
 		} catch (\ErrorException $e) {

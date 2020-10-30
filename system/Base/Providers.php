@@ -16,5 +16,6 @@ return
 		'System\Base\Providers\ViewServiceProvider',
 		'System\Base\Providers\FlashServiceProvider',
 		'System\Base\Providers\ErrorServiceProvider',
-		'System\Base\Providers\WidgetServiceProvider'
+		'System\Base\Providers\WidgetServiceProvider',
+		'System\Base\Providers\AccessServiceProvider'
 	];

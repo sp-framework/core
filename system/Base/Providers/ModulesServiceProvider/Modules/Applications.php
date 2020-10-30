@@ -24,151 +24,6 @@ class Applications extends BasePackage
 		return $this;
 	}
 
-	// public function getAll(bool $resetCache = false)
-	// {
-	// 	$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
-
-	// 	if (!$this->applications || $resetCache) {
-
-	// 		$this->model = ApplicationsModel::find($parameters);
-
-	// 		$this->applications = $this->model->toArray();
-	// 	}
-
-	// 	return $this;
-	// }
-
-	// public function getById(int $id = null, bool $resetCache = false)
-	// {
-	// 	$parameters = $this->paramsWithCache($this->getIdParams($id));
-
-	// 	$this->model = ApplicationsModel::find($parameters);
-
-	// 	return $this->getDbData($parameters);
-	// }
-
-	// public function getByParams($params = null, bool $resetCache = false)
-	// {
-	// 	$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
-
-	// 	$this->model = ApplicationsModel::find($parameters);
-
-	// 	return $this->getDbData($parameters);
-	// }
-
-	// protected function getDbData($parameters)
-	// {
-	// 	if ($this->model->count() === 1) {
-	// 		$this->packagesData->responseCode = 0;
-	// 		$this->packagesData->responseMessage = 'Found';
-
-	// 		array_push($this->cacheKeys, $parameters['cache']['key']);
-
-	// 		return $this->model->toArray()[0];
-
-	// 	} else if ($this->model->count() > 1) {
-	// 		$this->packagesData->responseCode = 1;
-	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-
-	// 	} else if ($this->model->count() === 0) {
-	// 		$this->packagesData->responseCode = 1;
-	// 		$this->packagesData->responseMessage = 'No Record Found!';
-	// 	}
-
-	// 	$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
-
-	// 	return false;
-	// }
-
-	// public function add(array $data)
-	// {
-	// 	try {
-	// 		$txManager = new Manager();
-	// 		$transaction = $txManager->get();
-
-	// 		$application = new ApplicationsModel();
-
-	// 		$application->setTransaction($transaction);
-
-	// 		$application->assign($data);
-
-	// 		$create = $application->create();
-
-	// 		if (!$create) {
-	// 			$transaction->rollback('Could not add application.');
-	// 		}
-
-	// 		if ($transaction->commit()) {
-	// 			$this->resetCache();
-
-	// 			$this->packagesData->responseCode = 0;
-
-	// 			$this->packagesData->responseMessage = 'Added application!';
-
-	// 			return true;
-	// 		}
-	// 	} catch (\Exception $e) {
-	// 		throw $e;
-	// 	}
-	// }
-
-	// public function update(array $data)
-	// {
-	// 	try {
-	// 		$txManager = new Manager();
-	// 		$transaction = $txManager->get();
-
-	// 		$application = new ApplicationsModel();
-
-	// 		$application->setTransaction($transaction);
-
-	// 		$application->assign($data);
-
-	// 		if (!$application->update()) {
-	// 			$transaction->rollback('Could not update application.');
-	// 		}
-
-	// 		if ($transaction->commit()) {
-	// 			//Delete Old cache if exists and generate new cache
-	// 			$this->updateCache($data['id']);
-
-	// 			$this->packagesData->responseCode = 0;
-
-	// 			$this->packagesData->responseMessage = 'Application Updated!';
-
-	// 			return true;
-	// 		}
-	// 	} catch (\Exception $e) {
-	// 		throw $e;
-	// 	}
-	// }
-
-	// public function remove(int $id)
-	// {
-	// 	//Need to solve dependencies for removal
-	// 	// $this->get($id);
-
-	// 	// if ($this->model->count() === 1) {
-	// 	// 	if ($this->model->delete()) {
-
-	// 	// 		$this->resetCache($id);
-
-	// 	// 		$this->packagesData->responseCode = 0;
-	// 	// 		$this->packagesData->responseMessage = 'Application Deleted!';
-	// 	// 		return true;
-	// 	// 	} else {
-	// 	// 		$this->packagesData->responseCode = 1;
-	// 	// 		$this->packagesData->responseMessage = 'Could not delete application.';
-	// 	// 	}
-	// 	// } else if ($this->model->count() > 1) {
-	// 	// 	$this->packagesData->responseCode = 1;
-	// 	// 	$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-	// 	// } else if ($this->model->count() === 0) {
-	// 	// 	$this->packagesData->responseCode = 1;
-	// 	// 	$this->packagesData->responseMessage = 'No Record Found with that ID!';
-	// 	// }
-	// }
-
 	public function getApplicationInfo()
 	{
 		if (isset($this->applicationInfo)) {
@@ -368,4 +223,151 @@ class Applications extends BasePackage
 			$this->modules->applications->update($defaultApplication);
 		}
 	}
+
+
+	// public function getAll(bool $resetCache = false)
+	// {
+	// 	$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+
+	// 	if (!$this->applications || $resetCache) {
+
+	// 		$this->model = ApplicationsModel::find($parameters);
+
+	// 		$this->applications = $this->model->toArray();
+	// 	}
+
+	// 	return $this;
+	// }
+
+	// public function getById(int $id = null, bool $resetCache = false)
+	// {
+	// 	$parameters = $this->paramsWithCache($this->getIdParams($id));
+
+	// 	$this->model = ApplicationsModel::find($parameters);
+
+	// 	return $this->getDbData($parameters);
+	// }
+
+	// public function getByParams($params = null, bool $resetCache = false)
+	// {
+	// 	$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
+
+	// 	$this->model = ApplicationsModel::find($parameters);
+
+	// 	return $this->getDbData($parameters);
+	// }
+
+	// protected function getDbData($parameters)
+	// {
+	// 	if ($this->model->count() === 1) {
+	// 		$this->packagesData->responseCode = 0;
+	// 		$this->packagesData->responseMessage = 'Found';
+
+	// 		array_push($this->cacheKeys, $parameters['cache']['key']);
+
+	// 		return $this->model->toArray()[0];
+
+	// 	} else if ($this->model->count() > 1) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+
+	// 	} else if ($this->model->count() === 0) {
+	// 		$this->packagesData->responseCode = 1;
+	// 		$this->packagesData->responseMessage = 'No Record Found!';
+	// 	}
+
+	// 	$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
+
+	// 	return false;
+	// }
+
+	// public function add(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
+
+	// 		$application = new ApplicationsModel();
+
+	// 		$application->setTransaction($transaction);
+
+	// 		$application->assign($data);
+
+	// 		$create = $application->create();
+
+	// 		if (!$create) {
+	// 			$transaction->rollback('Could not add application.');
+	// 		}
+
+	// 		if ($transaction->commit()) {
+	// 			$this->resetCache();
+
+	// 			$this->packagesData->responseCode = 0;
+
+	// 			$this->packagesData->responseMessage = 'Added application!';
+
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
+
+	// public function update(array $data)
+	// {
+	// 	try {
+	// 		$txManager = new Manager();
+	// 		$transaction = $txManager->get();
+
+	// 		$application = new ApplicationsModel();
+
+	// 		$application->setTransaction($transaction);
+
+	// 		$application->assign($data);
+
+	// 		if (!$application->update()) {
+	// 			$transaction->rollback('Could not update application.');
+	// 		}
+
+	// 		if ($transaction->commit()) {
+	// 			//Delete Old cache if exists and generate new cache
+	// 			$this->updateCache($data['id']);
+
+	// 			$this->packagesData->responseCode = 0;
+
+	// 			$this->packagesData->responseMessage = 'Application Updated!';
+
+	// 			return true;
+	// 		}
+	// 	} catch (\Exception $e) {
+	// 		throw $e;
+	// 	}
+	// }
+
+	// public function remove(int $id)
+	// {
+	// 	//Need to solve dependencies for removal
+	// 	// $this->get($id);
+
+	// 	// if ($this->model->count() === 1) {
+	// 	// 	if ($this->model->delete()) {
+
+	// 	// 		$this->resetCache($id);
+
+	// 	// 		$this->packagesData->responseCode = 0;
+	// 	// 		$this->packagesData->responseMessage = 'Application Deleted!';
+	// 	// 		return true;
+	// 	// 	} else {
+	// 	// 		$this->packagesData->responseCode = 1;
+	// 	// 		$this->packagesData->responseMessage = 'Could not delete application.';
+	// 	// 	}
+	// 	// } else if ($this->model->count() > 1) {
+	// 	// 	$this->packagesData->responseCode = 1;
+	// 	// 	$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+	// 	// } else if ($this->model->count() === 0) {
+	// 	// 	$this->packagesData->responseCode = 1;
+	// 	// 	$this->packagesData->responseMessage = 'No Record Found with that ID!';
+	// 	// }
+	// }
+
 }

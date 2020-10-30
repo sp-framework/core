@@ -16,7 +16,6 @@ class Tag
 	{
 		$this->tag = new PhalconTag;
 
-		//Register new tags
 		return $this->tag;
 	}
 }

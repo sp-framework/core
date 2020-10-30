@@ -23,7 +23,7 @@ class WidgetServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'widget',
 			function () use ($session, $connection, $request, $remoteContent, $logger) {
-				return (new Widget($session, $connection, $request, $remoteContent, $logger));
+				return (new Widget($session, $connection, $request, $remoteContent, $logger))->init();
 			}
 		);
 	}

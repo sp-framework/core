@@ -42,7 +42,6 @@ class CacheServiceProvider implements ServiceProviderInterface
         $caches['apcuCache'] = $container->getShared('apcuCache');
         $caches['opCache'] = $container->getShared('opCache');
 
-
         $container->setShared(
             'cacheTools',
             function () use ($cacheConfig, $caches) {
