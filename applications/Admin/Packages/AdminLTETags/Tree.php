@@ -130,6 +130,7 @@ class Tree extends AdminLTETags
                 $this->content .= '</ul></li>';
 
         } else if ($this->treeMode === 'select2') {
+
             if (isset($items['value'])) {
                 $this->content .=
                     '<optgroup label="' . $items['value'] . '">';
@@ -204,11 +205,19 @@ class Tree extends AdminLTETags
             $this->content .= '</p></a></li>';
 
         } else if ($this->treeMode == 'select2') {
-            foreach ($items as $itemKey => $itemValue) {
-                $hasKeyValue = '';
-                $hasValue = '';
-                $hasValueText = '';
 
+            foreach ($items as $itemKey => $itemValue) {
+                // var_dump($itemKey, $itemValue);
+                // $hasKeyValue = '';
+                // $hasValue = '';
+                // $hasValueText = '';
+
+                if (isset($this->fieldParams['fieldDataSelect2OptionsKey']) &&
+                    isset($this->fieldParams['fieldDataSelect2OptionsValue'])
+                ) {
+                    $key = $itemValue[$this->fieldParams['fieldDataSelect2OptionsKey']];
+                    $value = $itemValue[$this->fieldParams['fieldDataSelect2OptionsValue']];
+                // }
                 // if ($itemKey === $this->fieldParams['fieldDataSelect2OptionsKey']) {
 
                 //     $hasKeyValue = $itemValue;
@@ -218,17 +227,29 @@ class Tree extends AdminLTETags
 
                 //     $hasValueText = $itemValue;
                 // } else {
-                    $hasKeyValue = $itemKey;
-                    $hasValue = $itemValue;
-                    $hasValueText = $itemValue;
-                // }
+                    // $hasKeyValue = $itemKey;
+                    // $hasValue = $itemValue;
+                    // $hasValueText = $itemValue;
+                }
+
+                if (isset($itemValue['dataType'])) {
+                    $dataType = 'data-datatype="' . $itemValue['dataType'] . '"';
+                } else {
+                    $dataType = '';
+                }
+
+                if (isset($itemValue['numeric'])) {
+                    $numeric = 'data-numeric="' . $itemValue['numeric'] . '"';
+                } else {
+                    $numeric = '';
+                }
 
                 if ($itemKey === $this->fieldParams['fieldDataSelect2OptionsSelected']) {
                     $this->content .=
-                        '<option data-value="' . $hasKeyValue . '" value="' . $hasKeyValue . '" selected>' . $hasValueText . '</option>';
+                        '<option ' . $dataType . ' ' . $numeric . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
                 } else {
                     $this->content .=
-                        '<option data-value="' . $hasKeyValue . '" value="' . $hasKeyValue . '">' .$hasValueText . '</option>';
+                        '<option ' . $dataType . ' ' . $numeric . ' data-value="' . $key . '" value="' . $key . '">' .$value . '</option>';
                 }
             }
         }

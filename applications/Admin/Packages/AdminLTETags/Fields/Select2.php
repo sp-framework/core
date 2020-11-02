@@ -3,7 +3,6 @@
 namespace Applications\Admin\Packages\AdminLTETags\Fields;
 
 use Applications\Admin\Packages\AdminLTETags;
-use Applications\Admin\Packages\AdminLTETags\Tree;
 
 class Select2
 {
@@ -13,19 +12,23 @@ class Select2
 
     protected $links;
 
+    protected $escaper;
+
     protected $params;
 
     protected $fieldParams;
 
     protected $content;
 
-    public function __construct($view, $tag, $links, $params, $fieldParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $fieldParams)
     {
         $this->view = $view;
 
         $this->tag = $tag;
 
         $this->links = $links;
+
+        $this->escaper = $escaper;
 
         $this->params = $params;
 
@@ -42,7 +45,7 @@ class Select2
     protected function generateContent()
     {
         //We process array for select to that is wrapped inside an array. List data received from sdk is wrapped inside array. But, if the data is received from component, it will not be wrapped. So, we need to check and re-wrap the component data into an array #}
-        $this->fieldParams['fieldDataSelect2treeData'] =
+        $this->fieldParams['fieldDataSelect2TreeData'] =
             isset($this->params['fieldDataSelect2OptionsArray']) && $this->params['fieldDataSelect2OptionsArray'] === true ?
             [$this->params['fieldDataSelect2Options']] :
             $this->params['fieldDataSelect2Options'];
@@ -77,14 +80,16 @@ class Select2
                 strtoupper($this->fieldParams['fieldLabel']) . '</label> ' . $this->fieldParams['fieldHelp'] . ' ' . $this->fieldParams['fieldRequired'] .
                 '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:100%;" ' . $this->fieldParams['fieldSelect2Multiple'] . ' ' . $this->fieldParams['fieldDisabled'] . '>
                 <option></option>';
-        if ($this->fieldParams['fieldDataSelect2treeData']) {
+
+        if ($this->fieldParams['fieldDataSelect2TreeData']) {
+
             $this->content .=
-                (new AdminLTETags($this->view, $this->tag, $this->links))
+                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
                     ->useTag(
                         'tree',
                         [
                             'treeMode'      =>  'select2',
-                            'treeData'      =>  $this->fieldParams['fieldDataSelect2treeData'],
+                            'treeData'      =>  $this->fieldParams['fieldDataSelect2TreeData'],
                             'fieldParams'   =>  $this->fieldParams
                         ],
                     );

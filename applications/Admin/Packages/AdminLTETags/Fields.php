@@ -32,15 +32,26 @@ class Fields extends AdminLTETags
 
         $this->buildFieldParamsArr();
 
+        $this->content .=
+            '<div class="form-group ' . $this->fieldParams['fieldAdditionalClass'] . ' ' . $this->fieldParams['fieldHidden'] . '">';
+
+        if ($this->fieldParams['fieldLabel']) {
+            '<label>' . strtoupper($this->fieldParams['fieldLabel']) . '</label> ' .
+            $this->fieldParams['fieldHelp'] . ' ' .
+            $this->fieldParams['fieldRequired'];
+        }
+
         try {
             $field = 'Applications\\Admin\\Packages\\AdminLTETags\\Fields\\' . ucfirst($this->params['fieldType']);
 
-            $this->content .= (new $field($this->view, $this->tag, $this->links, $this->params, $this->fieldParams))->getContent();
+            $this->content .=
+                (new $field($this->view, $this->tag, $this->links, $this->escaper, $this->params, $this->fieldParams))->getContent();
 
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw $e;
         }
 
+        $this->content .= '</div>';
     }
 
     protected function buildFieldParamsArr()
@@ -70,9 +81,9 @@ class Fields extends AdminLTETags
         // fieldLabel - field label fall between <label></label> and other places
         if (isset($this->params['fieldLabel'])) {
             $this->fieldParams['fieldLabel'] =
-                $this->params['fieldLabel'] !== false ?
+                $this->params['fieldLabel'] ?
                 $this->params['fieldLabel'] :
-                '';
+                false;
 
         } else {
             $this->fieldParams['fieldLabel'] = '<label>missing_fieldLabel</label>';
@@ -94,7 +105,7 @@ class Fields extends AdminLTETags
             // fieldHelpTooltipTitle : Title of tooltip || Tooltip Title (HTML Allowed)
             // fieldHelpTooltipPosition : Position of tooltip || top
 
-        if (isset($this->params['fieldHelp'])) {
+        if (isset($this->params['fieldHelp']) && $this->params['fieldHelp'] !== false) {
 
             $this->fieldParams['fieldHelpTooltipPosition'] =
                 isset($this->params['fieldHelpTooltipPosition']) ?
@@ -129,7 +140,7 @@ class Fields extends AdminLTETags
         // Tooltip parameters:
         //     fieldRequiredTooltipTitle : Title of tooltip || Field cannot be empty. (HTML Allowed)
         //     fieldRequiredTooltipPosition : Position of tooltip || top
-        if (isset($this->params['fieldRequired'])) {
+        if (isset($this->params['fieldRequired']) && $this->params['fieldRequired'] !== false) {
             $this->fieldParams['fieldRequiredTooltipPosition'] =
                 isset($this->params['fieldRequiredTooltipPosition']) ?
                 $this->params['fieldRequiredTooltipPosition'] :
@@ -142,7 +153,14 @@ class Fields extends AdminLTETags
 
             $this->fieldParams['fieldRequired'] =
                 '<span><sup><i data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldRequiredTooltipPosition'] . '" title="' . $this->fieldParams['fieldRequiredTooltipTitle'] . '" style="font-size: 7px;" class="fas fa-fw fa-star fa-1 helper text-danger"></i></sup></span>';
+        } else {
+            $this->fieldParams['fieldRequired'] = '';
         }
+
+        $this->fieldParams['fieldAdditionalClass'] =
+            isset($this->params['fieldAdditionalClass']) ?
+            $this->params['fieldAdditionalClass'] :
+            '';
 
         $this->fieldParams['fieldHidden'] =
             isset($this->params['fieldHidden']) ?
@@ -156,24 +174,24 @@ class Fields extends AdminLTETags
                     ''
             : '';
 
-        $this->fieldParams['fieldDataMinNumber'] =
-            isset($this->params['fieldDataMinNumber']) ?
-            'min="' . $this->params['fieldDataMinNumber'] . '"':
+        $this->fieldParams['fieldDataInputMinNumber'] =
+            isset($this->params['fieldDataInputMinNumber']) ?
+            'min="' . $this->params['fieldDataInputMinNumber'] . '"':
             '';
 
-        $this->fieldParams['fieldDataMaxNumber'] =
-            isset($this->params['fieldDataMaxNumber']) ?
-            'max="' . $this->params['fieldDataMaxNumber'] . '"':
+        $this->fieldParams['fieldDataInputMaxNumber'] =
+            isset($this->params['fieldDataInputMaxNumber']) ?
+            'max="' . $this->params['fieldDataInputMaxNumber'] . '"':
             '';
 
-        $this->fieldParams['fieldDataMinLength'] =
-            isset($this->params['fieldDataMinLength']) ?
-            'minlength="' . $this->params['fieldDataMinLength'] . '"':
+        $this->fieldParams['fieldDataInputMinLength'] =
+            isset($this->params['fieldDataInputMinLength']) ?
+            'minlength="' . $this->params['fieldDataInputMinLength'] . '"':
             '';
 
-        $this->fieldParams['fieldDataMaxLength'] =
-            isset($this->params['fieldDataMaxLength']) ?
-            'maxlength="' . $this->params['fieldDataMaxLength'] . '"':
+        $this->fieldParams['fieldDataInputMaxLength'] =
+            isset($this->params['fieldDataInputMaxLength']) ?
+            'maxlength="' . $this->params['fieldDataInputMaxLength'] . '"':
             '';
 
         $this->fieldParams['fieldDisabled'] =

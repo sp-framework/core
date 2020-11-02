@@ -105,6 +105,7 @@ class Content extends AdminLTETags
     protected function getContentTypeSectionsListing()
     {
         $sectionsListing = '';
+
         if (isset($this->params['dtColumns']) || isset($this->params['dtRows'])) {
             if (isset($this->params['dtFilter']) && $this->params['dtFilter'] === true) {
 
@@ -138,16 +139,23 @@ class Content extends AdminLTETags
                         );
             }
 
-            // $sectionsListing .=
-            //     '<section id="' . $this->params['componentId'] .
-            //     '-listing-datatable" class="sectionWithListingDatatable">' .
-            //     $this->useTag('card', $this->params) .
-            //     '</section>';
+            $this->params['cardBodyContent'] = $this->useTag('content/listing/table', $this->params);
+
+            $sectionsListing .=
+                '<section id="' . $this->params['componentId'] .
+                '-listing" class="sectionWithListingDatatable">' .
+                $this->useTag('card', $this->params) .
+                '</section>';
 
         } else {
+
+            $this->params['cardBodyContent'] = $this->useTag('content/listing/table', $this->params);
+
             $sectionsListing .=
-                '<section id="' . $this->params['componentId'] . '-listing-datatable" class="sectionWithListingDatatable">' .
-                $this->useTag('card', $this->params);
+                '<section id="' . $this->params['componentId'] .
+                '-listing" class="sectionWithListingDatatable">' .
+                $this->useTag('card', $this->params) .
+                '</section>';
         }
 
         $sectionsListing .=
@@ -155,9 +163,6 @@ class Content extends AdminLTETags
                 window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
                 window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
             </script>';
-
-        $sectionsListing .=
-            '</section>';
 
         return $sectionsListing;
     }

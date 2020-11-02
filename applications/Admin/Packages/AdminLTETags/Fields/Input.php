@@ -2,6 +2,8 @@
 
 namespace Applications\Admin\Packages\AdminLTETags\Fields;
 
+use Applications\Admin\Packages\AdminLTETags;
+
 class Input
 {
     protected $view;
@@ -10,19 +12,23 @@ class Input
 
     protected $links;
 
+    protected $escaper;
+
     protected $params;
 
     protected $fieldParams;
 
     protected $content;
 
-    public function __construct($view, $tag, $links, $params, $fieldParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $fieldParams)
     {
         $this->view = $view;
 
         $this->tag = $tag;
 
         $this->links = $links;
+
+        $this->escaper = $escaper;
 
         $this->params = $params;
 
@@ -38,10 +44,6 @@ class Input
 
     protected function generateContent()
     {
-        $this->content .=
-            '<div class="form-group ' . $this->fieldParams['fieldHidden'] . '"><label>' .
-                strtoupper($this->fieldParams['fieldLabel']) . '</label> ' . $this->fieldParams['fieldHelp'] . ' ' . $this->fieldParams['fieldRequired'];
-
         $this->fieldParams['fieldGroupSize'] =
             isset($this->params['fieldGroupSize']) ?
             $this->params['fieldGroupSize'] :
@@ -86,29 +88,49 @@ class Input
         if (isset($this->params['fieldGroupPreAddonText']) ||
             isset($this->params['fieldGroupPreAddonIcon']) ||
             isset($this->params['fieldGroupPreAddonDropdown']) ||
-            isset($this->params['fieldGroupPreAddonButtonId'])
-        ) {
-            $this->preAddon();
-        }
-
-        $this->Input();
-
-        if (isset($this->params['fieldGroupPostAddonText']) ||
+            isset($this->params['fieldGroupPreAddonButtonId']) ||
+            isset($this->params['fieldGroupPostAddonText']) ||
             isset($this->params['fieldGroupPostAddonIcon']) ||
             isset($this->params['fieldGroupPostAddonDropdown']) ||
             isset($this->params['fieldGroupPostAddonButtonId'])
         ) {
-            $this->postAddon();
-        }
+            $this->content .=
+                '<div class="input-group input-group-' . $this->fieldParams['fieldGroupSize'] . '">';
 
-        $this->content .= '</div>';
+            if (isset($this->params['fieldGroupPreAddonText']) ||
+                isset($this->params['fieldGroupPreAddonIcon']) ||
+                isset($this->params['fieldGroupPreAddonDropdown']) ||
+                isset($this->params['fieldGroupPreAddonButtonId']) ||
+                isset($this->params['fieldGroupPreAddonButtons'])
+            ) {
+                $this->preAddon();
+            }
+
+            if ($this->fieldParams['fieldInputType'] === 'select') {
+                $this->select();
+            } else {
+                $this->Input();
+            }
+
+            if (isset($this->params['fieldGroupPostAddonText']) ||
+                isset($this->params['fieldGroupPostAddonIcon']) ||
+                isset($this->params['fieldGroupPostAddonDropdown']) ||
+                isset($this->params['fieldGroupPostAddonButtonId']) ||
+                isset($this->params['fieldGroupPostAddonButtons'])
+            ) {
+                $this->postAddon();
+
+                $this->content .= '</div>';
+            } else {
+                $this->content .= '</div>';
+            }
+        } else {
+            $this->Input();
+        }
     }
 
     protected function preAddon()
     {
-        $this->content .=
-            '<div class="input-group input-group-' . $this->fieldParams['fieldGroupSize'] . '">';
-
         if (isset($this->params['fieldGroupPreAddonText'])) {
             $this->content .=
                 '<div class="input-group-prepend">
@@ -169,8 +191,8 @@ class Input
 
             $this->content .= '<ul></div>';
 
-        } else if ($this->params['fieldGroupPreAddonButtonId'] &&
-                   $this->params['fieldGroupPreAddonButtonValue']
+        } else if (isset($this->params['fieldGroupPreAddonButtonId']) &&
+                   isset($this->params['fieldGroupPreAddonButtonValue'])
         ) {
             $this->fieldParams['fieldGroupPreAddonButtonClass'] =
                 isset($this->params['fieldGroupPreAddonButtonClass']) ?
@@ -193,6 +215,18 @@ class Input
                 'disabled' :
                 '';
 
+            if (isset($this->params['fieldGroupPreAddonButtonIcon'])) {
+                if ($this->params['fieldGroupPreAddonButtonIcon'] === 'after') {
+                    $this->params['fieldGroupPreAddonButtonValue'] =
+                        strtoupper($this->params['fieldGroupPreAddonButtonValue']) . ' ' .
+                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPreAddonButtonIcon'] . ' ml-1"></i>';
+                } else {
+                    $this->params['fieldGroupPreAddonButtonValue'] =
+                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPreAddonButtonIcon'] . ' mr-1"></i>' . ' ' .
+                        strtoupper($this->params['fieldGroupPreAddonButtonValue']);
+                }
+            }
+
             $this->content .=
                 '<div class="input-group-prepend">
                     <button ' . $this->fieldParams['fieldId'] . '-' . $this->params['fieldGroupPreAddonButtonId'] . '" class="btn btn-'. $this->fieldParams['fieldGroupPreAddonButtonClass'] . ' rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldGroupPreAddonButtonTooltipPosition']. '" title="' . $this->fieldParams['fieldGroupPreAddonButtonTooltipTitle'] . '" ' . $this->fieldParams['fieldGroupPreAddonButtonDisabled'] . '>' . $this->params['fieldGroupPreAddonButtonValue'] . '</button>
@@ -203,18 +237,61 @@ class Input
     protected function Input()
     {
         $this->content .=
-            '<input '. $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' type="' . $this->fieldParams['fieldInputType'] . '" class="form-control ' . $this->fieldParams['fieldSize'] . ' rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '"  placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataMinNumber'] . ' ' . $this->fieldParams['fieldDataMaxNumber'] . ' ' . $this->fieldParams['fieldDataMinLength'] . ' ' . $this->fieldParams['fieldDataMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldInputTypeTextFilter'] . ' value="' . $this->fieldParams['fieldValue'] . '" />';
+            '<input '. $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' type="' . $this->fieldParams['fieldInputType'] . '" class="form-control ' . $this->fieldParams['fieldSize'] . ' rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '"  placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataInputMinNumber'] . ' ' . $this->fieldParams['fieldDataInputMaxNumber'] . ' ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldInputTypeTextFilter'] . ' value="' . $this->fieldParams['fieldValue'] . '" />';
+    }
+
+    protected function select()
+    {
+        $this->fieldParams['fieldDataSelectTreeData'] =
+            isset($this->params['fieldDataSelectOptionsArray']) && $this->params['fieldDataSelectOptionsArray'] === true ?
+            [$this->params['fieldDataSelectOptions']] :
+            $this->params['fieldDataSelectOptions'];
+
+        $this->fieldParams['fieldDataSelectOptionsKey'] =
+            isset($this->params['fieldDataSelectOptionsKey']) ?
+            $this->params['fieldDataSelectOptionsKey'] :
+            '';
+
+        $this->fieldParams['fieldDataSelectOptionsValue'] =
+            isset($this->params['fieldDataSelectOptionsValue']) ?
+            $this->params['fieldDataSelectOptionsValue'] :
+            '';
+
+        $this->fieldParams['fieldDataSelectOptionsSelected'] =
+            isset($this->params['fieldDataSelectOptionsSelected']) ?
+            $this->params['fieldDataSelectOptionsSelected'] :
+            '';
+
+        $this->content .=
+            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="custom-select rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $this->fieldParams['fieldDisabled'] . '>
+                <option></option>';
+
+        if ($this->fieldParams['fieldDataSelectTreeData']) {
+
+            $this->content .=
+                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
+                    ->useTag(
+                        'tree',
+                        [
+                            'treeMode'      =>  'select2',
+                            'treeData'      =>  $this->fieldParams['fieldDataSelectTreeData'],
+                            'fieldParams'   =>  $this->fieldParams
+                        ],
+                    );
+        }
+
+        $this->content .= '</select>';
     }
 
     protected function postAddon()
     {
-        if ($this->params['fieldGroupPostAddonText']) {
+        if (isset($this->params['fieldGroupPostAddonText'])) {
 
             $this->content .=
                 '<div class="input-group-append">
                     <span class="input-group-text rounded-0">{{fieldGroupPostAddonText|raw}}</span>
                 </div>';
-        } else if ($this->params['fieldGroupPostAddonIcon']) {
+        } else if (isset($this->params['fieldGroupPostAddonIcon'])) {
 
             $this->content .=
                 '<div class="input-group-append">
@@ -222,7 +299,7 @@ class Input
                         <i class="fas fa-fw fa-' . $this->params['fieldGroupPostAddonIcon'] . '"></i>
                     </span>
                 </div>';
-        } else if ($this->params['fieldGroupPostAddonDropdown']) {
+        } else if (isset($this->params['fieldGroupPostAddonDropdown'])) {
 
             $this->fieldParams['fieldGroupPostAddonDropdownButtonClass'] =
                 isset($this->params['fieldGroupPostAddonDropdownButtonClass']) ?
@@ -268,8 +345,8 @@ class Input
 
             $this->content .= '<ul></div>';
 
-        } else if ($this->params['fieldGroupPostAddonButtonId'] &&
-                   $this->params['fieldGroupPostAddonButtonValue']
+        } else if (isset($this->params['fieldGroupPostAddonButtonId']) &&
+                   isset($this->params['fieldGroupPostAddonButtonValue'])
         ) {
             $this->fieldParams['fieldGroupPostAddonButtonClass'] =
                 isset($this->params['fieldGroupPostAddonButtonClass']) ?
@@ -292,10 +369,41 @@ class Input
                 'disabled' :
                 '';
 
+            if (isset($this->params['fieldGroupPostAddonButtonIcon'])) {
+                if ($this->params['fieldGroupPostAddonButtonIcon'] === 'after') {
+                    $this->params['fieldGroupPostAddonButtonValue'] =
+                        strtoupper($this->params['fieldGroupPostAddonButtonValue']) . ' ' .
+                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPostAddonButtonIcon'] . ' ml-1"></i>';
+                } else {
+                    $this->params['fieldGroupPostAddonButtonValue'] =
+                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPostAddonButtonIcon'] . ' mr-1"></i>' . ' ' .
+                        strtoupper($this->params['fieldGroupPostAddonButtonValue']);
+                }
+            }
+
             $this->content .=
-                '<div class="input-group-prepend">
+                '<div class="input-group-append">
                     <button ' . $this->fieldParams['fieldId'] . '-' . $this->params['fieldGroupPostAddonButtonId'] . '" class="btn btn-'. $this->fieldParams['fieldGroupPostAddonButtonClass'] . ' rounded-0" type="button" data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldGroupPostAddonButtonTooltipPosition']. '" title="' . $this->fieldParams['fieldGroupPostAddonButtonTooltipTitle'] . '" ' . $this->fieldParams['fieldGroupPostAddonButtonDisabled'] . '>' . $this->params['fieldGroupPostAddonButtonValue'] . '</button>
                 </div>' ;
+
+        } else if (isset($this->params['fieldGroupPostAddonButtons'])) {
+
+            $this->content .=
+                '<div class="input-group-append">';
+
+            $this->content .=
+                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
+                    ->useTag(
+                        'buttons',
+                        [
+                            'componentId'           => $this->params['componentId'],
+                            'sectionId'             => $this->params['sectionId'],
+                            'buttonType'            => 'button',
+                            'buttons'               => $this->params['fieldGroupPostAddonButtons'],
+                        ]
+                    );
+
+            $this->content .= '</div>';
         }
     }
 }

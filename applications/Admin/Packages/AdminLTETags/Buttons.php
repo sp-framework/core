@@ -10,9 +10,9 @@ class Buttons extends AdminLTETags
 
     protected $content = '';
 
-    protected $fieldParams = [];
+    protected $buttonParams = [];
 
-    public function getContent($params)
+    public function getContent(array $params)
     {
         $this->params = $params;
 
@@ -23,6 +23,36 @@ class Buttons extends AdminLTETags
 
     protected function generateContent()
     {
-        $this->content = 'buttons';
+        // buttonType - as per buttonType, code is generated
+        if (!isset($this->params['buttonType'])) {
+            $this->content .=
+                '<span class="text-uppercase text-danger">Error: buttonType missing</span>';
+            return;
+        }
+
+        $this->buildButtonParamsArr();
+
+        try {
+            $button = 'Applications\\Admin\\Packages\\AdminLTETags\\Buttons\\' . ucfirst($this->params['buttonType']);
+
+            $this->content .= (new $button($this->view, $this->tag, $this->links, $this->params, $this->buttonParams))->getContent();
+
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+
+    }
+
+    protected function buildButtonParamsArr()
+    {
+        if (isset($this->params['buttonLabel'])) {
+            if ($this->params['buttonLabel'] === false) {
+                $this->content .=
+                    '<label style="display:block; margin-bottom:29px;"></label>';
+            } else {
+                $this->content .=
+                    '<label style="display:block;">' . strtoupper($this->params['buttonLabel']) . '</label>';
+            }
+        }
     }
 }
