@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Admin\Components;
+namespace Applications\Admin\Components\Users;
 
 use System\Base\BaseComponent;
 

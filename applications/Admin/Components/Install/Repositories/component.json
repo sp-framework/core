@@ -4,7 +4,7 @@
 	"description"	: "Manage admin repositories via this component",
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/component-admin-repositories",
-	"path"			: "/",
+	"path"			: "Repositories/",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
@@ -24,11 +24,6 @@
 		}],
 		"packages"		:
 		[{
-			"name"		: "Repositories",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/package-admin-repositories"
-		},
-		{
 			"name"		: "Modules",
 			"version"	: "0.0.1",
 			"repo"		: "https://github.com/h-w-f/package-admin-modules"

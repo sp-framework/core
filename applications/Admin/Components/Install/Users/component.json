@@ -17,12 +17,7 @@
             "repo"      : "https://github.com/h-w-f/application-admin"
         },
         "components"    : [],
-        "packages"      :
-        [{
-            "name"      : "Users",
-            "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/package-admin-users"
-        }],
+        "packages"      : [],
         "middlewares"   : [],
         "views"         : []
     },

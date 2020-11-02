@@ -26,7 +26,7 @@
 		[{
 			"name"		: "Modules",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/package-admin-modules"
+			"repo"		: "https://github.com/h-w-f/package-admin-module"
 		}],
 		"middlewares"	: [],
 		"views"			: []

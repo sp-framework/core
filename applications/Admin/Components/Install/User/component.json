@@ -1,7 +1,7 @@
 {
     "name"          : "User",
     "displayName"   : "Admin User Management",
-    "description"   : "Manage admin user via this component",
+    "description"   : "Manage admin users user via this component",
     "version"       : "0.0.1",
     "repo"          : "https://github.com/h-w-f/component-admin-user",
     "path"          : "/",
@@ -16,17 +16,17 @@
             "version"   : "0.0.1",
             "repo"      : "https://github.com/h-w-f/application-admin"
         },
-        "components"    : [],
-        "packages"      :
+        "components"    :
         [{
-            "name"      : "User",
+            "name"      : "Users",
             "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/package-admin-user"
+            "repo"      : "https://github.com/h-w-f/component-admin-users"
         }],
+        "packages"      : [],
         "middlewares"   : [],
         "views"         : []
     },
     "menus"             : false,
-    "settings"          : {
+    "settings"      : {
     }
 }
