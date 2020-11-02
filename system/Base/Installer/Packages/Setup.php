@@ -55,6 +55,8 @@ class Setup
 
 		$this->security = $this->container->getShared('security');
 
+		$this->configs = new Configs();
+
 		if ($this->request->isPost()) {
 			$conn =
 					[
@@ -322,7 +324,12 @@ class Setup
 
 	public function writeConfigs($coreJson)
 	{
-		return (new Configs())->write($this->container, $this->postData, $coreJson);
+		return $this->configs->write($this->container, $this->postData, $coreJson);
+	}
+
+	public function revertBaseConfig($coreJson)
+	{
+		$this->configs->revert($this->container, $this->postData, $coreJson);
 	}
 
 	public function removeInstaller()

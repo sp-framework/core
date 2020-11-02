@@ -9,8 +9,17 @@ class Configs
 		return $this->writeBaseConfig($container, $postData, $coreJson);
 	}
 
-	protected function writeBaseConfig($container, $postData, $coreJson)
+	public function revert($container, $postData, $coreJson)
 	{
+		return $this->writeBaseConfig($container, $postData, $coreJson, true);
+	}
+
+	protected function writeBaseConfig($container, $postData, $coreJson, $revert = false)
+	{
+		if ($revert) {
+			$postData['username'] = '';
+		}
+
 		if ($postData['mode'] === 'production') {
 			$debug = "false";
 			$cache = "true";

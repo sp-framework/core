@@ -6,6 +6,7 @@ use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\View\Simple;
 use System\Base\Installer\Packages\Setup as SetupPackage;
 use System\Base\Providers\ContentServiceProvider\Local\Content as LocalContent;
+use System\Base\Providers\ValidationServiceProvider\Validation;
 
 Class Setup
 {
@@ -37,6 +38,12 @@ Class Setup
 			}
 		);
 
+		$container->setShared(
+			'validation',
+			function () {
+				return (new Validation())->init();
+			}
+		);
 		$this->container = $container;
 
 		$this->response = $this->container->getShared('response');
@@ -65,58 +72,65 @@ Class Setup
 		}
 
 		if ($this->request->isPost()) {
+			try {
+				if (!$this->setupPackage->checkDbEmpty()) {
 
-			if (!$this->setupPackage->checkDbEmpty()) {
+					$this->view->responseCode = 1;
+					$this->view->responseMessage =
+						'Database <strong>' . $this->postData['database_name'] . '</strong> not empty!' .
+						' Use drop existing tables checkbox to drop existing tables.';
 
-				$this->view->responseCode = 1;
-				$this->view->responseMessage =
-					'Database <strong>' . $this->postData['database_name'] . '</strong> not empty!' .
-					' Use drop existing tables checkbox to drop existing tables.';
+					if ($this->response->isSent() !== true) {
+						$this->response->setJsonContent($this->view->getParamsToView());
+
+						return $this->response->send();
+					}
+				}
+
+				$this->setupPackage->buildSchema();
+
+				$this->setupPackage->registerRepository();
+
+				$baseConfig =
+					$this->setupPackage->writeConfigs(
+						json_decode($this->container->getShared('localContent')->read('core.json'), true)
+					);
+
+				$this->setupPackage->registerCore($baseConfig);
+
+				$adminApplicationId = $this->setupPackage->registerModule('applications', null);
+
+				if ($adminApplicationId) {
+
+					$this->setupPackage->registerModule('components', $adminApplicationId);
+
+					$this->setupPackage->registerModule('packages', $adminApplicationId);
+
+					$this->setupPackage->registerModule('middlewares', $adminApplicationId);
+
+					$this->setupPackage->registerModule('views', $adminApplicationId);
+
+					$this->setupPackage->registerDomain();
+
+				}
+
+				// $this->setupPackage->removeInstaller();
+
+				$this->view->responseCode = 0;
+
+				$this->view->responseMessage = 'Schema Updated.';
 
 				if ($this->response->isSent() !== true) {
 					$this->response->setJsonContent($this->view->getParamsToView());
 
 					return $this->response->send();
 				}
-			}
-
-			$this->setupPackage->buildSchema();
-
-			$this->setupPackage->registerRepository();
-
-			$baseConfig =
-				$this->setupPackage->writeConfigs(
+			} catch (\Exception $e) {
+				$this->setupPackage->revertBaseConfig(
 					json_decode($this->container->getShared('localContent')->read('core.json'), true)
 				);
 
-			$this->setupPackage->registerCore($baseConfig);
-
-			$adminApplicationId = $this->setupPackage->registerModule('applications', null);
-
-			if ($adminApplicationId) {
-
-				$this->setupPackage->registerModule('components', $adminApplicationId);
-
-				$this->setupPackage->registerModule('packages', $adminApplicationId);
-
-				$this->setupPackage->registerModule('middlewares', $adminApplicationId);
-
-				$this->setupPackage->registerModule('views', $adminApplicationId);
-
-				$this->setupPackage->registerDomain();
-
-			}
-
-			// $this->setupPackage->removeInstaller();
-
-			$this->view->responseCode = 0;
-
-			$this->view->responseMessage = 'Schema Updated.';
-
-			if ($this->response->isSent() !== true) {
-				$this->response->setJsonContent($this->view->getParamsToView());
-
-				return $this->response->send();
+				throw $e;
 			}
 		} else {
 
