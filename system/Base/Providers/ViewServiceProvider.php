@@ -5,6 +5,7 @@ namespace System\Base\Providers;
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use Phalcon\Mvc\ViewBaseInterface;
+use System\Base\Providers\ViewServiceProvider\Escaper;
 use System\Base\Providers\ViewServiceProvider\Tag;
 use System\Base\Providers\ViewServiceProvider\View;
 use System\Base\Providers\ViewServiceProvider\Volt;
@@ -47,10 +48,18 @@ class ViewServiceProvider implements ServiceProviderInterface
 			}
 		);
 
+		$container->setShared(
+			'escaper',
+			function () {
+				return (new Escaper())->init();
+			}
+		);
+
 		$application = $container->getShared('modules')->applications->getApplicationInfo();
 		$tags = $container->getShared('modules')->views->getViewTags();
 		$view = $container->getShared('view');
 		$tag = $container->getShared('tag');
+		$escaper = $container->getShared('escaper');
 		$links = $container->getShared('links');
 
 		if ($tags) {
@@ -60,8 +69,8 @@ class ViewServiceProvider implements ServiceProviderInterface
 
 			$container->setShared(
 				$tagsName,
-				function () use ($package, $view, $tag, $links) {
-					return new $package($view, $tag, $links);
+				function () use ($package, $view, $tag, $links, $escaper) {
+					return new $package($view, $tag, $links, $escaper);
 				}
 			);
 		}
