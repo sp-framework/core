@@ -1,15 +1,15 @@
-/* 
+/*
 * @title: Baz Bubble Menu
 * @description: Adds bubble menu to any page.
 * @developer: guru@bazaari.com.au
 *
 * @Usage: 	<div id="Selector"></div>
 * 			$('#Selector').bazBubbleMenu(options);
-* 			
-* @options: 
- 		trigger		: has button style (size background-color)
- 						size options: tiny(30px), small(40px), medium(50px), large(60px), big(70px), huge(80px)
- 						background-color options: BB colors: bg-primary, bg-warning, bg-danger, etc.
+*
+* @options:
+		trigger		: has button style (size background-color)
+						size options: tiny(30px), small(40px), medium(50px), large(60px), big(70px), huge(80px)
+						background-color options: BB colors: bg-primary, bg-warning, bg-danger, etc.
 			trigger: {
 				type: 'click', // Either "click" or "menu" (Default : "menu")
 				icon: "fa fa-caret-square-o-up",
@@ -17,8 +17,8 @@
 				tooltip: {
 					tipText: "Top",
 					tipPosition: "right",
-				},		
-			}, 						
+				},
+			},
 		position 	: top-left, top-right, bottom-left, bottom-right',
 		direction 	: horizontal, vertical,
 		backdrop 	: true, false - backdrop is called via <div class="bubble-backdrop"></div>
@@ -34,7 +34,7 @@
 					tooltip: { // default: none
 						tipText: "help",
 						tipPosition: "left",
-					},					
+					},
 					onClick: function(){
 						console.log("fire");
 					}
@@ -86,13 +86,13 @@
 			$(this.element).addClass('bubble_menu ' + this.options.position + ' ' + this.options.direction);
 		}
 		$(this.element).append(
-			'<button class="bubble primary ' + 
-			(this.options.trigger.style ? this.options.trigger.style : 'large bg-primary') + 
+			'<button class="bubble primary ' +
+			(this.options.trigger.style ? this.options.trigger.style : 'large bg-primary') +
 			'" ' +
 			(this.options.trigger.tooltip ? 'data-toggle="tooltip" title="' + this.options.trigger.tooltip.tipText + '" data-placement="' +
-				this.options.trigger.tooltip.tipPosition : '') + 
-			'"><i class="' + 
-			(this.options.trigger.icon ? this.options.trigger.icon : 'fa fa-bars') + 
+				this.options.trigger.tooltip.tipPosition : '') +
+			'"><i class="' +
+			(this.options.trigger.icon ? this.options.trigger.icon : 'fa fa-bars') +
 			'"></i></button><dl></dl>'
 			);
 
@@ -102,13 +102,13 @@
 			$(this.options.buttons).each(function(e, i) {
 				if (i.button) {
 					$(element).find('dl').append(
-						'<dt><button ' + 
-						(i.tooltip ? 'data-toggle="tooltip" title="' + i.tooltip.tipText + '" data-placement="' + i.tooltip.tipPosition : '') + 
-						'" class="bubble ' + 
-						(i.button.style ? i.button.style : 'small bg-default') + 
-						' btn' + (e) + 
-						'"><i class="' + 
-						(i.button.icon ? i.button.icon : 'fa fa-bars') + 
+						'<dt><button ' +
+						(i.tooltip ? 'data-toggle="tooltip" title="' + i.tooltip.tipText + '" data-placement="' + i.tooltip.tipPosition : '') +
+						'" class="bubble ' +
+						(i.button.style ? i.button.style : 'small bg-default') +
+						' btn' + (e) +
+						'"><i class="' +
+						(i.button.icon ? i.button.icon : 'fa fa-bars') +
 						'"></i></button></dt>'
 						);
 					$(element).find(' dl .btn' + (e)).click(function() {
@@ -192,7 +192,7 @@
 						e.preventDefault();
 					}
 					that.click($(this));
-					return false;					
+					return false;
 				}
 			} else {
 				// Default Toggle
@@ -207,7 +207,7 @@
 		$(that.element).find('dl').click(function() {
 			that.collapse($(this));
 			return false;
-		});		
+		});
 	};
 
 	// Plugin Definition

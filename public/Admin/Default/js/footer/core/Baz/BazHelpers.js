@@ -1,12 +1,12 @@
 /* exported BazHelpers */
 /* globals */
-/* 
+/*
 * @title                    : BazHelpers
 * @description              : Baz Helper Tools Lib (include Various helper tools)
 * @developer                : guru@bazaari.com.au
 * @usage                    : BazHelpers._function_(_options_);
-* @functions                : 
-* @options                  : 
+* @functions                :
+* @options                  :
 */
 
 var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -20,7 +20,7 @@ var BazHelpers = function() {
     function error(errorMsg) {
         throw new Error(errorMsg);
     }
-    
+
     function bazModal(options) {
         var close, closeButton, createButton, updateButton, title, modalCentered, modalScrollable, modalSize, modalWidth;
         if (!options.modalId) {
@@ -72,19 +72,19 @@ var BazHelpers = function() {
                 updateButton = '';
             }
         }
-        var modalHTML = 
-            '<div class="modal fadeIn ' + options.modalAdditionalClasses + '" id="' + options.modalId + '-modal" tabindex="-1"  aria-labelledby="' + 
+        var modalHTML =
+            '<div class="modal fadeIn ' + options.modalAdditionalClasses + '" id="' + options.modalId + '-modal" tabindex="-1"  aria-labelledby="' +
             options.modalId + '-label" aria-hidden="true" data-backdrop="' + options.modalBackdrop + '" data-keyboard="' + options.modalEscClose + '">' +
             '<div ' + modalWidth + ' class="modal-dialog ' + modalCentered + ' ' + modalScrollable + ' ' + modalSize + '" role="document">' +
             '<div class="modal-content rounded-0 ' + options.modalContentAdditionalClasses + '">';
-        
+
         if (options.modalHeader) {
-            modalHTML += 
-                '<div class="modal-header border-bottom-0 rounded-0 bg-' + options.modalType + ' ' + options.modalHeaderAdditionalClasses + '"><h5 class="modal-title" id="' + 
+            modalHTML +=
+                '<div class="modal-header border-bottom-0 rounded-0 bg-' + options.modalType + ' ' + options.modalHeaderAdditionalClasses + '"><h5 class="modal-title" id="' +
                 options.modalId + '-label">' + title + '</h5>' + close + '</div>';
         }
 
-        modalHTML += '<div class="modal-body ' + options.modalBodyAdditionalClasses + '"></div>';            
+        modalHTML += '<div class="modal-body ' + options.modalBodyAdditionalClasses + '"></div>';
 
         if (options.modalFooter) {
             modalHTML += '<div class="modal-footer ' + options.modalFooterAdditionalClasses + '">' +
@@ -95,7 +95,7 @@ var BazHelpers = function() {
         }
 
         modalHTML += '</div></div></div>';
-        
+
         $(options.modalAppendOn).append(modalHTML);
     }
 
@@ -108,12 +108,12 @@ var BazHelpers = function() {
                 output += bazCreateHtmlList(obj[k]);
                 output += '</li>';
             } else {
-                output += '<li>' + k + ' => ' + obj[k] + '</li>'; 
+                output += '<li>' + k + ' => ' + obj[k] + '</li>';
             }
         });
         output += '</ul>';
         return output;
-    }    
+    }
 
     function bazHelpersConstructor() {
         // if something needs to be constructed
@@ -138,7 +138,7 @@ var BazHelpers = function() {
             'modalHeaderAdditionalClasses'          : '',
             'modalBodyAdditionalClasses'            : '',
             'modalFooter'                           : true,
-            'modalFooterAdditionalClasses'          : '',            
+            'modalFooterAdditionalClasses'          : '',
             'modalAppendOn'                         : 'body',
             'modalButtons'                          : {
                 'close'                             : false,
@@ -167,7 +167,7 @@ var BazHelpers = function() {
         }
         BazHelpers.createHtmlList = function(options) {
             var objToHtml = bazCreateHtmlList(options.obj);
-            return objToHtml;   
+            return objToHtml;
         }
     }
 

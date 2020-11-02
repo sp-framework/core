@@ -34,6 +34,7 @@
             componentId,
             sectionId,
             pnotifySound,
+            classes,
             swalSound;
         var listColumns = { };
             // that;
@@ -95,9 +96,13 @@
                         return $('input[type=radio]:checked', td).prop('checked') ? '1' : '0';
                     } );
                 };
-                var thisOptions = dataCollection[componentId][sectionId][sectionId + '-table'];
+
+                var thisOptions = dataCollection[componentId][sectionId];
                 listColumns[thisOptions.listOptions.tableName] = [];
+
                 var datatableOptions = thisOptions.listOptions.datatable;
+                datatableOptions.columns = JSON.parse(datatableOptions.columns);
+
                 var selectOptions, dom, showHideExportButton, showHideColumnsButton;
 
                 if (datatableOptions.showHideColumnsButton === 'true' ||
@@ -116,7 +121,7 @@
                 }
 
                 // ID Column
-                if (datatableOptions.hasIdColumn === 'true' || datatableOptions.hasIdColumn === '1') {
+                if (datatableOptions.addIdColumn === 'true' || datatableOptions.addIdColumn === '1') {
                     if (!datatableOptions.columns.find(({name}) => name === 'id')) {
                         listColumns[thisOptions.listOptions.tableName].push({
                             data    : 'id',
@@ -124,23 +129,38 @@
                         });
                     }
                 }
+
+                var columnsCount = 0;
+
                 // All Columns (except ID and __control and replacedColumns)
-                $.each(datatableOptions.columns, function(index,column) {
+                $.each(datatableOptions.columns[0], function(index,column) {
                     var disabled;
+
                     // disable column ordering
-                    var disableColumnOrdering = datatableOptions.disableColumnsOrdering.includes(column.name);
+                    var disableColumnOrdering = datatableOptions.disableColumnsOrdering.includes(column.id);
                     if (disableColumnOrdering) {
                         disabled = false;
                     } else {
                         disabled = true;
                     }
 
+                    if (datatableOptions.colTextTruncate) {
+                        classes = 'data-' + column.id + ' text-truncate dt-colTextTruncate';
+                    } else {
+                        classes = 'data-' + column.id;
+                    }
+
+                    if (datatableOptions.tableCompact) {
+                        classes = classes + ' pb-1 pt-1';
+                    }
+
                     listColumns[thisOptions.listOptions.tableName].push({
-                        data            : column.name,
-                        title           : column.value.toUpperCase(),
+                        data            : column.id,
+                        title           : column.name.toUpperCase(),
                         orderable       : disabled,
-                        className       : 'data-' + column.name
+                        className       : classes
                     });
+                    columnsCount++;
                 });
 
                 // Hide Columns
@@ -148,10 +168,11 @@
                 if (datatableOptions.hideIdColumn === 'true' || datatableOptions.hideIdColumn === '1') {
                     hideColumns.push(0);
                 }
-                if (datatableOptions.columns.length > datatableOptions.NoOfColumnsToShow) {
-                    var colDiff = datatableOptions.columns.length - datatableOptions.NoOfColumnsToShow;
+
+                if (columnsCount > datatableOptions.NoOfColumnsToShow) {
+                    var colDiff = columnsCount - datatableOptions.NoOfColumnsToShow;
                     for (var i = 1; i <= colDiff; i++) {
-                        hideColumns.push(datatableOptions.columns.length - i);
+                        hideColumns.push(columnsCount - i);
                     }
                 }
 
@@ -216,7 +237,7 @@
                                                 var shownCols = totCols - hiddenCols;
                                                 return '<i class="fas fa-eye fa-fw"></i> (' + shownCols + '/' + totCols + ')';
                                             },
-                            className       : 'btn-secondary',
+                            className       : 'btn-sm btn-' + datatableOptions.showHideColumnsButtonType,
                             prefixButtons   : [{
                                                 extend      : 'colvisGroup',
                                                 text        : 'SHOW ALL',
@@ -234,7 +255,7 @@
                         {
                             extend          : 'collection',
                             text            : 'Export',
-                            className       : '',
+                            className       : 'btn-sm btn-' + datatableOptions.showHideColumnsButtonType,
                             buttons         : [{
                                                 text            : 'Excel',
                                                 title           : 'DataExport - ' + thisOptions.listOptions.componentName,
@@ -279,8 +300,8 @@
                                                             next        : '<i class="fas fa-angle-right"></i>'
                                                         },
                                         zeroRecords     : datatableOptions.zeroRecords,
-                                        infoEmpty       : '',
-                                        searchPlaceholder: 'Search ' + thisOptions.listOptions.componentName + '...',
+                                        infoEmpty       : 'No entries found',
+                                        searchPlaceholder: 'Search shown ' + thisOptions.listOptions.componentName + '...',
                                         select          : {
                                             rows    : {
                                                     _   : 'Selected %d rows. Click the selected row again to deselect',
@@ -297,6 +318,9 @@
                                         }
                                     },
                     initComplete    : function() {
+                                        //Remove button secondary
+                                        $('.btn-' + datatableOptions.showHideColumnsButtonType).removeClass('btn-secondary');
+
                                         // Adjust hidden columns counter text in button
                                         $('#' + sectionId + '-table').on('column-visibility.dt', function(e) {
                                             var visCols = $('#' + sectionId + '-table thead tr:first th').length;
@@ -312,11 +336,11 @@
                                     }
                 });
 
-                if (thisOptions.listOptions.postURL) {
+                if (thisOptions.listOptions.postUrl) {
                     runDatatableAjax(thisOptions.listOptions.postParams);
                 } else {
-                    // Enable paging if data is more than 10 on static datatable
-                    if (datatableOptions.data.length > 10) {
+                    // Enable paging if data is more than 20 on static datatable
+                    if (datatableOptions.pagination && datatableOptions.paginationCounters.total_items > 20) {
                         $.extend(thisOptions.listOptions.datatable, {
                             paging : true,
                         });
@@ -327,15 +351,15 @@
                 }
 
                 function runDatatableAjax(postData, reDraw) {
-                    var url = dataCollection.env.rootPath + 'index.php?route=' + thisOptions.listOptions.postURL;
+                    var url = thisOptions.listOptions.postUrl;
                     $.ajax({
                         url         : url,
                         method      : 'post',
-                        dataType    : 'html',
+                        dataType    : 'json',
                         data        : postData,
                         success     : function(data) {
                             $('#list-data-loader').hide();
-                            $('#' + sectionId + '-table').append(data);
+                            $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
                         }
                     }).done(function() {
                         tableInit(reDraw);
@@ -376,45 +400,125 @@
                             }
                         }
                     });
+
                     if (!reDraw) {
                         // Pagination
-                        if (datatableOptions.pagination) {
+                        if (datatableOptions.pagination && datatableOptions.paginationCounters.total_items > 20) {
                             $.extend(thisOptions.listOptions.datatable, {
                                 paging : true,
                                 pagingType : 'simple',
                             });
+
                             datatableOptions['language']['zeroRecords'] = '<i class="fas fa-cog fa-spin"></i> Loading...';
                         }
-
+                        if (datatableOptions.tableCompact) {
+                            classes = 'data-actions pb-1 pt-1';
+                        } else {
+                            classes = 'data-actions';
+                        }
                         // Control Column
                         if (datatableOptions.rowControls) {
                             listColumns[thisOptions.listOptions.tableName].push({
                                 data        : '__control',
                                 title       : 'ACTIONS',
-                                orderable   : false
+                                orderable   : false,
+                                className   : classes
                             });
                         }
+
                         if (thisOptions.customFunctions.beforeTableInit) {
                             thisOptions.customFunctions.beforeTableInit();
                         }
+
                         thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
+
                         if (thisOptions.customFunctions.afterTableInit) {
                             thisOptions.customFunctions.afterTableInit();
                         }
+
+                        thisOptions['datatable'].columns.adjust().responsive.recalc();
+
+                        updateCounters();
+
+                        // Datatable Events
+                        //Responsive
+                        thisOptions['datatable'].on('draw responsive-resize responsive-display', function() {
+                            BazContentLoader.init({});
+                            thisOptions['datatable'].columns.adjust().responsive.recalc();
+                        });
+
+                        //Toggle response rows open/close
+                        thisOptions['datatable'].on('responsive-display', function(e, datatable, row, showHide) {
+                            if (showHide) {
+                                $($(row.node()).next('.child')).find('li').prepend(
+                                    '<i class="fa fas fa-fw fa-plus-circle text-info dtr-expand mr-1 dataTable-pointer"><i>'
+                                );
+
+                                changeResponsiveLiWidths($($(row.node()).next('.child')));
+
+                                $($(row.node()).next('.child')).find('.dtr-expand').click(function() {
+                                    if ($(this).parent().is('.text-truncate')) {
+                                        $(this).parent().removeClass('text-truncate dt-colTextTruncate');
+                                        $(this).removeClass('fa-plus-circle text-info').addClass('fa-minus-circle text-danger');
+                                    } else {
+                                        $(this).parent().addClass('text-truncate dt-colTextTruncate');
+                                        $(this).removeClass('fa-minus-circle text-danger').addClass('fa-plus-circle text-info');
+                                        changeResponsiveLiWidths($($(row.node()).next('.child')));
+                                    }
+                                });
+                            }
+                        });
+
+                        //Search
+                        thisOptions['datatable'].on('draw', function () {
+                            if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
+                                $('.dataTables_empty').html('...');
+                            }
+                        });
+
+                        //Length Change
+                        thisOptions['datatable'].on('length.dt', function (e, settings, len) {
+                            if (len === -1) {
+                                len = datatableOptions.paginationCounters.total_items;
+                            }
+                            thisOptions['datatable'].rows().clear().draw();
+                            $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
+                            runDatatableAjax({
+                                'page' : datatableOptions.paginationCounters.first,
+                                'limit': len
+                            }, true);
+                        });
+
                     } else { //redraw used on pagination prev and next
+
                         if (thisOptions.customFunctions.beforeRedraw) {
                             thisOptions.customFunctions.beforeRedraw();
                         }
+
                         thisOptions['datatable'].rows.add(datatableOptions.data).draw();
+
                         if (thisOptions.customFunctions.afterRedraw) {
                             thisOptions.customFunctions.afterRedraw();
                         }
 
+                        updateCounters();
                     }
 
                     if (datatableOptions.rowControls) {
                         BazContentLoader.init({});
                     }
+                }
+
+                //Update width for open child
+                function changeResponsiveLiWidths(child) {
+                    var width = child.width();
+
+                    var titleWidth = ((20 * width) / 100) / 16;//rem
+                    var liWidth = width/16;
+
+                    child.find('.dtr-title').css({"width" : titleWidth + 'rem'});
+                    child.find('.dtr-title').parent('li').removeClass('dt-colTextTruncate');
+                    child.find('.dtr-data').parent('li').css({"width" : liWidth + 'rem'});
                 }
 
                 //Register __control(Action buttons)
@@ -685,36 +789,55 @@
                             });
                         });
                     });
+                }
 
-                    // Datatable Events
-                    thisOptions['datatable'].on('draw responsive-resize responsive-display', function() {
-                        BazContentLoader.init({});
-                    });
+                function updateCounters() {
+                    var counters = { };
+
+                    counters.total = datatableOptions.paginationCounters.total_items;
+                    counters.end = datatableOptions.paginationCounters.limit * datatableOptions.paginationCounters.current;
+                    counters.start = (counters.end - datatableOptions.paginationCounters.limit) + 1;
+
+                    if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
+                        counters.end = datatableOptions.paginationCounters.total_items;
+                    }
+                    if (thisOptions['datatable']) {
+                        $('#admin-users-listing-table_info').empty().html(
+                            "Showing " + counters.start + " to " + counters.end +" of " + counters.total + " entries"
+                        );
+                    } else {
+                        $('#admin-users-listing-table_info').empty().html(
+                            "Showing " + counters.start + " to " + counters.end +" of " + counters.total + " entries"
+                        );
+                    }
                 }
 
                 function drawCallback() {
-                    if (datatableOptions.pagination) {
-                        if (datatableOptions.pagination.prev) {
+                    if (datatableOptions.pagination &&
+                        datatableOptions.paginationCounters.total_items > 20 &&
+                        (datatableOptions.paginationCounters.total_items !== datatableOptions.paginationCounters.limit)
+                    ) {
+
+                        if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.first) {
                             $('.paginate_button.previous').removeClass('disabled');
                             $('.paginate_button.previous').click(function() {
                                 thisOptions['datatable'].rows().clear().draw();
+                                $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
                                 runDatatableAjax({
-                                    'operation' : 'navigation',
-                                    'results'   : thisOptions.listOptions.postParams.results,
-                                    'dir'       : 'prev',
-                                    'id'        : datatableOptions.pagination.prev.id
-                                }, true)
+                                    'page' : datatableOptions.paginationCounters.previous,
+                                    'limit': datatableOptions.paginationCounters.limit
+                                }, true);
                             });
-                        } else if (datatableOptions.pagination.next) {
+                        }
+                        if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.last) {
                             $('.paginate_button.next').removeClass('disabled');
                             $('.paginate_button.next').click(function() {
                                 thisOptions['datatable'].rows().clear().draw();
+                                $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
                                 runDatatableAjax({
-                                    'operation' : 'navigation',
-                                    'results'   : thisOptions.listOptions.postParams.results,
-                                    'dir'       : 'next',
-                                    'id'        : datatableOptions.pagination.next.id
-                                }, true)
+                                    'page' : datatableOptions.paginationCounters.next,
+                                    'limit': datatableOptions.paginationCounters.limit
+                                }, true);
                             });
                         }
                     }
@@ -725,6 +848,7 @@
                 dataCollection = window['dataCollection'];
                 componentId = $(this).parents('.component')[0].id;
                 sectionId = $(this)[0].id;
+
                 dataCollection[componentId][sectionId]['BazContentSectionsList'] = $(this).data(DATA_KEY);
                 options = $.extend({}, Default, options);
 

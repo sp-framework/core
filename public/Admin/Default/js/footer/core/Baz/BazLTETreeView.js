@@ -1,12 +1,12 @@
 /* exported BazLTETreeView */
 /* globals */
-/* 
+/*
 * @title                    : BazLTETreeView
 * @description              : Baz LTE Tree View Lib
 * @developer                : guru@bazaari.com.au
 * @usage                    : BazLTETreeView._function_(_options_);
-* @functions                : 
-* @options                  : 
+* @functions                :
+* @options                  :
 */
 
 var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -108,11 +108,11 @@ var BazLTETreeView = function() {
         BazLTETreeView.defaults = {
             trigger: Selector.DATA_WIDGET + " " + Selector.LINK,
             animationSpeed: 300,
-            accordion: true         
+            accordion: true
         };
         BazLTETreeView.init = function(options) {
             init(_extends(BazLTETreeView.defaults, options));
-        }               
+        }
     }
 
     setup(bazLTETreeExampleConstructor);

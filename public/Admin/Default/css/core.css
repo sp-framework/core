@@ -28045,3 +28045,11 @@ a.disabled {
 .form-control:disabled, .form-control[readonly] {
   color: #95a5a6;
 }
+
+.layout-footer-fixed .wrapper .content-wrapper {
+  padding-bottom: calc(2.3rem + 1px) !important;
+}
+
+.card-body {
+  padding: 0.75rem !important;
+}
