@@ -2,20 +2,20 @@
 
 namespace System\Base\Providers\ViewServiceProvider;
 
-use Phalcon\Tag as PhalconTag;;
+use Phalcon\Tag as PhalconTag;
 
 class Tag
 {
-	protected $tag;
+    protected $tag;
 
-	public function __construct()
-	{
-	}
+    public function __construct()
+    {
+    }
 
-	public function init()
-	{
-		$this->tag = new PhalconTag;
+    public function init()
+    {
+        $this->tag = new PhalconTag;
 
-		return $this->tag;
-	}
+        return $this->tag;
+    }
 }
