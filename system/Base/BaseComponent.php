@@ -19,6 +19,8 @@ abstract class BaseComponent extends Controller
 
 	protected $componentName;
 
+	protected $componentId;
+
 	protected $viewName;
 
 	protected function onConstruct()
@@ -29,30 +31,54 @@ abstract class BaseComponent extends Controller
 			$this->checkLayout();
 		}
 
-		$this->view->widget = $this->widget;
-
-		$thisApplication = $this->modules->applications->getApplicationInfo();
-
-		$this->view->applicationName = $thisApplication['name'];
-
-		if (isset($thisApplication['route']) && $thisApplication['route'] !== '') {
-			$this->view->route = strtolower($thisApplication['route']);
-		} else {
-			$this->view->route = strtolower($thisApplication['name']);
-		}
+		$this->application = $this->modules->applications->getApplicationInfo();
 
 		$this->reflection = new \ReflectionClass($this);
 
 		$this->componentName =
 			str_replace('Component', '', $this->reflection->getShortName());
 
-		$this->view->componentName = $this->componentName;
+		$this->setDefaultViewData();
+	}
+
+	protected function setDefaultViewData()
+	{
+		$this->view->widget = $this->widget;
+
+		$this->view->applicationName = $this->application['name'];
+
+		if (isset($this->application['route']) && $this->application['route'] !== '') {
+			$this->view->route = strtolower($this->application['route']);
+		} else {
+			$this->view->route = strtolower($this->application['name']);
+		}
+
+		$this->view->componentName = strtolower($this->componentName);
+
+		$this->view->componentId =
+			strtolower($this->view->applicationName) . '-' . strtolower($this->componentName);
+
+		$reflection = Arr::sliceRight(explode('\\', $this->reflection->getName()), 3);
+
+		if (count($reflection) === 1) {
+			$parents = str_replace('Component', '', Arr::last($reflection));
+			$this->view->parents = $parents;
+			$this->view->parent = strtolower($parents);
+		} else {
+			$reflection[Arr::lastKey($reflection)] =
+				str_replace('Component', '', Arr::last($reflection));
+
+			$parents = $reflection;
+
+			$this->view->parents = $parents;
+			$this->view->parent = strtolower(Arr::last($parents));
+		}
 
 		$this->view->viewName =
 			$this->modules->views->getViewInfo()['name'];
 
 		$this->view->menus =
-			$this->modules->components->buildMenuFromComponents($thisApplication['id']);
+			$this->modules->components->buildMenuFromComponents($this->application['id']);
 	}
 
 	protected function setDefaultViewResponse()
@@ -111,6 +137,7 @@ abstract class BaseComponent extends Controller
 	protected function checkLayout()
 	{
 		if ($this->request->isAjax()) {
+
 			if (count($this->dispatcher->getParams()) > 0) {
 				$this->buildGetQueryParamsArr();
 
@@ -327,7 +354,7 @@ abstract class BaseComponent extends Controller
 		$this->application = $this->modules->applications->getApplicationInfo();
 
 		if ($this->checkPackage($packageClass)) {
-			return new $packageClass();
+			return (new $packageClass())->init();
 		} else {
 			throw new \Exception(
 				'Package class : ' . $packageClass .
