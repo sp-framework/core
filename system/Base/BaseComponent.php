@@ -27,10 +27,6 @@ abstract class BaseComponent extends Controller
 	{
 		$this->setDefaultViewResponse();
 
-		if (!$this->isJson() || $this->request->isAjax()) {
-			$this->checkLayout();
-		}
-
 		$this->application = $this->modules->applications->getApplicationInfo();
 
 		$this->reflection = new \ReflectionClass($this);
@@ -38,7 +34,10 @@ abstract class BaseComponent extends Controller
 		$this->componentName =
 			str_replace('Component', '', $this->reflection->getShortName());
 
-		$this->setDefaultViewData();
+		if (!$this->isJson() || $this->request->isAjax()) {
+			$this->checkLayout();
+			$this->setDefaultViewData();
+		}
 	}
 
 	protected function setDefaultViewData()
@@ -78,7 +77,7 @@ abstract class BaseComponent extends Controller
 			$this->modules->views->getViewInfo()['name'];
 
 		$this->view->menus =
-			$this->modules->components->buildMenuFromComponents($this->application['id']);
+			$this->modules->menus->getMenusForApplication($this->application['id']);
 	}
 
 	protected function setDefaultViewResponse()

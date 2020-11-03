@@ -93,14 +93,14 @@ class Middlewares
 					new Column(
 						'application_id',
 						[
-							'type'    => Column::TYPE_INTEGER,
+							'type'    => Column::TYPE_TINYINTEGER,
 							'notNull' => true,
 						]
 					),
 					new Column(
 						'sequence',
 						[
-							'type'    => Column::TYPE_INTEGER,
+							'type'    => Column::TYPE_TINYINTEGER,
 							'size'    => 1,
 							'notNull' => true,
 						]

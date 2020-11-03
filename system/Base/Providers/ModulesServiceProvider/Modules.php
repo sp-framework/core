@@ -6,6 +6,7 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Applications;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Core;
 use System\Base\Providers\ModulesServiceProvider\Modules\Domains;
+use System\Base\Providers\ModulesServiceProvider\Modules\Menus;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
@@ -28,6 +29,8 @@ class Modules
 	protected $repositories;
 
 	protected $domains;
+
+	protected $menus;
 
 	public function __construct()
 	{
@@ -100,5 +103,12 @@ class Modules
 		$this->domains = (new Domains())->init();
 
 		return $this->domains;
+	}
+
+	protected function initMenus()
+	{
+		$this->menus = (new Menus())->init();
+
+		return $this->menus;
 	}
 }

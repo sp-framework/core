@@ -85,7 +85,7 @@ class Packages
 					new Column(
 						'application_id',
 						[
-							'type'    => Column::TYPE_INTEGER,
+							'type'    => Column::TYPE_TINYINTEGER,
 							'notNull' => true,
 						]
 					),

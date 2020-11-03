@@ -52,10 +52,6 @@ class Router
 	public function init()
 	{
 		if ($this->setApplicationInfo()) {
-			$this->defaultNamespace =
-				'Applications\\' . ucfirst($this->applicationDefaults['application']) . '\\Components';
-
-			$this->router->setDefaultNamespace($this->defaultNamespace);
 
 			$this->getURI();
 
@@ -92,8 +88,42 @@ class Router
 		return $this->router;
 	}
 
+	protected function setDefaultNamespace(bool $home = false)
+	{
+		if ($home) {
+			$this->defaultNamespace =
+				'Applications\\' .
+				ucfirst($this->applicationDefaults['application']) .
+				'\\Components\\' .
+				ucfirst($this->applicationDefaults['component'])
+				;
+		} else {
+			if ($this->givenRouteClass !== '') {
+				$this->defaultNamespace =
+					'Applications\\' .
+					ucfirst($this->applicationDefaults['application']) .
+					'\\Components' .
+					$this->givenRouteClass . '\\' .
+					ucfirst($this->controller)
+					;
+			} else {
+				$this->defaultNamespace =
+					'Applications\\' .
+					ucfirst($this->applicationDefaults['application']) .
+					'\\Components\\' .
+					$this->givenRouteClass .
+					ucfirst($this->controller)
+					;
+			}
+		}
+
+		$this->router->setDefaultNamespace($this->defaultNamespace);
+	}
+
 	protected function registerHome()
 	{
+		$this->setDefaultNamespace(true);
+
 		$this->router->add(
 			'/',
 			[
@@ -131,10 +161,12 @@ class Router
 			$routeToMatch = '/' . $givenRoute;
 		}
 
+		$this->setDefaultNamespace(false);
+
 		$this->router->add(
 			$routeToMatch,
 			[
-				'namespace' 	=> $this->defaultNamespace . $this->givenRouteClass,
+				'namespace' 	=> $this->defaultNamespace,
 				'controller'	=> $this->controller,
 				'action'		=> $this->action,
 				'params'		=> isset($this->getQuery) ? 1 : null

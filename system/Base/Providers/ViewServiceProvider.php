@@ -65,7 +65,7 @@ class ViewServiceProvider implements ServiceProviderInterface
 		if ($tags) {
 			$tagsName = strtolower($tags['name']);
 
-			$package = 'Applications\\' . ucfirst($application['name']) . '\\' . 'Packages\\' . $tags['name'];
+			$package = 'Applications\\' . ucfirst($application['name']) . '\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
 
 			$container->setShared(
 				$tagsName,

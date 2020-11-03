@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Register;
 
 class Component
 {
-	public function register($db, $componentFile, $installedFiles, $newApplicationId)
+	public function register($db, $componentFile, $installedFiles, $newApplicationId, $menuId)
 	{
 		return $db->insertAsDict(
 			'components',
@@ -23,10 +23,7 @@ class Component
 					isset($componentFile['dependencies']) ?
 					json_encode($componentFile['dependencies']) :
 					null,
-				'menus'		 	=>
-					isset($componentFile['menus']) ?
-					json_encode($componentFile['menus']) :
-					null,
+				'menu_id'		 		=> $menuId,
 				'application_id'		=> $newApplicationId,
 				'installed'				=> 1,
 				'files'					=> json_encode($installedFiles)

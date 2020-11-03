@@ -33,7 +33,7 @@
 	"settings"		: {
 		"domain"			: "",
 		"view" 				: "Default",
-		"component" 		: "Modules",
+		"component" 		: "Home",
 		"errorComponent"	: "Errors",
 		"email"				: {
 			"enabled"			: false,

@@ -14,6 +14,7 @@ use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddlewa
 use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\User as RegisterUser;
+use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
@@ -21,6 +22,7 @@ use System\Base\Installer\Packages\Setup\Schema\Components;
 use System\Base\Installer\Packages\Setup\Schema\Core;
 use System\Base\Installer\Packages\Setup\Schema\Domains;
 use System\Base\Installer\Packages\Setup\Schema\Logs;
+use System\Base\Installer\Packages\Setup\Schema\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Repositories;
@@ -120,6 +122,7 @@ class Setup
 		$this->db->createTable('logs', '', (new Logs)->columns());
 		$this->db->createTable('domains', '', (new Domains)->columns());
 		$this->db->createTable('users', '', (new Users)->columns());
+		$this->db->createTable('menus', '', (new Menus)->columns());
 	}
 
 	public function registerRepository()//Change this to SP
@@ -152,7 +155,7 @@ class Setup
 			return $this->registerAdminApplication($jsonFile);
 		} else if ($type === 'components') {
 
-			$adminComponents = $this->localContent->listContents('applications/Admin/Components/Install/', true);
+			$adminComponents = $this->localContent->listContents('applications/Admin/Components/', true);
 
 			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
 				if ($adminComponent['basename'] === 'component.json') {
@@ -166,33 +169,43 @@ class Setup
 						throw new \Exception('Problem reading component.json at location ' . $adminComponent['path']);
 					}
 
-					$this->registerAdminComponent($jsonFile, $newApplicationId);
+					if ($jsonFile['menu']) {
+						$menuId = $this->registerAdminMenu($jsonFile['menu'], $newApplicationId);
+					} else {
+						$menuId = null;
+					}
+
+					$this->registerAdminComponent($jsonFile, $newApplicationId, $menuId);
 				}
 			}
 
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->localContent->listContents('applications/Admin/Packages/Install/', true);
+			$adminPackages = $this->localContent->listContents('applications/Admin/Packages/', true);
 
 			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
 				if ($adminPackage['basename'] === 'package.json') {
-					$jsonFile =
-						json_decode(
-							$this->localContent->read($adminPackage['path']),
-							true
-						);
+					if ($adminPackage['path'] !==
+						'applications/Admin/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
+					) {
+						$jsonFile =
+							json_decode(
+								$this->localContent->read($adminPackage['path']),
+								true
+							);
 
-					if (!$jsonFile) {
-						throw new \Exception('Problem reading package.json at location ' . $adminPackage['path']);
+						if (!$jsonFile) {
+							throw new \Exception('Problem reading package.json at location ' . $adminPackage['path']);
+						}
+
+						$this->registerAdminPackage($jsonFile, $newApplicationId);
 					}
-
-					$this->registerAdminPackage($jsonFile, $newApplicationId);
 				}
 			}
 		} else if ($type === 'middlewares') {
 
 			$adminMiddlewares =
-				$this->localContent->listContents('applications/Admin/Middlewares/Install/', true);
+				$this->localContent->listContents('applications/Admin/Middlewares/', true);
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
@@ -237,23 +250,35 @@ class Setup
 			);
 	}
 
-	protected function registerAdminComponent(array $componentFile, $newApplicationId)
+	protected function registerAdminComponent(array $componentFile, $newApplicationId, $menuId)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Admin/Components/');
+		$installedFiles = $this->getInstalledFiles('applications/Admin/Components/' . $componentFile['name']);
 
-		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $newApplicationId);
+		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $newApplicationId, $menuId);
+	}
+
+	protected function registerAdminMenu(array $menu, $newApplicationId)
+	{
+		if (isset($menu['seq'])) {
+			$sequence = $menu['seq'];
+			unset($menu['seq']);
+		} else {
+			$sequence = 99;
+		}
+
+		return (new RegisterMenu())->register($this->db, $menu, $newApplicationId, $sequence);
 	}
 
 	protected function registerAdminPackage(array $packageFile, $newApplicationId)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Admin/Packages/');
+		$installedFiles = $this->getInstalledFiles('applications/Admin/Packages/' . $packageFile['name']);
 
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles, $newApplicationId);
 	}
 
 	public function registerAdminMiddleware(array $middlewareFile, $newApplicationId)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Admin/Middlewares/');
+		$installedFiles = $this->getInstalledFiles('applications/Admin/Middlewares/' . $middlewareFile['name']);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles, $newApplicationId);
 	}

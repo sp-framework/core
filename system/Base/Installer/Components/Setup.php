@@ -112,6 +112,7 @@ Class Setup
 
 					$this->setupPackage->registerDomain();
 
+					$this->setupPackage->registerAdminUser($adminApplicationId);
 				}
 
 				// $this->setupPackage->removeInstaller();

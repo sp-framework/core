@@ -61,32 +61,6 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function buildMenuFromComponents($applicationId)
-	{
-		$cachedMenu = $this->cacheTools->getCache('menus');
-
-		if ($cachedMenu) {
-			return $cachedMenu;
-		}
-
-		$components = $this->getComponentsForApplication($applicationId);
-
-		$buildMenu = [];
-
-		foreach ($components as $key => $component) {
-			$menus = Json::decode($component['menus'], true);
-
-			if ($menus) {
-				$buildMenu = array_merge_recursive($buildMenu, $menus);
-			}
-
-		}
-
-		$this->cacheTools->setCache('menus', $buildMenu);
-
-		return $buildMenu;
-	}
-
 	// public function getAll(bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {
