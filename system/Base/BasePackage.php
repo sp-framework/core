@@ -4,12 +4,13 @@ namespace System\Base;
 
 use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Controller;
-use Phalcon\Mvc\Model\Transaction\Failed;
 use Phalcon\Mvc\Model\Transaction\Manager;
-use System\Base\Interfaces\BasePackageInterface;
+use Phalcon\Paginator\Adapter\Model;
+use Phalcon\Paginator\Adapter\NativeArray;
+use Phalcon\Paginator\Exception;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
-abstract class BasePackage extends Controller implements BasePackageInterface
+abstract class BasePackage extends Controller
 {
 	public $packagesData;
 
@@ -73,27 +74,6 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 		}
 	}
 
-	public function getAll(bool $resetCache = false, bool $enableCache = true)
-	{
-		if ($enableCache) {
-			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
-		} else {
-			$parameters = [];
-		}
-
-		if (!$this->config->cache->enabled) {
-			$parameters = [];
-		}
-		if (!$this->{$this->packageName} || $resetCache) {
-
-			$this->model = $this->modelToUse::find($parameters);
-
-			$this->{$this->packageName} = $this->model->toArray();
-		}
-
-		return $this;
-	}
-
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
 		if ($id) {
@@ -115,16 +95,30 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 		throw new \Exception('getById needs id parameter to be set.');
 	}
 
+	public function getAll(bool $resetCache = false, bool $enableCache = true)
+	{
+		if ($enableCache && $this->config->cache->enabled) {
+			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+		} else {
+			$parameters = [];
+		}
+
+		if (!$this->{$this->packageName} || $resetCache) {
+
+			$this->model = $this->modelToUse::find($parameters);
+
+			$this->{$this->packageName} = $this->model->toArray();
+		}
+
+		return $this;
+	}
+
 	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
 	{
-		if ($params && $params['conditions']) {
-			if ($enableCache) {
+		if (isset($params['conditions'])) {
+			if ($enableCache && $this->config->cache->enabled) {
 				$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
 			} else {
-				$parameters = $params;
-			}
-
-			if (!$this->config->cache->enabled) {
 				$parameters = $params;
 			}
 
@@ -136,7 +130,90 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 		throw new \Exception('getByParams needs parameter condition to be set.');
 	}
 
-	protected function getDbData($parameters, bool $enableCache = true, string $type = 'id')
+	public function getPaged(array $params = [], bool $resetCache = false, bool $enableCache = true)
+	{
+		//Empty columns causes SQL error :APL0:
+		if (isset($params['columns']) && count($params['columns']) === 0) {
+			unset($params['columns']);
+		}
+
+		$currentPage =
+			isset($this->request->getPost()['page']) ?
+			$this->request->getPost()['page'] :
+			1;
+
+		$pageParams['page'] = 1;
+		$pageParams['limit'] =
+			isset($this->request->getPost()['limit']) ?
+			$this->request->getPost()['limit'] :
+			20;
+
+		if ($pageParams > 1) {
+			$offset = ['offset' => $currentPage * $pageParams['limit']];
+		}
+
+		$params =
+			array_merge(
+				$params,
+				[
+					'conditions'	=> [],
+					'limit'			=> $pageParams['limit'],
+					'offset'		=>
+						$currentPage > 1 ?
+						($currentPage - 1) * $pageParams['limit'] :
+						0
+				]
+			);
+
+		// var_dump($this->modelToUse::count());
+			// var_dump($params);
+		$data = $this->getByParams($params);
+
+		if ($data) {
+			$pageParams['data'] = $data;
+		} else {
+			$pageParams['data'] = [];
+		}
+			// var_dump($pageParams);
+
+		// if ($this->modelToUse) {
+		// 	$pageParams['model'] = $this->modelToUse;
+		// } else {
+		// 	throw new \Exception('getPaged need modelToUse property, which is not set in package.');
+		// }
+
+		// if ($enableCache && $this->config->cache->enabled) {
+		// 	$pageParams['parameters'] = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
+		// } else {
+		// 	$pageParams['parameters'] = $params;
+		// }
+		// var_dump($pageParams);
+		try {
+			$paginator = new NativeArray($pageParams);
+		// var_dump($paginator);
+
+			$paged = $paginator->paginate();
+
+			// var_dump($paged);
+		// var_dump($paged);
+
+			$paginationCounters['total_items'] = $this->modelToUse::count();
+			$paginationCounters['limit'] = (int) $pageParams['limit'];
+			$paginationCounters['first'] = 1;
+			$paginationCounters['previous'] = (int) $currentPage > 1 ? $currentPage - 1 : 1;
+			$paginationCounters['current'] = (int) $currentPage;
+			$paginationCounters['next'] = $currentPage + 1;
+			$paginationCounters['last'] = (int) ceil($paginationCounters['total_items'] / ($paginationCounters['limit']));
+
+			$this->packagesData->paginationCounters = $paginationCounters;
+
+			return $paged;
+		} catch (Exception $e) {
+			throw $e;
+		}
+	}
+
+	protected function getDbData($parameters, bool $enableCache = true, string $type = 'id', bool $returnArray = true)
 	{
 		if ($this->model->count() === 0) {
 			$this->packagesData->responseCode = 1;
@@ -164,11 +241,15 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 				return;
 			}
 		} else if ($type === 'params') {
-			if ($enableCache) {
+			if ($enableCache && $this->config->cache->enabled) {
 				array_push($this->cacheKeys, $parameters['cache']['key']);
 			}
 
-			return $this->model->toArray();
+			if (!$returnArray) {
+				$this->model;
+			} else {
+				return $this->model->toArray();
+			}
 		}
 
 		$this->cacheTools->deleteCache($parameters['cache']['key']); //We delete cache on error.
@@ -456,12 +537,42 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 
 	}
 
-	public function getModelsColumnMap()
+	public function getModelsColumnMap(array $filter = [])
 	{
-		$metaData = $this->getModelsMetaData();
+		$metadata = [];
 
-		if ($metaData) {
-			return $metaData->getAttributes(new $this->modelToUse());
+		$md = $this->getModelsMetaData();
+		if ($md) {
+			$dataTypes = $md->getDataTypes(new $this->modelToUse());
+			$numeric = $md->getDataTypesNumeric(new $this->modelToUse());
+			$columns = $md->getAttributes(new $this->modelToUse());
+
+			$filteredColumns = [];
+
+			if (count($filter) > 0) {
+				foreach ($columns as $column) {
+					if (in_array($column, $filter)) {
+						array_push($filteredColumns, $column);
+					}
+				}
+			} else {
+				$filteredColumns = $columns;
+			}
+
+			foreach ($filteredColumns as $filteredColumn) {
+				$metadata[$filteredColumn]['id'] = $filteredColumn;
+				$metadata[$filteredColumn]['name'] = str_replace('_', ' ', $filteredColumn);
+
+				if (isset($numeric[$filteredColumn]) && $numeric[$filteredColumn] === true) {
+					$metadata[$filteredColumn]['numeric'] = 'true';
+				} else {
+					$metadata[$filteredColumn]['numeric'] = 'false';
+				}
+
+				$metadata[$filteredColumn]['dataType'] = $dataTypes[$filteredColumn];
+			}
+
+			return $metadata;
 		}
 
 		return false;
@@ -472,4 +583,52 @@ abstract class BasePackage extends Controller implements BasePackageInterface
 	// 		$this->get($id);
 	// 	}
 	// }
+	public function describe(string $table = null, $indexes = false, $references = false)
+	{
+		if (!$table) {
+			return $this->db->listTables($this->config->db->dbname);
+		} else {
+			if ($indexes) {
+				return $this->db->describeIndexes($table);
+			}
+			if ($references) {
+				return $this->db->describeReferences($table);
+			}
+			return $this->db->describeColumns($table);
+		}
+	}
+
+	public function dbViews()
+	{
+		return $this->db->listViews($this->config->db->dbname);
+	}
+
+	public function dbViewExists(string $view)
+	{
+		return $this->db->viewExists($view);
+	}
+
+	public function tableExists(string $table)
+	{
+		return $this->db->tableExists($table);
+	}
+
+	public function createTable(string $table, array $columns, $drop = false)
+	{
+		if ($drop) {
+			$this->dropTable($table);
+		}
+
+		return $this->db->createTable($table, '', $columns);
+	}
+
+	public function alterTable()
+	{
+		//
+	}
+
+	public function dropTable(string $table)
+	{
+		$this->db->dropTable($table);
+	}
 }
