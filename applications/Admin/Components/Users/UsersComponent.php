@@ -3,6 +3,7 @@
 namespace Applications\Admin\Components\Users;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
+use Applications\Admin\Packages\Filters\Filters;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -10,24 +11,48 @@ class UsersComponent extends BaseComponent
 {
     public function viewAction()
     {
-        $columnsToGet = [];
+        $columnsForTable = [];
+        $columnsForFilter = [];
 
-        // $users = $this->users->init();
-        $users = $this->modules->components;
+        $users = $this->users->init();
+        // $users = $this->modules->components;
 
         // $this->view->disable();
         if ($this->request->isGet()) {
-            $table['columns'] = $users->getModelsColumnMap($columnsToGet);
+            $table['columns'] = $users->getModelsColumnMap($columnsForTable);
+            $table['filterColumns'] = $users->getModelsColumnMap($columnsForFilter);
             $table['postUrl'] = $this->links->url('users/view');
+            $table['component'] = $this->component;
+
+            $filtersPackage = $this->usePackage(Filters::class);
+
+            $filtersArr =
+                $filtersPackage->getByParams(
+                    [
+                        'conditions'    => 'component_id = :cid:',
+                        'bind'          => [
+                            'cid'       => 5
+                        ]
+                    ]
+                );
+
+            foreach ($filtersArr as $key => $filter) {
+                $table['filters'][$filter['id']] = $filter;
+                $table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
+                $table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
+            }
 
             $this->view->table = $table;
+
+            // var_dump($filters);
+            // $this->view->disable();
 
         } else if ($this->request->isPost()) {
 
             $pagedData =
                 $users->getPaged(
                     [
-                        'columns' => $columnsToGet
+                        'columns' => $columnsForTable
                     ]
                 );
 
@@ -39,7 +64,7 @@ class UsersComponent extends BaseComponent
                     [
                         'view' => $this->links->url('users/user/q/id/' . $row['id']),
                         'edit' => $this->links->url('users/user/edit/q/id/' . $row['id']),
-                        'remove'=>$this->links->url('users/user/remove/q/id/' . $row["id"])
+                        'remove'=>$this->links->url('users/user/remove/q/id/' . $row['id'])
                     ];
             }
 
@@ -48,7 +73,7 @@ class UsersComponent extends BaseComponent
             $this->view->rows =
                 $adminltetags->useTag('content/listing/table',
                     [
-                        'componentId'                   => 'admin-users',
+                        'componentId'                   => $this->view->componentId,
                         'dtRows'                        => $rows,
                         'dtNotificationTextFromColumn'  => 'email',
                         'dtPagination'                  => true,
@@ -56,14 +81,14 @@ class UsersComponent extends BaseComponent
                     ]
                 );
         }
+        // $this->view->disable();
 
-
-        // $columnsToGet = ['id', 'email', 'can_login'];
+        // $columnsForTable = ['id', 'email', 'can_login'];
 
         // $users = $this->users->init();
 
         // if ($this->request->isGet()) {
-        //     $table['columns'] = $users->getModelsColumnMap($columnsToGet);
+        //     $table['columns'] = $users->getModelsColumnMap($columnsForTable);
         //     $table['postUrl'] = $this->links->url('users/view');
 
         //     $this->view->table = $table;
@@ -73,7 +98,7 @@ class UsersComponent extends BaseComponent
         //     $pagedData =
         //         $users->getPaged(
         //             [
-        //                 'columns' => $columnsToGet
+        //                 'columns' => $columnsForTable
         //             ]
         //         );
 

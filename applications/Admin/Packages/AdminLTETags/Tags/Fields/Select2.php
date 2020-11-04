@@ -20,8 +20,13 @@ class Select2
 
     protected $content;
 
+    protected $adminLTETags;
+
     public function __construct($view, $tag, $links, $escaper, $params, $fieldParams)
     {
+        $this->adminLTETags =
+            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
+
         $this->view = $view;
 
         $this->tag = $tag;
@@ -76,16 +81,13 @@ class Select2
             '';
 
         $this->content .=
-            '<div class="form-group '. $this->fieldParams['fieldHidden'] . '"><label>' .
-                strtoupper($this->fieldParams['fieldLabel']) . '</label> ' . $this->fieldParams['fieldHelp'] . ' ' . $this->fieldParams['fieldRequired'] .
-                '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:100%;" ' . $this->fieldParams['fieldSelect2Multiple'] . ' ' . $this->fieldParams['fieldDisabled'] . '>
+            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:100%;" ' . $this->fieldParams['fieldSelect2Multiple'] . ' ' . $this->fieldParams['fieldDisabled'] . '>
                 <option></option>';
 
         if ($this->fieldParams['fieldDataSelect2TreeData']) {
 
             $this->content .=
-                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
-                    ->useTag(
+                $this->adminLTETags->useTag(
                         'tree',
                         [
                             'treeMode'      =>  'select2',
@@ -95,6 +97,6 @@ class Select2
                     );
         }
 
-        $this->content .= '</select></div>';
+        $this->content .= '</select>';
     }
 }

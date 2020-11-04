@@ -2,7 +2,9 @@
 
 namespace Applications\Admin\Packages\AdminLTETags\Tags\Buttons;
 
-class Button
+use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
+
+class Button extends AdminLTETags
 {
     protected $view;
 
@@ -237,11 +239,11 @@ class Button
                 $button['tooltipTitle'] :
                 '';
 
-            $this->buildButton($buttonKey, $button);
+            $this->buildButton();
         }
     }
 
-    protected function buildButton($buttonKey, $button)
+    protected function buildButton()
     {
         if ($this->buttonParams['url'] !== '') {
             $this->content .=
@@ -249,7 +251,6 @@ class Button
         } else {
             $this->content .=
                 '<button ';
-
         }
 
         $this->content .=

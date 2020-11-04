@@ -14,6 +14,8 @@ abstract class BasePackage extends Controller
 {
 	public $packagesData;
 
+	protected $application;
+
 	protected $packageName;
 
 	protected $packageNameP;
@@ -45,6 +47,8 @@ abstract class BasePackage extends Controller
 
 	public function init()
 	{
+		$this->application = $this->modules->applications->getApplicationInfo();
+
 		return $this;
 	}
 
@@ -137,33 +141,128 @@ abstract class BasePackage extends Controller
 			unset($params['columns']);
 		}
 
-		$currentPage =
+		$pageParams['currentPage'] =
 			isset($this->request->getPost()['page']) ?
 			$this->request->getPost()['page'] :
 			1;
 
-		$pageParams['page'] = 1;
 		$pageParams['limit'] =
 			isset($this->request->getPost()['limit']) ?
 			$this->request->getPost()['limit'] :
 			20;
 
-		if ($pageParams > 1) {
-			$offset = ['offset' => $currentPage * $pageParams['limit']];
+		if ($pageParams['currentPage'] > 1) {
+			$offset = ['offset' => $pageParams['currentPage'] * $pageParams['limit']];
 		}
+
 
 		$params =
 			array_merge(
 				$params,
 				[
-					'conditions'	=> [],
 					'limit'			=> $pageParams['limit'],
 					'offset'		=>
-						$currentPage > 1 ?
-						($currentPage - 1) * $pageParams['limit'] :
-						0
+						$pageParams['currentPage'] > 1 ?
+						($pageParams['currentPage'] - 1) * $pageParams['limit'] :
+						0,
 				]
 			);
+
+		if (isset($this->request->getPost()['conditions'])) {
+			$postConditions = explode('&', $this->request->getPost()['conditions']);
+
+			$conditions = '';
+			$bind = [];
+
+			foreach ($postConditions as $conditionKey => $condition) {
+				$conditionArr = explode(':', $condition);
+
+				if ($conditionArr[1] === 'equals') {
+					$sign = '=';
+				} else if ($conditionArr[1] === 'between') {
+					$sign = 'BETWEEN';
+				} else if ($conditionArr[1] === 'notequals') {
+					$sign = '<>';
+				} else if ($conditionArr[1] === 'notbetween') {
+					$sign = 'NOT BETWEEN';
+				}
+				// var_dump($conditionArr);
+
+				if ($sign === 'BETWEEN') {
+					$valueArr = explode(',', $conditionArr[2]);
+
+					$conditions .=
+						'(' . $conditionArr[0] . ' ' . $sign;
+
+					foreach ($valueArr as $valueKey => $valueValue) {
+						$conditions .=
+							' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0] . ':';
+
+						$bind[
+							'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0]
+						] = $valueValue;
+
+						if (Arr::lastKey($valueArr) !== $valueKey) {
+							$conditions .= ' AND';
+						}
+					}
+
+					$conditions .=
+						')';
+				} else {
+					$valueArr = explode(',', $conditionArr[2]);
+
+					if (count($valueArr) > 1) {
+						foreach ($valueArr as $valueKey => $valueValue) {
+							$conditions .=
+								$conditionArr[0] . ' ' . $sign .
+								' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0] . ':';
+
+							$bind[
+								'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0]
+							] = $valueValue;
+
+							if (Arr::lastKey($valueArr) !== $valueKey) {
+								$conditions .= ' OR ';
+							}
+						}
+					} else {
+						$conditions .=
+							$conditionArr[0] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . $conditionArr[0] . ':';
+
+						$bind[
+							'baz_' . $conditionKey . '_' . $conditionArr[0]
+						] = $valueArr[0];
+					}
+
+				}
+				if (Arr::lastKey($postConditions) !== $conditionKey) {
+					$conditions .= ' ' . strtoupper($conditionArr[3]) . ' ';
+				}
+			}
+
+
+			var_dump($conditions, $bind);
+			// var_dump($this->request->getPost()['conditions']);
+			$params =
+				array_merge(
+					$params,
+					[
+						'conditions'	=> $conditions,
+						'bind'			=> $bind
+					]
+				);
+
+		} else {
+			$params =
+				array_merge(
+					$params,
+					[
+						'conditions'	=> '',
+					]
+				);
+		}
+
 
 		// var_dump($this->modelToUse::count());
 			// var_dump($params);
@@ -200,9 +299,9 @@ abstract class BasePackage extends Controller
 			$paginationCounters['total_items'] = $this->modelToUse::count();
 			$paginationCounters['limit'] = (int) $pageParams['limit'];
 			$paginationCounters['first'] = 1;
-			$paginationCounters['previous'] = (int) $currentPage > 1 ? $currentPage - 1 : 1;
-			$paginationCounters['current'] = (int) $currentPage;
-			$paginationCounters['next'] = $currentPage + 1;
+			$paginationCounters['previous'] = (int) $pageParams['currentPage'] > 1 ? $pageParams['currentPage'] - 1 : 1;
+			$paginationCounters['current'] = (int) $pageParams['currentPage'];
+			$paginationCounters['next'] = $pageParams['currentPage'] + 1;
 			$paginationCounters['last'] = (int) ceil($paginationCounters['total_items'] / ($paginationCounters['limit']));
 
 			$this->packagesData->paginationCounters = $paginationCounters;
@@ -422,8 +521,6 @@ abstract class BasePackage extends Controller
 
 	protected function usePackage($packageClass)
 	{
-		$this->application = $this->modules->applications->getApplicationInfo();
-
 		if ($this->checkPackage($packageClass)) {
 			return new $packageClass($this->container);
 		} else {
@@ -436,16 +533,11 @@ abstract class BasePackage extends Controller
 
 	protected function checkPackage($packageClass)
 	{
-		$packageName = Arr::last(explode('\\', $packageClass));
-
-		$packageApplicationId =
-			$this->packages[array_search($packageName, array_column($this->packages, 'name'))]['application_id'];
-
-		if ($packageApplicationId === $this->application['id']) {
-			return true;
-		} else {
-			return false;
-		}
+		return
+			$this->modules->packages->getNamedPackageForApplication(
+				Arr::last(explode('\\', $packageClass)),
+				$this->application['id']
+			);
 	}
 
 	public function getPackagesData()
@@ -542,6 +634,7 @@ abstract class BasePackage extends Controller
 		$metadata = [];
 
 		$md = $this->getModelsMetaData();
+
 		if ($md) {
 			$dataTypes = $md->getDataTypes(new $this->modelToUse());
 			$numeric = $md->getDataTypesNumeric(new $this->modelToUse());
@@ -564,12 +657,12 @@ abstract class BasePackage extends Controller
 				$metadata[$filteredColumn]['name'] = str_replace('_', ' ', $filteredColumn);
 
 				if (isset($numeric[$filteredColumn]) && $numeric[$filteredColumn] === true) {
-					$metadata[$filteredColumn]['numeric'] = 'true';
+					$metadata[$filteredColumn]['data']['numeric'] = 'true';
 				} else {
-					$metadata[$filteredColumn]['numeric'] = 'false';
+					$metadata[$filteredColumn]['data']['numeric'] = 'false';
 				}
 
-				$metadata[$filteredColumn]['dataType'] = $dataTypes[$filteredColumn];
+				$metadata[$filteredColumn]['data']['dataType'] = $dataTypes[$filteredColumn];
 			}
 
 			return $metadata;

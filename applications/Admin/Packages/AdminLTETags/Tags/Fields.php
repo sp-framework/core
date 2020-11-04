@@ -12,7 +12,7 @@ class Fields extends AdminLTETags
 
     protected $fieldParams = [];
 
-    public function getContent($params)
+    public function getContent(array $params)
     {
         $this->params = $params;
 
@@ -36,9 +36,10 @@ class Fields extends AdminLTETags
             '<div class="form-group ' . $this->fieldParams['fieldAdditionalClass'] . ' ' . $this->fieldParams['fieldHidden'] . '">';
 
         if ($this->fieldParams['fieldLabel']) {
-            '<label>' . strtoupper($this->fieldParams['fieldLabel']) . '</label> ' .
-            $this->fieldParams['fieldHelp'] . ' ' .
-            $this->fieldParams['fieldRequired'];
+            $this->content .=
+                '<label>' . strtoupper($this->fieldParams['fieldLabel']) . '</label> ' .
+                $this->fieldParams['fieldHelp'] . ' ' .
+                $this->fieldParams['fieldRequired'];
         }
 
         try {

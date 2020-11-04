@@ -44,6 +44,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th.dtr-control {
 table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td.dtr-control::before,
 table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th.dtr-control::before {
     line-height: 1.1rem !important;
+    top: 49%;
 }
 .dataTables_filter > label {
     margin-bottom: 0;

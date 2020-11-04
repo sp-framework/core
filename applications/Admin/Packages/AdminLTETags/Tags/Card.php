@@ -103,7 +103,7 @@ class Card extends AdminLTETags
             '<i class="fas fa-fw fa-plus"></i></button>' :
         $cardCollapsed = '';
 
-        if (count($this->params['cardShowTools']) > 0) {
+        if (isset($this->params['cardShowTools']) && count($this->params['cardShowTools']) > 0) {
             $tools = '';
 
             foreach ($this->params['cardShowTools'] as $key => $tool) {
@@ -145,9 +145,10 @@ class Card extends AdminLTETags
             $tools = '';
         }
 
-        isset($this->params['cardBodyAdditionalClass']) ?
-        $cardBodyAdditionalClass = $this->params['cardBodyAdditionalClass'] :
-        $cardBodyAdditionalClass = '';
+        $cardBodyAdditionalClass =
+            isset($this->params['cardBodyAdditionalClass']) ?
+            $this->params['cardBodyAdditionalClass'] :
+            '';
 
         if (isset($this->params['cardBodyContent'])) {
 
@@ -170,10 +171,7 @@ class Card extends AdminLTETags
                     $this->params
                 );
         } else {
-            $cardBody = '';
-        }
-        if (isset($this->params['cardBodyIncludeParams'])) {
-            $cardBodyIncludeParams = $this->params['cardBodyIncludeParams'];
+            $cardBody = 'cardBodyInclude/Content missing';
         }
 
         isset($this->params['cardFooterAdditionalClass']) ?

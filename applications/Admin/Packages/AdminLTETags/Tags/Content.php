@@ -21,7 +21,6 @@ class Content extends AdminLTETags
 
     protected function generateContent()
     {
-
         if (isset($this->params['componentId']) && isset($this->params['parentComponentId'])) {
             if (isset($this->params['contentType'])) {
 
@@ -34,8 +33,8 @@ class Content extends AdminLTETags
                     $this->content .= $this->getContentTypeSectionWithForm();
                 } else if ($this->params['contentType'] === 'sectionWithWizard') {
                     $this->content .= $this->getContentTypeSectionWithWizard();
-                } else if ($this->params['contentType'] === 'sectionsListing') {
-                    $this->content .= $this->getContentTypeSectionsListing();
+                } else if ($this->params['contentType'] === 'sectionWithListing') {
+                    $this->content .= $this->getContentTypeSectionWithListing();
                 } else if ($this->params['contentType'] === 'sectionWithStorage') {
                     $this->content .= $this->getContentTypeSectionWithStorage();
                 }
@@ -66,6 +65,21 @@ class Content extends AdminLTETags
 
     protected function getContentTypeSectionWithForm()
     {
+        $sectionForm = '';
+
+        $sectionForm .=
+            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] .
+            '" class="sectionWithForm">' . $this->useTag('card', $this->params) .
+            '</section>';
+
+        $sectionForm .=
+            '<script>
+                window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
+                window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
+            </script>';
+
+        return $sectionForm;
+
             // <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" data-bazdevmodetools="{{devModeTools|default('true')}}" class="sectionWithForm">
             //     {% include 'thelpers/card/card.html' with
             //         [
@@ -102,69 +116,25 @@ class Content extends AdminLTETags
         // </script>
     }
 
-    protected function getContentTypeSectionsListing()
+    protected function getContentTypeSectionWithListing()
     {
-        $sectionsListing = '';
+        $sectionListing = '';
 
-        if (isset($this->params['dtColumns']) || isset($this->params['dtRows'])) {
-            if (isset($this->params['dtFilter']) && $this->params['dtFilter'] === true) {
+        $this->params['cardBodyContent'] = $this->useTag('content/listing/table', $this->params);
 
-                isset($this->params['dtFilterCardType']) ?
-                $dtFilterCardType = $this->params['dtFilterCardType'] :
-                $dtFilterCardType = 'primary';
+        $sectionListing .=
+            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] .
+            '" class="sectionWithListingDatatable">' .
+            $this->useTag('card', $this->params) .
+            '</section>';
 
-                isset($this->params['dtFilterCardHeader']) ?
-                $dtFilterCardHeader = $this->params['dtFilterCardHeader'] :
-                $dtFilterCardHeader = true;
-
-                isset($this->params['dtFilterCardCollapsed']) ?
-                $dtFilterCardCollapsed = $this->params['dtFilterCardCollapsed'] :
-                $dtFilterCardCollapsed = false;
-
-                $sectionsListing .=
-                    '<section id="' . $this->params['componentId'] .
-                    '-listing-filter" class="sectionWithListingFilter mb-1">' .
-                        $this->useTag('card',
-                            [
-                                'componentId'         => $this->params['componentId'],
-                                'sectionId'           => $this->params['sectionId'],
-                                'cardType'            => $dtFilterCardType,
-                                'cardHeader'          => $dtFilterCardHeader,
-                                'cardCollapsed'       => $dtFilterCardCollapsed,
-                                'cardIcon'            => 'filter',
-                                'cardTitle'           => 'Filters',
-                                'cardShowTools'       => ['collapse'],
-                                'cardBodyContent'     => $this->useTag('content/listing/filter', $this->params)
-                            ]
-                        );
-            }
-
-            $this->params['cardBodyContent'] = $this->useTag('content/listing/table', $this->params);
-
-            $sectionsListing .=
-                '<section id="' . $this->params['componentId'] .
-                '-listing" class="sectionWithListingDatatable">' .
-                $this->useTag('card', $this->params) .
-                '</section>';
-
-        } else {
-
-            $this->params['cardBodyContent'] = $this->useTag('content/listing/table', $this->params);
-
-            $sectionsListing .=
-                '<section id="' . $this->params['componentId'] .
-                '-listing" class="sectionWithListingDatatable">' .
-                $this->useTag('card', $this->params) .
-                '</section>';
-        }
-
-        $sectionsListing .=
+        $sectionListing .=
             '<script>
                 window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
                 window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
             </script>';
 
-        return $sectionsListing;
+        return $sectionListing;
     }
 
     protected function getContentTypeSectionWithStorage()

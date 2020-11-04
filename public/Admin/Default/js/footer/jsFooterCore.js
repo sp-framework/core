@@ -4486,10 +4486,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 }));
 /* globals define exports BazContentFieldsValidator BazContentLoader Swal PNotify */
 /*
-* @title                    : BazContentSectionsList
+* @title                    : BazContentSectionWithListing
 * @description              : Baz Lib for Content (Sections With Form)
 * @developer                : guru@bazaari.com.au
-* @usage                    : ('#'+ sectionId).BazContentSectionsList;
+* @usage                    : ('#'+ sectionId).BazContentSectionWithListing;
 * @functions                :
 * @options                  :
 */
@@ -4501,9 +4501,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
 }(this, function (exports) {
     'use strict';
 
-    var BazContentSectionsList = function ($) {
+    var BazContentSectionWithListing = function ($) {
 
-        var NAME                    = 'BazContentSectionsList';
+        var NAME                    = 'BazContentSectionWithListing';
         var DATA_KEY                = 'baz.contentsectionslist';
         // var EVENT_KEY               = "." + DATA_KEY;
         var JQUERY_NO_CONFLICT      = $.fn[NAME];
@@ -4525,14 +4525,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
         var listColumns = { };
             // that;
 
-        var BazContentSectionsList = function () {
-            function BazContentSectionsList(element, settings) {
+        var BazContentSectionWithListing = function () {
+            function BazContentSectionWithListing(element, settings) {
                 // that = this;
                 this._element = element;
                 this._settings = settings;
             }
 
-            var _proto = BazContentSectionsList.prototype;
+            var _proto = BazContentSectionWithListing.prototype;
 
             _proto._error = function _error(message) {
                 throw new Error(message);
@@ -4561,15 +4561,74 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         'sectionId'     : sectionId,
                         'on'            : 'section'
                     });
+
+                    this._buildListingFilters(options);
                 }
 
                 if ($(this._element).is('.sectionWithListingDatatable')) {
-                    this._buildListDatatable(options);
+                    this._buildListingDatatable(options);
                 }
             };
 
-            //Build list datatable
-            _proto._buildListDatatable = function() {
+            //Build listing filters
+            _proto._buildListingFilters = function() {
+
+                //Buttons
+                $('#' + sectionId + '-filters').change(function() {
+                    if ($('#' + sectionId + '-filters option:selected').val() === "0") {
+
+                        $('#' + sectionId + '-edit, ' +
+                          '#' + sectionId + '-delete, ' +
+                          '#' + sectionId + '-share, ' +
+                          '#' + sectionId + '-apply'
+                        ).attr("disabled", true);
+
+                    } else {
+                        $('#' + sectionId + '-apply').attr("disabled", false);
+
+                        if ($('#' + sectionId + '-filters option:selected').data('permission') === 0) {
+                            $('#' + sectionId + '-edit, ' +
+                              '#' + sectionId + '-delete, ' +
+                              '#' + sectionId + '-share'
+                            ).attr("disabled", true);
+
+                        } else if ($('#' + sectionId + '-filters option:selected').data('permission') === 1) {
+                            //User
+                            $('#' + sectionId + '-edit, ' +
+                              '#' + sectionId + '-delete, ' +
+                              '#' + sectionId + '-share'
+                            ).attr("disabled", false);
+                        }
+                    }
+                });
+
+                //Add
+                $('#' + sectionId + '-add').click(function() {
+                    $('#' + sectionId + '-filter-modal').modal('show');
+                });
+
+                $('#' + sectionId + '-name').keyup(function() {
+                    if ($(this).val() !== '') {
+                        $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', false);
+                    } else {
+                        $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', true);
+                    }
+                });
+
+                //Add Save
+                //Add Apply (Temp)
+
+                //Edit
+                //Edit Save
+
+                //Delete
+
+                //Share
+                //Select Guid and Uids
+            }
+
+            //Build listing datatable
+            _proto._buildListingDatatable = function() {
                 // For checkbox Sorting
                 $.fn.dataTable.ext.order['dom-checkbox'] = function  ( settings, col ) {
                     return this.api().column( col, {order:'index'} ).nodes().map( function ( td ) {
@@ -5330,55 +5389,55 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
             };
 
-            BazContentSectionsList._jQueryInterface = function _jQueryInterface(options) {
+            BazContentSectionWithListing._jQueryInterface = function _jQueryInterface(options) {
                 dataCollection = window['dataCollection'];
                 componentId = $(this).parents('.component')[0].id;
                 sectionId = $(this)[0].id;
 
-                dataCollection[componentId][sectionId]['BazContentSectionsList'] = $(this).data(DATA_KEY);
+                dataCollection[componentId][sectionId]['BazContentSectionWithListing'] = $(this).data(DATA_KEY);
                 options = $.extend({}, Default, options);
 
-                if (!dataCollection[componentId][sectionId]['BazContentSectionsList']) {
-                    dataCollection[componentId][sectionId]['BazContentSectionsList'] = new BazContentSectionsList($(this), options);
+                if (!dataCollection[componentId][sectionId]['BazContentSectionWithListing']) {
+                    dataCollection[componentId][sectionId]['BazContentSectionWithListing'] = new BazContentSectionWithListing($(this), options);
                     $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
-                    dataCollection[componentId][sectionId]['BazContentSectionsList']._init(options);
+                    dataCollection[componentId][sectionId]['BazContentSectionWithListing']._init(options);
                 } else {
-                    delete dataCollection[componentId][sectionId]['BazContentSectionsList'];
-                    dataCollection[componentId][sectionId]['BazContentSectionsList'] = new BazContentSectionsList($(this), options);
+                    delete dataCollection[componentId][sectionId]['BazContentSectionWithListing'];
+                    dataCollection[componentId][sectionId]['BazContentSectionWithListing'] = new BazContentSectionWithListing($(this), options);
                     $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
-                    dataCollection[componentId][sectionId]['BazContentSectionsList']._init(options);
+                    dataCollection[componentId][sectionId]['BazContentSectionWithListing']._init(options);
                 }
             };
 
-        return BazContentSectionsList;
+        return BazContentSectionWithListing;
 
         }();
 
     $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentWizardAjaxComplete', function() {
         if ($('.sectionWithListingFilter').length > 0) {
             $('.sectionWithListingFilter').each(function() {
-                BazContentSectionsList._jQueryInterface.call($(this));
+                BazContentSectionWithListing._jQueryInterface.call($(this));
             });
         }
         if ($('.sectionWithListingDatatable').length > 0) {
             $('.sectionWithListingDatatable').each(function() {
-                BazContentSectionsList._jQueryInterface.call($(this));
+                BazContentSectionWithListing._jQueryInterface.call($(this));
             });
         }
     });
 
-    $.fn[NAME] = BazContentSectionsList._jQueryInterface;
-    $.fn[NAME].Constructor = BazContentSectionsList;
+    $.fn[NAME] = BazContentSectionWithListing._jQueryInterface;
+    $.fn[NAME].Constructor = BazContentSectionWithListing;
 
     $.fn[NAME].noConflict = function () {
         $.fn[NAME] = JQUERY_NO_CONFLICT;
-        return BazContentSectionsList._jQueryInterface;
+        return BazContentSectionWithListing._jQueryInterface;
     };
 
-    return BazContentSectionsList;
+    return BazContentSectionWithListing;
 }(jQuery);
 
-exports.BazContentSectionsList = BazContentSectionsList;
+exports.BazContentSectionWithListing = BazContentSectionWithListing;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

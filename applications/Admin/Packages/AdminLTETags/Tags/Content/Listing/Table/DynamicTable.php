@@ -3,6 +3,7 @@
 namespace Applications\Admin\Packages\AdminLTETags\Tags\Content\Listing\Table;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
+use Applications\Admin\Packages\AdminLTETags\Tags\Content\Listing\Filter;
 use Phalcon\Helper\Json;
 
 class DynamicTable
@@ -21,8 +22,13 @@ class DynamicTable
 
     protected $content;
 
+    protected $adminLTETags;
+
     public function __construct($view, $tag, $links, $escaper, $params)
     {
+        $this->adminLTETags =
+            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
+
         $this->view = $view;
 
         $this->tag = $tag;
@@ -49,64 +55,32 @@ class DynamicTable
     {
         if (isset($this->params['dtPrimaryButtons'])) {
             $this->content .=
-                '<div class="row mb-2">
-                    <div class="col">';
+                '<div class="row mb-2">';
 
-            $this->content .=
-                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
-                    ->useTag(
-                        'fields',
-                        [
-                            'componentId'                         => $this->params['componentId'],
-                            'sectionId'                           => $this->params['sectionId'],
-                            'fieldId'                             => 'filters',
-                            'fieldLabel'                          => false,
-                            'fieldType'                           => 'input',
-                            'fieldAdditionalClass'                => 'mb-1',
-                            'fieldGroupPreAddonIcon'              => 'filter',
-                            'fieldGroupPostAddonButtons'          =>
-                                [
-                                    'apply' => [
-                                        'title'                   => 'Apply',
-                                        'noMargin'                => true,
-                                        'disabled'                => true,
-                                        'tooltipTitle'            => 'Select to apply'
-                                    ],
-                                    'add'   => [
-                                        'title'                   => 'Add',
-                                        'type'                    => 'success',
-                                        'tooltipTitle'            => 'Add New Filter',
-                                        'icon'                    => 'plus',
-                                        'noMargin'                => true,
-                                        'buttonAdditionalClass'   => 'contentModalLink rounded-0',
-                                        'position'                => 'right',
-                                        'url'                     => $this->links->url('users/user/add')
-                                    ]
-                                ],
-                            // 'fieldGroupPostAddonButtonId'         => 'apply',
-                            // 'fieldGroupPostAddonButtonValue'      => 'Apply',
-                            // 'fieldGroupPostAddonButtonTooltipTitle'=> 'Select filter to apply',
-                            // 'fieldGroupPostAddonButtonDisabled'     => true,
-                            'fieldInputType'                      => 'select',
-                            'fieldHelp'                           => false,
-                            'fieldHelpTooltipContent'             => 'Select filter to apply',
-                            'fieldRequired'                       => false,
-                            'fieldBazScan'                        => false,
-                            'fieldBazPostOnCreate'                => false,
-                            'fieldBazPostOnUpdate'                => false,
-                            'fieldDataSelectOptions'              => [],
-                            'fieldDataSelectOptionsArray'         => true,
-                            'fieldDataSelectOptionsKey'           => 'id',
-                            'fieldDataSelectOptionsValue'         => 'name'
-                        ]
+            if (isset($this->params['dtFilter']) && $this->params['dtFilter'] === true) {
+                $filtersComponent =
+                    $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
+                        'Filters',
+                        $this->tag->getDi()->getShared('modules')->applications->getApplicationInfo()['id']
                     );
 
-            $this->content .=
-                    '</div><div class="col" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-primary-buttons">';
+                $filterComponent =
+                    $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
+                        'Filter',
+                        $this->tag->getDi()->getShared('modules')->applications->getApplicationInfo()['id']
+                    );
+
+                if ((bool) $filtersComponent['installed'] && (bool) $filterComponent['installed']) {
+                    $this->content .=
+                        (new Filter($this->view, $this->tag, $this->links, $this->escaper))->getContent($this->params);
+                }
+            }
 
             $this->content .=
-                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
-                    ->useTag(
+                '<div class="col" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-primary-buttons">';
+
+            $this->content .=
+                $this->adminLTETags->useTag(
                         'buttons',
                         [
                             'componentId'           => $this->params['componentId'],

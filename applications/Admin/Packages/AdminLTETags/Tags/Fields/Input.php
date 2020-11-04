@@ -20,8 +20,13 @@ class Input
 
     protected $content;
 
+    protected $adminLTETags;
+
     public function __construct($view, $tag, $links, $escaper, $params, $fieldParams)
     {
+        $this->adminLTETags =
+            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
+
         $this->view = $view;
 
         $this->tag = $tag;
@@ -85,14 +90,21 @@ class Input
             'data-fieldinputfilter=' . $this->params['fieldInputTypeTextFilter'] . '"' :
             '';
 
+        $this->fieldParams['fieldGroupPreAddonTextAdditionalClass'] =
+            isset($this->params['fieldGroupPreAddonTextAdditionalClass']) ?
+            $this->params['fieldGroupPreAddonTextAdditionalClass'] :
+            '';
+
         if (isset($this->params['fieldGroupPreAddonText']) ||
             isset($this->params['fieldGroupPreAddonIcon']) ||
             isset($this->params['fieldGroupPreAddonDropdown']) ||
             isset($this->params['fieldGroupPreAddonButtonId']) ||
+            isset($this->params['fieldGroupPreAddonButtons']) ||
             isset($this->params['fieldGroupPostAddonText']) ||
             isset($this->params['fieldGroupPostAddonIcon']) ||
             isset($this->params['fieldGroupPostAddonDropdown']) ||
-            isset($this->params['fieldGroupPostAddonButtonId'])
+            isset($this->params['fieldGroupPostAddonButtonId']) ||
+            isset($this->params['fieldGroupPostAddonButtons'])
         ) {
             $this->content .=
                 '<div class="input-group input-group-' . $this->fieldParams['fieldGroupSize'] . '">';
@@ -134,7 +146,7 @@ class Input
         if (isset($this->params['fieldGroupPreAddonText'])) {
             $this->content .=
                 '<div class="input-group-prepend">
-                    <span class="input-group-text rounded-0">' . $this->params['fieldGroupPreAddonText'] . '</span>
+                    <span class="input-group-text rounded-0 ' . $this->fieldParams['fieldGroupPreAddonTextAdditionalClass'] . '">' . $this->params['fieldGroupPreAddonText'] . '</span>
                 </div>';
 
         } else if (isset($this->params['fieldGroupPreAddonIcon'])) {
@@ -263,17 +275,23 @@ class Input
             '';
 
         $this->content .=
-            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="custom-select rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $this->fieldParams['fieldDisabled'] . '>
-                <option></option>';
+            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="custom-select rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $this->fieldParams['fieldDisabled'] . '>';
+
+        if (isset($this->params['fieldDataSelectOptionsZero'])) {
+            $this->content .=
+                '<option data-value="0" value="0">' . $this->params['fieldDataSelectOptionsZero'] . '</option>';
+        } else {
+            $this->content .=
+                '<option></option>';
+        }
 
         if ($this->fieldParams['fieldDataSelectTreeData']) {
 
             $this->content .=
-                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
-                    ->useTag(
+                $this->adminLTETags->useTag(
                         'tree',
                         [
-                            'treeMode'      =>  'select2',
+                            'treeMode'      =>  'select',
                             'treeData'      =>  $this->fieldParams['fieldDataSelectTreeData'],
                             'fieldParams'   =>  $this->fieldParams
                         ],
@@ -392,8 +410,7 @@ class Input
                 '<div class="input-group-append">';
 
             $this->content .=
-                (new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper))
-                    ->useTag(
+                $this->adminLTETags->useTag(
                         'buttons',
                         [
                             'componentId'           => $this->params['componentId'],

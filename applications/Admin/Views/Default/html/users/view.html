@@ -1,17 +1,20 @@
 {{adminltetags.useTag('content',
     [
+        'component'             : table['component'],
         'componentName'         : componentName,
         'componentId'           : componentId,
         'parentComponentId'     : parent,
         'sectionId'             : 'listing',
-        'contentType'           : 'sectionsListing',
+        'contentType'           : 'sectionWithListing',
         'cardHeader'            : true,
         'cardType'              : 'primary',
         'cardIcon'              : 'users',
         'cardTitle'             : componentName,
         'cardAdditionalClass'   : 'rounded-0',
         'cardShowTools'         : ['maximize', 'collapse'],
-        'dtFilter'              : false,
+        'dtFilter'              : true,
+        'dtFilters'             : table['filters'],
+        'dtFilterColumns'       : table['filterColumns'],
         'dtPrimaryButtons'      : {
                                     'add-user' : {
                                         'title'                   : 'Add New User',
@@ -23,13 +26,13 @@
                                         'url'                     : links.url('users/user/add')
                                     }
                                 },
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
         'dtStriped'             : true,
         'dtBordered'            : false,
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
-        'dtTable'               : table,
-        'dtColumns'             : table['columns'],
-        'dtPostUrl'             : table['postUrl'],
         'dtTableCompact'        : true,
         'dtZeroRecords'         : 'No users data available. Add user by clicking the Add new user button.'
     ]

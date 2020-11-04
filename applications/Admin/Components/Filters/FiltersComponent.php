@@ -3,20 +3,29 @@
 namespace Applications\Admin\Components\Filters;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
-use Applications\Admin\Packages\Filters;
-use Applications\Admin\Packages\Install\Filters\Package;
+use Applications\Admin\Packages\Filters\Filters;
+use Applications\Admin\Packages\Filters\Install\Package;
 use System\Base\BaseComponent;
 
 class FiltersComponent extends BaseComponent
 {
     public function viewAction()
     {
-        // $columnsToGet = ['id', 'name', 'permission'];
-        // $filtersPackage = $this->usePackage(Filters::class);
+        $columnsToGet = ['id', 'name', 'permission'];
+        $filtersPackage = $this->usePackage(Filters::class);
 
+        // $package = (new Package())->init();
+        // $install = $package->installPackage(true);
+        // $reInstall = $package->reInstallPackage();
 
-        $columnsToGet = [];
-        $filtersPackage = $this->modules->packages;
+        // if (!$install) {
+        //     var_dump($package->packagesData);
+        // } else {
+        //     echo 'Installed';
+        // }
+
+        // $columnsToGet = [];
+        // $filtersPackage = $this->modules->packages;
 
         // // $this->view->disable();
         if ($this->request->isGet()) {
@@ -55,7 +64,18 @@ class FiltersComponent extends BaseComponent
                         'dtRows'                        => $rows,
                         'dtNotificationTextFromColumn'  => 'email',
                         'dtPagination'                  => true,
-                        'dtPaginationCounters'          => $filtersPackage->packagesData->paginationCounters
+                        'dtPaginationCounters'          => $filtersPackage->packagesData->paginationCounters,
+                        'dtReplaceColumns'              =>
+                            [
+                                'permission' =>
+                                [
+                                    'html'  =>
+                                    [
+                                        '0'    => '<span class="badge badge-primary">System</span>',
+                                        '1'    => '<span class="badge badge-success">User</span>',
+                                    ]
+                                ]
+                            ]
                     ]
                 );
         }
@@ -63,6 +83,8 @@ class FiltersComponent extends BaseComponent
 }
         // Installation Example to follow
         // $package = new Package();
+        // $install = $package->installPackage(true);
+
         // var_dump($package->describe());
         // var_dump($package->dbViews());
         // var_dump($package->describe('filters'));
@@ -71,8 +93,6 @@ class FiltersComponent extends BaseComponent
         // var_dump($package->tableExists('filters'));
         // var_dump($package->tableExists('filter'));
         // var_dump($package->createTable('filters', (new Filters)->columns()));
-
-        // $install = $package->installPackage(true);
 
         // if (!$install) {
         //     var_dump($package->packagesData);

@@ -19,7 +19,7 @@ abstract class BaseComponent extends Controller
 
 	protected $componentName;
 
-	protected $componentId;
+	protected $component;
 
 	protected $viewName;
 
@@ -33,6 +33,11 @@ abstract class BaseComponent extends Controller
 
 		$this->componentName =
 			str_replace('Component', '', $this->reflection->getShortName());
+
+		$this->component =
+			$this->modules->components->getNamedComponentForApplication(
+				$this->componentName, $this->application['id']
+			);
 
 		if (!$this->isJson() || $this->request->isAjax()) {
 			$this->checkLayout();
@@ -350,8 +355,6 @@ abstract class BaseComponent extends Controller
 
 	protected function usePackage($packageClass)
 	{
-		$this->application = $this->modules->applications->getApplicationInfo();
-
 		if ($this->checkPackage($packageClass)) {
 			return (new $packageClass())->init();
 		} else {

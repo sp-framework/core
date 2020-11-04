@@ -39,7 +39,7 @@
  */
 
  [class*="icheck-"] {
-    min-height: 22px;
+    min-height: 18px;
     margin-top: 4px !important;
     margin-bottom: 6px !important;
     padding-left: 0;
@@ -56,8 +56,8 @@
 
 [class*="icheck-"] > label {
     padding-left: 29px !important;
-    min-height: 22px;
-    line-height: 22px;
+    min-height: 18px;
+    line-height: 18px;
     display: inline-block;
     position: relative;
     vertical-align: top;
@@ -81,11 +81,12 @@
         content: "";
         display: inline-block;
         position: absolute;
-        width: 22px;
-        height: 22px;
+        width: 18px;
+        height: 18px;
         border: 1px solid #D3CFC8;
         border-radius: 0;
         margin-left: -29px;
+        background: white;
     }
 
     [class*="icheck-"] > input:first-child:checked + label::after,
@@ -93,10 +94,10 @@
         content: "";
         display: inline-block;
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 7px;
-        height: 10px;
+        top: -1px;
+        left: -2px;
+        width: 6px;
+        height: 9px;
         border: solid 2px #fff;
         border-left: none;
         border-top: none;
@@ -977,11 +978,11 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th.dtr-control {
 table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td.dtr-control::before,
 table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th.dtr-control::before {
     line-height: 1.1rem !important;
+    top: 49%;
 }
 .dataTables_filter > label {
     margin-bottom: 0;
 }
-
 /*
  * The MIT License
  * Copyright (c) 2012 Matias Meno <m@tias.me>
