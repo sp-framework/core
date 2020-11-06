@@ -167,11 +167,11 @@ class Modal extends AdminLTETags
 
                         $this->content .=
                             '<div class="modal-footer ' . $this->modalParams['modalFooterAdditionalClasses'] . '">
-                            <button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary" data-dismiss="modal">' . $this->modalParams['modalButtonSecondaryTitle'] . '</button>';
+                            <button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-xs" data-dismiss="modal">' . $this->modalParams['modalButtonSecondaryTitle'] . '</button>';
 
                             if (isset($this->params['modalFooterButtonSubmitTitle'])) {
                                 $this->content .=
-                                    '<button type="button" id="' . $this->modalParams['modalId'] . '-button-submit" class="btn btn-primary">' . $this->params['modalFooterButtonSubmitTitle'] . '</button>';
+                                    '<button type="button" id="' . $this->modalParams['modalId'] . '-button-submit" class="btn btn-primary btn-xs">' . strtoupper($this->params['modalFooterButtonSubmitTitle']) . '</button>';
                             }
 
                         $this->content .= '</div>';

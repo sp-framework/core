@@ -31,6 +31,7 @@ class UsersComponent extends BaseComponent
                     [
                         'conditions'    => 'component_id = :cid:',
                         'bind'          => [
+                            // 'cid'       => $this->component['id']//For users
                             'cid'       => 5
                         ]
                     ]
@@ -40,6 +41,7 @@ class UsersComponent extends BaseComponent
                 $table['filters'][$filter['id']] = $filter;
                 $table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
                 $table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
+                $table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
             }
 
             $this->view->table = $table;

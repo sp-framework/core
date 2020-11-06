@@ -26,6 +26,7 @@ var BazContentFieldsValidator = function() {
         validateFormsOnDatatable, //Validate datatable form on datable submit
         dataCollection,
         sectionsJsTreeSelector;
+    var formValid = false;
     var hasError = []; //Validation, list of fields that has errors
     // var tableData = { }; //Datatable Data
 
@@ -63,34 +64,48 @@ var BazContentFieldsValidator = function() {
             error('Validator not found!');
         } else {
             $('#' + on).find('form').each(function(index,form) {
+
                 formId = $(form)[0].id;
+
                 $.validator.setDefaults({
                     debug: false,
-                    ignore: ":submit, :reset, :image, :disabled",
+                    ignore: ":submit, :reset, :image, :disabled, :hidden",
                     onkeyup: false,
                     onclick: false,
                     submitHandler: function() { },
                     focusInvalid: false
                 });
+
                 validateOptions = {
                     errorElement: 'div',
                     errorPlacement: function ( error, element ) {
-                        element.parents('.form-group').append(error);
-                        error.addClass('text-uppercase text-danger text-xs help-block');
-                        $(element).closest('.form-group').addClass('has-feedback');
+                        if (!formValid) {
+                            element.parents('.form-group').append(error);
+                            error.addClass('text-uppercase text-danger text-xs help-block');
+                            $(element).closest('.form-group').addClass('has-feedback');
+                        }
                     },
                     highlight: function (element) {
                         $(element).closest('.form-group').addClass('has-error');
                     },
-                    // unhighlight: function (element) { },
+                    // unhighlight: function () { },
                     success: function (element) {
-                        var type = $(element).parents('form').data('validateon');
-                        var formId = $(element).parents('form')[0].id;
-                        componentId = $(element).parents('.component')[0].id;
-                        sectionId = $(element).parents('.sectionWithForm')[0].id;
-                        $(element).closest('.form-group').removeClass('has-error');
-                        $(element).closest('.help-block').remove();
-                        validateForm(componentId, sectionId, true, type, true, formId);
+                        if (!formValid) {
+                            var type = $(element).parents('form').data('validateon');
+                            var formId = $(element).parents('form')[0].id;
+                            componentId = $(element).parents('.component')[0].id;
+
+                            if ($(element).parents('.sectionWithForm').length > 0) {
+                                sectionId = $(element).parents('.sectionWithForm')[0].id;
+                            } else if ($(element).parents('.sectionWithFormToDatatable').length > 0) {
+                                sectionId = $(element).parents('.sectionWithFormToDatatable')[0].id;
+                            }
+
+                            $(element).closest('.form-group').removeClass('has-error');
+                            $(element).closest('.help-block').remove();
+
+                            validateForm(componentId, sectionId, true, type, true, formId);
+                        }
                     }
                 };
                 if (dataCollection[componentId][sectionId][sectionId + '-form']) {
@@ -99,15 +114,15 @@ var BazContentFieldsValidator = function() {
 
                 dataCollection[componentId][sectionId]['formValidator'] = $(form).validate(validateOptions);//init validate form
 
-                if ($(form).data('validateon') === 'sections') {
+                if ($(form).data('validateon') === 'section') {
                     validateForms[componentId][sectionId].push(formId);
                 }
                 if ($(form).data('validateon') === 'datatable') {
                     validateFormsOnDatatable.push(formId);
                 }
             });
-            if ($('div[data-validateon="sections"]').length !== 0) {
-                $('div[data-validateon="sections"]').each(function (index, datatable) {
+            if ($('div[data-validateon="section"]').length !== 0) {
+                $('div[data-validateon="section"]').each(function (index, datatable) {
                     if (!validateDatatableOnSections[$(datatable).parents('section')[0].id]) {
                         validateDatatableOnSections[$(datatable).parents('section')[0].id] = [ ];
                         validateDatatableOnSections[$(datatable).parents('section')[0].id].push(datatable.id);
@@ -122,6 +137,7 @@ var BazContentFieldsValidator = function() {
     //Validate Sections on Submit
     function validateForm(componentId, sectionId, onSuccess, type, preValidated, formId) {
         if (!preValidated) {
+            formValid = false;
             if (type === 'component') {
                 formLocation = componentId;
                 // for (var component in validateForms[componentId]) {
@@ -147,7 +163,7 @@ var BazContentFieldsValidator = function() {
                 //         }
                 //     }
                 // }
-            } else if (type === 'sections') {
+            } else if (type === 'section') {
                 formLocation = sectionId;
                 $.each(validateForms[componentId][sectionId], function(index, form) {
                     $('#' + form).submit();
@@ -213,15 +229,19 @@ var BazContentFieldsValidator = function() {
                         cancelValidatingForm(type, formLocation, false, formId);
                     });
                     return false;
-                } else if (type === 'sections') {
+                } else if (type === 'section') {
                     $('#' + formLocation + '-alert-dismiss').click(function() {
-                        formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
+                        if ($(this).parents('.sectionWithForm').length > 0) {
+                            formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
+                        } else if ($(this).parents('.sectionWithFormToDatatable').length > 0) {
+                            formLocation = $(this).parent().siblings('.sectionWithFormToDatatable')[0].id;
+                        }
                         cancelValidatingForm(type, formLocation, false, formId);
                     });
                     return false;
                 } else if (type === 'datatable') {
                     $('#' + formLocation + '-alert-dismiss').click(function() {
-                        formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
+                        formLocation = $(this).parent().siblings('.sectionWithFormToDatatable')[0].id;
                         cancelValidatingForm(type, formLocation, false, formId);
                     });
                     return false;
@@ -230,6 +250,7 @@ var BazContentFieldsValidator = function() {
                 if (type === 'datatable') {
                     return true;
                 }
+                formValid = true;
                 return true;
             }
         } else {
@@ -256,13 +277,15 @@ var BazContentFieldsValidator = function() {
                     }
                     return true;
                 }
-            } else if (type === 'sections') {
+            } else if (type === 'section') {
                 hasErrorCount = $('#' + sectionId).find('.has-error').length;
                 hasError = [];
+
                 $('#' + sectionId).find('.has-error').each(function(index,errorId) {
                     var id = $(errorId).children('label').html();
                     hasError.push(id.toUpperCase());
                 });
+
                 if (hasErrorCount > 0) {
                     $('#' + sectionId + '-alert').find('strong').html(hasErrorCount);
                     return false;
@@ -288,7 +311,9 @@ var BazContentFieldsValidator = function() {
 
     //Cancel validating form
     function cancelValidatingForm(type, formLocation, jstreeRefresh, formId) {
+
         $('#' + formLocation + '-alert').remove();
+
         if (type === 'component') {
             if (sectionsJsTreeSelector) {
                 // BazContentFields.fixHeight('fixedHeight');
@@ -329,17 +354,20 @@ var BazContentFieldsValidator = function() {
                 $('#' + formLocation).find('[type="search"]').siblings('.input-group-addon').removeClass('bg-danger').addClass('bg-default');
             }
         }
+
         $('#' + formLocation).find('.form-group').each(function(i,v) {
             $(v).removeClass('has-error has-feedback');
         });
+
         $('#' + formLocation).find('.help-block').each(function(i,v) {
             $(v).remove();
         });
+
         //Cancel Validating datatable
         for (var sections in validateDatatableOnSections) {
             if (validateDatatableOnSections[sections].length > 0) {
                 $.each(validateDatatableOnSections[sections], function(index, datatable) {
-                    $('#' + datatable + '-table-data').removeClass('border-danger').addClass('border-default');
+                    $('#' + datatable + '-data').removeClass('border-danger').addClass('border-default');
                 });
             }
         }
@@ -359,7 +387,8 @@ var BazContentFieldsValidator = function() {
         }
         BazContentFieldsValidator.validateForm = function(options) {
             init(_extends(BazContentFieldsValidator.defaults, options));
-            var validate = validateForm(options.componentId, options.sectionId, options.onSuccess, options.type, options.preValidated, options.formId);
+            var validate =
+                validateForm(options.componentId, options.sectionId, options.onSuccess, options.type, options.preValidated, options.formId);
             return validate;
         }
         BazContentFieldsValidator.cancelValidatingForm = function(options) {
@@ -466,15 +495,15 @@ var BazContentFieldsValidator = function() {
 //                     validateOptions = $.extend(validateOptions, dataCollection[componentId].form);
 //                 }
 //                 $(form).validate(validateOptions);//init validate form
-//                 if ($(form).data('validateon') === 'sections') {
+//                 if ($(form).data('validateon') === 'section') {
 //                     validateFormsOnSections.push(formId);
 //                 }
 //                 if ($(form).data('validateon') === 'datatable') {
 //                     validateFormsOnDatatable.push(formId);
 //                 }
 //             });
-//             if ($('div[data-validateon="sections"]').length !== 0) {
-//                 $('div[data-validateon="sections"]').each(function (index, datatable) {
+//             if ($('div[data-validateon="section"]').length !== 0) {
+//                 $('div[data-validateon="section"]').each(function (index, datatable) {
 //                     if (!validateDatatableOnSections[$(datatable).parents('section')[0].id]) {
 //                         validateDatatableOnSections[$(datatable).parents('section')[0].id] = [ ];
 //                         validateDatatableOnSections[$(datatable).parents('section')[0].id].push(datatable.id);
@@ -488,13 +517,13 @@ var BazContentFieldsValidator = function() {
 
 //     //Validate Sections on Submit
 //     BazValidator.prototype.validateForm = function(onSuccess, type, preValidated, formId) {
-//         if (type === 'sections' || !type) {
+//         if (type === 'section' || !type) {
 //             formLocation = componentId;
 //         } else if (type === 'datatable') {
 //             formLocation = formId;
 //         }
 //         if (!preValidated) {
-//             if (type === 'sections') {
+//             if (type === 'section') {
 //                 $.each(validateFormsOnSections, function(index, form) {
 //                     $('#' + form).submit();
 //                 });
@@ -535,7 +564,7 @@ var BazContentFieldsValidator = function() {
 //                 '<div>'
 //                 );
 //                 errorSound.play();
-//                 if (type === 'sections') {
+//                 if (type === 'section') {
 //                     if (sectionsJsTreeSelector) {
 //                         that.fixHeight('fixedHeight');
 //                         $(sectionsJsTreeSelector).jstree(true).settings.search.search_callback = function(str, node) {
@@ -588,7 +617,7 @@ var BazContentFieldsValidator = function() {
 //             }
 //         } else {
 //             hasErrorCount = $('#' + formLocation).find('.has-error').length;
-//             if (type === 'sections' || !type) {
+//             if (type === 'section' || !type) {
 //                 hasError = [];
 //                 $('#' + formLocation).find('.has-error').each(function(index,errorId) {
 //                     var id = $(errorId).children('label').html();
@@ -623,7 +652,7 @@ var BazContentFieldsValidator = function() {
 //     //Cancel validating form
 //     BazValidator.prototype.cancelValidatingForm = function (type, formLocation, jstreeRefresh, formId) {
 //         $('#' + formLocation + '-alert').remove();
-//         if (!type || type === 'sections') {
+//         if (!type || type === 'section') {
 //             if (sectionsJsTreeSelector) {
 //                 that.fixHeight('fixedHeight');
 //                 $('#' + formLocation + '-sections-tree').children('.box').removeClass('box-danger').addClass('box-primary');

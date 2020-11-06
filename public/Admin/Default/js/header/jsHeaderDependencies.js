@@ -338,7 +338,7 @@ var BazContentLoader = function() {
     return bazContentLoaderConstructor;
 }();
 /* exported BazCore */
-/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 */
+/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyMobile */
 /*
 * @title                    : BazCore
 * @description              : Baz Core Lib
@@ -433,6 +433,7 @@ var BazCore = function() {
         // $.fn.select2.defaults.set("theme", "bootstrap4");
         PNotify.defaultModules.set(PNotifyBootstrap4, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5, {});
+        PNotify.defaultModules.set(PNotifyMobile, {});
         bazContent();
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();

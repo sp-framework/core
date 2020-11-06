@@ -164,16 +164,14 @@ class Fields extends AdminLTETags
             '';
 
         $this->fieldParams['fieldHidden'] =
-            isset($this->params['fieldHidden']) ?
-            $this->params['fieldHidden'] :
+            isset($this->params['fieldHidden']) && $this->params['fieldHidden'] === true ?
+            'd-none' :
             '';
 
         $this->fieldParams['fieldBazScan'] =
-            isset($this->params['fieldBazScan']) ?
-                $this->params['fieldBazScan'] === true ?
-                    'data-bazScanType="' . $this->params['fieldType'] . '"' :
-                    ''
-            : '';
+            isset($this->params['fieldBazScan']) && $this->params['fieldBazScan'] === true ?
+            'data-bazScanType="' . $this->params['fieldType'] . '"' :
+            '';
 
         $this->fieldParams['fieldDataInputMinNumber'] =
             isset($this->params['fieldDataInputMinNumber']) ?
@@ -196,11 +194,9 @@ class Fields extends AdminLTETags
             '';
 
         $this->fieldParams['fieldDisabled'] =
-            isset($this->params['fieldDisabled']) ?
-                $this->params['fieldDisabled'] === true ?
-                    'disabled' :
-                    ''
-            : '';
+            isset($this->params['fieldDisabled']) && $this->params['fieldDisabled'] === true ?
+            'disabled' :
+            '';
 
         // fieldBazPost: This is if you want BazContentFields.js to grab fields information and act on them. See BazContentFields.js documentation for more information as to what happens with certain field type.
         $this->fieldParams['fieldBazPostOnCreate'] =

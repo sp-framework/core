@@ -168,58 +168,86 @@ abstract class BasePackage extends Controller
 				]
 			);
 
-		if (isset($this->request->getPost()['conditions'])) {
-			$postConditions = explode('&', $this->request->getPost()['conditions']);
+// id:lessthan:200&and:contact_first_name:equals:Carnie&
 
+		if (isset($this->request->getPost()['conditions']) &&
+			$this->request->getPost()['conditions'] !== ''
+		) {
+			$postConditions = explode('&', rtrim($this->request->getPost()['conditions'], '&'));
 			$conditions = '';
 			$bind = [];
 
 			foreach ($postConditions as $conditionKey => $condition) {
 				$conditionArr = explode(':', $condition);
 
-				if ($conditionArr[1] === 'equals') {
-					$sign = '=';
-				} else if ($conditionArr[1] === 'between') {
-					$sign = 'BETWEEN';
-				} else if ($conditionArr[1] === 'notequals') {
-					$sign = '<>';
-				} else if ($conditionArr[1] === 'notbetween') {
-					$sign = 'NOT BETWEEN';
+				if (Arr::firstKey($postConditions) !== $conditionKey) {
+					$conditions .= ' ' . strtoupper($conditionArr[0]) . ' ';
 				}
-				// var_dump($conditionArr);
 
-				if ($sign === 'BETWEEN') {
-					$valueArr = explode(',', $conditionArr[2]);
+				$conditionArr[1] = str_replace(' ', '_', strtolower($conditionArr[1]));
 
-					$conditions .=
-						'(' . $conditionArr[0] . ' ' . $sign;
+				if ($conditionArr[2] === 'equals') {
+					$sign = '=';
+				} else if ($conditionArr[2] === 'notequals') {
+					$sign = '<>';
+				} else if ($conditionArr[2] === 'greaterthan') {
+					$sign = '>';
+				} else if ($conditionArr[2] === 'greaterthanequals') {
+					$sign = '>=';
+				} else if ($conditionArr[2] === 'lessthan') {
+					$sign = '<';
+				} else if ($conditionArr[2] === 'lessthanequals') {
+					$sign = '<=';
+				} else if ($conditionArr[2] === 'like') {
+					$sign = 'LIKE';
+				} else if ($conditionArr[2] === 'notlike') {
+					$sign = 'NOT LIKE';
+				} else if ($conditionArr[2] === 'between') {
+					$sign = 'BETWEEN';
+				} else if ($conditionArr[2] === 'notbetween') {
+					$sign = 'NOT BETWEEN';
+				} else if ($conditionArr[2] === 'empty') {
+					$sign = 'IS NULL';
+				} else if ($conditionArr[2] === 'notempty') {
+					$sign = 'IS NOT NULL';
+				}
+
+				if ($conditionArr[2] === 'between' || $conditionArr[2] === 'notbetween') {
+					$valueArr = explode(',', $conditionArr[3]);
+
+					if ($conditionArr[2] === 'between') {
+						$conditions .=
+							$conditionArr[1] . ' ' . $sign;
+					} else if ($conditionArr[2] === 'notbetween') {
+						$conditions .=
+						'NOT ' . $conditionArr[1] . ' BETWEEN';
+					}
 
 					foreach ($valueArr as $valueKey => $valueValue) {
 						$conditions .=
-							' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0] . ':';
+							' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1] . ':';
 
 						$bind[
-							'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0]
+							'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1]
 						] = $valueValue;
 
 						if (Arr::lastKey($valueArr) !== $valueKey) {
 							$conditions .= ' AND';
 						}
 					}
-
-					$conditions .=
-						')';
+				} else if ($conditionArr[2] === 'empty' || $conditionArr[2] === 'notempty') {
+					$conditions .= $conditionArr[1] . ' ' . $sign;
 				} else {
-					$valueArr = explode(',', $conditionArr[2]);
+					$valueArr = explode(',', $conditionArr[3]);
 
 					if (count($valueArr) > 1) {
 						foreach ($valueArr as $valueKey => $valueValue) {
 							$conditions .=
-								$conditionArr[0] . ' ' . $sign .
-								' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0] . ':';
+								$conditionArr[1] . ' ' . $sign .
+								' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1] . ':';
 
 							$bind[
-								'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[0]
+								'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1]
 							] = $valueValue;
 
 							if (Arr::lastKey($valueArr) !== $valueKey) {
@@ -228,30 +256,22 @@ abstract class BasePackage extends Controller
 						}
 					} else {
 						$conditions .=
-							$conditionArr[0] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . $conditionArr[0] . ':';
+							$conditionArr[1] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . $conditionArr[1] . ':';
 
 						$bind[
-							'baz_' . $conditionKey . '_' . $conditionArr[0]
+							'baz_' . $conditionKey . '_' . $conditionArr[1]
 						] = $valueArr[0];
 					}
-
-				}
-				if (Arr::lastKey($postConditions) !== $conditionKey) {
-					$conditions .= ' ' . strtoupper($conditionArr[3]) . ' ';
 				}
 			}
 
+			$filterConditions =
+				[
+					'conditions'	=> $conditions,
+					'bind'			=> $bind
+				];
 
-			var_dump($conditions, $bind);
-			// var_dump($this->request->getPost()['conditions']);
-			$params =
-				array_merge(
-					$params,
-					[
-						'conditions'	=> $conditions,
-						'bind'			=> $bind
-					]
-				);
+			$params = array_merge($params, $filterConditions);
 
 		} else {
 			$params =
@@ -266,6 +286,7 @@ abstract class BasePackage extends Controller
 
 		// var_dump($this->modelToUse::count());
 			// var_dump($params);
+			// die();
 		$data = $this->getByParams($params);
 
 		if ($data) {
@@ -293,16 +314,23 @@ abstract class BasePackage extends Controller
 
 			$paged = $paginator->paginate();
 
-			// var_dump($paged);
-		// var_dump($paged);
-
 			$paginationCounters['total_items'] = $this->modelToUse::count();
+
+			if (isset($filterConditions)) {
+				$paginationCounters['filtered_items'] = $this->modelToUse::count($filterConditions);
+			} else {
+				$paginationCounters['filtered_items'] = $paginationCounters['total_items'];
+			}
+
 			$paginationCounters['limit'] = (int) $pageParams['limit'];
 			$paginationCounters['first'] = 1;
-			$paginationCounters['previous'] = (int) $pageParams['currentPage'] > 1 ? $pageParams['currentPage'] - 1 : 1;
-			$paginationCounters['current'] = (int) $pageParams['currentPage'];
+			$paginationCounters['previous'] =
+				(int) $pageParams['currentPage'] > 1 ? $pageParams['currentPage'] - 1 : 1;
+			$paginationCounters['current'] =
+				(int) $pageParams['currentPage'];
 			$paginationCounters['next'] = $pageParams['currentPage'] + 1;
-			$paginationCounters['last'] = (int) ceil($paginationCounters['total_items'] / ($paginationCounters['limit']));
+			$paginationCounters['last'] =
+				(int) ceil($paginationCounters['filtered_items'] / ($paginationCounters['limit']));
 
 			$this->packagesData->paginationCounters = $paginationCounters;
 
@@ -637,7 +665,7 @@ abstract class BasePackage extends Controller
 
 		if ($md) {
 			$dataTypes = $md->getDataTypes(new $this->modelToUse());
-			$numeric = $md->getDataTypesNumeric(new $this->modelToUse());
+			$number = $md->getDataTypesNumeric(new $this->modelToUse());
 			$columns = $md->getAttributes(new $this->modelToUse());
 
 			$filteredColumns = [];
@@ -656,10 +684,10 @@ abstract class BasePackage extends Controller
 				$metadata[$filteredColumn]['id'] = $filteredColumn;
 				$metadata[$filteredColumn]['name'] = str_replace('_', ' ', $filteredColumn);
 
-				if (isset($numeric[$filteredColumn]) && $numeric[$filteredColumn] === true) {
-					$metadata[$filteredColumn]['data']['numeric'] = 'true';
+				if (isset($number[$filteredColumn]) && $number[$filteredColumn] === true) {
+					$metadata[$filteredColumn]['data']['number'] = 'true';
 				} else {
-					$metadata[$filteredColumn]['data']['numeric'] = 'false';
+					$metadata[$filteredColumn]['data']['number'] = 'false';
 				}
 
 				$metadata[$filteredColumn]['data']['dataType'] = $dataTypes[$filteredColumn];

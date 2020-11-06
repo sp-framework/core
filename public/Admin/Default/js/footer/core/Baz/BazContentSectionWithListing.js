@@ -1,4 +1,4 @@
-/* globals define exports BazContentFieldsValidator BazContentLoader Swal PNotify */
+/* globals define exports BazContentLoader Swal PNotify */
 /*
 * @title                    : BazContentSectionWithListing
 * @description              : Baz Lib for Content (Sections With Form)
@@ -28,20 +28,23 @@
         // var Selector = {
         // };
         var Default = {
-            task                    : null
+            task     : null
         };
         var dataCollection,
             componentId,
             sectionId,
             pnotifySound,
             classes,
+            that,
+            thisOptions,
+            datatableOptions,
             swalSound;
         var listColumns = { };
-            // that;
+        var query = '';
 
         var BazContentSectionWithListing = function () {
             function BazContentSectionWithListing(element, settings) {
-                // that = this;
+                that = this;
                 this._element = element;
                 this._settings = settings;
             }
@@ -68,14 +71,6 @@
                 }
 
                 if ($(this._element).is('.sectionWithListingFilter')) {
-                    $(this._element).BazContentFields();
-
-                    BazContentFieldsValidator.initValidator({
-                        'componentId'   : componentId,
-                        'sectionId'     : sectionId,
-                        'on'            : 'section'
-                    });
-
                     this._buildListingFilters(options);
                 }
 
@@ -86,41 +81,137 @@
 
             //Build listing filters
             _proto._buildListingFilters = function() {
+                $(this._element).BazContentSectionWithFormToDatatable();
 
-                //Buttons
+                //Filter Buttons
                 $('#' + sectionId + '-filters').change(function() {
-                    if ($('#' + sectionId + '-filters option:selected').val() === "0") {
 
-                        $('#' + sectionId + '-edit, ' +
-                          '#' + sectionId + '-delete, ' +
-                          '#' + sectionId + '-share, ' +
-                          '#' + sectionId + '-apply'
+                    if ($('#' + sectionId + '-filter-filters option:selected').val() === "0") {
+
+                        $('#' + sectionId + '-filter-edit, ' +
+                          '#' + sectionId + '-filter-delete, ' +
+                          '#' + sectionId + '-filter-share, ' +
+                          '#' + sectionId + '-filter-apply-saved'
                         ).attr("disabled", true);
 
                     } else {
-                        $('#' + sectionId + '-apply').attr("disabled", false);
+                        $('#' + sectionId + '-filter-apply-saved').attr("disabled", false);
 
-                        if ($('#' + sectionId + '-filters option:selected').data('permission') === 0) {
-                            $('#' + sectionId + '-edit, ' +
-                              '#' + sectionId + '-delete, ' +
-                              '#' + sectionId + '-share'
+                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0) {
+                            $('#' + sectionId + '-filter-edit, ' +
+                              '#' + sectionId + '-filter-delete, ' +
+                              '#' + sectionId + '-filter-share'
                             ).attr("disabled", true);
 
-                        } else if ($('#' + sectionId + '-filters option:selected').data('permission') === 1) {
+                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) {
                             //User
-                            $('#' + sectionId + '-edit, ' +
-                              '#' + sectionId + '-delete, ' +
-                              '#' + sectionId + '-share'
+                            $('#' + sectionId + '-filter-edit, ' +
+                              '#' + sectionId + '-filter-delete, ' +
+                              '#' + sectionId + '-filter-share'
                             ).attr("disabled", false);
                         }
                     }
                 });
 
-                //Add
+                //Apply-Saved
+                $('#' + sectionId + '-apply-saved').click(function() {
+                    if ($('#' + sectionId + '-filter-filters option:selected').val() !== "0") {
+                        query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+
+                        $('#' + sectionId + '-filter-modal').modal('hide');
+
+                        that._filterRunAjax(
+                            1,
+                            datatableOptions.paginationCounters.limit,
+                            query
+                        );
+                    }
+                });
+
+                //Reset
+                $('#' + sectionId + '-reset').click(function() {
+                    query = '';
+
+                    that._filterRunAjax(
+                        1,
+                        datatableOptions.paginationCounters.limit,
+                        query
+                    );
+                });
+
+                //Close Modal
+                $('#' + sectionId + '-cancel').click(function() {
+                    $('#' + sectionId + '-filter-modal').modal('hide');
+                });
+
+                //Add / Open Modal
                 $('#' + sectionId + '-add').click(function() {
                     $('#' + sectionId + '-filter-modal').modal('show');
                 });
 
+                //Edit / Open Modal
+                $('#' + sectionId + '-edit').click(function() {
+                    $('#' + sectionId + '-filter-modal').modal('show');
+                });
+
+                // Add Numeric for numberic fields
+                $('#' + sectionId + '-field').children().each(function(index, field) {
+                    if ($(field).data()['number'] == true) {
+                        var html = $(field).html();
+                        $(field).html(html + ' (Numeric)');
+                    }
+                });
+
+                //Enable/Disable Operators as per field type (numeric/alphanumeric)
+                $('#' + sectionId + '-field').on('select2:select', function(e) {
+
+                    var options = $('#' + sectionId + '-filter-operator').children();
+
+                    if ($(e.params.data.element).data()['number'] == true) {
+                        options.each(function(index, option) {
+                            $(option).attr('disabled', false);
+                        });
+                        $('#' + sectionId + '-filter-value').attr('pattern', "([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]");
+
+                    } else if ($(e.params.data.element).data()['number'] == false) {
+                        options.each(function(index, option) {
+                            if ($(option).val() === 'lessthan' ||
+                                $(option).val() === 'lessthanequals' ||
+                                $(option).val() === 'greaterthan' ||
+                                $(option).val() === 'greaterthanequals'
+                            ) {
+                                $(option).attr('disabled', true);
+                            } else {
+                                $(option).attr('disabled', false);
+                            }
+                        });
+                        $('#' + sectionId + '-filter-value').attr('pattern', "");
+                    }
+
+                    $('#' + sectionId + '-filter-operator').trigger('change');
+                });
+
+                //Enable/Disable value field on empty/notempty operator
+                $('#' + sectionId + '-operator').on('select2:select', function(e) {
+                    if ($(e.params.data.element).val() === 'empty' ||
+                        $(e.params.data.element).val() === 'notempty'
+                    ) {
+                        $('#' + sectionId + '-filter-value').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-value').attr('disabled', false);
+                    }
+                });
+                $('body').on('formToDatatableTableRowEdit', function() {
+                    if ($('#' + sectionId + '-filter-operator').val() === 'empty' ||
+                        $('#' + sectionId + '-filter-operator').val() === 'notempty'
+                    ) {
+                        $('#' + sectionId + '-filter-value').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-value').attr('disabled', false);
+                    }
+                });
+
+                //Add Save
                 $('#' + sectionId + '-name').keyup(function() {
                     if ($(this).val() !== '') {
                         $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', false);
@@ -129,16 +220,71 @@
                     }
                 });
 
-                //Add Save
-                //Add Apply (Temp)
+                //Adding to table
+                $('#' + sectionId + '-assign-button').click(function() {
+                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
+                    }
 
-                //Edit
-                //Edit Save
+                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
+                    $('#' + sectionId + '-filter-value').attr('disabled', false);
+                });
+
+                //For last Row - Remove And/Or
+                $('body').on('formToDatatableTableRowDelete', function() {
+                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
+
+                        $('#' + sectionId + '-filter-name').attr('disabled', true);
+                        $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
+                    }
+                });
+
+                //Add Apply (Temp) & Close Modal
+                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function() {
+                    var tableData =
+                        dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'];
+
+                    //eslint-disable-next-line
+                    console.log(tableData);
+
+                    $.each(tableData, function(index, data) {
+                        if (index === 0) {
+                            query +=
+                                '-:' +
+                                data['admin-users-listing-filter-field'] + ':' +
+                                data['admin-users-listing-filter-operator'] + ':' +
+                                data['admin-users-listing-filter-value'] + '&';
+                        } else {
+                            query +=
+                                data['admin-users-listing-filter-andor'] + ':' +
+                                data['admin-users-listing-filter-field'] + ':' +
+                                data['admin-users-listing-filter-operator'] + ':' +
+                                data['admin-users-listing-filter-value']
+                                + '&';
+                        }
+                    });
+
+                    //eslint-disable-next-line
+                    console.log(query);
+                    $('#' + sectionId + '-filter-modal').modal('hide');
+                    that._filterRunAjax(
+                        1,
+                        datatableOptions.paginationCounters.limit,
+                        query
+                    );
+                    // that._updateCounters();
+                });
+
+                //Save and Apply & Close Modal
 
                 //Delete
 
                 //Share
+
                 //Select Guid and Uids
+                // Need to create share modal
             }
 
             //Build listing datatable
@@ -156,10 +302,10 @@
                     } );
                 };
 
-                var thisOptions = dataCollection[componentId][sectionId];
+                thisOptions = dataCollection[componentId][sectionId];
                 listColumns[thisOptions.listOptions.tableName] = [];
 
-                var datatableOptions = thisOptions.listOptions.datatable;
+                datatableOptions = thisOptions.listOptions.datatable;
                 datatableOptions.columns = JSON.parse(datatableOptions.columns);
 
                 var selectOptions, dom, showHideExportButton, showHideColumnsButton;
@@ -360,6 +506,7 @@
                                                         },
                                         zeroRecords     : datatableOptions.zeroRecords,
                                         infoEmpty       : 'No entries found',
+                                        infoFiltered    : ' - filtered from _MAX_ shown entries',
                                         searchPlaceholder: 'Search shown ' + thisOptions.listOptions.componentName + '...',
                                         select          : {
                                             rows    : {
@@ -391,413 +538,232 @@
                                         });
                                     },
                     drawCallback    : function() {
-                                        drawCallback();
+                                        that._drawCallback();
                                     }
                 });
 
                 if (thisOptions.listOptions.postUrl) {
-                    runDatatableAjax(thisOptions.listOptions.postParams);
+                    that._runDatatableAjax(thisOptions.listOptions.postParams);
                 } else {
                     // Enable paging if data is more than 20 on static datatable
-                    if (datatableOptions.pagination && datatableOptions.paginationCounters.total_items > 20) {
+                    if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
                         $.extend(thisOptions.listOptions.datatable, {
                             paging : true,
                         });
                     }
                     $('#list-data-loader').hide();
-                    tableInit(false);
-                    registerEvents();
+                    that._tableInit(false);
+                    that._registerEvents();
                 }
+            }
 
-                function runDatatableAjax(postData, reDraw) {
-                    var url = thisOptions.listOptions.postUrl;
-                    $.ajax({
-                        url         : url,
-                        method      : 'post',
-                        dataType    : 'json',
-                        data        : postData,
-                        success     : function(data) {
-                            $('#list-data-loader').hide();
-                            $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
-                        }
-                    }).done(function() {
-                        tableInit(reDraw);
-                        registerEvents();
-                    });
-                        // TODO: fix card-body height when more rows are loaded.
-                        // TODO: BULK Edit/Delete
-                        //     // tableData[sectionId].buttons().container().appendTo('#products-list-buttons .col-sm-6:eq(0)');
-                        //     // that.fixHeight('fixedHeight');
-                        //     // $('#' + sectionId + '-list-table').on('length.dt', function() {
-                        //     //     that.fixHeight('fixedHeight');
-                        //     // });
-                        //     // $('#' + sectionId + '-filter').on('collapsed.boxwidget expanded.boxwidget', function() {
-                        //     //     that.fixHeight('fixedHeight');
-                        //     // });
-                        //     // $('#' + sectionId + '-filter-filters-apply').click(function() {
-                        //     //     $('#' + sectionId + '-filter .box').trigger('collapse.boxwidget');
-                        //     //     that.fixHeight('fixedHeight');
-                        //     // });
-                        //     // $('#' + sectionId + '-list').find('.dataTables_info').addClass('pull-right');
-                        //     //  }
-                        //     // });
-                    // });
-                }
-
-                //Initialize Table
-                function tableInit(reDraw) {
-                    // All Columns (except ID and __control)
-                    $.each(listColumns, function(index,column) {
-                        // Ordering of checkbox and radio columns
-                        for (var replaceColumn in datatableOptions.replaceColumns) {
-                            if (replaceColumn === column.data) {
-                                if (datatableOptions.replaceColumns[replaceColumn] === 'customSwitch') {
-                                    column.orderDataType = 'dom-checkbox';
-                                } else if (datatableOptions.replaceColumns[replaceColumn] === 'radioButtons') {
-                                    column.orderDataType = 'dom-radio';
-                                }
-                            }
-                        }
-                    });
-
-                    if (!reDraw) {
-                        // Pagination
-                        if (datatableOptions.pagination && datatableOptions.paginationCounters.total_items > 20) {
-                            $.extend(thisOptions.listOptions.datatable, {
-                                paging : true,
-                                pagingType : 'simple',
-                            });
-
-                            datatableOptions['language']['zeroRecords'] = '<i class="fas fa-cog fa-spin"></i> Loading...';
-                        }
-                        if (datatableOptions.tableCompact) {
-                            classes = 'data-actions pb-1 pt-1';
-                        } else {
-                            classes = 'data-actions';
-                        }
-                        // Control Column
-                        if (datatableOptions.rowControls) {
-                            listColumns[thisOptions.listOptions.tableName].push({
-                                data        : '__control',
-                                title       : 'ACTIONS',
-                                orderable   : false,
-                                className   : classes
-                            });
-                        }
-
-                        if (thisOptions.customFunctions.beforeTableInit) {
-                            thisOptions.customFunctions.beforeTableInit();
-                        }
-
-                        thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
-
-                        if (thisOptions.customFunctions.afterTableInit) {
-                            thisOptions.customFunctions.afterTableInit();
-                        }
-
-                        thisOptions['datatable'].columns.adjust().responsive.recalc();
-
-                        updateCounters();
-
-                        // Datatable Events
-                        //Responsive
-                        thisOptions['datatable'].on('draw responsive-resize responsive-display', function() {
-                            BazContentLoader.init({});
-                            thisOptions['datatable'].columns.adjust().responsive.recalc();
-                        });
-
-                        //Toggle response rows open/close
-                        thisOptions['datatable'].on('responsive-display', function(e, datatable, row, showHide) {
-                            if (showHide) {
-                                $($(row.node()).next('.child')).find('li').prepend(
-                                    '<i class="fa fas fa-fw fa-plus-circle text-info dtr-expand mr-1 dataTable-pointer"><i>'
-                                );
-
-                                changeResponsiveLiWidths($($(row.node()).next('.child')));
-
-                                $($(row.node()).next('.child')).find('.dtr-expand').click(function() {
-                                    if ($(this).parent().is('.text-truncate')) {
-                                        $(this).parent().removeClass('text-truncate dt-colTextTruncate');
-                                        $(this).removeClass('fa-plus-circle text-info').addClass('fa-minus-circle text-danger');
-                                    } else {
-                                        $(this).parent().addClass('text-truncate dt-colTextTruncate');
-                                        $(this).removeClass('fa-minus-circle text-danger').addClass('fa-plus-circle text-info');
-                                        changeResponsiveLiWidths($($(row.node()).next('.child')));
-                                    }
-                                });
-                            }
-                        });
-
-                        //Search
-                        thisOptions['datatable'].on('draw', function () {
-                            if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
-                                $('.dataTables_empty').html('...');
-                            }
-                        });
-
-                        //Length Change
-                        thisOptions['datatable'].on('length.dt', function (e, settings, len) {
-                            if (len === -1) {
-                                len = datatableOptions.paginationCounters.total_items;
-                            }
-                            thisOptions['datatable'].rows().clear().draw();
-                            $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
-                            runDatatableAjax({
-                                'page' : datatableOptions.paginationCounters.first,
-                                'limit': len
-                            }, true);
-                        });
-
-                    } else { //redraw used on pagination prev and next
-
-                        if (thisOptions.customFunctions.beforeRedraw) {
-                            thisOptions.customFunctions.beforeRedraw();
-                        }
-
-                        thisOptions['datatable'].rows.add(datatableOptions.data).draw();
-
-                        if (thisOptions.customFunctions.afterRedraw) {
-                            thisOptions.customFunctions.afterRedraw();
-                        }
-
-                        updateCounters();
+            _proto._runDatatableAjax = function(postData, reDraw) {
+                var url = thisOptions.listOptions.postUrl;
+                $.ajax({
+                    url         : url,
+                    method      : 'post',
+                    dataType    : 'json',
+                    data        : postData,
+                    success     : function(data) {
+                        $('#list-data-loader').hide();
+                        $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
                     }
+                }).done(function() {
+                    that._tableInit(reDraw);
+                    that._registerEvents();
+                });
+                    // TODO: fix card-body height when more rows are loaded.
+                    // TODO: BULK Edit/Delete
+                    //     // tableData[sectionId].buttons().container().appendTo('#products-list-buttons .col-sm-6:eq(0)');
+                    //     // that.fixHeight('fixedHeight');
+                    //     // $('#' + sectionId + '-list-table').on('length.dt', function() {
+                    //     //     that.fixHeight('fixedHeight');
+                    //     // });
+                    //     // $('#' + sectionId + '-filter').on('collapsed.boxwidget expanded.boxwidget', function() {
+                    //     //     that.fixHeight('fixedHeight');
+                    //     // });
+                    //     // $('#' + sectionId + '-filter-filters-apply').click(function() {
+                    //     //     $('#' + sectionId + '-filter .box').trigger('collapse.boxwidget');
+                    //     //     that.fixHeight('fixedHeight');
+                    //     // });
+                    //     // $('#' + sectionId + '-list').find('.dataTables_info').addClass('pull-right');
+                    //     //  }
+                    //     // });
+                // });
+            }
 
+            //Initialize Table
+            _proto._tableInit = function(reDraw) {
+                // All Columns (except ID and __control)
+                $.each(listColumns, function(index,column) {
+                    // Ordering of checkbox and radio columns
+                    for (var replaceColumn in datatableOptions.replaceColumns) {
+                        if (replaceColumn === column.data) {
+                            if (datatableOptions.replaceColumns[replaceColumn] === 'customSwitch') {
+                                column.orderDataType = 'dom-checkbox';
+                            } else if (datatableOptions.replaceColumns[replaceColumn] === 'radioButtons') {
+                                column.orderDataType = 'dom-radio';
+                            }
+                        }
+                    }
+                });
+
+                if (!reDraw) {
+                    // Pagination
+                    if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
+                        $.extend(thisOptions.listOptions.datatable, {
+                            paging : true,
+                            pagingType : 'simple',
+                        });
+
+                        datatableOptions['language']['zeroRecords'] = '<i class="fas fa-cog fa-spin"></i> Loading...';
+                    }
+                    if (datatableOptions.tableCompact) {
+                        classes = 'data-actions pb-1 pt-1';
+                    } else {
+                        classes = 'data-actions';
+                    }
+                    // Control Column
                     if (datatableOptions.rowControls) {
-                        BazContentLoader.init({});
-                    }
-                }
-
-                //Update width for open child
-                function changeResponsiveLiWidths(child) {
-                    var width = child.width();
-
-                    var titleWidth = ((20 * width) / 100) / 16;//rem
-                    var liWidth = width/16;
-
-                    child.find('.dtr-title').css({"width" : titleWidth + 'rem'});
-                    child.find('.dtr-title').parent('li').removeClass('dt-colTextTruncate');
-                    child.find('.dtr-data').parent('li').css({"width" : liWidth + 'rem'});
-                }
-
-                //Register __control(Action buttons)
-                function registerEvents() {
-                    // customSwitch Toggle Function
-                    $('#' + sectionId + '-table .custom-switch input').each(function(index,rowSwitchInput) {
-                        $(rowSwitchInput).click(function() {
-                            var rowSwitchInputId = $(rowSwitchInput)[0].id;
-                            var url = dataCollection.env.rootPath + 'index.php?route=' + $(rowSwitchInput).data('switchactionurl');
-                            var columnId = $(rowSwitchInput).data('columnid');
-                            var checked = $(rowSwitchInput).is('[checked]');
-                            var columnsDataToInclude = $(rowSwitchInput).data('switchactionincludecolumnsdata').split(',');
-                            var rowData;
-                            rowData = thisOptions['datatable'].row($(this).parents('tr')).data();
-                            if (checked) {
-                                rowData[columnId] = 0;
-                                $(rowSwitchInput).attr('checked', false);
-                                document.getElementById(rowSwitchInputId).checked = false;
-                            } else {
-                                rowData[columnId] = 1;
-                                $(rowSwitchInput).attr('checked', true);
-                                document.getElementById(rowSwitchInputId).checked = true;
-                            }
-                            var name = $(rowSwitchInput).parents('td').siblings('.data-' + $(rowSwitchInput).data('notificationtextfromcolumn')).html();
-                            var switchOnText = name + ' enabled';
-                            var switchOffText = name + ' disabled';
-                            if (checked) {
-                                PNotify.removeAll();
-                                Swal.fire({
-                                    title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
-                                                                  ' <span style="font-size:40px;" class="text-danger"> Disable ' +
-                                                                   name + '?</span>',
-                                    width                       : '100%',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    animation                   : false,
-                                    customClass                 : 'rounded-0 animated fadeIn',
-                                    buttonsStyling              : false,
-                                    confirmButtonClass          : 'btn btn-danger text-uppercase',
-                                    confirmButtonText           : 'Disable',
-                                    cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : false,
-                                    allowEscapeKey              : false,
-                                    allowEnterKey               : false,
-                                    onOpen                      : function() {
-                                        swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        runAjax(false, switchOffText);
-                                    } else {
-                                        $(rowSwitchInput).attr('checked', true);
-                                        document.getElementById(rowSwitchInputId).checked = true;
-                                    }
-                                });
-                            } else {
-                                runAjax(true, switchOnText);
-                            }
-                            function runAjax(status, notificationText) {
-                                var dataToSubmit = { };
-                                for (var data in rowData) {
-                                    if (columnsDataToInclude.includes(data)) {
-                                        dataToSubmit[data] = rowData[data];
-                                    }
-                                }
-                                $.ajax({
-                                    url         : url,
-                                    method      : 'post',
-                                    data        : dataToSubmit,
-                                    dataType    : 'json',
-                                    success     : function(response) {
-                                        if (response.status === 0) {
-                                            PNotify.removeAll();
-                                            PNotify.success({
-                                                title           : notificationText,
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $(rowSwitchInput).attr('checked', status);
-                                            document.getElementById(rowSwitchInputId).checked = true;
-                                        } else {
-                                            PNotify.removeAll();
-                                            PNotify.error({
-                                                title           : 'Error!',
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $(rowSwitchInput).attr('checked', false);
-                                            document.getElementById(rowSwitchInputId).checked = false;
-                                        }
-                                        pnotifySound.play();
-                                    }
-                                });
-                            }
+                        listColumns[thisOptions.listOptions.tableName].push({
+                            data        : '__control',
+                            title       : 'ACTIONS',
+                            orderable   : false,
+                            className   : classes
                         });
+                    }
+
+                    if (thisOptions.customFunctions.beforeTableInit) {
+                        thisOptions.customFunctions.beforeTableInit();
+                    }
+
+                    thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
+
+                    if (thisOptions.customFunctions.afterTableInit) {
+                        thisOptions.customFunctions.afterTableInit();
+                    }
+
+                    thisOptions['datatable'].columns.adjust().responsive.recalc();
+
+                    that._updateCounters();
+
+                    // Datatable Events
+                    //Responsive
+                    thisOptions['datatable'].on('draw responsive-resize responsive-display', function() {
+                        BazContentLoader.init({});
+                        thisOptions['datatable'].columns.adjust().responsive.recalc();
                     });
 
-                    // RadioButtons
-                    $('#' + sectionId + '-table .btn-group-toggle label').each(function(index,radioButtonsLabel) {
-                        $(radioButtonsLabel).click(function() {
-                            var currentCheckedId, currentCheckedLabel;
-                            $(this).siblings('label').children('input').each(function(index,sibling) {
-                                if (sibling.checked) {
-                                    currentCheckedId = sibling.id;
-                                    currentCheckedLabel = sibling.parentElement;
-                                } else if (sibling.defaultChecked) {
-                                    currentCheckedId = sibling.id;
-                                    currentCheckedLabel = sibling.parentElement;
+                    //Toggle response rows open/close
+                    thisOptions['datatable'].on('responsive-display', function(e, datatable, row, showHide) {
+                        if (showHide) {
+                            $($(row.node()).next('.child')).find('li').prepend(
+                                '<i class="fa fas fa-fw fa-plus-circle text-info dtr-expand mr-1 dataTable-pointer"><i>'
+                            );
+
+                            that._changeResponsiveLiWidths($($(row.node()).next('.child')));
+
+                            $($(row.node()).next('.child')).find('.dtr-expand').click(function() {
+                                if ($(this).parent().is('.text-truncate')) {
+                                    $(this).parent().removeClass('text-truncate dt-colTextTruncate');
+                                    $(this).removeClass('fa-plus-circle text-info').addClass('fa-minus-circle text-danger');
+                                } else {
+                                    $(this).parent().addClass('text-truncate dt-colTextTruncate');
+                                    $(this).removeClass('fa-minus-circle text-danger').addClass('fa-plus-circle text-info');
+                                    that._changeResponsiveLiWidths($($(row.node()).next('.child')));
                                 }
                             });
-                            var thisId = $(this).children('input')[0].id;
-                            var url = dataCollection.env.rootPath + 'index.php?route=' + $(this).children('input').data('radiobuttonsactionurl');
-                            var columnId = $(this).children('input').data('columnid');
-                            var dataValue = $(this).children('input').data('value');
-                            var checked = false;
-                            if ($(this).children('input').is('[checked]') || $(this).children('input')[0].defaultChecked) {
-                                checked = true;
-                            }
-                            var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                                                    $(this).children('input').data('columnid') + ' changed';
-                            if (!checked) {
-                                PNotify.removeAll();
-                                Swal.fire({
-                                    title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
-                                                                    ' <span style="font-size:40px;" class="text-danger"> Change ' +
-                                                                    $(this).parents('td').siblings('.data-' +
-                                                                        $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                                                                    $(this).children('input').data('columnid') +
-                                                                    '?</span>',
-                                    width                       : '100%',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    animation                   : false,
-                                    customClass                 : 'rounded-0 animated fadeIn',
-                                    buttonsStyling              : false,
-                                    confirmButtonClass          : 'btn btn-danger text-uppercase',
-                                    confirmButtonText           : 'Change',
-                                    cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : false,
-                                    allowEscapeKey              : false,
-                                    allowEnterKey               : false,
-                                    onOpen                      : function() {
-                                        swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        runAjax(false, radioChangeText);
-                                    } else {
-                                        $(this).removeClass('focus active');
-                                        $('#' + currentCheckedId).attr('checked', true);
-                                        document.getElementById(currentCheckedId).checked = true;
-                                        $(currentCheckedLabel).addClass('focus active');
-                                    }
-                                });
-                            }
-
-                            function runAjax(status, notificationText) {
-                                var columnsDataToInclude = $('#' + thisId).data('radiobuttonsactionincludecolumnsdata').split(',');
-                                var rowData = thisOptions['datatable'].row($('#' + thisId).parents('tr')).data();
-                                var dataToSubmit = { };
-                                for (var data in rowData) {
-                                    if (columnsDataToInclude.includes(data)) {
-                                        if (columnId === data) {
-                                            dataToSubmit[data] = dataValue;
-                                        } else {
-                                            dataToSubmit[data] = rowData[data];
-                                        }
-                                    }
-                                }
-                                $.ajax({
-                                    url         : url,
-                                    method      : 'post',
-                                    data        : dataToSubmit,
-                                    dataType    : 'json',
-                                    success     : function(response) {
-                                        if (response.status === 1) {
-                                            PNotify.removeAll()
-                                            PNotify.success({
-                                                title           : notificationText,
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $('#' + currentCheckedId).attr('checked', false);
-                                            document.getElementById(currentCheckedId).checked = false;
-                                            $('#' + thisId).attr('checked', true);
-                                            document.getElementById(thisId).checked = true;
-                                        } else {
-                                            PNotify.removeAll();
-                                            PNotify.error({
-                                                title           : 'Error!',
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $('#' + thisId).parent('label').removeClass('focus active');
-                                            $('#' + thisId).attr('checked', false);
-                                            document.getElementById(thisId).checked = false;
-                                            $('#' + currentCheckedId).attr('checked', true);
-                                            document.getElementById(currentCheckedId).checked = true;
-                                            $(currentCheckedLabel).addClass('focus active');
-                                        }
-                                        pnotifySound.play();
-                                    }
-                                });
-                            }
-                        });
+                        }
                     });
 
-                    // Deleting Row (element .rowRemove)
-                    $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {
-                        $(rowRemove).click(function(e) {
-                            e.preventDefault();
-                            var thisButton = this;
-                            var url = $(this).attr('href');
-                            var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).html();
-                            var dataToSend = { };
-                            dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
+                    //Search
+                    $('.dataTables_filter').find('input').keyup(function() {
+                        if ($(this).val() === '') {
+                            that._updateCounters();
+                        }
+                    });
+
+                    thisOptions['datatable'].on('draw', function () {
+                        if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
+                            $('.dataTables_empty').last().html('...');
+                        }
+                    });
+
+                    //Length Change
+                    thisOptions['datatable'].on('length.dt', function (e, settings, len) {
+                        if (len === -1) {
+                            len = datatableOptions.paginationCounters.filtered_items;
+                        }
+
+                        that._filterRunAjax(
+                            datatableOptions.paginationCounters.first,
+                            len,
+                            query
+                        );
+                    });
+
+                } else { //redraw used on pagination prev and next
+
+                    if (thisOptions.customFunctions.beforeRedraw) {
+                        thisOptions.customFunctions.beforeRedraw();
+                    }
+
+                    thisOptions['datatable'].rows.add(datatableOptions.data).draw();
+
+                    if (thisOptions.customFunctions.afterRedraw) {
+                        thisOptions.customFunctions.afterRedraw();
+                    }
+
+                    that._updateCounters();
+                }
+
+                if (datatableOptions.rowControls) {
+                    BazContentLoader.init({});
+                }
+            }
+
+            //Update width for open child
+            _proto._changeResponsiveLiWidths = function(child) {
+                var width = child.width();
+
+                var titleWidth = ((20 * width) / 100) / 16;//rem
+                var liWidth = width/16;
+
+                child.find('.dtr-title').css({"width" : titleWidth + 'rem'});
+                child.find('.dtr-title').parent('li').removeClass('dt-colTextTruncate');
+                child.find('.dtr-data').parent('li').css({"width" : liWidth + 'rem'});
+            }
+
+            //Register __control(Action buttons)
+            _proto._registerEvents = function() {
+                // customSwitch Toggle Function
+                $('#' + sectionId + '-table .custom-switch input').each(function(index,rowSwitchInput) {
+                    $(rowSwitchInput).click(function() {
+                        var rowSwitchInputId = $(rowSwitchInput)[0].id;
+                        var url = dataCollection.env.rootPath + 'index.php?route=' + $(rowSwitchInput).data('switchactionurl');
+                        var columnId = $(rowSwitchInput).data('columnid');
+                        var checked = $(rowSwitchInput).is('[checked]');
+                        var columnsDataToInclude = $(rowSwitchInput).data('switchactionincludecolumnsdata').split(',');
+                        var rowData;
+                        rowData = thisOptions['datatable'].row($(this).parents('tr')).data();
+                        if (checked) {
+                            rowData[columnId] = 0;
+                            $(rowSwitchInput).attr('checked', false);
+                            document.getElementById(rowSwitchInputId).checked = false;
+                        } else {
+                            rowData[columnId] = 1;
+                            $(rowSwitchInput).attr('checked', true);
+                            document.getElementById(rowSwitchInputId).checked = true;
+                        }
+                        var name = $(rowSwitchInput).parents('td').siblings('.data-' + $(rowSwitchInput).data('notificationtextfromcolumn')).html();
+                        var switchOnText = name + ' enabled';
+                        var switchOffText = name + ' disabled';
+                        if (checked) {
+                            PNotify.removeAll();
                             Swal.fire({
-                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
-                                                              '</i> <span style="font-size:40px;" class="text-danger"> Delete ' +
-                                                              deleteText + '?</span>',
+                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
+                                                              ' <span style="font-size:40px;" class="text-danger"> Disable ' +
+                                                               name + '?</span>',
                                 width                       : '100%',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
@@ -805,7 +771,7 @@
                                 customClass                 : 'rounded-0 animated fadeIn',
                                 buttonsStyling              : false,
                                 confirmButtonClass          : 'btn btn-danger text-uppercase',
-                                confirmButtonText           : 'Delete',
+                                confirmButtonText           : 'Disable',
                                 cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
@@ -817,91 +783,288 @@
                                 }
                             }).then((result) => {
                                 if (result.value) {
-                                    if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
-                                        dataToSend.confirm = '1';
-                                    }
-                                    $.ajax({
-                                        url         : url,
-                                        method      : 'post',
-                                        dataType    : 'json',
-                                        data        : dataToSend,
-                                        success     : function(response) {
-                                            if (response.status === 0) {
-                                                PNotify.removeAll();
-                                                PNotify.success({
-                                                    title           : deleteText + ' deleted.',
-                                                    cornerClass     : 'ui-pnotify-sharp'
-                                                });
-                                                // remove row on success
-                                                thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
-                                            } else {
-                                                PNotify.removeAll();
-                                                PNotify.error({
-                                                    title           : 'Error!',
-                                                    cornerClass     : 'ui-pnotify-sharp'
-                                                });
-                                            }
-                                            pnotifySound.play();
-                                        }
-                                    });
+                                    runAjax(false, switchOffText);
+                                } else {
+                                    $(rowSwitchInput).attr('checked', true);
+                                    document.getElementById(rowSwitchInputId).checked = true;
                                 }
                             });
+                        } else {
+                            runAjax(true, switchOnText);
+                        }
+                        function runAjax(status, notificationText) {
+                            var dataToSubmit = { };
+                            for (var data in rowData) {
+                                if (columnsDataToInclude.includes(data)) {
+                                    dataToSubmit[data] = rowData[data];
+                                }
+                            }
+                            $.ajax({
+                                url         : url,
+                                method      : 'post',
+                                data        : dataToSubmit,
+                                dataType    : 'json',
+                                success     : function(response) {
+                                    if (response.status === 0) {
+                                        PNotify.removeAll();
+                                        PNotify.success({
+                                            title           : notificationText,
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $(rowSwitchInput).attr('checked', status);
+                                        document.getElementById(rowSwitchInputId).checked = true;
+                                    } else {
+                                        PNotify.removeAll();
+                                        PNotify.error({
+                                            title           : 'Error!',
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $(rowSwitchInput).attr('checked', false);
+                                        document.getElementById(rowSwitchInputId).checked = false;
+                                    }
+                                    pnotifySound.play();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // RadioButtons
+                $('#' + sectionId + '-table .btn-group-toggle label').each(function(index,radioButtonsLabel) {
+                    $(radioButtonsLabel).click(function() {
+                        var currentCheckedId, currentCheckedLabel;
+                        $(this).siblings('label').children('input').each(function(index,sibling) {
+                            if (sibling.checked) {
+                                currentCheckedId = sibling.id;
+                                currentCheckedLabel = sibling.parentElement;
+                            } else if (sibling.defaultChecked) {
+                                currentCheckedId = sibling.id;
+                                currentCheckedLabel = sibling.parentElement;
+                            }
+                        });
+                        var thisId = $(this).children('input')[0].id;
+                        var url = dataCollection.env.rootPath + 'index.php?route=' + $(this).children('input').data('radiobuttonsactionurl');
+                        var columnId = $(this).children('input').data('columnid');
+                        var dataValue = $(this).children('input').data('value');
+                        var checked = false;
+                        if ($(this).children('input').is('[checked]') || $(this).children('input')[0].defaultChecked) {
+                            checked = true;
+                        }
+                        var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
+                                                $(this).children('input').data('columnid') + ' changed';
+                        if (!checked) {
+                            PNotify.removeAll();
+                            Swal.fire({
+                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
+                                                                ' <span style="font-size:40px;" class="text-danger"> Change ' +
+                                                                $(this).parents('td').siblings('.data-' +
+                                                                    $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
+                                                                $(this).children('input').data('columnid') +
+                                                                '?</span>',
+                                width                       : '100%',
+                                background                  : 'rgba(0,0,0,.8)',
+                                backdrop                    : 'rgba(0,0,0,.6)',
+                                animation                   : false,
+                                customClass                 : 'rounded-0 animated fadeIn',
+                                buttonsStyling              : false,
+                                confirmButtonClass          : 'btn btn-danger text-uppercase',
+                                confirmButtonText           : 'Change',
+                                cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                                showCancelButton            : true,
+                                keydownListenerCapture      : true,
+                                allowOutsideClick           : false,
+                                allowEscapeKey              : false,
+                                allowEnterKey               : false,
+                                onOpen                      : function() {
+                                    swalSound.play();
+                                }
+                            }).then((result) => {
+                                if (result.value) {
+                                    runAjax(false, radioChangeText);
+                                } else {
+                                    $(this).removeClass('focus active');
+                                    $('#' + currentCheckedId).attr('checked', true);
+                                    document.getElementById(currentCheckedId).checked = true;
+                                    $(currentCheckedLabel).addClass('focus active');
+                                }
+                            });
+                        }
+
+                        function runAjax(status, notificationText) {
+                            var columnsDataToInclude = $('#' + thisId).data('radiobuttonsactionincludecolumnsdata').split(',');
+                            var rowData = thisOptions['datatable'].row($('#' + thisId).parents('tr')).data();
+                            var dataToSubmit = { };
+                            for (var data in rowData) {
+                                if (columnsDataToInclude.includes(data)) {
+                                    if (columnId === data) {
+                                        dataToSubmit[data] = dataValue;
+                                    } else {
+                                        dataToSubmit[data] = rowData[data];
+                                    }
+                                }
+                            }
+                            $.ajax({
+                                url         : url,
+                                method      : 'post',
+                                data        : dataToSubmit,
+                                dataType    : 'json',
+                                success     : function(response) {
+                                    if (response.status === 1) {
+                                        PNotify.removeAll()
+                                        PNotify.success({
+                                            title           : notificationText,
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $('#' + currentCheckedId).attr('checked', false);
+                                        document.getElementById(currentCheckedId).checked = false;
+                                        $('#' + thisId).attr('checked', true);
+                                        document.getElementById(thisId).checked = true;
+                                    } else {
+                                        PNotify.removeAll();
+                                        PNotify.error({
+                                            title           : 'Error!',
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $('#' + thisId).parent('label').removeClass('focus active');
+                                        $('#' + thisId).attr('checked', false);
+                                        document.getElementById(thisId).checked = false;
+                                        $('#' + currentCheckedId).attr('checked', true);
+                                        document.getElementById(currentCheckedId).checked = true;
+                                        $(currentCheckedLabel).addClass('focus active');
+                                    }
+                                    pnotifySound.play();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // Deleting Row (element .rowRemove)
+                $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {
+                    $(rowRemove).click(function(e) {
+                        e.preventDefault();
+                        var thisButton = this;
+                        var url = $(this).attr('href');
+                        var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).html();
+                        var dataToSend = { };
+                        dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
+                        Swal.fire({
+                            title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
+                                                          '</i> <span style="font-size:40px;" class="text-danger"> Delete ' +
+                                                          deleteText + '?</span>',
+                            width                       : '100%',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            animation                   : false,
+                            customClass                 : 'rounded-0 animated fadeIn',
+                            buttonsStyling              : false,
+                            confirmButtonClass          : 'btn btn-danger text-uppercase',
+                            confirmButtonText           : 'Delete',
+                            cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : false,
+                            allowEscapeKey              : false,
+                            allowEnterKey               : false,
+                            onOpen                      : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
+                                    dataToSend.confirm = '1';
+                                }
+                                $.ajax({
+                                    url         : url,
+                                    method      : 'post',
+                                    dataType    : 'json',
+                                    data        : dataToSend,
+                                    success     : function(response) {
+                                        if (response.status === 0) {
+                                            PNotify.removeAll();
+                                            PNotify.success({
+                                                title           : deleteText + ' deleted.',
+                                                cornerClass     : 'ui-pnotify-sharp'
+                                            });
+                                            // remove row on success
+                                            thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
+                                        } else {
+                                            PNotify.removeAll();
+                                            PNotify.error({
+                                                title           : 'Error!',
+                                                cornerClass     : 'ui-pnotify-sharp'
+                                            });
+                                        }
+                                        pnotifySound.play();
+                                    }
+                                });
+                            }
                         });
                     });
+                });
+            }
+
+            _proto._updateCounters = function() {
+                var counters = { };
+
+                counters.total = datatableOptions.paginationCounters.total_items;
+                counters.filtered_total = datatableOptions.paginationCounters.filtered_items;
+                counters.end = datatableOptions.paginationCounters.limit * datatableOptions.paginationCounters.current;
+                counters.start = (counters.end - datatableOptions.paginationCounters.limit) + 1;
+
+                if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
+                    counters.end = datatableOptions.paginationCounters.filtered_items;
                 }
+                if (query) {
+                    $('#' + sectionId + '-table_info').empty().html(
+                        "Showing " + counters.start + " to " + counters.end +
+                        " of " + counters.filtered_total + " filtered entries (Total entries: " + counters.total + ")"
+                    );
+                } else {
+                    $('#' + sectionId + '-table_info').empty().html(
+                        "Showing " + counters.start + " to " + counters.end + " of " + counters.filtered_total + " entries"
+                    );
+                }
+            }
 
-                function updateCounters() {
-                    var counters = { };
+            _proto._filterRunAjax = function(page, limit, conditions) {
+                thisOptions['datatable'].rows().clear().draw();
+                $('.dataTables_empty').last().html('<i class="fas fa-cog fa-spin"></i> Loading...');
+                that._runDatatableAjax({
+                    'page'          : page,
+                    'limit'         : limit,
+                    'conditions'    : conditions
+                }, true);
+            }
 
-                    counters.total = datatableOptions.paginationCounters.total_items;
-                    counters.end = datatableOptions.paginationCounters.limit * datatableOptions.paginationCounters.current;
-                    counters.start = (counters.end - datatableOptions.paginationCounters.limit) + 1;
+            _proto._drawCallback = function() {
+                if (datatableOptions.pagination &&
+                    datatableOptions.paginationCounters.filtered_items > 20 &&
+                    (datatableOptions.paginationCounters.filtered_items !== datatableOptions.paginationCounters.limit)
+                ) {
 
-                    if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
-                        counters.end = datatableOptions.paginationCounters.total_items;
+                    if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.first) {
+                        $('.paginate_button.previous').removeClass('disabled');
+                        $('.paginate_button.previous').click(function() {
+                            that._filterRunAjax(
+                                datatableOptions.paginationCounters.previous,
+                                datatableOptions.paginationCounters.limit,
+                                query
+                            );
+                        });
                     }
-                    if (thisOptions['datatable']) {
-                        $('#admin-users-listing-table_info').empty().html(
-                            "Showing " + counters.start + " to " + counters.end +" of " + counters.total + " entries"
-                        );
-                    } else {
-                        $('#admin-users-listing-table_info').empty().html(
-                            "Showing " + counters.start + " to " + counters.end +" of " + counters.total + " entries"
-                        );
+                    if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.last) {
+                        $('.paginate_button.next').removeClass('disabled');
+                        $('.paginate_button.next').click(function() {
+                            that._filterRunAjax(
+                                datatableOptions.paginationCounters.next,
+                                datatableOptions.paginationCounters.limit,
+                                query
+                            );
+                        });
                     }
                 }
-
-                function drawCallback() {
-                    if (datatableOptions.pagination &&
-                        datatableOptions.paginationCounters.total_items > 20 &&
-                        (datatableOptions.paginationCounters.total_items !== datatableOptions.paginationCounters.limit)
-                    ) {
-
-                        if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.first) {
-                            $('.paginate_button.previous').removeClass('disabled');
-                            $('.paginate_button.previous').click(function() {
-                                thisOptions['datatable'].rows().clear().draw();
-                                $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
-                                runDatatableAjax({
-                                    'page' : datatableOptions.paginationCounters.previous,
-                                    'limit': datatableOptions.paginationCounters.limit
-                                }, true);
-                            });
-                        }
-                        if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.last) {
-                            $('.paginate_button.next').removeClass('disabled');
-                            $('.paginate_button.next').click(function() {
-                                thisOptions['datatable'].rows().clear().draw();
-                                $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
-                                runDatatableAjax({
-                                    'page' : datatableOptions.paginationCounters.next,
-                                    'limit': datatableOptions.paginationCounters.limit
-                                }, true);
-                            });
-                        }
-                    }
-                }
-            };
+            }
 
             BazContentSectionWithListing._jQueryInterface = function _jQueryInterface(options) {
                 dataCollection = window['dataCollection'];

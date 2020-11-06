@@ -37,11 +37,17 @@ class Filter extends AdminLTETags
                         'fieldGroupPreAddonIcon'              => 'filter',
                         'fieldGroupPostAddonButtons'          =>
                             [
-                                'apply' => [
+                                'apply-saved' => [
                                     'title'                   => 'Apply',
                                     'noMargin'                => true,
-                                    'disabled'                => true,
-                                    'tooltipTitle'            => 'Apply Selected Filter'
+                                    'disabled'                => true
+                                ],
+                                'reset' => [
+                                    'title'                   => false,
+                                    'noMargin'                => true,
+                                    'icon'                    => 'undo',
+                                    'type'                    => 'secondary',
+                                    'tooltipTitle'            => 'Reset Filters',
                                 ],
                                 'add'   => [
                                     'title'                   => false,
@@ -59,7 +65,7 @@ class Filter extends AdminLTETags
                                     'icon'                    => 'edit',
                                     'noMargin'                => true,
                                     'disabled'                => true,
-                                    'buttonAdditionalClass'   => 'rounded-0',
+                                    'buttonAdditionalClass'   => 'rounded-0 text-white',
                                     'position'                => 'right'
                                 ],
                                 'delete'   => [
@@ -110,312 +116,241 @@ class Filter extends AdminLTETags
 
         $modalContent =
             '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter" class="sectionWithListingFilter">
-                <div class="row vdivide">
-                    <div class="col">
-                        <div class="row">
-                            <div class="col">' .
-                                $this->useTag('fields',
-                                    [
-                                        'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
-                                        'fieldId'                             => 'columns',
-                                        'fieldLabel'                          => 'Columns',
-                                        'fieldType'                           => 'select2',
-                                        'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             => 'Select the column to filter',
-                                        'fieldRequired'                       => true,
-                                        'fieldBazScan'                        => true,
-                                        'fieldDataSelect2Options'             => $this->fieldParams['dtFilterColumns'],
-                                        'fieldDataSelect2OptionsArray'        => true,
-                                        'fieldDataSelect2OptionsKey'          => 'id',
-                                        'fieldDataSelect2OptionsValue'        => 'name'
-                                    ]
-                                ) .
-                            '</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">' .
-                                $this->useTag('fields',
-                                    [
-                                        'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
-                                        'fieldId'                             => 'operator',
-                                        'fieldLabel'                          => 'Operator',
-                                        'fieldType'                           => 'input',
-                                        'fieldInputType'                      => 'select',
-                                        'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             => 'Select filter operator. Check NOT for reverse operation.',
-                                        'fieldBazScan'                        => true,
-                                        'fieldRequired'                       => true,
-                                        'fieldGroupPreAddonText'              => '<span class="ml-2 mr-1">NOT</span>' . $this->useTag('fields',
-                                                [
-                                                    'componentId'                         => $this->params['componentId'],
-                                                    'sectionId'                           => $this->params['sectionId'] . '-filter',
-                                                    'fieldId'                             => 'not-operator',
-                                                    'fieldLabel'                          => false,
-                                                    'fieldType'                           => 'checkbox',
-                                                    'fieldAdditionalClass'                => 'm-0 ml-1',
-                                                    'fieldInputType'                      => 'text',
-                                                    'fieldHelp'                           => true,
-                                                    'fieldHelpTooltipContent'             => 'Not Operator',
-                                                    'fieldRequired'                       => false,
-                                                    'fieldBazScan'                        => true,
-                                                    'fieldCheckboxType'                   => 'warning',
-                                                    'fieldCheckboxInline'                 => true,
-                                                    'fieldCheckboxAdditionClass'          => 'mb-0'
-                                                ]
-                                        ),
-                                        'fieldGroupPreAddonTextAdditionalClass' => 'p-0 ml-1',
-                                        'fieldDataSelectOptions'                =>
+                <form autocomplete="off" class="mt-1" data-validateon="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-form">
+                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-fieldset">
+                        <div class="row vdivide">
+                            <div class="col">
+                                <div class="row">
+                                    <div class="col">' .
+                                        $this->useTag('fields',
                                             [
-                                                'equals'            =>
+                                                'componentId'                         => $this->params['componentId'],
+                                                'sectionId'                           => $this->params['sectionId'] . '-filter',
+                                                'fieldId'                             => 'andor',
+                                                'fieldLabel'                          => 'And/Or',
+                                                'fieldType'                           => 'select2',
+                                                'fieldHelp'                           => true,
+                                                'fieldHelpTooltipContent'             => 'Select And/Or<br>Not included in first/only filter.',
+                                                'fieldBazScan'                        => true,
+                                                'fieldRequired'                       => false,
+                                                'fieldDataSelect2Options'             =>
                                                     [
-                                                        'id'            => 'equals',
-                                                        'name'          => 'Equals to'
+                                                        'and'            =>
+                                                            [
+                                                                'id'            => 'and',
+                                                                'name'          => 'And'
+                                                            ],
+                                                        'or'            =>
+                                                            [
+                                                                'id'            => 'or',
+                                                                'name'          => 'Or'
+                                                            ]
                                                     ],
-                                                'lessthan'          =>
-                                                    [
-                                                        'id'            => 'lessthan',
-                                                        'name'          => 'Less than'
-                                                    ],
-                                                'greaterthan'       =>
-                                                    [
-                                                        'id'            => 'greaterthan',
-                                                        'name'          => 'Greater than'
-                                                    ],
-                                                'lessthanequal'     =>
-                                                    [
-                                                        'id'            => 'lessthanequal',
-                                                        'name'          => 'Less than equals to'
-                                                    ],
-                                                'greaterthanequal'  =>
-                                                    [
-                                                        'id'            => 'greaterthanequal',
-                                                        'name'          => 'Greater than equals to'
-                                                    ],
-                                                'like'              =>
-                                                    [
-                                                        'id'            => 'like',
-                                                        'name'          => 'Like'
-                                                    ],
-                                                'between'              =>
-                                                    [
-                                                        'id'            => 'between',
-                                                        'name'          => 'Between'
-                                                    ]
-                                            ],
-                                        'fieldDataSelectOptionsKey'           => 'id',
-                                        'fieldDataSelectOptionsValue'         => 'name',
-                                        'fieldDataSelectOptionsArray'         => true,
-                                        'fieldDataSelectOptionsZero'          => 'SELECT OPERATOR'
-                                    ]
-                                ) .
-                            '</div>
-                        </div>
-                        <div class="row" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value-text-row">
-                            <div class="col">' .
-                                $this->useTag('fields',
-                                    [
-                                        'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
-                                        'fieldId'                             => 'value-text',
-                                        'fieldLabel'                          => 'Filter Value(s)',
-                                        'fieldType'                           => 'input',
-                                        'fieldInputType'                      => 'text',
-                                        'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             =>
-                                            'Filter values of the selected field. Separate by comma for OR Operation. Ex: user1,user2 - will generate query that will filter user = user1 OR user = user2',
-                                        'fieldRequired'                       => true,
-                                        'fieldBazScan'                        => true,
-                                        'fieldBazJstreeSearch'                => false,
-                                        'fieldDataInputMinLength'             => 1,
-                                        'fieldDataInputMaxLength'             => 50
-                                    ]
-                                ) .
-                            '</div>
-                        </div>
-                        <div class="row" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value-number-row">
-                            <div class="col">' .
-                                $this->useTag('fields',
-                                    [
-                                        'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
-                                        'fieldId'                             => 'value-number',
-                                        'fieldLabel'                          => 'Filter Numeric Value(s)',
-                                        'fieldType'                           => 'input',
-                                        'fieldInputType'                      => 'number',
-                                        'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             =>
-                                            'Filter numeric values of the selected field. Separate by comma for OR Operation. Ex: 10,20 - will generate query that will filter price = 10 OR price = 20',
-                                        'fieldRequired'                       => true,
-                                        'fieldBazScan'                        => true,
-                                        'fieldBazJstreeSearch'                => false,
-                                        'fieldDataInputMinNumber'             => -9999999,
-                                        'fieldDataInputMaxNumber'             => 9999999
-                                    ]
-                                ) .
-                            '</div>
-                        </div>
-                        <div class="row" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value-between-row">
-                            <div class="col">' .
-                                $this->useTag('fields',
-                                    [
-                                        'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
-                                        'fieldId'                             => 'value-between-start',
-                                        'fieldLabel'                          => 'Between Start Value',
-                                        'fieldType'                           => 'input',
-                                        'fieldInputType'                      => 'text',
-                                        'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             => 'Filter value between start of the selected field',
-                                        'fieldRequired'                       => true,
-                                        'fieldBazScan'                        => true,
-                                        'fieldBazJstreeSearch'                => false,
-                                        'fieldDataMinLength'                  => 1,
-                                        'fieldDataMaxLength'                  => 50
-                                    ]
-                                ) .
-                            '</div>
-                            <div class="col">' .
-                                $this->useTag('fields',
-                                    [
-                                        'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
-                                        'fieldId'                             => 'value-between-end',
-                                        'fieldLabel'                          => 'Between End Value',
-                                        'fieldType'                           => 'input',
-                                        'fieldInputType'                      => 'text',
-                                        'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             => 'Filter value between end of the selected field',
-                                        'fieldRequired'                       => true,
-                                        'fieldBazScan'                        => true,
-                                        'fieldBazJstreeSearch'                => false,
-                                        'fieldDataMinLength'                  => 1,
-                                        'fieldDataMaxLength'                  => 50
-                                    ]
-                                ) .
-                            '</div>
-                        </div>
-                        <div class="row">
-                            <div class="col text-center">' .
-                                $this->useTag('buttons',
-                                    [
-                                        'componentId'           => $this->params['componentId'],
-                                        'sectionId'             => $this->params['sectionId'] . '-filter',
-                                        'buttonType'            => 'button',
-                                        'buttonLabel'           => false,
-                                        'buttons'               =>
+                                                'fieldDataSelect2OptionsKey'           => 'id',
+                                                'fieldDataSelect2OptionsValue'         => 'name',
+                                                'fieldDataSelect2OptionsArray'         => true,
+                                                'fieldDataSelect2OptionsSelected'      => 'and',
+                                            ]
+                                        ) .
+                                    '</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">' .
+                                        $this->useTag('fields',
                                             [
-                                                'assign'        =>
-                                                [
-                                                    'id'            => 'assign',
-                                                    'icon'          => 'arrow-right',
-                                                    'title'         => 'Assign'
+                                                'componentId'                         => $this->params['componentId'],
+                                                'sectionId'                           => $this->params['sectionId'] . '-filter',
+                                                'fieldId'                             => 'field',
+                                                'fieldLabel'                          => 'Field',
+                                                'fieldType'                           => 'select2',
+                                                'fieldHelp'                           => true,
+                                                'fieldHelpTooltipContent'             => 'Select the field to filter',
+                                                'fieldRequired'                       => true,
+                                                'fieldBazScan'                        => true,
+                                                'fieldDataSelect2Options'             => $this->fieldParams['dtFilterColumns'],
+                                                'fieldDataSelect2OptionsArray'        => true,
+                                                'fieldDataSelect2OptionsKey'          => 'id',
+                                                'fieldDataSelect2OptionsValue'        => 'name'
+                                            ]
+                                        ) .
+                                    '</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">' .
+                                        $this->useTag('fields',
+                                            [
+                                                'componentId'                         => $this->params['componentId'],
+                                                'sectionId'                           => $this->params['sectionId'] . '-filter',
+                                                'fieldId'                             => 'operator',
+                                                'fieldLabel'                          => 'Operator',
+                                                'fieldType'                           => 'select2',
+                                                'fieldHelp'                           => true,
+                                                'fieldHelpTooltipContent'             => 'Select filter operator.',
+                                                'fieldBazScan'                        => true,
+                                                'fieldRequired'                       => true,
+                                                'fieldDataSelect2Options'             =>
+                                                    [
+                                                        'equals'            =>
+                                                            [
+                                                                'id'            => 'equals',
+                                                                'name'          => 'Equals to'
+                                                            ],
+                                                        'notequals'            =>
+                                                            [
+                                                                'id'            => 'notequals',
+                                                                'name'          => 'Not equals to'
+                                                            ],
+                                                        'lessthan'          =>
+                                                            [
+                                                                'id'            => 'lessthan',
+                                                                'name'          => 'Less than'
+                                                            ],
+                                                        'lessthanequals'     =>
+                                                            [
+                                                                'id'            => 'lessthanequals',
+                                                                'name'          => 'Less than equals to'
+                                                            ],
+                                                        'greaterthan'       =>
+                                                            [
+                                                                'id'            => 'greaterthan',
+                                                                'name'          => 'Greater than'
+                                                            ],
+                                                        'greaterthanequals'  =>
+                                                            [
+                                                                'id'            => 'greaterthanequals',
+                                                                'name'          => 'Greater than equals to'
+                                                            ],
+                                                        'like'              =>
+                                                            [
+                                                                'id'            => 'like',
+                                                                'name'          => 'Like'
+                                                            ],
+                                                        'notlike'           =>
+                                                            [
+                                                                'id'            => 'notlike',
+                                                                'name'          => 'Not Like'
+                                                            ],
+                                                        'between'              =>
+                                                            [
+                                                                'id'            => 'between',
+                                                                'name'          => 'Is Between'
+                                                            ],
+                                                        'notbetween'        =>
+                                                            [
+                                                                'id'            => 'notbetween',
+                                                                'name'          => 'Is not between'
+                                                            ],
+                                                        'empty'             =>
+                                                            [
+                                                                'id'            => 'empty',
+                                                                'name'          => 'Is Empty'
+                                                            ],
+                                                        'notempty'          =>
+                                                            [
+                                                                'id'            => 'notempty',
+                                                                'name'          => 'Is not empty'
+                                                            ],
+                                                    ],
+                                                'fieldDataSelect2OptionsKey'           => 'id',
+                                                'fieldDataSelect2OptionsValue'         => 'name',
+                                                'fieldDataSelect2OptionsArray'         => true
+                                            ]
+                                        ) .
+                                    '</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">' .
+                                        $this->useTag('fields',
+                                            [
+                                                'componentId'                         => $this->params['componentId'],
+                                                'sectionId'                           => $this->params['sectionId'] . '-filter',
+                                                'fieldId'                             => 'value',
+                                                'fieldLabel'                          => 'Filter Value(s)',
+                                                'fieldType'                           => 'input',
+                                                'fieldInputType'                      => 'text',
+                                                'fieldHelp'                           => true,
+                                                'fieldHelpTooltipContent'             =>
+                                                    'Filter values of the selected field. Separate by comma for OR Operation and AND Operation (for BETWEEN Operator).<br> Ex: user1,user2 - will generate query that will filter user = user1 OR user = user2',
+                                                'fieldRequired'                       => true,
+                                                'fieldBazScan'                        => true,
+                                                'fieldBazJstreeSearch'                => false,
+                                                'fieldDataInputMinLength'             => 1,
+                                                'fieldDataInputMaxLength'             => 100
+                                            ]
+                                        ) .
+                                    '</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col">' .
+                                        $this->useTag('buttons',
+                                            [
+                                                'componentId'            => $this->params['componentId'],
+                                                'sectionId'              => $this->params['sectionId'] . '-filter',
+                                                'buttonLabel'            => false,
+                                                'buttonType'             => 'datatableButtons'
+                                            ]
+                                        ) .
+                                    '</div>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div data-validateOn="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-table"></div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <hr>
+                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-fieldset-save-apply">
+                        <div class="row">
+                            <div class="col">' .
+                                $this->useTag('fields',
+                                    [
+                                        'componentId'                           => $this->params['componentId'],
+                                        'sectionId'                             => $this->params['sectionId'] . '-filter',
+                                        'fieldId'                               => 'name',
+                                        'fieldLabel'                            => 'Save Filter',
+                                        'fieldType'                             => 'input',
+                                        'fieldInputType'                        => 'text',
+                                        'fieldHelp'                             => true,
+                                        'fieldDisabled'                         => true,
+                                        'fieldHelpTooltipContent'               => 'Filter name to save the above filters',
+                                        'fieldBazScan'                          => true,
+                                        'fieldBazPostOnCreate'                  => false,
+                                        'fieldBazPostOnUpdate'                  => true,
+                                        'fieldDataInputMinLength'               => 1,
+                                        'fieldDataInputMaxLength'               => 50,
+                                        'fieldGroupPostAddonButtons'            =>
+                                            [
+                                                'save' => [
+                                                    'title'                   => 'Save',
+                                                    'disabled'                => true,
+                                                    'icon'                    => 'save'
+                                                ],
+                                                'saveapply'   => [
+                                                    'title'                   => 'Save & Apply',
+                                                    'type'                    => 'secondary',
+                                                    'noMargin'                => true,
+                                                    'disabled'                => true,
+                                                    'buttonAdditionalClass'   => 'rounded-0',
+                                                    'position'                => 'right'
+                                                ],
+                                                'apply-new' => [
+                                                    'title'                   => 'Apply',
+                                                    'disabled'                => true,
+                                                    'icon'                    => 'filter',
+                                                ],
+                                                'cancel'   => [
+                                                    'title'                   => 'Cancel',
+                                                    'type'                    => 'secondary',
+                                                    'buttonAdditionalClass'   => 'rounded-0',
+                                                    'position'                => 'right'
                                                 ]
                                             ]
                                     ]
                                 ) .
                             '</div>
                         </div>
-                    </div>
-                    <div class="col">
-                        <div class="row" style="max-height:261px; min-height:261px; overflow:scroll;">
-                            <div class="col">
-                                <div class="table table-sm">
-                                    <table class="table table-hover">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th>Rule</th>
-                                                <th>Condition</th>
-                                                <th>Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>email:like:"guru@bazaari.com.au"</td>
-                                                <td>and</td>
-                                                <td>
-                                                    <button class="btn btn-danger btn-xs">
-                                                        <i class="fa fas fa-trash fa-xs"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>can_login:is:"1"</td>
-                                                <td></td>
-                                                <td>
-                                                    <button class="btn btn-danger btn-xs">
-                                                        <i class="fa fas fa-trash fa-xs"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col">' .
-                        $this->useTag('fields',
-                            [
-                                'componentId'                           => $this->params['componentId'],
-                                'sectionId'                             => $this->params['sectionId'] . '-filter',
-                                'fieldId'                               => 'name',
-                                'fieldLabel'                            => 'Save Filter',
-                                'fieldType'                             => 'input',
-                                'fieldInputType'                        => 'text',
-                                'fieldHelp'                             => true,
-                                'fieldHelpTooltipContent'               => 'Filter name to save the above filters',
-                                'fieldBazScan'                          => true,
-                                'fieldBazPostOnCreate'                  => false,
-                                'fieldBazPostOnUpdate'                  => true,
-                                'fieldDataInputMinLength'               => 1,
-                                'fieldDataInputMaxLength'               => 50,
-                                'fieldGroupPostAddonButtons'            =>
-                                    [
-                                        'save' => [
-                                            'title'                   => 'Save',
-                                            'noMargin'                => true,
-                                            'disabled'                => true,
-                                            'icon'                    => 'save',
-                                            'tooltipTitle'            => 'Save Filter'
-                                        ],
-                                        'saveapply'   => [
-                                            'title'                   => 'Save & Apply',
-                                            'type'                    => 'secondary',
-                                            'tooltipTitle'            => 'Save Filter and Apply',
-                                            'noMargin'                => true,
-                                            'disabled'                => true,
-                                            'buttonAdditionalClass'   => 'rounded-0',
-                                            'position'                => 'right'
-                                        ]
-                                    ]
-                            ]
-                        ) .
-                    '</div>
-                    <div class="col">' .
-                        $this->useTag('buttons',
-                            [
-                                'componentId'            => $this->params['componentId'],
-                                'sectionId'              => $this->params['sectionId'] . '-filter',
-                                'buttonLabel'            => false,
-                                'buttonType'             => 'button',
-                                'buttons'                =>
-                                [
-                                    'apply'              =>
-                                    [
-                                        'id'                 => 'apply',
-                                        'title'              => 'Apply filters',
-                                        'position'           => 'right'
-                                    ]
-                                ]
-                            ]
-                        ) .
-                    '</div>
-                </div>
+                    </fieldset>
+                </form>
             </section>';
 
         return $this->useTag('modal',
@@ -425,7 +360,7 @@ class Filter extends AdminLTETags
                 'modalSize'         => 'xl',
                 'modalHeader'       => true,
                 'modalTitle'        => '<i class="fa fas fa-fw fa-filter"></i> ' . strtoupper($this->params['componentName'] . ' Filter'),
-                'modalEscClose'     => 'true'
+                'modalEscClose'     => 'false'
             ]
         );
     }
@@ -441,22 +376,60 @@ class Filter extends AdminLTETags
                     $.extend(
                         window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter"],
                         {
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-columns" : {
-                            placeholder: "SELECT COLUMN TO FILTER",
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor" : {
+                                placeholder: "SELECT AND/OR",
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-not-operator" : {
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : {
+                            placeholder: "SELECT FIELD TO FILTER",
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : {
+                            placeholder: "SELECT FILTER OPERATOR",
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value-text" : {
-                            },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value-number" : {
-                            },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value-between-start" : {
-                            },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value-between-end" : {
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : {
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-name" : {
+                            },
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-datatables" : [
+                                "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-table"
+                            ],
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-table" : {
+                                "tableTitle"        : "Filters",
+                                "datatable"         : {
+                                    "responsive"        : true,
+                                    "rowReorder"        : false,
+                                    "searching"         : false,
+                                    "paging"            : false,
+                                    "ordering"          : false
+                                },
+                                "bazdatatable"      : {
+                                    "rowButtons"        : {
+                                        "canEdit"           : true,
+                                        "canDelete"         : true,
+                                    },
+                                    "compareData"       : "rows",
+                                    "keepFieldsData"    : ["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor"]
+                                },
+                                "postExtraction": function(datatable, extractedData) {
+                                    "use strict";
+
+                                    var fieldData = extractedData[0][1]["extractedData"];
+
+                                    extractedData[0][1]["extractedData"] = fieldData.replace(" (Numeric)", "");
+                                }
+                            },
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-form" : {
+                                "rules"     : {
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor" : "required",
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "required",
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : "required",
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "required"
+                                },
+                                messages: {
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "Please select a field",
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "Please select either And/Or",
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : "Please select an operator",
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "Please enter value. Numeric Fields only accept numbers or comma or decimal point"
+                                }
                             }
                         }
                     );

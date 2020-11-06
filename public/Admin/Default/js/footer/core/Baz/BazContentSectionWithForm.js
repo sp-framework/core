@@ -152,9 +152,9 @@
                                     }
                 });
             }
+
             _proto._sectionToObj = function _sectionToObj() {
-                componentId = $(this._element).parents('.component')[0].id;
-                sectionId = $(this._element)[0].id;
+
                 if (!dataCollection[componentId][sectionId]['data']) {
                     dataCollection[componentId][sectionId]['data'] = { };
                 }
@@ -319,10 +319,10 @@
 
     $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
         $('body').find('.sectionWithForm').each(function() {
-            if ($(this).data('bazdevmodetools') === 'false' ||
-                $(this).data('bazdevmodetools') === false) {
+            // if ($(this).data('bazdevmodetools') === 'false' ||
+            //     $(this).data('bazdevmodetools') === false) {
                 BazContentSectionWithForm._jQueryInterface.call($(this));
-            }
+            // }
         });
     });
 

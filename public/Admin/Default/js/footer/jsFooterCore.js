@@ -4012,6 +4012,27 @@ var BazHelpers = function() {
         return output;
     }
 
+    // Copy object
+    function iterationCopy(src) {
+        var target = { };
+        for (var prop in src) {
+            if (src.hasOwnProperty(prop)) {
+                target[prop] = src[prop];
+            }
+        }
+        return target;
+    }
+
+    // Check if Object Empty
+    function isEmpty(obj) {
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function bazHelpersConstructor() {
         // if something needs to be constructed
         return null;
@@ -4062,9 +4083,18 @@ var BazHelpers = function() {
         BazHelpers.modal = function(options) {
             bazModal(_extends(BazHelpers.defaults, options));
         }
+
         BazHelpers.createHtmlList = function(options) {
             var objToHtml = bazCreateHtmlList(options.obj);
             return objToHtml;
+        }
+
+        BazHelpers.iterationCopy = function(src) {
+            return iterationCopy(src);
+        }
+
+        BazHelpers.isEmpty = function(obj) {
+            return isEmpty(obj);
         }
     }
 
@@ -4294,9 +4324,9 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                     }
                 });
             }
+
             _proto._sectionToObj = function _sectionToObj() {
-                componentId = $(this._element).parents('.component')[0].id;
-                sectionId = $(this._element)[0].id;
+
                 if (!dataCollection[componentId][sectionId]['data']) {
                     dataCollection[componentId][sectionId]['data'] = { };
                 }
@@ -4461,10 +4491,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 
     $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
         $('body').find('.sectionWithForm').each(function() {
-            if ($(this).data('bazdevmodetools') === 'false' ||
-                $(this).data('bazdevmodetools') === false) {
+            // if ($(this).data('bazdevmodetools') === 'false' ||
+            //     $(this).data('bazdevmodetools') === false) {
                 BazContentSectionWithForm._jQueryInterface.call($(this));
-            }
+            // }
         });
     });
 
@@ -4484,7 +4514,1118 @@ exports.BazContentSectionWithForm = BazContentSectionWithForm;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-/* globals define exports BazContentFieldsValidator BazContentLoader Swal PNotify */
+/* globals define exports BazContentFieldsValidator BazContentFieldsValidator PNotify */
+/*
+* @title                    : BazContentSectionWithFormToDatatable
+* @description              : Baz Lib for Content (Sections With Form)
+* @developer                : guru@bazaari.com.au
+* @usage                    : ('#'+ sectionId).BazContentSectionWithFormToDatatable;
+* @functions                :
+* @options                  :
+*/
+(function (global, factory) {
+    'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+    typeof define === 'function' && define.amd ? define(['exports'], factory) :
+    (global = global || self, factory(global.BazLibs = {}));
+}(this, function (exports) {
+    'use strict';
+
+    var BazContentSectionWithFormToDatatable = function ($) {
+
+        var NAME                    = 'BazContentSectionWithFormToDatatable';
+        var DATA_KEY                = 'baz.contentsectionwithform';
+        // var EVENT_KEY               = "." + DATA_KEY;
+        var JQUERY_NO_CONFLICT      = $.fn[NAME];
+        // var Event = {
+        // };
+        // var ClassName = {
+        // };
+        // var Selector = {
+        // };
+        var Default = {
+            task                    : null
+        };
+        var dataCollection,
+            componentId,
+            sectionId,
+            that,
+            sectionOptions,
+            extractDatatableFieldsData,
+            multiTable,
+            selectedTable,
+            dataTableFields,
+            tableData,
+            pnotifySound;
+
+        var BazContentSectionWithFormToDatatable = function () {
+            function BazContentSectionWithFormToDatatable(element, settings) {
+                that = this;
+                that._element = element;
+                that._settings = settings;
+            }
+
+            var _proto = BazContentSectionWithFormToDatatable.prototype;
+
+            _proto._error = function _error(message) {
+                throw new Error(message);
+            };
+
+            _proto._init = function _init(options) {
+                pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3'); //Error Sound for Swal
+                componentId = $(this._element).parents('.component')[0].id;
+                sectionId = $(this._element)[0].id;
+
+                dataTableFields = { };
+                tableData = { };
+                dataTableFields[componentId] = { };
+                dataTableFields[componentId][sectionId] = { };
+                tableData[sectionId] = { };
+
+                sectionOptions = dataCollection[componentId][sectionId];
+                //eslint-disable-next-line
+                // console.log(sectionOptions);
+
+                dataCollection = window['dataCollection'];
+
+                if (!dataCollection[componentId]) {
+                    dataCollection[componentId] = { };
+                }
+                if (!dataCollection[componentId][sectionId]) {
+                    dataCollection[componentId][sectionId] = { };
+                }
+
+                if (options.task === 'tableDataToObj') {
+                    this._tableDataToObj();
+                } else {
+                    $(this._element).BazContentFields();
+
+                    BazContentFieldsValidator.initValidator({
+                        'componentId'   : componentId,
+                        'sectionId'     : sectionId,
+                        'on'            : 'section'
+                    });
+
+                    this._fieldsToDatatable(sectionId);
+                }
+
+            }
+
+            _proto._validateForm = function (onSuccess, type, preValidated, formId) {
+
+                var validated = BazContentFieldsValidator.validateForm({
+                    'componentId'     : componentId,
+                    'sectionId'       : sectionId,
+                    'onSuccess'       : onSuccess,
+                    'type'            : type,
+                    'preValidated'    : preValidated,
+                    'formId'          : formId
+                });
+
+                return validated;
+            };
+
+            //Fields to Datatable
+            _proto._fieldsToDatatable = function(fieldsetDatatable) {
+                var addSeq = [];
+
+                var columnDefsObj =
+                    [
+                        { 'targets': 0, 'visible': false },
+                        { 'orderable': true, 'className': 'reorder', 'targets': 0 },
+                        { 'orderable': false, 'targets': '_all' }
+                    ];
+
+                if (sectionOptions[fieldsetDatatable + '-datatables']) {
+                    $.each(sectionOptions[fieldsetDatatable + '-datatables'], function(i,v) {
+                        if (sectionOptions[v].datatable.rowReorder) {
+                            if (!sectionOptions[v].datatable.columnDefs) {
+                                sectionOptions[v].datatable.columnDefs = [];
+                                sectionOptions[v].datatable.columnDefs = columnDefsObj;
+                            } else {
+                                sectionOptions[v].datatable.columnDefs = $.merge(columnDefsObj, sectionOptions[v].datatable.columnDefs);
+                            }
+                            addSeq.push('true');
+                        }
+                    });
+                } else {
+                    that._error('Datatable Parameters missing for datatable - ' + fieldsetDatatable);
+                }
+                if ($.inArray('true', addSeq) !== -1) {
+                    $('#' + fieldsetDatatable + '-fields').prepend(
+                        '<div class="row margin-top-10 d-none">' +
+                        '   <div class="col-md-12">' +
+                        '       <label>SEQ</label>' +
+                        '       <div data-bazScan="true" data-bazScanType="seq" id="' + fieldsetDatatable + '-seq"></div>' +
+                        '   </div>' +
+                        '</div>' +
+                        '<div class="row margin-top-10 d-none">' +
+                        '   <div class="col-md-12">' +
+                        '       <label>SORT</label>' +
+                        '       <div data-bazScan="true" data-bazScanType="html" id="' + fieldsetDatatable + '-sort"><i class="fa fa-sort"></i></div>' +
+                        '   </div>' +
+                        '</div>'
+                    );
+                }
+
+                $(sectionOptions[fieldsetDatatable + '-datatables']).each(function(i,v) {
+                    // Generate table th
+                    var extractDatatableFieldsLabel = that._extractDatatableFieldsLabel(fieldsetDatatable, v);
+                    var labels = [];
+                    for (var label in extractDatatableFieldsLabel) {
+                        labels.push('<th class="pb-1 pt-1">' + extractDatatableFieldsLabel[label].labelName + '</th>');
+                    }
+                    labels = labels.join('');
+                    $('#' + v).append(
+                        '<div class="margin-bottom-10" id="' + v + '-div">' +
+                        '<label class="text-uppercase">' + sectionOptions[v].tableTitle + '</label> '+
+                        ' <i data-toggle="tooltip" data-placement="right" title="' + sectionOptions[v].tableTitle + ' table" class="fa fa-question-circle fa-1 helper"></i>' +
+                        '<table id="' + v + '-data" class="table table-striped dt-responsive compact" style="margin:0 !important;"' +
+                        ' width="100%" cellspacing="0"><thead>' +
+                        labels + '</thead><tbody></tbody></table></div>'
+                        );
+                    //Init Datatable
+                    tableData[sectionId][v] = { };
+                    tableData[sectionId][v] = $('#' + v + '-data').DataTable(sectionOptions[v].datatable);
+                    if (sectionOptions[v].datatable.rowReorder) {
+                        // If rowReorder enabled
+                        tableData[sectionId][v].on('row-reorder', function() {
+                            that._rowReorderRedoSeq(tableData[sectionId][v], v);
+                            // that._rowReorderDatatableDataToObject(details, sectionId, fieldsetDatatable, v);
+                            tableData[sectionId][v].draw();
+                        });
+                    }
+                });
+
+                //Assign button click
+                $('#' + fieldsetDatatable + '-assign-button').click(function(e) {
+                    e.preventDefault();
+
+                    var datatable;
+
+                    if ($(sectionOptions[fieldsetDatatable + '-datatables']).length > 1) {
+                        datatable = $('#' + sectionOptions[fieldsetDatatable].dataTableSelector.id)[0].value;
+                    } else {
+                        datatable = sectionOptions[fieldsetDatatable + '-datatables'][0];
+                    }
+
+                    $('#' + fieldsetDatatable + '-fields').siblings().find('.has-error').removeClass('has-error has-feedback');//remove previous validation
+                    $('#' + fieldsetDatatable + '-fields').siblings().find('table').removeClass('border-danger').addClass('border-default');//remove previous validation
+                    $('#' + fieldsetDatatable + '-fields').siblings().find('.help-block').remove();//remove previous validation
+
+                    //Execute preExtraction script passed from the html(js script)
+                    if (sectionOptions[datatable].preExtraction) {
+                        sectionOptions[datatable].preExtraction(tableData[sectionId][datatable]);
+                    }
+
+                    extractDatatableFieldsData = that._extractDatatableFieldsData(fieldsetDatatable, datatable, false);
+
+                    //Execute postExtraction script passed from the html(js script)
+                    if (sectionOptions[datatable].postExtraction) {
+                        sectionOptions[datatable].postExtraction(tableData[sectionId][datatable], extractDatatableFieldsData);
+                    }
+
+                    var validated = that._validateForm(false, 'section', false, fieldsetDatatable + '-form');
+
+                    if (validated) {
+
+                        var rowAdded =
+                            that._addExtractFieldsToDatatable(null, extractDatatableFieldsData, fieldsetDatatable, datatable, false);
+
+                        if (rowAdded) {
+                            $('#' + fieldsetDatatable).find('.jstreevalidate').val('');
+
+                            // that._validateForm(false, 'sections', true, null);
+
+                            tableData[sectionId][datatable].responsive.recalc();
+
+                            that._registerDatatableButtons(
+                                tableData[sectionId][datatable],
+                                $('#' + datatable + '-div'),
+                                datatable,
+                                sectionId,
+                                fieldsetDatatable
+                            );
+
+                            // var table = tableData[sectionId][datatable];
+
+                            tableData[sectionId][datatable].on('responsive-display', function (showHide) {
+                                if (showHide) {
+                                    that._registerDatatableButtons(
+                                        tableData[sectionId][datatable],
+                                        $('#' + datatable + '-div'),
+                                        datatable,
+                                        sectionId,
+                                        fieldsetDatatable
+                                    );
+                                }
+                            });
+
+                            //Execute postSuccess script passed from the html(js script)
+                            if (sectionOptions[datatable].postSuccess) {
+                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable], extractDatatableFieldsData);
+                            }
+
+                            that._clearDatatableFormData(datatable, fieldsetDatatable);
+                        }
+                    }
+                });
+            };
+
+            //Extract Fields Datatable data
+            _proto._extractDatatableFieldsLabel = function(fieldsetDatatable, datatable) {
+                var extractedLabel = null;
+                extractedLabel = { };
+                var counter = 0;
+                dataTableFields[componentId][sectionId][datatable] = [];
+                $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
+                    if ($(v).data('bazscantype')) {
+                        if (!($(v).data('bazscantype') === 'tableSelector' || $(v).data('bazscantype') === 'dropzone')) {
+                            extractedLabel[counter] = { };
+                            if ($(v).data('bazscantype') === 'jstree') {//jstree
+                                extractedLabel[counter].labelName = $(v).parents('.form-group').children('label').text();
+                            } else if ($(v).data('bazscantype') === 'radio') {// icheck-radio
+                                extractedLabel[counter].labelName = $(v).children('label').text();
+                            } else if ($(v).data('bazscantype') === 'checkbox') {// icheck-checkbox
+                                if ($(v).siblings('label').text() === '') {
+                                    extractedLabel[counter].labelName = $(v).parents('.form-group').children('label').text();
+                                } else {
+                                    extractedLabel[counter].labelName = $(v).siblings('label').text();
+                                }
+                            } else {
+                                extractedLabel[counter].labelName = $(v).siblings('label').text();
+                            }
+                            dataTableFields[componentId][sectionId][datatable].push($(v)[0].id);
+                        }
+                    }
+                    counter++;
+                });
+                //Add buttons
+                if (sectionOptions[datatable].bazdatatable && sectionOptions[datatable].bazdatatable.rowButtons) {
+                    extractedLabel[counter] = { };
+                    extractedLabel[counter].labelName = 'ACTIONS';
+                    dataTableFields[componentId][sectionId][datatable].push(fieldsetDatatable + '-actions');
+                }
+                return extractedLabel;
+            };
+
+            //Extract Fields Datatable data
+            _proto._extractDatatableFieldsData = function(fieldsetDatatable, datatable, isEdit) {
+                var extractedFieldsData = null;
+                var extractedJstreeData = null;
+                var finalExtractedData = null;
+                extractedFieldsData = { };
+                extractedJstreeData = { };
+                finalExtractedData = { };
+                var counter = 0;
+
+                $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
+                    if ($(v).data('bazscantype')) {
+                        if (!($(v).data('bazscantype') === 'tableSelector' || $(v).data('bazscantype') === 'dropzone')) {
+                            extractedFieldsData[counter] = { };
+                            extractedFieldsData[counter].id = v.id;
+                            // extractedFieldsData[counter].data = $('#' + v.id); //Enable if you need all data
+
+                            if (v.tagName === 'INPUT' && v.type === 'checkbox') {
+                                if ($(v)[0].checked === true) {
+                                    extractedFieldsData[counter].extractedData = 'YES';
+                                } else {
+                                    extractedFieldsData[counter].extractedData = 'NO';
+                                }
+                            } else if (v.tagName === 'INPUT' || v.tagName === "TEXTAREA") {
+                                if ($(v)[0].value === 'undefined') {//kill if incorrect Data
+                                    that._error('data is undefined!');
+                                    return;
+                                } else {
+                                    extractedFieldsData[counter].extractedData = $(v)[0].value;
+                                }
+                            }
+                            if ($(v).data('bazscantype') === 'select2') {
+                                extractedFieldsData[counter].extractedData = null;
+                                $($(v)[0].selectedOptions).each(function(i,v){
+                                    if (!extractedFieldsData[counter].extractedData) {
+                                        extractedFieldsData[counter].extractedData = '<span id="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
+                                    } else {
+                                        extractedFieldsData[counter].extractedData = extractedFieldsData[counter].extractedData + '<span id="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
+                                    }
+                                });
+                            }
+                            if ($(v).data('bazscantype') === 'jstree') {//jstree
+                                var treeData = that._getJsTreeSelectedNodePath(fieldsetDatatable + '-form', $(v));
+                                extractedJstreeData[counter] = { };
+                                for (i = 0; i < Object.keys(treeData).length; i++) {
+                                    extractedJstreeData[counter][i] = { };
+                                    extractedJstreeData[counter][i].id = v.id;
+                                    extractedJstreeData[counter][i].extractedData = '<span id="' + treeData[i].id + '" data-jstreeId="' + treeData[i].jstreeId + '">' + treeData[i].path + '</span><br>';
+                                    extractedJstreeData[counter][i].absolutePath = treeData[i].path;
+                                    extractedJstreeData[counter][i].nodeName = treeData[i].nodeName;
+                                }
+                            }
+                            if ($(v).data('bazscantype') === 'radio') {// icheck-radio
+                                extractedFieldsData[counter].extractedData = $(v).find('input:checked').siblings('label').text();
+                            }
+                            if ($(v).data('bazscantype') === 'trumbowyg') {//trumbowyg
+                                extractedFieldsData[counter].extractedData = $(v).trumbowyg('html')
+                            }
+                            if ($(v).data('bazscantype') === 'html') {//HTML (as-is data)
+                                extractedFieldsData[counter].extractedData = $(v).html();
+                            }
+                            if ($(v).data('bazscantype') === 'seq') {//sequence
+                                extractedFieldsData[counter].extractedData = $(v).html();
+                            }
+                        }
+                        if ($(v).data('bazscantype') === 'tableSelector') {
+                            selectedTable = $(v).val();
+                            multiTable = true;
+                        }
+                    }
+                    counter++;
+                });
+
+                var rowId = 0;
+
+                if (isEdit && multiTable) {
+                    datatable = selectedTable;
+                }
+
+                if (datatable) {
+                    if (tableData[sectionId][datatable].row().count() >= 0) {
+                        rowId = tableData[sectionId][datatable].row().count() + 1;
+                    }
+
+                    if (Object.keys(extractedJstreeData).length > 0) {
+                        for (var jstreesData in extractedJstreeData) {
+                            for (var jstreeData in extractedJstreeData[jstreesData]) {
+                                finalExtractedData[jstreeData] = { };
+                                for (var fieldsData in extractedFieldsData) {
+                                    finalExtractedData[jstreeData][fieldsData] = extractedFieldsData[fieldsData];
+                                    if (fieldsData === jstreesData) {
+                                        finalExtractedData[jstreeData][fieldsData] = extractedJstreeData[jstreesData][jstreeData];
+                                    }
+                                    if (sectionOptions[datatable].bazdatatable.rowButtons) {
+                                        //Add Action Buttons
+                                        finalExtractedData[jstreeData][counter] = { };
+                                        finalExtractedData[jstreeData][counter].extractedData = rowId;
+                                        if (sectionOptions[datatable].bazdatatable.rowButtons.canDelete && !sectionOptions[datatable].bazdatatable.rowButtons.canEdit) {
+                                            finalExtractedData[0][counter].id = fieldsetDatatable + '-actions';
+                                            finalExtractedData[jstreeData][counter].extractedData =
+                                                '<button data-row-id="' + rowId +
+                                                '" type="button" class="btn btn-xs btn-danger float-right ml-1 tableDeleteButton"><i class="fa fas fa-fw text-xs fa-trash"></i></button>';
+                                        } else if (!sectionOptions[datatable].bazdatatable.rowButtons.canDelete && sectionOptions[datatable].bazdatatable.rowButtons.canEdit) {
+                                            finalExtractedData[0][counter].id = fieldsetDatatable + '-actions';
+                                            finalExtractedData[jstreeData][counter].extractedData = '<button data-row-id="' + rowId + '" type="button" class="btn btn-xs btn-primary float-right tableEditButton"><i class="fa fas fa-fw text-xs fa-edit"></i></button>';
+                                        } else if (sectionOptions[datatable].bazdatatable.rowButtons.canDelete && sectionOptions[datatable].bazdatatable.rowButtons.canEdit) {
+                                            finalExtractedData[0][counter].id = fieldsetDatatable + '-actions';
+                                            finalExtractedData[jstreeData][counter].extractedData = '<button data-row-id="' + rowId + '" type="button" class="btn btn-xs btn-danger float-right ml-1 tableDeleteButton"><i class="fa fas fa-fw text-xs fa-trash"></i></button>' +
+                                                                                    '<button data-row-id="' + rowId + '" type="button" class="btn btn-xs btn-primary float-right tableEditButton"><i class="fa fas fa-fw text-xs fa-edit"></i></button>';
+                                        }
+                                    }
+                                }
+                                rowId++;
+                            }
+                        }
+                    } else {//No JS Tree data extraction
+                        finalExtractedData[0] = { };
+                        for (var noJstree in extractedFieldsData) {
+                            finalExtractedData[0][noJstree] = extractedFieldsData[noJstree];
+                            if (sectionOptions[datatable].bazdatatable && sectionOptions[datatable].bazdatatable.rowButtons) {
+                                //Add Action Buttons
+                                finalExtractedData[0][counter] = { };
+                                finalExtractedData[0][counter].extractedData = rowId;
+                                if (sectionOptions[datatable].bazdatatable.rowButtons.canDelete && !sectionOptions[datatable].bazdatatable.rowButtons.canEdit) {
+                                    finalExtractedData[0][counter].id = fieldsetDatatable + '-actions';
+                                    finalExtractedData[0][counter].extractedData =
+                                    '<button data-row-id="' + rowId + '" type="button" class="btn btn-xs btn-danger float-right ml-1 tableDeleteButton"><i class="fa fas fa-fw text-xs fa-trash"></i></button>';
+                                } else if (!sectionOptions[datatable].bazdatatable.rowButtons.canDelete && sectionOptions[datatable].bazdatatable.rowButtons.canEdit) {
+                                    finalExtractedData[0][counter].id = fieldsetDatatable + '-actions';
+                                    finalExtractedData[0][counter].extractedData =
+                                    '<button data-row-id="' + rowId + '" type="button" class="btn btn-xs btn-primary float-right tableEditButton"><i class="fa fas fa-fw text-xs fa-edit"></i></button>';
+                                } else if (sectionOptions[datatable].bazdatatable.rowButtons.canDelete && sectionOptions[datatable].bazdatatable.rowButtons.canEdit) {
+                                    finalExtractedData[0][counter].id = fieldsetDatatable + '-actions';
+                                    finalExtractedData[0][counter].extractedData =
+                                    '<button data-row-id="' + rowId + '" type="button" class="btn btn-xs btn-danger float-right ml-1 tableDeleteButton"><i class="fa fas fa-fw text-xs fa-trash"></i></button>' +
+                                                                            '<button data-row-id="' + rowId + '" type="button" class="btn btn-xs btn-primary float-right tableEditButton"><i class="fa fas fa-fw text-xs fa-edit"></i></button>';
+                                }
+                            }
+                        }
+                        rowId++;
+                    }
+                    return finalExtractedData;
+                } else {
+                    return false;
+                }
+            };
+
+            //Add extracted fields data to datatable
+            _proto._addExtractFieldsToDatatable = function(rowIndex, extractDatatableFieldsData, fieldsetDatatable, datatable, isEdit) {
+                var migrateData = false;
+                var oldDataTable;
+                // Need to convert to array to add to datatable to merge them later to object and add values to datatable
+                var rowExtractedId = [];
+                var rowExtractedData = [];
+                var found = false;
+
+                if (isEdit && multiTable) {
+                    if (datatable !== selectedTable ){
+                        migrateData = true;
+                    }
+                    oldDataTable = datatable;
+                    datatable = selectedTable;
+                }
+
+                if (!isEdit && sectionOptions[datatable].datatable.rowReorder) {
+                    var seq = tableData[sectionId][datatable].rows().count();
+                    if (seq === 0) {
+                        seq = 1;
+                    } else {
+                        seq = seq + 1;
+                    }
+                    for (var dataRows in extractDatatableFieldsData) {
+                        var oldId = extractDatatableFieldsData[dataRows][0].id;
+                        extractDatatableFieldsData[dataRows][0] = { };
+                        extractDatatableFieldsData[dataRows][0].id = oldId;
+                        extractDatatableFieldsData[dataRows][0].extractedData = seq;
+                        seq++;
+                    }
+                }
+
+                for (var rows in extractDatatableFieldsData) {
+                    rowExtractedData[rows] = [];
+                    rowExtractedId[rows] = [];
+                    for (var row in extractDatatableFieldsData[rows]) {
+                        rowExtractedData[rows].push(extractDatatableFieldsData[rows][row].extractedData);//to datatable
+                        rowExtractedId[rows].push(extractDatatableFieldsData[rows][row].id);
+                    }
+                }
+
+                if (sectionOptions[datatable].bazdatatable && sectionOptions[datatable].bazdatatable.compareData) {
+                    if (tableData[sectionId][datatable].rows().count() > 0) {
+
+                        $('#' + datatable).children().find('tbody tr').removeClass('animated fadeIn bg-warning');
+                        $('#' + datatable).children().find('tbody tr').children().removeClass('animated fadeIn bg-warning');
+
+                        found =
+                            that._compareData(
+                                sectionOptions[datatable].bazdatatable.compareData,
+                                extractDatatableFieldsData,
+                                tableData[sectionId][datatable].rows().data(),
+                                rowIndex,
+                                datatable
+                            );
+                    }
+                }
+
+                if (found) {
+                    PNotify.notice({
+                        title: 'Input data already exists in table!'
+                    });
+
+                    pnotifySound.play();
+
+                    return false;
+                } else {
+                    if (rowIndex !== null) {//rowIndex is from editDatatableRow
+                        if (!migrateData) {
+                            $(rowExtractedData).each(function(i,v) {
+                                tableData[sectionId][datatable].row(rowIndex).data(v).draw();
+                            });
+                        } else {
+                            tableData[oldDataTable].row(rowIndex).remove().draw();
+                            $(rowExtractedData).each(function(i,v) {
+                                var drawnRow = tableData[sectionId][datatable].row.add(v).draw().node();
+                                $(drawnRow).children('td').addClass('pb-1 pt-1');
+                            });
+                            // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, oldDataTable);
+                            that._tableDataToObj();
+                            that._registerDatatableButtons(
+                               tableData[oldDataTable],
+                               $('#' + datatable + '-div'),
+                               datatable,
+                               sectionId,
+                               fieldsetDatatable
+                            );
+                        }
+                        that._registerDatatableButtons(
+                           tableData[sectionId][datatable],
+                           $('#' + datatable + '-div'),
+                           datatable,
+                           sectionId,
+                           fieldsetDatatable
+                        );
+                        rowIndex = null;
+                    } else {//add new row
+                        $(rowExtractedData).each(function(i,v) {
+                            var drawnRow = tableData[sectionId][datatable].row.add(v).draw().node();
+                            $(drawnRow).children('td').addClass('pb-1 pt-1');
+                        });
+                        that._registerDatatableButtons(
+                           tableData[sectionId][datatable],
+                           $('#' + datatable + '-div'),
+                           datatable,
+                           sectionId,
+                           fieldsetDatatable
+                        );
+                    }
+                    //Add data to object
+                    // this._addEditDatatableDataToObject(rowIndex, rowExtractedId, rowExtractedData, fieldsetDatatable, sectionId, datatable);
+                    that._tableDataToObj();
+                    return true;
+                }
+            };
+
+            //Edit table Row
+            _proto._editDatatableRow = function(fieldsetDatatable, rowIndex, rowData, datatable) {
+                var fieldsetFields = [];
+                if ($(sectionOptions[fieldsetDatatable + '-datatables']).length > 1) {
+                    $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
+                        if (!($(v).data('bazscantype') === 'tableSelector' || $(v).data('bazscantype') === 'dropzone')) {
+                            fieldsetFields.push($(v));
+                        }
+                    });
+                    $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {// Selector is always in the end.
+                        if (($(v).data('bazscantype') === 'tableSelector')) {
+                            fieldsetFields.push($(v));
+                        }
+                    });
+                } else {
+                    fieldsetFields = $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]');
+                }
+
+                $(fieldsetFields).each(function(i,v) {
+                    if ($(v).data('bazscantype')) {
+                        if ($(v).data('bazscantype') === 'seq') {
+                            $(v).html(rowData[i]);
+                        } else if ($(v).data('bazscantype') !== 'html') {
+                            if (v.tagName === 'INPUT' && v.type === 'checkbox') {
+                                if (rowData[i] === 'YES') {
+                                    $(v).prop('checked', true);
+                                } else if (rowData[i] === 'NO') {
+                                    $(v).prop('checked', false);
+                                }
+                            } else if (v.tagName === 'INPUT' || v.tagName === 'TEXTAREA') {
+                                $(v).val(rowData[i]);
+                            }
+                            if (v.tagName === "SELECT" && $(v).data('bazscantype') !== 'tableSelector') {//Select2
+                                if (rowData[i]) {
+                                    var selectarr = rowData[i].split('<br>');
+                                    var selectArr = [];
+                                    $(selectarr).each(function(i,v) {
+                                        if (v !== "") {
+                                            var extractIds = v.match(/(["'])(?:(?=(\\?))\2.)*?\1/g); //match double or single quotes
+                                            selectArr.push(extractIds[0].replace(/"/g, ''));
+                                        }
+                                    });
+                                    $(v).val(selectArr);
+                                    $(v).trigger('change');
+                                }
+                            }
+                            if (v.tagName === "SELECT" && $(v).data('bazscantype') === 'tableSelector') {
+                                $(v).val(datatable);
+                                $(v).trigger('change');
+                            }
+                            if (v.tagName === 'DIV') {
+                                if ($(v).data('bazscantype') === 'jstree') {//jstree
+                                    if (rowData[i]) {
+                                        var jstreearr = rowData[i].split('<br>');
+                                        var jstreeArr = [];
+                                        $(jstreearr).each(function(i,v) {
+                                            if (v !== "") {
+                                                var extractJstreeId = v.match(/data-jstreeId=".*"/g);
+                                                var extractIds = extractJstreeId[0].match(/(["'])(?:(?=(\\?))\2.)*?\1/g); //match double or single quotes
+                                                jstreeArr.push(extractIds[0].replace(/"/g, ''));
+                                            }
+                                        });
+                                        $(v).jstree('select_node', jstreeArr);
+                                    }
+                                }
+                                if ($(v).data('bazscantype') === 'radio') {//radio
+                                    $(v).find('input').each(function() {
+                                        if (rowData[i] === $(this).siblings('label').text()) {
+                                            $(this).prop('checked', true);
+                                        } else {
+                                            $(this).prop('checked', false);
+                                        }
+                                    });
+                                }
+                                if ($(v).data('bazscantype') === 'trumbowyg') {//trumbowyg
+                                    $(v).trumbowyg('html', rowData[i]);
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Enable cancel/update button.
+                $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', false);
+                $('#' + fieldsetDatatable + '-update-button').attr('hidden', false);
+                $('#' + fieldsetDatatable + '-assign-button').attr('hidden', true);
+                // Then we extract data again, Compare again, Update data
+                $('#' + fieldsetDatatable + '-update-button').off();
+                $('#' + fieldsetDatatable + '-update-button').click(function(e) {
+                    e.preventDefault();
+
+                    var validated = that._validateForm(false, 'section', false, fieldsetDatatable + '-form');
+
+                    if (validated) {
+                        extractDatatableFieldsData = that._extractDatatableFieldsData(fieldsetDatatable, datatable, true);
+                        var rowAdded =
+                            that._addExtractFieldsToDatatable(
+                                rowIndex,
+                                extractDatatableFieldsData,
+                                fieldsetDatatable,
+                                datatable,
+                                true
+                            );
+                        if (rowAdded) {
+                            //Execute postSuccess script passed from the html(js script)
+                            if (sectionOptions[datatable].postSuccess) {
+                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable], extractDatatableFieldsData);
+                            }
+                        }
+                        that._clearDatatableFormData(datatable, fieldsetDatatable);
+                    }
+                    // Hide cancel/update button.
+                    $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
+                    $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
+                    $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
+                });
+                $('#' + fieldsetDatatable + '-cancel-button').off();
+                $('#' + fieldsetDatatable + '-cancel-button').click(function() {
+                    // Hide cancel/update button.
+                    $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
+                    $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
+                    $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
+                    that._clearDatatableFormData(datatable, fieldsetDatatable);
+                });
+            };
+
+            //Compare extracted fields data with data already in table
+            _proto._compareData = function(compareData, inputData, currentTableData, rowIndexToExcl, datatable) {
+
+                var foundRow, foundColumn;
+                var excludeActions = false;
+                var excludeSeqAndSort = false;
+
+                if ((sectionOptions[datatable].bazdatatable.rowButtons.canDelete === true) ||
+                    (sectionOptions[datatable].bazdatatable.rowButtons.canEdit === true)) {
+                    excludeActions = true;
+                }
+
+                if (sectionOptions[datatable].datatable.rowReorder === true) {
+                    excludeSeqAndSort = true;
+                }
+
+                if (!compareData.inclIds &&
+                    !compareData.exclIds &&
+                    (compareData === 'rows' || compareData === 'columns')
+                   ) {
+                    for (var a = 0; a < currentTableData.length; a++) {
+                        if (a !== rowIndexToExcl) {
+                            for (var aInputData in inputData) {
+                                var compareAllData = compareAll(compareData, inputData[aInputData], currentTableData[a]);
+
+                                if (compareAllData !== false) {
+                                    if (compareData === 'rows') {
+                                        foundRow = $('#' + datatable).find('tbody tr')[a];
+                                        $(foundRow).addClass('animated fadeIn bg-warning');
+                                    } else if (compareData === 'columns') {
+                                        foundColumn =
+                                            $($('#' + datatable).find('tbody tr')[a]).find('td')[compareAllData];
+                                        $(foundColumn).addClass('animated fadeIn bg-warning');
+                                    }
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                } else if (compareData.inclIds && Object.keys(compareData.inclIds).length > 0) {
+                    for (var b = 0; b < currentTableData.length; b++) {
+                        if (b !== rowIndexToExcl) {
+                            for (var bInputData in inputData) {
+                                if (compareOnlyInclIds(compareData.inclIds, inputData[bInputData], currentTableData[b])) {
+                                    foundRow = $('#' + datatable).find('tbody tr')[b];
+                                    $(foundRow).addClass('animated fadeIn bg-warning');
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                } else if (compareData.exclIds && Object.keys(compareData.exclIds).length > 0) {
+                    for (var c = 0; c < currentTableData.length; c++) {
+                        if (c !== rowIndexToExcl) {
+                            for (var cInputData in inputData) {
+                                if (compareAllMinusExclIds(compareData.exclIds, inputData[cInputData], currentTableData[c])) {
+                                    foundRow = $('#' + datatable).find('tbody tr')[c];
+                                    $(foundRow).addClass('animated fadeIn bg-warning');
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    return false;
+                } else {
+                    return false;
+                }
+
+                function compareAll(compareData, inputData, currentTableData) {
+                    var currentTableDataLength = 0;
+                    var startAt = 0;
+
+                    if (excludeSeqAndSort && excludeActions) {
+                        currentTableDataLength = currentTableData.length - 3;
+                        startAt = 2;
+                    } else if (!excludeSeqAndSort && excludeActions) {
+                        currentTableDataLength = currentTableData.length - 1;
+                    } else if (excludeSeqAndSort && !excludeActions) {
+                        currentTableDataLength = currentTableData.length - 2;
+                        startAt = 2;
+                    }
+
+                    if (compareData === 'rows') {
+                        var match = [];
+                        for (var i = 0; i < currentTableDataLength; i++) {
+                            if (currentTableData[startAt] === inputData[startAt].extractedData) {
+                                match[i] = 'true';
+                            } else {
+                                match[i] = 'false';
+                            }
+                            startAt++;
+                        }
+
+                        if ($.inArray('false', match) === -1) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } else if (compareData === 'columns') {
+                        for (var j = 0; j < currentTableDataLength; j++) {
+                            if (currentTableData[startAt] === inputData[startAt].extractedData) {
+                                return startAt;
+                            }
+                            startAt++;
+                        }
+                        return false;
+                    }
+                }
+
+                function compareOnlyInclIds(inclIds, inputData, currentTableData) {
+                    var inclIdsArray = [];
+                    var uniqueData = { };
+                    var uniqueDataFound = [];
+                    var found = [];
+                    var currentTableDataLength = 0;
+                    var startAt = 0;
+                    if (excludeSeqAndSort && excludeActions) {
+                        currentTableDataLength = currentTableData.length - 3;
+                        startAt = 2;
+                    } else if (!excludeSeqAndSort && excludeActions) {
+                        currentTableDataLength = currentTableData.length - 1;
+                    } else if (excludeSeqAndSort && !excludeActions) {
+                        currentTableDataLength = currentTableData.length - 2;
+                        startAt = 2;
+                    }
+                    for (var inclId in inclIds) {
+                        for (var sweepInclIds in inputData) {
+                            if (inclId === inputData[sweepInclIds].id) {
+                                if (inclIds[inclId].length >= 0) {
+                                    uniqueData[sweepInclIds] = [];
+                                    for (var uniqueInclId in inclIds[inclId]) {
+                                        uniqueData[sweepInclIds].push(inclIds[inclId][uniqueInclId]);
+                                    }
+                                }
+                                inclIdsArray.push(Number(sweepInclIds));
+                                break;
+                            }
+                        }
+                    }
+                    for (var i = 0; i < currentTableDataLength; i++) {
+                        var foundInclId = null;
+                        foundInclId = $.inArray(startAt,inclIdsArray);
+                        if (foundInclId !== -1) {
+                            if (currentTableData[startAt] === inputData[startAt].extractedData) {
+                                if (uniqueData[startAt].length > 0 ) {
+                                    for (var j = 0; j < uniqueData[startAt].length; j++) {
+                                        if (uniqueData[startAt][j] === inputData[startAt].extractedData) {
+                                            uniqueDataFound.push('true');
+                                        }
+                                    }
+                                } else {
+                                    found.push('true');
+                                }
+                            }
+                        }
+                        startAt++;
+                    }
+                    if (found.length === Object.keys(inclIds).length) {
+                        return true;
+                    } else if (uniqueDataFound.length > 0) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+
+                function compareAllMinusExclIds(exclIds, inputData, currentTableData) {
+                    var exclIdsArray = [];
+                    var currentTableDataLength = 0;
+                    var startAt = 0;
+                    if (excludeSeqAndSort && excludeActions) {
+                        currentTableDataLength = currentTableData.length - 3;
+                        startAt = 2;
+                    } else if (!excludeSeqAndSort && excludeActions) {
+                        currentTableDataLength = currentTableData.length - 1;
+                    } else if (excludeSeqAndSort && !excludeActions) {
+                        currentTableDataLength = currentTableData.length - 2;
+                        startAt = 2;
+                    }
+                    for (var exclId in exclIds) {
+                        for (var sweepExclIds in inputData) {
+                            if (exclId === inputData[sweepExclIds].id) {
+                                exclIdsArray.push(Number(sweepExclIds));
+                                break;
+                            }
+                        }
+                    }
+                    for (var i = 0; i < currentTableDataLength; i++) {
+                        var foundExclId = null;
+                        foundExclId = $.inArray(startAt,exclIdsArray);
+                        if (foundExclId === -1) {
+                            if (currentTableData[startAt] === inputData[startAt].extractedData) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                        startAt++;
+                    }
+                }
+            };
+
+            _proto._rowReorderRedoSeq = function(table, datatable) {
+                var redoSeq = 1;
+                $('#' + datatable).find('td.reorder').each(function() {
+                    $(this).html(redoSeq);
+                    redoSeq++;
+                });
+            };
+
+            //Register table row edit and delete buttons
+            _proto._registerDatatableButtons = function(table, el, datatable, sectionId, fieldsetDatatable) {
+                var rowIndex, rowData;
+                $(el).find('table').each(function() {
+                    $(this).find('.tableDeleteButton').each(function() {
+                        $(this).off();
+                        $(this).click(function() {
+                            if ($(this).closest('tr').hasClass('child')) {
+                                rowIndex = table.row($(this).closest('tr').prev('tr')).index();
+                                table.row($(this).closest('tr').prev('tr')).remove().draw();
+                                that._rowReorderRedoSeq(table, datatable);
+                                // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, datatable);
+                                that._tableDataToObj();
+                                that._clearDatatableFormData(datatable, fieldsetDatatable);
+                            } else {
+                                rowIndex = table.row($(this).closest('tr')).index();
+                                table.row($(this).parents('tr')).remove().draw();
+                                that._rowReorderRedoSeq(table, datatable);
+                                // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, datatable);
+                                that._tableDataToObj();
+                                that._clearDatatableFormData(datatable, fieldsetDatatable);
+                            }
+                            that._registerDatatableButtons(table, el, datatable, sectionId, fieldsetDatatable);
+                            //Execute postSuccess script passed from the html(js script)
+                            if (sectionOptions[datatable].postSuccess) {
+                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable]);
+                            }
+                            // Hide cancel/update button.
+                            $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
+                            $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
+                            $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
+
+                            $('body').trigger('formToDatatableTableRowDelete');
+
+                            if ($('#' + fieldsetDatatable + '-table-data tbody tr td.dataTables_empty').length === 1) {
+                                $('body').trigger('formToDatatableTableEmpty');
+                            }
+                        });
+                    });
+                    $(this).find('.tableEditButton').each(function() {
+                        $(this).off();
+                        $(this).click(function() {
+                            if ($(this).closest('tr').hasClass('child')) {
+                                rowIndex = table.row($(this).closest('tr').prev('tr')).index();
+                                rowData = table.row($(this).closest('tr').prev('tr')).data();
+                            } else {
+                                rowIndex = table.row($(this).closest('tr')).index();
+                                rowData = table.row($(this).closest('tr')).data();
+                            }
+                            // var popActions = rowData.pop();//get rid of actions
+                            that._clearDatatableFormData(datatable, fieldsetDatatable);
+                            that._editDatatableRow(fieldsetDatatable, rowIndex, rowData, datatable);
+                            //Execute onEdit script passed from the html(js script)
+                            if (sectionOptions[datatable].onEdit) {
+                                sectionOptions[datatable].onEdit(tableData[sectionId][datatable]);
+                            }
+                            $('body').trigger('formToDatatableTableRowEdit');
+                        });
+                    });
+                });
+            };
+
+            //Clear form data on success insertion
+            _proto._clearDatatableFormData = function(datatable, fieldsetDatatable) {
+                var fieldsToClear;
+                if (sectionOptions[datatable].bazdatatable.keepFieldsData) {
+                    var fieldsToKeep = sectionOptions[datatable].bazdatatable.keepFieldsData;
+                }
+                var allFields = [];
+                $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
+                    allFields.push($(v)[0].id);
+                });
+
+                if (fieldsToKeep && fieldsToKeep.length > 0) {
+                    fieldsToClear = $(allFields).not(sectionOptions[datatable].bazdatatable.keepFieldsData).get();//diff array
+                } else if (fieldsToKeep && fieldsToKeep.length === 0) {
+                    fieldsToClear = null;
+                } else {
+                    fieldsToClear = allFields;
+                }
+
+                if (fieldsToClear) {
+                    $.each(fieldsToClear, function(i,v) {
+                        v = '#' + v;
+                        if ($(v).data('bazscantype')) {
+                            if ($(v)[0].tagName === 'INPUT' && $(v)[0].type === 'checkbox') {
+                                $(v).prop('checked', $(v).prop('defaultChecked'));
+                            } else if ($(v)[0].tagName === 'INPUT' || $(v)[0].tagName === 'TEXTAREA') {
+                                $(v).val('');
+                            }
+                            if ($(v)[0].tagName === "SELECT") {//select2
+                                $(v).val(null).trigger('change');
+                            }
+                            if ($(v)[0].tagName === 'DIV') {
+                                if ($(v).data('bazscantype') === 'jstree') {//jstree
+                                    $(v).jstree('deselect_all');
+                                }
+                                if ($(v).data('bazscantype') === 'radio') {//radio
+                                    if ($(v).find('input[checked]').length !== 0) {
+                                        $(v).find('input[checked]').prop('checked', true);
+                                    } else {
+                                        $(v).find('input').each(function(i,v) {
+                                            $(v).prop('checked', false);
+                                        });
+                                    }
+                                }
+                                if ($(v).data('bazscantype') === 'trumbowyg') {//trumbowyg
+                                    $(v).trumbowyg('empty');
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+
+            // Add tables data to dataCollection
+            _proto._tableDataToObj = function()
+            {
+                // for (var sectionId in tableData) {
+                    for (var data in tableData[sectionId]) {
+                        var excludeActions = false;
+                        var excludeSeqAndSort = false;
+                        var currentTableDataLength = 0;
+
+                        if ((sectionOptions[data].bazdatatable.rowButtons.canDelete === true) ||
+                            (sectionOptions[data].bazdatatable.rowButtons.canEdit === true)
+                        ) {
+                            excludeActions = true;
+                        }
+
+                        if (sectionOptions[data].datatable.rowReorder === true) {
+                            excludeSeqAndSort = true;
+                        }
+
+                        dataCollection[componentId][sectionId][data]['data'] = [];
+
+                        $.each(tableData[sectionId][data].rows().data(), function(i,v) {
+                            var startAt = 0;
+                            if (excludeSeqAndSort && excludeActions) {
+                                currentTableDataLength = v.length - 3;
+                                startAt = 2;
+                            } else if (!excludeSeqAndSort && excludeActions) {
+                                currentTableDataLength = v.length - 1;
+                            } else if (excludeSeqAndSort && !excludeActions) {
+                                currentTableDataLength = v.length - 2;
+                                startAt = 2;
+                            }
+                            var thatI = i;
+                            dataCollection[componentId][sectionId][data]['data'][i] = { };
+                            for (var j = 0; j < currentTableDataLength; j++) {
+                                var columnData;
+                                var columnDataHasId = v[startAt].match(/id="(.*?)"/g)
+                                if (columnDataHasId) {
+                                    columnData = (columnDataHasId.toString().match(/"(.*?)"/g)).toString().replace(/"/g, '');
+                                } else {
+                                    columnData = v[startAt];
+                                }
+                                dataCollection[componentId][sectionId][data]['data'][thatI][dataTableFields[componentId][sectionId][data][startAt]] = columnData;
+                                startAt++;
+                            }
+                        });
+                    }
+                // }
+            }
+
+            BazContentSectionWithFormToDatatable._jQueryInterface = function _jQueryInterface(options) {
+                dataCollection = window['dataCollection'];
+                componentId = $(this).parents('.component')[0].id;
+                sectionId = $(this)[0].id;
+
+                dataCollection[componentId][sectionId]['BazContentSectionWithFormToDatatable'] = $(this).data(DATA_KEY);
+                options = $.extend({}, Default, options);
+
+                if (!dataCollection[componentId][sectionId]['BazContentSectionWithFormToDatatable']) {
+                    dataCollection[componentId][sectionId]['BazContentSectionWithFormToDatatable'] = new BazContentSectionWithFormToDatatable($(this), options);
+                    $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
+                    dataCollection[componentId][sectionId]['BazContentSectionWithFormToDatatable']._init(options);
+                } else {
+                    delete dataCollection[componentId][sectionId]['BazContentSectionWithFormToDatatable'];
+                    dataCollection[componentId][sectionId]['BazContentSectionWithFormToDatatable'] = new BazContentSectionWithFormToDatatable($(this), options);
+                    $(this).data(DATA_KEY, typeof options === 'string' ? 'options need to be an object and not string' : options);
+                    dataCollection[componentId][sectionId]['BazContentSectionWithFormToDatatable']._init(options);
+                }
+            };
+
+        return BazContentSectionWithFormToDatatable;
+
+        }();
+
+    $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
+        $('body').find('.sectionWithFormToDatatable').each(function() {
+            // if ($(this).data('bazdevmodetools') === 'false' ||
+            //     $(this).data('bazdevmodetools') === false) {
+                BazContentSectionWithFormToDatatable._jQueryInterface.call($(this));
+            // }
+        });
+    });
+
+    $.fn[NAME] = BazContentSectionWithFormToDatatable._jQueryInterface;
+    $.fn[NAME].Constructor = BazContentSectionWithFormToDatatable;
+
+    $.fn[NAME].noConflict = function () {
+        $.fn[NAME] = JQUERY_NO_CONFLICT;
+        return BazContentSectionWithFormToDatatable._jQueryInterface;
+    };
+
+    return BazContentSectionWithFormToDatatable;
+}(jQuery);
+
+exports.BazContentSectionWithFormToDatatable = BazContentSectionWithFormToDatatable;
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+}));
+/* globals define exports BazContentLoader Swal PNotify */
 /*
 * @title                    : BazContentSectionWithListing
 * @description              : Baz Lib for Content (Sections With Form)
@@ -4514,20 +5655,23 @@ Object.defineProperty(exports, '__esModule', { value: true });
         // var Selector = {
         // };
         var Default = {
-            task                    : null
+            task     : null
         };
         var dataCollection,
             componentId,
             sectionId,
             pnotifySound,
             classes,
+            that,
+            thisOptions,
+            datatableOptions,
             swalSound;
         var listColumns = { };
-            // that;
+        var query = '';
 
         var BazContentSectionWithListing = function () {
             function BazContentSectionWithListing(element, settings) {
-                // that = this;
+                that = this;
                 this._element = element;
                 this._settings = settings;
             }
@@ -4554,14 +5698,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
 
                 if ($(this._element).is('.sectionWithListingFilter')) {
-                    $(this._element).BazContentFields();
-
-                    BazContentFieldsValidator.initValidator({
-                        'componentId'   : componentId,
-                        'sectionId'     : sectionId,
-                        'on'            : 'section'
-                    });
-
                     this._buildListingFilters(options);
                 }
 
@@ -4572,41 +5708,137 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
             //Build listing filters
             _proto._buildListingFilters = function() {
+                $(this._element).BazContentSectionWithFormToDatatable();
 
-                //Buttons
+                //Filter Buttons
                 $('#' + sectionId + '-filters').change(function() {
-                    if ($('#' + sectionId + '-filters option:selected').val() === "0") {
 
-                        $('#' + sectionId + '-edit, ' +
-                          '#' + sectionId + '-delete, ' +
-                          '#' + sectionId + '-share, ' +
-                          '#' + sectionId + '-apply'
+                    if ($('#' + sectionId + '-filter-filters option:selected').val() === "0") {
+
+                        $('#' + sectionId + '-filter-edit, ' +
+                          '#' + sectionId + '-filter-delete, ' +
+                          '#' + sectionId + '-filter-share, ' +
+                          '#' + sectionId + '-filter-apply-saved'
                         ).attr("disabled", true);
 
                     } else {
-                        $('#' + sectionId + '-apply').attr("disabled", false);
+                        $('#' + sectionId + '-filter-apply-saved').attr("disabled", false);
 
-                        if ($('#' + sectionId + '-filters option:selected').data('permission') === 0) {
-                            $('#' + sectionId + '-edit, ' +
-                              '#' + sectionId + '-delete, ' +
-                              '#' + sectionId + '-share'
+                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0) {
+                            $('#' + sectionId + '-filter-edit, ' +
+                              '#' + sectionId + '-filter-delete, ' +
+                              '#' + sectionId + '-filter-share'
                             ).attr("disabled", true);
 
-                        } else if ($('#' + sectionId + '-filters option:selected').data('permission') === 1) {
+                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) {
                             //User
-                            $('#' + sectionId + '-edit, ' +
-                              '#' + sectionId + '-delete, ' +
-                              '#' + sectionId + '-share'
+                            $('#' + sectionId + '-filter-edit, ' +
+                              '#' + sectionId + '-filter-delete, ' +
+                              '#' + sectionId + '-filter-share'
                             ).attr("disabled", false);
                         }
                     }
                 });
 
-                //Add
+                //Apply-Saved
+                $('#' + sectionId + '-apply-saved').click(function() {
+                    if ($('#' + sectionId + '-filter-filters option:selected').val() !== "0") {
+                        query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+
+                        $('#' + sectionId + '-filter-modal').modal('hide');
+
+                        that._filterRunAjax(
+                            1,
+                            datatableOptions.paginationCounters.limit,
+                            query
+                        );
+                    }
+                });
+
+                //Reset
+                $('#' + sectionId + '-reset').click(function() {
+                    query = '';
+
+                    that._filterRunAjax(
+                        1,
+                        datatableOptions.paginationCounters.limit,
+                        query
+                    );
+                });
+
+                //Close Modal
+                $('#' + sectionId + '-cancel').click(function() {
+                    $('#' + sectionId + '-filter-modal').modal('hide');
+                });
+
+                //Add / Open Modal
                 $('#' + sectionId + '-add').click(function() {
                     $('#' + sectionId + '-filter-modal').modal('show');
                 });
 
+                //Edit / Open Modal
+                $('#' + sectionId + '-edit').click(function() {
+                    $('#' + sectionId + '-filter-modal').modal('show');
+                });
+
+                // Add Numeric for numberic fields
+                $('#' + sectionId + '-field').children().each(function(index, field) {
+                    if ($(field).data()['number'] == true) {
+                        var html = $(field).html();
+                        $(field).html(html + ' (Numeric)');
+                    }
+                });
+
+                //Enable/Disable Operators as per field type (numeric/alphanumeric)
+                $('#' + sectionId + '-field').on('select2:select', function(e) {
+
+                    var options = $('#' + sectionId + '-filter-operator').children();
+
+                    if ($(e.params.data.element).data()['number'] == true) {
+                        options.each(function(index, option) {
+                            $(option).attr('disabled', false);
+                        });
+                        $('#' + sectionId + '-filter-value').attr('pattern', "([0-9]+.{0,1}[0-9]*,{0,1})*[0-9]");
+
+                    } else if ($(e.params.data.element).data()['number'] == false) {
+                        options.each(function(index, option) {
+                            if ($(option).val() === 'lessthan' ||
+                                $(option).val() === 'lessthanequals' ||
+                                $(option).val() === 'greaterthan' ||
+                                $(option).val() === 'greaterthanequals'
+                            ) {
+                                $(option).attr('disabled', true);
+                            } else {
+                                $(option).attr('disabled', false);
+                            }
+                        });
+                        $('#' + sectionId + '-filter-value').attr('pattern', "");
+                    }
+
+                    $('#' + sectionId + '-filter-operator').trigger('change');
+                });
+
+                //Enable/Disable value field on empty/notempty operator
+                $('#' + sectionId + '-operator').on('select2:select', function(e) {
+                    if ($(e.params.data.element).val() === 'empty' ||
+                        $(e.params.data.element).val() === 'notempty'
+                    ) {
+                        $('#' + sectionId + '-filter-value').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-value').attr('disabled', false);
+                    }
+                });
+                $('body').on('formToDatatableTableRowEdit', function() {
+                    if ($('#' + sectionId + '-filter-operator').val() === 'empty' ||
+                        $('#' + sectionId + '-filter-operator').val() === 'notempty'
+                    ) {
+                        $('#' + sectionId + '-filter-value').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-value').attr('disabled', false);
+                    }
+                });
+
+                //Add Save
                 $('#' + sectionId + '-name').keyup(function() {
                     if ($(this).val() !== '') {
                         $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', false);
@@ -4615,16 +5847,71 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
                 });
 
-                //Add Save
-                //Add Apply (Temp)
+                //Adding to table
+                $('#' + sectionId + '-assign-button').click(function() {
+                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
+                    }
 
-                //Edit
-                //Edit Save
+                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
+                    $('#' + sectionId + '-filter-value').attr('disabled', false);
+                });
+
+                //For last Row - Remove And/Or
+                $('body').on('formToDatatableTableRowDelete', function() {
+                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
+
+                        $('#' + sectionId + '-filter-name').attr('disabled', true);
+                        $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
+                    }
+                });
+
+                //Add Apply (Temp) & Close Modal
+                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function() {
+                    var tableData =
+                        dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'];
+
+                    //eslint-disable-next-line
+                    console.log(tableData);
+
+                    $.each(tableData, function(index, data) {
+                        if (index === 0) {
+                            query +=
+                                '-:' +
+                                data['admin-users-listing-filter-field'] + ':' +
+                                data['admin-users-listing-filter-operator'] + ':' +
+                                data['admin-users-listing-filter-value'] + '&';
+                        } else {
+                            query +=
+                                data['admin-users-listing-filter-andor'] + ':' +
+                                data['admin-users-listing-filter-field'] + ':' +
+                                data['admin-users-listing-filter-operator'] + ':' +
+                                data['admin-users-listing-filter-value']
+                                + '&';
+                        }
+                    });
+
+                    //eslint-disable-next-line
+                    console.log(query);
+                    $('#' + sectionId + '-filter-modal').modal('hide');
+                    that._filterRunAjax(
+                        1,
+                        datatableOptions.paginationCounters.limit,
+                        query
+                    );
+                    // that._updateCounters();
+                });
+
+                //Save and Apply & Close Modal
 
                 //Delete
 
                 //Share
+
                 //Select Guid and Uids
+                // Need to create share modal
             }
 
             //Build listing datatable
@@ -4642,10 +5929,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     } );
                 };
 
-                var thisOptions = dataCollection[componentId][sectionId];
+                thisOptions = dataCollection[componentId][sectionId];
                 listColumns[thisOptions.listOptions.tableName] = [];
 
-                var datatableOptions = thisOptions.listOptions.datatable;
+                datatableOptions = thisOptions.listOptions.datatable;
                 datatableOptions.columns = JSON.parse(datatableOptions.columns);
 
                 var selectOptions, dom, showHideExportButton, showHideColumnsButton;
@@ -4846,6 +6133,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                                         },
                                         zeroRecords     : datatableOptions.zeroRecords,
                                         infoEmpty       : 'No entries found',
+                                        infoFiltered    : ' - filtered from _MAX_ shown entries',
                                         searchPlaceholder: 'Search shown ' + thisOptions.listOptions.componentName + '...',
                                         select          : {
                                             rows    : {
@@ -4877,413 +6165,232 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         });
                                     },
                     drawCallback    : function() {
-                                        drawCallback();
+                                        that._drawCallback();
                                     }
                 });
 
                 if (thisOptions.listOptions.postUrl) {
-                    runDatatableAjax(thisOptions.listOptions.postParams);
+                    that._runDatatableAjax(thisOptions.listOptions.postParams);
                 } else {
                     // Enable paging if data is more than 20 on static datatable
-                    if (datatableOptions.pagination && datatableOptions.paginationCounters.total_items > 20) {
+                    if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
                         $.extend(thisOptions.listOptions.datatable, {
                             paging : true,
                         });
                     }
                     $('#list-data-loader').hide();
-                    tableInit(false);
-                    registerEvents();
+                    that._tableInit(false);
+                    that._registerEvents();
                 }
+            }
 
-                function runDatatableAjax(postData, reDraw) {
-                    var url = thisOptions.listOptions.postUrl;
-                    $.ajax({
-                        url         : url,
-                        method      : 'post',
-                        dataType    : 'json',
-                        data        : postData,
-                        success     : function(data) {
-                            $('#list-data-loader').hide();
-                            $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
-                        }
-                    }).done(function() {
-                        tableInit(reDraw);
-                        registerEvents();
-                    });
-                        // TODO: fix card-body height when more rows are loaded.
-                        // TODO: BULK Edit/Delete
-                        //     // tableData[sectionId].buttons().container().appendTo('#products-list-buttons .col-sm-6:eq(0)');
-                        //     // that.fixHeight('fixedHeight');
-                        //     // $('#' + sectionId + '-list-table').on('length.dt', function() {
-                        //     //     that.fixHeight('fixedHeight');
-                        //     // });
-                        //     // $('#' + sectionId + '-filter').on('collapsed.boxwidget expanded.boxwidget', function() {
-                        //     //     that.fixHeight('fixedHeight');
-                        //     // });
-                        //     // $('#' + sectionId + '-filter-filters-apply').click(function() {
-                        //     //     $('#' + sectionId + '-filter .box').trigger('collapse.boxwidget');
-                        //     //     that.fixHeight('fixedHeight');
-                        //     // });
-                        //     // $('#' + sectionId + '-list').find('.dataTables_info').addClass('pull-right');
-                        //     //  }
-                        //     // });
-                    // });
-                }
-
-                //Initialize Table
-                function tableInit(reDraw) {
-                    // All Columns (except ID and __control)
-                    $.each(listColumns, function(index,column) {
-                        // Ordering of checkbox and radio columns
-                        for (var replaceColumn in datatableOptions.replaceColumns) {
-                            if (replaceColumn === column.data) {
-                                if (datatableOptions.replaceColumns[replaceColumn] === 'customSwitch') {
-                                    column.orderDataType = 'dom-checkbox';
-                                } else if (datatableOptions.replaceColumns[replaceColumn] === 'radioButtons') {
-                                    column.orderDataType = 'dom-radio';
-                                }
-                            }
-                        }
-                    });
-
-                    if (!reDraw) {
-                        // Pagination
-                        if (datatableOptions.pagination && datatableOptions.paginationCounters.total_items > 20) {
-                            $.extend(thisOptions.listOptions.datatable, {
-                                paging : true,
-                                pagingType : 'simple',
-                            });
-
-                            datatableOptions['language']['zeroRecords'] = '<i class="fas fa-cog fa-spin"></i> Loading...';
-                        }
-                        if (datatableOptions.tableCompact) {
-                            classes = 'data-actions pb-1 pt-1';
-                        } else {
-                            classes = 'data-actions';
-                        }
-                        // Control Column
-                        if (datatableOptions.rowControls) {
-                            listColumns[thisOptions.listOptions.tableName].push({
-                                data        : '__control',
-                                title       : 'ACTIONS',
-                                orderable   : false,
-                                className   : classes
-                            });
-                        }
-
-                        if (thisOptions.customFunctions.beforeTableInit) {
-                            thisOptions.customFunctions.beforeTableInit();
-                        }
-
-                        thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
-
-                        if (thisOptions.customFunctions.afterTableInit) {
-                            thisOptions.customFunctions.afterTableInit();
-                        }
-
-                        thisOptions['datatable'].columns.adjust().responsive.recalc();
-
-                        updateCounters();
-
-                        // Datatable Events
-                        //Responsive
-                        thisOptions['datatable'].on('draw responsive-resize responsive-display', function() {
-                            BazContentLoader.init({});
-                            thisOptions['datatable'].columns.adjust().responsive.recalc();
-                        });
-
-                        //Toggle response rows open/close
-                        thisOptions['datatable'].on('responsive-display', function(e, datatable, row, showHide) {
-                            if (showHide) {
-                                $($(row.node()).next('.child')).find('li').prepend(
-                                    '<i class="fa fas fa-fw fa-plus-circle text-info dtr-expand mr-1 dataTable-pointer"><i>'
-                                );
-
-                                changeResponsiveLiWidths($($(row.node()).next('.child')));
-
-                                $($(row.node()).next('.child')).find('.dtr-expand').click(function() {
-                                    if ($(this).parent().is('.text-truncate')) {
-                                        $(this).parent().removeClass('text-truncate dt-colTextTruncate');
-                                        $(this).removeClass('fa-plus-circle text-info').addClass('fa-minus-circle text-danger');
-                                    } else {
-                                        $(this).parent().addClass('text-truncate dt-colTextTruncate');
-                                        $(this).removeClass('fa-minus-circle text-danger').addClass('fa-plus-circle text-info');
-                                        changeResponsiveLiWidths($($(row.node()).next('.child')));
-                                    }
-                                });
-                            }
-                        });
-
-                        //Search
-                        thisOptions['datatable'].on('draw', function () {
-                            if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
-                                $('.dataTables_empty').html('...');
-                            }
-                        });
-
-                        //Length Change
-                        thisOptions['datatable'].on('length.dt', function (e, settings, len) {
-                            if (len === -1) {
-                                len = datatableOptions.paginationCounters.total_items;
-                            }
-                            thisOptions['datatable'].rows().clear().draw();
-                            $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
-                            runDatatableAjax({
-                                'page' : datatableOptions.paginationCounters.first,
-                                'limit': len
-                            }, true);
-                        });
-
-                    } else { //redraw used on pagination prev and next
-
-                        if (thisOptions.customFunctions.beforeRedraw) {
-                            thisOptions.customFunctions.beforeRedraw();
-                        }
-
-                        thisOptions['datatable'].rows.add(datatableOptions.data).draw();
-
-                        if (thisOptions.customFunctions.afterRedraw) {
-                            thisOptions.customFunctions.afterRedraw();
-                        }
-
-                        updateCounters();
+            _proto._runDatatableAjax = function(postData, reDraw) {
+                var url = thisOptions.listOptions.postUrl;
+                $.ajax({
+                    url         : url,
+                    method      : 'post',
+                    dataType    : 'json',
+                    data        : postData,
+                    success     : function(data) {
+                        $('#list-data-loader').hide();
+                        $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
                     }
+                }).done(function() {
+                    that._tableInit(reDraw);
+                    that._registerEvents();
+                });
+                    // TODO: fix card-body height when more rows are loaded.
+                    // TODO: BULK Edit/Delete
+                    //     // tableData[sectionId].buttons().container().appendTo('#products-list-buttons .col-sm-6:eq(0)');
+                    //     // that.fixHeight('fixedHeight');
+                    //     // $('#' + sectionId + '-list-table').on('length.dt', function() {
+                    //     //     that.fixHeight('fixedHeight');
+                    //     // });
+                    //     // $('#' + sectionId + '-filter').on('collapsed.boxwidget expanded.boxwidget', function() {
+                    //     //     that.fixHeight('fixedHeight');
+                    //     // });
+                    //     // $('#' + sectionId + '-filter-filters-apply').click(function() {
+                    //     //     $('#' + sectionId + '-filter .box').trigger('collapse.boxwidget');
+                    //     //     that.fixHeight('fixedHeight');
+                    //     // });
+                    //     // $('#' + sectionId + '-list').find('.dataTables_info').addClass('pull-right');
+                    //     //  }
+                    //     // });
+                // });
+            }
 
+            //Initialize Table
+            _proto._tableInit = function(reDraw) {
+                // All Columns (except ID and __control)
+                $.each(listColumns, function(index,column) {
+                    // Ordering of checkbox and radio columns
+                    for (var replaceColumn in datatableOptions.replaceColumns) {
+                        if (replaceColumn === column.data) {
+                            if (datatableOptions.replaceColumns[replaceColumn] === 'customSwitch') {
+                                column.orderDataType = 'dom-checkbox';
+                            } else if (datatableOptions.replaceColumns[replaceColumn] === 'radioButtons') {
+                                column.orderDataType = 'dom-radio';
+                            }
+                        }
+                    }
+                });
+
+                if (!reDraw) {
+                    // Pagination
+                    if (datatableOptions.pagination && datatableOptions.paginationCounters.filtered_items > 20) {
+                        $.extend(thisOptions.listOptions.datatable, {
+                            paging : true,
+                            pagingType : 'simple',
+                        });
+
+                        datatableOptions['language']['zeroRecords'] = '<i class="fas fa-cog fa-spin"></i> Loading...';
+                    }
+                    if (datatableOptions.tableCompact) {
+                        classes = 'data-actions pb-1 pt-1';
+                    } else {
+                        classes = 'data-actions';
+                    }
+                    // Control Column
                     if (datatableOptions.rowControls) {
-                        BazContentLoader.init({});
-                    }
-                }
-
-                //Update width for open child
-                function changeResponsiveLiWidths(child) {
-                    var width = child.width();
-
-                    var titleWidth = ((20 * width) / 100) / 16;//rem
-                    var liWidth = width/16;
-
-                    child.find('.dtr-title').css({"width" : titleWidth + 'rem'});
-                    child.find('.dtr-title').parent('li').removeClass('dt-colTextTruncate');
-                    child.find('.dtr-data').parent('li').css({"width" : liWidth + 'rem'});
-                }
-
-                //Register __control(Action buttons)
-                function registerEvents() {
-                    // customSwitch Toggle Function
-                    $('#' + sectionId + '-table .custom-switch input').each(function(index,rowSwitchInput) {
-                        $(rowSwitchInput).click(function() {
-                            var rowSwitchInputId = $(rowSwitchInput)[0].id;
-                            var url = dataCollection.env.rootPath + 'index.php?route=' + $(rowSwitchInput).data('switchactionurl');
-                            var columnId = $(rowSwitchInput).data('columnid');
-                            var checked = $(rowSwitchInput).is('[checked]');
-                            var columnsDataToInclude = $(rowSwitchInput).data('switchactionincludecolumnsdata').split(',');
-                            var rowData;
-                            rowData = thisOptions['datatable'].row($(this).parents('tr')).data();
-                            if (checked) {
-                                rowData[columnId] = 0;
-                                $(rowSwitchInput).attr('checked', false);
-                                document.getElementById(rowSwitchInputId).checked = false;
-                            } else {
-                                rowData[columnId] = 1;
-                                $(rowSwitchInput).attr('checked', true);
-                                document.getElementById(rowSwitchInputId).checked = true;
-                            }
-                            var name = $(rowSwitchInput).parents('td').siblings('.data-' + $(rowSwitchInput).data('notificationtextfromcolumn')).html();
-                            var switchOnText = name + ' enabled';
-                            var switchOffText = name + ' disabled';
-                            if (checked) {
-                                PNotify.removeAll();
-                                Swal.fire({
-                                    title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
-                                                                  ' <span style="font-size:40px;" class="text-danger"> Disable ' +
-                                                                   name + '?</span>',
-                                    width                       : '100%',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    animation                   : false,
-                                    customClass                 : 'rounded-0 animated fadeIn',
-                                    buttonsStyling              : false,
-                                    confirmButtonClass          : 'btn btn-danger text-uppercase',
-                                    confirmButtonText           : 'Disable',
-                                    cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : false,
-                                    allowEscapeKey              : false,
-                                    allowEnterKey               : false,
-                                    onOpen                      : function() {
-                                        swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        runAjax(false, switchOffText);
-                                    } else {
-                                        $(rowSwitchInput).attr('checked', true);
-                                        document.getElementById(rowSwitchInputId).checked = true;
-                                    }
-                                });
-                            } else {
-                                runAjax(true, switchOnText);
-                            }
-                            function runAjax(status, notificationText) {
-                                var dataToSubmit = { };
-                                for (var data in rowData) {
-                                    if (columnsDataToInclude.includes(data)) {
-                                        dataToSubmit[data] = rowData[data];
-                                    }
-                                }
-                                $.ajax({
-                                    url         : url,
-                                    method      : 'post',
-                                    data        : dataToSubmit,
-                                    dataType    : 'json',
-                                    success     : function(response) {
-                                        if (response.status === 0) {
-                                            PNotify.removeAll();
-                                            PNotify.success({
-                                                title           : notificationText,
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $(rowSwitchInput).attr('checked', status);
-                                            document.getElementById(rowSwitchInputId).checked = true;
-                                        } else {
-                                            PNotify.removeAll();
-                                            PNotify.error({
-                                                title           : 'Error!',
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $(rowSwitchInput).attr('checked', false);
-                                            document.getElementById(rowSwitchInputId).checked = false;
-                                        }
-                                        pnotifySound.play();
-                                    }
-                                });
-                            }
+                        listColumns[thisOptions.listOptions.tableName].push({
+                            data        : '__control',
+                            title       : 'ACTIONS',
+                            orderable   : false,
+                            className   : classes
                         });
+                    }
+
+                    if (thisOptions.customFunctions.beforeTableInit) {
+                        thisOptions.customFunctions.beforeTableInit();
+                    }
+
+                    thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
+
+                    if (thisOptions.customFunctions.afterTableInit) {
+                        thisOptions.customFunctions.afterTableInit();
+                    }
+
+                    thisOptions['datatable'].columns.adjust().responsive.recalc();
+
+                    that._updateCounters();
+
+                    // Datatable Events
+                    //Responsive
+                    thisOptions['datatable'].on('draw responsive-resize responsive-display', function() {
+                        BazContentLoader.init({});
+                        thisOptions['datatable'].columns.adjust().responsive.recalc();
                     });
 
-                    // RadioButtons
-                    $('#' + sectionId + '-table .btn-group-toggle label').each(function(index,radioButtonsLabel) {
-                        $(radioButtonsLabel).click(function() {
-                            var currentCheckedId, currentCheckedLabel;
-                            $(this).siblings('label').children('input').each(function(index,sibling) {
-                                if (sibling.checked) {
-                                    currentCheckedId = sibling.id;
-                                    currentCheckedLabel = sibling.parentElement;
-                                } else if (sibling.defaultChecked) {
-                                    currentCheckedId = sibling.id;
-                                    currentCheckedLabel = sibling.parentElement;
+                    //Toggle response rows open/close
+                    thisOptions['datatable'].on('responsive-display', function(e, datatable, row, showHide) {
+                        if (showHide) {
+                            $($(row.node()).next('.child')).find('li').prepend(
+                                '<i class="fa fas fa-fw fa-plus-circle text-info dtr-expand mr-1 dataTable-pointer"><i>'
+                            );
+
+                            that._changeResponsiveLiWidths($($(row.node()).next('.child')));
+
+                            $($(row.node()).next('.child')).find('.dtr-expand').click(function() {
+                                if ($(this).parent().is('.text-truncate')) {
+                                    $(this).parent().removeClass('text-truncate dt-colTextTruncate');
+                                    $(this).removeClass('fa-plus-circle text-info').addClass('fa-minus-circle text-danger');
+                                } else {
+                                    $(this).parent().addClass('text-truncate dt-colTextTruncate');
+                                    $(this).removeClass('fa-minus-circle text-danger').addClass('fa-plus-circle text-info');
+                                    that._changeResponsiveLiWidths($($(row.node()).next('.child')));
                                 }
                             });
-                            var thisId = $(this).children('input')[0].id;
-                            var url = dataCollection.env.rootPath + 'index.php?route=' + $(this).children('input').data('radiobuttonsactionurl');
-                            var columnId = $(this).children('input').data('columnid');
-                            var dataValue = $(this).children('input').data('value');
-                            var checked = false;
-                            if ($(this).children('input').is('[checked]') || $(this).children('input')[0].defaultChecked) {
-                                checked = true;
-                            }
-                            var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                                                    $(this).children('input').data('columnid') + ' changed';
-                            if (!checked) {
-                                PNotify.removeAll();
-                                Swal.fire({
-                                    title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
-                                                                    ' <span style="font-size:40px;" class="text-danger"> Change ' +
-                                                                    $(this).parents('td').siblings('.data-' +
-                                                                        $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                                                                    $(this).children('input').data('columnid') +
-                                                                    '?</span>',
-                                    width                       : '100%',
-                                    background                  : 'rgba(0,0,0,.8)',
-                                    backdrop                    : 'rgba(0,0,0,.6)',
-                                    animation                   : false,
-                                    customClass                 : 'rounded-0 animated fadeIn',
-                                    buttonsStyling              : false,
-                                    confirmButtonClass          : 'btn btn-danger text-uppercase',
-                                    confirmButtonText           : 'Change',
-                                    cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
-                                    showCancelButton            : true,
-                                    keydownListenerCapture      : true,
-                                    allowOutsideClick           : false,
-                                    allowEscapeKey              : false,
-                                    allowEnterKey               : false,
-                                    onOpen                      : function() {
-                                        swalSound.play();
-                                    }
-                                }).then((result) => {
-                                    if (result.value) {
-                                        runAjax(false, radioChangeText);
-                                    } else {
-                                        $(this).removeClass('focus active');
-                                        $('#' + currentCheckedId).attr('checked', true);
-                                        document.getElementById(currentCheckedId).checked = true;
-                                        $(currentCheckedLabel).addClass('focus active');
-                                    }
-                                });
-                            }
-
-                            function runAjax(status, notificationText) {
-                                var columnsDataToInclude = $('#' + thisId).data('radiobuttonsactionincludecolumnsdata').split(',');
-                                var rowData = thisOptions['datatable'].row($('#' + thisId).parents('tr')).data();
-                                var dataToSubmit = { };
-                                for (var data in rowData) {
-                                    if (columnsDataToInclude.includes(data)) {
-                                        if (columnId === data) {
-                                            dataToSubmit[data] = dataValue;
-                                        } else {
-                                            dataToSubmit[data] = rowData[data];
-                                        }
-                                    }
-                                }
-                                $.ajax({
-                                    url         : url,
-                                    method      : 'post',
-                                    data        : dataToSubmit,
-                                    dataType    : 'json',
-                                    success     : function(response) {
-                                        if (response.status === 1) {
-                                            PNotify.removeAll()
-                                            PNotify.success({
-                                                title           : notificationText,
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $('#' + currentCheckedId).attr('checked', false);
-                                            document.getElementById(currentCheckedId).checked = false;
-                                            $('#' + thisId).attr('checked', true);
-                                            document.getElementById(thisId).checked = true;
-                                        } else {
-                                            PNotify.removeAll();
-                                            PNotify.error({
-                                                title           : 'Error!',
-                                                cornerClass     : 'ui-pnotify-sharp'
-                                            });
-                                            $('#' + thisId).parent('label').removeClass('focus active');
-                                            $('#' + thisId).attr('checked', false);
-                                            document.getElementById(thisId).checked = false;
-                                            $('#' + currentCheckedId).attr('checked', true);
-                                            document.getElementById(currentCheckedId).checked = true;
-                                            $(currentCheckedLabel).addClass('focus active');
-                                        }
-                                        pnotifySound.play();
-                                    }
-                                });
-                            }
-                        });
+                        }
                     });
 
-                    // Deleting Row (element .rowRemove)
-                    $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {
-                        $(rowRemove).click(function(e) {
-                            e.preventDefault();
-                            var thisButton = this;
-                            var url = $(this).attr('href');
-                            var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).html();
-                            var dataToSend = { };
-                            dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
+                    //Search
+                    $('.dataTables_filter').find('input').keyup(function() {
+                        if ($(this).val() === '') {
+                            that._updateCounters();
+                        }
+                    });
+
+                    thisOptions['datatable'].on('draw', function () {
+                        if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
+                            $('.dataTables_empty').last().html('...');
+                        }
+                    });
+
+                    //Length Change
+                    thisOptions['datatable'].on('length.dt', function (e, settings, len) {
+                        if (len === -1) {
+                            len = datatableOptions.paginationCounters.filtered_items;
+                        }
+
+                        that._filterRunAjax(
+                            datatableOptions.paginationCounters.first,
+                            len,
+                            query
+                        );
+                    });
+
+                } else { //redraw used on pagination prev and next
+
+                    if (thisOptions.customFunctions.beforeRedraw) {
+                        thisOptions.customFunctions.beforeRedraw();
+                    }
+
+                    thisOptions['datatable'].rows.add(datatableOptions.data).draw();
+
+                    if (thisOptions.customFunctions.afterRedraw) {
+                        thisOptions.customFunctions.afterRedraw();
+                    }
+
+                    that._updateCounters();
+                }
+
+                if (datatableOptions.rowControls) {
+                    BazContentLoader.init({});
+                }
+            }
+
+            //Update width for open child
+            _proto._changeResponsiveLiWidths = function(child) {
+                var width = child.width();
+
+                var titleWidth = ((20 * width) / 100) / 16;//rem
+                var liWidth = width/16;
+
+                child.find('.dtr-title').css({"width" : titleWidth + 'rem'});
+                child.find('.dtr-title').parent('li').removeClass('dt-colTextTruncate');
+                child.find('.dtr-data').parent('li').css({"width" : liWidth + 'rem'});
+            }
+
+            //Register __control(Action buttons)
+            _proto._registerEvents = function() {
+                // customSwitch Toggle Function
+                $('#' + sectionId + '-table .custom-switch input').each(function(index,rowSwitchInput) {
+                    $(rowSwitchInput).click(function() {
+                        var rowSwitchInputId = $(rowSwitchInput)[0].id;
+                        var url = dataCollection.env.rootPath + 'index.php?route=' + $(rowSwitchInput).data('switchactionurl');
+                        var columnId = $(rowSwitchInput).data('columnid');
+                        var checked = $(rowSwitchInput).is('[checked]');
+                        var columnsDataToInclude = $(rowSwitchInput).data('switchactionincludecolumnsdata').split(',');
+                        var rowData;
+                        rowData = thisOptions['datatable'].row($(this).parents('tr')).data();
+                        if (checked) {
+                            rowData[columnId] = 0;
+                            $(rowSwitchInput).attr('checked', false);
+                            document.getElementById(rowSwitchInputId).checked = false;
+                        } else {
+                            rowData[columnId] = 1;
+                            $(rowSwitchInput).attr('checked', true);
+                            document.getElementById(rowSwitchInputId).checked = true;
+                        }
+                        var name = $(rowSwitchInput).parents('td').siblings('.data-' + $(rowSwitchInput).data('notificationtextfromcolumn')).html();
+                        var switchOnText = name + ' enabled';
+                        var switchOffText = name + ' disabled';
+                        if (checked) {
+                            PNotify.removeAll();
                             Swal.fire({
-                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
-                                                              '</i> <span style="font-size:40px;" class="text-danger"> Delete ' +
-                                                              deleteText + '?</span>',
+                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
+                                                              ' <span style="font-size:40px;" class="text-danger"> Disable ' +
+                                                               name + '?</span>',
                                 width                       : '100%',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
@@ -5291,7 +6398,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 customClass                 : 'rounded-0 animated fadeIn',
                                 buttonsStyling              : false,
                                 confirmButtonClass          : 'btn btn-danger text-uppercase',
-                                confirmButtonText           : 'Delete',
+                                confirmButtonText           : 'Disable',
                                 cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
@@ -5303,91 +6410,288 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 }
                             }).then((result) => {
                                 if (result.value) {
-                                    if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
-                                        dataToSend.confirm = '1';
-                                    }
-                                    $.ajax({
-                                        url         : url,
-                                        method      : 'post',
-                                        dataType    : 'json',
-                                        data        : dataToSend,
-                                        success     : function(response) {
-                                            if (response.status === 0) {
-                                                PNotify.removeAll();
-                                                PNotify.success({
-                                                    title           : deleteText + ' deleted.',
-                                                    cornerClass     : 'ui-pnotify-sharp'
-                                                });
-                                                // remove row on success
-                                                thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
-                                            } else {
-                                                PNotify.removeAll();
-                                                PNotify.error({
-                                                    title           : 'Error!',
-                                                    cornerClass     : 'ui-pnotify-sharp'
-                                                });
-                                            }
-                                            pnotifySound.play();
-                                        }
-                                    });
+                                    runAjax(false, switchOffText);
+                                } else {
+                                    $(rowSwitchInput).attr('checked', true);
+                                    document.getElementById(rowSwitchInputId).checked = true;
                                 }
                             });
+                        } else {
+                            runAjax(true, switchOnText);
+                        }
+                        function runAjax(status, notificationText) {
+                            var dataToSubmit = { };
+                            for (var data in rowData) {
+                                if (columnsDataToInclude.includes(data)) {
+                                    dataToSubmit[data] = rowData[data];
+                                }
+                            }
+                            $.ajax({
+                                url         : url,
+                                method      : 'post',
+                                data        : dataToSubmit,
+                                dataType    : 'json',
+                                success     : function(response) {
+                                    if (response.status === 0) {
+                                        PNotify.removeAll();
+                                        PNotify.success({
+                                            title           : notificationText,
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $(rowSwitchInput).attr('checked', status);
+                                        document.getElementById(rowSwitchInputId).checked = true;
+                                    } else {
+                                        PNotify.removeAll();
+                                        PNotify.error({
+                                            title           : 'Error!',
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $(rowSwitchInput).attr('checked', false);
+                                        document.getElementById(rowSwitchInputId).checked = false;
+                                    }
+                                    pnotifySound.play();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // RadioButtons
+                $('#' + sectionId + '-table .btn-group-toggle label').each(function(index,radioButtonsLabel) {
+                    $(radioButtonsLabel).click(function() {
+                        var currentCheckedId, currentCheckedLabel;
+                        $(this).siblings('label').children('input').each(function(index,sibling) {
+                            if (sibling.checked) {
+                                currentCheckedId = sibling.id;
+                                currentCheckedLabel = sibling.parentElement;
+                            } else if (sibling.defaultChecked) {
+                                currentCheckedId = sibling.id;
+                                currentCheckedLabel = sibling.parentElement;
+                            }
+                        });
+                        var thisId = $(this).children('input')[0].id;
+                        var url = dataCollection.env.rootPath + 'index.php?route=' + $(this).children('input').data('radiobuttonsactionurl');
+                        var columnId = $(this).children('input').data('columnid');
+                        var dataValue = $(this).children('input').data('value');
+                        var checked = false;
+                        if ($(this).children('input').is('[checked]') || $(this).children('input')[0].defaultChecked) {
+                            checked = true;
+                        }
+                        var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
+                                                $(this).children('input').data('columnid') + ' changed';
+                        if (!checked) {
+                            PNotify.removeAll();
+                            Swal.fire({
+                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
+                                                                ' <span style="font-size:40px;" class="text-danger"> Change ' +
+                                                                $(this).parents('td').siblings('.data-' +
+                                                                    $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
+                                                                $(this).children('input').data('columnid') +
+                                                                '?</span>',
+                                width                       : '100%',
+                                background                  : 'rgba(0,0,0,.8)',
+                                backdrop                    : 'rgba(0,0,0,.6)',
+                                animation                   : false,
+                                customClass                 : 'rounded-0 animated fadeIn',
+                                buttonsStyling              : false,
+                                confirmButtonClass          : 'btn btn-danger text-uppercase',
+                                confirmButtonText           : 'Change',
+                                cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                                showCancelButton            : true,
+                                keydownListenerCapture      : true,
+                                allowOutsideClick           : false,
+                                allowEscapeKey              : false,
+                                allowEnterKey               : false,
+                                onOpen                      : function() {
+                                    swalSound.play();
+                                }
+                            }).then((result) => {
+                                if (result.value) {
+                                    runAjax(false, radioChangeText);
+                                } else {
+                                    $(this).removeClass('focus active');
+                                    $('#' + currentCheckedId).attr('checked', true);
+                                    document.getElementById(currentCheckedId).checked = true;
+                                    $(currentCheckedLabel).addClass('focus active');
+                                }
+                            });
+                        }
+
+                        function runAjax(status, notificationText) {
+                            var columnsDataToInclude = $('#' + thisId).data('radiobuttonsactionincludecolumnsdata').split(',');
+                            var rowData = thisOptions['datatable'].row($('#' + thisId).parents('tr')).data();
+                            var dataToSubmit = { };
+                            for (var data in rowData) {
+                                if (columnsDataToInclude.includes(data)) {
+                                    if (columnId === data) {
+                                        dataToSubmit[data] = dataValue;
+                                    } else {
+                                        dataToSubmit[data] = rowData[data];
+                                    }
+                                }
+                            }
+                            $.ajax({
+                                url         : url,
+                                method      : 'post',
+                                data        : dataToSubmit,
+                                dataType    : 'json',
+                                success     : function(response) {
+                                    if (response.status === 1) {
+                                        PNotify.removeAll()
+                                        PNotify.success({
+                                            title           : notificationText,
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $('#' + currentCheckedId).attr('checked', false);
+                                        document.getElementById(currentCheckedId).checked = false;
+                                        $('#' + thisId).attr('checked', true);
+                                        document.getElementById(thisId).checked = true;
+                                    } else {
+                                        PNotify.removeAll();
+                                        PNotify.error({
+                                            title           : 'Error!',
+                                            cornerClass     : 'ui-pnotify-sharp'
+                                        });
+                                        $('#' + thisId).parent('label').removeClass('focus active');
+                                        $('#' + thisId).attr('checked', false);
+                                        document.getElementById(thisId).checked = false;
+                                        $('#' + currentCheckedId).attr('checked', true);
+                                        document.getElementById(currentCheckedId).checked = true;
+                                        $(currentCheckedLabel).addClass('focus active');
+                                    }
+                                    pnotifySound.play();
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // Deleting Row (element .rowRemove)
+                $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {
+                    $(rowRemove).click(function(e) {
+                        e.preventDefault();
+                        var thisButton = this;
+                        var url = $(this).attr('href');
+                        var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).html();
+                        var dataToSend = { };
+                        dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
+                        Swal.fire({
+                            title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
+                                                          '</i> <span style="font-size:40px;" class="text-danger"> Delete ' +
+                                                          deleteText + '?</span>',
+                            width                       : '100%',
+                            background                  : 'rgba(0,0,0,.8)',
+                            backdrop                    : 'rgba(0,0,0,.6)',
+                            animation                   : false,
+                            customClass                 : 'rounded-0 animated fadeIn',
+                            buttonsStyling              : false,
+                            confirmButtonClass          : 'btn btn-danger text-uppercase',
+                            confirmButtonText           : 'Delete',
+                            cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                            showCancelButton            : true,
+                            keydownListenerCapture      : true,
+                            allowOutsideClick           : false,
+                            allowEscapeKey              : false,
+                            allowEnterKey               : false,
+                            onOpen                      : function() {
+                                swalSound.play();
+                            }
+                        }).then((result) => {
+                            if (result.value) {
+                                if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
+                                    dataToSend.confirm = '1';
+                                }
+                                $.ajax({
+                                    url         : url,
+                                    method      : 'post',
+                                    dataType    : 'json',
+                                    data        : dataToSend,
+                                    success     : function(response) {
+                                        if (response.status === 0) {
+                                            PNotify.removeAll();
+                                            PNotify.success({
+                                                title           : deleteText + ' deleted.',
+                                                cornerClass     : 'ui-pnotify-sharp'
+                                            });
+                                            // remove row on success
+                                            thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
+                                        } else {
+                                            PNotify.removeAll();
+                                            PNotify.error({
+                                                title           : 'Error!',
+                                                cornerClass     : 'ui-pnotify-sharp'
+                                            });
+                                        }
+                                        pnotifySound.play();
+                                    }
+                                });
+                            }
                         });
                     });
+                });
+            }
+
+            _proto._updateCounters = function() {
+                var counters = { };
+
+                counters.total = datatableOptions.paginationCounters.total_items;
+                counters.filtered_total = datatableOptions.paginationCounters.filtered_items;
+                counters.end = datatableOptions.paginationCounters.limit * datatableOptions.paginationCounters.current;
+                counters.start = (counters.end - datatableOptions.paginationCounters.limit) + 1;
+
+                if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
+                    counters.end = datatableOptions.paginationCounters.filtered_items;
                 }
+                if (query) {
+                    $('#' + sectionId + '-table_info').empty().html(
+                        "Showing " + counters.start + " to " + counters.end +
+                        " of " + counters.filtered_total + " filtered entries (Total entries: " + counters.total + ")"
+                    );
+                } else {
+                    $('#' + sectionId + '-table_info').empty().html(
+                        "Showing " + counters.start + " to " + counters.end + " of " + counters.filtered_total + " entries"
+                    );
+                }
+            }
 
-                function updateCounters() {
-                    var counters = { };
+            _proto._filterRunAjax = function(page, limit, conditions) {
+                thisOptions['datatable'].rows().clear().draw();
+                $('.dataTables_empty').last().html('<i class="fas fa-cog fa-spin"></i> Loading...');
+                that._runDatatableAjax({
+                    'page'          : page,
+                    'limit'         : limit,
+                    'conditions'    : conditions
+                }, true);
+            }
 
-                    counters.total = datatableOptions.paginationCounters.total_items;
-                    counters.end = datatableOptions.paginationCounters.limit * datatableOptions.paginationCounters.current;
-                    counters.start = (counters.end - datatableOptions.paginationCounters.limit) + 1;
+            _proto._drawCallback = function() {
+                if (datatableOptions.pagination &&
+                    datatableOptions.paginationCounters.filtered_items > 20 &&
+                    (datatableOptions.paginationCounters.filtered_items !== datatableOptions.paginationCounters.limit)
+                ) {
 
-                    if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
-                        counters.end = datatableOptions.paginationCounters.total_items;
+                    if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.first) {
+                        $('.paginate_button.previous').removeClass('disabled');
+                        $('.paginate_button.previous').click(function() {
+                            that._filterRunAjax(
+                                datatableOptions.paginationCounters.previous,
+                                datatableOptions.paginationCounters.limit,
+                                query
+                            );
+                        });
                     }
-                    if (thisOptions['datatable']) {
-                        $('#admin-users-listing-table_info').empty().html(
-                            "Showing " + counters.start + " to " + counters.end +" of " + counters.total + " entries"
-                        );
-                    } else {
-                        $('#admin-users-listing-table_info').empty().html(
-                            "Showing " + counters.start + " to " + counters.end +" of " + counters.total + " entries"
-                        );
+                    if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.last) {
+                        $('.paginate_button.next').removeClass('disabled');
+                        $('.paginate_button.next').click(function() {
+                            that._filterRunAjax(
+                                datatableOptions.paginationCounters.next,
+                                datatableOptions.paginationCounters.limit,
+                                query
+                            );
+                        });
                     }
                 }
-
-                function drawCallback() {
-                    if (datatableOptions.pagination &&
-                        datatableOptions.paginationCounters.total_items > 20 &&
-                        (datatableOptions.paginationCounters.total_items !== datatableOptions.paginationCounters.limit)
-                    ) {
-
-                        if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.first) {
-                            $('.paginate_button.previous').removeClass('disabled');
-                            $('.paginate_button.previous').click(function() {
-                                thisOptions['datatable'].rows().clear().draw();
-                                $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
-                                runDatatableAjax({
-                                    'page' : datatableOptions.paginationCounters.previous,
-                                    'limit': datatableOptions.paginationCounters.limit
-                                }, true);
-                            });
-                        }
-                        if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.last) {
-                            $('.paginate_button.next').removeClass('disabled');
-                            $('.paginate_button.next').click(function() {
-                                thisOptions['datatable'].rows().clear().draw();
-                                $('.dataTables_empty').html('<i class="fas fa-cog fa-spin"></i> Loading...');
-                                runDatatableAjax({
-                                    'page' : datatableOptions.paginationCounters.next,
-                                    'limit': datatableOptions.paginationCounters.limit
-                                }, true);
-                            });
-                        }
-                    }
-                }
-            };
+            }
 
             BazContentSectionWithListing._jQueryInterface = function _jQueryInterface(options) {
                 dataCollection = window['dataCollection'];
@@ -7336,6 +8640,7 @@ var BazContentFieldsValidator = function() {
         validateFormsOnDatatable, //Validate datatable form on datable submit
         dataCollection,
         sectionsJsTreeSelector;
+    var formValid = false;
     var hasError = []; //Validation, list of fields that has errors
     // var tableData = { }; //Datatable Data
 
@@ -7373,34 +8678,48 @@ var BazContentFieldsValidator = function() {
             error('Validator not found!');
         } else {
             $('#' + on).find('form').each(function(index,form) {
+
                 formId = $(form)[0].id;
+
                 $.validator.setDefaults({
                     debug: false,
-                    ignore: ":submit, :reset, :image, :disabled",
+                    ignore: ":submit, :reset, :image, :disabled, :hidden",
                     onkeyup: false,
                     onclick: false,
                     submitHandler: function() { },
                     focusInvalid: false
                 });
+
                 validateOptions = {
                     errorElement: 'div',
                     errorPlacement: function ( error, element ) {
-                        element.parents('.form-group').append(error);
-                        error.addClass('text-uppercase text-danger text-xs help-block');
-                        $(element).closest('.form-group').addClass('has-feedback');
+                        if (!formValid) {
+                            element.parents('.form-group').append(error);
+                            error.addClass('text-uppercase text-danger text-xs help-block');
+                            $(element).closest('.form-group').addClass('has-feedback');
+                        }
                     },
                     highlight: function (element) {
                         $(element).closest('.form-group').addClass('has-error');
                     },
-                    // unhighlight: function (element) { },
+                    // unhighlight: function () { },
                     success: function (element) {
-                        var type = $(element).parents('form').data('validateon');
-                        var formId = $(element).parents('form')[0].id;
-                        componentId = $(element).parents('.component')[0].id;
-                        sectionId = $(element).parents('.sectionWithForm')[0].id;
-                        $(element).closest('.form-group').removeClass('has-error');
-                        $(element).closest('.help-block').remove();
-                        validateForm(componentId, sectionId, true, type, true, formId);
+                        if (!formValid) {
+                            var type = $(element).parents('form').data('validateon');
+                            var formId = $(element).parents('form')[0].id;
+                            componentId = $(element).parents('.component')[0].id;
+
+                            if ($(element).parents('.sectionWithForm').length > 0) {
+                                sectionId = $(element).parents('.sectionWithForm')[0].id;
+                            } else if ($(element).parents('.sectionWithFormToDatatable').length > 0) {
+                                sectionId = $(element).parents('.sectionWithFormToDatatable')[0].id;
+                            }
+
+                            $(element).closest('.form-group').removeClass('has-error');
+                            $(element).closest('.help-block').remove();
+
+                            validateForm(componentId, sectionId, true, type, true, formId);
+                        }
                     }
                 };
                 if (dataCollection[componentId][sectionId][sectionId + '-form']) {
@@ -7409,15 +8728,15 @@ var BazContentFieldsValidator = function() {
 
                 dataCollection[componentId][sectionId]['formValidator'] = $(form).validate(validateOptions);//init validate form
 
-                if ($(form).data('validateon') === 'sections') {
+                if ($(form).data('validateon') === 'section') {
                     validateForms[componentId][sectionId].push(formId);
                 }
                 if ($(form).data('validateon') === 'datatable') {
                     validateFormsOnDatatable.push(formId);
                 }
             });
-            if ($('div[data-validateon="sections"]').length !== 0) {
-                $('div[data-validateon="sections"]').each(function (index, datatable) {
+            if ($('div[data-validateon="section"]').length !== 0) {
+                $('div[data-validateon="section"]').each(function (index, datatable) {
                     if (!validateDatatableOnSections[$(datatable).parents('section')[0].id]) {
                         validateDatatableOnSections[$(datatable).parents('section')[0].id] = [ ];
                         validateDatatableOnSections[$(datatable).parents('section')[0].id].push(datatable.id);
@@ -7432,6 +8751,7 @@ var BazContentFieldsValidator = function() {
     //Validate Sections on Submit
     function validateForm(componentId, sectionId, onSuccess, type, preValidated, formId) {
         if (!preValidated) {
+            formValid = false;
             if (type === 'component') {
                 formLocation = componentId;
                 // for (var component in validateForms[componentId]) {
@@ -7457,7 +8777,7 @@ var BazContentFieldsValidator = function() {
                 //         }
                 //     }
                 // }
-            } else if (type === 'sections') {
+            } else if (type === 'section') {
                 formLocation = sectionId;
                 $.each(validateForms[componentId][sectionId], function(index, form) {
                     $('#' + form).submit();
@@ -7523,15 +8843,19 @@ var BazContentFieldsValidator = function() {
                         cancelValidatingForm(type, formLocation, false, formId);
                     });
                     return false;
-                } else if (type === 'sections') {
+                } else if (type === 'section') {
                     $('#' + formLocation + '-alert-dismiss').click(function() {
-                        formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
+                        if ($(this).parents('.sectionWithForm').length > 0) {
+                            formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
+                        } else if ($(this).parents('.sectionWithFormToDatatable').length > 0) {
+                            formLocation = $(this).parent().siblings('.sectionWithFormToDatatable')[0].id;
+                        }
                         cancelValidatingForm(type, formLocation, false, formId);
                     });
                     return false;
                 } else if (type === 'datatable') {
                     $('#' + formLocation + '-alert-dismiss').click(function() {
-                        formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
+                        formLocation = $(this).parent().siblings('.sectionWithFormToDatatable')[0].id;
                         cancelValidatingForm(type, formLocation, false, formId);
                     });
                     return false;
@@ -7540,6 +8864,7 @@ var BazContentFieldsValidator = function() {
                 if (type === 'datatable') {
                     return true;
                 }
+                formValid = true;
                 return true;
             }
         } else {
@@ -7566,13 +8891,15 @@ var BazContentFieldsValidator = function() {
                     }
                     return true;
                 }
-            } else if (type === 'sections') {
+            } else if (type === 'section') {
                 hasErrorCount = $('#' + sectionId).find('.has-error').length;
                 hasError = [];
+
                 $('#' + sectionId).find('.has-error').each(function(index,errorId) {
                     var id = $(errorId).children('label').html();
                     hasError.push(id.toUpperCase());
                 });
+
                 if (hasErrorCount > 0) {
                     $('#' + sectionId + '-alert').find('strong').html(hasErrorCount);
                     return false;
@@ -7598,7 +8925,9 @@ var BazContentFieldsValidator = function() {
 
     //Cancel validating form
     function cancelValidatingForm(type, formLocation, jstreeRefresh, formId) {
+
         $('#' + formLocation + '-alert').remove();
+
         if (type === 'component') {
             if (sectionsJsTreeSelector) {
                 // BazContentFields.fixHeight('fixedHeight');
@@ -7639,17 +8968,20 @@ var BazContentFieldsValidator = function() {
                 $('#' + formLocation).find('[type="search"]').siblings('.input-group-addon').removeClass('bg-danger').addClass('bg-default');
             }
         }
+
         $('#' + formLocation).find('.form-group').each(function(i,v) {
             $(v).removeClass('has-error has-feedback');
         });
+
         $('#' + formLocation).find('.help-block').each(function(i,v) {
             $(v).remove();
         });
+
         //Cancel Validating datatable
         for (var sections in validateDatatableOnSections) {
             if (validateDatatableOnSections[sections].length > 0) {
                 $.each(validateDatatableOnSections[sections], function(index, datatable) {
-                    $('#' + datatable + '-table-data').removeClass('border-danger').addClass('border-default');
+                    $('#' + datatable + '-data').removeClass('border-danger').addClass('border-default');
                 });
             }
         }
@@ -7669,7 +9001,8 @@ var BazContentFieldsValidator = function() {
         }
         BazContentFieldsValidator.validateForm = function(options) {
             init(_extends(BazContentFieldsValidator.defaults, options));
-            var validate = validateForm(options.componentId, options.sectionId, options.onSuccess, options.type, options.preValidated, options.formId);
+            var validate =
+                validateForm(options.componentId, options.sectionId, options.onSuccess, options.type, options.preValidated, options.formId);
             return validate;
         }
         BazContentFieldsValidator.cancelValidatingForm = function(options) {
@@ -7776,15 +9109,15 @@ var BazContentFieldsValidator = function() {
 //                     validateOptions = $.extend(validateOptions, dataCollection[componentId].form);
 //                 }
 //                 $(form).validate(validateOptions);//init validate form
-//                 if ($(form).data('validateon') === 'sections') {
+//                 if ($(form).data('validateon') === 'section') {
 //                     validateFormsOnSections.push(formId);
 //                 }
 //                 if ($(form).data('validateon') === 'datatable') {
 //                     validateFormsOnDatatable.push(formId);
 //                 }
 //             });
-//             if ($('div[data-validateon="sections"]').length !== 0) {
-//                 $('div[data-validateon="sections"]').each(function (index, datatable) {
+//             if ($('div[data-validateon="section"]').length !== 0) {
+//                 $('div[data-validateon="section"]').each(function (index, datatable) {
 //                     if (!validateDatatableOnSections[$(datatable).parents('section')[0].id]) {
 //                         validateDatatableOnSections[$(datatable).parents('section')[0].id] = [ ];
 //                         validateDatatableOnSections[$(datatable).parents('section')[0].id].push(datatable.id);
@@ -7798,13 +9131,13 @@ var BazContentFieldsValidator = function() {
 
 //     //Validate Sections on Submit
 //     BazValidator.prototype.validateForm = function(onSuccess, type, preValidated, formId) {
-//         if (type === 'sections' || !type) {
+//         if (type === 'section' || !type) {
 //             formLocation = componentId;
 //         } else if (type === 'datatable') {
 //             formLocation = formId;
 //         }
 //         if (!preValidated) {
-//             if (type === 'sections') {
+//             if (type === 'section') {
 //                 $.each(validateFormsOnSections, function(index, form) {
 //                     $('#' + form).submit();
 //                 });
@@ -7845,7 +9178,7 @@ var BazContentFieldsValidator = function() {
 //                 '<div>'
 //                 );
 //                 errorSound.play();
-//                 if (type === 'sections') {
+//                 if (type === 'section') {
 //                     if (sectionsJsTreeSelector) {
 //                         that.fixHeight('fixedHeight');
 //                         $(sectionsJsTreeSelector).jstree(true).settings.search.search_callback = function(str, node) {
@@ -7898,7 +9231,7 @@ var BazContentFieldsValidator = function() {
 //             }
 //         } else {
 //             hasErrorCount = $('#' + formLocation).find('.has-error').length;
-//             if (type === 'sections' || !type) {
+//             if (type === 'section' || !type) {
 //                 hasError = [];
 //                 $('#' + formLocation).find('.has-error').each(function(index,errorId) {
 //                     var id = $(errorId).children('label').html();
@@ -7933,7 +9266,7 @@ var BazContentFieldsValidator = function() {
 //     //Cancel validating form
 //     BazValidator.prototype.cancelValidatingForm = function (type, formLocation, jstreeRefresh, formId) {
 //         $('#' + formLocation + '-alert').remove();
-//         if (!type || type === 'sections') {
+//         if (!type || type === 'section') {
 //             if (sectionsJsTreeSelector) {
 //                 that.fixHeight('fixedHeight');
 //                 $('#' + formLocation + '-sections-tree').children('.box').removeClass('box-danger').addClass('box-primary');

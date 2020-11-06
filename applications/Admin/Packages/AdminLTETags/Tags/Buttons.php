@@ -30,7 +30,10 @@ class Buttons extends AdminLTETags
             return;
         }
 
-        $this->buildButtonParamsArr();
+        if (isset($this->params['buttonLabel']) && $this->params['buttonLabel'] !== false) {
+            $this->content .=
+                '<label style="display:block;">' . strtoupper($this->params['buttonLabel']) . '</label>';
+        }
 
         try {
             $button = 'Applications\\Admin\\Packages\\AdminLTETags\\Tags\\Buttons\\' . ucfirst($this->params['buttonType']);
@@ -41,18 +44,5 @@ class Buttons extends AdminLTETags
             throw new \Exception($e->getMessage());
         }
 
-    }
-
-    protected function buildButtonParamsArr()
-    {
-        if (isset($this->params['buttonLabel'])) {
-            if ($this->params['buttonLabel'] === false) {
-                $this->content .=
-                    '<label style="display:block; margin-bottom:29px;"></label>';
-            } else {
-                $this->content .=
-                    '<label style="display:block;">' . strtoupper($this->params['buttonLabel']) . '</label>';
-            }
-        }
     }
 }

@@ -115,6 +115,27 @@ var BazHelpers = function() {
         return output;
     }
 
+    // Copy object
+    function iterationCopy(src) {
+        var target = { };
+        for (var prop in src) {
+            if (src.hasOwnProperty(prop)) {
+                target[prop] = src[prop];
+            }
+        }
+        return target;
+    }
+
+    // Check if Object Empty
+    function isEmpty(obj) {
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     function bazHelpersConstructor() {
         // if something needs to be constructed
         return null;
@@ -165,9 +186,18 @@ var BazHelpers = function() {
         BazHelpers.modal = function(options) {
             bazModal(_extends(BazHelpers.defaults, options));
         }
+
         BazHelpers.createHtmlList = function(options) {
             var objToHtml = bazCreateHtmlList(options.obj);
             return objToHtml;
+        }
+
+        BazHelpers.iterationCopy = function(src) {
+            return iterationCopy(src);
+        }
+
+        BazHelpers.isEmpty = function(obj) {
+            return isEmpty(obj);
         }
     }
 

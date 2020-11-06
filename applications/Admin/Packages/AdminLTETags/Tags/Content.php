@@ -31,6 +31,8 @@ class Content extends AdminLTETags
                     $this->content .= $this->getContentTypeSection();
                 } else if ($this->params['contentType'] === 'sectionWithForm') {
                     $this->content .= $this->getContentTypeSectionWithForm();
+                } else if ($this->params['contentType'] === 'sectionWithFormToDatatable') {
+                    $this->content .= $this->getContentTypeSectionWithFormToDatatable();
                 } else if ($this->params['contentType'] === 'sectionWithWizard') {
                     $this->content .= $this->getContentTypeSectionWithWizard();
                 } else if ($this->params['contentType'] === 'sectionWithListing') {
@@ -55,7 +57,8 @@ class Content extends AdminLTETags
     protected function getContentTypeSection()
     {
         return
-            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '" class="section">' . $this->useTag('card', $this->params) .
+            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '" class="section">' .
+                $this->useTag('card', $this->params) .
             '</section>
             <script>
                 window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
@@ -69,8 +72,14 @@ class Content extends AdminLTETags
 
         $sectionForm .=
             '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] .
-            '" class="sectionWithForm">' . $this->useTag('card', $this->params) .
-            '</section>';
+            '" class="sectionWithForm">
+                <form data-validateon="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] .
+            '-form">
+                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-fieldset">' .
+                        $this->useTag('card', $this->params) .
+                    '</fieldset>
+                </form>
+            </section>';
 
         $sectionForm .=
             '<script>
@@ -79,24 +88,19 @@ class Content extends AdminLTETags
             </script>';
 
         return $sectionForm;
-
-            // <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" data-bazdevmodetools="{{devModeTools|default('true')}}" class="sectionWithForm">
-            //     {% include 'thelpers/card/card.html' with
-            //         [
-            //             'cardFooterContent'   : view.partial('thelpers/buttons',
-            //                                     [
-            //                                         'cardParams'    : cardParams,
-            //                                         'buttonType'    : 'sectionWithForm-buttons'
-            //                                     ])
-            //         ]
-            //     %}
-            // </section>
-            // <script>
-            //     window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
-            //     window['dataCollection']['env']['parentComponentId'] = '{{parentComponentId}}';
-            // </script>
     }
 
+    protected function getContentTypeSectionWithFormToDatatable()
+    {
+        return
+            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '" class="sectionWithFormToDatatable">' .
+                $this->useTag('card', $this->params) .
+            '</section>
+            <script>
+                window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
+                window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
+            </script>';
+    }
     protected function getContentTypeSectionWithWizard()
     {
         // <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithWizard">
