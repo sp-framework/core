@@ -24,90 +24,86 @@ class Filter extends AdminLTETags
     protected function generateContent()
     {
         $this->content .=
-            '<div class="col">' .
-                $this->useTag(
-                    'fields',
-                    [
-                        'componentId'                         => $this->params['componentId'],
-                        'sectionId'                           => $this->params['sectionId'] . '-filter',
-                        'fieldId'                             => 'filters',
-                        'fieldLabel'                          => false,
-                        'fieldType'                           => 'input',
-                        'fieldAdditionalClass'                => 'mb-1',
-                        'fieldGroupPreAddonIcon'              => 'filter',
-                        'fieldGroupPostAddonButtons'          =>
-                            [
-                                'apply-saved' => [
-                                    'title'                   => 'Apply',
-                                    'noMargin'                => true,
-                                    'disabled'                => true
+            '<div class="col">
+                <form autocomplete="off">' .
+                    $this->useTag(
+                        'fields',
+                        [
+                            'componentId'                         => $this->params['componentId'],
+                            'sectionId'                           => $this->params['sectionId'] . '-filter',
+                            'fieldId'                             => 'filters',
+                            'fieldLabel'                          => false,
+                            'fieldType'                           => 'input',
+                            'fieldAdditionalClass'                => 'mb-1',
+                            'fieldGroupPreAddonIcon'              => 'filter',
+                            'fieldGroupPostAddonButtons'          =>
+                                [
+                                    'edit'   => [
+                                        'title'                   => false,
+                                        'type'                    => 'warning',
+                                        'icon'                    => 'edit',
+                                        'noMargin'                => true,
+                                        'disabled'                => true,
+                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                        'position'                => 'right'
+                                    ],
+                                    'delete'   => [
+                                        'title'                   => false,
+                                        'type'                    => 'danger',
+                                        'icon'                    => 'trash',
+                                        'noMargin'                => true,
+                                        'disabled'                => true,
+                                        'buttonAdditionalClass'   => 'rounded-0',
+                                        'position'                => 'right'
+                                    ],
+                                    'share'   => [
+                                        'title'                   => false,
+                                        'type'                    => 'primary',
+                                        'tooltipTitle'            => 'Share Selected Saved Filter',
+                                        'icon'                    => 'share-alt',
+                                        'noMargin'                => true,
+                                        'disabled'                => true,
+                                        'buttonAdditionalClass'   => 'rounded-0',
+                                        'position'                => 'right'
+                                    ],
+                                    'add'   => [
+                                        'title'                   => false,
+                                        'type'                    => 'success',
+                                        'icon'                    => 'plus',
+                                        'noMargin'                => true,
+                                        'buttonAdditionalClass'   => 'rounded-0 ml-1',
+                                        'position'                => 'right'
+                                    ],
+                                    'reset' => [
+                                        'title'                   => false,
+                                        'noMargin'                => true,
+                                        'icon'                    => 'undo',
+                                        'type'                    => 'primary',
+                                        'buttonAdditionalClass'   => 'rounded-0 ml-1',
+                                        'tooltipTitle'            => 'Reset Filters',
+                                    ]
                                 ],
-                                'reset' => [
-                                    'title'                   => false,
-                                    'noMargin'                => true,
-                                    'icon'                    => 'undo',
-                                    'type'                    => 'secondary',
-                                    'tooltipTitle'            => 'Reset Filters',
-                                ],
-                                'add'   => [
-                                    'title'                   => false,
-                                    'type'                    => 'success',
-                                    'tooltipTitle'            => 'Add New Filter',
-                                    'icon'                    => 'plus',
-                                    'noMargin'                => true,
-                                    'buttonAdditionalClass'   => 'rounded-0',
-                                    'position'                => 'right'
-                                ],
-                                'edit'   => [
-                                    'title'                   => false,
-                                    'type'                    => 'warning',
-                                    'tooltipTitle'            => 'Edit Selected Filter',
-                                    'icon'                    => 'edit',
-                                    'noMargin'                => true,
-                                    'disabled'                => true,
-                                    'buttonAdditionalClass'   => 'rounded-0 text-white',
-                                    'position'                => 'right'
-                                ],
-                                'delete'   => [
-                                    'title'                   => false,
-                                    'type'                    => 'danger',
-                                    'tooltipTitle'            => 'Delete Selected Filter',
-                                    'icon'                    => 'trash',
-                                    'noMargin'                => true,
-                                    'disabled'                => true,
-                                    'buttonAdditionalClass'   => 'rounded-0',
-                                    'position'                => 'right'
-                                ],
-                                'share'   => [
-                                    'title'                   => false,
-                                    'type'                    => 'primary',
-                                    'tooltipTitle'            => 'Share Selected Filter',
-                                    'icon'                    => 'share-alt',
-                                    'noMargin'                => true,
-                                    'disabled'                => true,
-                                    'buttonAdditionalClass'   => 'rounded-0',
-                                    'position'                => 'right'
-                                ]
+                            'fieldInputType'                      => 'select',
+                            'fieldHelp'                           => false,
+                            'fieldDataSelectOptionsZero'          => 'Select Filter',
+                            'fieldDataSelectOptions'              => $this->params['dtFilters'],
+                            'fieldDataSelectOptionsArray'         => true,
+                            'fieldDataSelectOptionsKey'           => 'id',
+                            'fieldDataSelectOptionsValue'         => 'name'
+                        ]
+                    ) .
+                '</form>
+            </div>';
 
-                            ],
-                        'fieldInputType'                      => 'select',
-                        'fieldHelp'                           => false,
-                        'fieldDataSelectOptionsZero'          => 'Select Filter',
-                        'fieldDataSelectOptions'              => $this->params['dtFilters'],
-                        'fieldDataSelectOptionsArray'         => true,
-                        'fieldDataSelectOptionsKey'           => 'id',
-                        'fieldDataSelectOptionsValue'         => 'name'
-                    ]
-                ) .
-            '</div>';
+            $this->content .= $this->getFilterModalContent();
 
-            $this->content .= $this->getModalContent();
+            $this->content .= $this->getShareModalContent();
 
             $this->content .= $this->inclJs();
 
     }
 
-    protected function getModalContent()
+    protected function getFilterModalContent()
     {
         $this->fieldParams['dtFilterColumns'] =
             isset($this->params['dtFilterColumns']) ?
@@ -325,22 +321,17 @@ class Filter extends AdminLTETags
                                                     'disabled'                => true,
                                                     'icon'                    => 'save'
                                                 ],
-                                                'saveapply'   => [
-                                                    'title'                   => 'Save & Apply',
-                                                    'type'                    => 'secondary',
-                                                    'noMargin'                => true,
-                                                    'disabled'                => true,
-                                                    'buttonAdditionalClass'   => 'rounded-0',
-                                                    'position'                => 'right'
-                                                ],
                                                 'apply-new' => [
                                                     'title'                   => 'Apply',
                                                     'disabled'                => true,
+                                                    'buttonAdditionalClass'   => 'rounded-0 ml-1',
                                                     'icon'                    => 'filter',
                                                 ],
-                                                'cancel'   => [
-                                                    'title'                   => 'Cancel',
+                                                'saveapply'   => [
+                                                    'title'                   => 'Save & Apply',
                                                     'type'                    => 'secondary',
+                                                    // 'noMargin'                => true,
+                                                    'disabled'                => true,
                                                     'buttonAdditionalClass'   => 'rounded-0',
                                                     'position'                => 'right'
                                                 ]
@@ -359,8 +350,100 @@ class Filter extends AdminLTETags
                 'modalBodyContent'  => $modalContent,
                 'modalSize'         => 'xl',
                 'modalHeader'       => true,
+                'modalFooter'       => true,
                 'modalTitle'        => '<i class="fa fas fa-fw fa-filter"></i> ' . strtoupper($this->params['componentName'] . ' Filter'),
                 'modalEscClose'     => 'false'
+            ]
+        );
+    }
+
+    protected function getShareModalContent()
+    {
+        $modalContent =
+            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing">
+                <form autocomplete="off" class="mt-1" data-validateon="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-form">
+                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-fieldset">
+                        <div class="row">
+                            <div class="col">' .
+                                $this->useTag('fields',
+                                    [
+                                        'componentId'                         => $this->params['componentId'],
+                                        'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
+                                        'fieldId'                             => 'gid',
+                                        'fieldLabel'                          => 'Group(s)',
+                                        'fieldType'                           => 'select2',
+                                        'fieldHelp'                           => true,
+                                        'fieldHelpTooltipContent'             => 'Select Groups to share filter with',
+                                        'fieldBazScan'                        => true,
+                                        'fieldRequired'                       => false,
+                                        'fieldDataSelect2Options'             =>
+                                            [
+                                                'group1'            =>
+                                                    [
+                                                        'id'            => 'group1',
+                                                        'name'          => 'Group1'
+                                                    ],
+                                                'group2'            =>
+                                                    [
+                                                        'id'            => 'group2',
+                                                        'name'          => 'Group2'
+                                                    ]
+                                            ],
+                                        'fieldDataSelect2OptionsKey'           => 'id',
+                                        'fieldDataSelect2OptionsValue'         => 'name',
+                                        'fieldDataSelect2OptionsArray'         => true,
+                                        'fieldSelect2Multiple'                 => true
+                                    ]
+                                ) .
+                            '</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">' .
+                                $this->useTag('fields',
+                                    [
+                                        'componentId'                         => $this->params['componentId'],
+                                        'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
+                                        'fieldId'                             => 'uid',
+                                        'fieldLabel'                          => 'User(s)',
+                                        'fieldType'                           => 'select2',
+                                        'fieldHelp'                           => true,
+                                        'fieldHelpTooltipContent'             => 'Select Users to share filter with',
+                                        'fieldBazScan'                        => true,
+                                        'fieldRequired'                       => false,
+                                        'fieldDataSelect2Options'             =>
+                                            [
+                                                'user1'            =>
+                                                    [
+                                                        'id'            => 'user1',
+                                                        'name'          => 'User1'
+                                                    ],
+                                                'user2'            =>
+                                                    [
+                                                        'id'            => 'user2',
+                                                        'name'          => 'User2'
+                                                    ]
+                                            ],
+                                        'fieldDataSelect2OptionsKey'           => 'id',
+                                        'fieldDataSelect2OptionsValue'         => 'name',
+                                        'fieldDataSelect2OptionsArray'         => true,
+                                        'fieldSelect2Multiple'                 => true
+                                    ]
+                                ) .
+                            '</div>
+                        </div>
+                    </fieldset>
+                </form>
+            </section>';
+
+        return $this->useTag('modal',
+            [
+                'modalId'           => $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-modal',
+                'modalBodyContent'  => $modalContent,
+                'modalSize'         => 'lg',
+                'modalHeader'       => true,
+                'modalFooter'       => true,
+                'modalTitle'        => '<i class="fa fas fa-fw fa-share-alt"></i> ' . strtoupper($this->params['componentName'] . ' Filter share'),
+                'modalEscClose'     => 'true'
             ]
         );
     }
@@ -372,6 +455,18 @@ class Filter extends AdminLTETags
                 'if (!window["dataCollection"]["' . $this->params['componentId'] . '"]) {
                     window["dataCollection"]["' . $this->params['componentId'] . '"] = { };
                 }
+                window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing"] =
+                    $.extend(
+                        window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing"],
+                        {
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-gid" : {
+                                placeholder: "Select Group(s)",
+                            },
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-uid" : {
+                                placeholder: "Select User(s)",
+                            },
+                        }
+                    );
                 window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter"] =
                     $.extend(
                         window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter"],
@@ -380,10 +475,10 @@ class Filter extends AdminLTETags
                                 placeholder: "SELECT AND/OR",
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : {
-                            placeholder: "SELECT FIELD TO FILTER",
+                                placeholder: "SELECT FIELD TO FILTER",
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : {
-                            placeholder: "SELECT FILTER OPERATOR",
+                                placeholder: "SELECT FILTER OPERATOR",
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : {
                             },
@@ -425,8 +520,8 @@ class Filter extends AdminLTETags
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "required"
                                 },
                                 messages: {
+                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor" : "Please select either And/Or",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "Please select a field",
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "Please select either And/Or",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : "Please select an operator",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "Please enter value. Numeric Fields only accept numbers or comma or decimal point"
                                 }

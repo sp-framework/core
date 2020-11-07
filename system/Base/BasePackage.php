@@ -181,7 +181,11 @@ abstract class BasePackage extends Controller
 				$conditionArr = explode(':', $condition);
 
 				if (Arr::firstKey($postConditions) !== $conditionKey) {
-					$conditions .= ' ' . strtoupper($conditionArr[0]) . ' ';
+					if ($conditionArr[0] === '') {
+						$conditions .= ' AND ';//Default for AND/OR
+					} else {
+						$conditions .= ' ' . strtoupper($conditionArr[0]) . ' ';
+					}
 				}
 
 				$conditionArr[1] = str_replace(' ', '_', strtolower($conditionArr[1]));

@@ -81,6 +81,7 @@
 
             //Build listing filters
             _proto._buildListingFilters = function() {
+                $('#' + sectionId + '-sharing').BazContentFields();
                 $(this._element).BazContentSectionWithFormToDatatable();
 
                 //Filter Buttons
@@ -90,32 +91,27 @@
 
                         $('#' + sectionId + '-filter-edit, ' +
                           '#' + sectionId + '-filter-delete, ' +
-                          '#' + sectionId + '-filter-share, ' +
-                          '#' + sectionId + '-filter-apply-saved'
+                          '#' + sectionId + '-filter-share'
                         ).attr("disabled", true);
 
                     } else {
                         $('#' + sectionId + '-filter-apply-saved').attr("disabled", false);
 
-                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0) {
+                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0 || //System
+                            $('#' + sectionId + '-filter-filters option:selected').data('permission') === 2    //Shared
+                        ) {
                             $('#' + sectionId + '-filter-edit, ' +
                               '#' + sectionId + '-filter-delete, ' +
                               '#' + sectionId + '-filter-share'
                             ).attr("disabled", true);
 
-                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) {
-                            //User
+                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) { //User
                             $('#' + sectionId + '-filter-edit, ' +
                               '#' + sectionId + '-filter-delete, ' +
                               '#' + sectionId + '-filter-share'
                             ).attr("disabled", false);
                         }
-                    }
-                });
 
-                //Apply-Saved
-                $('#' + sectionId + '-apply-saved').click(function() {
-                    if ($('#' + sectionId + '-filter-filters option:selected').val() !== "0") {
                         query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
 
                         $('#' + sectionId + '-filter-modal').modal('hide');
@@ -128,8 +124,29 @@
                     }
                 });
 
+                // Add additional text to selection options
+                $('#' + sectionId + '-filters').children().each(function(index, filter) {
+                    var html = $(filter).html();
+                    if ($(filter).data()['permission'] == 0) {
+                        $(filter).html(html + ' (System)');
+                    } else if ($(filter).data()['permission'] == 2) {
+                        $(filter).html(html + ' (Shared)');
+                    } else if ($(filter).data()['shared_ids'] &&
+                               $(filter).data()['shared_ids'] !== ""
+                    ) {
+                        $(filter).html(html + ' (Sharing)');
+                    }
+                });
+
+                //Open Sharing Modal
+                $('#' + sectionId + '-share').click(function(e) {
+                    e.preventDefault();
+                    $('#' + sectionId + '-filter-sharing-modal').modal('show');
+                });
+
                 //Reset
-                $('#' + sectionId + '-reset').click(function() {
+                $('#' + sectionId + '-reset').click(function(e) {
+                    e.preventDefault();
                     query = '';
 
                     that._filterRunAjax(
@@ -137,21 +154,125 @@
                         datatableOptions.paginationCounters.limit,
                         query
                     );
+                    $('#' + sectionId + '-filter-filters').val(0);
                 });
 
                 //Close Modal
-                $('#' + sectionId + '-cancel').click(function() {
+                $('#' + sectionId + '-cancel').click(function(e) {
+                    e.preventDefault();
                     $('#' + sectionId + '-filter-modal').modal('hide');
                 });
 
                 //Add / Open Modal
-                $('#' + sectionId + '-add').click(function() {
+                $('#' + sectionId + '-add').click(function(e) {
+                    e.preventDefault();
+
                     $('#' + sectionId + '-filter-modal').modal('show');
                 });
 
                 //Edit / Open Modal
-                $('#' + sectionId + '-edit').click(function() {
+                $('#' + sectionId + '-edit').click(function(e) {
+                    e.preventDefault();
+
+                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+                    var conditionsStr = $(selectedFilter).data().conditions;
+                    var conditions = conditionsStr.substring(0, conditionsStr.length - 1);
+                    var conditionsRows = conditions.split('&');
+                    var conditionsColumns = [];
+
+                    $.each(conditionsRows, function(index, row) {
+                        conditionsColumns[index] = row.split(':');
+                    });
+
+                    var select2FieldData;
+
+                    //Andor Object
+                    select2FieldData = $('#' + sectionId + '-filter-andor option');
+                    var andOrS2 = { };
+                    select2FieldData.each(function(index, data) {
+                        if ($(data).data().value) {
+                            andOrS2[$(data).data().value] = $(data)[0].innerHTML;
+                        }
+                    });
+
+                    //Andor Object
+                    select2FieldData = $('#' + sectionId + '-filter-field option');
+                    var fieldS2 = { };
+                    select2FieldData.each(function(index, data) {
+                        if ($(data).data().value) {
+                            fieldS2[$(data).data().value] = $(data)[0].innerHTML;
+                        }
+                    });
+
+                    //Andor Object
+                    select2FieldData = $('#' + sectionId + '-filter-operator option');
+                    var operatorS2 = { };
+                    select2FieldData.each(function(index, data) {
+                        if ($(data).data().value) {
+                            operatorS2[$(data).data().value] = $(data)[0].innerHTML;
+                        }
+                    });
+
+                    var columns = { };
+                    //eslint-disable-next-line
+                    console.log(conditionsColumns);
+                    $.each(conditionsColumns, function(index, column) {
+
+                        columns[index] = { };
+                        columns[index][0] = { };
+                        columns[index][0]['id'] = sectionId + '-filter-andor';
+
+                        if (!andOrS2[column[0]]) {
+                            columns[index][0]['extractedData'] = '<span class="' + column[0] + '"></span><br>';
+                        } else {
+                            columns[index][0]['extractedData'] = '<span class="' + column[0] + '">' + andOrS2[column[0]] + '</span><br>';
+                        }
+
+                        columns[index][1] = { };
+                        columns[index][1]['id'] = sectionId + '-filter-field';
+                        columns[index][1]['extractedData'] = '<span class="' + column[1] + '">' + fieldS2[column[1]] + '</span><br>';
+
+                        columns[index][2] = { };
+                        columns[index][2]['id'] = sectionId + '-filter-operator';
+                        columns[index][2]['extractedData'] = '<span class="' + column[2] + '">' + operatorS2[column[2]] + '</span><br>';
+
+                        columns[index][3] = { };
+                        columns[index][3]['id'] = sectionId + '-filter-value';
+                        columns[index][3]['extractedData'] = column[3];
+
+                        columns[index][4] = { };
+                        columns[index][4]['id'] = sectionId + '-filter-actions';
+                        columns[index][4]['extractedData'] =
+                            '<button data-row-id="' + (index + 1) + '" type="button" class="btn btn-xs btn-danger float-right ml-1' +
+                            ' tableDeleteButton"><i class="fa fas fa-fw text-xs fa-trash"></i></button><button data-row-id="' +
+                            (index + 1) + '" type="button" class="btn btn-xs btn-primary float-right tableEditButton"><i class="fa ' +
+                            'fas fa-fw text-xs fa-edit"></i></button>';
+                    });
+
+                    dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = columns;
+
+                    dataCollection[componentId][sectionId + '-filter']['BazContentSectionWithFormToDatatable']._dataArrToTableData();
+
                     $('#' + sectionId + '-filter-modal').modal('show');
+                });
+
+                //Delete
+                $('#' + sectionId + '-delete').click(function(e) {
+                    e.preventDefault();
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+
+                    if ($(selectedFilter).data().ns === true) {
+                        $('#' + sectionId + '-filter-filters').val(0);
+                        $(selectedFilter).remove();
+                        $('#' + sectionId + '-filter-edit, ' +
+                          '#' + sectionId + '-filter-delete'
+                        ).attr("disabled", true);
+                    } else {
+                        //Delete via post
+                    }
                 });
 
                 // Add Numeric for numberic fields
@@ -201,6 +322,7 @@
                         $('#' + sectionId + '-filter-value').attr('disabled', false);
                     }
                 });
+
                 $('body').on('formToDatatableTableRowEdit', function() {
                     if ($('#' + sectionId + '-filter-operator').val() === 'empty' ||
                         $('#' + sectionId + '-filter-operator').val() === 'notempty'
@@ -220,34 +342,60 @@
                     }
                 });
 
-                //Adding to table
-                $('#' + sectionId + '-assign-button').click(function() {
-                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
-                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
-                    }
+                //Adding/Updating to table
+                $('#' + sectionId + '-assign-button').click(function(e) {
+                    e.preventDefault();
 
                     $('#' + sectionId + '-filter-name').attr('disabled', false);
                     $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
                     $('#' + sectionId + '-filter-value').attr('disabled', false);
                 });
 
-                //For last Row - Remove And/Or
+                //Remove First And Or
+                $('body').on('formToDatatableTableUpdated', function() {
+                    $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
+
+                    //Remove numeric from edit data
+                    $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
+                       //eslint-disable-next-line
+                       // console.log($(tr).find('td'));
+                       var field = $(tr).find('td')[1];
+                       field.innerHTML = field.innerHTML.replace(" (Numeric)", "");
+                       // $(tr)..innerHTML = $(td)[0].innerHTML.replace(" (Numeric)", "");
+                    });
+                    // $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).off();
+                    $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).click(function() {
+                        $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    });
+                });
+
+                $('body').on('formToDatatableTableUpdatedClicked', function() {
+                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
+                });
+
+                //If Only 1 row - Remove And/Or
                 $('body').on('formToDatatableTableRowDelete', function() {
                     if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
-                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
-
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
+                    }
+                    //eslint-disable-next-line
+                    console.log($('#' + sectionId + '-table tbody td.dataTables_empty'));
+                    if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
                         $('#' + sectionId + '-filter-name').attr('disabled', true);
                         $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-name').attr('disabled', false);
+                        $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
                     }
                 });
 
                 //Add Apply (Temp) & Close Modal
-                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function() {
+                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function(e) {
+                    e.preventDefault();
+                    query = '';
+
                     var tableData =
                         dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'];
-
-                    //eslint-disable-next-line
-                    console.log(tableData);
 
                     $.each(tableData, function(index, data) {
                         if (index === 0) {
@@ -266,25 +414,75 @@
                         }
                     });
 
-                    //eslint-disable-next-line
-                    console.log(query);
+                    //Make Filter Call
                     $('#' + sectionId + '-filter-modal').modal('hide');
                     that._filterRunAjax(
                         1,
                         datatableOptions.paginationCounters.limit,
                         query
                     );
-                    // that._updateCounters();
+
+                    if ($(this)[0].id === sectionId + '-filter-apply-new') {
+                        var filtersCount = $('#' + sectionId + '-filter-filters').children('option').length + 1;
+
+                        $('#' + sectionId + '-filter-filters')
+                            .append($('<option />')
+                                .val(filtersCount)
+                                .text('Filter Results ' + filtersCount + ' (Not Saved)')
+                                .prop('selected', true)
+                                .data({
+                                    "conditions"  : query,
+                                    "permissions" : 1,
+                                    "value"       : filtersCount,
+                                    "component_id": $(this).parents('.component').data()['component_id'],
+                                    "ns"          : true
+                                })
+                                .attr({
+                                    "data-conditions"   : query,
+                                    "data-permissions"  : 1,
+                                    "data-value"        : filtersCount,
+                                    "data-shared_ids"   : "",
+                                    "data-component_id" : $(this).parents('.component').data()['component_id'],
+                                    "ns"          : true
+                                })
+                            );
+                    }
+
+                    clearStoredData();
+
+                    $('#' + sectionId + '-filter-edit, ' +
+                      '#' + sectionId + '-filter-delete'
+                    ).attr("disabled", false);
+
                 });
 
-                //Save and Apply & Close Modal
+                function clearStoredData() {
+                    $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    $('#' + sectionId + '-filter-field').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-operator').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-value').val('');
 
-                //Delete
+                    query = '';
 
-                //Share
+                    dataCollection[componentId][sectionId + '-filter']['datatables'][sectionId + '-filter-table']
+                        .rows().clear().draw();
 
-                //Select Guid and Uids
-                // Need to create share modal
+                    dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = [];
+                    $('#' + sectionId + '-filter-name').attr('disabled', true);
+                    $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
+                    $('#' + sectionId + '-filter-save').attr('disabled', true);
+                    $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                    $('#' + sectionId + '-filter-cancel-button').attr('hidden', true);
+                    $('#' + sectionId + '-filter-update-button').attr('hidden', true);
+                    $('#' + sectionId + '-filter-assign-button').attr('hidden', false);
+                    $('#' + sectionId + '-filter-update-button').off();//Important
+                }
+
+                $('#' + sectionId + '-modal .modal-close').click(function(e) {
+                    e.preventDefault();
+
+                    clearStoredData();
+                });
             }
 
             //Build listing datatable
@@ -685,7 +883,7 @@
 
                     thisOptions['datatable'].on('draw', function () {
                         if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
-                            $('.dataTables_empty').last().html('...');
+                            $('.dataTables_empty').last().html('No entries found');
                         }
                     });
 

@@ -152,7 +152,7 @@ class Modal extends AdminLTETags
                         $this->content .=
                             '<div class="modal-header bg-' . $this->modalParams['modalType'] .' rounded-0">
                                 <h5 class="modal-title" id="' . $this->modalParams['modalId'] . '-label">' . $this->modalParams['modalTitle'] . '</h5>
-                                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                <button type="button" class="close modal-close text-white" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>';
@@ -167,7 +167,7 @@ class Modal extends AdminLTETags
 
                         $this->content .=
                             '<div class="modal-footer ' . $this->modalParams['modalFooterAdditionalClasses'] . '">
-                            <button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-xs" data-dismiss="modal">' . $this->modalParams['modalButtonSecondaryTitle'] . '</button>';
+                            <button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-xs modal-close" data-dismiss="modal">' . $this->modalParams['modalButtonSecondaryTitle'] . '</button>';
 
                             if (isset($this->params['modalFooterButtonSubmitTitle'])) {
                                 $this->content .=

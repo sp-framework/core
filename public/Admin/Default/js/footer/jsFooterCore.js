@@ -4555,7 +4555,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
             multiTable,
             selectedTable,
             dataTableFields,
-            tableData,
             pnotifySound;
 
         var BazContentSectionWithFormToDatatable = function () {
@@ -4577,12 +4576,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 sectionId = $(this._element)[0].id;
 
                 dataTableFields = { };
-                tableData = { };
                 dataTableFields[componentId] = { };
                 dataTableFields[componentId][sectionId] = { };
-                tableData[sectionId] = { };
 
                 sectionOptions = dataCollection[componentId][sectionId];
+                sectionOptions['datatables'] = { };
                 //eslint-disable-next-line
                 // console.log(sectionOptions);
 
@@ -4609,6 +4607,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     this._fieldsToDatatable(sectionId);
                 }
 
+                // $('body').on('dataArrToTableData', function() {
+                //     that._dataArrToTableData();
+                // });
             }
 
             _proto._validateForm = function (onSuccess, type, preValidated, formId) {
@@ -4651,6 +4652,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 } else {
                     that._error('Datatable Parameters missing for datatable - ' + fieldsetDatatable);
                 }
+
                 if ($.inArray('true', addSeq) !== -1) {
                     $('#' + fieldsetDatatable + '-fields').prepend(
                         '<div class="row margin-top-10 d-none">' +
@@ -4685,14 +4687,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         labels + '</thead><tbody></tbody></table></div>'
                         );
                     //Init Datatable
-                    tableData[sectionId][v] = { };
-                    tableData[sectionId][v] = $('#' + v + '-data').DataTable(sectionOptions[v].datatable);
+                    sectionOptions['datatables'][v] = $('#' + v + '-data').DataTable(sectionOptions[v].datatable);
                     if (sectionOptions[v].datatable.rowReorder) {
                         // If rowReorder enabled
-                        tableData[sectionId][v].on('row-reorder', function() {
-                            that._rowReorderRedoSeq(tableData[sectionId][v], v);
+                        sectionOptions['datatables'][v].on('row-reorder', function() {
+                            that._rowReorderRedoSeq(sectionOptions['datatables'][v], v);
                             // that._rowReorderDatatableDataToObject(details, sectionId, fieldsetDatatable, v);
-                            tableData[sectionId][v].draw();
+                            sectionOptions['datatables'][v].draw();
                         });
                     }
                 });
@@ -4715,14 +4716,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     //Execute preExtraction script passed from the html(js script)
                     if (sectionOptions[datatable].preExtraction) {
-                        sectionOptions[datatable].preExtraction(tableData[sectionId][datatable]);
+                        sectionOptions[datatable].preExtraction(sectionOptions['datatables'][datatable]);
                     }
 
                     extractDatatableFieldsData = that._extractDatatableFieldsData(fieldsetDatatable, datatable, false);
 
                     //Execute postExtraction script passed from the html(js script)
                     if (sectionOptions[datatable].postExtraction) {
-                        sectionOptions[datatable].postExtraction(tableData[sectionId][datatable], extractDatatableFieldsData);
+                        sectionOptions[datatable].postExtraction(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
                     }
 
                     var validated = that._validateForm(false, 'section', false, fieldsetDatatable + '-form');
@@ -4730,29 +4731,36 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     if (validated) {
 
                         var rowAdded =
-                            that._addExtractFieldsToDatatable(null, extractDatatableFieldsData, fieldsetDatatable, datatable, false);
+                            that._addExtractFieldsToDatatable(
+                                null,
+                                extractDatatableFieldsData,
+                                fieldsetDatatable,
+                                datatable,
+                                false,
+                                false
+                            );
 
                         if (rowAdded) {
                             $('#' + fieldsetDatatable).find('.jstreevalidate').val('');
 
                             // that._validateForm(false, 'sections', true, null);
 
-                            tableData[sectionId][datatable].responsive.recalc();
+                            sectionOptions['datatables'][datatable].responsive.recalc();
 
                             that._registerDatatableButtons(
-                                tableData[sectionId][datatable],
+                                sectionOptions['datatables'][datatable],
                                 $('#' + datatable + '-div'),
                                 datatable,
                                 sectionId,
                                 fieldsetDatatable
                             );
 
-                            // var table = tableData[sectionId][datatable];
+                            // var table = sectionOptions['datatables'][datatable];
 
-                            tableData[sectionId][datatable].on('responsive-display', function (showHide) {
+                            sectionOptions['datatables'][datatable].on('responsive-display', function (showHide) {
                                 if (showHide) {
                                     that._registerDatatableButtons(
-                                        tableData[sectionId][datatable],
+                                        sectionOptions['datatables'][datatable],
                                         $('#' + datatable + '-div'),
                                         datatable,
                                         sectionId,
@@ -4763,12 +4771,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                             //Execute postSuccess script passed from the html(js script)
                             if (sectionOptions[datatable].postSuccess) {
-                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable], extractDatatableFieldsData);
+                                sectionOptions[datatable].postSuccess(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
                             }
 
                             that._clearDatatableFormData(datatable, fieldsetDatatable);
                         }
                     }
+                    $('body').trigger('formToDatatableTableAssignClicked');
                 });
             };
 
@@ -4844,9 +4853,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 extractedFieldsData[counter].extractedData = null;
                                 $($(v)[0].selectedOptions).each(function(i,v){
                                     if (!extractedFieldsData[counter].extractedData) {
-                                        extractedFieldsData[counter].extractedData = '<span id="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
+                                        extractedFieldsData[counter].extractedData = '<span class="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
                                     } else {
-                                        extractedFieldsData[counter].extractedData = extractedFieldsData[counter].extractedData + '<span id="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
+                                        extractedFieldsData[counter].extractedData = extractedFieldsData[counter].extractedData + '<span class="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
                                     }
                                 });
                             }
@@ -4856,7 +4865,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 for (i = 0; i < Object.keys(treeData).length; i++) {
                                     extractedJstreeData[counter][i] = { };
                                     extractedJstreeData[counter][i].id = v.id;
-                                    extractedJstreeData[counter][i].extractedData = '<span id="' + treeData[i].id + '" data-jstreeId="' + treeData[i].jstreeId + '">' + treeData[i].path + '</span><br>';
+                                    extractedJstreeData[counter][i].extractedData = '<span class="' + treeData[i].id + '" data-jstreeId="' + treeData[i].jstreeId + '">' + treeData[i].path + '</span><br>';
                                     extractedJstreeData[counter][i].absolutePath = treeData[i].path;
                                     extractedJstreeData[counter][i].nodeName = treeData[i].nodeName;
                                 }
@@ -4889,8 +4898,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
 
                 if (datatable) {
-                    if (tableData[sectionId][datatable].row().count() >= 0) {
-                        rowId = tableData[sectionId][datatable].row().count() + 1;
+                    if (sectionOptions['datatables'][datatable].row().count() >= 0) {
+                        rowId = sectionOptions['datatables'][datatable].row().count() + 1;
                     }
 
                     if (Object.keys(extractedJstreeData).length > 0) {
@@ -4957,7 +4966,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
             };
 
             //Add extracted fields data to datatable
-            _proto._addExtractFieldsToDatatable = function(rowIndex, extractDatatableFieldsData, fieldsetDatatable, datatable, isEdit) {
+            _proto._addExtractFieldsToDatatable = function(rowIndex, extractDatatableFieldsData, fieldsetDatatable, datatable, isEdit, isImport) {
                 var migrateData = false;
                 var oldDataTable;
                 // Need to convert to array to add to datatable to merge them later to object and add values to datatable
@@ -4974,7 +4983,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
 
                 if (!isEdit && sectionOptions[datatable].datatable.rowReorder) {
-                    var seq = tableData[sectionId][datatable].rows().count();
+                    var seq = sectionOptions['datatables'][datatable].rows().count();
                     if (seq === 0) {
                         seq = 1;
                     } else {
@@ -4999,7 +5008,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
 
                 if (sectionOptions[datatable].bazdatatable && sectionOptions[datatable].bazdatatable.compareData) {
-                    if (tableData[sectionId][datatable].rows().count() > 0) {
+                    if (sectionOptions['datatables'][datatable].rows().count() > 0) {
 
                         $('#' + datatable).children().find('tbody tr').removeClass('animated fadeIn bg-warning');
                         $('#' + datatable).children().find('tbody tr').children().removeClass('animated fadeIn bg-warning');
@@ -5008,7 +5017,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             that._compareData(
                                 sectionOptions[datatable].bazdatatable.compareData,
                                 extractDatatableFieldsData,
-                                tableData[sectionId][datatable].rows().data(),
+                                sectionOptions['datatables'][datatable].rows().data(),
                                 rowIndex,
                                 datatable
                             );
@@ -5027,18 +5036,21 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     if (rowIndex !== null) {//rowIndex is from editDatatableRow
                         if (!migrateData) {
                             $(rowExtractedData).each(function(i,v) {
-                                tableData[sectionId][datatable].row(rowIndex).data(v).draw();
+                                sectionOptions['datatables'][datatable].row(rowIndex).data(v).draw();
                             });
                         } else {
-                            tableData[oldDataTable].row(rowIndex).remove().draw();
+                            sectionOptions['datatable'][oldDataTable].row(rowIndex).remove().draw();
                             $(rowExtractedData).each(function(i,v) {
-                                var drawnRow = tableData[sectionId][datatable].row.add(v).draw().node();
+                                var drawnRow = sectionOptions['datatables'][datatable].row.add(v).draw().node();
                                 $(drawnRow).children('td').addClass('pb-1 pt-1');
                             });
                             // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, oldDataTable);
-                            that._tableDataToObj();
+                            if (!isImport) {
+                                that._tableDataToObj();
+                            }
+
                             that._registerDatatableButtons(
-                               tableData[oldDataTable],
+                               sectionOptions['datatable'][oldDataTable],
                                $('#' + datatable + '-div'),
                                datatable,
                                sectionId,
@@ -5046,7 +5058,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             );
                         }
                         that._registerDatatableButtons(
-                           tableData[sectionId][datatable],
+                           sectionOptions['datatables'][datatable],
                            $('#' + datatable + '-div'),
                            datatable,
                            sectionId,
@@ -5055,11 +5067,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         rowIndex = null;
                     } else {//add new row
                         $(rowExtractedData).each(function(i,v) {
-                            var drawnRow = tableData[sectionId][datatable].row.add(v).draw().node();
+                            var drawnRow = sectionOptions['datatables'][datatable].row.add(v).draw().node();
                             $(drawnRow).children('td').addClass('pb-1 pt-1');
                         });
                         that._registerDatatableButtons(
-                           tableData[sectionId][datatable],
+                           sectionOptions['datatables'][datatable],
                            $('#' + datatable + '-div'),
                            datatable,
                            sectionId,
@@ -5068,13 +5080,18 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
                     //Add data to object
                     // this._addEditDatatableDataToObject(rowIndex, rowExtractedId, rowExtractedData, fieldsetDatatable, sectionId, datatable);
-                    that._tableDataToObj();
+                    if (!isImport) {
+                        that._tableDataToObj();
+                    }
+                    $('body').trigger('formToDatatableTableUpdated');
                     return true;
                 }
             };
 
             //Edit table Row
             _proto._editDatatableRow = function(fieldsetDatatable, rowIndex, rowData, datatable) {
+                //eslint-disable-next-line
+                console.log(fieldsetDatatable, rowIndex, rowData, datatable);
                 var fieldsetFields = [];
                 if ($(sectionOptions[fieldsetDatatable + '-datatables']).length > 1) {
                     $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
@@ -5160,34 +5177,49 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 $('#' + fieldsetDatatable + '-update-button').attr('hidden', false);
                 $('#' + fieldsetDatatable + '-assign-button').attr('hidden', true);
                 // Then we extract data again, Compare again, Update data
-                $('#' + fieldsetDatatable + '-update-button').off();
+                $('#' + fieldsetDatatable + '-update-button').off();//Important
                 $('#' + fieldsetDatatable + '-update-button').click(function(e) {
                     e.preventDefault();
 
                     var validated = that._validateForm(false, 'section', false, fieldsetDatatable + '-form');
 
                     if (validated) {
+
+                        //Execute preExtraction script passed from the html(js script)
+                        if (sectionOptions[datatable].preExtraction) {
+                            sectionOptions[datatable].preExtraction(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
+                        }
+
                         extractDatatableFieldsData = that._extractDatatableFieldsData(fieldsetDatatable, datatable, true);
+
+                        //Execute postExtraction script passed from the html(js script)
+                        if (sectionOptions[datatable].postExtraction) {
+                            sectionOptions[datatable].postExtraction(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
+                        }
+
                         var rowAdded =
                             that._addExtractFieldsToDatatable(
                                 rowIndex,
                                 extractDatatableFieldsData,
                                 fieldsetDatatable,
                                 datatable,
-                                true
+                                true,
+                                false
                             );
                         if (rowAdded) {
                             //Execute postSuccess script passed from the html(js script)
                             if (sectionOptions[datatable].postSuccess) {
-                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable], extractDatatableFieldsData);
+                                sectionOptions[datatable].postSuccess(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
                             }
                         }
+
                         that._clearDatatableFormData(datatable, fieldsetDatatable);
                     }
                     // Hide cancel/update button.
                     $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
+                    $('body').trigger('formToDatatableTableUpdatedClicked');
                 });
                 $('#' + fieldsetDatatable + '-cancel-button').off();
                 $('#' + fieldsetDatatable + '-cancel-button').click(function() {
@@ -5196,7 +5228,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
                     that._clearDatatableFormData(datatable, fieldsetDatatable);
+                    $('body').trigger('formToDatatableTableCancelClicked');
                 });
+
             };
 
             //Compare extracted fields data with data already in table
@@ -5436,7 +5470,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             that._registerDatatableButtons(table, el, datatable, sectionId, fieldsetDatatable);
                             //Execute postSuccess script passed from the html(js script)
                             if (sectionOptions[datatable].postSuccess) {
-                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable]);
+                                sectionOptions[datatable].postSuccess(sectionOptions['datatables'][datatable]);
                             }
                             // Hide cancel/update button.
                             $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
@@ -5448,6 +5482,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             if ($('#' + fieldsetDatatable + '-table-data tbody tr td.dataTables_empty').length === 1) {
                                 $('body').trigger('formToDatatableTableEmpty');
                             }
+                            that._tableDataToObj();
                         });
                     });
                     $(this).find('.tableEditButton').each(function() {
@@ -5465,7 +5500,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             that._editDatatableRow(fieldsetDatatable, rowIndex, rowData, datatable);
                             //Execute onEdit script passed from the html(js script)
                             if (sectionOptions[datatable].onEdit) {
-                                sectionOptions[datatable].onEdit(tableData[sectionId][datatable]);
+                                sectionOptions[datatable].onEdit(sectionOptions['datatables'][datatable]);
                             }
                             $('body').trigger('formToDatatableTableRowEdit');
                         });
@@ -5502,6 +5537,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 $(v).val('');
                             }
                             if ($(v)[0].tagName === "SELECT") {//select2
+                                $(v).children('option').attr('disabled', false);
                                 $(v).val(null).trigger('change');
                             }
                             if ($(v)[0].tagName === 'DIV') {
@@ -5530,7 +5566,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
             _proto._tableDataToObj = function()
             {
                 // for (var sectionId in tableData) {
-                    for (var data in tableData[sectionId]) {
+                    for (var data in sectionOptions['datatables']) {
                         var excludeActions = false;
                         var excludeSeqAndSort = false;
                         var currentTableDataLength = 0;
@@ -5547,7 +5583,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                         dataCollection[componentId][sectionId][data]['data'] = [];
 
-                        $.each(tableData[sectionId][data].rows().data(), function(i,v) {
+                        $.each(sectionOptions['datatables'][data].rows().data(), function(i,v) {
                             var startAt = 0;
                             if (excludeSeqAndSort && excludeActions) {
                                 currentTableDataLength = v.length - 3;
@@ -5562,9 +5598,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             dataCollection[componentId][sectionId][data]['data'][i] = { };
                             for (var j = 0; j < currentTableDataLength; j++) {
                                 var columnData;
-                                var columnDataHasId = v[startAt].match(/id="(.*?)"/g)
-                                if (columnDataHasId) {
-                                    columnData = (columnDataHasId.toString().match(/"(.*?)"/g)).toString().replace(/"/g, '');
+                                var columnDataHasClass = v[startAt].match(/class="(.*?)"/g)
+                                if (columnDataHasClass) {
+                                    columnData = (columnDataHasClass.toString().match(/"(.*?)"/g)).toString().replace(/"/g, '');
                                 } else {
                                     columnData = v[startAt];
                                 }
@@ -5574,6 +5610,33 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         });
                     }
                 // }
+            }
+
+            // Add tables data from dataCollection
+            _proto._dataArrToTableData = function()
+            {
+                //eslint-disable-next-line
+                console.log('i triggered');
+                for (var table in sectionOptions['datatables']) {
+                    //eslint-disable-next-line
+                    // console.log(table);
+                    for (var data in sectionOptions[table]['data']) {
+                        //eslint-disable-next-line
+                        // console.log(sectionOptions[table]['data'][data]);
+                        that._addExtractFieldsToDatatable(
+                            null,
+                            {"0" : sectionOptions[table]['data'][data]},
+                            sectionId,
+                            table,
+                            false,
+                            true
+                        );
+                    }
+                }
+                // $('body').off('dataArrToTableData');
+                // $('body').on('dataArrToTableData', function() {
+                //     that._dataArrToTableData();
+                // });
             }
 
             BazContentSectionWithFormToDatatable._jQueryInterface = function _jQueryInterface(options) {
@@ -5708,6 +5771,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
             //Build listing filters
             _proto._buildListingFilters = function() {
+                $('#' + sectionId + '-sharing').BazContentFields();
                 $(this._element).BazContentSectionWithFormToDatatable();
 
                 //Filter Buttons
@@ -5717,32 +5781,27 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                         $('#' + sectionId + '-filter-edit, ' +
                           '#' + sectionId + '-filter-delete, ' +
-                          '#' + sectionId + '-filter-share, ' +
-                          '#' + sectionId + '-filter-apply-saved'
+                          '#' + sectionId + '-filter-share'
                         ).attr("disabled", true);
 
                     } else {
                         $('#' + sectionId + '-filter-apply-saved').attr("disabled", false);
 
-                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0) {
+                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0 || //System
+                            $('#' + sectionId + '-filter-filters option:selected').data('permission') === 2    //Shared
+                        ) {
                             $('#' + sectionId + '-filter-edit, ' +
                               '#' + sectionId + '-filter-delete, ' +
                               '#' + sectionId + '-filter-share'
                             ).attr("disabled", true);
 
-                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) {
-                            //User
+                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) { //User
                             $('#' + sectionId + '-filter-edit, ' +
                               '#' + sectionId + '-filter-delete, ' +
                               '#' + sectionId + '-filter-share'
                             ).attr("disabled", false);
                         }
-                    }
-                });
 
-                //Apply-Saved
-                $('#' + sectionId + '-apply-saved').click(function() {
-                    if ($('#' + sectionId + '-filter-filters option:selected').val() !== "0") {
                         query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
 
                         $('#' + sectionId + '-filter-modal').modal('hide');
@@ -5755,8 +5814,29 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
                 });
 
+                // Add additional text to selection options
+                $('#' + sectionId + '-filters').children().each(function(index, filter) {
+                    var html = $(filter).html();
+                    if ($(filter).data()['permission'] == 0) {
+                        $(filter).html(html + ' (System)');
+                    } else if ($(filter).data()['permission'] == 2) {
+                        $(filter).html(html + ' (Shared)');
+                    } else if ($(filter).data()['shared_ids'] &&
+                               $(filter).data()['shared_ids'] !== ""
+                    ) {
+                        $(filter).html(html + ' (Sharing)');
+                    }
+                });
+
+                //Open Sharing Modal
+                $('#' + sectionId + '-share').click(function(e) {
+                    e.preventDefault();
+                    $('#' + sectionId + '-filter-sharing-modal').modal('show');
+                });
+
                 //Reset
-                $('#' + sectionId + '-reset').click(function() {
+                $('#' + sectionId + '-reset').click(function(e) {
+                    e.preventDefault();
                     query = '';
 
                     that._filterRunAjax(
@@ -5764,21 +5844,125 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         datatableOptions.paginationCounters.limit,
                         query
                     );
+                    $('#' + sectionId + '-filter-filters').val(0);
                 });
 
                 //Close Modal
-                $('#' + sectionId + '-cancel').click(function() {
+                $('#' + sectionId + '-cancel').click(function(e) {
+                    e.preventDefault();
                     $('#' + sectionId + '-filter-modal').modal('hide');
                 });
 
                 //Add / Open Modal
-                $('#' + sectionId + '-add').click(function() {
+                $('#' + sectionId + '-add').click(function(e) {
+                    e.preventDefault();
+
                     $('#' + sectionId + '-filter-modal').modal('show');
                 });
 
                 //Edit / Open Modal
-                $('#' + sectionId + '-edit').click(function() {
+                $('#' + sectionId + '-edit').click(function(e) {
+                    e.preventDefault();
+
+                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+                    var conditionsStr = $(selectedFilter).data().conditions;
+                    var conditions = conditionsStr.substring(0, conditionsStr.length - 1);
+                    var conditionsRows = conditions.split('&');
+                    var conditionsColumns = [];
+
+                    $.each(conditionsRows, function(index, row) {
+                        conditionsColumns[index] = row.split(':');
+                    });
+
+                    var select2FieldData;
+
+                    //Andor Object
+                    select2FieldData = $('#' + sectionId + '-filter-andor option');
+                    var andOrS2 = { };
+                    select2FieldData.each(function(index, data) {
+                        if ($(data).data().value) {
+                            andOrS2[$(data).data().value] = $(data)[0].innerHTML;
+                        }
+                    });
+
+                    //Andor Object
+                    select2FieldData = $('#' + sectionId + '-filter-field option');
+                    var fieldS2 = { };
+                    select2FieldData.each(function(index, data) {
+                        if ($(data).data().value) {
+                            fieldS2[$(data).data().value] = $(data)[0].innerHTML;
+                        }
+                    });
+
+                    //Andor Object
+                    select2FieldData = $('#' + sectionId + '-filter-operator option');
+                    var operatorS2 = { };
+                    select2FieldData.each(function(index, data) {
+                        if ($(data).data().value) {
+                            operatorS2[$(data).data().value] = $(data)[0].innerHTML;
+                        }
+                    });
+
+                    var columns = { };
+                    //eslint-disable-next-line
+                    console.log(conditionsColumns);
+                    $.each(conditionsColumns, function(index, column) {
+
+                        columns[index] = { };
+                        columns[index][0] = { };
+                        columns[index][0]['id'] = sectionId + '-filter-andor';
+
+                        if (!andOrS2[column[0]]) {
+                            columns[index][0]['extractedData'] = '<span class="' + column[0] + '"></span><br>';
+                        } else {
+                            columns[index][0]['extractedData'] = '<span class="' + column[0] + '">' + andOrS2[column[0]] + '</span><br>';
+                        }
+
+                        columns[index][1] = { };
+                        columns[index][1]['id'] = sectionId + '-filter-field';
+                        columns[index][1]['extractedData'] = '<span class="' + column[1] + '">' + fieldS2[column[1]] + '</span><br>';
+
+                        columns[index][2] = { };
+                        columns[index][2]['id'] = sectionId + '-filter-operator';
+                        columns[index][2]['extractedData'] = '<span class="' + column[2] + '">' + operatorS2[column[2]] + '</span><br>';
+
+                        columns[index][3] = { };
+                        columns[index][3]['id'] = sectionId + '-filter-value';
+                        columns[index][3]['extractedData'] = column[3];
+
+                        columns[index][4] = { };
+                        columns[index][4]['id'] = sectionId + '-filter-actions';
+                        columns[index][4]['extractedData'] =
+                            '<button data-row-id="' + (index + 1) + '" type="button" class="btn btn-xs btn-danger float-right ml-1' +
+                            ' tableDeleteButton"><i class="fa fas fa-fw text-xs fa-trash"></i></button><button data-row-id="' +
+                            (index + 1) + '" type="button" class="btn btn-xs btn-primary float-right tableEditButton"><i class="fa ' +
+                            'fas fa-fw text-xs fa-edit"></i></button>';
+                    });
+
+                    dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = columns;
+
+                    dataCollection[componentId][sectionId + '-filter']['BazContentSectionWithFormToDatatable']._dataArrToTableData();
+
                     $('#' + sectionId + '-filter-modal').modal('show');
+                });
+
+                //Delete
+                $('#' + sectionId + '-delete').click(function(e) {
+                    e.preventDefault();
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+
+                    if ($(selectedFilter).data().ns === true) {
+                        $('#' + sectionId + '-filter-filters').val(0);
+                        $(selectedFilter).remove();
+                        $('#' + sectionId + '-filter-edit, ' +
+                          '#' + sectionId + '-filter-delete'
+                        ).attr("disabled", true);
+                    } else {
+                        //Delete via post
+                    }
                 });
 
                 // Add Numeric for numberic fields
@@ -5828,6 +6012,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#' + sectionId + '-filter-value').attr('disabled', false);
                     }
                 });
+
                 $('body').on('formToDatatableTableRowEdit', function() {
                     if ($('#' + sectionId + '-filter-operator').val() === 'empty' ||
                         $('#' + sectionId + '-filter-operator').val() === 'notempty'
@@ -5847,34 +6032,60 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
                 });
 
-                //Adding to table
-                $('#' + sectionId + '-assign-button').click(function() {
-                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
-                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
-                    }
+                //Adding/Updating to table
+                $('#' + sectionId + '-assign-button').click(function(e) {
+                    e.preventDefault();
 
                     $('#' + sectionId + '-filter-name').attr('disabled', false);
                     $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
                     $('#' + sectionId + '-filter-value').attr('disabled', false);
                 });
 
-                //For last Row - Remove And/Or
+                //Remove First And Or
+                $('body').on('formToDatatableTableUpdated', function() {
+                    $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
+
+                    //Remove numeric from edit data
+                    $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
+                       //eslint-disable-next-line
+                       // console.log($(tr).find('td'));
+                       var field = $(tr).find('td')[1];
+                       field.innerHTML = field.innerHTML.replace(" (Numeric)", "");
+                       // $(tr)..innerHTML = $(td)[0].innerHTML.replace(" (Numeric)", "");
+                    });
+                    // $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).off();
+                    $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).click(function() {
+                        $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    });
+                });
+
+                $('body').on('formToDatatableTableUpdatedClicked', function() {
+                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
+                });
+
+                //If Only 1 row - Remove And/Or
                 $('body').on('formToDatatableTableRowDelete', function() {
                     if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
-                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '';
-
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
+                    }
+                    //eslint-disable-next-line
+                    console.log($('#' + sectionId + '-table tbody td.dataTables_empty'));
+                    if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
                         $('#' + sectionId + '-filter-name').attr('disabled', true);
                         $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-name').attr('disabled', false);
+                        $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
                     }
                 });
 
                 //Add Apply (Temp) & Close Modal
-                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function() {
+                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function(e) {
+                    e.preventDefault();
+                    query = '';
+
                     var tableData =
                         dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'];
-
-                    //eslint-disable-next-line
-                    console.log(tableData);
 
                     $.each(tableData, function(index, data) {
                         if (index === 0) {
@@ -5893,25 +6104,75 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         }
                     });
 
-                    //eslint-disable-next-line
-                    console.log(query);
+                    //Make Filter Call
                     $('#' + sectionId + '-filter-modal').modal('hide');
                     that._filterRunAjax(
                         1,
                         datatableOptions.paginationCounters.limit,
                         query
                     );
-                    // that._updateCounters();
+
+                    if ($(this)[0].id === sectionId + '-filter-apply-new') {
+                        var filtersCount = $('#' + sectionId + '-filter-filters').children('option').length + 1;
+
+                        $('#' + sectionId + '-filter-filters')
+                            .append($('<option />')
+                                .val(filtersCount)
+                                .text('Filter Results ' + filtersCount + ' (Not Saved)')
+                                .prop('selected', true)
+                                .data({
+                                    "conditions"  : query,
+                                    "permissions" : 1,
+                                    "value"       : filtersCount,
+                                    "component_id": $(this).parents('.component').data()['component_id'],
+                                    "ns"          : true
+                                })
+                                .attr({
+                                    "data-conditions"   : query,
+                                    "data-permissions"  : 1,
+                                    "data-value"        : filtersCount,
+                                    "data-shared_ids"   : "",
+                                    "data-component_id" : $(this).parents('.component').data()['component_id'],
+                                    "ns"          : true
+                                })
+                            );
+                    }
+
+                    clearStoredData();
+
+                    $('#' + sectionId + '-filter-edit, ' +
+                      '#' + sectionId + '-filter-delete'
+                    ).attr("disabled", false);
+
                 });
 
-                //Save and Apply & Close Modal
+                function clearStoredData() {
+                    $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    $('#' + sectionId + '-filter-field').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-operator').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-value').val('');
 
-                //Delete
+                    query = '';
 
-                //Share
+                    dataCollection[componentId][sectionId + '-filter']['datatables'][sectionId + '-filter-table']
+                        .rows().clear().draw();
 
-                //Select Guid and Uids
-                // Need to create share modal
+                    dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = [];
+                    $('#' + sectionId + '-filter-name').attr('disabled', true);
+                    $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
+                    $('#' + sectionId + '-filter-save').attr('disabled', true);
+                    $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                    $('#' + sectionId + '-filter-cancel-button').attr('hidden', true);
+                    $('#' + sectionId + '-filter-update-button').attr('hidden', true);
+                    $('#' + sectionId + '-filter-assign-button').attr('hidden', false);
+                    $('#' + sectionId + '-filter-update-button').off();//Important
+                }
+
+                $('#' + sectionId + '-modal .modal-close').click(function(e) {
+                    e.preventDefault();
+
+                    clearStoredData();
+                });
             }
 
             //Build listing datatable
@@ -6312,7 +6573,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     thisOptions['datatable'].on('draw', function () {
                         if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
-                            $('.dataTables_empty').last().html('...');
+                            $('.dataTables_empty').last().html('No entries found');
                         }
                     });
 

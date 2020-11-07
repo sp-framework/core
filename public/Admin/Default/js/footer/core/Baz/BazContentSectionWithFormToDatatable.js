@@ -39,7 +39,6 @@
             multiTable,
             selectedTable,
             dataTableFields,
-            tableData,
             pnotifySound;
 
         var BazContentSectionWithFormToDatatable = function () {
@@ -61,12 +60,11 @@
                 sectionId = $(this._element)[0].id;
 
                 dataTableFields = { };
-                tableData = { };
                 dataTableFields[componentId] = { };
                 dataTableFields[componentId][sectionId] = { };
-                tableData[sectionId] = { };
 
                 sectionOptions = dataCollection[componentId][sectionId];
+                sectionOptions['datatables'] = { };
                 //eslint-disable-next-line
                 // console.log(sectionOptions);
 
@@ -93,6 +91,9 @@
                     this._fieldsToDatatable(sectionId);
                 }
 
+                // $('body').on('dataArrToTableData', function() {
+                //     that._dataArrToTableData();
+                // });
             }
 
             _proto._validateForm = function (onSuccess, type, preValidated, formId) {
@@ -135,6 +136,7 @@
                 } else {
                     that._error('Datatable Parameters missing for datatable - ' + fieldsetDatatable);
                 }
+
                 if ($.inArray('true', addSeq) !== -1) {
                     $('#' + fieldsetDatatable + '-fields').prepend(
                         '<div class="row margin-top-10 d-none">' +
@@ -169,14 +171,13 @@
                         labels + '</thead><tbody></tbody></table></div>'
                         );
                     //Init Datatable
-                    tableData[sectionId][v] = { };
-                    tableData[sectionId][v] = $('#' + v + '-data').DataTable(sectionOptions[v].datatable);
+                    sectionOptions['datatables'][v] = $('#' + v + '-data').DataTable(sectionOptions[v].datatable);
                     if (sectionOptions[v].datatable.rowReorder) {
                         // If rowReorder enabled
-                        tableData[sectionId][v].on('row-reorder', function() {
-                            that._rowReorderRedoSeq(tableData[sectionId][v], v);
+                        sectionOptions['datatables'][v].on('row-reorder', function() {
+                            that._rowReorderRedoSeq(sectionOptions['datatables'][v], v);
                             // that._rowReorderDatatableDataToObject(details, sectionId, fieldsetDatatable, v);
-                            tableData[sectionId][v].draw();
+                            sectionOptions['datatables'][v].draw();
                         });
                     }
                 });
@@ -199,14 +200,14 @@
 
                     //Execute preExtraction script passed from the html(js script)
                     if (sectionOptions[datatable].preExtraction) {
-                        sectionOptions[datatable].preExtraction(tableData[sectionId][datatable]);
+                        sectionOptions[datatable].preExtraction(sectionOptions['datatables'][datatable]);
                     }
 
                     extractDatatableFieldsData = that._extractDatatableFieldsData(fieldsetDatatable, datatable, false);
 
                     //Execute postExtraction script passed from the html(js script)
                     if (sectionOptions[datatable].postExtraction) {
-                        sectionOptions[datatable].postExtraction(tableData[sectionId][datatable], extractDatatableFieldsData);
+                        sectionOptions[datatable].postExtraction(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
                     }
 
                     var validated = that._validateForm(false, 'section', false, fieldsetDatatable + '-form');
@@ -214,29 +215,36 @@
                     if (validated) {
 
                         var rowAdded =
-                            that._addExtractFieldsToDatatable(null, extractDatatableFieldsData, fieldsetDatatable, datatable, false);
+                            that._addExtractFieldsToDatatable(
+                                null,
+                                extractDatatableFieldsData,
+                                fieldsetDatatable,
+                                datatable,
+                                false,
+                                false
+                            );
 
                         if (rowAdded) {
                             $('#' + fieldsetDatatable).find('.jstreevalidate').val('');
 
                             // that._validateForm(false, 'sections', true, null);
 
-                            tableData[sectionId][datatable].responsive.recalc();
+                            sectionOptions['datatables'][datatable].responsive.recalc();
 
                             that._registerDatatableButtons(
-                                tableData[sectionId][datatable],
+                                sectionOptions['datatables'][datatable],
                                 $('#' + datatable + '-div'),
                                 datatable,
                                 sectionId,
                                 fieldsetDatatable
                             );
 
-                            // var table = tableData[sectionId][datatable];
+                            // var table = sectionOptions['datatables'][datatable];
 
-                            tableData[sectionId][datatable].on('responsive-display', function (showHide) {
+                            sectionOptions['datatables'][datatable].on('responsive-display', function (showHide) {
                                 if (showHide) {
                                     that._registerDatatableButtons(
-                                        tableData[sectionId][datatable],
+                                        sectionOptions['datatables'][datatable],
                                         $('#' + datatable + '-div'),
                                         datatable,
                                         sectionId,
@@ -247,12 +255,13 @@
 
                             //Execute postSuccess script passed from the html(js script)
                             if (sectionOptions[datatable].postSuccess) {
-                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable], extractDatatableFieldsData);
+                                sectionOptions[datatable].postSuccess(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
                             }
 
                             that._clearDatatableFormData(datatable, fieldsetDatatable);
                         }
                     }
+                    $('body').trigger('formToDatatableTableAssignClicked');
                 });
             };
 
@@ -328,9 +337,9 @@
                                 extractedFieldsData[counter].extractedData = null;
                                 $($(v)[0].selectedOptions).each(function(i,v){
                                     if (!extractedFieldsData[counter].extractedData) {
-                                        extractedFieldsData[counter].extractedData = '<span id="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
+                                        extractedFieldsData[counter].extractedData = '<span class="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
                                     } else {
-                                        extractedFieldsData[counter].extractedData = extractedFieldsData[counter].extractedData + '<span id="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
+                                        extractedFieldsData[counter].extractedData = extractedFieldsData[counter].extractedData + '<span class="' + $(v)[0].value + '">' + $(v)[0].text + '</span><br>';
                                     }
                                 });
                             }
@@ -340,7 +349,7 @@
                                 for (i = 0; i < Object.keys(treeData).length; i++) {
                                     extractedJstreeData[counter][i] = { };
                                     extractedJstreeData[counter][i].id = v.id;
-                                    extractedJstreeData[counter][i].extractedData = '<span id="' + treeData[i].id + '" data-jstreeId="' + treeData[i].jstreeId + '">' + treeData[i].path + '</span><br>';
+                                    extractedJstreeData[counter][i].extractedData = '<span class="' + treeData[i].id + '" data-jstreeId="' + treeData[i].jstreeId + '">' + treeData[i].path + '</span><br>';
                                     extractedJstreeData[counter][i].absolutePath = treeData[i].path;
                                     extractedJstreeData[counter][i].nodeName = treeData[i].nodeName;
                                 }
@@ -373,8 +382,8 @@
                 }
 
                 if (datatable) {
-                    if (tableData[sectionId][datatable].row().count() >= 0) {
-                        rowId = tableData[sectionId][datatable].row().count() + 1;
+                    if (sectionOptions['datatables'][datatable].row().count() >= 0) {
+                        rowId = sectionOptions['datatables'][datatable].row().count() + 1;
                     }
 
                     if (Object.keys(extractedJstreeData).length > 0) {
@@ -441,7 +450,7 @@
             };
 
             //Add extracted fields data to datatable
-            _proto._addExtractFieldsToDatatable = function(rowIndex, extractDatatableFieldsData, fieldsetDatatable, datatable, isEdit) {
+            _proto._addExtractFieldsToDatatable = function(rowIndex, extractDatatableFieldsData, fieldsetDatatable, datatable, isEdit, isImport) {
                 var migrateData = false;
                 var oldDataTable;
                 // Need to convert to array to add to datatable to merge them later to object and add values to datatable
@@ -458,7 +467,7 @@
                 }
 
                 if (!isEdit && sectionOptions[datatable].datatable.rowReorder) {
-                    var seq = tableData[sectionId][datatable].rows().count();
+                    var seq = sectionOptions['datatables'][datatable].rows().count();
                     if (seq === 0) {
                         seq = 1;
                     } else {
@@ -483,7 +492,7 @@
                 }
 
                 if (sectionOptions[datatable].bazdatatable && sectionOptions[datatable].bazdatatable.compareData) {
-                    if (tableData[sectionId][datatable].rows().count() > 0) {
+                    if (sectionOptions['datatables'][datatable].rows().count() > 0) {
 
                         $('#' + datatable).children().find('tbody tr').removeClass('animated fadeIn bg-warning');
                         $('#' + datatable).children().find('tbody tr').children().removeClass('animated fadeIn bg-warning');
@@ -492,7 +501,7 @@
                             that._compareData(
                                 sectionOptions[datatable].bazdatatable.compareData,
                                 extractDatatableFieldsData,
-                                tableData[sectionId][datatable].rows().data(),
+                                sectionOptions['datatables'][datatable].rows().data(),
                                 rowIndex,
                                 datatable
                             );
@@ -511,18 +520,21 @@
                     if (rowIndex !== null) {//rowIndex is from editDatatableRow
                         if (!migrateData) {
                             $(rowExtractedData).each(function(i,v) {
-                                tableData[sectionId][datatable].row(rowIndex).data(v).draw();
+                                sectionOptions['datatables'][datatable].row(rowIndex).data(v).draw();
                             });
                         } else {
-                            tableData[oldDataTable].row(rowIndex).remove().draw();
+                            sectionOptions['datatable'][oldDataTable].row(rowIndex).remove().draw();
                             $(rowExtractedData).each(function(i,v) {
-                                var drawnRow = tableData[sectionId][datatable].row.add(v).draw().node();
+                                var drawnRow = sectionOptions['datatables'][datatable].row.add(v).draw().node();
                                 $(drawnRow).children('td').addClass('pb-1 pt-1');
                             });
                             // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, oldDataTable);
-                            that._tableDataToObj();
+                            if (!isImport) {
+                                that._tableDataToObj();
+                            }
+
                             that._registerDatatableButtons(
-                               tableData[oldDataTable],
+                               sectionOptions['datatable'][oldDataTable],
                                $('#' + datatable + '-div'),
                                datatable,
                                sectionId,
@@ -530,7 +542,7 @@
                             );
                         }
                         that._registerDatatableButtons(
-                           tableData[sectionId][datatable],
+                           sectionOptions['datatables'][datatable],
                            $('#' + datatable + '-div'),
                            datatable,
                            sectionId,
@@ -539,11 +551,11 @@
                         rowIndex = null;
                     } else {//add new row
                         $(rowExtractedData).each(function(i,v) {
-                            var drawnRow = tableData[sectionId][datatable].row.add(v).draw().node();
+                            var drawnRow = sectionOptions['datatables'][datatable].row.add(v).draw().node();
                             $(drawnRow).children('td').addClass('pb-1 pt-1');
                         });
                         that._registerDatatableButtons(
-                           tableData[sectionId][datatable],
+                           sectionOptions['datatables'][datatable],
                            $('#' + datatable + '-div'),
                            datatable,
                            sectionId,
@@ -552,13 +564,18 @@
                     }
                     //Add data to object
                     // this._addEditDatatableDataToObject(rowIndex, rowExtractedId, rowExtractedData, fieldsetDatatable, sectionId, datatable);
-                    that._tableDataToObj();
+                    if (!isImport) {
+                        that._tableDataToObj();
+                    }
+                    $('body').trigger('formToDatatableTableUpdated');
                     return true;
                 }
             };
 
             //Edit table Row
             _proto._editDatatableRow = function(fieldsetDatatable, rowIndex, rowData, datatable) {
+                //eslint-disable-next-line
+                console.log(fieldsetDatatable, rowIndex, rowData, datatable);
                 var fieldsetFields = [];
                 if ($(sectionOptions[fieldsetDatatable + '-datatables']).length > 1) {
                     $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
@@ -644,34 +661,49 @@
                 $('#' + fieldsetDatatable + '-update-button').attr('hidden', false);
                 $('#' + fieldsetDatatable + '-assign-button').attr('hidden', true);
                 // Then we extract data again, Compare again, Update data
-                $('#' + fieldsetDatatable + '-update-button').off();
+                $('#' + fieldsetDatatable + '-update-button').off();//Important
                 $('#' + fieldsetDatatable + '-update-button').click(function(e) {
                     e.preventDefault();
 
                     var validated = that._validateForm(false, 'section', false, fieldsetDatatable + '-form');
 
                     if (validated) {
+
+                        //Execute preExtraction script passed from the html(js script)
+                        if (sectionOptions[datatable].preExtraction) {
+                            sectionOptions[datatable].preExtraction(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
+                        }
+
                         extractDatatableFieldsData = that._extractDatatableFieldsData(fieldsetDatatable, datatable, true);
+
+                        //Execute postExtraction script passed from the html(js script)
+                        if (sectionOptions[datatable].postExtraction) {
+                            sectionOptions[datatable].postExtraction(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
+                        }
+
                         var rowAdded =
                             that._addExtractFieldsToDatatable(
                                 rowIndex,
                                 extractDatatableFieldsData,
                                 fieldsetDatatable,
                                 datatable,
-                                true
+                                true,
+                                false
                             );
                         if (rowAdded) {
                             //Execute postSuccess script passed from the html(js script)
                             if (sectionOptions[datatable].postSuccess) {
-                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable], extractDatatableFieldsData);
+                                sectionOptions[datatable].postSuccess(sectionOptions['datatables'][datatable], extractDatatableFieldsData);
                             }
                         }
+
                         that._clearDatatableFormData(datatable, fieldsetDatatable);
                     }
                     // Hide cancel/update button.
                     $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
+                    $('body').trigger('formToDatatableTableUpdatedClicked');
                 });
                 $('#' + fieldsetDatatable + '-cancel-button').off();
                 $('#' + fieldsetDatatable + '-cancel-button').click(function() {
@@ -680,7 +712,9 @@
                     $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
                     that._clearDatatableFormData(datatable, fieldsetDatatable);
+                    $('body').trigger('formToDatatableTableCancelClicked');
                 });
+
             };
 
             //Compare extracted fields data with data already in table
@@ -920,7 +954,7 @@
                             that._registerDatatableButtons(table, el, datatable, sectionId, fieldsetDatatable);
                             //Execute postSuccess script passed from the html(js script)
                             if (sectionOptions[datatable].postSuccess) {
-                                sectionOptions[datatable].postSuccess(tableData[sectionId][datatable]);
+                                sectionOptions[datatable].postSuccess(sectionOptions['datatables'][datatable]);
                             }
                             // Hide cancel/update button.
                             $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
@@ -932,6 +966,7 @@
                             if ($('#' + fieldsetDatatable + '-table-data tbody tr td.dataTables_empty').length === 1) {
                                 $('body').trigger('formToDatatableTableEmpty');
                             }
+                            that._tableDataToObj();
                         });
                     });
                     $(this).find('.tableEditButton').each(function() {
@@ -949,7 +984,7 @@
                             that._editDatatableRow(fieldsetDatatable, rowIndex, rowData, datatable);
                             //Execute onEdit script passed from the html(js script)
                             if (sectionOptions[datatable].onEdit) {
-                                sectionOptions[datatable].onEdit(tableData[sectionId][datatable]);
+                                sectionOptions[datatable].onEdit(sectionOptions['datatables'][datatable]);
                             }
                             $('body').trigger('formToDatatableTableRowEdit');
                         });
@@ -986,6 +1021,7 @@
                                 $(v).val('');
                             }
                             if ($(v)[0].tagName === "SELECT") {//select2
+                                $(v).children('option').attr('disabled', false);
                                 $(v).val(null).trigger('change');
                             }
                             if ($(v)[0].tagName === 'DIV') {
@@ -1014,7 +1050,7 @@
             _proto._tableDataToObj = function()
             {
                 // for (var sectionId in tableData) {
-                    for (var data in tableData[sectionId]) {
+                    for (var data in sectionOptions['datatables']) {
                         var excludeActions = false;
                         var excludeSeqAndSort = false;
                         var currentTableDataLength = 0;
@@ -1031,7 +1067,7 @@
 
                         dataCollection[componentId][sectionId][data]['data'] = [];
 
-                        $.each(tableData[sectionId][data].rows().data(), function(i,v) {
+                        $.each(sectionOptions['datatables'][data].rows().data(), function(i,v) {
                             var startAt = 0;
                             if (excludeSeqAndSort && excludeActions) {
                                 currentTableDataLength = v.length - 3;
@@ -1046,9 +1082,9 @@
                             dataCollection[componentId][sectionId][data]['data'][i] = { };
                             for (var j = 0; j < currentTableDataLength; j++) {
                                 var columnData;
-                                var columnDataHasId = v[startAt].match(/id="(.*?)"/g)
-                                if (columnDataHasId) {
-                                    columnData = (columnDataHasId.toString().match(/"(.*?)"/g)).toString().replace(/"/g, '');
+                                var columnDataHasClass = v[startAt].match(/class="(.*?)"/g)
+                                if (columnDataHasClass) {
+                                    columnData = (columnDataHasClass.toString().match(/"(.*?)"/g)).toString().replace(/"/g, '');
                                 } else {
                                     columnData = v[startAt];
                                 }
@@ -1058,6 +1094,33 @@
                         });
                     }
                 // }
+            }
+
+            // Add tables data from dataCollection
+            _proto._dataArrToTableData = function()
+            {
+                //eslint-disable-next-line
+                console.log('i triggered');
+                for (var table in sectionOptions['datatables']) {
+                    //eslint-disable-next-line
+                    // console.log(table);
+                    for (var data in sectionOptions[table]['data']) {
+                        //eslint-disable-next-line
+                        // console.log(sectionOptions[table]['data'][data]);
+                        that._addExtractFieldsToDatatable(
+                            null,
+                            {"0" : sectionOptions[table]['data'][data]},
+                            sectionId,
+                            table,
+                            false,
+                            true
+                        );
+                    }
+                }
+                // $('body').off('dataArrToTableData');
+                // $('body').on('dataArrToTableData', function() {
+                //     that._dataArrToTableData();
+                // });
             }
 
             BazContentSectionWithFormToDatatable._jQueryInterface = function _jQueryInterface(options) {

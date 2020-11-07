@@ -91,7 +91,6 @@ class Button extends AdminLTETags
                 }
             }
 
-
             $this->buttonParams['size'] =
                 isset($button['size']) ?
                 'btn-' . $button['size'] :
@@ -127,11 +126,11 @@ class Button extends AdminLTETags
             if (isset($button['icon']) && isset($button['title'])) {
                 if (isset($button['position']) && $button['position'] === 'after') {
                     $this->buttonParams['icon'] =
-                        '<i class="fas fa-fw fa-' . $button['icon'] . ' ml-1"></i>';
+                        '<i class="fas fa-fw fa-' . $button['icon'] . '"></i>';
                     $this->buttonParams['iconPosition'] = 'after';
                 } else {
                     $this->buttonParams['icon'] =
-                        '<i class="fas fa-fw fa-' . $button['icon'] . ' mr-1"></i>';
+                        '<i class="fas fa-fw fa-' . $button['icon'] . '"></i>';
                     $this->buttonParams['iconPosition'] = '';
                 }
             } else {

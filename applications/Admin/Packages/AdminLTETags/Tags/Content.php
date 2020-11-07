@@ -25,7 +25,7 @@ class Content extends AdminLTETags
             if (isset($this->params['contentType'])) {
 
                 $this->content .=
-                    '<div id="' . $this->params['componentId'] . '" class="component">';
+                    '<div id="' . $this->params['componentId'] . '" class="component" data-component_id="' . $this->params['component']['id'] . '">';
 
                 if ($this->params['contentType'] === 'section') {
                     $this->content .= $this->getContentTypeSection();

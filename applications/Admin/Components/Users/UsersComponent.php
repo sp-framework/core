@@ -42,6 +42,7 @@ class UsersComponent extends BaseComponent
                 $table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
                 $table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
                 $table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
+                $table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
             }
 
             $this->view->table = $table;
