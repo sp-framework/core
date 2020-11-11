@@ -208,7 +208,17 @@ class Fields extends AdminLTETags
             isset($this->params['fieldBazPostOnUpdate']) ?
             'data-bazPostOnUpdate="true"' :
             '';
-
         //
+
+        if (isset($this->params['fieldDataAttributes']) &&
+            is_array($this->params['fieldDataAttributes'])
+        ) {
+            $this->fieldParams['fieldDataAttributes'] = '';
+            foreach ($this->params['fieldDataAttributes'] as $attrKey => $attrValue) {
+                $this->fieldParams['fieldDataAttributes'] .= 'data-' . $attrKey . '="' . $attrValue . '" ';
+            }
+        } else {
+            $this->fieldParams['fieldDataAttributes'] = '';
+        }
     }
 }

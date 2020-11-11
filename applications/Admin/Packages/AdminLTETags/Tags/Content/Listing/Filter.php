@@ -3,6 +3,7 @@
 namespace Applications\Admin\Packages\AdminLTETags\Tags\Content\Listing;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
+use Phalcon\Helper\Arr;
 
 class Filter extends AdminLTETags
 {
@@ -23,8 +24,37 @@ class Filter extends AdminLTETags
 
     protected function generateContent()
     {
+        $defaultFilter = null;
+
+        foreach ($this->params['dtFilters'] as $filterKey => $filter) {
+            if ($filter['is_default'] === '1') {
+                $defaultFilter = $filterKey;
+                $this->params['dtFilters'][$filterKey]['name'] =
+                    $this->params['dtFilters'][$filterKey]['name'] . ' (Default)';
+            }
+
+            if ($filter['permission'] === '0') {
+                if (!$defaultFilter) {
+                     $defaultFilter = $filterKey;
+                }
+                $this->params['dtFilters'][$filterKey]['name'] =
+                    $this->params['dtFilters'][$filterKey]['name'] . ' (System)';
+            } else if ($filter['permission'] === '2') {
+                $this->params['dtFilters'][$filterKey]['name'] =
+                    $this->params['dtFilters'][$filterKey]['name'] . ' (Shared)';
+            }
+            if ($filter['shared_ids']) {
+                $this->params['dtFilters'][$filterKey]['name'] =
+                    $this->params['dtFilters'][$filterKey]['name'] . ' (Sharing)';
+            }
+        }
+
+        if (!$defaultFilter) {
+            $defaultFilter = Arr::firstKey($this->params['dtFilters']);
+        }
+
         $this->content .=
-            '<div class="col">
+            '<div class="col" id="listing-filters" hidden>
                 <form autocomplete="off">' .
                     $this->useTag(
                         'fields',
@@ -38,6 +68,15 @@ class Filter extends AdminLTETags
                             'fieldGroupPreAddonIcon'              => 'filter',
                             'fieldGroupPostAddonButtons'          =>
                                 [
+                                    'qsave'   => [//Quick Save for filter already in DB
+                                        'title'                   => false,
+                                        'type'                    => 'primary',
+                                        'icon'                    => 'save',
+                                        'noMargin'                => true,
+                                        'hidden'                  => true,
+                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                        'position'                => 'right'
+                                    ],
                                     'edit'   => [
                                         'title'                   => false,
                                         'type'                    => 'warning',
@@ -74,6 +113,14 @@ class Filter extends AdminLTETags
                                         'buttonAdditionalClass'   => 'rounded-0 ml-1',
                                         'position'                => 'right'
                                     ],
+                                    'clone'   => [
+                                        'title'                   => false,
+                                        'type'                    => 'info',
+                                        'icon'                    => 'copy',
+                                        'noMargin'                => true,
+                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                        'position'                => 'right'
+                                    ],
                                     'reset' => [
                                         'title'                   => false,
                                         'noMargin'                => true,
@@ -85,11 +132,11 @@ class Filter extends AdminLTETags
                                 ],
                             'fieldInputType'                      => 'select',
                             'fieldHelp'                           => false,
-                            'fieldDataSelectOptionsZero'          => 'Select Filter',
                             'fieldDataSelectOptions'              => $this->params['dtFilters'],
                             'fieldDataSelectOptionsArray'         => true,
                             'fieldDataSelectOptionsKey'           => 'id',
-                            'fieldDataSelectOptionsValue'         => 'name'
+                            'fieldDataSelectOptionsValue'         => 'name',
+                            'fieldDataSelectOptionsSelected'      => $defaultFilter
                         ]
                     ) .
                 '</form>
@@ -126,6 +173,11 @@ class Filter extends AdminLTETags
                                                 'fieldLabel'                          => 'And/Or',
                                                 'fieldType'                           => 'select2',
                                                 'fieldHelp'                           => true,
+                                                'fieldDisabled'                       => true,
+                                                'fieldDataAttributes'                 =>
+                                                    [
+                                                        'disabledtext'      => '-'
+                                                    ],
                                                 'fieldHelpTooltipContent'             => 'Select And/Or<br>Not included in first/only filter.',
                                                 'fieldBazScan'                        => true,
                                                 'fieldRequired'                       => false,
@@ -302,9 +354,24 @@ class Filter extends AdminLTETags
                                     [
                                         'componentId'                           => $this->params['componentId'],
                                         'sectionId'                             => $this->params['sectionId'] . '-filter',
-                                        'fieldId'                               => 'name',
-                                        'fieldLabel'                            => 'Save Filter',
+                                        'fieldId'                               => 'id',
+                                        'fieldLabel'                            => 'Filter Id',
                                         'fieldType'                             => 'input',
+                                        'fieldInputType'                        => 'text',
+                                        'fieldPlaceholder'                      => 'Filter Id',
+                                        'fieldDisabled'                         => true,
+                                        'fieldHidden'                           => true,
+                                        'fieldBazScan'                          => true,
+                                    ]
+                                ) .
+                                $this->useTag('fields',
+                                    [
+                                        'componentId'                           => $this->params['componentId'],
+                                        'sectionId'                             => $this->params['sectionId'] . '-filter',
+                                        'fieldId'                               => 'name',
+                                        'fieldLabel'                            => 'Filter Name',
+                                        'fieldType'                             => 'input',
+                                        'fieldPlaceholder'                      => 'Enter Filter Name',
                                         'fieldInputType'                        => 'text',
                                         'fieldHelp'                             => true,
                                         'fieldDisabled'                         => true,
@@ -314,28 +381,43 @@ class Filter extends AdminLTETags
                                         'fieldBazPostOnUpdate'                  => true,
                                         'fieldDataInputMinLength'               => 1,
                                         'fieldDataInputMaxLength'               => 50,
-                                        'fieldGroupPostAddonButtons'            =>
-                                            [
-                                                'save' => [
-                                                    'title'                   => 'Save',
-                                                    'disabled'                => true,
-                                                    'icon'                    => 'save'
-                                                ],
-                                                'apply-new' => [
-                                                    'title'                   => 'Apply',
-                                                    'disabled'                => true,
-                                                    'buttonAdditionalClass'   => 'rounded-0 ml-1',
-                                                    'icon'                    => 'filter',
-                                                ],
-                                                'saveapply'   => [
-                                                    'title'                   => 'Save & Apply',
-                                                    'type'                    => 'secondary',
-                                                    // 'noMargin'                => true,
-                                                    'disabled'                => true,
-                                                    'buttonAdditionalClass'   => 'rounded-0',
-                                                    'position'                => 'right'
-                                                ]
-                                            ]
+                                        // 'fieldGroupPostAddonButtons'            =>
+                                        //     [
+                                        //         'save' => [
+                                        //             'title'                   => 'Save',
+                                        //             'disabled'                => true,
+                                        //             'icon'                    => 'save'
+                                        //         ],
+                                        //         'apply-new' => [
+                                        //             'title'                   => 'Apply',
+                                        //             'disabled'                => true,
+                                        //             'buttonAdditionalClass'   => 'rounded-0 ml-1',
+                                        //             'icon'                    => 'filter',
+                                        //         ],
+                                        //         'saveapply'   => [
+                                        //             'title'                   => 'Save & Apply',
+                                        //             'type'                    => 'secondary',
+                                        //             // 'noMargin'                => true,
+                                        //             'disabled'                => true,
+                                        //             'buttonAdditionalClass'   => 'rounded-0',
+                                        //             'position'                => 'right'
+                                        //         ]
+                                        //     ]
+                                    ]
+                                ) .
+                            '</div>
+                            <div class="col">' .
+                                $this->useTag('fields',
+                                    [
+                                        'componentId'                           => $this->params['componentId'],
+                                        'sectionId'                             => $this->params['sectionId'] . '-filter',
+                                        'fieldId'                               => 'default',
+                                        'fieldLabel'                            => 'Default?',
+                                        'fieldType'                             => 'checkbox',
+                                        'fieldCheckboxType'                     => 'info',
+                                        'fieldHelp'                             => true,
+                                        'fieldHelpTooltipContent'               => 'Make this filter as default filter<br>Note: Only saved filters can be made default.',
+                                        'fieldBazScan'                          => true,
                                     ]
                                 ) .
                             '</div>
@@ -346,13 +428,43 @@ class Filter extends AdminLTETags
 
         return $this->useTag('modal',
             [
-                'modalId'           => $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-modal',
-                'modalBodyContent'  => $modalContent,
-                'modalSize'         => 'xl',
-                'modalHeader'       => true,
-                'modalFooter'       => true,
-                'modalTitle'        => '<i class="fa fas fa-fw fa-filter"></i> ' . strtoupper($this->params['componentName'] . ' Filter'),
-                'modalEscClose'     => 'false'
+                'componentId'               => $this->params['componentId'],
+                'sectionId'                 => $this->params['sectionId'],
+                'modalId'                   => 'filter-modal',
+                'modalBodyContent'          => $modalContent,
+                'modalSize'                 => 'xl',
+                'modalHeader'               => true,
+                'modalFooter'               => true,
+                'modalTitle'                => '<i class="fa fas fa-fw fa-filter"></i> ' . strtoupper($this->params['componentName'] . ' Filter'),
+                'modalEscClose'             => 'false',
+                'modalFooterButtons'        =>
+                    [
+                        'componentId'                       => $this->params['componentId'],
+                        'sectionId'                         => $this->params['sectionId'] . '-filter',
+                        'buttonType'                        => 'dropdownSplitButtons',
+                        'buttonSize'                        => 'sm',
+                        'dropdownSplitButtonsSplit'         => true,
+                        'splitMainButtonId'                 => 'saveapply',
+                        'splitMainButtonTitle'              => 'SAVE & APPLY',
+                        'splitMainButtonDisabled'           => false,
+                        'dropdownDirection'                 => 'up',
+                        'dropdownAlign'                     => 'right',
+                        'buttons'                           =>
+                            [
+                                // 'save' => [
+                                //     'title'                   => 'Save',
+                                //     'disabled'                => true,
+                                // ],
+                                'apply' => [
+                                    'title'                   => 'Apply',
+                                    'disabled'                => true,
+                                ],
+                                // 'cloneapply' => [
+                                //     'title'                   => 'Clone & Apply',
+                                //     'disabled'                => true,
+                                // ],
+                            ]
+                    ]
             ]
         );
     }
@@ -437,13 +549,15 @@ class Filter extends AdminLTETags
 
         return $this->useTag('modal',
             [
-                'modalId'           => $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-modal',
-                'modalBodyContent'  => $modalContent,
-                'modalSize'         => 'lg',
-                'modalHeader'       => true,
-                'modalFooter'       => true,
-                'modalTitle'        => '<i class="fa fas fa-fw fa-share-alt"></i> ' . strtoupper($this->params['componentName'] . ' Filter share'),
-                'modalEscClose'     => 'true'
+                'componentId'               => $this->params['componentId'],
+                'sectionId'                 => $this->params['sectionId'],
+                'modalId'                   => 'filter-sharing-modal',
+                'modalBodyContent'          => $modalContent,
+                'modalSize'                 => 'lg',
+                'modalHeader'               => true,
+                'modalFooter'               => true,
+                'modalTitle'                => '<i class="fa fas fa-fw fa-share-alt"></i> ' . strtoupper($this->params['componentName'] . ' Filter share'),
+                'modalEscClose'             => 'true'
             ]
         );
     }
@@ -482,7 +596,11 @@ class Filter extends AdminLTETags
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : {
                             },
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-id" : {
+                            },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-name" : {
+                            },
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-default" : {
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-datatables" : [
                                 "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-table"
@@ -514,13 +632,11 @@ class Filter extends AdminLTETags
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-form" : {
                                 "rules"     : {
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor" : "required",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "required",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : "required",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "required"
                                 },
                                 messages: {
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor" : "Please select either And/Or",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "Please select a field",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : "Please select an operator",
                                     "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "Please enter value. Numeric Fields only accept numbers or comma or decimal point"
@@ -531,3 +647,32 @@ class Filter extends AdminLTETags
             </script>';
     }
 }
+                    //DropdownSplitButtons - Dropdown
+                    // [
+                    //     'componentId'                       => $this->params['componentId'],
+                    //     'sectionId'                         => $this->params['sectionId'],
+                    //     'buttonType'                        => 'dropdownSplitButtons',
+                    //     'buttonSize'                        => 'sm',
+                    //     'dropdownButtonTitle'               => 'Actions',
+                    //     'dropdownSplitButtonsSplit'         => true,
+                    //     'dropdownButtonId'                  => 'modal-actions',
+                    //     'dropdownDirection'                 => 'up',
+                    //     'dropdownAlign'                     => 'right',
+                    //     'buttons'                           =>
+                    //         [
+                    //             'save' => [
+                    //                 'title'                   => 'Save',
+                    //                 'disabled'                => true,
+                    //                 'icon'                    => 'save'
+                    //             ],
+                    //             'apply-new' => [
+                    //                 'title'                   => 'Apply',
+                    //                 'disabled'                => true,
+                    //                 'icon'                    => 'filter',
+                    //             ],
+                    //             'saveapply'   => [
+                    //                 'title'                   => 'Save & Apply',
+                    //                 'disabled'                => true,
+                    //             ]
+                    //         ]
+                    // ]

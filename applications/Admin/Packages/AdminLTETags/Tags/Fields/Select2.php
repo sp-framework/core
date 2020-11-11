@@ -81,7 +81,7 @@ class Select2
             '';
 
         $this->content .=
-            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:100%;" ' . $this->fieldParams['fieldSelect2Multiple'] . ' ' . $this->fieldParams['fieldDisabled'] . '>
+            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:100%;" ' . $this->fieldParams['fieldSelect2Multiple'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldDataAttributes'] . '>
                 <option></option>';
 
         if ($this->fieldParams['fieldDataSelect2TreeData']) {

@@ -24,25 +24,23 @@ class UsersComponent extends BaseComponent
             $table['postUrl'] = $this->links->url('users/view');
             $table['component'] = $this->component;
 
-            $filtersPackage = $this->usePackage(Filters::class);
+            // $filtersPackage = $this->usePackage(Filters::class)->getFiltersForComponent($this->component['id']);
+            $filtersArr = $this->usePackage(Filters::class)->getFiltersForComponent(5);
 
-            $filtersArr =
-                $filtersPackage->getByParams(
-                    [
-                        'conditions'    => 'component_id = :cid:',
-                        'bind'          => [
-                            // 'cid'       => $this->component['id']//For users
-                            'cid'       => 5
-                        ]
-                    ]
-                );
-
+            $table['postUrlParams'] = [];
             foreach ($filtersArr as $key => $filter) {
                 $table['filters'][$filter['id']] = $filter;
+                $table['filters'][$filter['id']]['data']['name'] = $filter['name'];
+                $table['filters'][$filter['id']]['data']['id'] = $filter['id'];
                 $table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
-                $table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
                 $table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
+                $table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
+                $table['filters'][$filter['id']]['data']['is_default'] = $filter['is_default'];
                 $table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
+
+                if ($filter['is_default'] === '1') {
+                    $table['postUrlParams'] = ['conditions' => $filter['conditions']];
+                }
             }
 
             $this->view->table = $table;

@@ -65,8 +65,6 @@
 
                 sectionOptions = dataCollection[componentId][sectionId];
                 sectionOptions['datatables'] = { };
-                //eslint-disable-next-line
-                // console.log(sectionOptions);
 
                 dataCollection = window['dataCollection'];
 
@@ -259,9 +257,10 @@
                             }
 
                             that._clearDatatableFormData(datatable, fieldsetDatatable);
+
+                            $('body').trigger('formToDatatableTableAssignClicked');
                         }
                     }
-                    $('body').trigger('formToDatatableTableAssignClicked');
                 });
             };
 
@@ -313,10 +312,10 @@
                 var counter = 0;
 
                 $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
-                    if ($(v).data('bazscantype')) {
+                    extractedFieldsData[counter] = { };
+                    extractedFieldsData[counter].id = v.id;
+                    if ($(v).data('bazscantype') && !$(v).attr('disabled')) {
                         if (!($(v).data('bazscantype') === 'tableSelector' || $(v).data('bazscantype') === 'dropzone')) {
-                            extractedFieldsData[counter] = { };
-                            extractedFieldsData[counter].id = v.id;
                             // extractedFieldsData[counter].data = $('#' + v.id); //Enable if you need all data
 
                             if (v.tagName === 'INPUT' && v.type === 'checkbox') {
@@ -367,9 +366,16 @@
                                 extractedFieldsData[counter].extractedData = $(v).html();
                             }
                         }
+
                         if ($(v).data('bazscantype') === 'tableSelector') {
                             selectedTable = $(v).val();
                             multiTable = true;
+                        }
+                    } else {
+                        if ($(v).data().disabledtxt) {
+                            extractedFieldsData[counter].extractedData = $(v).data().disabledtxt;
+                        } else {
+                            extractedFieldsData[counter].extractedData = '-';
                         }
                     }
                     counter++;
@@ -567,15 +573,15 @@
                     if (!isImport) {
                         that._tableDataToObj();
                     }
+
                     $('body').trigger('formToDatatableTableUpdated');
+
                     return true;
                 }
             };
 
             //Edit table Row
             _proto._editDatatableRow = function(fieldsetDatatable, rowIndex, rowData, datatable) {
-                //eslint-disable-next-line
-                console.log(fieldsetDatatable, rowIndex, rowData, datatable);
                 var fieldsetFields = [];
                 if ($(sectionOptions[fieldsetDatatable + '-datatables']).length > 1) {
                     $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
@@ -613,7 +619,9 @@
                                     $(selectarr).each(function(i,v) {
                                         if (v !== "") {
                                             var extractIds = v.match(/(["'])(?:(?=(\\?))\2.)*?\1/g); //match double or single quotes
-                                            selectArr.push(extractIds[0].replace(/"/g, ''));
+                                            if (extractIds) {
+                                                selectArr.push(extractIds[0].replace(/"/g, ''));
+                                            }
                                         }
                                     });
                                     $(v).val(selectArr);
@@ -938,6 +946,7 @@
                         $(this).click(function() {
                             if ($(this).closest('tr').hasClass('child')) {
                                 rowIndex = table.row($(this).closest('tr').prev('tr')).index();
+                                rowData = table.row($(this).closest('tr').prev('tr')).data();
                                 table.row($(this).closest('tr').prev('tr')).remove().draw();
                                 that._rowReorderRedoSeq(table, datatable);
                                 // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, datatable);
@@ -945,6 +954,7 @@
                                 that._clearDatatableFormData(datatable, fieldsetDatatable);
                             } else {
                                 rowIndex = table.row($(this).closest('tr')).index();
+                                rowData = table.row($(this).parents('tr')).data();
                                 table.row($(this).parents('tr')).remove().draw();
                                 that._rowReorderRedoSeq(table, datatable);
                                 // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, datatable);
@@ -961,9 +971,16 @@
                             $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                             $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
 
-                            $('body').trigger('formToDatatableTableRowDelete');
+                            $('body').trigger(
+                                {
+                                    'type'     :'formToDatatableTableRowDelete',
+                                    'rowIndex' : rowIndex,
+                                    'rowData'  : rowData,
+                                    'rowsCount': table.rows().count()
+                                }
+                            );
 
-                            if ($('#' + fieldsetDatatable + '-table-data tbody tr td.dataTables_empty').length === 1) {
+                            if (table.rows().count() === 0) {
                                 $('body').trigger('formToDatatableTableEmpty');
                             }
                             that._tableDataToObj();
@@ -986,7 +1003,14 @@
                             if (sectionOptions[datatable].onEdit) {
                                 sectionOptions[datatable].onEdit(sectionOptions['datatables'][datatable]);
                             }
-                            $('body').trigger('formToDatatableTableRowEdit');
+                            $('body').trigger(
+                                {
+                                    'type'     :'formToDatatableTableRowEdit',
+                                    'rowIndex' : rowIndex,
+                                    'rowData'  : rowData,
+                                    'rowsCount': table.rows().count()
+                                }
+                            );
                         });
                     });
                 });
@@ -995,6 +1019,7 @@
             //Clear form data on success insertion
             _proto._clearDatatableFormData = function(datatable, fieldsetDatatable) {
                 var fieldsToClear;
+
                 if (sectionOptions[datatable].bazdatatable.keepFieldsData) {
                     var fieldsToKeep = sectionOptions[datatable].bazdatatable.keepFieldsData;
                 }
@@ -1013,32 +1038,31 @@
 
                 if (fieldsToClear) {
                     $.each(fieldsToClear, function(i,v) {
-                        v = '#' + v;
-                        if ($(v).data('bazscantype')) {
-                            if ($(v)[0].tagName === 'INPUT' && $(v)[0].type === 'checkbox') {
-                                $(v).prop('checked', $(v).prop('defaultChecked'));
-                            } else if ($(v)[0].tagName === 'INPUT' || $(v)[0].tagName === 'TEXTAREA') {
-                                $(v).val('');
+                        if ($('#' + v).data('bazscantype')) {
+                            if ($('#' + v)[0].tagName === 'INPUT' && $('#' + v)[0].type === 'checkbox') {
+                                $('#' + v).prop('checked', $('#' + v).prop('defaultChecked'));
+                            } else if ($('#' + v)[0].tagName === 'INPUT' || $('#' + v)[0].tagName === 'TEXTAREA') {
+                                $('#' + v).val('');
                             }
-                            if ($(v)[0].tagName === "SELECT") {//select2
-                                $(v).children('option').attr('disabled', false);
-                                $(v).val(null).trigger('change');
+                            if ($('#' + v)[0].tagName === "SELECT") {//select2
+                                $('#' + v).children('option').attr('disabled', false);
+                                $('#' + v).val(null).trigger('change');
                             }
-                            if ($(v)[0].tagName === 'DIV') {
-                                if ($(v).data('bazscantype') === 'jstree') {//jstree
-                                    $(v).jstree('deselect_all');
+                            if ($('#' + v)[0].tagName === 'DIV') {
+                                if ($('#' + v).data('bazscantype') === 'jstree') {//jstree
+                                    $('#' + v).jstree('deselect_all');
                                 }
-                                if ($(v).data('bazscantype') === 'radio') {//radio
-                                    if ($(v).find('input[checked]').length !== 0) {
-                                        $(v).find('input[checked]').prop('checked', true);
+                                if ($('#' + v).data('bazscantype') === 'radio') {//radio
+                                    if ($('#' + v).find('input[checked]').length !== 0) {
+                                        $('#' + v).find('input[checked]').prop('checked', true);
                                     } else {
-                                        $(v).find('input').each(function(i,v) {
-                                            $(v).prop('checked', false);
+                                        $('#' + v).find('input').each(function(i,v) {
+                                            $('#' + v).prop('checked', false);
                                         });
                                     }
                                 }
-                                if ($(v).data('bazscantype') === 'trumbowyg') {//trumbowyg
-                                    $(v).trumbowyg('empty');
+                                if ($('#' + v).data('bazscantype') === 'trumbowyg') {//trumbowyg
+                                    $('#' + v).trumbowyg('empty');
                                 }
                             }
                         }
@@ -1082,7 +1106,9 @@
                             dataCollection[componentId][sectionId][data]['data'][i] = { };
                             for (var j = 0; j < currentTableDataLength; j++) {
                                 var columnData;
-                                var columnDataHasClass = v[startAt].match(/class="(.*?)"/g)
+                                if (v[startAt]) {
+                                    var columnDataHasClass = v[startAt].match(/class="(.*?)"/g)
+                                }
                                 if (columnDataHasClass) {
                                     columnData = (columnDataHasClass.toString().match(/"(.*?)"/g)).toString().replace(/"/g, '');
                                 } else {
@@ -1099,14 +1125,8 @@
             // Add tables data from dataCollection
             _proto._dataArrToTableData = function()
             {
-                //eslint-disable-next-line
-                console.log('i triggered');
                 for (var table in sectionOptions['datatables']) {
-                    //eslint-disable-next-line
-                    // console.log(table);
                     for (var data in sectionOptions[table]['data']) {
-                        //eslint-disable-next-line
-                        // console.log(sectionOptions[table]['data'][data]);
                         that._addExtractFieldsToDatatable(
                             null,
                             {"0" : sectionOptions[table]['data'][data]},
@@ -1117,10 +1137,7 @@
                         );
                     }
                 }
-                // $('body').off('dataArrToTableData');
-                // $('body').on('dataArrToTableData', function() {
-                //     that._dataArrToTableData();
-                // });
+                $('body').trigger('formToDatatableTableImportComplete');
             }
 
             BazContentSectionWithFormToDatatable._jQueryInterface = function _jQueryInterface(options) {

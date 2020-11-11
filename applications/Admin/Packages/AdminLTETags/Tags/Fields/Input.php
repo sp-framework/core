@@ -274,7 +274,7 @@ class Input
     protected function Input()
     {
         $this->content .=
-            '<input '. $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' type="' . $this->fieldParams['fieldInputType'] . '" class="form-control ' . $this->fieldParams['fieldSize'] . ' rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '"  placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataInputMinNumber'] . ' ' . $this->fieldParams['fieldDataInputMaxNumber'] . ' ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldInputTypeTextFilter'] . ' value="' . $this->fieldParams['fieldValue'] . '" />';
+            '<input '. $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' type="' . $this->fieldParams['fieldInputType'] . '" class="form-control ' . $this->fieldParams['fieldSize'] . ' rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '"  placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataAttributes'] . ' ' . $this->fieldParams['fieldDataInputMinNumber'] . ' ' . $this->fieldParams['fieldDataInputMaxNumber'] . ' ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldInputTypeTextFilter'] . ' value="' . $this->fieldParams['fieldValue'] . '" />';
     }
 
     protected function select()
@@ -300,14 +300,16 @@ class Input
             '';
 
         $this->content .=
-            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="custom-select rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $this->fieldParams['fieldDisabled'] . '>';
+            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="custom-select rounded-0" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $this->fieldParams['fieldDataAttributes'] . ' ' . $this->fieldParams['fieldDisabled'] . '>';
 
-        if (isset($this->params['fieldDataSelectOptionsZero'])) {
-            $this->content .=
-                '<option data-value="0" value="0">' . $this->params['fieldDataSelectOptionsZero'] . '</option>';
-        } else {
-            $this->content .=
-                '<option></option>';
+        if (isset($this->params['fieldDataSelectOptionsZero']) && $this->params['fieldDataSelectOptionsZero'] === true) {
+            if (isset($this->params['fieldDataSelectOptionsZeroTitle'])) {
+                $this->content .=
+                    '<option data-value="0" value="0">' . $this->params['fieldDataSelectOptionsZeroTitle'] . '</option>';
+            } else {
+                $this->content .=
+                    '<option></option>';
+            }
         }
 
         if ($this->fieldParams['fieldDataSelectTreeData']) {

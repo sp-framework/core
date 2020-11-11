@@ -19,7 +19,7 @@ class Filters extends BaseModel
     public $name;
 
     /**
-     * Column(name="conditions", type="text", length=65535)
+     * Column(name="conditions", type="text", length=65535, nullable=true)
      */
     public $conditions;
 
@@ -32,6 +32,11 @@ class Filters extends BaseModel
      * @Column(column="permission", type="integer")
      */
     public $permission;
+
+    /**
+     * @Column(column="is_default", type="text", length=4096, nullable=true)
+     */
+    public $is_default;
 
     /**
      * @Column(column="shared_ids", type="text", length=4096, nullable=true)

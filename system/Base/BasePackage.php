@@ -155,7 +155,6 @@ abstract class BasePackage extends Controller
 			$offset = ['offset' => $pageParams['currentPage'] * $pageParams['limit']];
 		}
 
-
 		$params =
 			array_merge(
 				$params,
@@ -167,8 +166,6 @@ abstract class BasePackage extends Controller
 						0,
 				]
 			);
-
-// id:lessthan:200&and:contact_first_name:equals:Carnie&
 
 		if (isset($this->request->getPost()['conditions']) &&
 			$this->request->getPost()['conditions'] !== ''
@@ -287,10 +284,6 @@ abstract class BasePackage extends Controller
 				);
 		}
 
-
-		// var_dump($this->modelToUse::count());
-			// var_dump($params);
-			// die();
 		$data = $this->getByParams($params);
 
 		if ($data) {
@@ -298,23 +291,9 @@ abstract class BasePackage extends Controller
 		} else {
 			$pageParams['data'] = [];
 		}
-			// var_dump($pageParams);
 
-		// if ($this->modelToUse) {
-		// 	$pageParams['model'] = $this->modelToUse;
-		// } else {
-		// 	throw new \Exception('getPaged need modelToUse property, which is not set in package.');
-		// }
-
-		// if ($enableCache && $this->config->cache->enabled) {
-		// 	$pageParams['parameters'] = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
-		// } else {
-		// 	$pageParams['parameters'] = $params;
-		// }
-		// var_dump($pageParams);
 		try {
 			$paginator = new NativeArray($pageParams);
-		// var_dump($paginator);
 
 			$paged = $paginator->paginate();
 
@@ -397,7 +376,17 @@ abstract class BasePackage extends Controller
 
 			$create = ${$this->packageName}->create();
 
-			if (!$create) {
+			if ($create) {
+				$this->resetCache();
+
+				$this->packagesData->responseCode = 0;
+
+				$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
+
+				$this->packagesData->last = ${$this->packageName}->toArray();
+
+				return true;
+			} else {
 				$errMessages = [];
 
 				foreach (${$this->packageName}->getMessages() as $value) {
@@ -408,16 +397,6 @@ abstract class BasePackage extends Controller
 					"Could not update {$this->packageNameS}. Reasons: <br>" .
 					join(',', $errMessages)
 				);
-			} else {
-				$this->resetCache();
-
-				$this->packagesData->responseCode = 0;
-
-				$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
-
-				$this->packagesData->last = ${$this->packageName};
-
-				return true;
 			}
 		} else {
 			throw new \Exception('Data array missing. Cannot add!');
@@ -452,7 +431,7 @@ abstract class BasePackage extends Controller
 
 				$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
 
-				$this->packagesData->last = ${$this->packageName};
+				$this->packagesData->last = ${$this->packageName}->toArray();
 
 				return true;
 			}
@@ -463,13 +442,14 @@ abstract class BasePackage extends Controller
 
 	public function remove(int $id)
 	{
-		if ($this->packageName === 'core') {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = "Could not delete {$this->packageNameS}.";
-			return;
-		}
-
+		//Move this to Modules Package
+		// if ($this->packageName === 'core') {
+		// 	$this->packagesData->responseCode = 1;
+		// 	$this->packagesData->responseMessage = "Could not delete {$this->packageNameS}.";
+		// 	return;
+		// }
 		//Need to solve dependencies for removal
+
 		$this->getById($id);
 
 		if ($this->model->count() === 1) {
@@ -478,12 +458,60 @@ abstract class BasePackage extends Controller
 				$this->resetCache($id);
 
 				$this->packagesData->responseCode = 0;
+
 				$this->packagesData->responseMessage = "{$this->packageNameS} Deleted!";
+
 				return true;
 			} else {
 				$this->packagesData->responseCode = 1;
+
 				$this->packagesData->responseMessage = "Could not delete {$this->packageNameS}.";
 			}
+		} else if ($this->model->count() > 1) {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
+		} else if ($this->model->count() === 0) {
+			$this->packagesData->responseCode = 1;
+			$this->packagesData->responseMessage = 'No Record Found with that ID!';
+		}
+	}
+
+	public function clone(int $id, string $addCloneTxtToColumn = 'name', array $data = null)
+	{
+		if (!$data) {
+			$source = $this->getById($id);
+		} else {
+			$source = $data;
+		}
+
+		if ($source) {
+
+			unset($source['id']);
+
+			if (isset($source[$addCloneTxtToColumn])) {
+
+				$orgSource = $source[$addCloneTxtToColumn];
+
+				$source[$addCloneTxtToColumn] = $source[$addCloneTxtToColumn] . ' (Clone)';
+
+			} else {
+				$this->packagesData->responseCode = 1;
+
+				$this->packagesData->responseMessage = 'Clone Text cannot be added to column ' . $addCloneTxtToColumn . '. Please provide proper column data';
+
+				return false;
+			}
+
+			$add = $this->add($source);
+
+			if ($add) {
+				$this->packagesData->responseCode = 0;
+
+				$this->packagesData->responseMessage = $orgSource . ' cloned successfully';
+
+				return true;
+			}
+
 		} else if ($this->model->count() > 1) {
 			$this->packagesData->responseCode = 1;
 			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';

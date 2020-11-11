@@ -31,7 +31,6 @@ class Button extends AdminLTETags
         $this->buttonParams = $buttonParams;
 
         $this->buildButtonParamsArr();
-
     }
 
     public function getContent()
@@ -44,8 +43,7 @@ class Button extends AdminLTETags
         if (isset($this->params['buttons'])) {
             $buttons = $this->params['buttons'];
         } else {
-            $this->content .= 'Error: buttons (array) missing';
-            return;
+            throw new \Exception('Error: buttons (array) missing');
         }
 
         // if (!$this->params['buttonsNoMargin']) {
@@ -124,7 +122,7 @@ class Button extends AdminLTETags
             }
 
             if (isset($button['icon']) && isset($button['title'])) {
-                if (isset($button['position']) && $button['position'] === 'after') {
+                if (isset($button['iconPosition']) && $button['iconPosition'] === 'after') {
                     $this->buttonParams['icon'] =
                         '<i class="fas fa-fw fa-' . $button['icon'] . '"></i>';
                     $this->buttonParams['iconPosition'] = 'after';

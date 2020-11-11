@@ -41,7 +41,7 @@ class Buttons extends AdminLTETags
             $this->content .= (new $button($this->view, $this->tag, $this->links, $this->params, $this->buttonParams))->getContent();
 
         } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
+            throw $e;
         }
 
     }

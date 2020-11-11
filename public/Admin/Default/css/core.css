@@ -28021,7 +28021,7 @@ input[type=number] {
 /* Disable a tag */
 a.disabled {
   pointer-events: none;
-  cursor: default;
+  cursor: not-allowed;
 }
 
 /* Cursor */
@@ -28048,4 +28048,9 @@ a.disabled {
 
 .card-body {
   padding: 0.75rem !important;
+}
+
+.dropdown-menu a:hover {
+  color: #fff;
+  background-color: #3498DB;
 }

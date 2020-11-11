@@ -77,7 +77,7 @@ class DynamicTable
             }
 
             $this->content .=
-                '<div class="col" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-primary-buttons">';
+                '<div class="col" id="listing-primary-buttons" hidden>';
 
             $this->content .=
                 $this->adminLTETags->useTag(
@@ -114,7 +114,7 @@ class DynamicTable
         $this->content .=
             '<div class="row">
                 <div class="col">
-                    <div class="row m-2 text-center" id="list-data-loader">
+                    <div class="row m-2 text-center" id="listing-data-loader">
                         <div class="col">
                             <div class="fa-2x">
                                 <i class="fa fa-cog fa-spin"></i> Loading...
@@ -152,7 +152,7 @@ class DynamicTable
 
         $this->dtParams["dtPostUrlParams"] =
             isset($this->params["dtPostUrlParams"]) ?
-            $this->escaper->escapeJs(Json::encode([$this->params["dtPostUrlParams"]])) :
+            $this->escaper->escapeJs(Json::encode($this->params["dtPostUrlParams"])) :
             null;
 
         $this->dtParams["dtNoOfColumnsToShow"] =
@@ -279,7 +279,7 @@ class DynamicTable
                                     "componentName"         : "' . $this->params["componentName"] . '",
                                     "tableName"             : "' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '-table",
                                     "postUrl"               : "' . $this->dtParams["dtPostUrl"] . '",
-                                    "postParams"            : { },
+                                    "postParams"            : JSON.parse("' . $this->dtParams["dtPostUrlParams"] . '"),
                                     "datatable"     : {
                                         "columns"                           : "' . $this->dtParams["dtColumns"] . '",
                                         "colTextTruncate"                   : "' . $this->dtParams["colTextTruncate"] . '",
@@ -314,11 +314,11 @@ class DynamicTable
                                 }
                             });';
 
-        if ($this->dtParams["dtPostUrlParams"]) {
-            $this->content .=
-                'window["dataCollection"]["' . $this->params["componentId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["listOptions"]["postParams"] =
-                        $.extend(window["dataCollection"]["' . $this->params["componentId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["listOptions"]["postParams"], "' . $this->dtParams["dtPostUrlParams"] . '");';
-        }
+        // if ($this->dtParams["dtPostUrlParams"]) {
+        //     $this->content .=
+        //         'window["dataCollection"]["' . $this->params["componentId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["listOptions"]["postParams"] =
+        //                 $.extend(window["dataCollection"]["' . $this->params["componentId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["' . $this->params["componentId"] . '-' . $this->params["sectionId"] . '"]["listOptions"]["postParams"], "' . $this->dtParams["dtPostUrlParams"] . '");';
+        // }
 
         $this->content .= '</script>';
     }

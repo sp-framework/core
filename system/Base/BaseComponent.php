@@ -80,9 +80,6 @@ abstract class BaseComponent extends Controller
 
 		$this->view->viewName =
 			$this->modules->views->getViewInfo()['name'];
-
-		$this->view->menus =
-			$this->modules->menus->getMenusForApplication($this->application['id']);
 	}
 
 	protected function setDefaultViewResponse()
@@ -350,6 +347,9 @@ abstract class BaseComponent extends Controller
 			if ($inlineScript && $inlineScript !== '') {
 				$this->assets->addInlineJs($inlineScript);
 			}
+
+			$this->view->menus =
+				$this->modules->menus->getMenusForApplication($this->application['id']);
 		}
 	}
 

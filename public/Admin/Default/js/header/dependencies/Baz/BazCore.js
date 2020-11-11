@@ -1,5 +1,5 @@
 /* exported BazCore */
-/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyDesktop PNotifyPaginate PNotifyMobile */
+/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile */
 /*
 * @title                    : BazCore
 * @description              : Baz Core Lib
@@ -96,7 +96,7 @@ var BazCore = function() {
         PNotify.defaultModules.set(PNotifyFontAwesome5, {});
         PNotify.defaultModules.set(PNotifyFontAwesome5Fix, {});
         PNotify.defaultModules.set(PNotifyMobile, {});
-        PNotify.defaultModules.set(PNotifyDesktop, {});
+        // PNotify.defaultModules.set(PNotifyDesktop, {});
         PNotify.defaultModules.set(PNotifyPaginate, {});
         bazContent();
         toolTipsAndPopovers();

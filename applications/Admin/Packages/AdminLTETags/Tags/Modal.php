@@ -29,7 +29,8 @@ class Modal extends AdminLTETags
             return;
         }
 
-        $this->modalParams['modalId'] = $this->params['modalId'];
+        $this->modalParams['modalId'] =
+            $this->params['componentId'] . '-' . $this->params['sectionId'] . '-' . $this->params['modalId'];
 
         if (isset($this->params['modalTrigger'])) {
             if ($this->params['modalTrigger'] === 'button') {
@@ -46,27 +47,49 @@ class Modal extends AdminLTETags
                                 'modalButton'           => true,
                                 'id'                    => $this->params['modalId'] . '-button',
                                 'title'                 =>
-                                    isset($this->params['modalButtonTitle']) ? $this->params['modalButtonTitle'] : 'modalButtonTitle Missing',
+                                    isset($this->params['modalButtonTitle']) ?
+                                    $this->params['modalButtonTitle'] :
+                                    'modalButtonTitle Missing',
                                 'position'              =>
-                                    isset($this->params['modalButtonPosition']) ? $this->params['modalButtonPosition'] : 'left',
+                                    isset($this->params['modalButtonPosition']) ?
+                                    $this->params['modalButtonPosition'] :
+                                    'left',
                                 'size'                  =>
-                                    isset($this->params['modalButtonSize']) ? $this->params['modalButtonSize'] : 'xs',
+                                    isset($this->params['modalButtonSize']) ?
+                                    $this->params['modalButtonSize'] :
+                                    'xs',
                                 'type'                  =>
-                                    isset($this->params['modalButtonType']) ? $this->params['modalButtonType'] : 'primary',
+                                    isset($this->params['modalButtonType']) ?
+                                    $this->params['modalButtonType'] :
+                                    'primary',
                                 'style'                 =>
-                                    isset($this->params['modalButtonStyle']) ? $this->params['modalButtonStyle'] : '',
+                                    isset($this->params['modalButtonStyle']) ?
+                                    $this->params['modalButtonStyle'] :
+                                    '',
                                 'flat'                  =>
-                                    isset($this->params['modalButtonFlat']) ? $this->params['modalButtonFlat'] : '',
+                                    isset($this->params['modalButtonFlat']) ?
+                                    $this->params['modalButtonFlat'] :
+                                    '',
                                 'icon'                  =>
-                                    isset($this->params['modalButtonIcon']) ? $this->params['modalButtonIcon'] : '',
+                                    isset($this->params['modalButtonIcon']) ?
+                                    $this->params['modalButtonIcon'] :
+                                    '',
                                 'hidden'                =>
-                                    isset($this->params['modalButtonHidden']) ? $this->params['modalButtonHidden'] : '',
+                                    isset($this->params['modalButtonHidden']) ?
+                                    $this->params['modalButtonHidden'] :
+                                    '',
                                 'disabled'              =>
-                                    isset($this->params['modalButtonDisabled']) ? $this->params['modalButtonDisabled'] : '',
+                                    isset($this->params['modalButtonDisabled']) ?
+                                    $this->params['modalButtonDisabled'] :
+                                    '',
                                 'block'                 =>
-                                    isset($this->params['modalButtonBlock']) ? $this->params['modalButtonBlock'] : '',
+                                    isset($this->params['modalButtonBlock']) ?
+                                    $this->params['modalButtonBlock'] :
+                                    '',
                                 'buttonAdditionalClass' =>
-                                    isset($this->params['modalButtonAdditionalClass']) ? $this->params['modalButtonAdditionalClass'] : ''
+                                    isset($this->params['modalButtonAdditionalClass']) ?
+                                    $this->params['modalButtonAdditionalClass'] :
+                                    ''
                             ]
                         ]
                     ]
@@ -74,10 +97,14 @@ class Modal extends AdminLTETags
             } else if ($this->params['modalTrigger'] === 'link') {
 
                 $this->modalParams['modalLinkAdditionalClass'] =
-                    isset($this->params['modalLinkAdditionalClass']) ? $this->params['modalLinkAdditionalClass'] : '';
+                    isset($this->params['modalLinkAdditionalClass']) ?
+                    $this->params['modalLinkAdditionalClass'] :
+                    '';
 
                 $this->modalParams['modalLinkTitle'] =
-                    isset($this->params['modalLinkTitle']) ? $this->params['modalLinkTitle'] : 'modalLinkTitle Missing';
+                    isset($this->params['modalLinkTitle']) ?
+                    $this->params['modalLinkTitle'] :
+                    'modalLinkTitle Missing';
 
                 $this->content .=
                     '<a href="#" class="' . $this->modalParams['modalLinkAdditionalClass'] . '" data-toggle="modal" data-target="#' . $this->params['modalId'] . '-modal">' . $this->modalParams['modalLinkTitle'] . '"</a>';
@@ -85,19 +112,29 @@ class Modal extends AdminLTETags
         }
 
         $this->modalParams['modalAdditionalClasses'] =
-            isset($this->params['modalAdditionalClasses']) ? $this->params['modalAdditionalClasses'] : '';
+            isset($this->params['modalAdditionalClasses']) ?
+            $this->params['modalAdditionalClasses'] :
+            '';
 
         $this->modalParams['modalContentAdditionalClasses'] =
-            isset($this->params['modalContentAdditionalClasses']) ? $this->params['modalContentAdditionalClasses'] : '';
+            isset($this->params['modalContentAdditionalClasses']) ?
+            $this->params['modalContentAdditionalClasses'] :
+            '';
 
         $this->modalParams['modalBodyAdditionalClasses'] =
-            isset($this->params['modalBodyAdditionalClasses']) ? $this->params['modalBodyAdditionalClasses'] : '';
+            isset($this->params['modalBodyAdditionalClasses']) ?
+            $this->params['modalBodyAdditionalClasses'] :
+            '';
 
         $this->modalParams['modalFooterAdditionalClasses'] =
-            isset($this->params['modalFooterAdditionalClasses']) ? $this->params['modalFooterAdditionalClasses'] : '';
+            isset($this->params['modalFooterAdditionalClasses']) ?
+            $this->params['modalFooterAdditionalClasses'] :
+            '';
 
         $this->modalParams['modalButtonSecondaryTitle'] =
-            isset($this->params['modalButtonSecondaryTitle']) ? $this->params['modalButtonSecondaryTitle'] : 'CLOSE';
+            isset($this->params['modalButtonSecondaryTitle']) ?
+            $this->params['modalButtonSecondaryTitle'] :
+            'CLOSE';
 
         $this->modalParams['modalScrollable'] =
             isset($this->params['modalScrollable']) ? 'modal-dialog-scrollable' : '';
@@ -109,14 +146,29 @@ class Modal extends AdminLTETags
             isset($this->params['modalSize']) ? 'modal-' . $this->params['modalSize'] : '';
 
         $this->modalParams['modalEscClose'] =
-            isset($this->params['modalEscClose']) ? $this->params['modalEscClose'] : 'false';
-
+            isset($this->params['modalEscClose']) ?
+            $this->params['modalEscClose'] :
+            'false';
 
         $this->modalParams['modalType'] =
-            isset($this->params['modalType']) ? $this->params['modalType'] : 'primary';
+            isset($this->params['modalType']) ?
+            $this->params['modalType'] :
+            'primary';
 
         $this->modalParams['modalTitle'] =
-            isset($this->params['modalTitle']) ? $this->params['modalTitle'] : 'modalTitle missing';
+            isset($this->params['modalTitle']) ?
+            $this->params['modalTitle'] :
+            'modalTitle missing';
+
+        $this->modalParams['modalCloseButtonTitle'] =
+            isset($this->params['modalCloseButtonTitle']) ?
+            $this->params['modalCloseButtonTitle'] :
+            'Close';
+
+        $this->modalParams['modalCloseButtonSize'] =
+            isset($this->params['modalCloseButtonSize']) ?
+            $this->params['modalCloseButtonSize'] :
+            'sm';
 
         if (isset($this->params['modalBodyContent'])) {
 
@@ -151,31 +203,36 @@ class Modal extends AdminLTETags
                     if (isset($this->params['modalHeader']) && $this->params['modalHeader'] === true) {
                         $this->content .=
                             '<div class="modal-header bg-' . $this->modalParams['modalType'] .' rounded-0">
-                                <h5 class="modal-title" id="' . $this->modalParams['modalId'] . '-label">' . $this->modalParams['modalTitle'] . '</h5>
+                                <h6 class="modal-title" id="' . $this->modalParams['modalId'] . '-label">' . $this->modalParams['modalTitle'] . '</h6>
                                 <button type="button" class="close modal-close text-white" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>';
                     }
 
-                    $this->content .=
-                        '<div class="modal-body ' . $this->modalParams['modalBodyAdditionalClasses'] . '">' .
-                            $modalBody .
-                        '</div>';
+        $this->content .=
+            '<div class="modal-body ' . $this->modalParams['modalBodyAdditionalClasses'] . '">' .
+                $modalBody .
+            '</div>';
 
-                    if (isset($this->params['modalFooter']) && $this->params['modalFooter'] === true) {
+        if (isset($this->params['modalFooter']) && $this->params['modalFooter'] === true) {
 
-                        $this->content .=
-                            '<div class="modal-footer ' . $this->modalParams['modalFooterAdditionalClasses'] . '">
-                            <button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-xs modal-close" data-dismiss="modal">' . $this->modalParams['modalButtonSecondaryTitle'] . '</button>';
+            $this->content .=
+                '<div class="modal-footer ' . $this->modalParams['modalFooterAdditionalClasses'] . '">';
 
-                            if (isset($this->params['modalFooterButtonSubmitTitle'])) {
-                                $this->content .=
-                                    '<button type="button" id="' . $this->modalParams['modalId'] . '-button-submit" class="btn btn-primary btn-xs">' . strtoupper($this->params['modalFooterButtonSubmitTitle']) . '</button>';
-                            }
+            if (isset($this->params['modalFooterButtons'])) {
+                $this->content .=
+                    $this->useTag(
+                        'buttons',
+                        $this->params['modalFooterButtons']
+                    );
+            }
+            $this->content .=
+                '<button type="button" id="' . $this->modalParams['modalId'] . '-button-close" class="btn btn-secondary btn-' . $this->modalParams['modalCloseButtonSize'] . ' modal-close text-uppercase" data-dismiss="modal">' . $this->modalParams['modalCloseButtonTitle'] . '</button>';
 
-                        $this->content .= '</div>';
-                    }
+            $this->content .= '</div>';
+        }
+
         $this->content .= '</div></div></div>';
     }
 }

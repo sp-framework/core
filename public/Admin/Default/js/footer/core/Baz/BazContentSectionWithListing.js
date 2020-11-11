@@ -84,58 +84,37 @@
                 $('#' + sectionId + '-sharing').BazContentFields();
                 $(this._element).BazContentSectionWithFormToDatatable();
 
-                //Filter Buttons
-                $('#' + sectionId + '-filters').change(function() {
-
-                    if ($('#' + sectionId + '-filter-filters option:selected').val() === "0") {
-
-                        $('#' + sectionId + '-filter-edit, ' +
-                          '#' + sectionId + '-filter-delete, ' +
-                          '#' + sectionId + '-filter-share'
+                function toggleFilterButtons(sectionId) {
+                    if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 0 || //System
+                        $('#' + sectionId + '-filters option:selected').data()['permission'] === 2    //Shared
+                    ) {
+                        $('#' + sectionId + '-edit, ' +
+                          '#' + sectionId + '-delete, ' +
+                          '#' + sectionId + '-share'
                         ).attr("disabled", true);
 
-                    } else {
-                        $('#' + sectionId + '-filter-apply-saved').attr("disabled", false);
-
-                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0 || //System
-                            $('#' + sectionId + '-filter-filters option:selected').data('permission') === 2    //Shared
-                        ) {
-                            $('#' + sectionId + '-filter-edit, ' +
-                              '#' + sectionId + '-filter-delete, ' +
-                              '#' + sectionId + '-filter-share'
-                            ).attr("disabled", true);
-
-                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) { //User
-                            $('#' + sectionId + '-filter-edit, ' +
-                              '#' + sectionId + '-filter-delete, ' +
-                              '#' + sectionId + '-filter-share'
-                            ).attr("disabled", false);
-                        }
-
-                        query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
-
-                        $('#' + sectionId + '-filter-modal').modal('hide');
-
-                        that._filterRunAjax(
-                            1,
-                            datatableOptions.paginationCounters.limit,
-                            query
-                        );
-                    }
-                });
-
-                // Add additional text to selection options
-                $('#' + sectionId + '-filters').children().each(function(index, filter) {
-                    var html = $(filter).html();
-                    if ($(filter).data()['permission'] == 0) {
-                        $(filter).html(html + ' (System)');
-                    } else if ($(filter).data()['permission'] == 2) {
-                        $(filter).html(html + ' (Shared)');
-                    } else if ($(filter).data()['shared_ids'] &&
-                               $(filter).data()['shared_ids'] !== ""
+                    } else if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 1
                     ) {
-                        $(filter).html(html + ' (Sharing)');
+                        $('#' + sectionId + '-edit, ' +
+                          '#' + sectionId + '-delete, ' +
+                          '#' + sectionId + '-share'
+                        ).attr("disabled", false);
                     }
+                }
+
+                toggleFilterButtons(sectionId);
+
+                //Filter Buttons
+                $('#' + sectionId + '-filters').change(function() {
+                    toggleFilterButtons(sectionId + '-filter');
+
+                    query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+
+                    that._filterRunAjax(
+                        1,
+                        datatableOptions.paginationCounters.limit,
+                        query
+                    );
                 });
 
                 //Open Sharing Modal
@@ -147,37 +126,129 @@
                 //Reset
                 $('#' + sectionId + '-reset').click(function(e) {
                     e.preventDefault();
+
+                    resetFilters();
+                });
+
+                function resetFilters() {
                     query = '';
+                    var defaultFilter = null;
+
+                    $('#' + sectionId + '-filter-filters').children().each(function(index, filter) {
+                        if ($(filter).data()['is_default'] == 1) {
+                            query = $(filter).data()['conditions'];
+                            defaultFilter = filter;
+                            return false;
+                        }
+                    });
 
                     that._filterRunAjax(
                         1,
                         datatableOptions.paginationCounters.limit,
                         query
                     );
-                    $('#' + sectionId + '-filter-filters').val(0);
-                });
 
-                //Close Modal
-                $('#' + sectionId + '-cancel').click(function(e) {
-                    e.preventDefault();
-                    $('#' + sectionId + '-filter-modal').modal('hide');
-                });
+                    toggleFilterButtons(sectionId + '-filter');
+
+                    if (defaultFilter) {
+                        $('#' + sectionId + '-filter-filters').val($(defaultFilter).val());
+                        $('#' + sectionId + '-filter-edit, ' +
+                          '#' + sectionId + '-filter-delete, ' +
+                          '#' + sectionId + '-filter-share'
+                        ).attr("disabled", false);
+                    }
+                }
 
                 //Add / Open Modal
                 $('#' + sectionId + '-add').click(function(e) {
                     e.preventDefault();
 
+                    clearStoredData();
+
                     $('#' + sectionId + '-filter-modal').modal('show');
+                });
+
+                //Clone / Open Modal
+                $('#' + sectionId + '-clone').click(function(e) {
+                    e.preventDefault();
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+
+                    $.post('filter/clone',
+                           {'id' : selectedFilter.data()['id'], 'component_id' : selectedFilter.data()['component_id']},
+                           function(data) {
+                        if (data.responseCode === 0) {
+                            PNotify.success({
+                                'title'     : data.responseMessage
+                            });
+                            if (data.filters) {
+                                redoFiltersOptions('', sectionId, data);
+                            }
+                            resetFilters();
+                            toggleFilterButtons(sectionId + '-filter');
+                        } else {
+                            PNotify.error({
+                                'title'     : data.responseMessage
+                            });
+                        }
+                    }, 'json');
+
+                    // var filtersCount = $('#' + sectionId + '-filter-filters').children('option').length + 1;
+
+                    // $('#' + sectionId + '-filter-filters')
+                    //     .append($('<option />')
+                    //         .val(filtersCount)
+                    //         .text('Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ') (Not Saved)')
+                    //         .prop('selected', true)
+                    //         .data({
+                    //             "conditions"        : $(selectedFilter).data()['conditions'],
+                    //             "permission"        : 1,
+                    //             "value"             : filtersCount,
+                    //             "shared_ids"        : "",
+                    //             "component_id"      : $(this).parents('.component').data()['component_id'],
+                    //             "name"              : 'Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ')',
+                    //             "is_default"        : "0",
+                    //             "ns"                : true
+                    //         })
+                    //         .attr({
+                    //             "data-conditions"   : $(selectedFilter).data()['conditions'],
+                    //             "data-permission"   : 1,
+                    //             "data-value"        : filtersCount,
+                    //             "data-shared_ids"   : "",
+                    //             "data-component_id" : $(this).parents('.component').data()['component_id'],
+                    //             "data-name"         : 'Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ')',
+                    //             "is_default"        : "0",
+                    //             "ns"                : true
+                    //         })
+                    //     );
+
+                    // PNotify.success({
+                    //     'title' : 'Cloned successfully'
+                    // });
+
+                    toggleFilterButtons(sectionId + '-filter');
+
+                    // editFilter();
+
+                    // $('#' + sectionId + '-filter-modal').modal('show');
                 });
 
                 //Edit / Open Modal
                 $('#' + sectionId + '-edit').click(function(e) {
                     e.preventDefault();
 
-                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    editFilter();
 
+                    $('#' + sectionId + '-filter-modal').modal('show');
+                });
+                function editFilter() {
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+
                     var conditionsStr = $(selectedFilter).data().conditions;
+
+                    if (conditionsStr === '') { //Empty string for show all condition
+                        return;
+                    }
                     var conditions = conditionsStr.substring(0, conditionsStr.length - 1);
                     var conditionsRows = conditions.split('&');
                     var conditionsColumns = [];
@@ -196,6 +267,11 @@
                             andOrS2[$(data).data().value] = $(data)[0].innerHTML;
                         }
                     });
+
+                    if ($('#' + sectionId + '-filter-andor').data().disabledtext) {
+                        andOrS2[$('#' + sectionId + '-filter-andor').data().disabledtext] =
+                        $('#' + sectionId + '-filter-andor').data().disabledtext;
+                    }
 
                     //Andor Object
                     select2FieldData = $('#' + sectionId + '-filter-field option');
@@ -216,8 +292,7 @@
                     });
 
                     var columns = { };
-                    //eslint-disable-next-line
-                    console.log(conditionsColumns);
+
                     $.each(conditionsColumns, function(index, column) {
 
                         columns[index] = { };
@@ -255,7 +330,23 @@
 
                     dataCollection[componentId][sectionId + '-filter']['BazContentSectionWithFormToDatatable']._dataArrToTableData();
 
-                    $('#' + sectionId + '-filter-modal').modal('show');
+                    $('#' + sectionId + '-filter-id').val($(selectedFilter).data()['id']);
+                    $('#' + sectionId + '-filter-name').val($(selectedFilter).data()['name']);
+
+                    if ($(selectedFilter).data()['is_default'] === 1) {
+                        $('#' + sectionId + '-filter-default')[0].checked = true;
+                        $('#' + sectionId + '-filter-default').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-default')[0].checked = false;
+                        $('#' + sectionId + '-filter-default').attr('disabled', false);
+                    }
+                }
+                $('body').on('formToDatatableTableImportComplete', function () {
+                    dataCollection[componentId][sectionId + '-filter']['BazContentSectionWithFormToDatatable']._tableDataToObj();
+                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    $('#' + sectionId + '-filter-save').removeClass('disabled');
+                    $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                    $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
                 });
 
                 //Delete
@@ -264,15 +355,68 @@
 
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
-                    if ($(selectedFilter).data().ns === true) {
-                        $('#' + sectionId + '-filter-filters').val(0);
-                        $(selectedFilter).remove();
-                        $('#' + sectionId + '-filter-edit, ' +
-                          '#' + sectionId + '-filter-delete'
-                        ).attr("disabled", true);
-                    } else {
-                        //Delete via post
-                    }
+                    Swal.fire({
+                        title                       : '<i class="fa fa-fw fa-question-circle text-danger mr-2" style="font-size: 1.25rem;position: relative;top: 3px;">' +
+                                                      '</i> <h5 class="text-danger"> Delete Filter ' + selectedFilter.data()['name'] + '?</span>',
+                        width                       : '100%',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Delete',
+                        customClass                 : {
+                            'container'                 : 'rounded-0 animated fadeIn',
+                            'confirmButton'             : 'btn btn-danger text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showClass                   : {
+                            'popup'                     : 'swal2-noanimation',
+                            'backdrop'                  : 'swal2-noanimation'
+                        },
+                        hideClass                   : {
+                            'popup'                     : '',
+                            'backdrop'                  : ''
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        allowEnterKey               : false,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            if ($(selectedFilter).data().ns === true) {
+                                $(selectedFilter).remove();
+                                $('#' + sectionId + '-filter-edit, ' +
+                                  '#' + sectionId + '-filter-delete, ' +
+                                  '#' + sectionId + '-filter-share'
+                                ).attr("disabled", true);
+                                PNotify.success({
+                                    'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
+                                });
+                                resetFilters();
+                            } else {
+                                $.post('filter/remove',
+                                       {'id' : selectedFilter.data()['id'], 'component_id' : selectedFilter.data()['component_id']},
+                                       function(data) {
+                                    if (data.responseCode === 0) {
+                                        PNotify.success({
+                                            'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
+                                        });
+                                        if (data.filters) {
+                                            redoFiltersOptions('', sectionId, data);
+                                        }
+                                        resetFilters();
+                                    } else {
+                                        PNotify.error({
+                                            'title'     : 'Cannot delete filter.'
+                                        });
+                                    }
+                                }, 'json');
+                            }
+                        }
+                    });
                 });
 
                 // Add Numeric for numberic fields
@@ -323,7 +467,7 @@
                     }
                 });
 
-                $('body').on('formToDatatableTableRowEdit', function() {
+                $('body').on('formToDatatableTableRowEdit', function(e) {
                     if ($('#' + sectionId + '-filter-operator').val() === 'empty' ||
                         $('#' + sectionId + '-filter-operator').val() === 'notempty'
                     ) {
@@ -331,68 +475,142 @@
                     } else {
                         $('#' + sectionId + '-filter-value').attr('disabled', false);
                     }
-                });
 
-                //Add Save
-                $('#' + sectionId + '-name').keyup(function() {
-                    if ($(this).val() !== '') {
-                        $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', false);
+                    $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    $('#' + sectionId + '-filter-value').attr('disabled', false);
+
+                    if (e.rowsCount === 1) {
+                        $('#' + sectionId + '-filter-andor').attr('disabled', true);
                     } else {
-                        $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', true);
+                        if (e.rowIndex === 0) {
+                            $('#' + sectionId + '-filter-andor').attr('disabled', true);
+                        } else {
+                            $('#' + sectionId + '-filter-andor').attr('disabled', false);
+                        }
                     }
                 });
 
-                //Adding/Updating to table
+                //Add Name
+                $('#' + sectionId + '-name').keyup(function() {
+                    if ($(this).val() !== '') {
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
+                        $('#' + sectionId + '-filter-save').removeClass('disabled');
+                    } else {
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                        $('#' + sectionId + '-filter-save').addClass('disabled');
+                    }
+                });
+
+                //Adding to table
                 $('#' + sectionId + '-assign-button').click(function(e) {
                     e.preventDefault();
+                    onFormToDatatableTableUpdate(e);
 
-                    $('#' + sectionId + '-filter-name').attr('disabled', false);
-                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
-                    $('#' + sectionId + '-filter-value').attr('disabled', false);
+                    // $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    // $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                    // $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
+                    // $('#' + sectionId + '-filter-value').attr('disabled', false);
+
+                    // $('#' + sectionId + '-filter-andor').attr('disabled', false);
+                    // $('#' + sectionId + '-filter-andor').val('and').trigger('change');
                 });
 
-                //Remove First And Or
-                $('body').on('formToDatatableTableUpdated', function() {
-                    $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
-
-                    //Remove numeric from edit data
-                    $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
-                       //eslint-disable-next-line
-                       // console.log($(tr).find('td'));
-                       var field = $(tr).find('td')[1];
-                       field.innerHTML = field.innerHTML.replace(" (Numeric)", "");
-                       // $(tr)..innerHTML = $(td)[0].innerHTML.replace(" (Numeric)", "");
-                    });
-                    // $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).off();
-                    $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).click(function() {
-                        $('#' + sectionId + '-filter-andor').val('and').trigger('change');
-                    });
+                $('body').on('formToDatatableTableUpdatedClicked', function(e) {
+                    onFormToDatatableTableUpdate(e);
+                    // $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                    // $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
                 });
 
-                $('body').on('formToDatatableTableUpdatedClicked', function() {
-                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
+                $('#' + sectionId + '-default').click(function() {
+
+                    var postData = { };
+                        postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
+
+                    $.post('filter/getdefaultfilter', postData, function(data) {
+                        if (data.responseCode === 0) {
+                            Swal.fire({
+                                title                       : '<i class="fa fa-fw fa-question-circle text-danger mr-2" style="font-size: 1.25rem;position: relative;top: 3px;">' +
+                                                              '</i> <h5 class="text-danger"> Filter ' +
+                                                              data.defaultFilter[0].name + ' is already set as default. ' +
+                                                              'Make this filter default instead?</h5>',
+                                width                       : '100%',
+                                background                  : 'rgba(0,0,0,.8)',
+                                backdrop                    : 'rgba(0,0,0,.6)',
+                                buttonsStyling              : false,
+                                confirmButtonText           : 'Yes',
+                                cancelButtonText            : 'No',
+                                customClass                 : {
+                                    'container'                 : 'rounded-0 animated fadeIn',
+                                    'confirmButton'             : 'btn btn-info text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                },
+                                showClass                   : {
+                                    'popup'                     : 'swal2-noanimation',
+                                    'backdrop'                  : 'swal2-noanimation'
+                                },
+                                hideClass                   : {
+                                    'popup'                     : '',
+                                    'backdrop'                  : ''
+                                },
+                                showCancelButton            : true,
+                                keydownListenerCapture      : true,
+                                allowOutsideClick           : false,
+                                allowEscapeKey              : false,
+                                allowEnterKey               : false,
+                                didOpen                     : function() {
+                                    swalSound.play();
+                                }
+                            }).then((result) => {
+                                if (result.isDismissed) {
+                                    $('#' + sectionId + '-filter-default')[0].checked = false;
+                                }
+                            });
+                        }
+                    }, 'json');
+
+                    $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
+                    $('#' + sectionId + '-filter-apply').removeClass('disabled');
                 });
 
                 //If Only 1 row - Remove And/Or
-                $('body').on('formToDatatableTableRowDelete', function() {
-                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
-                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
-                    }
-                    //eslint-disable-next-line
-                    console.log($('#' + sectionId + '-table tbody td.dataTables_empty'));
-                    if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
-                        $('#' + sectionId + '-filter-name').attr('disabled', true);
-                        $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
-                    } else {
-                        $('#' + sectionId + '-filter-name').attr('disabled', false);
-                        $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
-                    }
+                $('body').on('formToDatatableTableRowDelete', function(e) {
+                    onFormToDatatableTableUpdate(e);
                 });
 
-                //Add Apply (Temp) & Close Modal
-                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function(e) {
+                function onFormToDatatableTableUpdate(e) {
+                    //Remove numeric from edit data
+                    $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
+                       var field = $(tr).find('td')[1];
+                       if (field) {
+                           field.innerHTML = field.innerHTML.replace(" (Numeric)", "");
+                       }
+                    });
+                    $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    $('#' + sectionId + '-filter-andor').attr('disabled', false);
+
+                    if (e.rowsCount === 1) {
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
+                    }
+                    if (e.rowsCount < 1) {
+                        $('#' + sectionId + '-filter-name').attr('disabled', true);
+                        $('#' + sectionId + '-filter-apply').addClass('disabled');
+                        $('#' + sectionId + '-filter-cloneapply').addClass('disabled');
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-name').attr('disabled', false);
+                        $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                        $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
+                    }
+                }
+
+                //Save
+                $('#' + sectionId + '-apply, #' + sectionId + '-saveapply').click(function(e) {
                     e.preventDefault();
+
                     query = '';
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
                     var tableData =
                         dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'];
@@ -414,6 +632,83 @@
                         }
                     });
 
+                    var filterName = $('#' + sectionId + '-filter-name').val();
+
+                    if (filterName === '') {
+                        $('#' + sectionId + '-filter-name').addClass('is-invalid');
+                        $('#' + sectionId + '-filter-name').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                        return;
+                    }
+
+                    if ($(this)[0].id === sectionId + '-filter-apply') {
+                        if ($(selectedFilter).data()['is_default'] == 1) {
+                            filterName = filterName + ' (Default)';
+                        }
+                        filterName = filterName + ' (Not Saved)';
+                        $(selectedFilter)
+                            .append($('<option />')
+                                .text(filterName)
+                                .data({
+                                    "conditions"        : query,
+                                    "ns"                : true
+                                })
+                                .attr({
+                                    "data-conditions"   : query,
+                                    "ns"                : true
+                                })
+                            );
+
+                        $('#' + sectionId + '-filter-qsave').attr('hidden', false);
+                    } else if ($(this)[0].id === sectionId + '-filter-saveapply') {
+
+                        //Save To Db
+                        var postData = { };
+                        postData['id'] = $('#' + sectionId + '-filter-id').val();
+                        postData['name'] = filterName;
+                        postData['conditions'] = query;
+                        postData['component_id'] = $(selectedFilter).data()['component_id'];
+                        postData['permission'] = 1;
+
+                        if ($('#' + sectionId + '-filter-default')[0].checked === true) {
+                            postData['is_default'] = '1';
+                            filterName = filterName + ' (Default)';
+                        } else {
+                            postData['is_default'] = '0';
+                        }
+
+                        var url;
+
+                        if (postData['id'] !== '') {
+                            url = 'filter/update';
+                            // appendFilter = selectedFilter;
+                        } else {
+                            url = 'filter/add';
+                            // appendFilter = $('#' + sectionId + '-filter-filters');
+                        }
+
+                        //Update Filter
+                        $.post(url, postData, function(data) {
+                            if (data.responseCode === 0) {
+                                PNotify.success({
+                                    'title' : data.responseMessage
+                                });
+                                if (data.filters) {
+                                    redoFiltersOptions(query, sectionId, data);
+                                }
+
+                            } else {
+                                PNotify.error({
+                                    'title' : data.responseMessage
+                                });
+                            }
+                        }, 'json');
+
+
+                        $('#' + sectionId + '-filter-qsave').attr('hidden', true);
+                    }
+
                     //Make Filter Call
                     $('#' + sectionId + '-filter-modal').modal('hide');
                     that._filterRunAjax(
@@ -422,62 +717,72 @@
                         query
                     );
 
-                    if ($(this)[0].id === sectionId + '-filter-apply-new') {
-                        var filtersCount = $('#' + sectionId + '-filter-filters').children('option').length + 1;
-
-                        $('#' + sectionId + '-filter-filters')
-                            .append($('<option />')
-                                .val(filtersCount)
-                                .text('Filter Results ' + filtersCount + ' (Not Saved)')
-                                .prop('selected', true)
-                                .data({
-                                    "conditions"  : query,
-                                    "permissions" : 1,
-                                    "value"       : filtersCount,
-                                    "component_id": $(this).parents('.component').data()['component_id'],
-                                    "ns"          : true
-                                })
-                                .attr({
-                                    "data-conditions"   : query,
-                                    "data-permissions"  : 1,
-                                    "data-value"        : filtersCount,
-                                    "data-shared_ids"   : "",
-                                    "data-component_id" : $(this).parents('.component').data()['component_id'],
-                                    "ns"          : true
-                                })
-                            );
-                    }
-
+                    toggleFilterButtons(sectionId + '-filter');
                     clearStoredData();
 
-                    $('#' + sectionId + '-filter-edit, ' +
-                      '#' + sectionId + '-filter-delete'
-                    ).attr("disabled", false);
-
+                    // $('#' + sectionId + '-filter-edit, #' + sectionId + '-filter-delete').attr("disabled", false);
                 });
+
+                function redoFiltersOptions(query, sectionId, data) {
+                    var filtersOptions = '';
+                    $.each(data.filters, function(index, filter) {
+                        filtersOptions += '<option ';
+                        var filterName = filter['name'];
+
+                        for (var filterColumn in filter) {
+                            filtersOptions += 'data-' + filterColumn + '="' + filter[filterColumn] + '" ';
+                        }
+
+                        filtersOptions += 'data-value="' + filter['id'] + '" value="' + filter['id'] + '" ';
+
+                        if (filter['is_default'] == '1') {
+                            filterName = filter['name'] + ' (Default)';
+                        }
+                        if (filter['permission'] == '0') {
+                            filterName = filter['name'] + ' (System)';
+                        } else if (filter['permission'] == '2') {
+                            filterName = filter['name'] + ' (Shared)';
+                        }
+                        if (filter['shared_ids']) {
+                            filterName = filter['name'] + ' (Sharing)';
+                        }
+
+                        if (filter['conditions'] === query) {
+                            filtersOptions += 'selected';
+                        }
+
+                        filtersOptions += '>' + filterName;
+                        filtersOptions += '</option>';
+                    });
+                    $('#' + sectionId + '-filter-filters').empty().append(filtersOptions);
+                }
 
                 function clearStoredData() {
                     $('#' + sectionId + '-filter-andor').val('and').trigger('change');
                     $('#' + sectionId + '-filter-field').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-field-error').remove();
                     $('#' + sectionId + '-filter-operator').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-operator-error').remove();
                     $('#' + sectionId + '-filter-value').val('');
-
-                    query = '';
+                    $('#' + sectionId + '-filter-id').val('');
+                    $('#' + sectionId + '-filter-name').val('');
+                    $('#' + sectionId + '-filter-default')[0].checked = 0;
 
                     dataCollection[componentId][sectionId + '-filter']['datatables'][sectionId + '-filter-table']
                         .rows().clear().draw();
 
                     dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = [];
                     $('#' + sectionId + '-filter-name').attr('disabled', true);
-                    $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
-                    $('#' + sectionId + '-filter-save').attr('disabled', true);
+                    $('#' + sectionId + '-filter-name').val('New Filter');
                     $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                    $('#' + sectionId + '-filter-apply').addClass('disabled');
                     $('#' + sectionId + '-filter-cancel-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-update-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-assign-button').attr('hidden', false);
                     $('#' + sectionId + '-filter-update-button').off();//Important
                 }
 
+                //Modal Close button
                 $('#' + sectionId + '-modal .modal-close').click(function(e) {
                     e.preventDefault();
 
@@ -749,7 +1054,9 @@
                             paging : true,
                         });
                     }
-                    $('#list-data-loader').hide();
+                    $('#listing-data-loader').hide();
+                    $('#listing-primary-buttons').attr('hidden', false);
+                    $('#listing-filters').attr('hidden', false);
                     that._tableInit(false);
                     that._registerEvents();
                 }
@@ -763,7 +1070,9 @@
                     dataType    : 'json',
                     data        : postData,
                     success     : function(data) {
-                        $('#list-data-loader').hide();
+                        $('#listing-data-loader').hide();
+                        $('#listing-primary-buttons').attr('hidden', false);
+                        $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
                     }
                 }).done(function() {
@@ -957,7 +1266,6 @@
                         var switchOnText = name + ' enabled';
                         var switchOffText = name + ' disabled';
                         if (checked) {
-                            PNotify.removeAll();
                             Swal.fire({
                                 title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
                                                               ' <span style="font-size:40px;" class="text-danger"> Disable ' +
@@ -965,12 +1273,21 @@
                                 width                       : '100%',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
-                                animation                   : false,
-                                customClass                 : 'rounded-0 animated fadeIn',
+                                customClass                 : {
+                                    'container'                 : 'rounded-0 animated fadeIn',
+                                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                },
+                                showClass                   : {
+                                    'popup'                     : 'swal2-noanimation',
+                                    'backdrop'                  : 'swal2-noanimation'
+                                },
+                                hideClass                   : {
+                                    'popup'                     : '',
+                                    'backdrop'                  : ''
+                                },
                                 buttonsStyling              : false,
-                                confirmButtonClass          : 'btn btn-danger text-uppercase',
                                 confirmButtonText           : 'Disable',
-                                cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
                                 allowOutsideClick           : false,
@@ -1004,7 +1321,6 @@
                                 dataType    : 'json',
                                 success     : function(response) {
                                     if (response.status === 0) {
-                                        PNotify.removeAll();
                                         PNotify.success({
                                             title           : notificationText,
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -1012,7 +1328,6 @@
                                         $(rowSwitchInput).attr('checked', status);
                                         document.getElementById(rowSwitchInputId).checked = true;
                                     } else {
-                                        PNotify.removeAll();
                                         PNotify.error({
                                             title           : 'Error!',
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -1051,7 +1366,6 @@
                         var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
                                                 $(this).children('input').data('columnid') + ' changed';
                         if (!checked) {
-                            PNotify.removeAll();
                             Swal.fire({
                                 title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
                                                                 ' <span style="font-size:40px;" class="text-danger"> Change ' +
@@ -1062,12 +1376,21 @@
                                 width                       : '100%',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
-                                animation                   : false,
-                                customClass                 : 'rounded-0 animated fadeIn',
                                 buttonsStyling              : false,
-                                confirmButtonClass          : 'btn btn-danger text-uppercase',
                                 confirmButtonText           : 'Change',
-                                cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                                customClass                 : {
+                                    'container'                 : 'rounded-0 animated fadeIn',
+                                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                },
+                                showClass                   : {
+                                    'popup'                     : 'swal2-noanimation',
+                                    'backdrop'                  : 'swal2-noanimation'
+                                },
+                                hideClass                   : {
+                                    'popup'                     : '',
+                                    'backdrop'                  : ''
+                                },
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
                                 allowOutsideClick           : false,
@@ -1118,7 +1441,6 @@
                                         $('#' + thisId).attr('checked', true);
                                         document.getElementById(thisId).checked = true;
                                     } else {
-                                        PNotify.removeAll();
                                         PNotify.error({
                                             title           : 'Error!',
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -1153,12 +1475,21 @@
                             width                       : '100%',
                             background                  : 'rgba(0,0,0,.8)',
                             backdrop                    : 'rgba(0,0,0,.6)',
-                            animation                   : false,
-                            customClass                 : 'rounded-0 animated fadeIn',
                             buttonsStyling              : false,
-                            confirmButtonClass          : 'btn btn-danger text-uppercase',
                             confirmButtonText           : 'Delete',
-                            cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                            customClass                 : {
+                                'container'                 : 'rounded-0 animated fadeIn',
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showClass                   : {
+                                'popup'                     : 'swal2-noanimation',
+                                'backdrop'                  : 'swal2-noanimation'
+                            },
+                            hideClass                   : {
+                                'popup'                     : '',
+                                'backdrop'                  : ''
+                            },
                             showCancelButton            : true,
                             keydownListenerCapture      : true,
                             allowOutsideClick           : false,
@@ -1179,7 +1510,6 @@
                                     data        : dataToSend,
                                     success     : function(response) {
                                         if (response.status === 0) {
-                                            PNotify.removeAll();
                                             PNotify.success({
                                                 title           : deleteText + ' deleted.',
                                                 cornerClass     : 'ui-pnotify-sharp'
@@ -1187,7 +1517,6 @@
                                             // remove row on success
                                             thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
                                         } else {
-                                            PNotify.removeAll();
                                             PNotify.error({
                                                 title           : 'Error!',
                                                 cornerClass     : 'ui-pnotify-sharp'

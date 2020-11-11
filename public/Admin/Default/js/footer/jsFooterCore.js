@@ -4581,8 +4581,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 sectionOptions = dataCollection[componentId][sectionId];
                 sectionOptions['datatables'] = { };
-                //eslint-disable-next-line
-                // console.log(sectionOptions);
 
                 dataCollection = window['dataCollection'];
 
@@ -4775,9 +4773,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             }
 
                             that._clearDatatableFormData(datatable, fieldsetDatatable);
+
+                            $('body').trigger('formToDatatableTableAssignClicked');
                         }
                     }
-                    $('body').trigger('formToDatatableTableAssignClicked');
                 });
             };
 
@@ -4829,10 +4828,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 var counter = 0;
 
                 $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
-                    if ($(v).data('bazscantype')) {
+                    extractedFieldsData[counter] = { };
+                    extractedFieldsData[counter].id = v.id;
+                    if ($(v).data('bazscantype') && !$(v).attr('disabled')) {
                         if (!($(v).data('bazscantype') === 'tableSelector' || $(v).data('bazscantype') === 'dropzone')) {
-                            extractedFieldsData[counter] = { };
-                            extractedFieldsData[counter].id = v.id;
                             // extractedFieldsData[counter].data = $('#' + v.id); //Enable if you need all data
 
                             if (v.tagName === 'INPUT' && v.type === 'checkbox') {
@@ -4883,9 +4882,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 extractedFieldsData[counter].extractedData = $(v).html();
                             }
                         }
+
                         if ($(v).data('bazscantype') === 'tableSelector') {
                             selectedTable = $(v).val();
                             multiTable = true;
+                        }
+                    } else {
+                        if ($(v).data().disabledtxt) {
+                            extractedFieldsData[counter].extractedData = $(v).data().disabledtxt;
+                        } else {
+                            extractedFieldsData[counter].extractedData = '-';
                         }
                     }
                     counter++;
@@ -5083,15 +5089,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     if (!isImport) {
                         that._tableDataToObj();
                     }
+
                     $('body').trigger('formToDatatableTableUpdated');
+
                     return true;
                 }
             };
 
             //Edit table Row
             _proto._editDatatableRow = function(fieldsetDatatable, rowIndex, rowData, datatable) {
-                //eslint-disable-next-line
-                console.log(fieldsetDatatable, rowIndex, rowData, datatable);
                 var fieldsetFields = [];
                 if ($(sectionOptions[fieldsetDatatable + '-datatables']).length > 1) {
                     $('#' + fieldsetDatatable + '-fieldset').find('[data-bazscantype]').each(function(i,v) {
@@ -5129,7 +5135,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                     $(selectarr).each(function(i,v) {
                                         if (v !== "") {
                                             var extractIds = v.match(/(["'])(?:(?=(\\?))\2.)*?\1/g); //match double or single quotes
-                                            selectArr.push(extractIds[0].replace(/"/g, ''));
+                                            if (extractIds) {
+                                                selectArr.push(extractIds[0].replace(/"/g, ''));
+                                            }
                                         }
                                     });
                                     $(v).val(selectArr);
@@ -5454,6 +5462,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $(this).click(function() {
                             if ($(this).closest('tr').hasClass('child')) {
                                 rowIndex = table.row($(this).closest('tr').prev('tr')).index();
+                                rowData = table.row($(this).closest('tr').prev('tr')).data();
                                 table.row($(this).closest('tr').prev('tr')).remove().draw();
                                 that._rowReorderRedoSeq(table, datatable);
                                 // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, datatable);
@@ -5461,6 +5470,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 that._clearDatatableFormData(datatable, fieldsetDatatable);
                             } else {
                                 rowIndex = table.row($(this).closest('tr')).index();
+                                rowData = table.row($(this).parents('tr')).data();
                                 table.row($(this).parents('tr')).remove().draw();
                                 that._rowReorderRedoSeq(table, datatable);
                                 // that._deleteDatatableDataFromObject(rowIndex, fieldsetDatatable, sectionId, datatable);
@@ -5477,9 +5487,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                             $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
 
-                            $('body').trigger('formToDatatableTableRowDelete');
+                            $('body').trigger(
+                                {
+                                    'type'     :'formToDatatableTableRowDelete',
+                                    'rowIndex' : rowIndex,
+                                    'rowData'  : rowData,
+                                    'rowsCount': table.rows().count()
+                                }
+                            );
 
-                            if ($('#' + fieldsetDatatable + '-table-data tbody tr td.dataTables_empty').length === 1) {
+                            if (table.rows().count() === 0) {
                                 $('body').trigger('formToDatatableTableEmpty');
                             }
                             that._tableDataToObj();
@@ -5502,7 +5519,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             if (sectionOptions[datatable].onEdit) {
                                 sectionOptions[datatable].onEdit(sectionOptions['datatables'][datatable]);
                             }
-                            $('body').trigger('formToDatatableTableRowEdit');
+                            $('body').trigger(
+                                {
+                                    'type'     :'formToDatatableTableRowEdit',
+                                    'rowIndex' : rowIndex,
+                                    'rowData'  : rowData,
+                                    'rowsCount': table.rows().count()
+                                }
+                            );
                         });
                     });
                 });
@@ -5511,6 +5535,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
             //Clear form data on success insertion
             _proto._clearDatatableFormData = function(datatable, fieldsetDatatable) {
                 var fieldsToClear;
+
                 if (sectionOptions[datatable].bazdatatable.keepFieldsData) {
                     var fieldsToKeep = sectionOptions[datatable].bazdatatable.keepFieldsData;
                 }
@@ -5529,32 +5554,31 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 if (fieldsToClear) {
                     $.each(fieldsToClear, function(i,v) {
-                        v = '#' + v;
-                        if ($(v).data('bazscantype')) {
-                            if ($(v)[0].tagName === 'INPUT' && $(v)[0].type === 'checkbox') {
-                                $(v).prop('checked', $(v).prop('defaultChecked'));
-                            } else if ($(v)[0].tagName === 'INPUT' || $(v)[0].tagName === 'TEXTAREA') {
-                                $(v).val('');
+                        if ($('#' + v).data('bazscantype')) {
+                            if ($('#' + v)[0].tagName === 'INPUT' && $('#' + v)[0].type === 'checkbox') {
+                                $('#' + v).prop('checked', $('#' + v).prop('defaultChecked'));
+                            } else if ($('#' + v)[0].tagName === 'INPUT' || $('#' + v)[0].tagName === 'TEXTAREA') {
+                                $('#' + v).val('');
                             }
-                            if ($(v)[0].tagName === "SELECT") {//select2
-                                $(v).children('option').attr('disabled', false);
-                                $(v).val(null).trigger('change');
+                            if ($('#' + v)[0].tagName === "SELECT") {//select2
+                                $('#' + v).children('option').attr('disabled', false);
+                                $('#' + v).val(null).trigger('change');
                             }
-                            if ($(v)[0].tagName === 'DIV') {
-                                if ($(v).data('bazscantype') === 'jstree') {//jstree
-                                    $(v).jstree('deselect_all');
+                            if ($('#' + v)[0].tagName === 'DIV') {
+                                if ($('#' + v).data('bazscantype') === 'jstree') {//jstree
+                                    $('#' + v).jstree('deselect_all');
                                 }
-                                if ($(v).data('bazscantype') === 'radio') {//radio
-                                    if ($(v).find('input[checked]').length !== 0) {
-                                        $(v).find('input[checked]').prop('checked', true);
+                                if ($('#' + v).data('bazscantype') === 'radio') {//radio
+                                    if ($('#' + v).find('input[checked]').length !== 0) {
+                                        $('#' + v).find('input[checked]').prop('checked', true);
                                     } else {
-                                        $(v).find('input').each(function(i,v) {
-                                            $(v).prop('checked', false);
+                                        $('#' + v).find('input').each(function(i,v) {
+                                            $('#' + v).prop('checked', false);
                                         });
                                     }
                                 }
-                                if ($(v).data('bazscantype') === 'trumbowyg') {//trumbowyg
-                                    $(v).trumbowyg('empty');
+                                if ($('#' + v).data('bazscantype') === 'trumbowyg') {//trumbowyg
+                                    $('#' + v).trumbowyg('empty');
                                 }
                             }
                         }
@@ -5598,7 +5622,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             dataCollection[componentId][sectionId][data]['data'][i] = { };
                             for (var j = 0; j < currentTableDataLength; j++) {
                                 var columnData;
-                                var columnDataHasClass = v[startAt].match(/class="(.*?)"/g)
+                                if (v[startAt]) {
+                                    var columnDataHasClass = v[startAt].match(/class="(.*?)"/g)
+                                }
                                 if (columnDataHasClass) {
                                     columnData = (columnDataHasClass.toString().match(/"(.*?)"/g)).toString().replace(/"/g, '');
                                 } else {
@@ -5615,14 +5641,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
             // Add tables data from dataCollection
             _proto._dataArrToTableData = function()
             {
-                //eslint-disable-next-line
-                console.log('i triggered');
                 for (var table in sectionOptions['datatables']) {
-                    //eslint-disable-next-line
-                    // console.log(table);
                     for (var data in sectionOptions[table]['data']) {
-                        //eslint-disable-next-line
-                        // console.log(sectionOptions[table]['data'][data]);
                         that._addExtractFieldsToDatatable(
                             null,
                             {"0" : sectionOptions[table]['data'][data]},
@@ -5633,10 +5653,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         );
                     }
                 }
-                // $('body').off('dataArrToTableData');
-                // $('body').on('dataArrToTableData', function() {
-                //     that._dataArrToTableData();
-                // });
+                $('body').trigger('formToDatatableTableImportComplete');
             }
 
             BazContentSectionWithFormToDatatable._jQueryInterface = function _jQueryInterface(options) {
@@ -5774,58 +5791,37 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 $('#' + sectionId + '-sharing').BazContentFields();
                 $(this._element).BazContentSectionWithFormToDatatable();
 
-                //Filter Buttons
-                $('#' + sectionId + '-filters').change(function() {
-
-                    if ($('#' + sectionId + '-filter-filters option:selected').val() === "0") {
-
-                        $('#' + sectionId + '-filter-edit, ' +
-                          '#' + sectionId + '-filter-delete, ' +
-                          '#' + sectionId + '-filter-share'
+                function toggleFilterButtons(sectionId) {
+                    if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 0 || //System
+                        $('#' + sectionId + '-filters option:selected').data()['permission'] === 2    //Shared
+                    ) {
+                        $('#' + sectionId + '-edit, ' +
+                          '#' + sectionId + '-delete, ' +
+                          '#' + sectionId + '-share'
                         ).attr("disabled", true);
 
-                    } else {
-                        $('#' + sectionId + '-filter-apply-saved').attr("disabled", false);
-
-                        if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 0 || //System
-                            $('#' + sectionId + '-filter-filters option:selected').data('permission') === 2    //Shared
-                        ) {
-                            $('#' + sectionId + '-filter-edit, ' +
-                              '#' + sectionId + '-filter-delete, ' +
-                              '#' + sectionId + '-filter-share'
-                            ).attr("disabled", true);
-
-                        } else if ($('#' + sectionId + '-filter-filters option:selected').data('permission') === 1) { //User
-                            $('#' + sectionId + '-filter-edit, ' +
-                              '#' + sectionId + '-filter-delete, ' +
-                              '#' + sectionId + '-filter-share'
-                            ).attr("disabled", false);
-                        }
-
-                        query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
-
-                        $('#' + sectionId + '-filter-modal').modal('hide');
-
-                        that._filterRunAjax(
-                            1,
-                            datatableOptions.paginationCounters.limit,
-                            query
-                        );
-                    }
-                });
-
-                // Add additional text to selection options
-                $('#' + sectionId + '-filters').children().each(function(index, filter) {
-                    var html = $(filter).html();
-                    if ($(filter).data()['permission'] == 0) {
-                        $(filter).html(html + ' (System)');
-                    } else if ($(filter).data()['permission'] == 2) {
-                        $(filter).html(html + ' (Shared)');
-                    } else if ($(filter).data()['shared_ids'] &&
-                               $(filter).data()['shared_ids'] !== ""
+                    } else if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 1
                     ) {
-                        $(filter).html(html + ' (Sharing)');
+                        $('#' + sectionId + '-edit, ' +
+                          '#' + sectionId + '-delete, ' +
+                          '#' + sectionId + '-share'
+                        ).attr("disabled", false);
                     }
+                }
+
+                toggleFilterButtons(sectionId);
+
+                //Filter Buttons
+                $('#' + sectionId + '-filters').change(function() {
+                    toggleFilterButtons(sectionId + '-filter');
+
+                    query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+
+                    that._filterRunAjax(
+                        1,
+                        datatableOptions.paginationCounters.limit,
+                        query
+                    );
                 });
 
                 //Open Sharing Modal
@@ -5837,37 +5833,129 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 //Reset
                 $('#' + sectionId + '-reset').click(function(e) {
                     e.preventDefault();
+
+                    resetFilters();
+                });
+
+                function resetFilters() {
                     query = '';
+                    var defaultFilter = null;
+
+                    $('#' + sectionId + '-filter-filters').children().each(function(index, filter) {
+                        if ($(filter).data()['is_default'] == 1) {
+                            query = $(filter).data()['conditions'];
+                            defaultFilter = filter;
+                            return false;
+                        }
+                    });
 
                     that._filterRunAjax(
                         1,
                         datatableOptions.paginationCounters.limit,
                         query
                     );
-                    $('#' + sectionId + '-filter-filters').val(0);
-                });
 
-                //Close Modal
-                $('#' + sectionId + '-cancel').click(function(e) {
-                    e.preventDefault();
-                    $('#' + sectionId + '-filter-modal').modal('hide');
-                });
+                    toggleFilterButtons(sectionId + '-filter');
+
+                    if (defaultFilter) {
+                        $('#' + sectionId + '-filter-filters').val($(defaultFilter).val());
+                        $('#' + sectionId + '-filter-edit, ' +
+                          '#' + sectionId + '-filter-delete, ' +
+                          '#' + sectionId + '-filter-share'
+                        ).attr("disabled", false);
+                    }
+                }
 
                 //Add / Open Modal
                 $('#' + sectionId + '-add').click(function(e) {
                     e.preventDefault();
 
+                    clearStoredData();
+
                     $('#' + sectionId + '-filter-modal').modal('show');
+                });
+
+                //Clone / Open Modal
+                $('#' + sectionId + '-clone').click(function(e) {
+                    e.preventDefault();
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+
+                    $.post('filter/clone',
+                           {'id' : selectedFilter.data()['id'], 'component_id' : selectedFilter.data()['component_id']},
+                           function(data) {
+                        if (data.responseCode === 0) {
+                            PNotify.success({
+                                'title'     : data.responseMessage
+                            });
+                            if (data.filters) {
+                                redoFiltersOptions('', sectionId, data);
+                            }
+                            resetFilters();
+                            toggleFilterButtons(sectionId + '-filter');
+                        } else {
+                            PNotify.error({
+                                'title'     : data.responseMessage
+                            });
+                        }
+                    }, 'json');
+
+                    // var filtersCount = $('#' + sectionId + '-filter-filters').children('option').length + 1;
+
+                    // $('#' + sectionId + '-filter-filters')
+                    //     .append($('<option />')
+                    //         .val(filtersCount)
+                    //         .text('Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ') (Not Saved)')
+                    //         .prop('selected', true)
+                    //         .data({
+                    //             "conditions"        : $(selectedFilter).data()['conditions'],
+                    //             "permission"        : 1,
+                    //             "value"             : filtersCount,
+                    //             "shared_ids"        : "",
+                    //             "component_id"      : $(this).parents('.component').data()['component_id'],
+                    //             "name"              : 'Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ')',
+                    //             "is_default"        : "0",
+                    //             "ns"                : true
+                    //         })
+                    //         .attr({
+                    //             "data-conditions"   : $(selectedFilter).data()['conditions'],
+                    //             "data-permission"   : 1,
+                    //             "data-value"        : filtersCount,
+                    //             "data-shared_ids"   : "",
+                    //             "data-component_id" : $(this).parents('.component').data()['component_id'],
+                    //             "data-name"         : 'Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ')',
+                    //             "is_default"        : "0",
+                    //             "ns"                : true
+                    //         })
+                    //     );
+
+                    // PNotify.success({
+                    //     'title' : 'Cloned successfully'
+                    // });
+
+                    toggleFilterButtons(sectionId + '-filter');
+
+                    // editFilter();
+
+                    // $('#' + sectionId + '-filter-modal').modal('show');
                 });
 
                 //Edit / Open Modal
                 $('#' + sectionId + '-edit').click(function(e) {
                     e.preventDefault();
 
-                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    editFilter();
 
+                    $('#' + sectionId + '-filter-modal').modal('show');
+                });
+                function editFilter() {
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
+
                     var conditionsStr = $(selectedFilter).data().conditions;
+
+                    if (conditionsStr === '') { //Empty string for show all condition
+                        return;
+                    }
                     var conditions = conditionsStr.substring(0, conditionsStr.length - 1);
                     var conditionsRows = conditions.split('&');
                     var conditionsColumns = [];
@@ -5886,6 +5974,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             andOrS2[$(data).data().value] = $(data)[0].innerHTML;
                         }
                     });
+
+                    if ($('#' + sectionId + '-filter-andor').data().disabledtext) {
+                        andOrS2[$('#' + sectionId + '-filter-andor').data().disabledtext] =
+                        $('#' + sectionId + '-filter-andor').data().disabledtext;
+                    }
 
                     //Andor Object
                     select2FieldData = $('#' + sectionId + '-filter-field option');
@@ -5906,8 +5999,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     });
 
                     var columns = { };
-                    //eslint-disable-next-line
-                    console.log(conditionsColumns);
+
                     $.each(conditionsColumns, function(index, column) {
 
                         columns[index] = { };
@@ -5945,7 +6037,23 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     dataCollection[componentId][sectionId + '-filter']['BazContentSectionWithFormToDatatable']._dataArrToTableData();
 
-                    $('#' + sectionId + '-filter-modal').modal('show');
+                    $('#' + sectionId + '-filter-id').val($(selectedFilter).data()['id']);
+                    $('#' + sectionId + '-filter-name').val($(selectedFilter).data()['name']);
+
+                    if ($(selectedFilter).data()['is_default'] === 1) {
+                        $('#' + sectionId + '-filter-default')[0].checked = true;
+                        $('#' + sectionId + '-filter-default').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-default')[0].checked = false;
+                        $('#' + sectionId + '-filter-default').attr('disabled', false);
+                    }
+                }
+                $('body').on('formToDatatableTableImportComplete', function () {
+                    dataCollection[componentId][sectionId + '-filter']['BazContentSectionWithFormToDatatable']._tableDataToObj();
+                    $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    $('#' + sectionId + '-filter-save').removeClass('disabled');
+                    $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                    $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
                 });
 
                 //Delete
@@ -5954,15 +6062,68 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
-                    if ($(selectedFilter).data().ns === true) {
-                        $('#' + sectionId + '-filter-filters').val(0);
-                        $(selectedFilter).remove();
-                        $('#' + sectionId + '-filter-edit, ' +
-                          '#' + sectionId + '-filter-delete'
-                        ).attr("disabled", true);
-                    } else {
-                        //Delete via post
-                    }
+                    Swal.fire({
+                        title                       : '<i class="fa fa-fw fa-question-circle text-danger mr-2" style="font-size: 1.25rem;position: relative;top: 3px;">' +
+                                                      '</i> <h5 class="text-danger"> Delete Filter ' + selectedFilter.data()['name'] + '?</span>',
+                        width                       : '100%',
+                        background                  : 'rgba(0,0,0,.8)',
+                        backdrop                    : 'rgba(0,0,0,.6)',
+                        buttonsStyling              : false,
+                        confirmButtonText           : 'Delete',
+                        customClass                 : {
+                            'container'                 : 'rounded-0 animated fadeIn',
+                            'confirmButton'             : 'btn btn-danger text-uppercase',
+                            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                        },
+                        showClass                   : {
+                            'popup'                     : 'swal2-noanimation',
+                            'backdrop'                  : 'swal2-noanimation'
+                        },
+                        hideClass                   : {
+                            'popup'                     : '',
+                            'backdrop'                  : ''
+                        },
+                        showCancelButton            : true,
+                        keydownListenerCapture      : true,
+                        allowOutsideClick           : true,
+                        allowEscapeKey              : true,
+                        allowEnterKey               : false,
+                        didOpen                     : function() {
+                            swalSound.play();
+                        }
+                    }).then((result) => {
+                        if (result.value) {
+                            if ($(selectedFilter).data().ns === true) {
+                                $(selectedFilter).remove();
+                                $('#' + sectionId + '-filter-edit, ' +
+                                  '#' + sectionId + '-filter-delete, ' +
+                                  '#' + sectionId + '-filter-share'
+                                ).attr("disabled", true);
+                                PNotify.success({
+                                    'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
+                                });
+                                resetFilters();
+                            } else {
+                                $.post('filter/remove',
+                                       {'id' : selectedFilter.data()['id'], 'component_id' : selectedFilter.data()['component_id']},
+                                       function(data) {
+                                    if (data.responseCode === 0) {
+                                        PNotify.success({
+                                            'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
+                                        });
+                                        if (data.filters) {
+                                            redoFiltersOptions('', sectionId, data);
+                                        }
+                                        resetFilters();
+                                    } else {
+                                        PNotify.error({
+                                            'title'     : 'Cannot delete filter.'
+                                        });
+                                    }
+                                }, 'json');
+                            }
+                        }
+                    });
                 });
 
                 // Add Numeric for numberic fields
@@ -6013,7 +6174,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
                 });
 
-                $('body').on('formToDatatableTableRowEdit', function() {
+                $('body').on('formToDatatableTableRowEdit', function(e) {
                     if ($('#' + sectionId + '-filter-operator').val() === 'empty' ||
                         $('#' + sectionId + '-filter-operator').val() === 'notempty'
                     ) {
@@ -6021,68 +6182,142 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     } else {
                         $('#' + sectionId + '-filter-value').attr('disabled', false);
                     }
-                });
 
-                //Add Save
-                $('#' + sectionId + '-name').keyup(function() {
-                    if ($(this).val() !== '') {
-                        $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', false);
+                    $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    $('#' + sectionId + '-filter-value').attr('disabled', false);
+
+                    if (e.rowsCount === 1) {
+                        $('#' + sectionId + '-filter-andor').attr('disabled', true);
                     } else {
-                        $('#' + sectionId + '-filter-save, #' + sectionId + '-filter-saveapply').attr('disabled', true);
+                        if (e.rowIndex === 0) {
+                            $('#' + sectionId + '-filter-andor').attr('disabled', true);
+                        } else {
+                            $('#' + sectionId + '-filter-andor').attr('disabled', false);
+                        }
                     }
                 });
 
-                //Adding/Updating to table
+                //Add Name
+                $('#' + sectionId + '-name').keyup(function() {
+                    if ($(this).val() !== '') {
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
+                        $('#' + sectionId + '-filter-save').removeClass('disabled');
+                    } else {
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                        $('#' + sectionId + '-filter-save').addClass('disabled');
+                    }
+                });
+
+                //Adding to table
                 $('#' + sectionId + '-assign-button').click(function(e) {
                     e.preventDefault();
+                    onFormToDatatableTableUpdate(e);
 
-                    $('#' + sectionId + '-filter-name').attr('disabled', false);
-                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
-                    $('#' + sectionId + '-filter-value').attr('disabled', false);
+                    // $('#' + sectionId + '-filter-name').attr('disabled', false);
+                    // $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                    // $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
+                    // $('#' + sectionId + '-filter-value').attr('disabled', false);
+
+                    // $('#' + sectionId + '-filter-andor').attr('disabled', false);
+                    // $('#' + sectionId + '-filter-andor').val('and').trigger('change');
                 });
 
-                //Remove First And Or
-                $('body').on('formToDatatableTableUpdated', function() {
-                    $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
-
-                    //Remove numeric from edit data
-                    $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
-                       //eslint-disable-next-line
-                       // console.log($(tr).find('td'));
-                       var field = $(tr).find('td')[1];
-                       field.innerHTML = field.innerHTML.replace(" (Numeric)", "");
-                       // $(tr)..innerHTML = $(td)[0].innerHTML.replace(" (Numeric)", "");
-                    });
-                    // $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).off();
-                    $($('#' + sectionId + '-filter-table-data tbody tr').find('[data-row-id="1"]')[1]).click(function() {
-                        $('#' + sectionId + '-filter-andor').val('and').trigger('change');
-                    });
+                $('body').on('formToDatatableTableUpdatedClicked', function(e) {
+                    onFormToDatatableTableUpdate(e);
+                    // $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                    // $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
                 });
 
-                $('body').on('formToDatatableTableUpdatedClicked', function() {
-                    $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
+                $('#' + sectionId + '-default').click(function() {
+
+                    var postData = { };
+                        postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
+
+                    $.post('filter/getdefaultfilter', postData, function(data) {
+                        if (data.responseCode === 0) {
+                            Swal.fire({
+                                title                       : '<i class="fa fa-fw fa-question-circle text-danger mr-2" style="font-size: 1.25rem;position: relative;top: 3px;">' +
+                                                              '</i> <h5 class="text-danger"> Filter ' +
+                                                              data.defaultFilter[0].name + ' is already set as default. ' +
+                                                              'Make this filter default instead?</h5>',
+                                width                       : '100%',
+                                background                  : 'rgba(0,0,0,.8)',
+                                backdrop                    : 'rgba(0,0,0,.6)',
+                                buttonsStyling              : false,
+                                confirmButtonText           : 'Yes',
+                                cancelButtonText            : 'No',
+                                customClass                 : {
+                                    'container'                 : 'rounded-0 animated fadeIn',
+                                    'confirmButton'             : 'btn btn-info text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                },
+                                showClass                   : {
+                                    'popup'                     : 'swal2-noanimation',
+                                    'backdrop'                  : 'swal2-noanimation'
+                                },
+                                hideClass                   : {
+                                    'popup'                     : '',
+                                    'backdrop'                  : ''
+                                },
+                                showCancelButton            : true,
+                                keydownListenerCapture      : true,
+                                allowOutsideClick           : false,
+                                allowEscapeKey              : false,
+                                allowEnterKey               : false,
+                                didOpen                     : function() {
+                                    swalSound.play();
+                                }
+                            }).then((result) => {
+                                if (result.isDismissed) {
+                                    $('#' + sectionId + '-filter-default')[0].checked = false;
+                                }
+                            });
+                        }
+                    }, 'json');
+
+                    $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
+                    $('#' + sectionId + '-filter-apply').removeClass('disabled');
                 });
 
                 //If Only 1 row - Remove And/Or
-                $('body').on('formToDatatableTableRowDelete', function() {
-                    if ($('#' + sectionId + '-filter-table-data tbody tr').length === 1) {
-                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
-                    }
-                    //eslint-disable-next-line
-                    console.log($('#' + sectionId + '-table tbody td.dataTables_empty'));
-                    if ($('#' + sectionId + '-table tbody td.dataTables_empty').length === 1) {
-                        $('#' + sectionId + '-filter-name').attr('disabled', true);
-                        $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
-                    } else {
-                        $('#' + sectionId + '-filter-name').attr('disabled', false);
-                        $('#' + sectionId + '-filter-apply-new').attr('disabled', false);
-                    }
+                $('body').on('formToDatatableTableRowDelete', function(e) {
+                    onFormToDatatableTableUpdate(e);
                 });
 
-                //Add Apply (Temp) & Close Modal
-                $('#' + sectionId + '-apply-new, #' + sectionId + '-saveapply').click(function(e) {
+                function onFormToDatatableTableUpdate(e) {
+                    //Remove numeric from edit data
+                    $('#' + sectionId + '-filter-table-data tbody tr').each(function(index, tr) {
+                       var field = $(tr).find('td')[1];
+                       if (field) {
+                           field.innerHTML = field.innerHTML.replace(" (Numeric)", "");
+                       }
+                    });
+                    $('#' + sectionId + '-filter-andor').val('and').trigger('change');
+                    $('#' + sectionId + '-filter-andor').attr('disabled', false);
+
+                    if (e.rowsCount === 1) {
+                        $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
+                    }
+                    if (e.rowsCount < 1) {
+                        $('#' + sectionId + '-filter-name').attr('disabled', true);
+                        $('#' + sectionId + '-filter-apply').addClass('disabled');
+                        $('#' + sectionId + '-filter-cloneapply').addClass('disabled');
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                    } else {
+                        $('#' + sectionId + '-filter-name').attr('disabled', false);
+                        $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                        $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
+                        $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
+                    }
+                }
+
+                //Save
+                $('#' + sectionId + '-apply, #' + sectionId + '-saveapply').click(function(e) {
                     e.preventDefault();
+
                     query = '';
+
+                    var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
                     var tableData =
                         dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'];
@@ -6104,6 +6339,83 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         }
                     });
 
+                    var filterName = $('#' + sectionId + '-filter-name').val();
+
+                    if (filterName === '') {
+                        $('#' + sectionId + '-filter-name').addClass('is-invalid');
+                        $('#' + sectionId + '-filter-name').focus(function() {
+                            $(this).removeClass('is-invalid');
+                        });
+                        return;
+                    }
+
+                    if ($(this)[0].id === sectionId + '-filter-apply') {
+                        if ($(selectedFilter).data()['is_default'] == 1) {
+                            filterName = filterName + ' (Default)';
+                        }
+                        filterName = filterName + ' (Not Saved)';
+                        $(selectedFilter)
+                            .append($('<option />')
+                                .text(filterName)
+                                .data({
+                                    "conditions"        : query,
+                                    "ns"                : true
+                                })
+                                .attr({
+                                    "data-conditions"   : query,
+                                    "ns"                : true
+                                })
+                            );
+
+                        $('#' + sectionId + '-filter-qsave').attr('hidden', false);
+                    } else if ($(this)[0].id === sectionId + '-filter-saveapply') {
+
+                        //Save To Db
+                        var postData = { };
+                        postData['id'] = $('#' + sectionId + '-filter-id').val();
+                        postData['name'] = filterName;
+                        postData['conditions'] = query;
+                        postData['component_id'] = $(selectedFilter).data()['component_id'];
+                        postData['permission'] = 1;
+
+                        if ($('#' + sectionId + '-filter-default')[0].checked === true) {
+                            postData['is_default'] = '1';
+                            filterName = filterName + ' (Default)';
+                        } else {
+                            postData['is_default'] = '0';
+                        }
+
+                        var url;
+
+                        if (postData['id'] !== '') {
+                            url = 'filter/update';
+                            // appendFilter = selectedFilter;
+                        } else {
+                            url = 'filter/add';
+                            // appendFilter = $('#' + sectionId + '-filter-filters');
+                        }
+
+                        //Update Filter
+                        $.post(url, postData, function(data) {
+                            if (data.responseCode === 0) {
+                                PNotify.success({
+                                    'title' : data.responseMessage
+                                });
+                                if (data.filters) {
+                                    redoFiltersOptions(query, sectionId, data);
+                                }
+
+                            } else {
+                                PNotify.error({
+                                    'title' : data.responseMessage
+                                });
+                            }
+                        }, 'json');
+
+
+                        $('#' + sectionId + '-filter-qsave').attr('hidden', true);
+                    }
+
                     //Make Filter Call
                     $('#' + sectionId + '-filter-modal').modal('hide');
                     that._filterRunAjax(
@@ -6112,62 +6424,72 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         query
                     );
 
-                    if ($(this)[0].id === sectionId + '-filter-apply-new') {
-                        var filtersCount = $('#' + sectionId + '-filter-filters').children('option').length + 1;
-
-                        $('#' + sectionId + '-filter-filters')
-                            .append($('<option />')
-                                .val(filtersCount)
-                                .text('Filter Results ' + filtersCount + ' (Not Saved)')
-                                .prop('selected', true)
-                                .data({
-                                    "conditions"  : query,
-                                    "permissions" : 1,
-                                    "value"       : filtersCount,
-                                    "component_id": $(this).parents('.component').data()['component_id'],
-                                    "ns"          : true
-                                })
-                                .attr({
-                                    "data-conditions"   : query,
-                                    "data-permissions"  : 1,
-                                    "data-value"        : filtersCount,
-                                    "data-shared_ids"   : "",
-                                    "data-component_id" : $(this).parents('.component').data()['component_id'],
-                                    "ns"          : true
-                                })
-                            );
-                    }
-
+                    toggleFilterButtons(sectionId + '-filter');
                     clearStoredData();
 
-                    $('#' + sectionId + '-filter-edit, ' +
-                      '#' + sectionId + '-filter-delete'
-                    ).attr("disabled", false);
-
+                    // $('#' + sectionId + '-filter-edit, #' + sectionId + '-filter-delete').attr("disabled", false);
                 });
+
+                function redoFiltersOptions(query, sectionId, data) {
+                    var filtersOptions = '';
+                    $.each(data.filters, function(index, filter) {
+                        filtersOptions += '<option ';
+                        var filterName = filter['name'];
+
+                        for (var filterColumn in filter) {
+                            filtersOptions += 'data-' + filterColumn + '="' + filter[filterColumn] + '" ';
+                        }
+
+                        filtersOptions += 'data-value="' + filter['id'] + '" value="' + filter['id'] + '" ';
+
+                        if (filter['is_default'] == '1') {
+                            filterName = filter['name'] + ' (Default)';
+                        }
+                        if (filter['permission'] == '0') {
+                            filterName = filter['name'] + ' (System)';
+                        } else if (filter['permission'] == '2') {
+                            filterName = filter['name'] + ' (Shared)';
+                        }
+                        if (filter['shared_ids']) {
+                            filterName = filter['name'] + ' (Sharing)';
+                        }
+
+                        if (filter['conditions'] === query) {
+                            filtersOptions += 'selected';
+                        }
+
+                        filtersOptions += '>' + filterName;
+                        filtersOptions += '</option>';
+                    });
+                    $('#' + sectionId + '-filter-filters').empty().append(filtersOptions);
+                }
 
                 function clearStoredData() {
                     $('#' + sectionId + '-filter-andor').val('and').trigger('change');
                     $('#' + sectionId + '-filter-field').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-field-error').remove();
                     $('#' + sectionId + '-filter-operator').val(null).trigger('change');
+                    $('#' + sectionId + '-filter-operator-error').remove();
                     $('#' + sectionId + '-filter-value').val('');
-
-                    query = '';
+                    $('#' + sectionId + '-filter-id').val('');
+                    $('#' + sectionId + '-filter-name').val('');
+                    $('#' + sectionId + '-filter-default')[0].checked = 0;
 
                     dataCollection[componentId][sectionId + '-filter']['datatables'][sectionId + '-filter-table']
                         .rows().clear().draw();
 
                     dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = [];
                     $('#' + sectionId + '-filter-name').attr('disabled', true);
-                    $('#' + sectionId + '-filter-apply-new').attr('disabled', true);
-                    $('#' + sectionId + '-filter-save').attr('disabled', true);
+                    $('#' + sectionId + '-filter-name').val('New Filter');
                     $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                    $('#' + sectionId + '-filter-apply').addClass('disabled');
                     $('#' + sectionId + '-filter-cancel-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-update-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-assign-button').attr('hidden', false);
                     $('#' + sectionId + '-filter-update-button').off();//Important
                 }
 
+                //Modal Close button
                 $('#' + sectionId + '-modal .modal-close').click(function(e) {
                     e.preventDefault();
 
@@ -6439,7 +6761,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             paging : true,
                         });
                     }
-                    $('#list-data-loader').hide();
+                    $('#listing-data-loader').hide();
+                    $('#listing-primary-buttons').attr('hidden', false);
+                    $('#listing-filters').attr('hidden', false);
                     that._tableInit(false);
                     that._registerEvents();
                 }
@@ -6453,7 +6777,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     dataType    : 'json',
                     data        : postData,
                     success     : function(data) {
-                        $('#list-data-loader').hide();
+                        $('#listing-data-loader').hide();
+                        $('#listing-primary-buttons').attr('hidden', false);
+                        $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
                     }
                 }).done(function() {
@@ -6647,7 +6973,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         var switchOnText = name + ' enabled';
                         var switchOffText = name + ' disabled';
                         if (checked) {
-                            PNotify.removeAll();
                             Swal.fire({
                                 title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
                                                               ' <span style="font-size:40px;" class="text-danger"> Disable ' +
@@ -6655,12 +6980,21 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 width                       : '100%',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
-                                animation                   : false,
-                                customClass                 : 'rounded-0 animated fadeIn',
+                                customClass                 : {
+                                    'container'                 : 'rounded-0 animated fadeIn',
+                                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                },
+                                showClass                   : {
+                                    'popup'                     : 'swal2-noanimation',
+                                    'backdrop'                  : 'swal2-noanimation'
+                                },
+                                hideClass                   : {
+                                    'popup'                     : '',
+                                    'backdrop'                  : ''
+                                },
                                 buttonsStyling              : false,
-                                confirmButtonClass          : 'btn btn-danger text-uppercase',
                                 confirmButtonText           : 'Disable',
-                                cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
                                 allowOutsideClick           : false,
@@ -6694,7 +7028,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 dataType    : 'json',
                                 success     : function(response) {
                                     if (response.status === 0) {
-                                        PNotify.removeAll();
                                         PNotify.success({
                                             title           : notificationText,
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -6702,7 +7035,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         $(rowSwitchInput).attr('checked', status);
                                         document.getElementById(rowSwitchInputId).checked = true;
                                     } else {
-                                        PNotify.removeAll();
                                         PNotify.error({
                                             title           : 'Error!',
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -6741,7 +7073,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
                                                 $(this).children('input').data('columnid') + ' changed';
                         if (!checked) {
-                            PNotify.removeAll();
                             Swal.fire({
                                 title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
                                                                 ' <span style="font-size:40px;" class="text-danger"> Change ' +
@@ -6752,12 +7083,21 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 width                       : '100%',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
-                                animation                   : false,
-                                customClass                 : 'rounded-0 animated fadeIn',
                                 buttonsStyling              : false,
-                                confirmButtonClass          : 'btn btn-danger text-uppercase',
                                 confirmButtonText           : 'Change',
-                                cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                                customClass                 : {
+                                    'container'                 : 'rounded-0 animated fadeIn',
+                                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                                },
+                                showClass                   : {
+                                    'popup'                     : 'swal2-noanimation',
+                                    'backdrop'                  : 'swal2-noanimation'
+                                },
+                                hideClass                   : {
+                                    'popup'                     : '',
+                                    'backdrop'                  : ''
+                                },
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
                                 allowOutsideClick           : false,
@@ -6808,7 +7148,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         $('#' + thisId).attr('checked', true);
                                         document.getElementById(thisId).checked = true;
                                     } else {
-                                        PNotify.removeAll();
                                         PNotify.error({
                                             title           : 'Error!',
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -6843,12 +7182,21 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             width                       : '100%',
                             background                  : 'rgba(0,0,0,.8)',
                             backdrop                    : 'rgba(0,0,0,.6)',
-                            animation                   : false,
-                            customClass                 : 'rounded-0 animated fadeIn',
                             buttonsStyling              : false,
-                            confirmButtonClass          : 'btn btn-danger text-uppercase',
                             confirmButtonText           : 'Delete',
-                            cancelButtonClass           : 'ml-2 btn btn-default text-uppercase',
+                            customClass                 : {
+                                'container'                 : 'rounded-0 animated fadeIn',
+                                'confirmButton'             : 'btn btn-danger text-uppercase',
+                                'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                            },
+                            showClass                   : {
+                                'popup'                     : 'swal2-noanimation',
+                                'backdrop'                  : 'swal2-noanimation'
+                            },
+                            hideClass                   : {
+                                'popup'                     : '',
+                                'backdrop'                  : ''
+                            },
                             showCancelButton            : true,
                             keydownListenerCapture      : true,
                             allowOutsideClick           : false,
@@ -6869,7 +7217,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                     data        : dataToSend,
                                     success     : function(response) {
                                         if (response.status === 0) {
-                                            PNotify.removeAll();
                                             PNotify.success({
                                                 title           : deleteText + ' deleted.',
                                                 cornerClass     : 'ui-pnotify-sharp'
@@ -6877,7 +7224,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                             // remove row on success
                                             thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
                                         } else {
-                                            PNotify.removeAll();
                                             PNotify.error({
                                                 title           : 'Error!',
                                                 cornerClass     : 'ui-pnotify-sharp'

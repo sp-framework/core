@@ -32,7 +32,7 @@ class Filters
                     'conditions',
                     [
                         'type'    => Column::TYPE_TEXT,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -45,6 +45,14 @@ class Filters
                 ),
                 new Column(
                     'permission',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'size'    => 1,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'is_default',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'size'    => 1,
