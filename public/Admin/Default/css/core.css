@@ -16208,6 +16208,9 @@ textarea.form-control.is-warning {
 .card.maximized-card [data-widget='collapse'] {
   display: none;
 }
+.card.maximized-card .card-body {
+  overflow: auto;
+}
 .card.maximized-card .card-header,
 .card.maximized-card .card-footer {
   border-radius: 0 !important;

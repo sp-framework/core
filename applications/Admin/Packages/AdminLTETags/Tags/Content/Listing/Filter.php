@@ -441,28 +441,15 @@ class Filter extends AdminLTETags
                     [
                         'componentId'                       => $this->params['componentId'],
                         'sectionId'                         => $this->params['sectionId'] . '-filter',
-                        'buttonType'                        => 'dropdownSplitButtons',
+                        'buttonType'                        => 'button',
                         'buttonSize'                        => 'sm',
-                        'dropdownSplitButtonsSplit'         => true,
-                        'splitMainButtonId'                 => 'saveapply',
-                        'splitMainButtonTitle'              => 'SAVE & APPLY',
-                        'splitMainButtonDisabled'           => false,
-                        'dropdownDirection'                 => 'up',
-                        'dropdownAlign'                     => 'right',
                         'buttons'                           =>
                             [
-                                // 'save' => [
-                                //     'title'                   => 'Save',
-                                //     'disabled'                => true,
-                                // ],
-                                'apply' => [
-                                    'title'                   => 'Apply',
-                                    'disabled'                => true,
+                                'save' => [
+                                    'title'                 => 'Save',
+                                    'disabled'              => true,
+                                    'icon'                  => 'save'
                                 ],
-                                // 'cloneapply' => [
-                                //     'title'                   => 'Clone & Apply',
-                                //     'disabled'                => true,
-                                // ],
                             ]
                     ]
             ]

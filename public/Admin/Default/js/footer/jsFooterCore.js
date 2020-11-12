@@ -5881,63 +5881,32 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
+                    if ($(selectedFilter).data()['conditions'] === '') {
+                        PNotify.error({'title': 'Show All filter cannot be cloned'});
+                        return;
+                    }
                     $.post('filter/clone',
                            {'id' : selectedFilter.data()['id'], 'component_id' : selectedFilter.data()['component_id']},
                            function(data) {
-                        if (data.responseCode === 0) {
-                            PNotify.success({
-                                'title'     : data.responseMessage
-                            });
-                            if (data.filters) {
-                                redoFiltersOptions('', sectionId, data);
-                            }
-                            resetFilters();
-                            toggleFilterButtons(sectionId + '-filter');
-                        } else {
-                            PNotify.error({
-                                'title'     : data.responseMessage
-                            });
-                        }
-                    }, 'json');
-
-                    // var filtersCount = $('#' + sectionId + '-filter-filters').children('option').length + 1;
-
-                    // $('#' + sectionId + '-filter-filters')
-                    //     .append($('<option />')
-                    //         .val(filtersCount)
-                    //         .text('Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ') (Not Saved)')
-                    //         .prop('selected', true)
-                    //         .data({
-                    //             "conditions"        : $(selectedFilter).data()['conditions'],
-                    //             "permission"        : 1,
-                    //             "value"             : filtersCount,
-                    //             "shared_ids"        : "",
-                    //             "component_id"      : $(this).parents('.component').data()['component_id'],
-                    //             "name"              : 'Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ')',
-                    //             "is_default"        : "0",
-                    //             "ns"                : true
-                    //         })
-                    //         .attr({
-                    //             "data-conditions"   : $(selectedFilter).data()['conditions'],
-                    //             "data-permission"   : 1,
-                    //             "data-value"        : filtersCount,
-                    //             "data-shared_ids"   : "",
-                    //             "data-component_id" : $(this).parents('.component').data()['component_id'],
-                    //             "data-name"         : 'Filter Results ' + filtersCount + ' (Clone of ' + $(selectedFilter).data()['name'] + ')',
-                    //             "is_default"        : "0",
-                    //             "ns"                : true
-                    //         })
-                    //     );
-
-                    // PNotify.success({
-                    //     'title' : 'Cloned successfully'
-                    // });
+                                if (data.responseCode === 0) {
+                                    PNotify.success({
+                                        'title'     : data.responseMessage
+                                    });
+                                    if (data.filters) {
+                                        redoFiltersOptions('', sectionId, data);
+                                    }
+                                    resetFilters();
+                                    toggleFilterButtons(sectionId + '-filter');
+                                } else {
+                                    PNotify.error({
+                                        'title'     : data.responseMessage
+                                    });
+                                }
+                            },
+                        'json'
+                    );
 
                     toggleFilterButtons(sectionId + '-filter');
-
-                    // editFilter();
-
-                    // $('#' + sectionId + '-filter-modal').modal('show');
                 });
 
                 //Edit / Open Modal
@@ -6051,9 +6020,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 $('body').on('formToDatatableTableImportComplete', function () {
                     dataCollection[componentId][sectionId + '-filter']['BazContentSectionWithFormToDatatable']._tableDataToObj();
                     $('#' + sectionId + '-filter-name').attr('disabled', false);
-                    $('#' + sectionId + '-filter-save').removeClass('disabled');
-                    $('#' + sectionId + '-filter-apply').removeClass('disabled');
-                    $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
                 });
 
                 //Delete
@@ -6200,11 +6166,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 //Add Name
                 $('#' + sectionId + '-name').keyup(function() {
                     if ($(this).val() !== '') {
-                        $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
-                        $('#' + sectionId + '-filter-save').removeClass('disabled');
+                        $('#' + sectionId + '-filter-save').attr('disabled', false);
                     } else {
-                        $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
-                        $('#' + sectionId + '-filter-save').addClass('disabled');
+                        $('#' + sectionId + '-filter-save').attr('disabled', true);
                     }
                 });
 
@@ -6214,8 +6178,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     onFormToDatatableTableUpdate(e);
 
                     // $('#' + sectionId + '-filter-name').attr('disabled', false);
-                    // $('#' + sectionId + '-filter-apply').removeClass('disabled');
-                    // $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
                     // $('#' + sectionId + '-filter-value').attr('disabled', false);
 
                     // $('#' + sectionId + '-filter-andor').attr('disabled', false);
@@ -6224,8 +6186,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 $('body').on('formToDatatableTableUpdatedClicked', function(e) {
                     onFormToDatatableTableUpdate(e);
-                    // $('#' + sectionId + '-filter-apply').removeClass('disabled');
-                    // $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
                 });
 
                 $('#' + sectionId + '-default').click(function() {
@@ -6275,8 +6235,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         }
                     }, 'json');
 
-                    $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
-                    $('#' + sectionId + '-filter-apply').removeClass('disabled');
+                    $('#' + sectionId + '-filter-save').attr('disabled', false);
                 });
 
                 //If Only 1 row - Remove And/Or
@@ -6300,19 +6259,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     }
                     if (e.rowsCount < 1) {
                         $('#' + sectionId + '-filter-name').attr('disabled', true);
-                        $('#' + sectionId + '-filter-apply').addClass('disabled');
-                        $('#' + sectionId + '-filter-cloneapply').addClass('disabled');
-                        $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
+                        $('#' + sectionId + '-filter-save').attr('disabled', true);
                     } else {
                         $('#' + sectionId + '-filter-name').attr('disabled', false);
-                        $('#' + sectionId + '-filter-apply').removeClass('disabled');
-                        $('#' + sectionId + '-filter-cloneapply').removeClass('disabled');
-                        $('#' + sectionId + '-filter-saveapply').attr('disabled', false);
+                        $('#' + sectionId + '-filter-save').attr('disabled', false);
                     }
                 }
 
                 //Save
-                $('#' + sectionId + '-apply, #' + sectionId + '-saveapply').click(function(e) {
+                $('#' + sectionId + '-save').click(function(e) {
                     e.preventDefault();
 
                     query = '';
@@ -6349,72 +6304,48 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         return;
                     }
 
-                    if ($(this)[0].id === sectionId + '-filter-apply') {
-                        if ($(selectedFilter).data()['is_default'] == 1) {
-                            filterName = filterName + ' (Default)';
-                        }
-                        filterName = filterName + ' (Not Saved)';
-                        $(selectedFilter)
-                            .append($('<option />')
-                                .text(filterName)
-                                .data({
-                                    "conditions"        : query,
-                                    "ns"                : true
-                                })
-                                .attr({
-                                    "data-conditions"   : query,
-                                    "ns"                : true
-                                })
-                            );
+                    //Save To Db
+                    var postData = { };
+                    postData['id'] = $('#' + sectionId + '-filter-id').val();
+                    postData['name'] = filterName;
+                    postData['conditions'] = query;
+                    postData['component_id'] = $(selectedFilter).data()['component_id'];
+                    postData['permission'] = 1;
 
-                        $('#' + sectionId + '-filter-qsave').attr('hidden', false);
-                    } else if ($(this)[0].id === sectionId + '-filter-saveapply') {
-
-                        //Save To Db
-                        var postData = { };
-                        postData['id'] = $('#' + sectionId + '-filter-id').val();
-                        postData['name'] = filterName;
-                        postData['conditions'] = query;
-                        postData['component_id'] = $(selectedFilter).data()['component_id'];
-                        postData['permission'] = 1;
-
-                        if ($('#' + sectionId + '-filter-default')[0].checked === true) {
-                            postData['is_default'] = '1';
-                            filterName = filterName + ' (Default)';
-                        } else {
-                            postData['is_default'] = '0';
-                        }
-
-                        var url;
-
-                        if (postData['id'] !== '') {
-                            url = 'filter/update';
-                            // appendFilter = selectedFilter;
-                        } else {
-                            url = 'filter/add';
-                            // appendFilter = $('#' + sectionId + '-filter-filters');
-                        }
-
-                        //Update Filter
-                        $.post(url, postData, function(data) {
-                            if (data.responseCode === 0) {
-                                PNotify.success({
-                                    'title' : data.responseMessage
-                                });
-                                if (data.filters) {
-                                    redoFiltersOptions(query, sectionId, data);
-                                }
-
-                            } else {
-                                PNotify.error({
-                                    'title' : data.responseMessage
-                                });
-                            }
-                        }, 'json');
-
-
-                        $('#' + sectionId + '-filter-qsave').attr('hidden', true);
+                    if ($('#' + sectionId + '-filter-default')[0].checked === true) {
+                        postData['is_default'] = '1';
+                        filterName = filterName + ' (Default)';
+                    } else {
+                        postData['is_default'] = '0';
                     }
+
+                    var url;
+
+                    if (postData['id'] !== '') {
+                        url = 'filter/update';
+                    } else {
+                        url = 'filter/add';
+                    }
+
+                    //Update Filter
+                    $.post(url, postData, function(data) {
+                        if (data.responseCode === 0) {
+                            PNotify.success({
+                                'title' : data.responseMessage
+                            });
+                            if (data.filters) {
+                                redoFiltersOptions(query, sectionId, data);
+                            }
+
+                        } else {
+                            PNotify.error({
+                                'title' : data.responseMessage
+                            });
+                        }
+                    }, 'json');
+
+
+                    $('#' + sectionId + '-filter-qsave').attr('hidden', true);
 
                     //Make Filter Call
                     $('#' + sectionId + '-filter-modal').modal('hide');
@@ -6426,8 +6357,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     toggleFilterButtons(sectionId + '-filter');
                     clearStoredData();
-
-                    // $('#' + sectionId + '-filter-edit, #' + sectionId + '-filter-delete').attr("disabled", false);
                 });
 
                 function redoFiltersOptions(query, sectionId, data) {
@@ -6481,8 +6410,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = [];
                     $('#' + sectionId + '-filter-name').attr('disabled', true);
                     $('#' + sectionId + '-filter-name').val('New Filter');
-                    $('#' + sectionId + '-filter-saveapply').attr('disabled', true);
-                    $('#' + sectionId + '-filter-apply').addClass('disabled');
+                    $('#' + sectionId + '-filter-save').attr('disabled', true);
                     $('#' + sectionId + '-filter-cancel-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-update-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-assign-button').attr('hidden', false);
