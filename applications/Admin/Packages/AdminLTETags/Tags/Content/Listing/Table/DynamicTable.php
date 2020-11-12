@@ -53,11 +53,11 @@ class DynamicTable
 
     protected function generateTableContent()
     {
-        if (isset($this->params['dtPrimaryButtons'])) {
+        if (isset($this->params['dtPrimaryButtons']) || isset($this->params['dtFilter'])) {
             $this->content .=
                 '<div class="row mb-2">';
 
-            if (isset($this->params['dtFilter']) && $this->params['dtFilter'] === true) {
+            if ($this->params['dtFilter'] === true) {
                 $filtersComponent =
                     $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
                         'Filters',
@@ -76,23 +76,25 @@ class DynamicTable
                 }
             }
 
-            $this->content .=
-                '<div class="col" id="listing-primary-buttons" hidden>';
+            if (isset($this->params['dtPrimaryButtons'])) {
+                $this->content .=
+                    '<div class="col" id="listing-primary-buttons" hidden>';
 
-            $this->content .=
-                $this->adminLTETags->useTag(
-                        'buttons',
-                        [
-                            'componentId'           => $this->params['componentId'],
-                            'sectionId'             => $this->params['sectionId'] . '-filter',
-                            'buttonType'            => 'button',
-                            'buttons'               => $this->params['dtPrimaryButtons']
-                        ]
-                    );
+                $this->content .=
+                    $this->adminLTETags->useTag(
+                            'buttons',
+                            [
+                                'componentId'           => $this->params['componentId'],
+                                'sectionId'             => $this->params['sectionId'] . '-filter',
+                                'buttonType'            => 'button',
+                                'buttons'               => $this->params['dtPrimaryButtons']
+                            ]
+                        );
 
-            $this->content .=
-                    '</div>
-                </div>';
+                $this->content .= '</div>';
+            }
+
+            $this->content .= '</div>';
         }
 
         $this->dtParams['dtStriped'] =

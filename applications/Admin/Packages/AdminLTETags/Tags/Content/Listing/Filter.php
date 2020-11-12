@@ -68,15 +68,6 @@ class Filter extends AdminLTETags
                             'fieldGroupPreAddonIcon'              => 'filter',
                             'fieldGroupPostAddonButtons'          =>
                                 [
-                                    'qsave'   => [//Quick Save for filter already in DB
-                                        'title'                   => false,
-                                        'type'                    => 'primary',
-                                        'icon'                    => 'save',
-                                        'noMargin'                => true,
-                                        'hidden'                  => true,
-                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
-                                        'position'                => 'right'
-                                    ],
                                     'edit'   => [
                                         'title'                   => false,
                                         'type'                    => 'warning',
@@ -381,28 +372,6 @@ class Filter extends AdminLTETags
                                         'fieldBazPostOnUpdate'                  => true,
                                         'fieldDataInputMinLength'               => 1,
                                         'fieldDataInputMaxLength'               => 50,
-                                        // 'fieldGroupPostAddonButtons'            =>
-                                        //     [
-                                        //         'save' => [
-                                        //             'title'                   => 'Save',
-                                        //             'disabled'                => true,
-                                        //             'icon'                    => 'save'
-                                        //         ],
-                                        //         'apply-new' => [
-                                        //             'title'                   => 'Apply',
-                                        //             'disabled'                => true,
-                                        //             'buttonAdditionalClass'   => 'rounded-0 ml-1',
-                                        //             'icon'                    => 'filter',
-                                        //         ],
-                                        //         'saveapply'   => [
-                                        //             'title'                   => 'Save & Apply',
-                                        //             'type'                    => 'secondary',
-                                        //             // 'noMargin'                => true,
-                                        //             'disabled'                => true,
-                                        //             'buttonAdditionalClass'   => 'rounded-0',
-                                        //             'position'                => 'right'
-                                        //         ]
-                                        //     ]
                                     ]
                                 ) .
                             '</div>

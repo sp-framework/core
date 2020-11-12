@@ -637,9 +637,6 @@
                         }
                     }, 'json');
 
-
-                    $('#' + sectionId + '-filter-qsave').attr('hidden', true);
-
                     //Make Filter Call
                     $('#' + sectionId + '-filter-modal').modal('hide');
                     that._filterRunAjax(

@@ -2,6 +2,8 @@
 
 namespace System\Base;
 
+use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
+use Applications\Admin\Packages\Filters\Filters;
 use Phalcon\Assets\Collection;
 use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
@@ -422,170 +424,90 @@ abstract class BaseComponent extends Controller
 
 			$this->view->setRenderLevel(View::LEVEL_MAIN_LAYOUT);
 		}
-
 	}
-	// protected function generateView()
-	// {
-	// 	$this->getDefaults();
 
-	// 	// var_dump($this->getData);
-	// 	// if ($this->getData === '') {
-	// 	// 	if ($this->requestUri === '/' ||
-	// 	// 		$this->requestUri === '/' .
-	// 	// 			strtolower($this->applicationInfo['name']) . '/' ||
-	// 	// 		$this->requestUri === '/' .
-	// 	// 			strtolower($this->applicationInfo['name']) . '/' . $this->defaultComponentsName
-	// 	// 		) {
-	// 	// 		return $this->checkViewFile('default');
-	// 	// 	} else {
-	// 	// 		$path =
-	// 	// 			str_replace(
-	// 	// 				'/' . strtolower($this->applicationInfo['name']) . '/',
-	// 	// 				'',
-	// 	// 				$this->requestUri
-	// 	// 			);
-	// 	// 		return $this->checkViewFile($path);
-	// 	// 	}
-	// 	// } else {
-	// 		$uri = explode('?', $this->requestUri);
-	// 		// dump($uri, $this->applicationName);
-	// 		if ($uri[0] === '/' ||
-	// 			$uri[0] === '/' . strtolower($this->applicationName) ||
-	// 			$uri[0] === '/' . strtolower($this->applicationName) . '/' ||
-	// 			$uri[0] === '/' . strtolower($this->applicationInfo['route']) ||
-	// 			$uri[0] === '/' . strtolower($this->applicationInfo['route']) . '/' ||
-	// 			$uri[0] === '/' . strtolower($this->applicationInfo['route']) . '/' . $this->defaultComponentsName ||
-	// 			$uri[0] === '/' . strtolower($this->applicationName) . '/' . $this->defaultComponentsName
-	// 			) {
+	//Datatable Content
+	protected function generateDTContent(
+		$package,
+		string $postUrl,
+		int $componentId = null,
+		array $columnsForTable = [],
+		$withFilter = true,
+		array $columnsForFilter = [],
+		array $controlActions = null
+	)
+	{
+		if (gettype($package) === 'string') {
+			$package = $this->usePackage($package);
+		}
 
-	// 			return $this->checkViewFile('default');
-	// 		} else {
-	// 			$explodeUri = explode('/', trim($uri[0], '/'));
+		if ($this->request->isGet()) {
+			$table = [];
+			$table['columns'] = $package->getModelsColumnMap($columnsForTable);
+			$table['filterColumns'] = $package->getModelsColumnMap($columnsForFilter);
+			$table['postUrl'] = $this->links->url($postUrl);
+			$table['component'] = $this->component;
 
-	// 			if ($explodeUri[0] === strtolower($this->applicationInfo['route'])) {
-	// 				$strToReplace =
-	// 					'/' . strtolower($this->applicationInfo['route']) . '/';
+			if (!$componentId) {
+				$componentId = $this->component['id'];
+			}
 
-	// 			} else if ($explodeUri[0] === strtolower($this->applicationName)) {
-	// 				$strToReplace =
-	// 					'/' . strtolower($this->applicationName) . '/';
-	// 			}
+			$filtersArr = $this->usePackage(Filters::class)->getFiltersForComponent($componentId);
 
-	// 			$componentName =
-	// 				str_replace(
-	// 					$strToReplace,
-	// 					'',
-	// 					$uri[0]
-	// 				);
+			$table['postUrlParams'] = [];
+			foreach ($filtersArr as $key => $filter) {
+				$table['filters'][$filter['id']] = $filter;
+				$table['filters'][$filter['id']]['data']['name'] = $filter['name'];
+				$table['filters'][$filter['id']]['data']['id'] = $filter['id'];
+				$table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
+				$table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
+				$table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
+				$table['filters'][$filter['id']]['data']['is_default'] = $filter['is_default'];
+				$table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
 
-	// 		}
+				if ($filter['is_default'] === '1') {
+					$table['postUrlParams'] = ['conditions' => $filter['conditions']];
+				}
+			}
 
-	// 		return $this->checkViewFile($componentName);
-	// 	// }
-	// }
+			$this->view->table = $table;
 
-	// protected function checkViewFile($componentName)
-	// {
-	// 	if ($this->viewFile) {
-	// 		$viewFile = $this->viewFile;
+		} else if ($this->request->isPost()) {
 
-	// 		// return $this->modules->views->render(
-	// 		// 	$this->response,
-	// 		// 	$this->viewFile,
-	// 		// 	$this->viewsData,
-	// 		// 	$componentName
-	// 		// );
-	// 	} else {
-	// 		if ($componentName === 'default') {
-	// 			$viewFile =
-	// 				'/' . $this->applicationName . '/' . $this->defaultViewsName .
-	// 				'/html/' . $this->defaultComponentsName . '/view.html';
+			$pagedData =
+				$package->getPaged(
+					[
+						'columns' => $columnsForTable
+					]
+				);
 
-	// 			$componentName = $this->defaultComponentsName;
+			$rows = $pagedData->getItems();
 
-	// 			// return $this->modules->views->render(
-	// 			// 	$this->response,
-	// 			// 	'/' . $this->defaultViewsName . '/html/' . $this->defaultComponentsName . '/view.html',
-	// 			// 	$this->viewsData,
-	// 			// 	$this->defaultComponentsName
-	// 			// );
-	// 		} else {
-	// 			if ($this->applicationInfo['name'] === 'Base') {
-	// 				$viewFile = '/Base/Default/html/' . $componentName . '/view.html';
-	// 				// return $this->modules->views->render(
-	// 				// 	$this->response,
-	// 				// 	'/Base/html/' . $componentName . '/view.html',
-	// 				// 	$this->viewsData,
-	// 				// 	$componentName
-	// 				// );
-	// 			} else {
-	// 				$viewFile =
-	// 					'/' . $this->applicationName . '/' . $this->defaultViewsName .
-	// 					'/html/' . $componentName . '/view.html';
+			if ($controlActions) {
+				// add control action to each row
+				foreach($rows as &$row) {
+					$actions = [];
 
-	// 				// return $this->modules->views->render(
-	// 				// 	$this->response,
-	// 				// 	'/' . $this->defaultViewsName . '/html/' . $componentName . '/view.html',
-	// 				// 	$this->viewsData,
-	// 				// 	$componentName
-	// 				// );
-	// 			}
-	// 		}
-	// 	}
+					foreach ($controlActions as $key => &$action) {
+						$actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+					}
 
-	// 	return $this->modules->views->render(
-	// 		$this->response,
-	// 		$viewFile,
-	// 		$this->viewsData,
-	// 		$componentName
-	// 	);
-	// }
+					$row["__control"] = $actions;
+				}
+			}
 
-	// protected function getDefaults()
-	// {
-	// 	// var_dump($this->applicationInfo, $this->applicationDefaults);
-	// 	if ($this->applicationInfo && $this->applicationDefaults) {
+			$adminltetags = new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
 
-	// 		$this->applicationName = $this->applicationDefaults['application'];
-
-
-	// 		// foreach (unserialize($this->applicationInfo['dependencies'])['views'] as $viewsKey => $view) {
-	// 		// 	if ($view['is_default'] === 'true') {
-	// 		// 		$this->defaultViewsName = ucfirst($view['name']);
-	// 		// 		break;
-	// 		// 	}
-	// 		// }
-	// 		// foreach (unserialize($this->applicationInfo['dependencies'])['components'] as $componentsKey => $component) {
-	// 		// 	if ($component['is_default'] === 'true') {
-	// 		// 		$this->defaultComponentsName = strtolower($component['name']);
-	// 		// 		break;
-	// 		// 	}
-	// 		// }
-	// 		// if (unserialize($this->applicationInfo['settings'])['view']['is_default'] === 'true') {
-	// 		// 	$this->defaultViewsName = ucfirst(unserialize($this->applicationInfo['settings'])['view']['name']);
-	// 		// }
-	// 		// if (unserialize($this->applicationInfo['settings'])['component']['is_default'] === 'true') {
-	// 		// 	$this->defaultComponentsName =
-	// 		// 		strtolower(unserialize($this->applicationInfo['settings'])['component']['name']);
-	// 		// }
-
-	// 			$this->defaultComponentsName = strtolower($this->applicationDefaults['component']);
-
-	// 			$this->defaultViewsName = $this->applicationDefaults['view'];
-
-	// 	} else {
-	// 		$this->applicationInfo = ['name' => 'Base'];
-
-	// 		$this->applicationName = 'Base';
-
-	// 		$this->applicationInfo['route'] = null;
-	// 	}
-	// }
-
-	// protected function viewFile($viewFile)
-	// {
-	// 	$this->viewFile = $viewFile;
-
-	// 	return $this;
-	// }
+			$this->view->rows =
+				$adminltetags->useTag('content/listing/table',
+					[
+						'componentId'                   => $this->view->componentId,
+						'dtRows'                        => $rows,
+						'dtNotificationTextFromColumn'  => 'email',
+						'dtPagination'                  => true,
+						'dtPaginationCounters'          => $package->packagesData->paginationCounters
+					]
+				);
+		}
+	}
 }
