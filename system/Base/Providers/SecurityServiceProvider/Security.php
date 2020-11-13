@@ -6,14 +6,18 @@ use Phalcon\Security as PhalconSecurity;
 
 class Security
 {
-    protected $connectionId;
+    public $security;
 
     public function __construct()
     {
     }
 
-    public function init()
+    public function init(int $workFactor = 12)
     {
-        return new PhalconSecurity();
+        $this->security = new PhalconSecurity();
+
+        $this->security->setWorkFactor($workFactor);
+
+        return $this->security;
     }
 }

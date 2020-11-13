@@ -70,11 +70,11 @@ if (localStorage.getItem('bazDevMode') === null) {
             {{assets.get('body').getCodes()[1].getContent()}}
         </script>
         <div class="wrapper">
-            {% include("layouts/default/header/view") %}
-            {% include("layouts/default/sidebar/view") %}
-            {% include("layouts/default/content/view") %}
-            {% include("layouts/default/controlsidebar/view") %}
-            {% include("layouts/default/footer/view") %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/header/view') %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view') %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/content/view') %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/controlsidebar/view') %}
+            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view') %}
         </div>
     </body>
 </html>

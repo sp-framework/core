@@ -17,7 +17,6 @@ class Session
     {
         $this->session = new Manager();
 
-
         if ($this->checkCachePath()) {
             $savePath = base_path('var/storage/cache/session/');
         } else {

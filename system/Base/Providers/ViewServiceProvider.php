@@ -26,11 +26,12 @@ class ViewServiceProvider implements ServiceProviderInterface
 		);
 
 		$views = $container->getShared('modules')->views->init();
+		$events = $container->getShared('events');
 
 		$container->setShared(
 			'view',
-			function () use ($views) {
-				return (new View($views))->init();
+			function () use ($views, $events) {
+				return (new View($views, $events))->init();
 			}
 		);
 

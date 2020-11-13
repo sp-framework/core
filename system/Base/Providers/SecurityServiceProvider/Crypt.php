@@ -6,7 +6,7 @@ use Phalcon\Crypt as PhalconCrypt;
 
 class Crypt
 {
-    protected $connectionId;
+    protected $crypt;
 
     public function __construct()
     {
@@ -14,6 +14,8 @@ class Crypt
 
     public function init()
     {
-        return new Crypt();
+        $this->crypt = new PhalconCrypt();
+
+        return $this->crypt;
     }
 }

@@ -6,7 +6,7 @@ use Phalcon\Security\Random as PhalconRandom;
 
 class Random
 {
-    protected $connectionId;
+    protected $random;
 
     public function __construct()
     {
@@ -14,6 +14,8 @@ class Random
 
     public function init()
     {
-        return new PhalconRandom();
+        $this->random = new PhalconRandom();
+
+        return $this->random;
     }
 }

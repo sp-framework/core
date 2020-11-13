@@ -2,43 +2,24 @@
 
 namespace System\Base\Providers;
 
-use League\Container\ServiceProvider\AbstractServiceProvider;
-use League\Container\ServiceProvider\BootableServiceProviderInterface;
-use League\Route\Router;
-use System\Base\Providers\ModulesServiceProvider\Applications;
-use System\Base\Providers\ModulesServiceProvider\Model\Middlewares;
+use Phalcon\Di\Injectable;
+use Phalcon\Events\Event;
+use Phalcon\Mvc\DispatcherInterface;
 
-class MiddlewaresServiceProvider extends AbstractServiceProvider implements BootableServiceProviderInterface
+class MiddlewaresServiceProvider extends Injectable
 {
-    protected $provides = [];
-
-    public function register()
-    {
-        //
-    }
-
-    public function boot()
-    {
-        $container = $this->getContainer();
-
-        $route = $container->get(Router::class);
-
-        $db = $container->get('db');
-
-        $applications = new Applications($container);
-
-        if ($applications->getApplicationInfo()) {
-            $applicationId = $applications->getApplicationInfo()['id'];
-        } else {
-            $applicationId = null;
-        }
-
+    public function beforeExecuteRoute(
+        Event $event,
+        DispatcherInterface $dispatcher,
+        $data
+    ) {
         $middlewares =
-            $db->getByData(Middlewares::class, ['application_id' => $applicationId], ['sequence' => 'ASC']);
+            msort($this->modules->middlewares->middlewares, 'sequence');
 
-        foreach ($middlewares as $middlewareKey => $middleware) {
-            if ($middleware->get('enabled') == 1) {
-                $route->middleware($container->get($middleware->get('class')));
+        foreach ($middlewares as $middleware) {
+            $middlewareClass = $middleware['class'] . '\\' . $middleware['name'];
+            if ($middleware['enabled'] === '1') {
+                (new $middlewareClass())->process();
             }
         }
     }

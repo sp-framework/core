@@ -2,7 +2,9 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
+use Phalcon\Db\Index;
 use System\Base\BasePackage;
+use System\Base\Installer\Packages\Setup\Schema\Users as UsersSchema;
 use System\Base\Providers\AccessServiceProvider\Model\Users as UsersModel;
 
 class Users extends BasePackage
@@ -23,7 +25,7 @@ class Users extends BasePackage
 
         if ($validated) {
             $data['password'] =
-                $this->hashPassword($data['password']);
+                $this->secTools->hashPassword($data['password']);
 
             $newUser = $this->add($data);
 
@@ -35,9 +37,9 @@ class Users extends BasePackage
         return false;
     }
 
-    protected function checkUserByEmail(string $email)
+    public function checkUserByEmail(string $email)
     {
-        return
+        $user =
             $this->getByParams(
                     [
                         'conditions'    => 'email = :email:',
@@ -49,14 +51,43 @@ class Users extends BasePackage
                     false,
                     false
                 );
+
+        if ($user) {
+            return $user[0];
+        } else {
+            return false;
+        }
     }
 
-    protected function hashPassword(string $password)
+    public function checkUserByIdentifier(string $rememberIdentifier)
     {
-        try {
-            return $this->security->hash($password);
-        } catch (\Exception $e) {
-            throw $e;
+        $user =
+            $this->getByParams(
+                    [
+                        'conditions'    => 'remember_identifier = :ri:',
+                        'bind'          =>
+                            [
+                                'ri'  => $rememberIdentifier
+                            ]
+                    ],
+                    false,
+                    false
+                );
+
+        if ($user) {
+            return $user[0];
+        } else {
+            return false;
         }
+    }
+
+    public function clearUserRememberToken(int $id)
+    {
+        $user = $this->getById($id);
+
+        $user['remember_identifier'] = null;
+        $user['remember_token'] = null;
+
+        return $this->update($user);
     }
 }

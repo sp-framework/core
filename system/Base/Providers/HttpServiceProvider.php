@@ -4,10 +4,11 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
+use Phalcon\Helper\Json;
 use System\Base\Providers\HttpServiceProvider\Cookies;
+use System\Base\Providers\HttpServiceProvider\Links;
 use System\Base\Providers\HttpServiceProvider\Request;
 use System\Base\Providers\HttpServiceProvider\Response;
-use System\Base\Providers\HttpServiceProvider\Links;
 
 class HttpServiceProvider implements ServiceProviderInterface
 {
@@ -27,10 +28,15 @@ class HttpServiceProvider implements ServiceProviderInterface
             }
         );
 
+        $response = $container->getShared('response');
+        $crypt = $container->getShared('crypt');
+        $random = $container->getShared('random');
+        $core = $container->getShared('modules')->core;
+
         $container->setShared(
             'cookies',
-            function () {
-                return (new Cookies())->init();
+            function () use ($response, $crypt, $random, $core) {
+                return (new Cookies($response, $crypt, $random, $core))->init();
             }
         );
 

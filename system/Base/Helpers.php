@@ -1,13 +1,13 @@
 <?php
 
-use Laminas\Diactoros\Response\RedirectResponse;
-use System\Base\Providers\DatabaseServiceProvider\Model;
+// use Laminas\Diactoros\Response\RedirectResponse;
+// use System\Base\Providers\DatabaseServiceProvider\Model;
 
-if (!function_exists('redirect')) {
-    function redirect($path) {
-        return new RedirectResponse($path);
-    }
-}
+// if (!function_exists('redirect')) {
+//     function redirect($path) {
+//         return new RedirectResponse($path);
+//     }
+// }
 
 if (!function_exists('base_path')) {
     function base_path($path = '') {
@@ -76,20 +76,20 @@ if (!function_exists('xmlToArray')) {
     }
 }
 
-if (!function_exists('getAllArr')) {
-    function getAllArr(array $array)
-    {
-        $objArr = [];
+// if (!function_exists('getAllArr')) {
+//     function getAllArr(array $array)
+//     {
+//         $objArr = [];
 
-        foreach ($array as $arrayKey => $arrayValue) {
-            if ($arrayValue instanceof Model) {
-                $objArr[$arrayKey] = $arrayValue->getAllArr();
-            }
-        }
+//         foreach ($array as $arrayKey => $arrayValue) {
+//             if ($arrayValue instanceof Model) {
+//                 $objArr[$arrayKey] = $arrayValue->getAllArr();
+//             }
+//         }
 
-        return $objArr;
-    }
-}
+//         return $objArr;
+//     }
+// }
 
 if (!function_exists('msort')) {
     function msort($array, $key, $sort_flags = SORT_REGULAR, $order = SORT_ASC) {

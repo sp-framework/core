@@ -1,15 +1,11 @@
-{% set componentName = 'modules' %}
-{% set componentId = 'admin-modules' %}
-{% set parentComponentId = componentId %}
-{% set sectionId = 'list' %}
-
 {{adminltetags.useTag('content',
     [
+        'component'                   : component,
         'componentId'                 : componentId,
-        'parentComponentId'           : parentComponentId,
-        'sectionId'                   : sectionId,
+        'parentComponentId'           : parent,
+        'sectionId'                   : 'list',
         'contentType'                 : 'section',
-        'cardId'                      : sectionId ~ '-card',
+        'cardId'                      : 'list-card',
         'cardHeader'                  : true,
         'cardType'                    : 'primary',
         'cardIcon'                    : 'th-large',
@@ -26,12 +22,3 @@
         'cardShowTools'               : []
     ]
 )}}
-{# <div id="{{componentId}}" class="component">
-    <div id="{{componentId}}-content">
-        <div class="row">
-            <div class="col">
-                {% include 'thelpers/content/content' with ['cardParams' : cardParams] %}
-            </div>
-        </div>
-    </div>
-</div> #}

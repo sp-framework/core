@@ -13,11 +13,15 @@ class Dispatcher
 {
     protected $dispatcher;
 
+    protected $events;
+
     protected $applicationsInfo;
 
-    public function __construct($applicationsInfo, $config)
+    public function __construct($applicationsInfo, $config, $events)
     {
         $this->applicationsInfo = $applicationsInfo;
+
+        $this->events = $events;
 
         $this->dispatcher = new PhalconDispatcher();
 
@@ -35,6 +39,8 @@ class Dispatcher
                     )
                 );
             }
+        } else {
+            $this->dispatcher->setEventsManager($this->events);//Register Other events
         }
     }
 
@@ -45,9 +51,7 @@ class Dispatcher
 
     protected function register404($errorComponent)
     {
-        $eventsManager = new Manager();
-
-        $eventsManager->attach(
+        $this->events->attach(
             'dispatch:beforeException',
             function (
                 Event $event,
@@ -79,7 +83,6 @@ class Dispatcher
             }
         );
 
-        return $eventsManager;
-
+        return $this->events;
     }
 }

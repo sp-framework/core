@@ -6,6 +6,7 @@ use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use System\Base\Providers\SecurityServiceProvider\Crypt;
 use System\Base\Providers\SecurityServiceProvider\Random;
+use System\Base\Providers\SecurityServiceProvider\SecTools;
 use System\Base\Providers\SecurityServiceProvider\Security;
 
 class SecurityServiceProvider implements ServiceProviderInterface
@@ -30,6 +31,17 @@ class SecurityServiceProvider implements ServiceProviderInterface
             'crypt',
             function () {
                 return (new Crypt())->init();
+            }
+        );
+
+        $security = $container->getShared('security');
+        $random = $container->getShared('random');
+        $crypt = $container->getShared('crypt');
+
+        $container->setShared(
+            'secTools',
+            function () use ($security, $random, $crypt) {
+                return (new SecTools($security, $random, $crypt))->init();
             }
         );
     }

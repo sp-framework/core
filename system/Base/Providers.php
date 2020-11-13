@@ -3,6 +3,8 @@
 return
 	[
 		'System\Base\Providers\ConfigServiceProvider',
+		'System\Base\Providers\EventsServiceProvider',
+		'System\Base\Providers\SecurityServiceProvider',
 		'System\Base\Providers\SessionServiceProvider',
 		'System\Base\Providers\DatabaseServiceProvider',
 		'System\Base\Providers\CacheServiceProvider',
@@ -18,5 +20,5 @@ return
 		'System\Base\Providers\ErrorServiceProvider',
 		'System\Base\Providers\WidgetServiceProvider',
 		'System\Base\Providers\AccessServiceProvider',
-		'System\Base\Providers\ValidationServiceProvider'
+		'System\Base\Providers\ValidationServiceProvider',
 	];

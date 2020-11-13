@@ -4,17 +4,18 @@ namespace System\Base\Installer\Packages;
 
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplication;
 use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
+use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\User as RegisterUser;
-use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
@@ -121,8 +122,16 @@ class Setup
 		$this->db->createTable('cache', '', (new Cache)->columns());
 		$this->db->createTable('logs', '', (new Logs)->columns());
 		$this->db->createTable('domains', '', (new Domains)->columns());
-		$this->db->createTable('users', '', (new Users)->columns());
 		$this->db->createTable('menus', '', (new Menus)->columns());
+		$this->db->createTable('users', '', (new Users)->columns());
+		$index_unique = new Index(
+			'column_UNIQUE',
+			[
+				'email',
+			],
+			'UNIQUE'
+		);
+		$this->db->addIndex('users', $conn['dbname'], $index_unique);
 	}
 
 	public function registerRepository()//Change this to SP
@@ -309,7 +318,7 @@ class Setup
 			$messages = 'Error: ';
 
 			foreach ($validated as $key => $value) {
-				$messages .= $value['message'];
+				$messages .= $value['message'] . ' ';
 			}
 			return $messages;
 		} else {

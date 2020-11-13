@@ -4,6 +4,6 @@
         <span class="brand-text font-weight-light">{{applicationName|upper}}</span>
     </a>
     <div class="sidebar">
-        {% include "layouts/default/sidebar/menu/view.html" %}
+        {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/menu/view') %}
     </div>
 </aside>

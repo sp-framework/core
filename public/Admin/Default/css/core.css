@@ -27808,6 +27808,30 @@ input[type=number] {
 * Login, Logout, Lock, Reset, 2Fa
 * -------------------------------
 */
+.login-page, .register-page {
+  height: 100vh !important;
+}
+
+.login-box,
+.reset-box {
+  width: 360px;
+  margin: 7% auto;
+}
+
+.login-box > .card,
+.reset-box > .card {
+  background-color: transparent !important;
+}
+
+.login-box,
+.reset-box,
+.lockscreen-wrapper {
+  background: rgba(0, 0, 0, 0.8) !important;
+  border-radius: 4px;
+  color: #fff;
+  padding: 10px;
+}
+
 .login-logo,
 .lockscreen-logo,
 .reset-logo {
@@ -27827,12 +27851,6 @@ input[type=number] {
   margin-bottom: 25px !important;
 }
 
-.login-box,
-.reset-box {
-  width: 360px;
-  margin: 7% auto;
-}
-
 @media (max-width: 768px) {
   .login-box,
   .reset-box {
@@ -27840,27 +27858,15 @@ input[type=number] {
     margin-top: 20px;
   }
 }
-.login-box-body,
-.reset-box-body,
-.lockscreen-wrapper {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-  width: 400px;
-  height: 360px;
-  background: rgba(0, 0, 0, 0.8) !important;
-  border-radius: 4px;
-  color: #fff;
-  padding: 20px;
+.login-card-body .form-control-feedback,
+.reset-card-body .form-control-feedback,
+.lockscreen-wrapper .form-control-feedback {
+  color: #777 !important;
 }
 
-.login-box-body .form-control-feedback,
-.reset-box-body .form-control-feedback,
-.lockscreen-wrapper .form-control-feedback {
-  color: #777;
+.login-card-body, .register-card-body {
+  color: #999 !important;
+  background-color: transparent !important;
 }
 
 .lockscreen-wrapper {

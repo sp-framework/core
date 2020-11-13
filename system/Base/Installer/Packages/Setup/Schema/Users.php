@@ -45,7 +45,7 @@ class Users
                         ]
                     ),
                     new Column(
-                        'remember_token',
+                        'remember_identifier',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 2048,
@@ -53,7 +53,7 @@ class Users
                         ]
                     ),
                     new Column(
-                        'remember_identifier',
+                        'remember_token',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 2048,

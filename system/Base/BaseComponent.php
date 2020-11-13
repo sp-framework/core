@@ -21,15 +21,25 @@ abstract class BaseComponent extends Controller
 
 	protected $componentName;
 
+	protected $application;
+
 	protected $component;
 
+	protected $views;
+
 	protected $viewName;
+
+	protected $viewSettings;
+
+	protected $assetsCollections = [];
 
 	protected function onConstruct()
 	{
 		$this->setDefaultViewResponse();
 
 		$this->application = $this->modules->applications->getApplicationInfo();
+
+		$this->views = $this->modules->views->getViewInfo();
 
 		$this->reflection = new \ReflectionClass($this);
 
@@ -40,11 +50,6 @@ abstract class BaseComponent extends Controller
 			$this->modules->components->getNamedComponentForApplication(
 				$this->componentName, $this->application['id']
 			);
-
-		if (!$this->isJson() || $this->request->isAjax()) {
-			$this->checkLayout();
-			$this->setDefaultViewData();
-		}
 	}
 
 	protected function setDefaultViewData()
@@ -58,6 +63,8 @@ abstract class BaseComponent extends Controller
 		} else {
 			$this->view->route = strtolower($this->application['name']);
 		}
+
+		$this->view->component = $this->component;
 
 		$this->view->componentName = strtolower($this->componentName);
 
@@ -80,8 +87,7 @@ abstract class BaseComponent extends Controller
 			$this->view->parent = strtolower(Arr::last($parents));
 		}
 
-		$this->view->viewName =
-			$this->modules->views->getViewInfo()['name'];
+		$this->view->viewName = $this->views['name'];
 	}
 
 	protected function setDefaultViewResponse()
@@ -108,11 +114,20 @@ abstract class BaseComponent extends Controller
 	protected function afterExecuteRoute()
 	{
 		if ($this->isJson()) {
-
 			return $this->sendJson();
-		} else {
+		}
+
+		if (!$this->isJson() || $this->request->isAjax()) {
+			$this->viewSettings = json_decode($this->views['settings'], true);
+
+			$this->checkLayout();
+
+			$this->view->menus =
+				$this->modules->menus->getMenusForApplication($this->application['id']);
+
+			$this->setDefaultViewData();
+
 			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
-			// var_dump($this->view->getViewsDir());
 		}
 	}
 
@@ -149,30 +164,15 @@ abstract class BaseComponent extends Controller
 						$this->buildAssets();
 						return;
 					} else {
-						$this->view->disableLevel(
-										[
-											View::LEVEL_LAYOUT 		=> true,
-											View::LEVEL_MAIN_LAYOUT => true
-										]
-									);
+						$this->disableViewLevel();
 						return;
 					}
 				} else {
-					$this->view->disableLevel(
-										[
-											View::LEVEL_LAYOUT 		=> true,
-											View::LEVEL_MAIN_LAYOUT => true
-										]
-									);
+					$this->disableViewLevel();
 						return;
 				}
 			} else {
-				$this->view->disableLevel(
-								[
-									View::LEVEL_LAYOUT 		=> true,
-									View::LEVEL_MAIN_LAYOUT => true
-								]
-							);
+				$this->disableViewLevel();
 				return;
 			}
 		} else if ($this->request->isGet()) {
@@ -181,12 +181,7 @@ abstract class BaseComponent extends Controller
 
 				if (Arr::has($this->getQueryArr, 'layout')) {
 					if ($this->getQueryArr['layout'] === '0') {
-						$this->view->disableLevel(
-							[
-								View::LEVEL_LAYOUT 		=> true,
-								View::LEVEL_MAIN_LAYOUT => true
-							]
-						);
+						$this->disableViewLevel();
 						return;
 					} else {
 						$this->buildAssets();
@@ -204,12 +199,7 @@ abstract class BaseComponent extends Controller
 
 			if (Arr::has($this->request->getPost(), 'layout')) {
 				if ($this->request->getPost('layout') === '0') {
-					$this->view->disableLevel(
-						[
-							View::LEVEL_LAYOUT 		=> true,
-							View::LEVEL_MAIN_LAYOUT => true
-						]
-					);
+					$this->disableViewLevel();
 					return;
 				} else {
 					$this->buildAssets();
@@ -220,14 +210,19 @@ abstract class BaseComponent extends Controller
 				return;
 			}
 		} else {
-			$this->view->disableLevel(
-							[
-								View::LEVEL_LAYOUT 		=> true,
-								View::LEVEL_MAIN_LAYOUT => true
-							]
-						);
+			$this->disableViewLevel();
 			return;
 		}
+	}
+
+	protected function disableViewLevel()
+	{
+		$this->view->disableLevel(
+			[
+				View::LEVEL_LAYOUT 		=> true,
+				View::LEVEL_MAIN_LAYOUT => true
+			]
+		);
 	}
 
 	protected function buildGetQueryParamsArr()
@@ -259,99 +254,125 @@ abstract class BaseComponent extends Controller
 
 	protected function buildAssets()
 	{
-		if ($this->modules->views->getViewInfo()) {
+		$this->buildAssetsTitle();
+		$this->buildAssetsMeta();
+		$this->buildAssetsHeadCss();
+		$this->buildAssetsHeadStyle();
+		$this->buildAssetsHeadJs();
+		$this->buildAssetsBody();
+		$this->buildAssetsBodyJs();
+		$this->buildAssetsFooter();
+		$this->buildAssetsFooterJs();
+		$this->buildAssetsFooterJsInline();
+	}
 
-			$settings = json_decode($this->modules->views->getViewInfo()['settings'], true);
+	protected function buildAssetsTitle()
+	{
+		$this->tag::setDocType(Tag::XHTML5);
 
-			$this->tag::setDocType(Tag::XHTML5);
+		if (isset($this->viewSettings['head']['title'])) {
+			Tag::setTitle($this->viewSettings['head']['title']);
 
-			if (isset($settings['head']['title'])) {
-				Tag::setTitle($settings['head']['title']);
-
-				if (isset($this->componentName)) {
-					Tag::appendTitle(' - ' . $this->componentName);
-				}
-			} else {
-				Tag::setTitle('Title Missing In Application Configuration');
+			if (isset($this->componentName)) {
+				Tag::appendTitle(' - ' . $this->componentName);
 			}
+		} else {
+			Tag::setTitle('Title Missing In Application Configuration');
+		}
+	}
 
-			//Meta
-			$meta = $this->assets->collection('meta');
+	protected function buildAssetsMeta()
+	{
+		$this->assetsCollections['meta'] = $this->assets->collection('meta');
 
-			if (isset($settings['head']['meta']['charset'])) {
-				$charset = $settings['head']['meta']['charset'];
-			} else {
-				$charset = 'UTF-8';
+		if (isset($this->viewSettings['head']['meta']['charset'])) {
+			$charset = $this->viewSettings['head']['meta']['charset'];
+		} else {
+			$charset = 'UTF-8';
+		}
+
+		$this->assetsCollections['meta']->addInline(new Inline('charset', $charset));
+
+		$this->assetsCollections['meta']->addInline(
+			new Inline('description', $this->viewSettings['head']['meta']['description'])
+		);
+		$this->assetsCollections['meta']->addInline(
+			new Inline('keywords', $this->viewSettings['head']['meta']['keywords'])
+		);
+		$this->assetsCollections['meta']->addInline(
+			new Inline('author', $this->viewSettings['head']['meta']['author'])
+		);
+		$this->assetsCollections['meta']->addInline(
+			new Inline('viewport', $this->viewSettings['head']['meta']['viewport'])
+		);
+	}
+
+	protected function buildAssetsHeadCss()
+	{
+		$this->assetsCollections['headLinks'] = $this->assets->collection('headLinks');
+		$links = $this->viewSettings['head']['link']['href'];
+		if (count($links) > 0) {
+			foreach ($links as $link) {
+				$this->assetsCollections['headLinks']->addCss($link);
 			}
+		}
+	}
 
-			$meta->addInline(new Inline('charset', $charset));
+	protected function buildAssetsHeadStyle()
+	{
+		$this->assetsCollections['headStyle'] = $this->assets->collection('headStyle');
+		$inlineStyle = $this->viewSettings['head']['style'] ?? null;
+		if ($inlineStyle) {
+			$this->assets->addInlineCss($inlineStyle);
+		}
+	}
 
-			$meta->addInline(
-				new Inline('description', $settings['head']['meta']['description'])
-			);
-			$meta->addInline(
-				new Inline('keywords', $settings['head']['meta']['keywords'])
-			);
-			$meta->addInline(
-				new Inline('author', $settings['head']['meta']['author'])
-			);
-			$meta->addInline(
-				new Inline('viewport', $settings['head']['meta']['viewport'])
-			);
+	protected function buildAssetsHeadJs()
+	{
+		$this->assetsCollections['headJs'] = $this->assets->collection('headJs');
 
-			//Head - Css
-			$headLinks = $this->assets->collection('headLinks');
-			$links = $settings['head']['link']['href'];
-			if (count($links) > 0) {
-				foreach ($links as $link) {
-					$headLinks->addCss($link);
-				}
+		$scripts = $this->viewSettings['head']['script']['src'];
+
+		if (count($scripts) > 0) {
+			foreach ($scripts as $script) {
+				$this->assetsCollections['headJs']->addJs($script);
 			}
+		}
+	}
 
-			//Head - Style
-			$headStyle = $this->assets->collection('headStyle');
-			$inlineStyle = $settings['head']['style'] ?? null;
-			if ($inlineStyle) {
-				$this->assets->addInlineCss($inlineStyle);
+	protected function buildAssetsBody()
+	{
+		$this->assetsCollections['body'] = $this->assets->collection('body');
+		$this->assetsCollections['body']->addInline(new Inline('bodyParams', $this->viewSettings['body']['params']));
+	}
+
+	protected function buildAssetsBodyJs()
+	{
+		$this->assetsCollections['body']->addInline(new Inline('bodyScript', $this->viewSettings['body']['jsscript']));
+	}
+
+	protected function buildAssetsFooter()
+	{
+		$this->assetsCollections['footer'] = $this->assets->collection('footer');
+		$this->assetsCollections['footer']->addInline(new Inline('footerParams', $this->viewSettings['footer']['params']));
+	}
+
+	protected function buildAssetsFooterJs()
+	{
+		$this->assetsCollections['footerJs'] = $this->assets->collection('footerJs');
+		$scripts = $this->viewSettings['footer']['script']['src'];
+		if (count($scripts) > 0) {
+			foreach ($scripts as $script) {
+				$this->assetsCollections['footerJs']->addJs($script);
 			}
+		}
+	}
 
-			//Head - Js
-			$headJs = $this->assets->collection('headJs');
-			$scripts = $settings['head']['script']['src'];
-			if (count($scripts) > 0) {
-				foreach ($scripts as $script) {
-					$headJs->addJs($script);
-				}
-			}
-
-			//Body
-			$body = $this->assets->collection('body');
-			$body->addInline(new Inline('bodyParams', $settings['body']['params']));
-
-			//Body - Js Scripts right after Body tag
-			$body->addInline(new Inline('bodyScript', $settings['body']['jsscript']));
-
-			//Footer - <footer tag parameters>
-			$footer = $this->assets->collection('footer');
-			$footer->addInline(new Inline('footerParams', $settings['footer']['params']));
-
-			//Footer - Js Scripts
-			$footerJs = $this->assets->collection('footerJs');
-			$scripts = $settings['footer']['script']['src'];
-			if (count($scripts) > 0) {
-				foreach ($scripts as $script) {
-					$footerJs->addJs($script);
-				}
-			}
-
-			// Footer inline scripts
-			$inlineScript = $settings['footer']['jsscript'] ?? null;
-			if ($inlineScript && $inlineScript !== '') {
-				$this->assets->addInlineJs($inlineScript);
-			}
-
-			$this->view->menus =
-				$this->modules->menus->getMenusForApplication($this->application['id']);
+	protected function buildAssetsFooterJsInline()
+	{
+		$inlineScript = $this->viewSettings['footer']['jsscript'] ?? null;
+		if ($inlineScript && $inlineScript !== '') {
+			$this->assets->addInlineJs($inlineScript);
 		}
 	}
 

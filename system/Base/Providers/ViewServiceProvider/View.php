@@ -13,16 +13,18 @@ class View
 
 	protected $views;
 
-	public function __construct($views)
+	protected $events;
+
+	public function __construct($views, $events)
 	{
 		$this->views = $views;
+
+		$this->events = $events;
 	}
 
 	public function init()
 	{
-		$eventManager = new Manager();
-
-		$eventManager->attach(
+		$this->events->attach(
 			'view',
 			function (Event $event, $view) {
 
@@ -58,7 +60,7 @@ class View
 			]
 		);
 
-		$this->phalconView->setEventsManager($eventManager);
+		$this->phalconView->setEventsManager($this->events);
 
 		return $this->phalconView;
 	}
