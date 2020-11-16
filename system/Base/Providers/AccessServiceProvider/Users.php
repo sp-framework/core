@@ -2,9 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
-use Phalcon\Db\Index;
 use System\Base\BasePackage;
-use System\Base\Installer\Packages\Setup\Schema\Users as UsersSchema;
 use System\Base\Providers\AccessServiceProvider\Model\Users as UsersModel;
 
 class Users extends BasePackage
@@ -79,15 +77,5 @@ class Users extends BasePackage
         } else {
             return false;
         }
-    }
-
-    public function clearUserRememberToken(int $id)
-    {
-        $user = $this->getById($id);
-
-        $user['remember_identifier'] = null;
-        $user['remember_token'] = null;
-
-        return $this->update($user);
     }
 }

@@ -112,7 +112,11 @@ Class Setup
 
 					$this->setupPackage->registerDomain();
 
-					$this->setupPackage->registerAdminUser($adminApplicationId);
+					$adminRoleId = $this->setupPackage->registerRootAdminRole();
+
+					if ($adminRoleId) {
+						$this->setupPackage->registerAdminUser($adminApplicationId, $adminRoleId);
+					}
 				}
 
 				// $this->setupPackage->removeInstaller();

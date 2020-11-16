@@ -5,6 +5,7 @@
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/component-admin-modules",
 	"path"			: "/",
+	"type"          : "listing",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

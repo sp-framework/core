@@ -4,7 +4,7 @@ namespace Applications\Admin\Packages\AdminLTETags\Tags\Buttons;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
 
-class Button extends AdminLTETags
+class Button
 {
     protected $view;
 
@@ -12,19 +12,28 @@ class Button extends AdminLTETags
 
     protected $links;
 
-    protected $params;
+    protected $escaper;
 
-    protected $buttonParams = [];
+    protected $adminLTETags;
+
+    protected $params;
 
     protected $content;
 
-    public function __construct($view, $tag, $links, $params, $buttonParams)
+    protected $buttonParams = [];
+
+    public function __construct($view, $tag, $links, $escaper, $params, $buttonParams)
     {
         $this->view = $view;
 
         $this->tag = $tag;
 
         $this->links = $links;
+
+        $this->escaper = $escaper;
+
+        $this->adminLTETags =
+            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
 
         $this->params = $params;
 
@@ -54,6 +63,7 @@ class Button extends AdminLTETags
         // }
 
         foreach ($buttons as $buttonKey => $button) {
+
             if (isset($button['title'])) {
                 if ($button['title'] === false) {
                     $this->buttonParams['title'] = '';
@@ -155,71 +165,48 @@ class Button extends AdminLTETags
                 $button['url'] :
                 '';
 
-            $this->buttonParams['createActionUrl'] = '';
-            $this->buttonParams['createSuccessRedirectUrl'] = '';
+            $this->buttonParams['addActionUrl'] = '';
+            $this->buttonParams['addSuccessRedirectUrl'] = '';
             $this->buttonParams['updateActionUrl'] = '';
             $this->buttonParams['updateSuccessRedirectUrl'] = '';
+            $this->buttonParams['cancelActionUrl'] = '';
+            $this->buttonParams['cancelSuccessRedirectUrl'] = '';
+            $this->buttonParams['closeActionUrl'] = '';
+            $this->buttonParams['closeSuccessRedirectUrl'] = '';
             $this->buttonParams['hasAjax'] = '';
 
-            if ($buttonKey === 'create') {
-                if (isset($button['actionUrl'])) {
-                    $this->buttonParams['createActionUrl'] = 'actionurl="' . $button['actionUrl'] . '"';
-                    $this->buttonParams['createSuccessRedirectUrl'] = '';
-                    $this->buttonParams['hasAjax'] = '';
-                } else if (isset($button['successRedirectUrl'])) {
-                    $this->buttonParams['createActionUrl'] = '';
-                    $this->buttonParams['createSuccessRedirectUrl'] = 'href="' . $button['successRedirectUrl'] . '"';
-                    $this->buttonParams['hasAjax'] = 'methodPost';
-                }
-            }
-
-            if ($buttonKey === 'edit') {
-                if (isset($button['actionUrl'])) {
+            if ($buttonKey === 'addData') {
+                // if (isset($button['actionUrl'])) {
+                    $this->buttonParams['addActionUrl'] = 'actionurl="' . $button['actionUrl'] . '"';
+                //     $this->buttonParams['addSuccessRedirectUrl'] = '';
+                //     $this->buttonParams['hasAjax'] = '';
+                // } else if (isset($button['successRedirectUrl'])) {
+                //     $this->buttonParams['addActionUrl'] = '';
+                    $this->buttonParams['addSuccessRedirectUrl'] = 'href="' . $button['successRedirectUrl'] . '"';
+                    $this->buttonParams['hasAjax'] = 'addData';
+                // }
+            } else if ($buttonKey === 'updateData') {
+                // if (isset($button['actionUrl']) && isset($this->params['updateButtonId'])) {
                     $this->buttonParams['updateActionUrl'] = 'actionurl="' . $button['actionUrl'] . '"';
-
-                    if (isset($this->params['updateButtonId'])) {
-                        $this->buttonParams['updateActionUrl'] =
-                            $this->buttonParams['updateActionUrl'] . '&id="' . $this->params['updateButtonId'] . '"';
-                    }
-                    $this->buttonParams['updateSuccessRedirectUrl'] = '';
-                    $this->buttonParams['hasAjax'] = '';
-                } else if (isset($button['successRedirectUrl'])) {
-                    $this->buttonParams['updateActionUrl'] = '';
+                //     $this->buttonParams['updateSuccessRedirectUrl'] = '';
+                //     $this->buttonParams['hasAjax'] = '';
+                // } else if (isset($button['successRedirectUrl'])) {
+                //     $this->buttonParams['updateActionUrl'] = '';
                     $this->buttonParams['updateSuccessRedirectUrl'] = 'href="' . $button['successRedirectUrl'] . '"';
-                    $this->buttonParams['hasAjax'] = 'methodPost';
-                }
-            }
-
-            if ($buttonKey === 'cancel' && isset($button['actionUrl'])) {
+                    $this->buttonParams['hasAjax'] = 'updateData';
+                // }
+            } else if ($buttonKey === 'cancelForm' && isset($button['actionUrl'])) {
                 $this->buttonParams['cancelActionUrl'] = 'href="' . $button['actionUrl'] . '"';
-                $this->buttonParams['hasAjax'] = 'contentAjaxLink';
-            } else {
-                $this->buttonParams['cancelActionUrl'] = '';
-                $this->buttonParams['hasAjax'] = '';
-            }
-
-            if ($buttonKey === 'close' && isset($button['actionUrl'])) {
+                $this->buttonParams['hasAjax'] = 'cancelForm contentAjaxLink';
+            } else if ($buttonKey === 'closeForm' && isset($button['actionUrl'])) {
                 $this->buttonParams['closeActionUrl'] = 'href="' . $button['actionUrl'] . '"';
-                $this->buttonParams['hasAjax'] = 'contentAjaxLink';
-            } else {
-                $this->buttonParams['closeActionUrl'] = '';
-                $this->buttonParams['hasAjax'] = '';
+                $this->buttonParams['hasAjax'] = 'closeForm contentAjaxLink';
             }
 
             $this->buttonParams['actionTarget'] =
                 isset($button['actionTarget']) ?
                 'data-actiontarget="' . $button['actionTarget'] . '"' :
                 '';
-
-            if (isset($button['successNotifyMessage']) && $button['successNotifyMessage'] !== '') {
-                $this->buttonParams['successNotificationTitle'] =
-                    'data-notificationtitle="' . $button['title'] . '"';
-                $this->buttonParams['successNotificationMessage'] =
-                    'data-notificationmessage="' . $button['successNotifyMessage'] . '"';
-            } else {
-                $this->buttonParams['successNotificationTitle'] = '';
-                $this->buttonParams['successNotificationMessage'] = '';
-            }
 
             $this->buttonParams['additionalClass'] =
                 isset($button['buttonAdditionalClass']) ?
@@ -235,7 +222,7 @@ class Button extends AdminLTETags
                 isset($button['tooltipTitle']) ?
                 $button['tooltipTitle'] :
                 '';
-
+                // var_dump($this->buttonParams);
             $this->buildButton();
         }
     }
@@ -260,17 +247,15 @@ class Button extends AdminLTETags
                 $this->buttonParams['position'] . ' ' .
                 $this->buttonParams['hasAjax'] . ' ' .
                 $this->buttonParams['additionalClass'] . ' ' .
-                $this->buttonParams['createActionUrl'] . ' ' .
+            '" ' .
+                $this->buttonParams['addActionUrl'] . ' ' .
                 $this->buttonParams['updateActionUrl'] . ' ' .
                 $this->buttonParams['cancelActionUrl'] . ' ' .
                 $this->buttonParams['closeActionUrl'] . ' ' .
-                $this->buttonParams['createSuccessRedirectUrl'] . ' ' .
+                $this->buttonParams['addSuccessRedirectUrl'] . ' ' .
                 $this->buttonParams['updateSuccessRedirectUrl'] . ' ' .
                 $this->buttonParams['actionTarget'] . ' ' .
-                $this->buttonParams['successNotificationTitle'] . ' ' .
-                $this->buttonParams['successNotificationMessage'] .
-            '" ' .
-            'id="' . $this->buttonParams['id'] . '" ' .
+            ' id="' . $this->buttonParams['id'] . '" ' .
             'data-toggle="tooltip" data-html="true" data-placement="' .
                 $this->buttonParams['tooltipPosition']. '" title="' .
                 $this->buttonParams['tooltipTitle'] . '" ' .
@@ -279,6 +264,7 @@ class Button extends AdminLTETags
             $this->buttonParams['modalButton'] .
             ' role="button">';
 
+            // var_dump($this->content);
             if ($this->buttonParams['icon'] !== '') {
                 if ($this->buttonParams['iconPosition'] === 'after') {
                     $this->content .=

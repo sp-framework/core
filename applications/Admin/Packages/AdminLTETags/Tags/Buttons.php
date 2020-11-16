@@ -38,7 +38,7 @@ class Buttons extends AdminLTETags
         try {
             $button = 'Applications\\Admin\\Packages\\AdminLTETags\\Tags\\Buttons\\' . ucfirst($this->params['buttonType']);
 
-            $this->content .= (new $button($this->view, $this->tag, $this->links, $this->params, $this->buttonParams))->getContent();
+            $this->content .= (new $button($this->view, $this->tag, $this->links, $this->escaper, $this->params, $this->buttonParams))->getContent();
 
         } catch (\Exception $e) {
             throw $e;

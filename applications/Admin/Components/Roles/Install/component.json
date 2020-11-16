@@ -1,0 +1,35 @@
+{
+    "name"          : "Roles",
+    "displayName"   : "Admin Roles Management",
+    "description"   : "Manage admin roles via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-roles",
+    "path"          : "/",
+    "type"          : "listing",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "application" : {
+            "name"      : "Admin",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/application-admin"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "roles"         : {
+            "title"     : "roles",
+            "icon"      : "sitemap",
+            "link"      : "roles"
+        }
+    },
+    "settings"          : {
+    }
+}

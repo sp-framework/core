@@ -1,10 +1,11 @@
 {
-    "name"          : "Filter",
-    "displayName"   : "Admin Filter Management",
-    "description"   : "Manage admin filters filter via this component",
+    "name"          : "Auth",
+    "displayName"   : "Admin Auth Management",
+    "description"   : "Manage admin auth via this component",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-admin-filter",
+    "repo"          : "https://github.com/h-w-f/component-admin-auth",
     "path"          : "/",
+    "type"          : "other",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -16,18 +17,8 @@
             "version"   : "0.0.1",
             "repo"      : "https://github.com/h-w-f/application-admin"
         },
-        "components"    :
-        [{
-            "name"      : "Filters",
-            "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/component-admin-filters"
-        }],
-        "packages"      :
-        [{
-            "name"      : "Filters",
-            "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/package-admin-filter"
-        }],
+        "components"    : [],
+        "packages"      : [],
         "middlewares"   : [],
         "views"         : []
     },

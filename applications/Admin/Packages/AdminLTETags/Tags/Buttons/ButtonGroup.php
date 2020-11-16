@@ -4,7 +4,7 @@ namespace Applications\Admin\Packages\AdminLTETags\Tags\Buttons;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
 
-class ButtonGroup extends AdminLTETags
+class ButtonGroup
 {
     protected $view;
 
@@ -12,13 +12,17 @@ class ButtonGroup extends AdminLTETags
 
     protected $links;
 
+    protected $escaper;
+
+    protected $adminLTETags;
+
+    protected $content;
+
     protected $params;
 
     protected $buttonParams = [];
 
-    protected $content;
-
-    public function __construct($view, $tag, $links, $params, $buttonParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $buttonParams)
     {
         $this->view = $view;
 
@@ -26,12 +30,14 @@ class ButtonGroup extends AdminLTETags
 
         $this->links = $links;
 
+        $this->escaper = $escaper;
+
+        $this->adminLTETags =
+            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
+
         $this->params = $params;
 
         $this->buttonParams = $buttonParams;
-
-        // $this->buildButtonParamsArr();
-
     }
 
     public function getContent()

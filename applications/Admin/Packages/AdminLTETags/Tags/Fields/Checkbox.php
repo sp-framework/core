@@ -24,9 +24,6 @@ class Checkbox
 
     public function __construct($view, $tag, $links, $escaper, $params, $fieldParams)
     {
-        $this->adminLTETags =
-            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
-
         $this->view = $view;
 
         $this->tag = $tag;
@@ -38,6 +35,9 @@ class Checkbox
         $this->params = $params;
 
         $this->fieldParams = $fieldParams;
+
+        $this->adminLTETags =
+            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
 
         $this->generateContent();
     }

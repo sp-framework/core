@@ -4,7 +4,7 @@ namespace Applications\Admin\Packages\AdminLTETags\Tags\Buttons;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
 
-class DatatableButtons extends AdminLTETags
+class DatatableButtons
 {
     protected $view;
 
@@ -12,17 +12,28 @@ class DatatableButtons extends AdminLTETags
 
     protected $links;
 
+    protected $escaper;
+
+    protected $adminLTETags;
+
+    protected $content;
+
     protected $params;
 
     protected $buttonParams = [];
 
-    public function __construct($view, $tag, $links, $params, $buttonParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $buttonParams)
     {
         $this->view = $view;
 
         $this->tag = $tag;
 
         $this->links = $links;
+
+        $this->escaper = $escaper;
+
+        $this->adminLTETags =
+            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
 
         $this->params = $params;
 
@@ -32,7 +43,7 @@ class DatatableButtons extends AdminLTETags
     public function getContent()
     {
         return
-            $this->useTag('buttons',
+            $this->adminLTETags->useTag('buttons',
                 [
                     'componentId'            => $this->params['componentId'],
                     'sectionId'              => $this->params['sectionId'],

@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Auth
 {
-    protected $key = 'id';
+    protected $key = null;
 
     protected $separator = '|';
 
@@ -42,14 +42,40 @@ class Auth
 
     public function logout()
     {
-        $this->users->clearUserRememberToken($this->user['id']);
+        $cookieKey = 'remember_' . $this->getKey();
 
-        $this->cookies->delete('remember');
+        if ($this->user) {
+            $this->clearUserRememberToken($cookieKey);
+        }
 
-        $this->session->remove($this->key);
-        $this->session->remove('_PHCOOKIE_remember');
+        if ($this->cookies->has($cookieKey)) {
+            $this->cookies->delete($cookieKey);
+        }
+
+        if ($this->session->has($this->key)) {
+            $this->session->remove($this->key);
+        }
+
+        if ($this->session->has('_PHCOOKIE_' . $cookieKey)) {
+            $this->session->remove('_PHCOOKIE_' . $cookieKey);
+        }
 
         return true;
+    }
+
+    protected function clearUserRememberToken($cookieKey)
+    {
+        $user = $this->user;
+
+        $user['remember_identifier'] = Json::decode($user['remember_identifier'], true);
+        unset($user['remember_identifier'][$cookieKey]);
+        $user['remember_identifier'] = Json::encode($user['remember_identifier']);
+
+        $user['remember_token'] = Json::decode($user['remember_token'], true);
+        unset($user['remember_token'][$cookieKey]);
+        $user['remember_token'] = Json::encode($user['remember_token']);
+
+        $this->users->update($user);
     }
 
     public function attempt($postData, $remember = false)
@@ -58,9 +84,9 @@ class Auth
 
         if ($this->user) {
 
-            $canLogins = Json::decode($this->user['can_login'], true);
+            $permissions = Json::decode($this->user['permissions'], true);
 
-            if (!$canLogins[$this->application['id']]) {//Not allowed for application
+            if (!$permissions[strtolower($this->application['name'])]) {//Not allowed for application
                 return false;
             }
 
@@ -90,22 +116,26 @@ class Auth
 
     public function setUserFromCookie()
     {
+        $cookieKey = 'remember_' . $this->getKey();
+
+        $userToken = Json::decode($this->user['remember_token'], true)[$cookieKey];
+
         list($identifier, $token) =
-            explode($this->separator, $this->cookies->get('remember')->getValue());
+            explode($this->separator, $this->cookies->get($cookieKey)->getValue());
 
         $identifierUser = $this->users->checkUserByIdentifier($identifier);
         if ($this->user !== $identifierUser) {
 
-            $this->cookies->delete('remember');
+            $this->cookies->delete($cookieKey);
 
             return;
         }
 
-        if (!$this->secTools->checkPassword($token, $this->user['remember_token'])) {
+        if (!$this->secTools->checkPassword($token, $userToken)) {
 
-            $this->users->clearUserRememberToken($this->user['id']);
+            $this->clearUserRememberToken($cookieKey);
 
-            $this->cookies->delete('remember');
+            $this->cookies->delete($cookieKey);
 
             throw new \Exception('Cannot set user from cookie');
         }
@@ -113,26 +143,27 @@ class Auth
 
     public function hasRecaller()
     {
-        return $this->cookies->has('remember');
+        return $this->cookies->has('remember' . $this->getKey());
     }
 
     protected function setRememberToken()
     {
+        $cookieKey = 'remember_' . $this->getKey();
         list($identifier, $token) = $this->recallerGenerate();
 
         $this->cookies->set(
-            'remember',
+            $cookieKey,
             $identifier . $this->separator . $token,
             time() + 86400
         );
 
-        $this->cookies->get('remember')->setOptions(['samesite'=>'strict']);
+        $this->cookies->get($cookieKey)->setOptions(['samesite'=>'strict']);
 
         $this->cookies->send();
 
-        $this->user['remember_identifier'] = $identifier;
+        $this->user['remember_identifier'] = Json::encode([$cookieKey => $identifier]);
 
-        $this->user['remember_token'] = $this->secTools->hashPassword($token);
+        $this->user['remember_token'] = Json::encode([$cookieKey => $this->secTools->hashPassword($token)]);
 
         $this->users->update($this->user);
     }
@@ -154,12 +185,26 @@ class Auth
 
     public function hasUserInSession()
     {
-        return $this->session->has($this->key);
+        return $this->session->has($this->getKey());
+    }
+
+    protected function getKey()
+    {
+        if (!$this->key) {
+            $this->setKey();
+        }
+
+        return $this->key;
+    }
+
+    protected function setKey()
+    {
+        $this->key = strtolower($this->application['name']);
     }
 
     public function setUserFromSession()
     {
-        $this->user = $this->users->getById($this->session->get($this->key));
+        $this->user = $this->users->getById($this->session->get($this->getKey()));
 
         if (!$this->user) {
             throw new \Exception('User not found in session');
@@ -168,7 +213,7 @@ class Auth
 
     protected function setUserSession()
     {
-        $this->session->set($this->key, $this->user['id']);
+        $this->session->set($this->getKey(), $this->user['id']);
     }
 
     public function generateNewPassword($complexity = 1, $length = 6)

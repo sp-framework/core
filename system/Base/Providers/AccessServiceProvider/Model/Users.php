@@ -24,9 +24,9 @@ class Users extends BaseModel
     public $password;
 
     /**
-     * @Column(column="can_login", type="string", length=50)
+     * @Column(column="permissions", type="string", length=2048)
      */
-    public $can_login;
+    public $permissions;
 
     /**
      * @Column(column="version", type="string", length=15)

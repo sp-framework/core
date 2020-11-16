@@ -10,7 +10,7 @@ class FiltersComponent extends BaseComponent
     public function viewAction()
     {
         // var_dump($this->events);
-        $this->view->disable();
+        // $this->view->disable();
         $this->generateDTContent(Filters::class, 'filters/view');
     }
 }

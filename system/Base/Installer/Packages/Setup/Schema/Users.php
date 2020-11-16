@@ -37,10 +37,10 @@ class Users
                         ]
                     ),
                     new Column(
-                        'can_login',
+                        'permissions',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
+                            'size'    => 2048,
                             'notNull' => true,
                         ]
                     ),
@@ -48,7 +48,7 @@ class Users
                         'remember_identifier',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'size'    => 65535,
                             'notNull' => false,
                         ]
                     ),
@@ -56,7 +56,7 @@ class Users
                         'remember_token',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'size'    => 65535,
                             'notNull' => false,
                         ]
                     )

@@ -64,11 +64,6 @@ class Input
             $this->params['fieldInputType'] :
             'text';
 
-        $this->fieldParams['fieldValue'] =
-            isset($this->params['fieldValue']) ?
-            $this->params['fieldValue'] :
-            '';
-
         /*  fieldInputTypeTextFilter (Works with JS)
             available options:      int (only numbers can be negative),
                                     positiveInt (only positive numbers),

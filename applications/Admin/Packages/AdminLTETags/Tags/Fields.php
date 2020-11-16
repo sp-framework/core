@@ -61,15 +61,12 @@ class Fields extends AdminLTETags
         if (!isset($this->params['componentId']) ||
             !isset($this->params['sectionId'])
         ) {
-            $this->content .=
-                '<span class="text-uppercase text-danger">componentId or sectionId missing</span>';
+            throw new \Exception('componentId or sectionId missing');
             return;
         }
 
         if (!isset($this->params['fieldId'])) {
-            $this->content .=
-                '<span class="text-uppercase text-danger">fieldId missing</span>';
-            return;
+            throw new \Exception('fieldId missing');
         }
 
         $this->fieldParams['idChain'] = $this->params['componentId'] . '-' . $this->params['sectionId'];
@@ -170,7 +167,7 @@ class Fields extends AdminLTETags
 
         $this->fieldParams['fieldBazScan'] =
             isset($this->params['fieldBazScan']) && $this->params['fieldBazScan'] === true ?
-            'data-bazScanType="' . $this->params['fieldType'] . '"' :
+            'data-bazscantype="' . $this->params['fieldType'] . '"' :
             '';
 
         $this->fieldParams['fieldDataInputMinNumber'] =
@@ -220,5 +217,10 @@ class Fields extends AdminLTETags
         } else {
             $this->fieldParams['fieldDataAttributes'] = '';
         }
+
+        $this->fieldParams['fieldValue'] =
+            isset($this->params['fieldValue']) ?
+            $this->params['fieldValue'] :
+            '';
     }
 }

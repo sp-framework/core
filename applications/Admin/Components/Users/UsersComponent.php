@@ -10,13 +10,15 @@ class UsersComponent extends BaseComponent
     {
         $users = $this->users->init();
 
-        $actions =
+        $controlActions =
             [
-                'view'      => 'user',
-                'edit'      => 'user/edit',
-                'remove'    => 'user/remove'
+                'actionsToEnable'       =>
+                [
+                    'edit'      => 'user',
+                    'remove'    => 'user/remove'
+                ]
             ];
 
-        $this->generateDTContent($users, 'users/view', null, [], true, [], $actions);
+        $this->generateDTContent($users, 'users/view', null, ['email'], true, ['email'], $controlActions, null, null, 'email');
     }
 }

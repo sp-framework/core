@@ -50,6 +50,16 @@ abstract class BaseComponent extends Controller
 			$this->modules->components->getNamedComponentForApplication(
 				$this->componentName, $this->application['id']
 			);
+
+		if (!$this->isJson() || $this->request->isAjax()) {
+			$this->viewSettings = json_decode($this->views['settings'], true);
+
+			$this->setDefaultViewData();
+
+			$this->checkLayout();
+
+			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
+		}
 	}
 
 	protected function setDefaultViewData()
@@ -118,16 +128,8 @@ abstract class BaseComponent extends Controller
 		}
 
 		if (!$this->isJson() || $this->request->isAjax()) {
-			$this->viewSettings = json_decode($this->views['settings'], true);
-
-			$this->checkLayout();
-
 			$this->view->menus =
 				$this->modules->menus->getMenusForApplication($this->application['id']);
-
-			$this->setDefaultViewData();
-
-			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 		}
 	}
 
@@ -455,16 +457,30 @@ abstract class BaseComponent extends Controller
 		array $columnsForTable = [],
 		$withFilter = true,
 		array $columnsForFilter = [],
-		array $controlActions = null
+		array $controlActions = null,
+		array $dtReplaceColumnsTitle = null,
+		array $dtReplaceColumns = null,
+		string $dtNotificationTextFromColumn = null
 	)
 	{
 		if (gettype($package) === 'string') {
 			$package = $this->usePackage($package);
 		}
 
+		if (count($columnsForTable) > 0) {
+			$columnsForTable = array_merge($columnsForTable, ['id']);
+			$columnsForFilter = array_merge($columnsForFilter, ['id']);
+		}
+
 		if ($this->request->isGet()) {
+
 			$table = [];
 			$table['columns'] = $package->getModelsColumnMap($columnsForTable);
+			if ($dtReplaceColumnsTitle && count($dtReplaceColumnsTitle) > 0) {
+				foreach ($dtReplaceColumnsTitle as $dtReplaceColumnsTitleKey => $dtReplaceColumnsTitleValue) {
+					$table['columns'][$dtReplaceColumnsTitleKey]['name'] = $dtReplaceColumnsTitleValue;
+				}
+			}
 			$table['filterColumns'] = $package->getModelsColumnMap($columnsForFilter);
 			$table['postUrl'] = $this->links->url($postUrl);
 			$table['component'] = $this->component;
@@ -494,7 +510,6 @@ abstract class BaseComponent extends Controller
 			$this->view->table = $table;
 
 		} else if ($this->request->isPost()) {
-
 			$pagedData =
 				$package->getPaged(
 					[
@@ -509,8 +524,17 @@ abstract class BaseComponent extends Controller
 				foreach($rows as &$row) {
 					$actions = [];
 
-					foreach ($controlActions as $key => &$action) {
-						$actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+					foreach ($controlActions['actionsToEnable'] as $key => &$action) {
+						if (isset($controlActions['disableActionsForIds']) &&
+							is_array($controlActions['disableActionsForIds']) &&
+							count($controlActions['disableActionsForIds']) > 0
+						) {
+							if (!in_array($row['id'], $controlActions['disableActionsForIds'])) {
+								$actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+							}
+						} else {
+							$actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+						}
 					}
 
 					$row["__control"] = $actions;
@@ -524,9 +548,10 @@ abstract class BaseComponent extends Controller
 					[
 						'componentId'                   => $this->view->componentId,
 						'dtRows'                        => $rows,
-						'dtNotificationTextFromColumn'  => 'email',
+						'dtNotificationTextFromColumn'  => $dtNotificationTextFromColumn,
 						'dtPagination'                  => true,
-						'dtPaginationCounters'          => $package->packagesData->paginationCounters
+						'dtPaginationCounters'          => $package->packagesData->paginationCounters,
+						'dtReplaceColumns'				=> $dtReplaceColumns
 					]
 				);
 		}

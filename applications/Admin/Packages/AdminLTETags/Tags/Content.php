@@ -70,16 +70,21 @@ class Content extends AdminLTETags
     {
         $sectionForm = '';
 
+        $this->params['cardFooterContent'] =
+            $this->useTag('buttons',
+                [
+                    'componentId'            => $this->params['componentId'],
+                    'sectionId'              => $this->params['sectionId'],
+                    'buttonLabel'            => false,
+                    'buttonType'             => 'sectionWithFormButtons',
+                    'formButtons'            => $this->params['formButtons']
+                ]
+            );
+
         $sectionForm .=
-            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] .
-            '" class="sectionWithForm">
-                <form data-validateon="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] .
-            '-form">
-                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-fieldset">' .
-                        $this->useTag('card', $this->params) .
-                    '</fieldset>
-                </form>
-            </section>';
+            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '" class="sectionWithForm">' .
+                $this->useTag('card', $this->params) .
+            '</section>';
 
         $sectionForm .=
             '<script>

@@ -41,8 +41,8 @@ class LoginComponent extends BaseComponent
 
     protected function validateData()
     {
-        $this->validation->add('user', PresenceOf::class, ["message" => "Please enter a username."]);
-        $this->validation->add('pass', PresenceOf::class, ["message" => "Please enter a password."]);
+        $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+        $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
 
         $validated = $this->validation->validate($this->postData())->jsonSerialize();
 

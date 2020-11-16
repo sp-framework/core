@@ -393,7 +393,7 @@
                     }
                     thisFieldId = fieldId;
                     fieldId = document.getElementById(fieldId);
-                    maxLength(fieldId, options);
+                    maxLength(thisFieldId, options);
                     if (options.afterInit) {
                         options.afterInit(dataCollection);
                     }

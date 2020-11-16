@@ -6,6 +6,7 @@ use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
 use System\Base\Providers\AccessServiceProvider\Acl;
 use System\Base\Providers\AccessServiceProvider\Auth;
+use System\Base\Providers\AccessServiceProvider\Roles;
 use System\Base\Providers\AccessServiceProvider\Users;
 
 class AccessServiceProvider implements ServiceProviderInterface
@@ -16,6 +17,13 @@ class AccessServiceProvider implements ServiceProviderInterface
             'users',
             function () {
                 return (new Users())->init();
+            }
+        );
+
+        $container->setShared(
+            'roles',
+            function () {
+                return (new Roles())->init();
             }
         );
 

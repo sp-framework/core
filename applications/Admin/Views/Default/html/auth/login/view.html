@@ -51,7 +51,6 @@ BazCore.header({
                             'fieldLabel'                            : false,
                             'fieldType'                             : 'checkbox',
                             'fieldCheckboxType'                     : 'success',
-                            'fieldCheckboxInline'                   : true,
                             'fieldCheckboxLabel'                    : 'Remember',
                             'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase',
                             'fieldBazScan'                          : true
@@ -64,11 +63,11 @@ BazCore.header({
                             </a>
                         </div>
                         <div class="col">
-                            <a id="{{componentId}}-form-submit" type="submit" class="btn btn-info float-right">
+                            <button id="{{componentId}}-form-submit" type="button" class="btn btn-info float-right">
                                 <i class="fa fa-cog fa-spin login-spinner" hidden></i>
                                 <span class="sr-only">Loading...</span>
                                 <span class="text-uppercase">Login</span>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </form>

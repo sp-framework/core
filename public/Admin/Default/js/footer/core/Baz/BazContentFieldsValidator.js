@@ -136,6 +136,8 @@ var BazContentFieldsValidator = function() {
 
     //Validate Sections on Submit
     function validateForm(componentId, sectionId, onSuccess, type, preValidated, formId) {
+        //eslint-disable-next-line
+        console.log(componentId, sectionId, onSuccess, type, preValidated, formId);
         if (!preValidated) {
             formValid = false;
             if (type === 'component') {

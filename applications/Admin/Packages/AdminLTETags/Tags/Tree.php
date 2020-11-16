@@ -16,14 +16,25 @@ class Tree extends AdminLTETags
 
     public function getContent(array $treeParams)
     {
-        $this->treeMode = $treeParams['treeMode'];
-
         $this->fieldParams =
             isset($treeParams['fieldParams']) ?
             $treeParams['fieldParams'] :
             null;
 
-        $this->generateContent($treeParams['treeData']);
+        if (isset($treeParams['treeMode'])) {
+            $this->treeMode = $treeParams['treeMode'];
+        } else {
+            throw new \Exception('treeMode not set.');
+        }
+        if ($treeParams['treeMode'] === 'jstree') {
+            $this->generateContent(
+                $treeParams['treeData'],
+                $treeParams['groupIcon'],
+                $treeParams['itemIcon']
+            );
+        } else {
+            $this->generateContent($treeParams['treeData']);
+        }
 
         return $this->content;
     }
@@ -33,31 +44,28 @@ class Tree extends AdminLTETags
         return $this->childsContent;
     }
 
-    protected function generateContent(array $treeData)
+    protected function generateContent(array $treeData, string $groupIcon = null, string $itemIcon = null)
     {
         foreach ($treeData as $key => $items) {
-            if (isset($items['children'])) {
-                if ($items['children'] === true) {
+            if (isset($items['children']) && $items['children'] === true) {
+                $this->childsContent = '';
 
-                    $this->childsContent = '';
-
-                    if (isset($items['childs'])) {
-                        $this->childsContent .= $this->treeGroup($key, $items);
-                    } else {
-                        $this->childsContent .= $this->treeItem($key, $items);
-                    }
+                if (isset($items['childs'])) {
+                    $this->childsContent .= $this->treeGroup($key, $items, $groupIcon, $itemIcon);
+                } else {
+                    $this->childsContent .= $this->treeItem($key, $items, $itemIcon);
                 }
             } else {
                 if (isset($items['childs'])) {
-                    $this->content .= $this->treeGroup($key, $items);
+                    $this->content .= $this->treeGroup($key, $items, $groupIcon, $itemIcon);
                 } else {
-                    $this->content .= $this->treeItem($key, $items);
+                    $this->content .= $this->treeItem($key, $items, $itemIcon);
                 }
             }
         }
     }
 
-    protected function treeGroup($key, $items)
+    protected function treeGroup($key, $items, $groupIcon, $itemIcon)
     {
         if ($this->treeMode === 'jstree') {
             $groupAdditionalClass =
@@ -65,44 +73,47 @@ class Tree extends AdminLTETags
                 'class="' . $items['groupAdditionalClass'] . '"' :
                 '';
 
-            $groupIcon =
-                isset($items['groupIcon']) ?
-                $items['groupIcon'] :
+            $itemsId =
+                isset($items['id']) ?
+                $items['id'] :
                 '';
 
             $this->content .=
-                '<li ' . $groupAdditionalClass . ' data-id="' . $items['id'] . '" data-jstree="' . $groupIcon . '">';
+                '<li ' . $groupAdditionalClass . ' data-id="' . $itemsId . '" data-jstree=\'' . $groupIcon . '\'>';
 
-            if (isset($items['title'])) {
-                $this->content .= $items['title'];
-            } else if (isset($items['name'])) {
-                $this->content .= $items['name'];
-            } else if (isset($items['entry'])) {
-                $this->content .= $items['entry'];
-            }
+                if (isset($items['title'])) {
+                    $this->content .= $items['title'];
+                } else if (isset($items['name'])) {
+                    $this->content .= $items['name'];
+                } else if (isset($items['entry'])) {
+                    $this->content .= $items['entry'];
+                }
 
-            $this->contnet .=
-                '<ul>';
+                $this->content .=
+                    '<ul>';
 
-            if (isset($items['childs'])) {
-                $this->generateContent(
-                    'select2',
-                    [
-                        'treeData' => $items['childs'],
-                        'children' => true
-                    ]
-                );
+                if (isset($items['childs'])) {
+                    $this->generateContent(
+                        [
+                            'treeData' => $items['childs'],
+                            'children' => true
+                        ],
+                        $groupIcon,
+                        $itemIcon
+                    );
 
-                $this->content .= $this->getChildsContent();
-            }
+                    $this->content .= $this->getChildsContent();
+                }
 
-            $this->contnet .=
-                '</ul>';
+                $this->content .=
+                    '</ul>';
 
-            $this->contnet .=
+            $this->content .=
                 '</li>';
+
         } else if ($this->treeMode === 'sideMenu') {
-            $icon =
+
+            $itemIcon =
                 isset($items['icon']) ?
                 $items['icon'] :
                 'circle';
@@ -110,15 +121,14 @@ class Tree extends AdminLTETags
             $this->content .=
                 '<li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
-                        <i class="fas fa-fw fa-' . $icon . ' nav-icon"></i>
+                        <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
                     <p class="text-uppercase">' . $key . '
-                        <i class="right fas fa-angle-left"></i>
+                        <i class="right fa fa-angle-left"></i>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">';
 
                 $this->generateContent(
-                    'sideMenu',
                     [
                         'treeData' => $items['childs'],
                         'children' => true
@@ -137,7 +147,6 @@ class Tree extends AdminLTETags
             }
 
             $this->generateContent(
-                'select2',
                 [
                     'treeData' => $items['childs'],
                     'children' => true
@@ -153,7 +162,7 @@ class Tree extends AdminLTETags
         }
     }
 
-    protected function treeItem($key, $items)
+    protected function treeItem($key, $items, $itemIcon)
     {
         $itemAdditionalClass =
             isset($items['itemAdditionalClass']) ?
@@ -161,29 +170,51 @@ class Tree extends AdminLTETags
             '';
 
         if ($this->treeMode === 'jstree') {
-            if ($items['type'] === 'pdf') {
-                $itemIcon = '{"icon" : "fas fa-fw fa-file-pdf text-sm"}';
-            } else if ($items['type'] === 'jpg' || $items['type'] === 'png') {
-                $itemIcon = '{"icon" : "fas fa-fw fa-file-image text-sm"}';
-            } else {
-                $itemIcon = '';
-            }
-            $this->content .=
-                '<li class="' . $itemAdditionalClass . '" data-id="' . $items['id'] . '" data-file-type="' . $items['type'] . '" data-jstree="' . $itemIcon . '">';
+            if (is_array($items)) {
+                foreach ($items as $itemKey => $itemValue) {
+                    $itemId =
+                        isset($itemValue['id']) ?
+                        $itemValue['id'] :
+                        '';
 
-                if (isset($items['title'])) {
-                    $this->content .= $items['title'];
-                } else if (isset($items['name'])) {
-                    $this->content .= $items['name'];
-                } else if (isset($items['entry'])) {
-                    $this->content .= $items['entry'];
+                    if (isset($itemValue['type']) &&
+                        $itemValue['type'] === 'pdf'
+                    ) {
+
+                        $itemType = $itemValue['type'];
+                        $itemIcon = "{'icon' : 'fa fa-fw fa-file-pdf text-sm'}";
+
+                    } else if ((isset($itemValue['type']) && $itemValue['type'] === 'jpg') ||
+                               (isset($itemValue['type']) && $itemValue['type'] === 'png')
+                    ) {
+
+                        $itemType = $itemValue['type'];
+                        $itemIcon = "{'icon' : 'fa fa-fw fa-file-image text-sm'}";
+
+                    } else {
+
+                        $itemType = '';
+                    }
+
+                    $this->content .=
+                        '<li class="' . $itemAdditionalClass . '" data-id="' . $itemId . '" data-file-type="' . $itemType . '" data-jstree=\'' . $itemIcon . '\'>';
+
+                        if (isset($itemValue['title'])) {
+                            $this->content .= $itemValue['title'];
+                        } else if (isset($itemValue['name'])) {
+                            $this->content .= $itemValue['name'];
+                        } else if (isset($itemValue['entry'])) {
+                            $this->content .= $itemValue['entry'];
+                        }
+
+                    $this->content .= '</li>';
                 }
 
-            $this->content .= '</li>';
+            }
 
         } else if ($this->treeMode === 'sideMenu') {
 
-            $icon =
+            $itemIcon =
                 isset($items['icon']) ?
                 $items['icon'] :
                 'circle';
@@ -191,7 +222,7 @@ class Tree extends AdminLTETags
             $this->content .=
                 '<li class="nav-item">
                     <a class="nav-link contentAjaxLink" href="' . $this->links->url($items['link']) . '">
-                        <i class="fas fa-fw fa-' . $icon . ' nav-icon"></i>
+                        <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
                         <p class="text-uppercase">';
 
             if (isset($items['title'])) {
@@ -256,7 +287,7 @@ class Tree extends AdminLTETags
                 // } else {
                 //     $numeric = '';
                 // }
-                if ($itemKey === $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
+                if ($itemKey == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
                     $this->content .=
                         '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . ucfirst($value) . '</option>';
                 } else {

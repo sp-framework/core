@@ -5,6 +5,7 @@
     "version"       : "0.0.1",
     "repo"          : "https://github.com/h-w-f/component-admin-user",
     "path"          : "/",
+    "type"          : "crud",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",

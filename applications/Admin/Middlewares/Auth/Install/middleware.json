@@ -5,7 +5,7 @@
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/middleware-admin-auth",
 	"path"			: "/",
-	"class"			: "Middlewares\\Admin\\Auth",
+	"class"			: "Applications\\Admin\\Middlewares\\Auth",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

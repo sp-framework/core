@@ -5,7 +5,7 @@
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/middleware-admin-modules",
 	"path"			: "/",
-	"class"			: "Middlewares\\Admin\\Modules",
+	"class"			: "Applications\\Admin\\Middlewares\\Mdoules",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

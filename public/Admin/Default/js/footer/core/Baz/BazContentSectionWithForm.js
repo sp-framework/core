@@ -63,13 +63,23 @@
                     dataCollection[componentId][sectionId] = { };
                 }
 
+                if (!dataCollection[componentId][sectionId]['data']) {
+                    dataCollection[componentId][sectionId]['data'] = { };
+                }
+                if (!dataCollection[componentId][sectionId]['dataToSubmit']) {
+                    dataCollection[componentId][sectionId]['dataToSubmit'] = { };
+                }
+
                 $(this._element).BazContentFields();
+
                 BazContentFieldsValidator.initValidator({
                     'componentId'   : componentId,
                     'sectionId'     : sectionId,
                     'on'            : 'section'
                 });
+
                 this._initSectionButtonsAndActions();
+
                 if (options.task === 'validateForm') {
                     this._validateForm(options.buttonId);
                 }
@@ -78,13 +88,12 @@
                 }
             };
 
-            _proto._validateForm = function _validateForm(thisButtonId) {
+            _proto._validateForm = function _validateForm() {
                 var validated = BazContentFieldsValidator.validateForm({
-                    'componentId'     : $(thisButtonId).parents('.component')[0].id,
-                    'sectionId'       : $(thisButtonId).parents('.sectionWithForm')[0].id,
-                    'task'            : 'validateForm',
+                    'componentId'     : componentId,
+                    'sectionId'       : sectionId,
                     'onSuccess'       : false,
-                    'type'            : 'sections',
+                    'type'            : 'section',
                     'preValidated'    : false,
                     'formId'          : null
                 });
@@ -92,16 +101,23 @@
             };
 
             _proto._initSectionButtonsAndActions = function _initSectionButtonsAndActions() {
-                $('#' + sectionId + ' .card-footer button.methodPost').each(function(index,button) {
-                    $(button).click(function(e) {
-                        e.preventDefault();
-                        if (that._validateForm(this)) {
-                            $(this).attr('disabled', true);
-                            that._runAjax(this, $(this).attr('actionurl'), $.param(that._sectionToObj()));
-                        }
-                    });
+
+                if ($('#' + sectionId + '-id').val() === '') {
+                    $('#' + sectionId + ' .card-footer button.addData').attr('hidden', false);
+                    $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
+                } else if ('#' + sectionId + ' .card-footer button.updateData') {
+                    $('#' + sectionId + ' .card-footer button.updateData').attr('hidden', false);
+                    $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
+                }
+
+                $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').click(function(e) {
+                    e.preventDefault();
+                    if (that._validateForm()) {
+                        $(this).attr('disabled', true);
+                        that._runAjax(this, $(this).attr('actionurl'), $.param(that._sectionToObj()));
+                    }
                 });
-            };
+            }
 
             _proto._runAjax = function _runAjax(thisButtonId, url, dataToSubmit) {
                 $.ajax({
@@ -110,11 +126,9 @@
                     'method'        : 'post',
                     'dataType'      : 'json',
                     'success'       : function(data) {
-                                        if (data.status === 0) {
-                                            PNotify.removeAll();
+                                        if (data.responseCode == '0') {
                                             PNotify.success({
-                                                title   : decodeURI($(thisButtonId).data('notificationtitle')),
-                                                text    : decodeURI($(thisButtonId).data('notificationmessage'))
+                                                title   : data.responseMessage,
                                             });
                                             if ($(thisButtonId).data('actiontarget') === 'mainContent') {
                                                 BazContentLoader.loadAjax($(thisButtonId), {
@@ -142,11 +156,8 @@
                                                 $(thisButtonId).attr('disabled', false);
                                             }
                                         } else {
-                                            PNotify.removeAll();
-                                            // Instead of error, something like contact BAZ link can be shown which can be diverted to form.
                                             PNotify.error({
-                                                title   : 'Error!',
-                                                text    : 'Contact Administrator'
+                                                title   : data.responseMessage
                                             });
                                         }
                                     }
@@ -279,16 +290,30 @@
                 //      });
                 // }
                 if (dataCollection[componentId][sectionId].data.id === '') {//Create
+                    var dataToSubmit;
+
                     $('#' + sectionId).find('[data-bazpostoncreate=true]').each(function() {
                         stripComponentId = $(this)[0].id.split('-');
                         stripComponentId = stripComponentId[stripComponentId.length - 1];
-                        dataCollection[componentId][sectionId]['dataToSubmit'][stripComponentId] = dataCollection[componentId][sectionId].data[stripComponentId];
+                        if (typeof dataCollection[componentId][sectionId].data[stripComponentId] === 'object' ||
+                            $.isArray(dataCollection[componentId][sectionId].data[stripComponentId])) {
+                            dataToSubmit = JSON.stringify(dataCollection[componentId][sectionId].data[stripComponentId]);
+                        } else {
+                            dataToSubmit = dataCollection[componentId][sectionId].data[stripComponentId];
+                        }
+                        dataCollection[componentId][sectionId]['dataToSubmit'][stripComponentId] = dataToSubmit;
                     });
                 } else {//Edit
                     $('#' + sectionId).find('[data-bazpostonupdate=true]').each(function() {
                         stripComponentId = $(this)[0].id.split('-');
                         stripComponentId = stripComponentId[stripComponentId.length - 1];
-                        dataCollection[componentId][sectionId]['dataToSubmit'][stripComponentId] = dataCollection[componentId][sectionId].data[stripComponentId];
+                        if (typeof dataCollection[componentId][sectionId].data[stripComponentId] === 'object' ||
+                            $.isArray(dataCollection[componentId][sectionId].data[stripComponentId])) {
+                            dataToSubmit = JSON.stringify(dataCollection[componentId][sectionId].data[stripComponentId]);
+                        } else {
+                            dataToSubmit = dataCollection[componentId][sectionId].data[stripComponentId];
+                        }
+                        dataCollection[componentId][sectionId]['dataToSubmit'][stripComponentId] = dataToSubmit;
                     });
                 }
                 return dataCollection[componentId][sectionId]['dataToSubmit'];
