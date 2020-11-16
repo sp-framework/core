@@ -33,12 +33,11 @@ class Menus extends BasePackage
 
         foreach (msort($this->menus, 'sequence') as $key => $menu) {
             $menu = Json::decode($menu['menu'], true);
-
             if ($menu) {
-                $buildMenu = array_merge_recursive($buildMenu, $menu);
+                $buildMenu = array_replace_recursive($buildMenu, $menu);
             }
         }
-
+        // var_dump($buildMenu);
         $this->cacheTools->setCache('menus', $buildMenu);
 
         return $buildMenu;

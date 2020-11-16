@@ -47,13 +47,13 @@ class Tree extends AdminLTETags
     protected function generateContent(array $treeData, string $groupIcon = null, string $itemIcon = null)
     {
         foreach ($treeData as $key => $items) {
-            if (isset($items['children']) && $items['children'] === true) {
+            if (isset($treeData['children']) && $treeData['children'] === true) {
                 $this->childsContent = '';
 
                 if (isset($items['childs'])) {
-                    $this->childsContent .= $this->treeGroup($key, $items, $groupIcon, $itemIcon);
+                    $this->childsContent .= $this->treeGroup($key, $items, $groupIcon, $itemIcon, true);
                 } else {
-                    $this->childsContent .= $this->treeItem($key, $items, $itemIcon);
+                    $this->childsContent .= $this->treeItem($key, $items, $itemIcon, true);
                 }
             } else {
                 if (isset($items['childs'])) {
@@ -65,7 +65,7 @@ class Tree extends AdminLTETags
         }
     }
 
-    protected function treeGroup($key, $items, $groupIcon, $itemIcon)
+    protected function treeGroup($key, $items, $groupIcon, $itemIcon, $children = null)
     {
         if ($this->treeMode === 'jstree') {
             $groupAdditionalClass =
@@ -112,17 +112,21 @@ class Tree extends AdminLTETags
                 '</li>';
 
         } else if ($this->treeMode === 'sideMenu') {
-
             $itemIcon =
                 isset($items['icon']) ?
                 $items['icon'] :
                 'circle';
 
+            $itemTitle =
+                isset($items['title']) ?
+                $items['title'] :
+                $key;
+
             $this->content .=
                 '<li class="nav-item has-treeview">
                     <a href="#" class="nav-link">
                         <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
-                    <p class="text-uppercase">' . $key . '
+                    <p class="text-uppercase">' . $itemTitle . '
                         <i class="right fa fa-angle-left"></i>
                     </p>
                 </a>
@@ -162,7 +166,7 @@ class Tree extends AdminLTETags
         }
     }
 
-    protected function treeItem($key, $items, $itemIcon)
+    protected function treeItem($key, $items, $itemIcon, $children = null)
     {
         $itemAdditionalClass =
             isset($items['itemAdditionalClass']) ?
@@ -213,27 +217,57 @@ class Tree extends AdminLTETags
             }
 
         } else if ($this->treeMode === 'sideMenu') {
+            if (is_array($items)) {
+                if (!$children) {
+                    $itemIcon =
+                        isset($items['icon']) ?
+                        $items['icon'] :
+                        'circle';
 
-            $itemIcon =
-                isset($items['icon']) ?
-                $items['icon'] :
-                'circle';
+                    $this->content .=
+                        '<li class="nav-item">
+                            <a class="nav-link contentAjaxLink" href="' . $this->links->url($items['link']) . '">
+                                <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
+                                <p class="text-uppercase">';
 
-            $this->content .=
-                '<li class="nav-item">
-                    <a class="nav-link contentAjaxLink" href="' . $this->links->url($items['link']) . '">
-                        <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
-                        <p class="text-uppercase">';
+                    if (isset($items['title'])) {
+                        $this->content .= $items['title'];
+                    } else if (isset($items['name'])) {
+                        $this->content .= $items['name'];
+                    } else if (isset($items['entry'])) {
+                        $this->content .= $items['entry'];
+                    }
 
-            if (isset($items['title'])) {
-                $this->content .= $items['title'];
-            } else if (isset($items['name'])) {
-                $this->content .= $items['name'];
-            } else if (isset($items['entry'])) {
-                $this->content .= $items['entry'];
+                    $this->content .= '</p></a></li>';
+                } else if ($children) {
+                    foreach ($items as $itemKey => $itemValue) {
+                        if (isset($itemValue['childs'])) {
+                            $this->content .= $this->treeGroup($itemKey, $itemValue, null, null, null);
+                        } else {
+                            $itemIcon =
+                                isset($itemValue['icon']) ?
+                                $itemValue['icon'] :
+                                'circle';
+
+                            $this->content .=
+                                '<li class="nav-item">
+                                    <a class="nav-link contentAjaxLink" href="' . $this->links->url($itemValue['link']) . '">
+                                        <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
+                                        <p class="text-uppercase">';
+
+                            if (isset($itemValue['title'])) {
+                                $this->content .= $itemValue['title'];
+                            } else if (isset($itemValue['name'])) {
+                                $this->content .= $itemValue['name'];
+                            } else if (isset($itemValue['entry'])) {
+                                $this->content .= $itemValue['entry'];
+                            }
+
+                            $this->content .= '</p></a></li>';
+                        }
+                    }
+                }
             }
-
-            $this->content .= '</p></a></li>';
 
         } else if ($this->treeMode === 'select' || $this->treeMode === 'select2') {
             if ($this->treeMode === 'select') {
@@ -298,3 +332,5 @@ class Tree extends AdminLTETags
         }
     }
 }
+// 3 layer Menu Example
+// {"users":{"title":"users","icon":"users","childs":{"accounts":{"title":"accounts","childs":{"account":{"title":"account","link":"account"}}}}}}

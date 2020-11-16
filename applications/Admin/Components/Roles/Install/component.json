@@ -23,11 +23,15 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 3,
-        "roles"         : {
-            "title"     : "roles",
-            "icon"      : "sitemap",
-            "link"      : "roles"
+        "accounts"      : {
+            "title"     : "accounts",
+            "icon"      : "users",
+            "childs"    : {
+                "roles" : {
+                    "title"     : "roles",
+                    "link"      : "roles"
+                }
+            }
         }
     },
     "settings"          : {
