@@ -3,6 +3,8 @@
 namespace System\Base\Providers\AccessServiceProvider;
 
 use Phalcon\Helper\Json;
+use Phalcon\Validation\Validator\PresenceOf;
+use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 class Auth
 {
@@ -22,7 +24,11 @@ class Auth
 
     protected $secTools;
 
-    public function __construct($session, $cookies, $users, $applications, $secTools)
+    protected $validation;
+
+    public $packagesData;
+
+    public function __construct($session, $cookies, $users, $applications, $secTools, $validation)
     {
         $this->session = $session;
 
@@ -33,6 +39,10 @@ class Auth
         $this->application = $applications->getApplicationInfo();
 
         $this->secTools = $secTools;
+
+        $this->validation = $validation;
+
+        $this->packagesData = new PackagesData;
     }
 
     public function init()
@@ -80,22 +90,43 @@ class Auth
 
     public function attempt($postData, $remember = false)
     {
+        $validate = $this->validateData($postData);
+
+        if ($validate !== true) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = $validate;
+
+            return false;
+        }
+
         $this->user = $this->users->checkUserByEmail($postData['user']);
 
         if ($this->user) {
 
             $permissions = Json::decode($this->user['permissions'], true);
 
-            if (!$permissions[strtolower($this->application['name'])]) {//Not allowed for application
+            if (!$permissions[strtolower($this->application['name'])]['login']) {//Not allowed for application
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+
                 return false;
             }
 
             if (!$this->secTools->checkPassword($postData['pass'], $this->user['password'])) {//Password Fail
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+
                 return false;
             }
         } else {
             $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the user exists.
 
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
             return false;
         }
 
@@ -111,6 +142,10 @@ class Auth
             $this->setRememberToken();
         }
 
+        $this->packagesData->responseCode = 0;
+
+        $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
+
         return true;
     }
 
@@ -124,6 +159,7 @@ class Auth
             explode($this->separator, $this->cookies->get($cookieKey)->getValue());
 
         $identifierUser = $this->users->checkUserByIdentifier($identifier);
+
         if ($this->user !== $identifierUser) {
 
             $this->cookies->delete($cookieKey);
@@ -216,17 +252,41 @@ class Auth
         $this->session->set($this->getKey(), $this->user['id']);
     }
 
-    public function generateNewPassword($complexity = 1, $length = 6)
+    public function loginPermit()
     {
-        // return substr(str_shuffle($this->setPasswordComplexityChars($complexity)), 0, $length);
+        var_dump($this->user);
+        return false;
     }
+    // public function generateNewPassword($complexity = 1, $length = 6)
+    // {
+            // return substr(str_shuffle($this->setPasswordComplexityChars($complexity)), 0, $length);
+    // }
 
-    public function checkAdminUser()
+    // public function checkAdminUser()
+    // {
+    //     if ($this->userProvider->getByCompanyId()) {
+    //         return false;
+    //     }
+
+    //     return true;
+    // }
+
+    protected function validateData(array $data)
     {
-        if ($this->userProvider->getByCompanyId()) {
-            return false;
-        }
+        $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+        $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
 
-        return true;
+        $validated = $this->validation->validate($data)->jsonSerialize();
+
+        if (count($validated) > 0) {
+            $messages = 'Error: ';
+
+            foreach ($validated as $key => $value) {
+                $messages .= $value['message'] . ' ';
+            }
+            return $messages;
+        } else {
+            return true;
+        }
     }
 }

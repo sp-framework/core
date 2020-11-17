@@ -24,7 +24,7 @@ class Users
                         'email',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
+                            'size'    => 100,
                             'notNull' => true,
                         ]
                     ),
@@ -33,6 +33,20 @@ class Users
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 2048,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
+                        'role_id',
+                        [
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
+                        'override_role',
+                        [
+                            'type'    => Column::TYPE_TINYINTEGER,
                             'notNull' => true,
                         ]
                     ),
@@ -47,16 +61,14 @@ class Users
                     new Column(
                         'remember_identifier',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 65535,
+                            'type'    => Column::TYPE_TEXT,
                             'notNull' => false,
                         ]
                     ),
                     new Column(
                         'remember_token',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 65535,
+                            'type'    => Column::TYPE_TEXT,
                             'notNull' => false,
                         ]
                     )

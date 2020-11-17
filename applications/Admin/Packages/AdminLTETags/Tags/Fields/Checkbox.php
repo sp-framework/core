@@ -63,7 +63,7 @@ class Checkbox
             '';
 
         $this->fieldParams['fieldCheckboxChecked'] =
-            isset($this->params['fieldCheckboxChecked']) ?
+            isset($this->params['fieldCheckboxChecked']) && $this->params['fieldCheckboxChecked'] === true ?
             'checked' :
             '';
 
@@ -78,7 +78,7 @@ class Checkbox
             '';
 
         $this->fieldParams['showFieldCheckboxLabelHelpAndRequired'] =
-            isset($this->params['fieldCheckboxLabel']) ?
+            $this->params['fieldLabel'] === false ?
             '<span>' . $this->fieldParams['fieldHelp'] . ' ' . $this->fieldParams['fieldRequired'] . '</span>' :
             '';
 

@@ -40,6 +40,26 @@ class Middlewares extends BasePackage
 		}
 	}
 
+	public function getMiddlewaresForApplication($applicationId)
+	{
+		$filters =
+			$this->model->filter(
+				function($middleware) use ($applicationId) {
+					if ($middleware->application_id === $applicationId) {
+						return $middleware;
+					}
+				}
+			);
+
+		$middlewares = [];
+
+		foreach ($filters as $key => $filter) {
+			$middlewares[$key] = $filter->toArray();
+		}
+
+		return $middlewares;
+	}
+
 	// public function getAll($params = [], bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {

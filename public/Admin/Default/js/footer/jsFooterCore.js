@@ -4328,6 +4328,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                                 $(thisButtonId).attr('disabled', false);
                                             }
                                         } else {
+                                            $(thisButtonId).attr('disabled', false);
                                             PNotify.error({
                                                 title   : data.responseMessage
                                             });
@@ -6976,8 +6977,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 method      : 'post',
                                 data        : dataToSubmit,
                                 dataType    : 'json',
-                                success     : function(response) {
-                                    if (response.status === 0) {
+                                success     : function(data) {
+                                    if (data.responseCode === 0) {
                                         PNotify.success({
                                             title           : notificationText,
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -7086,8 +7087,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 method      : 'post',
                                 data        : dataToSubmit,
                                 dataType    : 'json',
-                                success     : function(response) {
-                                    if (response.status === 1) {
+                                success     : function(data) {
+                                    if (data.responseCode === 1) {
                                         PNotify.removeAll()
                                         PNotify.success({
                                             title           : notificationText,
@@ -7152,7 +7153,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             allowOutsideClick           : false,
                             allowEscapeKey              : false,
                             allowEnterKey               : false,
-                            onOpen                      : function() {
+                            didOpen                      : function() {
                                 swalSound.play();
                             }
                         }).then((result) => {
@@ -7165,18 +7166,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                     method      : 'post',
                                     dataType    : 'json',
                                     data        : dataToSend,
-                                    success     : function(response) {
-                                        if (response.status === 0) {
+                                    success     : function(data) {
+                                        if (data.responseCode === 0) {
                                             PNotify.success({
-                                                title           : deleteText + ' deleted.',
-                                                cornerClass     : 'ui-pnotify-sharp'
+                                                title           : data.responseMessage
                                             });
                                             // remove row on success
                                             thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
                                         } else {
                                             PNotify.error({
-                                                title           : 'Error!',
-                                                cornerClass     : 'ui-pnotify-sharp'
+                                                title           : data.responseMessage,
                                             });
                                         }
                                         pnotifySound.play();

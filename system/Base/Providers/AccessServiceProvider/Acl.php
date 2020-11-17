@@ -10,7 +10,7 @@ class Acl
 
     public function __construct()
     {
-
+        //
     }
 
     public function init()

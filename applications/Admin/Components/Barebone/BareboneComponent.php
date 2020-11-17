@@ -2,7 +2,7 @@
 
 namespace Applications\Admin\Components\Barebone;
 
-use Applications\Admin\Packages\Barebone;
+use Applications\Admin\Packages\Barebone\Barebone;
 use System\Base\BaseComponent;
 
 class BareboneComponent extends BaseComponent

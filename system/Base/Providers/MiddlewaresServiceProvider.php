@@ -13,12 +13,14 @@ class MiddlewaresServiceProvider extends Injectable
         DispatcherInterface $dispatcher,
         $data
     ) {
+        $application = $this->modules->applications->getApplicationInfo();
+
         $middlewares =
-            msort($this->modules->middlewares->middlewares, 'sequence');
+            msort($this->modules->middlewares->getMiddlewaresForApplication($application['id']), 'sequence');
 
         foreach ($middlewares as $middleware) {
-            $middlewareClass = $middleware['class'] . '\\' . $middleware['name'];
             if ($middleware['enabled'] === '1') {
+                $middlewareClass = $middleware['class'] . '\\' . $middleware['name'];
                 (new $middlewareClass())->process();
             }
         }

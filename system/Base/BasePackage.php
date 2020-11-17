@@ -394,7 +394,7 @@ abstract class BasePackage extends Controller
 				}
 
 				throw new \Exception(
-					"Could not update {$this->packageNameS}. Reasons: <br>" .
+					"Could not add {$this->packageNameS}. Reasons: <br>" .
 					join(',', $errMessages)
 				);
 			}

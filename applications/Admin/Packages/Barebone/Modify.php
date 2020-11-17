@@ -21,7 +21,7 @@ class Modify extends BasePackage
 				//Error
 			}
 		} else if ($type === 'components') {
-			$file = 'applications/' . $names['applicationName'] . '/Components/' . $names['componentName'] . 'Component.php';
+			$file = 'applications/' . $names['applicationName'] . '/Components/' . $names['componentName'] . '/' . $names['componentName'] . 'Component.php';
 
 			$componentFile = $this->localContent->read($file);
 
@@ -38,7 +38,7 @@ class Modify extends BasePackage
 			}
 
 			$file =
-				'applications/' . $names['applicationName'] . '/Components/Install/' . $names['componentName'] . '/component.json';
+				'applications/' . $names['applicationName'] . '/Components/' . $names['componentName'] . '/Install/component.json';
 
 			$componentFile = $this->localContent->read($file);
 
@@ -57,7 +57,7 @@ class Modify extends BasePackage
 			}
 
 		} else if ($type === 'packages') {
-			$file = 'applications/' . $names['applicationName'] . '/Packages/' . $names['packageName'] . '.php';
+			$file = 'applications/' . $names['applicationName'] . '/Packages/' . $names['packageName'] . '/' . $names['packageName'] . '.php';
 
 			$packageFile = $this->localContent->read($file);
 
@@ -74,7 +74,7 @@ class Modify extends BasePackage
 			}
 
 			$file =
-				'applications/' . $names['applicationName'] . '/Packages/Install/' . $names['packageName'] . '/package.json';
+				'applications/' . $names['applicationName'] . '/Packages/' . $names['packageName'] . '/Install/package.json';
 
 			$packageFile = $this->localContent->read($file);
 
@@ -95,7 +95,7 @@ class Modify extends BasePackage
 
 		} else if ($type === 'middlewares') {
 			$file =
-				'applications/' . $names['applicationName'] . '/Middlewares/' . $names['middlewareName'] . '.php';
+				'applications/' . $names['applicationName'] . '/Middlewares/' . $names['middlewareName'] . '/' . $names['middlewareName'] . '.php';
 
 			$middlewareFile = $this->localContent->read($file);
 
@@ -113,7 +113,7 @@ class Modify extends BasePackage
 			}
 
 			$file =
-				'applications/' . $names['applicationName'] . '/Middlewares/Install/' . $names['middlewareName'] . '/middleware.json';
+				'applications/' . $names['applicationName'] . '/Middlewares/' . $names['middlewareName'] . '/Install/middleware.json';
 
 			$middlewareFile = $this->localContent->read($file);
 

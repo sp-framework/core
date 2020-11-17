@@ -16,11 +16,11 @@ class Roles extends BasePackage
     public function addRole(array $data)
     {
         if ($this->add($data)) {
-            $this->packagesData->reponseCode = 0;
+            $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' role';
         } else {
-            $this->packagesData->reponseCode = 1;
+            $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'Error adding new role.';
         }
@@ -29,19 +29,34 @@ class Roles extends BasePackage
     public function updateRole(array $data)
     {
         if ($this->update($data)) {
-            $this->packagesData->reponseCode = 0;
+            $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' role';
         } else {
-            $this->packagesData->reponseCode = 1;
+            $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error updating new role.';
+            $this->packagesData->responseMessage = 'Error updating role.';
         }
     }
 
     public function removeRole(array $data)
     {
-        //Check users assigned first.
+        if (isset($data['id']) && $data['id'] != 1) {
+            if ($this->remove($data['id'])) {
+                //Check users assigned to the role
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Removed role';
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error removing role.';
+            }
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Cannot remove default role.';
+        }
     }
 
     public function checkUserByEmail(string $email)

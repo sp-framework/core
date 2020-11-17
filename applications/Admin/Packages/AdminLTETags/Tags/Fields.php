@@ -42,14 +42,16 @@ class Fields extends AdminLTETags
                 $this->fieldParams['fieldRequired'];
         }
 
-        try {
-            $field = 'Applications\\Admin\\Packages\\AdminLTETags\\Tags\\Fields\\' . ucfirst($this->params['fieldType']);
+        if ($this->params['fieldType'] !== false) {
+            try {
+                $field = 'Applications\\Admin\\Packages\\AdminLTETags\\Tags\\Fields\\' . ucfirst($this->params['fieldType']);
 
-            $this->content .=
-                (new $field($this->view, $this->tag, $this->links, $this->escaper, $this->params, $this->fieldParams))->getContent();
+                $this->content .=
+                    (new $field($this->view, $this->tag, $this->links, $this->escaper, $this->params, $this->fieldParams))->getContent();
 
-        } catch (\Exception $e) {
-            throw $e;
+            } catch (\Exception $e) {
+                throw $e;
+            }
         }
 
         $this->content .= '</div>';

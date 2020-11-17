@@ -156,6 +156,7 @@
                                                 $(thisButtonId).attr('disabled', false);
                                             }
                                         } else {
+                                            $(thisButtonId).attr('disabled', false);
                                             PNotify.error({
                                                 title   : data.responseMessage
                                             });

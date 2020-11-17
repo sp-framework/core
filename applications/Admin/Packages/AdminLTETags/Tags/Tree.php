@@ -176,44 +176,49 @@ class Tree extends AdminLTETags
         if ($this->treeMode === 'jstree') {
             if (is_array($items)) {
                 foreach ($items as $itemKey => $itemValue) {
-                    $itemId =
-                        isset($itemValue['id']) ?
-                        $itemValue['id'] :
-                        '';
 
-                    if (isset($itemValue['type']) &&
-                        $itemValue['type'] === 'pdf'
-                    ) {
-
-                        $itemType = $itemValue['type'];
-                        $itemIcon = "{'icon' : 'fa fa-fw fa-file-pdf text-sm'}";
-
-                    } else if ((isset($itemValue['type']) && $itemValue['type'] === 'jpg') ||
-                               (isset($itemValue['type']) && $itemValue['type'] === 'png')
-                    ) {
-
-                        $itemType = $itemValue['type'];
-                        $itemIcon = "{'icon' : 'fa fa-fw fa-file-image text-sm'}";
+                    if (isset($itemValue['childs'])) {
+                        $this->content .= $this->treeGroup($itemKey, $itemValue, '{"icon" : "fa fa-fw fa-plus text-sm"}', '{"icon" : "fa fa-fw fa-circle text-sm"}', null);
 
                     } else {
+                        $itemId =
+                            isset($itemValue['id']) ?
+                            $itemValue['id'] :
+                            '';
 
-                        $itemType = '';
-                    }
+                        if (isset($itemValue['type']) &&
+                            $itemValue['type'] === 'pdf'
+                        ) {
 
-                    $this->content .=
-                        '<li class="' . $itemAdditionalClass . '" data-id="' . $itemId . '" data-file-type="' . $itemType . '" data-jstree=\'' . $itemIcon . '\'>';
+                            $itemType = $itemValue['type'];
+                            $itemIcon = "{'icon' : 'fa fa-fw fa-file-pdf text-sm'}";
 
-                        if (isset($itemValue['title'])) {
-                            $this->content .= $itemValue['title'];
-                        } else if (isset($itemValue['name'])) {
-                            $this->content .= $itemValue['name'];
-                        } else if (isset($itemValue['entry'])) {
-                            $this->content .= $itemValue['entry'];
+                        } else if ((isset($itemValue['type']) && $itemValue['type'] === 'jpg') ||
+                                   (isset($itemValue['type']) && $itemValue['type'] === 'png')
+                        ) {
+
+                            $itemType = $itemValue['type'];
+                            $itemIcon = "{'icon' : 'fa fa-fw fa-file-image text-sm'}";
+
+                        } else {
+
+                            $itemType = '';
                         }
 
-                    $this->content .= '</li>';
-                }
+                        $this->content .=
+                            '<li class="' . $itemAdditionalClass . '" data-id="' . $itemId . '" data-file-type="' . $itemType . '" data-jstree=\'' . $itemIcon . '\'>';
 
+                            if (isset($itemValue['title'])) {
+                                $this->content .= $itemValue['title'];
+                            } else if (isset($itemValue['name'])) {
+                                $this->content .= $itemValue['name'];
+                            } else if (isset($itemValue['entry'])) {
+                                $this->content .= $itemValue['entry'];
+                            }
+
+                        $this->content .= '</li>';
+                    }
+                }
             }
 
         } else if ($this->treeMode === 'sideMenu') {

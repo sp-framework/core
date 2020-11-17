@@ -32,4 +32,9 @@ class Roles extends BaseModel
      * @Column(column="permissions", type="string", length=65535)
      */
     public $permissions;
+
+    /**
+     * @Column(column="users", type="string", length=65535)
+     */
+    public $users;
 }

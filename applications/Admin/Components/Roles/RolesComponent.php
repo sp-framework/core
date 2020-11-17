@@ -12,7 +12,7 @@ class RolesComponent extends BaseComponent
 
         $controlActions =
             [
-                'disableActionsForIds'  => [1],
+                // 'disableActionsForIds'  => [1],
                 'actionsToEnable'       =>
                 [
                     'edit'      => 'role',
@@ -20,30 +20,30 @@ class RolesComponent extends BaseComponent
                 ]
             ];
 
-        if ($this->request->isPost()) {
-            $rolesIdToName = [];
-            foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
-                $rolesIdToName[$roleValue['id']] = $roleValue['name'];
-            }
+        // if ($this->request->isPost()) {
+        //     $rolesIdToName = [];
+        //     foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
+        //         $rolesIdToName[$roleValue['id']] = $roleValue['name'];
+        //     }
 
-            $replaceColumns =
-                [
-                    'parent_id' => ['html'  => $rolesIdToName]
-                ];
-        } else {
-            $replaceColumns = null;
-        }
+        //     $replaceColumns =
+        //         [
+        //             'parent_id' => ['html'  => $rolesIdToName]
+        //         ];
+        // } else {
+        //     $replaceColumns = null;
+        // }
 
         $this->generateDTContent(
             $roles,
             'roles/view',
             null,
-            ['name', 'description', 'parent_id'],
+            ['name', 'description'],
             true,
-            ['name', 'description', 'parent_id'],
+            ['name', 'description'],
             $controlActions,
-            ['parent_id' => 'parent'],
-            $replaceColumns,
+            [],
+            null,
             'name'
         );
     }

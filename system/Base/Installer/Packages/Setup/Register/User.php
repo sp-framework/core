@@ -13,9 +13,9 @@ class User
                 [
                     'admin' =>
                         [
-                            'can_login'     => true,
-                            'gids'          => [$adminRoleId]
-                        ]
+                            'login'         => true,
+                        ],
+                    'permissions'   => []
                 ]
             );
 
@@ -24,7 +24,9 @@ class User
             [
                 'email'                 => $email,
                 'password'              => $password,
-                'permissions'             => $permissions
+                'role_id'               => $adminRoleId,
+                'override_role'         => 0,
+                'permissions'           => $permissions
             ]
         );
 

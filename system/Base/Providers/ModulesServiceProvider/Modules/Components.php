@@ -61,21 +61,21 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function getComponentsForType($type)
+	public function getComponentsForApplicationAndType($applicationId, $type)
 	{
 		$components = [];
 
 		$filter =
 			$this->model->filter(
-				function($component) use ($type) {
-					if ($component->type === $type) {
+				function($component) use ($applicationId, $type) {
+					if ($component->application_id === $applicationId && $component->type === $type) {
 						return $component;
 					}
 				}
 			);
 
 		foreach ($filter as $key => $value) {
-			array_push($components, $value->toArray());
+			$components[$key] = $value->toArray();
 		}
 
 		return $components;

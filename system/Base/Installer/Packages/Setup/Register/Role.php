@@ -8,32 +8,18 @@ class Role
 {
     public function register($db)
     {
-        $insertRootRole = $db->insertAsDict(
+        $insertAdminRole = $db->insertAsDict(
             'roles',
             [
-                'name'              => '1011',
-                'description'       => 'Beep Boop Beep Beep',
-                'parent_id'         => '0',
-                'permissions'       => Json::encode([])
+                'name'              => 'System Administrators',
+                'description'       => 'System Administrators Role',
+                'permissions'       => Json::encode([]),
+                'users'             => Json::encode([1])
             ]
         );
 
-        if ($insertRootRole) {
-            $insertAdminRole = $db->insertAsDict(
-                'roles',
-                [
-                    'name'              => 'System Administrators',
-                    'description'       => 'System Administrators Role',
-                    'parent_id'         => $db->lastInsertId(),
-                    'permissions'       => Json::encode([])
-                ]
-            );
-
-            if ($insertAdminRole) {
-                return $db->lastInsertId();
-            } else {
-                return null;
-            }
+        if ($insertAdminRole) {
+            return $db->lastInsertId();
         } else {
             return null;
         }

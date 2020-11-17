@@ -15,6 +15,22 @@ class ExceptionHandlers extends BaseComponent
 	// 	return $this->sendJson();
 	// }
 
+	public function handlePermissionDeniedException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
+
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = 'Permission Denied!';
+
+			return $this->sendJson();
+		}
+
+		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/Error/'));
+
+		return $this->view->partial('permissiondenied');
+	}
+
 	public function handleValidationException()
 	{
 		$this->session->set([

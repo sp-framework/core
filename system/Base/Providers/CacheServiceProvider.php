@@ -49,7 +49,7 @@ class CacheServiceProvider implements ServiceProviderInterface
             }
         );
 
-        if ($container->getShared('config')->cache) {
+        if ($container->getShared('config')->cache->enabled) {
             $container->setShared(
                 'modelsMetadata',
                 function () {

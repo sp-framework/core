@@ -32,7 +32,7 @@ class Register extends BasePackage
 
 			$file =
 				'applications/' . $names['applicationName'] .
-				'/Components/Install/' . $names['componentName'] . '/component.json';
+				'/Components/' . $names['componentName'] . '/Install/component.json';
 
 			return
 				$this->registerBareboneComponent(
@@ -46,7 +46,7 @@ class Register extends BasePackage
 
 			$file =
 				'applications/' . $names['applicationName'] .
-				'/Packages/Install/' . $names['packageName'] . '/package.json';
+				'/Packages/' . $names['packageName'] . '/Install/package.json';
 
 			return $this->registerBarebonePackage(
 				json_decode(
@@ -59,7 +59,7 @@ class Register extends BasePackage
 
 			$file =
 				'applications/' . $names['applicationName'] .
-				'/Middlewares/Install/' . $names['middlewareName'] . '/middleware.json';
+				'/Middlewares/' . $names['middlewareName'] . '/Install/middleware.json';
 
 			return $this->registerBareboneMiddleware(
 				json_decode(
@@ -107,7 +107,7 @@ class Register extends BasePackage
 		);
 
 		if ($application) {
-			return $this->modules->applications->packagesData->last->toArray();
+			return $this->modules->applications->packagesData->last;
 		} else {
 			return false;
 		}
@@ -124,6 +124,7 @@ class Register extends BasePackage
 				'version'				=> $componentFile['version'],
 				'path'					=> $componentFile['path'],
 				'repo'					=> $componentFile['repo'],
+				'type'					=> $componentFile['type'],
 				'settings'			 	=>
 					isset($componentFile['settings']) ?
 					json_encode($componentFile['settings']) :
@@ -139,7 +140,7 @@ class Register extends BasePackage
 		);
 
 		if ($component) {
-			return $this->modules->components->packagesData->last->toArray();
+			return $this->modules->components->packagesData->last;
 		} else {
 			return false;
 		}
@@ -171,7 +172,7 @@ class Register extends BasePackage
 		);
 
 		if ($package) {
-			return $this->modules->packages->packagesData->last->toArray();
+			return $this->modules->packages->packagesData->last;
 		} else {
 			return false;
 		}
@@ -206,7 +207,7 @@ class Register extends BasePackage
 		);
 
 		if ($middleware) {
-			return $this->modules->middlewares->packagesData->last->toArray();
+			return $this->modules->middlewares->packagesData->last;
 		} else {
 			return false;
 		}
@@ -237,7 +238,7 @@ class Register extends BasePackage
 		);
 
 		if ($view) {
-			return $this->modules->views->packagesData->last->toArray();
+			return $this->modules->views->packagesData->last;
 		} else {
 			return false;
 		}

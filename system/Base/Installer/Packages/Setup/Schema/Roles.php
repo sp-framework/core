@@ -37,19 +37,19 @@ class Roles
                         ]
                     ),
                     new Column(
-                        'parent_id',
+                        'permissions',
                         [
-                            'type'    => Column::TYPE_INTEGER,
+                            'type'    => Column::TYPE_TEXT,
                             'notNull' => true,
                         ]
                     ),
                     new Column(
-                        'permissions',
+                        'users',
                         [
-                            'type'    => Column::TYPE_MEDIUMTEXT,
-                            'notNull' => true,
+                            'type'    => Column::TYPE_TEXT,
+                            'notNull' => false,
                         ]
-                    ),
+                    )
                 ]
             ];
     }

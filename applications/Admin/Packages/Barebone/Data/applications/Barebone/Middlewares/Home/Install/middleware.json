@@ -5,7 +5,7 @@
 	"version"		: "0.0.1",
 	"repo"			: "https://",
 	"path"			: "/",
-	"class"			: "Middlewares\\Barebone\\Home",
+	"class"			: "Applications\\Barebone\\Middlewares\\Home",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

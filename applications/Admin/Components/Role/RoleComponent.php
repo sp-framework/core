@@ -9,16 +9,22 @@ class RoleComponent extends BaseComponent
 {
     public function viewAction()
     {
-        $componentsArr =
-            array_merge(
-                $this->modules->components->getComponentsForType('listing'),
-                $this->modules->components->getComponentsForType('crud')
-            );
-        $components['listing'] = ['name' => 'LISTING'];
-        $components['crud'] = ['name' => 'CRUD'];
-        foreach ($componentsArr as $key => $component) {
-            $components[$component['type']]['childs'][$key]['id'] = $component['id'];
-            $components[$component['type']]['childs'][$key]['name'] = $component['name'];
+        // $this->view->disable();
+        $applicationsArr = $this->modules->applications->applications;
+
+        foreach ($applicationsArr as $applicationKey => $application) {
+            $componentsArr =
+                array_merge(
+                    $this->modules->components->getComponentsForApplicationAndType($application['id'], 'listing'),
+                    $this->modules->components->getComponentsForApplicationAndType($application['id'], 'crud')
+                );
+            $components[strtolower($application['name'])] = ['title' => strtoupper($application['name'])];
+            $components[strtolower($application['name'])]['childs']['listing'] = ['title' => 'LISTINGS'];
+            $components[strtolower($application['name'])]['childs']['crud'] = ['title' => 'FORMS'];
+            foreach ($componentsArr as $key => $component) {
+                $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['id'] = $component['id'];
+                $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['title'] = $component['name'];
+            }
         }
 
         $this->view->components = $components;
@@ -44,18 +50,26 @@ class RoleComponent extends BaseComponent
                     $permissionsArr = [];
                 }
                 $permissions = [];
-                foreach ($componentsArr as $componentKey => $componentValue) {
-                    if ($componentValue['type'] === 'listing') {
-                        if (isset($permissionsArr[$componentValue['id']])) {
-                            $permissions[$componentValue['id']] = $permissionsArr[$componentValue['id']];
-                        } else {
-                            $permissions[$componentValue['id']] = [0];
-                        }
-                    } else if ($componentValue['type'] === 'crud') {
-                        if (isset($permissionsArr[$componentValue['id']])) {
-                            $permissions[$componentValue['id']] = $permissionsArr[$componentValue['id']];
-                        } else {
-                            $permissions[$componentValue['id']] = [0,0,0,0];
+
+                foreach ($applicationsArr as $applicationKey => $application) {
+                    $componentsArr =
+                        array_merge(
+                            $this->modules->components->getComponentsForApplicationAndType($application['id'], 'listing'),
+                            $this->modules->components->getComponentsForApplicationAndType($application['id'], 'crud')
+                        );
+                    foreach ($componentsArr as $componentKey => $componentValue) {
+                        if ($componentValue['type'] === 'listing') {
+                            if (isset($permissionsArr[$componentValue['id']])) {
+                                $permissions[$application['id']][$componentValue['id']] = $permissionsArr[$componentValue['id']];
+                            } else {
+                                $permissions[$application['id']][$componentValue['id']] = [0];
+                            }
+                        } else if ($componentValue['type'] === 'crud') {
+                            if (isset($permissionsArr[$componentValue['id']])) {
+                                $permissions[$application['id']][$componentValue['id']] = $permissionsArr[$componentValue['id']];
+                            } else {
+                                $permissions[$application['id']][$componentValue['id']] = [0,0,0,0];
+                            }
                         }
                     }
                 }
@@ -78,11 +92,18 @@ class RoleComponent extends BaseComponent
             $role = [];
             $permissions = [];
 
-            foreach ($componentsArr as $componentKey => $componentValue) {
-                if ($componentValue['type'] === 'listing') {
-                    $permissions[$componentValue['id']] = [0];
-                } else if ($componentValue['type'] === 'crud') {
-                    $permissions[$componentValue['id']] = [0,0,0,0];
+            foreach ($applicationsArr as $applicationKey => $application) {
+                $componentsArr =
+                    array_merge(
+                        $this->modules->components->getComponentsForApplicationAndType($application['id'], 'listing'),
+                        $this->modules->components->getComponentsForApplicationAndType($application['id'], 'crud')
+                    );
+                foreach ($componentsArr as $componentKey => $componentValue) {
+                    if ($componentValue['type'] === 'listing') {
+                        $permissions[$application['id']][$componentValue['id']] = [0];
+                    } else if ($componentValue['type'] === 'crud') {
+                        $permissions[$application['id']][$componentValue['id']] = [0,0,0,0];
+                    }
                 }
             }
 
@@ -130,6 +151,18 @@ class RoleComponent extends BaseComponent
 
     public function removeAction()
     {
-        //Delete from DB. Check User assigned to role
+        if ($this->request->isPost()) {
+
+            $this->roles->removeRole($this->postData());
+
+            $this->view->responseCode = $this->roles->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
     }
 }
