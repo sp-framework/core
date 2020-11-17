@@ -9,8 +9,14 @@ class FiltersComponent extends BaseComponent
 {
     public function viewAction()
     {
-        // var_dump($this->events);
-        // $this->view->disable();
-        $this->generateDTContent(Filters::class, 'filters/view');
+        $controlActions =
+            [
+                'actionsToEnable'       =>
+                [
+                    'view'      => 'filter'
+                ]
+            ];
+
+        $this->generateDTContent(Filters::class, 'filters/view', null, ['name'], true, ['name'], $controlActions, null, null, 'name');
     }
 }

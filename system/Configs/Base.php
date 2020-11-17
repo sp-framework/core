@@ -2,7 +2,7 @@
 
 return
 	[
-		"debug"			=> true, //true - Development false - Production
+		"debug"			=> false, //true - Development false - Production
 		"db" 			=>
 		[
 			"host" 				=> "localhost",
@@ -13,7 +13,7 @@ return
 		],
 		"cache"			=>
 		[
-			"enabled"			=> false, //Global Cache value //true - Production false - Development
+			"enabled"			=> true, //Global Cache value //true - Production false - Development
 			"timeout"			=> 60, //Global Cache timeout in seconds
 			"service"			=> "streamCache"
 		],
