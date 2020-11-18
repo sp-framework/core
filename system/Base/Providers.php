@@ -4,6 +4,7 @@ return
 	[
 		'System\Base\Providers\ConfigServiceProvider',
 		'System\Base\Providers\EventsServiceProvider',
+		'System\Base\Providers\AnnotationsServiceProvider',
 		'System\Base\Providers\SecurityServiceProvider',
 		'System\Base\Providers\SessionServiceProvider',
 		'System\Base\Providers\DatabaseServiceProvider',

@@ -5,6 +5,7 @@
     "version"       : "0.0.1",
     "repo"          : "https://github.com/h-w-f/component-admin-users",
     "path"          : "/",
+    "class"         : "Applications\\Admin\\Components\\Users\\UsersComponent",
     "type"          : "listing",
     "dependencies"  : {
         "core"          : {
@@ -25,7 +26,7 @@
     "menu"              : {
         "seq"           : 2,
         "accounts"      : {
-            "title"     : "accounts",
+            "title"     : "Users Management",
             "icon"      : "users",
             "childs"    : {
                 "users" : {

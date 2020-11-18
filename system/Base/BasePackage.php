@@ -581,6 +581,8 @@ abstract class BasePackage extends Controller
 
 	protected function usePackage($packageClass)
 	{
+		$this->init();
+
 		if ($this->checkPackage($packageClass)) {
 			return new $packageClass($this->container);
 		} else {

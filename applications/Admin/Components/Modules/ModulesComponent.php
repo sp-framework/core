@@ -7,6 +7,9 @@ use System\Base\BaseComponent;
 
 class ModulesComponent extends BaseComponent
 {
+	/**
+	 * @acl(name=view)
+	 */
 	public function viewAction()
 	{
 		$modules = $this->usePackage(ModulesPackage::class);

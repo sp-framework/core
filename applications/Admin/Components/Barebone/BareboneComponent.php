@@ -7,11 +7,17 @@ use System\Base\BaseComponent;
 
 class BareboneComponent extends BaseComponent
 {
+	/**
+	 * @acl(name=view)
+	 */
 	public function viewAction()
 	{
 		$this->view->applications = $this->modules->applications->applications;
 	}
 
+	/**
+	 * @acl(name=install)
+	 */
 	public function installAction()
 	{
 		$barebonePackage = $this->usePackage(Barebone::class);

@@ -6,6 +6,9 @@ use System\Base\BaseComponent;
 
 class UsersComponent extends BaseComponent
 {
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
         $users = $this->users->init();

@@ -33,11 +33,12 @@ class AccessServiceProvider implements ServiceProviderInterface
         $applications = $container->getShared('modules')->applications;
         $secTools = $container->getShared('secTools');
         $validation = $container->getShared('validation');
+        $logger = $container->getShared('logger');
 
         $container->setShared(
             'auth',
-            function () use ($session, $cookies, $users, $applications, $secTools, $validation) {
-                return (new Auth($session, $cookies, $users, $applications, $secTools, $validation))->init();
+            function () use ($session, $cookies, $users, $applications, $secTools, $validation, $logger) {
+                return (new Auth($session, $cookies, $users, $applications, $secTools, $validation, $logger))->init();
             }
         );
 

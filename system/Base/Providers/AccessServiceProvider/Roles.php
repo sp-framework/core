@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\AccessServiceProvider\Model\Roles as RolesModel;
 
@@ -42,6 +43,19 @@ class Roles extends BasePackage
     public function removeRole(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
+
+            $role = $this->getById($data['id']);
+
+            $users = Json::decode($role['users'], true);
+
+            if (count($users) > 0) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Role has users assigned to it. Cannot removes role.';
+
+                return false;
+            }
+
             if ($this->remove($data['id'])) {
                 //Check users assigned to the role
                 $this->packagesData->responseCode = 0;

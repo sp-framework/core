@@ -53,9 +53,13 @@ class Email
         return $this->emailSettings;
     }
 
-    public function setup()
+    public function setup($emailSettings = null)
     {
-        $this->emailSettings = Json::decode($this->application['settings'], true)['email'];
+        if ($emailSettings) {
+            $this->emailSettings = $emailSettings;
+        } else {
+            $this->emailSettings = Json::decode($this->application['settings'], true)['email'];
+        }
 
         if ($this->emailSettings['enabled'] === 'true') {
             $this->email->isSMTP();

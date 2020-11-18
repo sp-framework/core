@@ -4,8 +4,9 @@
 	"description"	: "Manage admin repositories via this component",
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/component-admin-repositories",
-	"path"			: "Repositories/",
-	"type"          : "crud",
+	"path"			: "/",
+	"class"         : "Applications\\Admin\\Components\\Repositories\\RepositoriesComponent",
+	"type"          : "system",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

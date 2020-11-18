@@ -16,7 +16,7 @@ BazCore.header({
             </div>
             <div id="{{componentId}}-regular" hidden>
                 <p class="login-box-msg text-sm">Login to start {{applicationName|lower}} session</p>
-                <form action="{{links.url('auth/login/signin')}}" id="{{componentId}}-form">
+                <form action="{{links.url('auth/login')}}" id="{{componentId}}-form">
                     {{adminltetags.useTag('fields',
                         [
                             'componentId'                           : componentId,

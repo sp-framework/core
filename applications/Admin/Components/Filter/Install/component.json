@@ -5,7 +5,8 @@
     "version"       : "0.0.1",
     "repo"          : "https://github.com/h-w-f/component-admin-filter",
     "path"          : "/",
-    "type"          : "crud",
+    "class"         : "Applications\\Admin\\Components\\Filter\\FilterComponent",
+    "type"          : "forms",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",

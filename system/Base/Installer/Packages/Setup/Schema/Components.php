@@ -69,6 +69,14 @@ class Components
 						]
 					),
 					new Column(
+						'class',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 2048,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'type',
 						[
 							'type'    => Column::TYPE_VARCHAR,

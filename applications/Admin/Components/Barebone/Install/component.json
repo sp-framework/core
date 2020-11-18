@@ -5,7 +5,8 @@
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/component-admin-barebone",
 	"path"			: "/",
-	"type"          : "other",
+	"class"			: "Applications\\Admin\\Components\\Barebone\\BareboneComponent",
+	"type"          : "system",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

@@ -11,10 +11,6 @@ class User
         $permissions =
             Json::encode(
                 [
-                    'admin' =>
-                        [
-                            'login'         => true,
-                        ],
                     'permissions'   => []
                 ]
             );
@@ -26,7 +22,8 @@ class User
                 'password'              => $password,
                 'role_id'               => $adminRoleId,
                 'override_role'         => 0,
-                'permissions'           => $permissions
+                'permissions'           => $permissions,
+                'can_login'             => Json::encode(['Admin' => true])
             ]
         );
 

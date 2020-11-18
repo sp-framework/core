@@ -6,41 +6,20 @@ use System\Base\BaseModel;
 
 class Users extends BaseModel
 {
-    /**
-     * @Primary
-     * @Identity
-     * @Column(type='integer', nullable=false)
-     */
     public $id;
 
-    /**
-     * @Column(column="email", type="string", length=50)
-     */
     public $email;
 
-    /**
-     * @Column(column="password", type="string", length=50)
-     */
     public $password;
 
-    /**
-     * @Column(column="permissions", type="string", length=2048)
-     */
     public $permissions;
 
-    /**
-     * @Column(column="version", type="string", length=15)
-     */
+    public $can_login;
+
     public $version;
 
-    /**
-     * @Column(column="remember_token", type="string", length=2048, nullable=true)
-     */
     public $remember_token;
 
-    /**
-     * @Column(column="remember_identifier", type="string", length=2048, nullable=true)
-     */
     public $remember_identifier;
     // public $id;
     // public $customer_name;

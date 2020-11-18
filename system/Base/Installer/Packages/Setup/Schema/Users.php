@@ -59,6 +59,14 @@ class Users
                         ]
                     ),
                     new Column(
+                        'can_login',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 2048,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'remember_identifier',
                         [
                             'type'    => Column::TYPE_TEXT,

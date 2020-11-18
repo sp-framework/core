@@ -12,7 +12,7 @@
 {% else %}
     {% set override = false %}
 {% endif %}
-{% set userPermissions = user['permissions']['permissions'] %}
+{% set userPermissions = user['permissions'] %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
@@ -74,7 +74,7 @@
                         'fieldLabel'                     : 'Email New Password',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Email New Password to this user.<br>NOTE: Email Settings must be configured for this option to work.',
-                        'fieldRequired'                  : true,
+                        'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'info',
                         'fieldCheckboxLabel'             : '',
@@ -96,7 +96,7 @@
                         'fieldLabel'                     : 'Force User Change Password',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Force use to change password at next login.',
-                        'fieldRequired'                  : true,
+                        'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'warning',
                         'fieldCheckboxLabel'             : '',
@@ -117,18 +117,21 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'applicationslogin',
+                        'fieldId'                        : 'can_login',
                         'fieldLabel'                     : 'Can Login?',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select applications to which this user can login',
-                        'fieldRequired'                  : true,
-                        'fieldType'                      : false
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'html',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
                     ]
                 )}}
                 {% for application in applications %}
-                    {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-applications-login-' ~ application] = application %}
-                    {% if user['permissions'][application] is defined %}
-                        {% if user['permissions'][application]['login'] == true %}
+                    {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ application['name']] = application['name'] %}
+                    {% if user['can_login'][application['name']] is defined %}
+                        {% if user['can_login'][application['name']] == true %}
                             {% set checked = true %}
                         {% else %}
                             {% set checked = false %}
@@ -142,11 +145,11 @@
                             'componentName'                  : componentName,
                             'componentId'                    : componentId,
                             'sectionId'                      : sectionId,
-                            'fieldId'                        : 'applications-login-' ~ application,
+                            'fieldId'                        : 'can_login-' ~ application['name'],
                             'fieldLabel'                     : false,
                             'fieldType'                      : 'checkbox',
                             'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : application,
+                            'fieldCheckboxLabel'             : application['name'],
                             'fieldCheckboxChecked'           : checked,
                             'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                             'fieldBazScan'                   : false
@@ -190,7 +193,7 @@
                         'fieldLabel'                     : 'User Level Permissions',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select permissions for the user<br>NOTE: These permissions override role permissions',
-                        'fieldRequired'                  : true,
+                        'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'danger',
                         'fieldCheckboxLabel'             : '',
@@ -252,6 +255,58 @@
     </fieldset>
 </form>
 <script>
+var acls = JSON.parse('{{acls}}');
+var gridColumns = [];
+gridColumns.push(
+    {
+        header          :   '<p class="text-center mb-0">' +
+                                '<span class="cursor-pointer">' +
+                                    '<i id="{{componentId}}-{{sectionId}}-permissions-components-denyall" ' +
+                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                        'data-original-title="Deny All" class="fas fa-fw fa-times-circle ' +
+                                        'mr-1 text-danger helper components">' +
+                                    '</i>' +
+                                '</span>' +
+                                    ' COMPONENTS ' +
+                                '<span class="cursor-pointer">' +
+                                    '<i id="{{componentId}}-{{sectionId}}-permissions-components-permitall" ' +
+                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                        'data-original-title="Permit All" class="fas fa-fw fa-check-circle ' +
+                                        'ml-1 text-success helper components">' +
+                                    '</i>' +
+                                '</span>' +
+                            '</p>',
+        wideCellClass   : 'text-center components',
+        title           : "_DATA_",
+        width           : 300
+    }
+);
+
+for (var acl in acls) {
+    gridColumns.push(
+        {
+            header          :   '<p class="text-center mb-0">' +
+                                    '<span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-permissions-' + acls[acl] + '-denyall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Deny all ' + acls[acl] + '" class="fas fa-fw fa-times-circle ' +
+                                            'mr-1 text-danger helper ' + acls[acl] + '">' +
+                                        '</i>' +
+                                    '</span> ' +
+                                        acls[acl].toUpperCase() +
+                                    ' <span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-permissions-' + acls[acl] + '-permitall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Permit all ' + acls[acl] + '" class="fas fa-fw fa-check-circle ' +
+                                            'ml-1 text-success helper ' + acls[acl] + '">' +
+                                        '</i>' +
+                                    '</span>' +
+                                '</p>',
+            wideCellClass   : 'text-center ACL-' + acls[acl],
+            cellClass       : 'empty ACL-' + acls[acl]
+        }
+    );
+}
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -281,6 +336,27 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-email'                       : { },
         '{{componentId}}-{{sectionId}}-email_new_password'          : { },
         '{{componentId}}-{{sectionId}}-force_change_password'       : { },
+        '{{componentId}}-{{sectionId}}-can_login'                   : {
+            'afterInit'     : function () {
+                'use strict';
+                //CanLogin
+                dataCollectionSection['data']['can_login'] = { };
+                var checkboxIds = JSON.parse('{{checkboxIds}}');
+                for (var checkbox in checkboxIds) {
+                    $('#' + checkbox).click(function() {
+                        extractCheckboxData(checkbox, checkboxIds[checkbox])
+                    });
+                    extractCheckboxData(checkbox, checkboxIds[checkbox])
+                }
+                function extractCheckboxData(checkbox, application) {
+                    if ($('#' + checkbox)[0].checked === true) {
+                        dataCollectionSection['data']['can_login'][application] = true;
+                    } else {
+                        dataCollectionSection['data']['can_login'][application] = false;
+                    }
+                }
+            }
+        },
         '{{componentId}}-{{sectionId}}-role_id'                     : {
             'placeholder'   : 'SELECT ROLE'
         },
@@ -324,124 +400,16 @@ dataCollectionSection =
                         "grid"
             ],
             grid: {
-                columns: [
-                    {
-                        header          :   '<p class="text-center mb-0">' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-components-denyall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Deny All" class="fas fa-fw fa-times-circle ' +
-                                                        'mr-1 text-danger helper components">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                                    ' COMPONENTS ' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-components-permitall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Permit All" class="fas fa-fw fa-check-circle ' +
-                                                        'ml-1 text-success helper components">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                            '</p>',
-                        wideCellClass   : 'text-center components',
-                        title           : "_DATA_",
-                        width           : 500
-                    },
-                    {
-                        header          :   '<p class="text-center mb-0">' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-view-denyall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Deny All View" class="fas fa-fw fa-times-circle ' +
-                                                        'mr-1 text-danger helper view">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                                    ' VIEW ' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-view-permitall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Permit All View" class="fas fa-fw fa-check-circle ' +
-                                                        'ml-1 text-success helper view">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                            '</p>',
-                        wideCellClass   : 'text-center view',
-                        cellClass       : 'empty'
-                    },
-                    {
-                        header          :   '<p class="text-center mb-0">' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-add-denyall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Deny All Add" class="fas fa-fw fa-times-circle ' +
-                                                        'mr-1 text-danger helper add">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                                    ' ADD ' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-add-permitall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Permit All Add" class="fas fa-fw fa-check-circle ' +
-                                                        'ml-1 text-success helper add">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                            '</p>',
-                        wideCellClass   : 'text-center add',
-                        cellClass       : 'empty'
-                    },
-                    {
-                        header          :   '<p class="text-center mb-0">' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-edit-denyall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Deny All Edit" class="fas fa-fw fa-times-circle ' +
-                                                        'mr-1 text-danger helper edit">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                                    ' EDIT ' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-edit-permitall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Permit All Edit" class="fas fa-fw fa-check-circle ' +
-                                                        'ml-1 text-success helper edit">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                            '</p>',
-                        wideCellClass   : 'text-center edit',
-                        cellClass       : 'empty'
-                    },
-                    {
-                        header          :   '<p class="text-center mb-0">' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-remove-denyall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Deny All Remove" class="fas fa-fw fa-times-circle ' +
-                                                        'mr-1 text-danger helper remove">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                                    ' REMOVE ' +
-                                                '<span class="cursor-pointer">' +
-                                                    '<i id="{{componentId}}-{{sectionId}}-permissions-remove-permitall" ' +
-                                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                                                        'data-original-title="Permit All Remove" class="fas fa-fw fa-check-circle ' +
-                                                        'ml-1 text-success helper remove">' +
-                                                    '</i>' +
-                                                '</span>' +
-                                            '</p>',
-                        wideCellClass   : 'text-center remove',
-                        cellClass       : 'empty'
-                    },
-                ],
+                columns: gridColumns,
                 resizable   : true
             },
             afterInit : function(dataCollection) {
                 'use strict';
-                var checkboxIds = JSON.parse('{{checkboxIds}}');
                 //Fix Grid Width
                 (function fixGrid() {
                     var gridCount = $('.jstree-grid-column').length - 1;
                     var gridWidth = $('.jstree-grid-wrapper').width();
-                    var colWidth = (gridWidth - 500) / gridCount;
+                    var colWidth = (gridWidth - 300) / gridCount;
                     $('.jstree-grid-column').each(function(index,grid) {
                         if (index !== 0) {
                             $(grid).css({
@@ -465,7 +433,8 @@ dataCollectionSection =
                 gridData = dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'];
 
                 permissions = JSON.parse('{{userPermissions}}');//Parse DB Data
-
+                //eslint-disable-next-line
+                console.log(permissions);
                 for (var application in permissions) {
                     for (var component in permissions[application]) {
                         if ($('#{{componentId}}-{{sectionId}}-permissions').find('[data-id="' + component + '"]').length > 0) {
@@ -479,6 +448,8 @@ dataCollectionSection =
                         }
                     }
                 }
+                //eslint-disable-next-line
+                console.log(gridData);
                 $.each(allIds, function(index, obj) {
                     if (gridData[obj.id]) {
                         var jstreeIdStructure =
@@ -503,24 +474,40 @@ dataCollectionSection =
                         $('.jstree-grid-wrapper')
                             .find('[data-jstreegrid="' + jstreeGridId + '"]')
                             .each(function(index, column) {
-                                var spanClass, spanData;
-                                if (index === 0) {
-                                    spanClass = 'view ';
-                                } else if (index === 1) {
-                                    spanClass = 'add ';
-                                } else if (index === 2) {
-                                    spanClass = 'edit ';
-                                } else if (index === 3) {
-                                    spanClass = 'remove ';
-                                }
-                                if (gridData[jstreeGridId]['permissions'][index] == '0') {
-                                    spanClass += 'text-danger cursor-pointer';
-                                    spanData = '<i class="fa fa-fw fa-times-circle"></i>';
-                                    $(this).children('span').removeClass('empty');
-                                } else if (gridData[jstreeGridId]['permissions'][index] == '1') {
-                                    spanClass += 'text-success cursor-pointer';
-                                    spanData = '<i class="fa fa-fw fa-check-circle"></i>';
-                                    $(this).children('span').removeClass('empty');
+                                var permission, spanClass, spanData;
+                                //eslint-disable-next-line
+                                var spanClasses = $(this).children('span').attr("class").split(/\s+/);
+                                $(spanClasses).each(function(index, sclass) {
+                                    if (sclass.search(/ACL-.*/) === 0) {
+                                        permission = sclass.replace('ACL-', '');
+                                        //eslint-disable-next-line
+                                        // console.log(permission);
+                                        spanClass = permission + ' ';
+                                    }
+                                });
+                                // if (index === 0) {
+                                //     spanClass = 'view ';
+                                // } else if (index === 1) {
+                                //     spanClass = 'add ';
+                                // } else if (index === 2) {
+                                //     spanClass = 'edit ';
+                                // } else if (index === 3) {
+                                //     spanClass = 'remove ';
+                                // }
+                                    //eslint-disable-next-line
+                                    // console.log(gridData[jstreeGridId]['permissions'][permission]);
+                                // if (gridData[jstreeGridId]['permissions'][permission]) {
+                                //     //eslint-disable-next-line
+                                //     console.log('me');
+                                    if (gridData[jstreeGridId]['permissions'][permission] == '0') {
+                                        spanClass += 'text-danger cursor-pointer';
+                                        spanData = '<i class="fa fa-fw fa-times-circle"></i>';
+                                        $(this).children('span').removeClass('empty');
+                                    } else if (gridData[jstreeGridId]['permissions'][permission] == '1') {
+                                        spanClass += 'text-success cursor-pointer';
+                                        spanData = '<i class="fa fa-fw fa-check-circle"></i>';
+                                        $(this).children('span').removeClass('empty');
+                                    // }
                                 } else {
                                     spanClass = 'na';
                                     spanData = '<p class="text-secondary">-</p>';
@@ -596,28 +583,42 @@ dataCollectionSection =
                             viewState = 'permit';
                         }
                         //We only need this to store data at the moment. If the array is going to be named array like view => 0, then we dont need this.
-                        var colNum, column;
-                        column = dataGridId.split('col');
-                        colNum = column[1] - 1;
+                        // var colNum, column;
                         //eslint-disable-next-line
-                        // console.log(viewState, myState);
+                        // console.log(dataGridId);
+                        var permission, spanClass, spanData;
+                        var spanClasses = $('#' + dataGridId).children('span').attr("class").split(/\s+/);
+                        $(spanClasses).each(function(index, sclass) {
+                            if (sclass.search(/ACL-.*/) === 0) {
+                                permission = sclass.replace('ACL-', '');
+                                //eslint-disable-next-line
+                                // console.log(permission);
+                                spanClass = permission + ' ';
+                            }
+                        });
+                        //eslint-disable-next-line
+                        console.log(viewState, myState);
+                        //eslint-disable-next-line
+                        console.log(permission);
+                        // column = dataGridId.split('col');
+                        // colNum = column[1] - 1;
                         if (viewState === 'deny' && myState === 'deny') {
                         // if ($('#' + dataGridId).children('span').hasClass('text-danger') || $('#' + dataGridId).children('span').hasClass('text-secondary')) {
                             $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
                             $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
                             $('#' + viewId).children('span').removeClass('text-danger').addClass('text-success');
                             $('#' + viewId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
-                            gridData[dataNodeId]['permissions'][0] = '1';
-                            gridData[dataNodeId]['permissions'][colNum] = '1';
+                            gridData[dataNodeId]['permissions']['view'] = 1;
+                            gridData[dataNodeId]['permissions'][permission] = 1;
                         } else if (viewState === 'permit' && myState === 'permit') {
                         // } else if ($('#' + dataGridId).children('span').hasClass('text-success')) {
                             $('#' + dataGridId).children('span').removeClass('text-success').addClass('text-danger');
                             $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
-                            gridData[dataNodeId]['permissions'][colNum] = '0';
+                            gridData[dataNodeId]['permissions'][permission] = 0;
                         } else if (viewState === 'permit' && myState === 'deny') {
                             $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
                             $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
-                            gridData[dataNodeId]['permissions'][colNum] = '1';
+                            gridData[dataNodeId]['permissions'][permission] = 1;
                         }
 
                         // Disable all siblings if view is disabled
@@ -628,9 +629,19 @@ dataCollectionSection =
                                         $.each(siblings, function(index, sibl) {
                                             if (index > 0) {
                                                 if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
+                                                    var permission, spanClass, spanData;
+                                                    var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
+                                                    $(spanClasses).each(function(index, sclass) {
+                                                        if (sclass.search(/ACL-.*/) === 0) {
+                                                            permission = sclass.replace('ACL-', '');
+                                                            spanClass = permission + ' ';
+                                                        }
+                                                        gridData[dataNodeId]['permissions'][permission] = 0;
+                                                    });
+                                                            //eslint-disable-next-line
+                                                            // console.log(permission);
                                                     $(sibl).children('span').removeClass('text-success').addClass('text-danger');
                                                     $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
-                                                    gridData[dataNodeId]['permissions'][index] = '0';
                                                 }
                                             }
                                         });
@@ -638,9 +649,19 @@ dataCollectionSection =
                                         $.each(siblings, function(index, sibl) {
                                             if (index > 0) {
                                                 if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
+                                                    var permission, spanClass, spanData;
+                                                    var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
+                                                    $(spanClasses).each(function(index, sclass) {
+                                                        if (sclass.search(/ACL-.*/) === 0) {
+                                                            permission = sclass.replace('ACL-', '');
+                                                            //eslint-disable-next-line
+                                                            // console.log(permission);
+                                                            spanClass = permission + ' ';
+                                                        }
+                                                        gridData[dataNodeId]['permissions'][permission] = 0;
+                                                    });
                                                     $(sibl).children('span').removeClass('text-success').addClass('text-danger');
                                                     $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
-                                                    gridData[dataNodeId]['permissions'][index] = '0';
                                                 }
                                             }
                                         });
@@ -726,29 +747,49 @@ dataCollectionSection =
                     });
 
                     // Bulk deny/permit (Specific Columns)
-                    $('#{{componentId}}-{{sectionId}}-permissions-view-denyall').click(function(e) {
-                        e.preventDefault();
-                        denyPermitAll(null, null, false, true);
-                    });
-                    $('#{{componentId}}-{{sectionId}}-permissions-view-permitall').click(function(e) {
-                        e.preventDefault();
-                        denyPermitAll(this, true, null, true);
-                    });
+                    // $('#{{componentId}}-{{sectionId}}-permissions-view-denyall').click(function(e) {
+                    //     e.preventDefault();
+                    //     denyPermitAll(null, null, false, true);
+                    // });
+                    // $('#{{componentId}}-{{sectionId}}-permissions-view-permitall').click(function(e) {
+                    //     e.preventDefault();
+                    //     denyPermitAll(this, true, null, true);
+                    // });
 
-                    $('#{{componentId}}-{{sectionId}}-permissions-add-denyall, ' +
-                      '#{{componentId}}-{{sectionId}}-permissions-edit-denyall, ' +
-                      '#{{componentId}}-{{sectionId}}-permissions-remove-denyall')
-                    .click(function(e) {
-                        e.preventDefault();
-                        denyPermitAll(this, false, null, null);
-                    });
-                    $('#{{componentId}}-{{sectionId}}-permissions-add-permitall, ' +
-                      '#{{componentId}}-{{sectionId}}-permissions-edit-permitall, ' +
-                      '#{{componentId}}-{{sectionId}}-permissions-remove-permitall')
-                    .click(function(e) {
-                        e.preventDefault();
-                        denyPermitAll(this, true, null, null);
-                    });
+                    for (var aclAll in acls) {
+                        $('#{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-denyall').click(function(e) {
+                            e.preventDefault();
+
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-view-denyall') {
+                                denyPermitAll(null, null, false, true);
+                            } else {
+                                denyPermitAll(this, false, null, null);
+                            }
+                        });
+                        $('#{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-permitall').click(function(e) {
+                            e.preventDefault();
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-view-permitall') {
+                                denyPermitAll(this, true, null, true);
+                            } else {
+                                denyPermitAll(this, true, null, null);
+                            }
+                        });
+                    }
+
+                    // $('#{{componentId}}-{{sectionId}}-permissions-add-denyall, ' +
+                    //   '#{{componentId}}-{{sectionId}}-permissions-edit-denyall, ' +
+                    //   '#{{componentId}}-{{sectionId}}-permissions-remove-denyall')
+                    // .click(function(e) {
+                    //     e.preventDefault();
+                    //     denyPermitAll(this, false, null, null);
+                    // });
+                    // $('#{{componentId}}-{{sectionId}}-permissions-add-permitall, ' +
+                    //   '#{{componentId}}-{{sectionId}}-permissions-edit-permitall, ' +
+                    //   '#{{componentId}}-{{sectionId}}-permissions-remove-permitall')
+                    // .click(function(e) {
+                    //     e.preventDefault();
+                    //     denyPermitAll(this, true, null, null);
+                    // });
                 })();
 
                 // Function to make bulk changes
@@ -756,6 +797,15 @@ dataCollectionSection =
                     //eslint-disable-next-line
                     // console.log(denyPermitPermissionIconId, permit, component, view);
                     if (denyPermitPermissionIconId) {
+                        // var permission, spanClass, spanData;
+                        // var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
+                        // $(spanClasses).each(function(index, sclass) {
+                        //     if (sclass.search(/ACL-.*/) === 0) {
+                        //         permission = sclass.replace('ACL-', '');
+                        //         spanClass = permission + ' ';
+                        //     }
+                        //     // gridData[dataNodeId]['permissions'][permission] = 0;
+                        // });
                         var colNum, column;
                         column = $(denyPermitPermissionIconId).parents('div').next('div')[0].id.split('col');
                         colNum = column[1] - 1;
@@ -801,15 +851,26 @@ dataCollectionSection =
                                 .each(function(index,span) {
                                     if (!$(span).hasClass('empty') &&
                                         !$(span).hasClass('na')) {
-                                        if (component) {
-                                            $(span).removeClass('text-danger').addClass('text-success');
-                                            $(span).html('<i class="fas fa-fw fa-check-circle"></i>');
-                                            gridData[child.id]['permissions'][index] = '1';
-                                        } else {
-                                            $(span).removeClass('text-success').addClass('text-danger');
-                                            $(span).html('<i class="fas fa-fw fa-times-circle"></i>');
-                                            gridData[child.id]['permissions'][index] = '0';
-                                        }
+
+                                        var permission, spanClass, spanData;
+                                        var spanClasses = $(span).attr("class").split(/\s+/);
+                                        $(spanClasses).each(function(index, sclass) {
+                                            if (sclass.search(/ACL-.*/) === 0) {
+                                                permission = sclass.replace('ACL-', '');
+                                                spanClass = permission + ' ';
+                                            }
+                                            // gridData[dataNodeId]['permissions'][permission] = 0;
+                                            if (component) {
+                                                $(span).removeClass('text-danger').addClass('text-success');
+                                                $(span).html('<i class="fas fa-fw fa-check-circle"></i>');
+                                                gridData[child.id]['permissions'][permission] = 1;
+                                            } else {
+                                                $(span).removeClass('text-success').addClass('text-danger');
+                                                $(span).html('<i class="fas fa-fw fa-times-circle"></i>');
+                                                gridData[child.id]['permissions'][permission] = 0;
+                                            }
+                                        });
+
                                     }
                             });
                         }
@@ -835,29 +896,13 @@ dataCollectionSection =
                     // }
 
                     var data = dataCollectionSection['data']['permissions'];
-                    data['permissions'] = { };
 
                     for (var nodeId in gridData) {
-                        data['permissions'][gridData[nodeId]['component_id']] = { };
-                        data['permissions'][gridData[nodeId]['component_id']] = gridData[nodeId]['permissions'];
+                        data[gridData[nodeId]['component_id']] = gridData[nodeId]['permissions'];
                     }
-                    for (var checkbox in checkboxIds) {
-                        data[checkboxIds[checkbox]] = { };
 
-                        if ($('#' + checkbox)[0].checked) {
-                            data[checkboxIds[checkbox]]['login'] = true;
-                        } else {
-                            data[checkboxIds[checkbox]]['login'] = false;
-                        }
-                    }
 
                     // dataCollectionSection['dataToSubmit']['permissions'] = JSON.stringify(data);
-                }
-
-                for (var checkbox in checkboxIds) {
-                    $('#' + checkbox).click(function() {
-                        extractData();
-                    });
                 }
             }
         }),

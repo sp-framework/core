@@ -26,9 +26,11 @@ class Auth
 
     protected $validation;
 
+    protected $logger;
+
     public $packagesData;
 
-    public function __construct($session, $cookies, $users, $applications, $secTools, $validation)
+    public function __construct($session, $cookies, $users, $applications, $secTools, $validation, $logger)
     {
         $this->session = $session;
 
@@ -42,6 +44,8 @@ class Auth
 
         $this->validation = $validation;
 
+        $this->logger = $logger;
+
         $this->packagesData = new PackagesData;
     }
 
@@ -53,6 +57,8 @@ class Auth
     public function logout()
     {
         $cookieKey = 'remember_' . $this->getKey();
+
+        $this->setUserFromSession();
 
         if ($this->user) {
             $this->clearUserRememberToken($cookieKey);
@@ -69,6 +75,8 @@ class Auth
         if ($this->session->has('_PHCOOKIE_' . $cookieKey)) {
             $this->session->remove('_PHCOOKIE_' . $cookieKey);
         }
+
+        // $this->logger->log->debug($this->user['email'] . ' logged out successfully from application: ' . $this->application['name']);
 
         return true;
     }
@@ -104,12 +112,25 @@ class Auth
 
         if ($this->user) {
 
-            $permissions = Json::decode($this->user['permissions'], true);
+            if ($this->user['can_login']) {
+                $canLogin = Json::decode($this->user['can_login'], true);
 
-            if (!$permissions[strtolower($this->application['name'])]['login']) {//Not allowed for application
+                if (!$canLogin[strtolower($this->application['name'])]) {//Not allowed for application
+
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+
+                    $this->logger->log->debug('User is not allowed to login to application ' . $this->application['name']);
+
+                    return false;
+                }
+            } else {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+
+                $this->logger->log->debug('User is not allowed to login to application ' . $this->application['name']);
 
                 return false;
             }
@@ -119,6 +140,8 @@ class Auth
 
                 $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
 
+                $this->logger->log->debug('Incorrect username/password entered by user ' . $this->user['email'] . ' on application ' . $this->application['name']);
+
                 return false;
             }
         } else {
@@ -127,10 +150,14 @@ class Auth
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+
+            $this->logger->log->debug($this->user['email'] . ' is not in DB. Application: ' . $this->application['name']);
+
             return false;
         }
 
         if ($this->secTools->passwordNeedsRehash($this->user['password'])) {
+
             $this->user['password'] = $this->secTools->hashPassword($postData['pass']);
 
             $this->users->update($this->user);
@@ -145,6 +172,8 @@ class Auth
         $this->packagesData->responseCode = 0;
 
         $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
+
+        $this->logger->log->debug($this->user['email'] . ' authenticated successfully on application ' . $this->application['name']);
 
         return true;
     }
@@ -172,6 +201,8 @@ class Auth
             $this->clearUserRememberToken($cookieKey);
 
             $this->cookies->delete($cookieKey);
+
+            $this->logger->log->debug('Cannot set user : ' . $this->user['email'] . ' via cookie for application: ' . $this->application['name']);
 
             throw new \Exception('Cannot set user from cookie');
         }
@@ -243,6 +274,8 @@ class Auth
         $this->user = $this->users->getById($this->session->get($this->getKey()));
 
         if (!$this->user) {
+            $this->logger->log->debug($this->user['email'] . ' not found in session for application: ' . $this->application['name']);
+
             throw new \Exception('User not found in session');
         }
     }

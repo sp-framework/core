@@ -7,6 +7,9 @@ use System\Base\BaseComponent;
 
 class FiltersComponent extends BaseComponent
 {
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
         $controlActions =

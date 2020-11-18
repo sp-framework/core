@@ -5,7 +5,8 @@
     "version"       : "0.0.1",
     "repo"          : "https://github.com/h-w-f/component-admin-auth",
     "path"          : "/",
-    "type"          : "other",
+    "class"         : "Applications\\Admin\\Components\\Auth\\AuthComponent",
+    "type"          : "system",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",

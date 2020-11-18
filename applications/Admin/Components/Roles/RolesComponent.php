@@ -6,6 +6,9 @@ use System\Base\BaseComponent;
 
 class RolesComponent extends BaseComponent
 {
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
         $roles = $this->roles->init();

@@ -14,14 +14,13 @@ class Auth extends BaseMiddleware
 
         $guestAccess =
         [
+            '/' . $appName . '/auth',
             '/' . $appName . '/auth/login',
-            '/' . $appName . '/auth/login/signin',
+            '/' . $appName . '/auth/logout',
             '/' . $appName . '/auth/forgot',
             '/' . $appName . '/auth/pwreset',
-            '/' . $appName . '/auth/pwreset/vialink',
-            '/' . $appName . '/auth/pwreset/forgot',
-            '/' . $appName . '/auth/register',
-            '/' . $appName . '/auth/register/create'
+            '/' . $appName . '/auth/pwresetlink',
+            '/' . $appName . '/auth/pwresetforgot',
         ];
 
         if (!in_array($givenRoute, $guestAccess)) {
@@ -47,7 +46,7 @@ class Auth extends BaseMiddleware
 
             //Authenticated
             if (!$this->auth->check()) {
-                return $this->response->redirect('/' . $appName . '/auth/login');
+                return $this->response->redirect('/' . $appName . '/auth');
             }
         }
     }

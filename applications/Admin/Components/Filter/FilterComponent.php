@@ -7,11 +7,17 @@ use System\Base\BaseComponent;
 
 class FilterComponent extends BaseComponent
 {
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
         //
     }
 
+    /**
+     * @acl(name=add)
+     */
     public function addAction()
     {
         $filterPackage = $this->usePackage(Filter::class);
@@ -27,6 +33,9 @@ class FilterComponent extends BaseComponent
         $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
     }
 
+    /**
+     * @acl(name=update)
+     */
     public function updateAction()
     {
         $filterPackage = $this->usePackage(Filter::class);
@@ -42,6 +51,9 @@ class FilterComponent extends BaseComponent
         $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
     }
 
+    /**
+     * @acl(name=remove)
+     */
     public function removeAction()
     {
         $filterPackage = $this->usePackage(Filter::class);
@@ -57,6 +69,9 @@ class FilterComponent extends BaseComponent
         $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
     }
 
+    /**
+     * @acl(name=clone)
+     */
     public function cloneAction()
     {
         $filterPackage = $this->usePackage(Filter::class);
@@ -74,6 +89,7 @@ class FilterComponent extends BaseComponent
         $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
     }
 
+    //need to move to view
     public function getDefaultFilterAction()
     {
         $filterPackage = $this->usePackage(Filter::class);

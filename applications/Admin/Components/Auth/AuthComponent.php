@@ -1,17 +1,23 @@
 <?php
 
-namespace Applications\Admin\Components\Auth\Login;
+namespace Applications\Admin\Components\Auth;
 
 use System\Base\BaseComponent;
 
-class LoginComponent extends BaseComponent
+class AuthComponent extends BaseComponent
 {
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
         $this->view->setLayout('auth');
     }
 
-    public function signinAction()
+    /**
+     * @acl(name=login)
+     */
+    public function loginAction()
     {
         $auth = $this->auth->init();
 
@@ -22,7 +28,10 @@ class LoginComponent extends BaseComponent
         $this->view->responseMessage = $auth->packagesData->responseMessage;
     }
 
-    public function signoutAction()
+    /**
+     * @acl(name=logout)
+     */
+    public function logoutAction()
     {
         if ($this->auth->logout()) {
             $this->view->responseCode = 0;

@@ -7,6 +7,9 @@ use System\Base\BaseComponent;
 
 class ModuleComponent extends BaseComponent
 {
+	/**
+	 * @acl(name=view)
+	 */
 	public function viewAction()
 	{
 		$infoModule = $this->usePackage(Module::class)->moduleInfo();
@@ -16,6 +19,9 @@ class ModuleComponent extends BaseComponent
 		$this->view->module = $infoModule->packagesData->info;
 	}
 
+	/**
+	 * @acl(name=install)
+	 */
 	public function installAction()
 	{
 		$modules = $this->usePackage(ModulesPackage::class);
@@ -50,6 +56,9 @@ class ModuleComponent extends BaseComponent
 		}
 	}
 
+	/**
+	 * @acl(name=update)
+	 */
 	public function updateAction()
 	{
 		$modules = $this->usePackage(ModulesPackage::class);

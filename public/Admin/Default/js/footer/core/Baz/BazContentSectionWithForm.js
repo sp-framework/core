@@ -297,7 +297,8 @@
                         stripComponentId = $(this)[0].id.split('-');
                         stripComponentId = stripComponentId[stripComponentId.length - 1];
                         if (typeof dataCollection[componentId][sectionId].data[stripComponentId] === 'object' ||
-                            $.isArray(dataCollection[componentId][sectionId].data[stripComponentId])) {
+                            $.isArray(dataCollection[componentId][sectionId].data[stripComponentId])
+                        ) {
                             dataToSubmit = JSON.stringify(dataCollection[componentId][sectionId].data[stripComponentId]);
                         } else {
                             dataToSubmit = dataCollection[componentId][sectionId].data[stripComponentId];
@@ -309,7 +310,8 @@
                         stripComponentId = $(this)[0].id.split('-');
                         stripComponentId = stripComponentId[stripComponentId.length - 1];
                         if (typeof dataCollection[componentId][sectionId].data[stripComponentId] === 'object' ||
-                            $.isArray(dataCollection[componentId][sectionId].data[stripComponentId])) {
+                            $.isArray(dataCollection[componentId][sectionId].data[stripComponentId])
+                        ) {
                             dataToSubmit = JSON.stringify(dataCollection[componentId][sectionId].data[stripComponentId]);
                         } else {
                             dataToSubmit = dataCollection[componentId][sectionId].data[stripComponentId];
