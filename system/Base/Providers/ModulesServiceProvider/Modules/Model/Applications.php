@@ -35,4 +35,12 @@ class Applications extends BaseModel
     public $update_version;
 
     public $mode;
+
+    public $registration_allowed;
+
+    public $registration_role_id;
+
+    public $guest_role_id;
+
+    public $can_login_role_ids;
 }

@@ -23,7 +23,7 @@ class Domains extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($domain) use ($name) {
-					if ($domain->domain === $name) {
+					if ($domain->name === $name) {
 						return $domain;
 					}
 				}
@@ -35,6 +35,52 @@ class Domains extends BasePackage
 			return $filter[0]->toArray();
 		} else {
 			return false;
+		}
+	}
+
+	public function addDomain(array $data)
+	{
+		$add = $this->add($data);
+
+		if ($add) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Domain Added';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error Adding Domain';
+		}
+	}
+
+	public function updateDomain(array $data)
+	{
+		$update = $this->update($data);
+
+		if ($update) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Domain Updated';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error Updating Domain';
+		}
+		//
+	}
+
+	public function removeDomain(array $data)
+	{
+		$remove = $this->remove($data['id']);
+
+		if ($remove) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Domain Removed';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error Removing Domain';
 		}
 	}
 }

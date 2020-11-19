@@ -137,7 +137,7 @@ class Setup
 		$domainUnique = new Index(
 			'column_UNIQUE',
 			[
-				'domain',
+				'name',
 			],
 			'UNIQUE'
 		);

@@ -5,9 +5,6 @@ namespace Applications\Admin\Components\Role;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
-/**
- * @RoleComponent
- */
 class RoleComponent extends BaseComponent
 {
     /**

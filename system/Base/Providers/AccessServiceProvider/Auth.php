@@ -130,17 +130,38 @@ class Auth
         if ($this->user) {
 
             if ($this->user['can_login']) {
-                $canLogin = Json::decode($this->user['can_login'], true);
+                $this->user['can_login'] = Json::decode($this->user['can_login'], true);
 
-                if (!isset($canLogin[$this->application['name']]) ||
-                    (isset($canLogin[$this->application['name']]) && !$canLogin[$this->application['name']])
-                ) {//Not allowed for application
+                if (!isset($this->user['can_login'][$this->application['name']])) {//New Application OR New user via rego
 
+                    if ($this->application['can_login_role_ids']) {
+
+                        $this->application['can_login_role_ids'] = Json::decode($this->application['can_login_role_ids'], true);
+                    }
+
+                    if (in_array($this->user['role_id'], $this->application['can_login_role_ids'])) {
+
+                        $this->user['can_login'][$this->application['name']] = true;
+
+                        $this->user['can_login'] = Json::encode($this->user['can_login']);
+
+                        $this->users->update($this->user);
+
+                    } else {
+                        $this->packagesData->responseCode = 1;
+
+                        $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+
+                        $this->logger->log->debug($this->user['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
+
+                        return false;
+                    }
+                } else if (isset($this->user['can_login'][$this->application['name']]) && !$this->user['can_login'][$this->application['name']]) {//Not allowed for application
                     $this->packagesData->responseCode = 1;
 
                     $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                    $this->logger->log->debug('User is not allowed to login to application ' . $this->application['name']);
+                    $this->logger->log->debug($this->user['email'] . ' is not allowed to login to application ' . $this->application['name']);
 
                     return false;
                 }
@@ -149,7 +170,7 @@ class Auth
 
                 $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                $this->logger->log->debug('User is not allowed to login to application ' . $this->application['name']);
+                $this->logger->log->debug($this->user['email'] . ' is not allowed to login to application ' . $this->application['name']);
 
                 return false;
             }

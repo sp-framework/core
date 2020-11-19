@@ -10,13 +10,13 @@ class Domain
 
 		$settings =
 		[
-			"defaultApplication"	=> "Admin"
+			// "defaultApplication"	=> "Admin"
 		];
 
 		$db->insertAsDict(
 			'domains',
 			[
-				'domain' 				=> $request->getHttpHost(),
+				'name'   				=> $request->getHttpHost(),
 				'description' 			=> '',
 				'settings'			 	=> json_encode($settings)
 			]

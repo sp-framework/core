@@ -129,6 +129,36 @@ class Applications
 						'notNull' => true,
 					]
 				),
+				new Column(
+					'registration_allowed',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'size'    => 1,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'registration_role_id',
+					[
+						'type'    => Column::TYPE_SMALLINTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'guest_role_id',
+					[
+						'type'    => Column::TYPE_SMALLINTEGER,
+						'notNull' => false,
+					]
+				),
+				new Column(
+					'can_login_role_ids',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'    => 2048,
+						'notNull' => false,
+					]
+				),
 			]
 		];
 	}

@@ -13,6 +13,20 @@ class UsersComponent extends BaseComponent
     {
         $users = $this->users->init();
 
+        if ($this->request->isPost()) {
+            $rolesIdToName = [];
+            foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
+                $rolesIdToName[$roleValue['id']] = $roleValue['name'] . ' (' . $roleValue['id'] . ')';
+            }
+
+            $replaceColumns =
+                [
+                    'role_id' => ['html'  => $rolesIdToName]
+                ];
+        } else {
+            $replaceColumns = null;
+        }
+
         $controlActions =
             [
                 'actionsToEnable'       =>
@@ -22,6 +36,17 @@ class UsersComponent extends BaseComponent
                 ]
             ];
 
-        $this->generateDTContent($users, 'users/view', null, ['email'], true, ['email'], $controlActions, null, null, 'email');
+        $this->generateDTContent(
+            $users,
+            'users/view',
+            null,
+            ['email', 'role_id'],
+            true,
+            ['email', 'role_id'],
+            $controlActions,
+            ['role_id' => 'role (ID)'],
+            $replaceColumns,
+            'email'
+        );
     }
 }

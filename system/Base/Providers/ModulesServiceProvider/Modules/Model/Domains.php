@@ -8,7 +8,7 @@ class Domains extends BaseModel
 {
     public $id;
 
-    public $domain;
+    public $name;
 
     public $description;
 

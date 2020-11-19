@@ -21,10 +21,10 @@ class Domains
 						]
 					),
 					new Column(
-						'domain',
+						'name',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 50,
+							'size'    => 100,
 							'notNull' => true,
 						]
 					),
@@ -40,7 +40,7 @@ class Domains
 						'settings',
 						[
 							'type'    => Column::TYPE_TEXT,
-							'notNull' => true,
+							'notNull' => false,
 						]
 					)
 				]

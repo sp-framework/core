@@ -4,7 +4,6 @@ namespace System\Base\Providers\ErrorServiceProvider;
 
 use System\Base\Providers\ErrorServiceProvider\ExceptionHandlers;
 
-
 class Error
 {
 	protected $applicationInfo;

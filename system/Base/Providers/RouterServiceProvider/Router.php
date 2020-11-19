@@ -270,10 +270,10 @@ class Router
 
 	protected function validateDomain()
 	{
-		$applicationDomain = Json::decode($this->applicationInfo['settings'], true);
+		$applicationSettings = Json::decode($this->applicationInfo['settings'], true);
 
-		if (isset($applicationDomain['domain']) &&
-				($applicationDomain['domain'] !== '' && $applicationDomain['domain'] !== '0')
+		if (isset($applicationSettings['domain']) &&
+			($applicationSettings['domain'] !== '' && $applicationSettings['domain'] !== '0')
 		) {
 			if (!$this->domains->getNamedDomain($this->request->getHttpHost())) {
 				$this->logger->log->alert(
@@ -283,13 +283,13 @@ class Router
 				return false;
 			}
 
-			if ($this->request->getHttpHost() === $applicationDomain['domain']) {
+			if ($this->request->getHttpHost() === $applicationSettings['domain']) {
 				return true;
 			} else {
 				$this->logger->log->alert(
 					'Trying to access application ' . $this->applicationInfo['name'] .
 					' on domain ' . $this->request->getHttpHost() . '. Application is restricted to ' .
-					$applicationDomain['domain']
+					$applicationSettings['domain']
 				);
 
 				return false;

@@ -8,8 +8,6 @@ class ErrorsComponent extends BaseComponent
 {
     public function routenotfoundAction()
     {
-        $this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/Error/'));
-
-        $this->view->pick('notfound');
+        $this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/'));
     }
 }
