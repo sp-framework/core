@@ -121,9 +121,9 @@ class Roles extends BasePackage
     {
         $acls = [];
         $applicationsArr = $this->modules->applications->applications;
-        $componentsArr = $this->modules->components->components;
 
         foreach ($applicationsArr as $applicationKey => $application) {
+            $componentsArr = $this->modules->components->getComponentsForApplication($application['id']);
             $components[strtolower($application['name'])] = ['title' => strtoupper($application['name'])];
             foreach ($componentsArr as $key => $component) {
                 $components[strtolower($application['name'])]['childs'][$component['type']] = ['title' => strtoupper($component['type'])];
@@ -164,6 +164,7 @@ class Roles extends BasePackage
                 $permissions = [];
 
                 foreach ($applicationsArr as $applicationKey => $application) {
+                    $componentsArr = $this->modules->components->getComponentsForApplication($application['id']);
                     foreach ($componentsArr as $key => $component) {
                         if ($component['class'] && $component['class'] !== '') {
                             $reflector = $this->annotations->get($component['class']);
@@ -203,6 +204,7 @@ class Roles extends BasePackage
             $permissions = [];
 
             foreach ($applicationsArr as $applicationKey => $application) {
+                $componentsArr = $this->modules->components->getComponentsForApplication($application['id']);
                 foreach ($componentsArr as $key => $component) {
                     //Build ACL Columns
                     if ($component['class'] && $component['class'] !== '') {
