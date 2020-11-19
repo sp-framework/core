@@ -155,7 +155,7 @@ function processLogin() {
         $('body').vegas('destroy');
         $('.login-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('text-danger').addClass('text-success text-bold');
-        window.location = '/';
+        window.location = '/{{applicationName|lower}}/';
     }
 
     // function loginTwofa() {

@@ -225,114 +225,6 @@ dataCollectionSection =
             ],
             grid: {
                 columns: gridColumns,
-                // [
-                //     {
-                //         header          :   '<p class="text-center mb-0">' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-components-denyall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Deny All" class="fas fa-fw fa-times-circle ' +
-                //                                         'mr-1 text-danger helper components">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                                     ' COMPONENTS ' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-components-permitall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Permit All" class="fas fa-fw fa-check-circle ' +
-                //                                         'ml-1 text-success helper components">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                             '</p>',
-                //         wideCellClass   : 'text-center components',
-                //         title           : "_DATA_",
-                //         width           : 500
-                //     },
-                //     {
-                //         header          :   '<p class="text-center mb-0">' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-view-denyall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Deny All View" class="fas fa-fw fa-times-circle ' +
-                //                                         'mr-1 text-danger helper view">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                                     ' VIEW ' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-view-permitall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Permit All View" class="fas fa-fw fa-check-circle ' +
-                //                                         'ml-1 text-success helper view">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                             '</p>',
-                //         wideCellClass   : 'text-center view',
-                //         cellClass       : 'empty'
-                //     },
-                //     {
-                //         header          :   '<p class="text-center mb-0">' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-add-denyall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Deny All Add" class="fas fa-fw fa-times-circle ' +
-                //                                         'mr-1 text-danger helper add">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                                     ' ADD ' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-add-permitall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Permit All Add" class="fas fa-fw fa-check-circle ' +
-                //                                         'ml-1 text-success helper add">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                             '</p>',
-                //         wideCellClass   : 'text-center add',
-                //         cellClass       : 'empty'
-                //     },
-                //     {
-                //         header          :   '<p class="text-center mb-0">' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-edit-denyall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Deny All Edit" class="fas fa-fw fa-times-circle ' +
-                //                                         'mr-1 text-danger helper edit">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                                     ' EDIT ' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-edit-permitall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Permit All Edit" class="fas fa-fw fa-check-circle ' +
-                //                                         'ml-1 text-success helper edit">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                             '</p>',
-                //         wideCellClass   : 'text-center edit',
-                //         cellClass       : 'empty'
-                //     },
-                //     {
-                //         header          :   '<p class="text-center mb-0">' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-remove-denyall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Deny All Remove" class="fas fa-fw fa-times-circle ' +
-                //                                         'mr-1 text-danger helper remove">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                                     ' REMOVE ' +
-                //                                 '<span class="cursor-pointer">' +
-                //                                     '<i id="{{componentId}}-{{sectionId}}-permissions-remove-permitall" ' +
-                //                                         'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
-                //                                         'data-original-title="Permit All Remove" class="fas fa-fw fa-check-circle ' +
-                //                                         'ml-1 text-success helper remove">' +
-                //                                     '</i>' +
-                //                                 '</span>' +
-                //                             '</p>',
-                //         wideCellClass   : 'text-center remove',
-                //         cellClass       : 'empty'
-                //     },
-                // ],
                 resizable   : true
             },
             afterInit : function(dataCollection) {
@@ -361,12 +253,10 @@ dataCollectionSection =
                 if (!dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data']) {
                     dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'] = { };
                 }
-                // dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}-permissions']['data']['permissions'] = { };
                 gridData = dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'];
 
                 permissions = JSON.parse('{{rolePermissions}}');//Parse DB Data
-                //eslint-disable-next-line
-                console.log(permissions);
+
                 for (var application in permissions) {
                     for (var component in permissions[application]) {
                         if ($('#{{componentId}}-{{sectionId}}-permissions').find('[data-id="' + component + '"]').length > 0) {
@@ -380,8 +270,7 @@ dataCollectionSection =
                         }
                     }
                 }
-                //eslint-disable-next-line
-                console.log(gridData);
+
                 $.each(allIds, function(index, obj) {
                     if (gridData[obj.id]) {
                         var jstreeIdStructure =
@@ -407,39 +296,23 @@ dataCollectionSection =
                             .find('[data-jstreegrid="' + jstreeGridId + '"]')
                             .each(function(index, column) {
                                 var permission, spanClass, spanData;
-                                //eslint-disable-next-line
+
                                 var spanClasses = $(this).children('span').attr("class").split(/\s+/);
                                 $(spanClasses).each(function(index, sclass) {
                                     if (sclass.search(/ACL-.*/) === 0) {
                                         permission = sclass.replace('ACL-', '');
-                                        //eslint-disable-next-line
-                                        // console.log(permission);
                                         spanClass = permission + ' ';
                                     }
                                 });
-                                // if (index === 0) {
-                                //     spanClass = 'view ';
-                                // } else if (index === 1) {
-                                //     spanClass = 'add ';
-                                // } else if (index === 2) {
-                                //     spanClass = 'edit ';
-                                // } else if (index === 3) {
-                                //     spanClass = 'remove ';
-                                // }
-                                    //eslint-disable-next-line
-                                    // console.log(gridData[jstreeGridId]['permissions'][permission]);
-                                // if (gridData[jstreeGridId]['permissions'][permission]) {
-                                //     //eslint-disable-next-line
-                                //     console.log('me');
-                                    if (gridData[jstreeGridId]['permissions'][permission] == '0') {
-                                        spanClass += 'text-danger cursor-pointer';
-                                        spanData = '<i class="fa fa-fw fa-times-circle"></i>';
-                                        $(this).children('span').removeClass('empty');
-                                    } else if (gridData[jstreeGridId]['permissions'][permission] == '1') {
-                                        spanClass += 'text-success cursor-pointer';
-                                        spanData = '<i class="fa fa-fw fa-check-circle"></i>';
-                                        $(this).children('span').removeClass('empty');
-                                    // }
+
+                                if (gridData[jstreeGridId]['permissions'][permission] == '0') {
+                                    spanClass += 'text-danger cursor-pointer';
+                                    spanData = '<i class="fa fa-fw fa-times-circle"></i>';
+                                    $(this).children('span').removeClass('empty');
+                                } else if (gridData[jstreeGridId]['permissions'][permission] == '1') {
+                                    spanClass += 'text-success cursor-pointer';
+                                    spanData = '<i class="fa fa-fw fa-check-circle"></i>';
+                                    $(this).children('span').removeClass('empty');
                                 } else {
                                     spanClass = 'na';
                                     spanData = '<p class="text-secondary">-</p>';
@@ -484,15 +357,11 @@ dataCollectionSection =
                 );
 
                 function toggleGridCell(dataGridId, dataNodeId, bulk, bulkState) {
-                    //eslint-disable-next-line
-                    // console.log(dataGridId, dataNodeId, bulk, bulkState);
                     // Only run on columns that have data and are not empty or na (N/A)
                     if (!$('#' + dataGridId).children('span').hasClass('empty') && !$('#' + dataGridId).children('span').hasClass('na')) {
                         parents = gridData[dataNodeId]['parents'];
                         children = gridData[dataNodeId]['children'];
                         var siblings = findSiblings(dataNodeId);
-                        //eslint-disable-next-line
-                        // console.log(siblings);
                         var viewId, viewState, myState;
 
                         viewId = $(siblings)[0].id;
@@ -515,27 +384,15 @@ dataCollectionSection =
                             viewState = 'permit';
                         }
                         //We only need this to store data at the moment. If the array is going to be named array like view => 0, then we dont need this.
-                        // var colNum, column;
-                        //eslint-disable-next-line
-                        // console.log(dataGridId);
                         var permission, spanClass, spanData;
                         var spanClasses = $('#' + dataGridId).children('span').attr("class").split(/\s+/);
                         $(spanClasses).each(function(index, sclass) {
                             if (sclass.search(/ACL-.*/) === 0) {
                                 permission = sclass.replace('ACL-', '');
-                                //eslint-disable-next-line
-                                // console.log(permission);
                                 spanClass = permission + ' ';
                             }
                         });
-                        //eslint-disable-next-line
-                        console.log(viewState, myState);
-                        //eslint-disable-next-line
-                        console.log(permission);
-                        // column = dataGridId.split('col');
-                        // colNum = column[1] - 1;
                         if (viewState === 'deny' && myState === 'deny') {
-                        // if ($('#' + dataGridId).children('span').hasClass('text-danger') || $('#' + dataGridId).children('span').hasClass('text-secondary')) {
                             $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
                             $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
                             $('#' + viewId).children('span').removeClass('text-danger').addClass('text-success');
@@ -543,7 +400,6 @@ dataCollectionSection =
                             gridData[dataNodeId]['permissions']['view'] = 1;
                             gridData[dataNodeId]['permissions'][permission] = 1;
                         } else if (viewState === 'permit' && myState === 'permit') {
-                        // } else if ($('#' + dataGridId).children('span').hasClass('text-success')) {
                             $('#' + dataGridId).children('span').removeClass('text-success').addClass('text-danger');
                             $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
                             gridData[dataNodeId]['permissions'][permission] = 0;
@@ -570,8 +426,6 @@ dataCollectionSection =
                                                         }
                                                         gridData[dataNodeId]['permissions'][permission] = 0;
                                                     });
-                                                            //eslint-disable-next-line
-                                                            // console.log(permission);
                                                     $(sibl).children('span').removeClass('text-success').addClass('text-danger');
                                                     $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
                                                 }
@@ -586,8 +440,6 @@ dataCollectionSection =
                                                     $(spanClasses).each(function(index, sclass) {
                                                         if (sclass.search(/ACL-.*/) === 0) {
                                                             permission = sclass.replace('ACL-', '');
-                                                            //eslint-disable-next-line
-                                                            // console.log(permission);
                                                             spanClass = permission + ' ';
                                                         }
                                                         gridData[dataNodeId]['permissions'][permission] = 0;
@@ -603,69 +455,9 @@ dataCollectionSection =
                                 }
                             }
                         }
-
-                        // if (!bulk) {
-                        //     // Disable children if parent is deny
-                        //     if (children.length > 0) {
-                        //         toggleChildren(children, dataGridId);
-                        //     }
-                        //     // Enable parent if child is enabled
-                        //     if (parents.length > 0) {
-                        //         toggleParents(parents, siblings, viewId, viewState);
-                        //     }
-                        // }
                     }
                     extractData();
                 }
-
-                // function toggleParents(parents, siblings, viewId, viewState) {
-                //     $.each(parents, function(index, parent) {
-                //         var parentColumn = $('.jstree-grid-wrapper').find('[data-jstreegrid="' + parent + '"]')[0];//Only View
-                //         if ($(parentColumn).children('span').hasClass('text-danger')) {
-                //             $(parentColumn).children('span').removeClass('text-danger').addClass('text-success');
-                //             $(parentColumn).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
-                //             gridData[$(parentColumn).data('jstreegrid')]['permissions'][0][0] = '1';
-                //         }
-                //     });
-                //     $.each(siblings, function(index, sibl) {
-                //         if (viewState === 'deny' || viewState === 'disabled') {
-                //             // if ($(sibl)[0].id !== viewId) {
-                //             //     if ($(sibl).children('span').hasClass('text-secondary')) {
-                //             //         $(sibl).children('span').removeClass('text-secondary').addClass('text-danger');
-                //             //         gridData[$(sibl).data('jstreegrid')]['permissions'][0][index] = '0';
-                //             //     }
-                //             // } else {
-                //                 $(sibl).children('span').removeClass('text-danger').addClass('text-success');
-                //                 $(sibl).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
-                //                 gridData[$(sibl).data('jstreegrid')]['permissions'][0][index] = '1';
-                //             // }
-                //         }
-                //     });
-                // }
-
-                // function toggleChildren(children, dataGridId) {
-                //     var childrenRemoveClass, childrenAddClass, childrenIcon, childrenPermissionData;
-                //     $.each(children, function(index, child) {
-                //         var childColumns = $('.jstree-grid-wrapper').find('[data-jstreegrid="' + child + '"]');
-                //         if ($('#' + dataGridId).children('span').hasClass('text-danger')) {
-                //             var siblings = $('.jstree-grid-wrapper').find('[data-jstreegrid="' + child + '"]');
-                //             childrenRemoveClass = 'text-danger text-success';
-                //             childrenAddClass = 'text-danger';
-                //             childrenIcon = 'times';
-                //             childrenPermissionData = '0';
-                //         } else if ($('#' + dataGridId).children('span').hasClass('text-success')) {
-                //             childrenRemoveClass = 'text-danger text-success';
-                //             childrenAddClass = 'text-danger';
-                //             childrenIcon = 'times';
-                //             childrenPermissionData = '0';
-                //         }
-                //         $(childColumns).children('span').removeClass(childrenRemoveClass).addClass(childrenAddClass);
-                //         $(childColumns).children('span').html('<i class="fas fa-fw fa-' + childrenIcon + '-circle"></i>');
-                //         $.each(childColumns, function(index, childColumn) {
-                //             gridData[child]['permissions'][0][index] = childrenPermissionData;
-                //         });
-                //     });
-                // }
 
                 (function registerBulkButtons() {
                     // Bulk deny/permit (All)
@@ -677,16 +469,6 @@ dataCollectionSection =
                         e.preventDefault();
                         denyPermitAll(null, null, true, null);
                     });
-
-                    // Bulk deny/permit (Specific Columns)
-                    // $('#{{componentId}}-{{sectionId}}-permissions-view-denyall').click(function(e) {
-                    //     e.preventDefault();
-                    //     denyPermitAll(null, null, false, true);
-                    // });
-                    // $('#{{componentId}}-{{sectionId}}-permissions-view-permitall').click(function(e) {
-                    //     e.preventDefault();
-                    //     denyPermitAll(this, true, null, true);
-                    // });
 
                     for (var aclAll in acls) {
                         $('#{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-denyall').click(function(e) {
@@ -707,37 +489,11 @@ dataCollectionSection =
                             }
                         });
                     }
-
-                    // $('#{{componentId}}-{{sectionId}}-permissions-add-denyall, ' +
-                    //   '#{{componentId}}-{{sectionId}}-permissions-edit-denyall, ' +
-                    //   '#{{componentId}}-{{sectionId}}-permissions-remove-denyall')
-                    // .click(function(e) {
-                    //     e.preventDefault();
-                    //     denyPermitAll(this, false, null, null);
-                    // });
-                    // $('#{{componentId}}-{{sectionId}}-permissions-add-permitall, ' +
-                    //   '#{{componentId}}-{{sectionId}}-permissions-edit-permitall, ' +
-                    //   '#{{componentId}}-{{sectionId}}-permissions-remove-permitall')
-                    // .click(function(e) {
-                    //     e.preventDefault();
-                    //     denyPermitAll(this, true, null, null);
-                    // });
                 })();
 
                 // Function to make bulk changes
                 function denyPermitAll(denyPermitPermissionIconId, permit, component, view) {
-                    //eslint-disable-next-line
-                    // console.log(denyPermitPermissionIconId, permit, component, view);
                     if (denyPermitPermissionIconId) {
-                        // var permission, spanClass, spanData;
-                        // var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
-                        // $(spanClasses).each(function(index, sclass) {
-                        //     if (sclass.search(/ACL-.*/) === 0) {
-                        //         permission = sclass.replace('ACL-', '');
-                        //         spanClass = permission + ' ';
-                        //     }
-                        //     // gridData[dataNodeId]['permissions'][permission] = 0;
-                        // });
                         var colNum, column;
                         column = $(denyPermitPermissionIconId).parents('div').next('div')[0].id.split('col');
                         colNum = column[1] - 1;
@@ -745,38 +501,10 @@ dataCollectionSection =
                     // Deny All in that Column
                     $.each(allIds, function(index, child) {
                         if (denyPermitPermissionIconId) {
-                            // if (view) {
-                                toggleGridCell(
-                                    $('.jstree-grid-wrapper')
-                                    .find('[data-jstreegrid="' + child.id + '"]')[colNum].id, child.id, true, permit
-                                );
-                            // } else {
-                            //     if (!$($('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')[colNum])
-                            //             .children('span').hasClass('empty') &&
-                            //         !$($('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')[colNum])
-                            //             .children('span').hasClass('na')
-                            //     ) {
-                            //         if (permit) {
-                            //             $($('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')[colNum])
-                            //                 .children('span')
-                            //                 .removeClass('text-danger')
-                            //                 .addClass('text-success');
-                            //             $($('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')[colNum])
-                            //                 .children('span')
-                            //                 .html('<i class="fas fa-fw fa-check-circle"></i>');
-                            //             gridData[child.id]['permissions'][colNum] = '1';
-                            //         } else {
-                            //             $($('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')[colNum])
-                            //                 .children('span')
-                            //                 .removeClass('text-success')
-                            //                 .addClass('text-danger');
-                            //             $($('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')[colNum])
-                            //                 .children('span')
-                            //                 .html('<i class="fas fa-fw fa-times-circle"></i>');
-                            //             gridData[child.id]['permissions'][colNum] = '0';
-                            //         }
-                            //     }
-                            // }
+                            toggleGridCell(
+                                $('.jstree-grid-wrapper')
+                                .find('[data-jstreegrid="' + child.id + '"]')[colNum].id, child.id, true, permit
+                            );
                         } else {
                             $('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')
                                 .children('span')
@@ -791,7 +519,6 @@ dataCollectionSection =
                                                 permission = sclass.replace('ACL-', '');
                                                 spanClass = permission + ' ';
                                             }
-                                            // gridData[dataNodeId]['permissions'][permission] = 0;
                                             if (component) {
                                                 $(span).removeClass('text-danger').addClass('text-success');
                                                 $(span).html('<i class="fas fa-fw fa-check-circle"></i>');
@@ -807,7 +534,6 @@ dataCollectionSection =
                             });
                         }
                     });
-
                     extractData();
                 }
 
@@ -820,20 +546,12 @@ dataCollectionSection =
                     if (!dataCollectionSection['data']['permissions']) {
                         dataCollectionSection['data']['permissions'] = { };
                     }
-                    // if (!dataCollectionSection['dataToSubmit']) {
-                    //     dataCollectionSection['dataToSubmit'] = { };
-                    // }
-                    // if (!dataCollectionSection['dataToSubmit']['permissions']) {
-                    //     dataCollectionSection['dataToSubmit']['permissions'] = { };
-                    // }
 
                     var data = dataCollectionSection['data']['permissions'];
 
                     for (var nodeId in gridData) {
                         data[gridData[nodeId]['component_id']] = gridData[nodeId]['permissions'];
                     }
-
-                    // dataCollectionSection['dataToSubmit']['permissions'] = JSON.stringify(data);
                 }
             }
         }),

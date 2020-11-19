@@ -60,8 +60,8 @@
                 sectionId = $(this._element)[0].id;
 
                 dataCollection = window['dataCollection'];
-                pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3');
-                swalSound = new Audio(dataCollection.env.soundPath + 'swal.mp3');
+                pnotifySound = dataCollection.env.sounds.pnotifySound
+                swalSound = dataCollection.env.sounds.swalSound
 
                 if (!dataCollection[componentId]) {
                     dataCollection[componentId] = { };

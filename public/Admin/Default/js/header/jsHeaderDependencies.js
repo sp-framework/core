@@ -172,39 +172,44 @@ var BazContentLoader = function() {
 
         setTimeout(function () {
             $(options.ajaxContainer).load(urlToLoad, options.ajaxLoadLinkParams, function (response, status, xhr) {
-                // console.log(xhr.getAllResponseHeaders()); //trying to get page last edit for storing data locally
-                if (options.ajaxSetTitle) {
-                    var titlePart = response.split("title>"); //dirty little trick to get an html element
-                    titlePart = titlePart[1].split("</"); //since the <title> element is always the same, this is possible
-                    var title = titlePart[0];
-                    document.title = title; //set the title
-                }
-
-                if (options.ajaxDynamicUrl && popped != true) {
-                    var state = { name: urlToLoad, page: title, id: elementId };
-
-                    history.pushState(state, title, urlToLoad); //change url to the one provided
-                }
-                if (status == "success") {
-                    // BAZ Template Not Found
-                    var template = /^Error: can't load template.*$/;
-                    if (template.test(response)) {
-                        $(options.ajaxContainer).empty();
-                        options.ajaxError.call('templateError');
-                    }
-                    if (element) {
-                        options.ajaxFinished.call(element); //call the 'finished' callback
-                    } else {
-                        options.ajaxFinished.call();
+                if (xhr.getResponseHeader('NEED_AUTH') === '1') {
+                    response = null;
+                    window.location = xhr.getResponseHeader('REDIRECT_URL');
+                } else {
+                    // console.log(xhr.getAllResponseHeaders()); //trying to get page last edit for storing data locally
+                    if (options.ajaxSetTitle) {
+                        var titlePart = response.split("title>"); //dirty little trick to get an html element
+                        titlePart = titlePart[1].split("</"); //since the <title> element is always the same, this is possible
+                        var title = titlePart[0];
+                        document.title = title; //set the title
                     }
 
-                } else if (status == "error" || status == "timeout" || status == "parseerror") {
-                    options.ajaxError.call(xhr.status); //call the 'error' callback, 'this' = xhr.status
+                    if (options.ajaxDynamicUrl && popped != true) {
+                        var state = { name: urlToLoad, page: title, id: elementId };
+
+                        history.pushState(state, title, urlToLoad); //change url to the one provided
+                    }
+                    if (status == "success") {
+                        // BAZ Template Not Found
+                        var template = /^Error: can't load template.*$/;
+                        if (template.test(response)) {
+                            $(options.ajaxContainer).empty();
+                            options.ajaxError.call('templateError');
+                        }
+                        if (element) {
+                            options.ajaxFinished.call(element); //call the 'finished' callback
+                        } else {
+                            options.ajaxFinished.call();
+                        }
+
+                    } else if (status == "error" || status == "timeout" || status == "parseerror") {
+                        options.ajaxError.call(xhr.status); //call the 'error' callback, 'this' = xhr.status
+                    }
+                    // Reset counter after page load complete to accommodate new links (if any)
+                    init(options);
+                    dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
+                    $('body').trigger('bazContentLoaderAjaxComplete');
                 }
-                // Reset counter after page load complete to accommodate new links (if any)
-                init(options);
-                dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
-                $('body').trigger('bazContentLoaderAjaxComplete');
             });
         }, options.ajaxLoadDelay);
     }
@@ -242,31 +247,34 @@ var BazContentLoader = function() {
 
         setTimeout(function () {
             $(options.modalContainer).load(urlToLoad, options.modalLoadLinkParams, function (response, status, xhr) {
+                if (xhr.getResponseHeader('NEED_AUTH') === '1') {
+                    window.location = xhr.getResponseHeader('REDIRECT_URL');
+                } else {
+                    if (status == "success") {
+                        // BAZ Template Not Found
+                        var template = /^Error: can't load template.*$/;
+                        if (template.test(response)) {
+                            $(options.modalContainer).html(($('#baz-error-templateError').html()));
+                            $(options.modalContainer).removeClass('p-0');
+                            options.modalError.call('templateError');
+                        }
+                        if (element) {
+                            options.modalFinished.call(element); //call the 'finished' callback
+                        } else {
+                            options.modalFinished.call();
+                        }
 
-                if (status == "success") {
-                    // BAZ Template Not Found
-                    var template = /^Error: can't load template.*$/;
-                    if (template.test(response)) {
-                        $(options.modalContainer).html(($('#baz-error-templateError').html()));
+                    } else if (status == "error" || status == "timeout" || status == "parseerror") {
+                        $(options.modalContainer).html(($('#baz-error-' + xhr.status).html()));
                         $(options.modalContainer).removeClass('p-0');
-                        options.modalError.call('templateError');
+                        options.modalError.call(xhr.status); //call the 'error' callback, 'this' = xhr.status
                     }
-                    if (element) {
-                        options.modalFinished.call(element); //call the 'finished' callback
-                    } else {
-                        options.modalFinished.call();
-                    }
-
-                } else if (status == "error" || status == "timeout" || status == "parseerror") {
-                    $(options.modalContainer).html(($('#baz-error-' + xhr.status).html()));
-                    $(options.modalContainer).removeClass('p-0');
-                    options.modalError.call(xhr.status); //call the 'error' callback, 'this' = xhr.status
+                    // Reset counter after page load complete to accommodate new links (if any)
+                    init(options);
+                    dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
+                    // Trigger Modal Complete
+                    $('body').trigger('bazContentLoaderModalComplete');
                 }
-                // Reset counter after page load complete to accommodate new links (if any)
-                init(options);
-                dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
-                // Trigger Modal Complete
-                $('body').trigger('bazContentLoaderModalComplete');
             });
         }, options.modalLoadDelay);
     }

@@ -17,8 +17,6 @@ abstract class BaseComponent extends Controller
 {
 	protected $getQueryArr = [];
 
-	protected $applicationName;
-
 	protected $componentName;
 
 	protected $application;

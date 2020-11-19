@@ -82,6 +82,11 @@ class Users extends BasePackage
 
             $data['password'] = $this->secTools->hashPassword($password);
         }
+
+        if ($data['force_logout'] === '1') {
+            $data['session_id'] = null;
+        }
+
         if ($this->update($data)) {
 
             if ($data['email_new_password'] === '1') {
@@ -251,8 +256,13 @@ class Users extends BasePackage
                 $components[strtolower($application['name'])]['childs'][$component['type']] = ['title' => strtoupper($component['type'])];
             }
             foreach ($componentsArr as $key => $component) {
-                $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['id'] = $component['id'];
-                $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['title'] = $component['name'];
+                $reflector = $this->annotations->get($component['class']);
+                $methods = $reflector->getMethodsAnnotations();
+
+                if ($methods) {
+                    $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['id'] = $component['id'];
+                    $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['title'] = $component['name'];
+                }
             }
         }
 
@@ -273,17 +283,17 @@ class Users extends BasePackage
 
             if ($user) {
 
-                if ($user['permissions'] && $user['permissions'] !== '') {
-                    $permissionsArr = Json::decode($user['permissions'], true);
-                } else {
-                    $permissionsArr = [];
-                }
                 if ($user['can_login'] && $user['can_login'] !== '') {
                     $user['can_login'] = Json::decode($user['can_login'], true);
                 } else {
                     $user['can_login'] = [];
                 }
 
+                if ($user['permissions'] && $user['permissions'] !== '') {
+                    $permissionsArr = Json::decode($user['permissions'], true);
+                } else {
+                    $permissionsArr = [];
+                }
                 $permissions = [];
 
                 foreach ($applicationsArr as $applicationKey => $application) {
@@ -316,7 +326,7 @@ class Users extends BasePackage
 
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'User ID Not Found!';
+                $this->packagesData->responseMessage = 'User Not Found!';
 
                 return false;
             }

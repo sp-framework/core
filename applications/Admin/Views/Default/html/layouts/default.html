@@ -1,4 +1,4 @@
-
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -45,6 +45,9 @@ if (!window.dataCollection) {
         dataCollection.env.rootPath +
         "{{modules.applications.getApplicationInfo()['name']}}" + '/' +
         "{{modules.views.getViewInfo()['name']}}" + '/' + 'sounds/';
+    dataCollection.env.sounds = { };
+    dataCollection.env.sounds.pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3');
+    dataCollection.env.sounds.swalSound = new Audio(dataCollection.env.soundPath + 'swal.mp3');
     dataCollection.env.fontsPath =
         dataCollection.env.rootPath +
         "{{modules.applications.getApplicationInfo()['name']}}" + '/' +
@@ -78,3 +81,4 @@ if (localStorage.getItem('bazDevMode') === null) {
         </div>
     </body>
 </html>
+<!-- htmlmin:ignore -->

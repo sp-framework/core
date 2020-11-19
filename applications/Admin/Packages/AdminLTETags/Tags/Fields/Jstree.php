@@ -52,10 +52,10 @@ class Jstree
         $this->content .=
             '<input type="text" class="form-control form-control-sm jstreevalidate rounded-0" ' . $this->fieldParams['fieldId'] . '-validate" ' . $this->fieldParams['fieldName'] . '-tree-validate" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" hidden />
             <div ' . $this->fieldParams['fieldId'] . '-tree-tools" class="mb-2 float-right">
-                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-add" class="text-primary" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Add new ' . $this->fieldParams['fieldId'] . '" hidden>
+                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-add" class="text-primary" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Add new ' . $this->params['fieldId'] . '" hidden>
                     <i class="fa fa-fw fa-plus"></i>
                 </a>
-                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-edit" class="text-primary ml-1" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Edit selected ' . $this->fieldParams['fieldId'] . '" hidden>
+                <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-edit" class="text-primary ml-1" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Edit selected ' . $this->params['fieldId'] . '" hidden>
                     <i class="fa fa-fw fa-edit"></i>
                 </a>
                 <a href="#" ' . $this->fieldParams['fieldId'] . '-tools-collapse" class="text-primary ml-1" data-container="body" data-placement="left" data-toggle="tooltip" data-html="true" title="Collapse All" hidden>

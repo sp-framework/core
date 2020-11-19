@@ -5,7 +5,8 @@
 	"version"		: "0.0.1",
 	"repo"			: "https://",
 	"path"			: "/",
-	"type"			: "crud",
+	"class"			: "Applications\\Barebone\\Components\\Home\\HomeComponent",
+	"type"			: "forms",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

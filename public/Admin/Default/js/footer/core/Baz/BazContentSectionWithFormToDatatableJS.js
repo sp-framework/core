@@ -34,8 +34,6 @@ var BazContentSectionWithFormToDatatable = function() {
     }
 
     function init(options) {
-        //eslint-disable-next-line
-        console.log(options);
         componentId = $(options.sectionId).parents('.component')[0].id;
         sectionId = $(options.sectionId)[0].id;
 
@@ -46,7 +44,7 @@ var BazContentSectionWithFormToDatatable = function() {
             dataCollection[componentId][sectionId] = { };
         }
 
-        pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3'); //Error Sound for Swal
+        pnotifySound = dataCollection.env.sounds.pnotifySound
 
         dataTableFields = { };
         tableData = { };

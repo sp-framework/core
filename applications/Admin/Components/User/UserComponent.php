@@ -13,12 +13,12 @@ class UserComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
-            $view = $this->users->generateViewData($this->getData()['id']);
+            $user = $this->users->generateViewData($this->getData()['id']);
         } else {
-            $view = $this->users->generateViewData();
+            $user = $this->users->generateViewData();
         }
 
-        if ($view) {
+        if ($user) {
             $this->view->components = $this->users->packagesData->components;
 
             $this->view->acls = $this->users->packagesData->acls;
@@ -28,15 +28,11 @@ class UserComponent extends BaseComponent
             $this->view->applications = $this->users->packagesData->applications;
 
             $this->view->roles = $this->users->packagesData->roles;
-
-            $this->view->responseCode = $this->users->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
-        } else {
-            $this->view->responseCode = $this->users->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
         }
+
+        $this->view->responseCode = $this->users->packagesData->responseCode;
+
+        $this->view->responseMessage = $this->users->packagesData->responseMessage;
     }
 
     /**

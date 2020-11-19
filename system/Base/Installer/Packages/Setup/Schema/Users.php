@@ -67,6 +67,14 @@ class Users
                         ]
                     ),
                     new Column(
+                        'session_id',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 1024,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'remember_identifier',
                         [
                             'type'    => Column::TYPE_TEXT,

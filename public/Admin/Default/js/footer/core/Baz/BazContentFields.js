@@ -62,7 +62,8 @@
                 componentId = $(this._element).parents('.component')[0].id;
                 sectionId = $(this._element)[0].id;
                 dataCollection = window['dataCollection'];
-                pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3'); //Notification sound
+                pnotifySound = dataCollection.env.sounds.pnotifySound
+
                 // Grab Components HTML Code (future use)
                 // if (!dataCollection[componentId].html){
                 //     dataCollection[componentId].html = $('#' + componentId).parents('.container-fluid').html();

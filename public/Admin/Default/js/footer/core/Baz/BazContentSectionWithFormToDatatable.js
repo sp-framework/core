@@ -55,7 +55,7 @@
             };
 
             _proto._init = function _init(options) {
-                pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3'); //Error Sound for Swal
+                pnotifySound = dataCollection.env.sounds.pnotifySound;
                 componentId = $(this._element).parents('.component')[0].id;
                 sectionId = $(this._element)[0].id;
 

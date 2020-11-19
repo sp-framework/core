@@ -12,12 +12,20 @@ class Acl extends BaseMiddleware
 {
     protected $components = [];
 
+    protected $controller;
+
+    protected $action;
+
+    protected $user;
+
+    protected $userEmail;
+
+    protected $role;
+
     public function process()
     {
         $appName = strtolower($this->application['name']);
-
         $givenRoute = $this->request->getUri();
-
         $guestAccess =
         [
             '/' . $appName . '/auth',
@@ -28,94 +36,91 @@ class Acl extends BaseMiddleware
             '/' . $appName . '/auth/pwresetlink',
             '/' . $appName . '/auth/pwresetforgot',
         ];
-
         if (in_array($givenRoute, $guestAccess)) {
             return;
         }
 
-        if (!$this->auth->hasUserInSession()) {
+        if (!$this->auth->hasUserInSession()) {//Not Authenticated
             return $this->response->redirect('/' . $appName . '/auth');
         }
+
         $rolesArr = $this->roles->getAll()->roles;
         $roles = [];
         foreach ($rolesArr as $key => $value) {
             $roles[$value['id']] = $value;
         }
 
-        $user = $this->auth->user();
+        $this->user = $this->auth->user();
 
-        if ($user['role_id'] === '1') {//Systems Administrators
+        if ($this->user['role_id'] === '1') {//Systems Administrators
             return;
         }
 
         $this->checkCachePath();
-
         $aclFileDir = 'var/storage/cache/acls/';
 
-        $controller = $this->dispatcher->getControllerName();
-        $action = str_replace('Action', '', $this->dispatcher->getActiveMethod());
+        $this->controller = $this->dispatcher->getControllerName();
+        $this->action = str_replace('Action', '', $this->dispatcher->getActiveMethod());
 
+        if ($this->user && $this->user['override_role'] === '1') {
+            $this->userEmail = str_replace('.', '', str_replace('@', '', $this->user['email']));
 
-        if ($user && $user['override_role'] === '1') {
-            $userEmail = str_replace('.', '', str_replace('@', '', $user['email']));
+            if ($this->localContent->has($aclFileDir . $this->userEmail . $this->user['id'])) {
 
-            if ($this->localContent->has($aclFileDir . $userEmail . $user['id'])) {
-
-                $this->acl = unserialize($this->localContent->read($aclFileDir . $userEmail . $user['id']));
+                $this->acl = unserialize($this->localContent->read($aclFileDir . $this->userEmail . $this->user['id']));
 
             } else {
 
                 $this->acl->addRole(
-                    new Role($userEmail, 'User Override Role')
+                    new Role($this->userEmail, 'User Override Role')
                 );
-
-                $permissions = Json::decode($user['permissions'], true)['permissions'];
+                $permissions = Json::decode($this->user['permissions'], true);
 
                 $this->generateComponentsArr();
 
                 foreach ($permissions as $componentKey => $permission) {
-                    $this->buildAndTestAcl($userEmail, $componentKey, $permission);
+                    $this->buildAndTestAcl($this->userEmail, $componentKey, $permission);
                 }
 
                 if ($this->config->cache->enabled) {
-                    $this->localContent->put($aclFileDir . $userEmail . $user['id'], serialize($this->acl));
+                    $this->localContent->put($aclFileDir . $this->userEmail . $this->user['id'], serialize($this->acl));
                 }
             }
 
-            if (!$this->acl->isAllowed($userEmail, $controller, $action)) {
+            if (!$this->acl->isAllowed($this->userEmail, $this->controller, $this->action)) {
                 throw new PermissionDeniedException();
             }
         } else {
-            $role = $roles[$user['role_id']];
+            $this->role = $roles[$this->user['role_id']];
 
-            $roleName = strtolower(str_replace(' ', '', $role['name']));
+            $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
 
-            if ($this->localContent->has($aclFileDir . $roleName . $role['id'])) {
+            if ($this->localContent->has($aclFileDir . $this->roleName . $this->role['id'] . $this->controller . $this->action)) {
 
-                $this->acl = unserialize($this->localContent->read($aclFileDir . $roleName . $role['id']));
+                $this->acl = unserialize($this->localContent->read($aclFileDir . $this->roleName . $this->role['id'] . $this->controller . $this->action));
 
             } else {
                 $this->generateComponentsArr();
 
                 $this->acl->addRole(
-                    new Role($roleName, $role['description'])
+                    new Role($this->roleName, $this->role['description'])
                 );
 
-                $permissions = Json::decode($role['permissions'], true);
+                $permissions = Json::decode($this->role['permissions'], true);
 
-                // if ($user['role_id'] === '1') {
-                //     $this->buildAndTestAcl($roleName, $componentKey, $permission, true);//System Admins
-                // } else {
-                    foreach ($permissions as $componentKey => $permission) {
-                        $this->buildAndTestAcl($roleName, $componentKey, $permission);
+                foreach ($permissions as $componentKey => $permission) {
+                    if ($this->components[$componentKey]['name'] === $this->controller) {
+                        $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
+                        break;
                     }
-                // }
+                }
+                // var_dump($this->acl);
                 if ($this->config->cache->enabled) {
-                    $this->localContent->put($aclFileDir . $roleName . $role['id'], serialize($this->acl));
+                    $this->localContent->put($aclFileDir . $this->roleName . $this->role['id'] . $this->controller . $this->action, serialize($this->acl));
                 }
             }
 
-            if (!$this->acl->isAllowed($roleName, $controller, $action)) {
+            if (!$this->acl->isAllowed($this->roleName, $this->controller, $this->action)) {
                 throw new PermissionDeniedException();
             }
         }
@@ -125,75 +130,19 @@ class Acl extends BaseMiddleware
     {
         $componentName = $this->components[$componentKey]['name'];
         $componentDescription = $this->components[$componentKey]['description'];
-        // var_dump($this->components[$componentKey]['type']);
-
-        if ($this->components[$componentKey]['type'] === 'listing') {
-            $this->acl->addComponent(
-                new Component($componentName, $componentDescription),
-                [
-                    'view'
-                ]
-            );
-
-            if ($permission[0] === '1') {
-                $this->acl->allow($name, $componentName, 'view');
-            } else if ($permission[0] === '0') {
-                $this->acl->deny($name, $componentName, 'view');
-            }
-
-        } else if ($this->components[$componentKey]['type'] === 'crud') {
-            $this->acl->addComponent(
-                new Component($componentName, $componentDescription),
-                [
-                    'view',
-                    'add',
-                    'update',
-                    'remove'
-                ]
-            );
-
-            if ($permission[0] === '1') {
-                $this->acl->allow($name, $componentName, 'view');
-            } else if ($permission[0] === '0') {
-                $this->acl->deny($name, $componentName, 'view');
-            }
-            if ($permission[1] === '1') {
-                $this->acl->allow($name, $componentName, 'add');
-            } else if ($permission[1] === '0') {
-                $this->acl->deny($name, $componentName, 'add');
-            }
-            if ($permission[2] === '1') {
-                $this->acl->allow($name, $componentName, 'update');
-            } else if ($permission[2] === '0') {
-                $this->acl->deny($name, $componentName, 'update');
-            }
-            if ($permission[3] === '1') {
-                $this->acl->allow($name, $componentName, 'remove');
-            } else if ($permission[3] === '0') {
-                $this->acl->deny($name, $componentName, 'remove');
-            }
-        } else if ($this->components[$componentKey]['type'] === 'system') {
-            if ($this->components[$componentKey]['class']) {
-                var_dump($this->components[$componentKey]['class']);
-            }
-        }
-
+        $componentAcls = $this->components[$componentKey]['acls'];
+        // var_dump($this->components[$componentKey]);
         $this->acl->addComponent(
-            new Component('home', 'home'),
-            [
-                'view'
-            ]
+            new Component($componentName, $componentDescription), $componentAcls
         );
-        $this->acl->allow('*', 'home', '*');
 
-        // $this->acl->addComponent(
-        //     new Component('auth', 'auth'),
-        //     [
-        //         'login',
-        //         'logout'
-        //     ]
-        // );
-        // $this->acl->allow('*', 'auth', ['login', 'logout']);
+        // var_dump($permission[$this->action]);
+        if ($permission[$this->action] === 1) {
+            $this->acl->allow($name, $componentName, $this->action);
+            $this->logger->log->debug('User ' . $this->userEmail . ' granted access to component ' . $componentName . ' for action ' . $this->action);
+        } else {
+            $this->logger->log->debug('User ' . $this->userEmail . ' denied access to component ' . $componentName . ' for action ' . $this->action);
+        }
     }
 
     protected function checkCachePath()
@@ -212,12 +161,21 @@ class Acl extends BaseMiddleware
 
         // $components = [];
 
-        foreach ($componentsArr as $key => $value) {
-            // if ($value['type'] === 'crud' || $value['type'] === 'listing') {
-                $this->components[$value['id']]['name'] = strtolower($value['name']);
-                $this->components[$value['id']]['type'] = $value['type'];
-                $this->components[$value['id']]['description'] = $value['description'];
-            // }
+        foreach ($componentsArr as $component) {
+            if ($component['class'] && $component['class'] !== '') {
+                $reflector = $this->annotations->get($component['class']);
+                $methods = $reflector->getMethodsAnnotations();
+
+                if ($methods) {
+                    $this->components[$component['id']]['name'] = strtolower($component['name']);
+                    $this->components[$component['id']]['description'] = $component['description'];
+                    foreach ($methods as $annotation) {
+                        $action = $annotation->getAll('acl')[0]->getArguments();
+                        $acls[$action['name']] = $action['name'];
+                        $this->components[$component['id']]['acls'][$action['name']] = $action['name'];
+                    }
+                }
+            }
         }
     }
 }

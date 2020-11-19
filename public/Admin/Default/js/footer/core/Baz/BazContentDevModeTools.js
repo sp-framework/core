@@ -30,7 +30,7 @@
         var Default = {
         };
         var dataCollection = window['dataCollection'];
-        var pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3');
+        var pnotifySound = dataCollection.env.sounds.pnotifySound;
         var sectionId,
             componentId;
 

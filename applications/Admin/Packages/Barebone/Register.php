@@ -123,6 +123,7 @@ class Register extends BasePackage
 				'description' 			=> $componentFile['description'],
 				'version'				=> $componentFile['version'],
 				'path'					=> $componentFile['path'],
+				'class'					=> $componentFile['class'],
 				'repo'					=> $componentFile['repo'],
 				'type'					=> $componentFile['type'],
 				'settings'			 	=>
