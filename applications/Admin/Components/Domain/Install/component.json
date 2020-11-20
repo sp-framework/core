@@ -1,0 +1,34 @@
+{
+    "name"          : "Domain",
+    "displayName"   : "Admin Domain Management",
+    "description"   : "Manage admin domains domain via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-domain",
+    "path"          : "/",
+    "class"         : "Applications\\Admin\\Components\\Domain\\DomainComponent",
+    "type"          : "forms",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "application" : {
+            "name"      : "Admin",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/application-admin"
+        },
+        "components"    :
+        [{
+            "name"      : "Domains",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/component-admin-domains"
+        }],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : false,
+    "settings"      : {
+    }
+}
