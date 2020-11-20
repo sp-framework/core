@@ -57,7 +57,7 @@ class DynamicTable
             $this->content .=
                 '<div class="row mb-2">';
 
-            if ($this->params['dtFilter'] === true) {
+            if (isset($this->params['dtFilter']) && $this->params['dtFilter'] === true) {
                 $filtersComponent =
                     $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
                         'Filters',

@@ -479,29 +479,34 @@ abstract class BaseComponent extends Controller
 					$table['columns'][$dtReplaceColumnsTitleKey]['name'] = $dtReplaceColumnsTitleValue;
 				}
 			}
-			$table['filterColumns'] = $package->getModelsColumnMap($columnsForFilter);
 			$table['postUrl'] = $this->links->url($postUrl);
+			$table['postUrlParams'] = [];
+
 			$table['component'] = $this->component;
+
 
 			if (!$componentId) {
 				$componentId = $this->component['id'];
 			}
 
-			$filtersArr = $this->usePackage(Filters::class)->getFiltersForComponent($componentId);
+			if ($withFilter) {
+				$table['withFilter'] = $withFilter;
+				$filtersArr = $this->usePackage(Filters::class)->getFiltersForComponent($componentId);
 
-			$table['postUrlParams'] = [];
-			foreach ($filtersArr as $key => $filter) {
-				$table['filters'][$filter['id']] = $filter;
-				$table['filters'][$filter['id']]['data']['name'] = $filter['name'];
-				$table['filters'][$filter['id']]['data']['id'] = $filter['id'];
-				$table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
-				$table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
-				$table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
-				$table['filters'][$filter['id']]['data']['is_default'] = $filter['is_default'];
-				$table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
+				$table['filterColumns'] = $package->getModelsColumnMap($columnsForFilter);
+				foreach ($filtersArr as $key => $filter) {
+					$table['filters'][$filter['id']] = $filter;
+					$table['filters'][$filter['id']]['data']['name'] = $filter['name'];
+					$table['filters'][$filter['id']]['data']['id'] = $filter['id'];
+					$table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
+					$table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
+					$table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
+					$table['filters'][$filter['id']]['data']['is_default'] = $filter['is_default'];
+					$table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
 
-				if ($filter['is_default'] === '1') {
-					$table['postUrlParams'] = ['conditions' => $filter['conditions']];
+					if ($filter['is_default'] === '1') {
+						$table['postUrlParams'] = ['conditions' => $filter['conditions']];
+					}
 				}
 			}
 

@@ -326,7 +326,8 @@ class Tree extends AdminLTETags
                 // } else {
                 //     $numeric = '';
                 // }
-                if ($itemKey == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
+                // var_dump($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']);
+                if ($key == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
                     $this->content .=
                         '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . ucfirst($value) . '</option>';
                 } else {
