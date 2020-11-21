@@ -127,8 +127,9 @@ class SectionWithFormButtons
                     [
                         'title'                 => 'Add',
                         'position'              => 'right',
-                        'icon'                  => 'plus',
-                        'size'                  => 'xs',
+                        'icon'                  => 'cog fa-spin',
+                        'iconHidden'            => true,
+                        'size'                  => 'sm',
                         'hidden'                => true,
                         'buttonAdditionalClass' => 'mr-1 ml-1',
                         'action'                => 'post',
@@ -140,8 +141,9 @@ class SectionWithFormButtons
                     [
                         'title'                 => 'Update',
                         'position'              => 'right',
-                        'icon'                  => 'plus',
-                        'size'                  => 'xs',
+                        'icon'                  => 'cog fa-spin',
+                        'iconHidden'            => true,
+                        'size'                  => 'sm',
                         'hidden'                => true,
                         'buttonAdditionalClass' => 'mr-1 ml-1',
                         'action'                => 'post',
@@ -153,9 +155,8 @@ class SectionWithFormButtons
                     [
                         'title'                 => 'Cancel',
                         'position'              => 'right',
-                        'icon'                  => 'times',
                         'type'                  => 'secondary',
-                        'size'                  => 'xs',
+                        'size'                  => 'sm',
                         'hidden'                => true,
                         'buttonAdditionalClass' => 'mr-1 ml-1',
                         'actionUrl'             => $this->buttonParams['cancelActionUrl']
@@ -165,7 +166,7 @@ class SectionWithFormButtons
                         'title'                 => 'Close',
                         'position'              => 'right',
                         'type'                  => 'secondary',
-                        'size'                  => 'xs',
+                        'size'                  => 'sm',
                         'hidden'                => true,
                         'buttonAdditionalClass' => 'mr-1 ml-1',
                         'actionUrl'             => $this->buttonParams['closeActionUrl']

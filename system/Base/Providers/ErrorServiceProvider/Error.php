@@ -67,6 +67,10 @@ class Error
 
 			$this->logMessage();
 		}
+		if ($this->class === 'DomainNotRegisteredException') {
+			$this->showOnScreen();
+			return;
+		}
 
 		$customHandler = $this->customHandler($this->class);
 

@@ -40,8 +40,6 @@ class BareboneComponent extends BaseComponent
 
 		}
 		return $this->sendJson();
-
-		$this->view->disable();
 	}
 
 	public function getSelectedApplicationViewsComponentsAction()

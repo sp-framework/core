@@ -10,15 +10,12 @@ class ErrorServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-		$applicationInfo = $container->getShared('modules')->applications->getApplicationInfo();
-
-		$config = $container->getShared('config');
-
-		$logger = $container->getShared('logger');
-
 		$container->setShared(
 			'error',
-			function () use ($applicationInfo, $config, $logger) {
+			function () use ($container) {
+				$applicationInfo = $container->getShared('modules')->applications->getApplicationInfo();
+				$config = $container->getShared('config');
+				$logger = $container->getShared('logger');
 				return (new Error($applicationInfo, $config, $logger))->init();
 			}
 		);

@@ -40,7 +40,7 @@ class Modules
 	{
 		if (!isset($this->{$name})) {
 			if (method_exists($this, $method = "init" . ucfirst("{$name}"))) {
-				return $this->{$method}();
+				$this->{$name} = $this->{$method}();
 			}
 		}
 
@@ -50,8 +50,6 @@ class Modules
 	protected function initCore()
 	{
 		$this->core = (new Core())->init();
-
-		$this->core->getAll();
 
 		return $this->core;
 	}

@@ -21,7 +21,7 @@ class Applications
 					]
 				),
 				new Column(
-					'name',
+					'route',
 					[
 						'type'    => Column::TYPE_VARCHAR,
 						'size'    => 50,
@@ -29,11 +29,11 @@ class Applications
 					]
 				),
 				new Column(
-					'route',
+					'name',
 					[
 						'type'    => Column::TYPE_VARCHAR,
 						'size'    => 50,
-						'notNull' => false,
+						'notNull' => true,
 					]
 				),
 				new Column(
@@ -79,14 +79,6 @@ class Applications
 					'dependencies',
 					[
 						'type'    => Column::TYPE_TEXT,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'is_default',
-					[
-						'type'    => Column::TYPE_INTEGER,
-						'size'    => 1,
 						'notNull' => true,
 					]
 				),
@@ -158,7 +150,7 @@ class Applications
 						'size'    => 2048,
 						'notNull' => false,
 					]
-				),
+				)
 			]
 		];
 	}

@@ -1,4 +1,5 @@
 {
+    "route"         : "auth",
     "name"          : "Auth",
     "displayName"   : "Admin Auth Management",
     "description"   : "Manage admin auth via this component",

@@ -1,4 +1,5 @@
 {
+    "route"         : "domain",
     "name"          : "Domain",
     "displayName"   : "Admin Domain Management",
     "description"   : "Manage admin domains domain via this component",

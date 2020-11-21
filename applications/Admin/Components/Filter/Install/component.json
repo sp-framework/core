@@ -1,4 +1,5 @@
 {
+    "route"         : "filter",
     "name"          : "Filter",
     "displayName"   : "Admin Filter Management",
     "description"   : "Manage admin filters filter via this component",

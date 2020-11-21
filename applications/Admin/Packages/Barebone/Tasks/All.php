@@ -36,28 +36,30 @@ class All extends BasePackage
 
 		} else {
 
-			if ($postData['default'] === 'true' && $postData['force'] !== '1') {
+			// if ($postData['default'] === 'true' && $postData['force'] !== '1') {
 
-				$this->packagesData->defaultApplication
-					= $this->modules->applications->getDefaultApplication();
+			// 	$this->packagesData->defaultApplication
+			// 		= $this->modules->applications->getDefaultApplication();
 
-				if ($this->packagesData->defaultApplication) {
+			// 	if ($this->packagesData->defaultApplication) {
 
-					$this->packagesData->responseCode = 2;
+			// 		$this->packagesData->responseCode = 2;
 
-					$this->packagesData->responseMessage =
-						$this->packagesData->defaultApplication['name'] .
-						' application is already set to default. Make application ' .
-						$postData['applicationName'] .
-						' as default?';
+			// 		$this->packagesData->responseMessage =
+			// 			$this->packagesData->defaultApplication['name'] .
+			// 			' application is already set to default. Make application ' .
+			// 			$postData['applicationName'] .
+			// 			' as default?';
 
-					return false;
-				}
-			}
+			// 		return false;
+			// 	}
+			// }
 
 			$names = [];
 			$names['applicationName'] = ucfirst(strtolower($postData['applicationName']));
+			$names['applicationRoute'] = strtolower($postData['applicationName']);
 			$names['componentName'] = 'Home';
+			$names['componentRoute'] = 'home';
 			$names['packageName'] = 'Home';
 			$names['middlewareName'] = 'Home';
 			$names['viewName'] = 'Default';
@@ -91,9 +93,9 @@ class All extends BasePackage
 
 				$this->packagesData->bareboneModule = $newApplication;
 
-				if ($postData['default'] === 'true' && $postData['force'] === '1') {
-					$this->modules->applications->removeDefaultFlag();
-				}
+				// if ($postData['default'] === 'true' && $postData['force'] === '1') {
+				// 	$this->modules->applications->removeDefaultFlag();
+				// }
 
 				return true;
 

@@ -15,13 +15,15 @@ class MiddlewaresServiceProvider extends Injectable
     ) {
         $application = $this->modules->applications->getApplicationInfo();
 
-        $middlewares =
-            msort($this->modules->middlewares->getMiddlewaresForApplication($application['id']), 'sequence');
+        if ($application) {
+            $middlewares =
+                msort($this->modules->middlewares->getMiddlewaresForApplication($application['id']), 'sequence');
 
-        foreach ($middlewares as $middleware) {
-            if ($middleware['enabled'] === '1') {
-                $middlewareClass = $middleware['class'] . '\\' . $middleware['name'];
-                (new $middlewareClass())->process();
+            foreach ($middlewares as $middleware) {
+                if ($middleware['enabled'] === '1') {
+                    $middlewareClass = $middleware['class'] . '\\' . $middleware['name'];
+                    (new $middlewareClass())->process();
+                }
             }
         }
     }

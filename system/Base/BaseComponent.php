@@ -49,10 +49,21 @@ abstract class BaseComponent extends Controller
 				$this->componentName, $this->application['id']
 			);
 
+		if (!$this->component) {
+			$this->componentRoute =
+				str_replace('Component', '', $this->reflection->getShortName());
+			$this->component =
+				$this->modules->components->getRouteComponentForApplication(
+					strtolower($this->componentRoute), $this->application['id']
+				);
+		}
+
 		if (!$this->isJson() || $this->request->isAjax()) {
 			$this->viewSettings = json_decode($this->views['settings'], true);
 
-			$this->setDefaultViewData();
+			// if (!$this->isJson() && $this->request->isAjax()) {
+				$this->setDefaultViewData();
+			// }
 
 			$this->checkLayout();
 
@@ -65,6 +76,8 @@ abstract class BaseComponent extends Controller
 		$this->view->widget = $this->widget;
 
 		$this->view->applicationName = $this->application['name'];
+
+		$this->view->applicationRoute = $this->application['route'];
 
 		if (isset($this->application['route']) && $this->application['route'] !== '') {
 			$this->view->route = strtolower($this->application['route']);
@@ -483,7 +496,6 @@ abstract class BaseComponent extends Controller
 			$table['postUrlParams'] = [];
 
 			$table['component'] = $this->component;
-
 
 			if (!$componentId) {
 				$componentId = $this->component['id'];

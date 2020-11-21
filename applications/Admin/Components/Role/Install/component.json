@@ -1,4 +1,5 @@
 {
+    "route"         : "role",
     "name"          : "Role",
     "displayName"   : "Admin Role Management",
     "description"   : "Manage admin roles role via this component",

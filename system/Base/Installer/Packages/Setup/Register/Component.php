@@ -6,14 +6,14 @@ class Component
 {
 	public function register($db, $componentFile, $installedFiles, $newApplicationId, $menuId)
 	{
-		return $db->insertAsDict(
+		$insertComponent =  $db->insertAsDict(
 			'components',
 			[
+				'route'					=> $componentFile['route'],
 				'name' 					=> $componentFile['name'],
 				'display_name' 			=> $componentFile['displayName'],
 				'description' 			=> $componentFile['description'],
 				'version'				=> $componentFile['version'],
-				'path'					=> $componentFile['path'],
 				'class'					=> $componentFile['class'],
 				'repo'					=> $componentFile['repo'],
 				'type'					=> $componentFile['type'],//listing, crud, other
@@ -31,5 +31,12 @@ class Component
 				'files'					=> json_encode($installedFiles)
 			]
 		);
+
+		if ($insertComponent) {
+			if ($componentFile['route'] === 'home') {
+				return $db->lastInsertId();
+			}
+		}
+		return null;
 	}
 }

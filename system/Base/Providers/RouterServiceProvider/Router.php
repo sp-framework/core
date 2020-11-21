@@ -5,18 +5,31 @@ namespace System\Base\Providers\RouterServiceProvider;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Router as PhalconRouter;
+use System\Base\Providers\RouterServiceProvider\Exceptions\DomainNotRegisteredException;
 
 class Router
 {
-	protected $router;
+	protected $domains;
+
+	protected $domain;
+
+	protected $domainDefaults;
 
 	protected $applications;
+
+	protected $components;
+
+	protected $views;
+
+	protected $logger;
+
+	protected $request;
+
+	protected $router;
 
 	protected $applicationInfo;
 
 	protected $applicationDefaults;
-
-	protected $request;
 
 	protected $requestUri;
 
@@ -32,11 +45,15 @@ class Router
 
 	protected $uri;
 
-	public function __construct($domains, $applications, $logger, $request)
+	public function __construct($domains, $applications, $components, $views, $logger, $request)
 	{
 		$this->domains = $domains;
 
 		$this->applications = $applications;
+
+		$this->components = $components;
+
+		$this->views = $views;
 
 		$this->logger = $logger;
 
@@ -51,14 +68,12 @@ class Router
 
 	public function init()
 	{
-		if ($this->setApplicationInfo()) {
-
+		if ($this->validateDomain()) {
 			$this->getURI();
 
 			if ($this->applicationInfo && $this->applicationDefaults) {
-				if ($this->applicationInfo['name'] !== $this->applicationDefaults['application']) {
+				if ($this->applicationInfo['route'] !== $this->applicationDefaults['application']) {
 					if ($this->uri !== '' &&
-						$this->uri !== strtolower($this->applicationInfo['name']) &&
 						$this->uri !== strtolower($this->applicationInfo['route'])
 					) {
 						$this->registerRoute($this->uri);
@@ -211,13 +226,12 @@ class Router
 
 	protected function regitserNotFound()
 	{
+
 		if ($this->applicationDefaults) {
 
-			$settings = Json::decode($this->applicationInfo['settings'], true);
+			if (isset($this->applicationDefaults['errorComponent'])) {
 
-			if (isset($settings['errorComponent'])) {
-
-				$errorComponent = $settings['errorComponent'];
+				$errorComponent = ucfirst($this->applicationDefaults['errorComponent']);
 
 			} else {
 				$this->router->setDefaultNamespace
@@ -245,58 +259,69 @@ class Router
 		);
 	}
 
-	protected function setApplicationInfo()
-	{
-		$this->applicationInfo = $this->applications->getApplicationInfo();
+	// protected function setApplicationInfo()
+	// {
+	// 	if (!$this->validateDomain()) {
+	// 		return false;
+	// 	}
 
-		if ($this->applicationInfo) {
+	// 	$this->applicationInfo = $this->applications->getApplicationInfo();
 
-			if (!$this->validateDomain()) {
-				return false;
-			}
+	// 	if ($this->applicationInfo) {
 
-			$this->applicationDefaults = $this->applications->getApplicationDefaults();
 
-			if (!$this->applicationDefaults ||
-				$this->applicationInfo['name'] !== $this->applicationDefaults['application']
-			) {
-				$this->applicationDefaults =
-					$this->applications->getApplicationDefaults($this->applicationInfo['name']);
-			}
-			return true;
-		}
-		return false;
-	}
+	// 		$this->applicationDefaults = $this->applications->getApplicationDefaults();
+
+	// 		if (!$this->applicationDefaults ||
+	// 			$this->applicationInfo['name'] !== $this->applicationDefaults['application']
+	// 		) {
+	// 			$this->applicationDefaults =
+	// 				$this->applications->getApplicationDefaults($this->applicationInfo['name']);
+	// 		}
+	// 		return true;
+	// 	}
+	// 	return false;
+	// }
 
 	protected function validateDomain()
 	{
-		$applicationSettings = Json::decode($this->applicationInfo['settings'], true);
+		$this->domain = $this->domains->getDomain();
 
-		if (isset($applicationSettings['domain']) &&
-			($applicationSettings['domain'] !== '' && $applicationSettings['domain'] !== '0')
-		) {
-			if (!$this->domains->getNamedDomain($this->request->getHttpHost())) {
-				$this->logger->log->alert(
-					'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
-				);
+		if (!$this->domain) {
+			$this->logger->log->alert(
+				'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
+			);
 
-				return false;
-			}
-
-			if ($this->request->getHttpHost() === $applicationSettings['domain']) {
-				return true;
-			} else {
-				$this->logger->log->alert(
-					'Trying to access application ' . $this->applicationInfo['name'] .
-					' on domain ' . $this->request->getHttpHost() . '. Application is restricted to ' .
-					$applicationSettings['domain']
-				);
-
-				return false;
-			}
-		} else {
-			return true;
+			throw new DomainNotRegisteredException('Domain ' . $this->request->getHttpHost() . ' is not registered with system!');
 		}
+
+		$this->applicationInfo = $this->applications->getApplicationInfo();
+
+		if (isset($this->domain['settings']['applications'][$this->applicationInfo['id']]['allowed']) &&
+			!$this->domain['settings']['applications'][$this->applicationInfo['id']]['allowed']
+		) {
+			$this->logger->log->alert(
+				'Trying to access application ' . $this->applicationInfo['name'] .
+				' on domain ' . $this->request->getHttpHost()
+			);
+
+			return false;
+		}
+
+		if (!isset($this->domain['settings']['applications'][$this->applicationInfo['id']])) {
+			return false;
+		}
+
+		$this->applicationDefaults['id'] = $this->applicationInfo['id'];
+		$this->applicationDefaults['application'] = $this->applicationInfo['route'];
+		$this->applicationDefaults['component'] =
+			$this->components->getIdComponent($this->domain['settings']['applications'][$this->applicationInfo['id']]['defaultComponent'])['route'];
+		$this->applicationDefaults['errorComponent'] =
+			$this->components->getIdComponent($this->domain['settings']['applications'][$this->applicationInfo['id']]['errorComponent'])['route'];
+		$this->applicationDefaults['view'] =
+			$this->views->getIdViews($this->domain['settings']['applications'][$this->applicationInfo['id']]['defaultViews'])['name'];
+
+		return true;
 	}
 
 	protected function getURI()

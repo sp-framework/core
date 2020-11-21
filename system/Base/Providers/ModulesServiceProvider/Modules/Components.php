@@ -19,6 +19,28 @@ class Components extends BasePackage
 		return $this;
 	}
 
+	public function getRouteComponentForApplication($route, $applicationId)
+	{
+		$filter =
+			$this->model->filter(
+				function($component) use ($route, $applicationId) {
+					if ($component->route === $route &&
+						$component->application_id === $applicationId
+					) {
+						return $component;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate component route found for component ' . $route);
+		} else if (count($filter) === 1) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
+	}
+
 	public function getNamedComponentForApplication($name, $applicationId)
 	{
 		$filter =
@@ -48,7 +70,7 @@ class Components extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($component) use ($applicationId) {
-					if ($component->application_id === $applicationId) {
+					if ($component->application_id == $applicationId) {
 						return $component;
 					}
 				}
@@ -79,5 +101,25 @@ class Components extends BasePackage
 		}
 
 		return $components;
+	}
+
+	public function getIdComponent($id)
+	{
+		$filter =
+			$this->model->filter(
+				function($component) use ($id) {
+					if ($component->id == $id) {
+						return $component;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate component Id found for id ' . $id);
+		} else if (count($filter) === 1) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
 	}
 }

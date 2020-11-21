@@ -58,30 +58,6 @@
                     ]
                 )}}
             </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'default_application_id',
-                        'fieldLabel'                     : 'Default Application',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a default application for this domain.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDataSelect2Options'        : applications,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': domainDefaultApplicationId
-                    ]
-                )}}
-            </div>
         </div>
         <div class="row">
             <div class="col">
@@ -108,6 +84,228 @@
                 )}}
             </div>
         </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'default_application_id',
+                        'fieldLabel'                     : 'Default Application',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select a default application for this domain.<br> Example: When you access this site via root link like http://www.yoursite.com.au/',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : true,
+                        'fieldDataSelect2Options'        : applications,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': domainDefaultApplicationId
+                    ]
+                )}}
+            </div>
+        </div>
+        {# For settings #}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'settings',
+                'fieldLabel'                     : false,
+                'fieldHelp'                      : true,
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'html',
+                'fieldHidden'                    : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+        {% set applicationNames = [] %}
+        {% for application in applications %}
+            {% set applicationNames[application['name']|lower] = application['id'] %}
+            {% if domain['settings']['applications'][application['id']] is defined %}
+                {% if domain['settings']['applications'][application['id']]['allowed'] == true %}
+                    {% set checked = true %}
+                {% else %}
+                    {% set checked = false %}
+                {% endif %}
+            {% else %}
+                {% set checked = true %}
+            {% endif %}
+            <hr>
+            <div class="application" data-id="{{application['id']}}">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'allowed-' ~ application['name'],
+                                'fieldLabel'                     : 'Application ' ~ application['name'] ~ ' Allowed on domain?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select applications that can be accessed via this domain.',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'html',
+                                'fieldAdditionalClass'           : 'mb-1',
+                                'fieldBazScan'                   : false
+                            ]
+                        )}}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'allowed-' ~ application['name']|lower,
+                                'fieldLabel'                     : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'success',
+                                'fieldCheckboxChecked'           : checked,
+                                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                                'fieldBazScan'                   : false
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {% if domain['settings']['applications'][application['id']]['emailService'] is defined %}
+                            {% set emailService = domain['settings']['applications'][application['id']]['emailService'] %}
+                        {% else %}
+                            {% set emailService = 0 %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'email-service-' ~ application['name']|lower,
+                                'fieldLabel'                     : 'Use Email Settings',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select email service for this domain. Email will be sent out using these service.',
+                                'fieldBazScan'                   : true,
+                                'fieldRequired'                  : false,
+                                'fieldDataAttributes'            :
+                                    [
+                                        'type' : 'emailService'
+                                    ],
+                                'fieldDataSelect2Options'        : emailservices,
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': emailService
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {% if domain['settings']['applications'][application['id']]['defaultComponent'] is defined %}
+                            {% set defaultComponent = domain['settings']['applications'][application['id']]['defaultComponent'] %}
+                        {% else %}
+                            {% set defaultComponent = 0 %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'default-component-' ~ application['name']|lower,
+                                'fieldLabel'                     : 'Default Component',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select a default component for this application.',
+                                'fieldBazScan'                   : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataAttributes'            :
+                                    [
+                                        'type' : 'defaultComponent'
+                                    ],
+                                'fieldDataSelect2Options'        : applications[application['id']]['components'],
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': defaultComponent
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {% if domain['settings']['applications'][application['id']]['errorComponent'] is defined %}
+                            {% set errorComponent = domain['settings']['applications'][application['id']]['errorComponent'] %}
+                        {% else %}
+                            {% set errorComponent = 0 %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'default-error-component-' ~ application['name']|lower,
+                                'fieldLabel'                     : 'Default Error Component',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select a default error component for this application.',
+                                'fieldBazScan'                   : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataAttributes'            :
+                                    [
+                                        'type' : 'errorComponent'
+                                    ],
+                                'fieldDataSelect2Options'        : applications[application['id']]['components'],
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': errorComponent
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {% if domain['settings']['applications'][application['id']]['defaultViews'] is defined %}
+                            {% set defaultViews = domain['settings']['applications'][application['id']]['defaultViews'] %}
+                        {% else %}
+                            {% set defaultViews = 0 %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'default-views-' ~ application['name']|lower,
+                                'fieldLabel'                     : 'Default View (Template)',
+                                'fieldType'                      : 'select2',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Select a default view for this application.',
+                                'fieldBazScan'                   : true,
+                                'fieldRequired'                  : true,
+                                'fieldDataAttributes'            :
+                                    [
+                                        'type' : 'defaultViews'
+                                    ],
+                                'fieldDataSelect2Options'        : applications[application['id']]['views'],
+                                'fieldDataSelect2OptionsKey'     : 'id',
+                                'fieldDataSelect2OptionsValue'   : 'name',
+                                'fieldDataSelect2OptionsArray'   : true,
+                                'fieldDataSelect2OptionsSelected': defaultViews
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        {% set applicationNames = json_encode(applicationNames, 16) %}
     </fieldset>
 </form>
 <script>
@@ -134,14 +332,50 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
     dataCollectionSectionForm =
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
+
+var dynamicFields = { };
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-name'                    : { },
-        '{{componentId}}-{{sectionId}}-default_application_id'  : {
-            'placeholder' : 'SELECT APPLICATION'
-        },
         '{{componentId}}-{{sectionId}}-description'             : { },
+        '{{componentId}}-{{sectionId}}-default_application_id'  : {
+            'placeholder' : 'SELECT DEFAULT APPLICATION'
+        },
+        '{{componentId}}-{{sectionId}}-settings'                : {
+            afterInit : function () {
+                'use strict';
+
+                for (var checkbox in dynamicFields['checkboxes']) {
+                    $('#' + checkbox).click(function() {
+                        extractData(checkbox, null, null, $('#' + checkbox).parents('.application').data('id'));
+                    });
+                    extractData(checkbox, null, null, $('#' + checkbox).parents('.application').data('id'))
+                }
+
+                for (var select2 in dynamicFields['select2']) {
+                    $('#' + select2).on('change', function() {
+                        var id = $(this)[0].id;
+                        extractData(null, id, $('#' + id).data('type'), $('#' + id).parents('.application').data('id'));
+                    });
+                    extractData(null, select2, $('#' + select2).data('type'), $('#' + select2).parents('.application').data('id'));
+                }
+
+                function extractData(checkbox = null, select2 = null, select2Type = null, applicationId) {
+                    if (checkbox) {
+                        if ($('#' + checkbox)[0].checked === true) {
+                            dataCollectionSection['data']['settings']['applications'][applicationId]['allowed'] = true;
+                        } else {
+                            dataCollectionSection['data']['settings']['applications'][applicationId]['allowed'] = false;
+                        }
+                    } else if (select2 && select2Type) {
+                        dataCollectionSection['data']['settings']['applications'][applicationId][select2Type] =
+                            $($('#' + select2)[0].selectedOptions[0]).val();
+                    }
+                }
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
@@ -153,4 +387,31 @@ dataCollectionSection =
             }
         }
     });
+
+var applicationNames = JSON.parse('{{applicationNames}}');
+
+dynamicFields['checkboxes'] = { };
+dynamicFields['select2'] = { };
+dataCollectionSection['data'] = { };
+dataCollectionSection['data']['settings'] = { }
+dataCollectionSection['data']['settings']['applications'] = { };
+for (var name in applicationNames) {
+    dataCollectionSection['data']['settings']['applications'][applicationNames[name]] = { };
+    dynamicFields['checkboxes']['{{componentId}}-{{sectionId}}-allowed-' + name] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-allowed-' + name] = { };
+    dynamicFields['select2']['{{componentId}}-{{sectionId}}-default-component-' + name] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-default-component-' + name] = {"placeholder": "SELECT DEFAULT COMPONENT"};
+    dynamicFields['select2']['{{componentId}}-{{sectionId}}-default-error-component-' + name] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-default-error-component-' + name] = {"placeholder": "SELECT ERROR COMPONENT"};
+    dynamicFields['select2']['{{componentId}}-{{sectionId}}-default-views-' + name] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-default-views-' + name] = {"placeholder": "SELECT DEFAULT VIEW"};
+    dynamicFields['select2']['{{componentId}}-{{sectionId}}-email-service-' + name] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-email-service-' + name] = {"placeholder": "SELECT EMAIL SERVICE"};
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-default-component-' + name] = "required";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-default-error-component-' + name] = "required";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-default-views-' + name] = "required";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-default-component-' + name] = "Please select default component";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-default-error-component-' + name] = "Please select error component";
+    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-default-views-' + name] = "please select default view";
+}
 </script>

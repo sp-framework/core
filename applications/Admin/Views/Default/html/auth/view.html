@@ -127,7 +127,6 @@ $('#{{componentId}}-form-submit').click(function(e) {
 
 $('body').keyup(function(e) {
     'use strict';
-    e.preventDefault();
     if (e.keyCode === 13) {
         processLogin();
     }
@@ -146,7 +145,7 @@ function processLogin() {
         $('#{{componentId}}-form-submit').attr('disabled', false);
         setTimeout(function () {
             $('.login-box-msg').removeClass('text-danger animated flash text-bold text-sm');
-            $('.login-box-msg').text('Login to start {{applicationName|lower}} session');
+            $('.login-box-msg').text('Login to start {{applicationRoute}} session');
             $('.login-box-msg').addClass('animated fadeIn');
         }, 5000);
     }
@@ -155,7 +154,7 @@ function processLogin() {
         $('body').vegas('destroy');
         $('.login-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('text-danger').addClass('text-success text-bold');
-        window.location = '/{{applicationName|lower}}/';
+        window.location = '/{{applicationRoute}}/';
     }
 
     // function loginTwofa() {

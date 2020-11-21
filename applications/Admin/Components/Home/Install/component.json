@@ -1,4 +1,5 @@
 {
+    "route"         : "home",
     "name"          : "Home",
     "displayName"   : "Admin Home",
     "description"   : "Admin home",

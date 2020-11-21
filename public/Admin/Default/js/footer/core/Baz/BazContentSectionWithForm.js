@@ -78,13 +78,12 @@
                     'on'            : 'section'
                 });
 
-                this._initSectionButtonsAndActions();
-
                 if (options.task === 'validateForm') {
                     this._validateForm(options.buttonId);
-                }
-                if (options.task === 'sectionToObj') {
+                } else if (options.task === 'sectionToObj') {
                     this._sectionToObj();
+                } else {
+                    this._initSectionButtonsAndActions();
                 }
             };
 
@@ -113,6 +112,7 @@
                 $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').click(function(e) {
                     e.preventDefault();
                     if (that._validateForm()) {
+                        $(this).children('i').attr('hidden', false);
                         $(this).attr('disabled', true);
                         that._runAjax(this, $(this).attr('actionurl'), $.param(that._sectionToObj()));
                     }
@@ -161,6 +161,7 @@
                                                 title   : data.responseMessage
                                             });
                                         }
+                                        $(thisButtonId).children('i').attr('hidden', true);
                                     }
                 });
             }

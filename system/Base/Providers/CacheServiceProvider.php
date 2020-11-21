@@ -14,37 +14,38 @@ class CacheServiceProvider implements ServiceProviderInterface
 {
     public function register(DiInterface $container) : void
     {
-        $cacheConfig = $container->getShared('config')->cache;
-
         $container->setShared(
             'streamCache',
-            function () use ($cacheConfig) {
+            function () use ($container) {
+                $cacheConfig = $container->getShared('config')->cache;
                 return (new StreamCache($cacheConfig))->init();
             }
         );
 
         $container->setShared(
             'apcuCache',
-            function () use ($cacheConfig) {
+            function () use ($container) {
+                $cacheConfig = $container->getShared('config')->cache;
                 return (new ApcuCache($cacheConfig))->init();
             }
         );
 
         $container->setShared(
             'opCache',
-            function () use ($cacheConfig) {
+            function () use ($container) {
+                $cacheConfig = $container->getShared('config')->cache;
                 return (new OpCache($cacheConfig))->init();
             }
         );
 
-        $caches = [];
-        $caches['streamCache'] = $container->getShared('streamCache');
-        $caches['apcuCache'] = $container->getShared('apcuCache');
-        $caches['opCache'] = $container->getShared('opCache');
-
         $container->setShared(
             'cacheTools',
-            function () use ($cacheConfig, $caches) {
+            function () use ($container) {
+                $cacheConfig = $container->getShared('config')->cache;
+                $caches = [];
+                $caches['streamCache'] = $container->getShared('streamCache');
+                $caches['apcuCache'] = $container->getShared('apcuCache');
+                $caches['opCache'] = $container->getShared('opCache');
                 return new CacheTools($cacheConfig, $caches);
             }
         );

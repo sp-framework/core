@@ -1,4 +1,5 @@
 {
+	"route"			: "home",
 	"name"			: "Home",
 	"displayName" 	: "Component Home (Barebone)",
 	"description"	: "Component Home (Barebone)",

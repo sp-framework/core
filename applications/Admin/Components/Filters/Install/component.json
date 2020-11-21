@@ -1,4 +1,5 @@
 {
+    "route"         : "filters",
     "name"          : "Filters",
     "displayName"   : "Admin Filters Management",
     "description"   : "Manage admin filters via this component",
@@ -29,7 +30,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 2,
+        "seq"           : 98,
         "filters"       : {
             "title"     : "filters",
             "icon"      : "filter",

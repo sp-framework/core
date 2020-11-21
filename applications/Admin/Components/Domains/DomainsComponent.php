@@ -13,20 +13,6 @@ class DomainsComponent extends BaseComponent
     {
         $domains = $this->modules->domains->init();
 
-        if ($this->request->isPost()) {
-            $applicationsIdToName = [];
-            foreach ($this->modules->applications->applications as $applicationKey => $applicationValue) {
-                $applicationsIdToName[$applicationValue['id']] = $applicationValue['name'];
-            }
-
-            $replaceColumns =
-                [
-                    'default_application_id' => ['html'  => $applicationsIdToName]
-                ];
-        } else {
-            $replaceColumns = null;
-        }
-
         $controlActions =
             [
                 // 'disableActionsForIds'  => [1],
@@ -41,12 +27,12 @@ class DomainsComponent extends BaseComponent
             $domains,
             'domains/view',
             null,
-            ['name', 'default_application_id', 'description'],
+            ['name'],
             false,
-            ['name', 'default_application_id', 'description'],
+            ['name'],
             $controlActions,
-            ['default_application_id' => 'Default Application'],
-            $replaceColumns,
+            null,
+            null,
             'name'
         );
     }

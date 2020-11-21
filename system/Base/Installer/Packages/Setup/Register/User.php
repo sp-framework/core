@@ -23,7 +23,7 @@ class User
                 'role_id'               => $adminRoleId,
                 'override_role'         => 0,
                 'permissions'           => $permissions,
-                'can_login'             => Json::encode(['Admin' => true])
+                'can_login'             => Json::encode(['admin' => true])
             ]
         );
 

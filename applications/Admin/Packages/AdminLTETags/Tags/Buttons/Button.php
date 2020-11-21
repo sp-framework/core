@@ -132,13 +132,18 @@ class Button
             }
 
             if (isset($button['icon']) && isset($button['title'])) {
+                if (isset($button['iconHidden']) && $button['iconHidden'] === true) {
+                    $iconHidden = 'hidden';
+                } else {
+                    $iconHidden = '';
+                }
                 if (isset($button['iconPosition']) && $button['iconPosition'] === 'after') {
                     $this->buttonParams['icon'] =
-                        '<i class="fas fa-fw fa-' . $button['icon'] . '"></i>';
+                        '<i class="fas fa-fw fa-' . $button['icon'] . '" ' . $iconHidden . '></i>';
                     $this->buttonParams['iconPosition'] = 'after';
                 } else {
                     $this->buttonParams['icon'] =
-                        '<i class="fas fa-fw fa-' . $button['icon'] . '"></i>';
+                        '<i class="fas fa-fw fa-' . $button['icon'] . '" ' . $iconHidden . '></i>';
                     $this->buttonParams['iconPosition'] = '';
                 }
             } else {

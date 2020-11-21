@@ -43,6 +43,7 @@ class Component extends BasePackage
 				$this->modules->applications->getIdApplication($postData['application_id'])['name'];
 
 			$names['componentName'] = ucfirst(strtolower($postData['componentName']));
+			$names['componentRoute'] = strtolower($postData['componentName']);
 
 			$installedFiles = $copy->copyModuleStructure('components', $names, $postData);
 

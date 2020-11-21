@@ -1,4 +1,5 @@
 {
+	"route"			: "repositories",
 	"name"			: "Repositories",
 	"displayName" 	: "Admin Repositories Management",
 	"description"	: "Manage admin repositories via this component",

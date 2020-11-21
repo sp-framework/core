@@ -390,7 +390,7 @@ class Input
         }
 
         if (isset($this->params['fieldGroupPostAddonButtonId']) &&
-                   isset($this->params['fieldGroupPostAddonButtonValue'])
+            isset($this->params['fieldGroupPostAddonButtonValue'])
         ) {
             $this->fieldParams['fieldGroupPostAddonButtonClass'] =
                 isset($this->params['fieldGroupPostAddonButtonClass']) ?
@@ -414,13 +414,19 @@ class Input
                 '';
 
             if (isset($this->params['fieldGroupPostAddonButtonIcon'])) {
+                $iconHidden =
+                    (isset($this->params['fieldGroupPostAddonButtonIconHidden'])) &&
+                        $this->params['fieldGroupPostAddonButtonIconHidden'] === true ?
+                    'hidden' :
+                    '';
+
                 if ($this->params['fieldGroupPostAddonButtonIcon'] === 'after') {
                     $this->params['fieldGroupPostAddonButtonValue'] =
                         strtoupper($this->params['fieldGroupPostAddonButtonValue']) . ' ' .
-                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPostAddonButtonIcon'] . ' ml-1"></i>';
+                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPostAddonButtonIcon'] . ' ml-1" ' . $iconHidden . '></i>';
                 } else {
                     $this->params['fieldGroupPostAddonButtonValue'] =
-                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPostAddonButtonIcon'] . ' mr-1"></i>' . ' ' .
+                        '<i class="fas fa-fw fa-' . $this->params['fieldGroupPostAddonButtonIcon'] . ' mr-1" ' . $iconHidden . '></i>' . ' ' .
                         strtoupper($this->params['fieldGroupPostAddonButtonValue']);
                 }
             }

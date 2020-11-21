@@ -34,13 +34,13 @@ class SecurityServiceProvider implements ServiceProviderInterface
             }
         );
 
-        $security = $container->getShared('security');
-        $random = $container->getShared('random');
-        $crypt = $container->getShared('crypt');
 
         $container->setShared(
             'secTools',
-            function () use ($security, $random, $crypt) {
+            function () use ($container) {
+                $security = $container->getShared('security');
+                $random = $container->getShared('random');
+                $crypt = $container->getShared('crypt');
                 return (new SecTools($security, $random, $crypt))->init();
             }
         );

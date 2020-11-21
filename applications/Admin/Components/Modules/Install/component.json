@@ -1,4 +1,5 @@
 {
+	"route"			: "modules",
 	"name"			: "Modules",
 	"displayName" 	: "Admin Modules Management",
 	"description"	: "Manage admin modules via this component",

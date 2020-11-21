@@ -1,4 +1,5 @@
 {
+    "route"         : "roles",
     "name"          : "Roles",
     "displayName"   : "Admin Roles Management",
     "description"   : "Manage admin roles via this component",
@@ -24,15 +25,11 @@
         "views"         : []
     },
     "menu"              : {
-        "accounts"      : {
-            "title"     : "Users Management",
-            "icon"      : "users",
-            "childs"    : {
-                "roles" : {
-                    "title"     : "roles",
-                    "link"      : "roles"
-                }
-            }
+        "seq"           : 5,
+        "roles"         : {
+            "icon"      : "users-cog",
+            "title"     : "roles",
+            "link"      : "roles"
         }
     },
     "settings"          : {

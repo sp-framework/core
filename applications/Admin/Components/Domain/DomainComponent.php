@@ -13,12 +13,18 @@ class DomainComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
-            $domain = $this->modules->domains->getById($this->getData()['id']);
-
-            $this->view->domain = $domain;
+            $domain = $this->modules->domains->generateViewData($this->getData()['id']);
+        } else {
+            $domain = $this->modules->domains->generateViewData();
         }
 
-        $this->view->applications = $this->modules->applications->applications;
+        if ($domain) {
+            $this->view->domain = $this->modules->domains->packagesData->domain;
+        }
+
+        $this->view->emailservices = $this->modules->domains->packagesData->emailservices;
+
+        $this->view->applications = $this->modules->domains->packagesData->applications;
     }
 
     /**

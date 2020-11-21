@@ -21,6 +21,14 @@ class Components
 						]
 					),
 					new Column(
+						'route',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'name',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -54,14 +62,6 @@ class Components
 					),
 					new Column(
 						'repo',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 2048,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'path',
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 2048,

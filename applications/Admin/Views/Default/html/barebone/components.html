@@ -7,7 +7,7 @@
                 <label class="input-group-text" for="component-barebone-application">Select Application</label>
             </div>
             <select class="custom-select" id="component-barebone-application">
-                <option value="0" selected="selected">Select...</option>
+                <option value="0" selected>Select...</option>
                 {% for application in applications %}
                     {% if application['name'] != 'Admin' %}
                         <option value="{{application['id']}}">{{application['name']}}</option>

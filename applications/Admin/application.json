@@ -1,4 +1,5 @@
 {
+	"route"			: "admin",
 	"name"			: "Admin",
 	"displayName" 	: "Admin Application",
 	"description" 	: "Admin Application",
@@ -31,10 +32,6 @@
 		}]
 	},
 	"settings"		: {
-		"domain"			: "",
-		"view" 				: "Default",
-		"component" 		: "Home",
-		"errorComponent"	: "Errors",
 		"email"				: {
 			"enabled"			: false,
 			"encryption"	 	: "",

@@ -86,6 +86,7 @@ class Register extends BasePackage
 		$application = $this->modules->applications->add(
 			[
 				// 'id'					=> '',
+				'route' 				=> $applicationFile['route'],
 				'name' 					=> $applicationFile['name'],
 				'display_name' 			=> $applicationFile['displayName'],
 				'description' 			=> $applicationFile['description'],
@@ -99,7 +100,7 @@ class Register extends BasePackage
 					isset($applicationFile['dependencies']) ?
 					json_encode($applicationFile['dependencies']) :
 					null,
-				'is_default'			=> $this->postData['default'] === 'true' ? 1 :0,
+				// 'is_default'			=> $this->postData['default'] === 'true' ? 1 :0,
 				'installed'				=> 1,
 				'files'					=> json_encode($this->installedFiles),
 				'mode'					=> $this->config->debug === true ? 1 : 0
@@ -118,6 +119,7 @@ class Register extends BasePackage
 		$component = $this->modules->components->add(
 			[
 				// 'id'					=> '',
+				'route' 				=> $componentFile['route'],
 				'name' 					=> $componentFile['name'],
 				'display_name' 			=> $componentFile['displayName'],
 				'description' 			=> $componentFile['description'],

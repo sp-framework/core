@@ -10,16 +10,12 @@ class DispatcherServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-		$applicationInfo =
-			$container->getShared('modules')->applications->getApplicationInfo();
-
-		$config = $container->getShared('config');
-
-		$events = $container->getShared('events');
-
 		$container->setShared(
 			'dispatcher',
-			function () use ($applicationInfo, $config, $events) {
+			function () use ($container) {
+				$applicationInfo = $container->getShared('modules')->applications->getApplicationInfo();
+				$config = $container->getShared('config');
+				$events = $container->getShared('events');
 				return (new Dispatcher($applicationInfo, $config, $events))->init();
 			}
 		);

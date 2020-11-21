@@ -8,14 +8,14 @@
                 <input type="text" name="all-barebone-name" id="all-barebone-name" class="form-control" placeholder="Eg: Admin/Dashboard/Blog">
             </div>
         </div>
-        <div class="form-group">
+{#         <div class="form-group">
             <div class="checkbox icheck-info">
                 <input type="checkbox" name="all-default" id="all-default">
                 <label for="all-default">
                     Default application?
                 </label>
             </div>
-        </div>
+        </div> #}
         <button class="btn btn-primary float-right" type="button" id="all-install-barebone-button">Install</button>
     </div>
 </div>
@@ -39,7 +39,7 @@ $('#all-install-barebone-button').click(function() {
             {
                 'task'                      : 'all',
                 'applicationName'           : $('#all-barebone-name').val().trim(),
-                "default"                   : $('#all-default')[0].checked,
+                // "default"                   : $('#all-default')[0].checked,
                 "force"                     : "0"
             };
 
@@ -65,76 +65,77 @@ $('#all-install-barebone-button').click(function() {
                 });
 
                 $('#all-install-barebone-button').attr('disabled', false);
-            } else if (data.responseCode === 2) {
-                Swal.fire({
-                    title               : data.responseMessage,
-                    icon                : 'info',
-                    showCancelButton    : true,
-                    showDenyButton      : true,
-                    confirmButtonText   : 'Install & Make Default',
-                    denyButtonText      : 'Install & Don\'t Make Default',
-                    width               : '50%'
-                }).then((result) => {
-                    var postData;
-                    if (result.isConfirmed) {
-                        postData =
-                            {
-                                'task'                      : 'all',
-                                'applicationName'           : $('#all-barebone-name').val().trim(),
-                                "default"                   : $('#all-default')[0].checked,
-                                "force"                     : "1"
-                            };
+            // } else if (data.responseCode === 2) {
+            //     Swal.fire({
+            //         title               : data.responseMessage,
+            //         icon                : 'info',
+            //         showCancelButton    : true,
+            //         showDenyButton      : true,
+            //         confirmButtonText   : 'Install & Make Default',
+            //         denyButtonText      : 'Install & Don\'t Make Default',
+            //         width               : '50%'
+            //     }).then((result) => {
+            //         var postData;
+            //         if (result.isConfirmed) {
+            //             postData =
+            //                 {
+            //                     'task'                      : 'all',
+            //                     'applicationName'           : $('#all-barebone-name').val().trim(),
+            //                     "default"                   : $('#all-default')[0].checked,
+            //                     "force"                     : "1"
+            //                 };
 
-                        $.post('/{{route}}/barebone/install', postData, function(data) {
-                            if (data && data.responseCode === 0) {
-                                PNotify.success({
-                                    text            : data.responseMessage,
-                                    textTrusted     : true
-                                });
+            //             $.post('/{{route}}/barebone/install', postData, function(data) {
+            //                 if (data && data.responseCode === 0) {
+            //                     PNotify.success({
+            //                         text            : data.responseMessage,
+            //                         textTrusted     : true
+            //                     });
 
-                                $('#all-access-div').attr('hidden', false);
-                                $('#all-access').attr('disabled', false);
-                                $('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
-                                $('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
-                            } else if (data && data.responseCode === 1) {
-                                PNotify.error({
-                                    text            : data.responseMessage,
-                                    textTrusted     : true
-                                });
-                            }
-                        }, 'json');
-                    } else if (result.isDenied) {
-                        $('#all-default')[0].checked = false;
-                        postData =
-                            {
-                                'task'                      : 'all',
-                                'applicationName'           : $('#all-barebone-name').val().trim(),
-                                "default"                   : 'false',
-                                "force"                     : "0"
-                            };
+            //                     $('#all-access-div').attr('hidden', false);
+            //                     $('#all-access').attr('disabled', false);
+            //                     $('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
+            //                     $('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
+            //                 } else if (data && data.responseCode === 1) {
+            //                     PNotify.error({
+            //                         text            : data.responseMessage,
+            //                         textTrusted     : true
+            //                     });
+            //                 }
+            //             }, 'json');
+            //         } else if (result.isDenied) {
+            //             $('#all-default')[0].checked = false;
+            //             postData =
+            //                 {
+            //                     'task'                      : 'all',
+            //                     'applicationName'           : $('#all-barebone-name').val().trim(),
+            //                     "default"                   : 'false',
+            //                     "force"                     : "0"
+            //                 };
 
-                        $.post('/{{route}}/barebone/install', postData, function(data) {
-                            if (data && data.responseCode === 0) {
-                                PNotify.success({
-                                    text        : data.responseMessage,
-                                    textTrusted : true
-                                });
+            //             $.post('/{{route}}/barebone/install', postData, function(data) {
+            //                 if (data && data.responseCode === 0) {
+            //                     PNotify.success({
+            //                         text        : data.responseMessage,
+            //                         textTrusted : true
+            //                     });
 
-                                $('#all-access-div').attr('hidden', false);
-                                $('#all-access').attr('disabled', false);
-                                $('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
-                                $('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
-                            } else if (data && data.responseCode === 1){
-                                PNotify.error({
-                                    text        : data.responseMessage,
-                                    textTrusted : true
-                                });
-                            }
-                        }, 'json');
-                    } else {
-                        $('#all-install-barebone-button').attr('disabled', false);
-                    }
-                });
+            //                     $('#all-access-div').attr('hidden', false);
+            //                     $('#all-access').attr('disabled', false);
+            //                     $('#all-access').attr('href', '/' + data.bareboneModule.name.toLowerCase() + '/');
+            //                     $('#all-access').html('<i class="fa fa-check"></i> Access ' + $('#all-barebone-name').val() + ' application');
+            //                 } else if (data && data.responseCode === 1){
+            //                     PNotify.error({
+            //                         text        : data.responseMessage,
+            //                         textTrusted : true
+            //                     });
+            //                 }
+            //             }, 'json');
+            //         } else {
+            //             $('#all-install-barebone-button').attr('disabled', false);
+            //         }
+            //     });
+            // }
             }
         }, 'json');
     }

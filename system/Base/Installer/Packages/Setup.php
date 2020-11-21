@@ -23,6 +23,8 @@ use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Components;
 use System\Base\Installer\Packages\Setup\Schema\Core;
 use System\Base\Installer\Packages\Setup\Schema\Domains;
+use System\Base\Installer\Packages\Setup\Schema\EmailServices;
+use System\Base\Installer\Packages\Setup\Schema\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Logs;
 use System\Base\Installer\Packages\Setup\Schema\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Middlewares;
@@ -119,20 +121,21 @@ class Setup
 		$this->db->createTable('repositories', '', (new Repositories)->columns());
 		$this->db->createTable('core', '', (new Core)->columns());
 		$this->db->createTable('applications', '', (new Applications)->columns());
-		$applicationNameUnique = new Index(
+		$applicationsRouteUnique = new Index(
 			'column_UNIQUE',
 			[
-				'name',
+				'route',
 			],
 			'UNIQUE'
 		);
-		$this->db->addIndex('applications', $this->dbConfig['db']['dbname'], $applicationNameUnique);
+		$this->db->addIndex('applications', $this->dbConfig['db']['dbname'], $applicationsRouteUnique);
 		$this->db->createTable('components', '', (new Components)->columns());
 		$this->db->createTable('packages', '', (new Packages)->columns());
 		$this->db->createTable('middlewares', '', (new Middlewares)->columns());
 		$this->db->createTable('views', '', (new Views)->columns());
 		$this->db->createTable('cache', '', (new Cache)->columns());
 		$this->db->createTable('logs', '', (new Logs)->columns());
+		$this->db->createTable('email_services', '', (new EmailServices)->columns());
 		$this->db->createTable('domains', '', (new Domains)->columns());
 		$domainUnique = new Index(
 			'column_UNIQUE',
@@ -143,6 +146,7 @@ class Setup
 		);
 		$this->db->addIndex('domains', $this->dbConfig['db']['dbname'], $domainUnique);
 		$this->db->createTable('menus', '', (new Menus)->columns());
+		$this->db->createTable('filters', '', (new Filters)->columns());
 		$this->db->createTable('users', '', (new Users)->columns());
 		$emailUnique = new Index(
 			'column_UNIQUE',
@@ -179,6 +183,7 @@ class Setup
 
 	public function registerModule($type, $newApplicationId)
 	{
+
 		if ($type === 'applications') {
 			$jsonFile =
 				json_decode(
@@ -192,6 +197,8 @@ class Setup
 
 			return $this->registerAdminApplication($jsonFile);
 		} else if ($type === 'components') {
+
+			$homeComponentId = null;
 
 			$adminComponents = $this->localContent->listContents('applications/Admin/Components/', true);
 
@@ -213,9 +220,15 @@ class Setup
 						$menuId = null;
 					}
 
-					$this->registerAdminComponent($jsonFile, $newApplicationId, $menuId);
+					$component = $this->registerAdminComponent($jsonFile, $newApplicationId, $menuId);
+
+					if ($component) {
+						$homeComponentId = $component;
+					}
 				}
 			}
+
+			return $homeComponentId;
 
 		} else if ($type === 'packages') {
 
@@ -331,9 +344,9 @@ class Setup
 		return (new RegisterView())->register($this->db, $viewFile, $installedFiles, $newApplicationId);
 	}
 
-	public function registerDomain()
+	public function registerDomain($homeComponentId = null)
 	{
-		return (new RegisterDomain())->register($this->db, $this->request);
+		return (new RegisterDomain())->register($this->db, $this->request, $homeComponentId);
 	}
 
 	public function validateData()

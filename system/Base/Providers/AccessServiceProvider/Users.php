@@ -42,7 +42,11 @@ class Users extends BasePackage
                 $this->packagesData->responseMessage = 'Account added';
 
                 if ($data['email_new_password'] === '1') {
-                    $this->emailNewPassword($data['email'], $password);
+                    if ($this->emailNewPassword($data['email'], $password) !== true) {
+                        $this->packagesData->responseCode = 1;
+
+                        $this->packagesData->responseMessage = 'Error sending email for new password.';
+                    }
                 }
 
                 $id = $this->packagesData->last['id'];
@@ -90,7 +94,11 @@ class Users extends BasePackage
         if ($this->update($data)) {
 
             if ($data['email_new_password'] === '1') {
-                $this->emailNewPassword($data['email'], $password);
+                if ($this->emailNewPassword($data['email'], $password) !== true) {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Error sending email for new password.';
+                }
             }
 
             $this->updateRoleUsers($data['role_id'], $data['id'], $user['role_id']);
@@ -191,24 +199,25 @@ class Users extends BasePackage
     protected function emailNewPassword($email, $password)
     {
         $this->email->setup(
-            [
-                'enabled'   =>  'true',
-                'host'      =>  'mail.bazaari.com.au',
-                'port'      => 465,
-                'auth'      => true,
-                'allow_html_body'=> true,
-                'username'  => 'no-reply@bazaari.com.au',
-                'test_email_address'  => 'guru@bazaari.com.au',
-                'password'  => 'ddU{&]ga3MQ&',
-                'encryption'=> 'true',
-            ]
+            // [
+            //     'enabled'   =>  'true',
+            //     'host'      =>  'mail.bazaari.com.au',
+            //     'port'      => 465,
+            //     'auth'      => true,
+            //     'allow_html_body'=> true,
+            //     'username'  => 'no-reply@bazaari.com.au',
+            //     'test_email_address'  => 'guru@bazaari.com.au',
+            //     'password'  => 'ddU{&]ga3MQ&',
+            //     'encryption'=> 'true',
+            // ]
         );
 
-        $this->email->setSender('guru@bazaari.com.au', 'Guru');
+        $emailSettings = $this->email->getEmailSettings();
+        $this->email->setSender($emailSettings['username'], $emailSettings['username']);
         $this->email->setRecipientTo($email, $email);
-        $this->email->setSubject('Testing Email');
+        $this->email->setSubject('OTP for ' . $this->modules->domains->getDomain()['name']);
         $this->email->setBody($password);
-        $this->email->sendNewEmail();
+        return $this->email->sendNewEmail();
     }
 
     protected function updateRoleUsers(int $rid, int $id, int $oldRid = null)

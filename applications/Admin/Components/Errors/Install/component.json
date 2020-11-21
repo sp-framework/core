@@ -1,4 +1,5 @@
 {
+	"route"			: "errors",
 	"name"			: "Errors",
 	"displayName" 	: "Admin Errors Component",
 	"description"	: "Component to manage Errors on Admin Application",

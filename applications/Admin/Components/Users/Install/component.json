@@ -1,4 +1,5 @@
 {
+    "route"         : "users",
     "name"          : "Users",
     "displayName"   : "Admin Users Management",
     "description"   : "List users via this component",
@@ -24,16 +25,11 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 2,
-        "accounts"      : {
-            "title"     : "Users Management",
+        "seq"           : 4,
+        "users" : {
             "icon"      : "users",
-            "childs"    : {
-                "users" : {
-                    "title"     : "users",
-                    "link"      : "users"
-                }
-            }
+            "title"     : "users",
+            "link"      : "users"
         }
     },
     "settings"          : {

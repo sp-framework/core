@@ -15,6 +15,7 @@ class Modify extends BasePackage
 
 			if ($applicationFile) {
 				$applicationFile = str_replace('Barebone', $names['applicationName'], $applicationFile);
+				$applicationFile = str_replace('barebone', $names['applicationRoute'], $applicationFile);
 
 				$this->localContent->put($file, $applicationFile);
 			} else {
@@ -46,6 +47,7 @@ class Modify extends BasePackage
 				$componentFile = str_replace('Barebone', $names['applicationName'], $componentFile);
 
 				if ($postData['task'] === 'component') {
+					$componentFile = str_replace('home', $names['componentRoute'], $componentFile);
 					$componentFile = str_replace('Home', $names['componentName'], $componentFile);
 					$componentFile = str_replace('Hello World', $names['componentName'], $componentFile);
 				}

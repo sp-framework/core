@@ -85,13 +85,21 @@ class Auth
 
     protected function clearUserRememberToken($cookieKey)
     {
-        $this->user['remember_identifier'] = Json::decode($this->user['remember_identifier'], true);
-        unset($this->user['remember_identifier'][$cookieKey]);
-        $this->user['remember_identifier'] = Json::encode($this->user['remember_identifier']);
+        if ($this->user['session_id']) {
+            $this->user['session_id'] = null;
+        }
 
-        $this->user['remember_token'] = Json::decode($this->user['remember_token'], true);
-        unset($this->user['remember_token'][$cookieKey]);
-        $this->user['remember_token'] = Json::encode($this->user['remember_token']);
+        if ($this->user['remember_identifier']) {
+            $this->user['remember_identifier'] = Json::decode($this->user['remember_identifier'], true);
+            unset($this->user['remember_identifier'][$cookieKey]);
+            $this->user['remember_identifier'] = Json::encode($this->user['remember_identifier']);
+        }
+
+        if ($this->user['remember_token']) {
+            $this->user['remember_token'] = Json::decode($this->user['remember_token'], true);
+            unset($this->user['remember_token'][$cookieKey]);
+            $this->user['remember_token'] = Json::encode($this->user['remember_token']);
+        }
 
         $this->users->update($this->user);
 
@@ -128,11 +136,10 @@ class Auth
         $this->user = $this->users->checkUserByEmail($postData['user']);
 
         if ($this->user) {
-
             if ($this->user['can_login']) {
                 $this->user['can_login'] = Json::decode($this->user['can_login'], true);
 
-                if (!isset($this->user['can_login'][$this->application['name']])) {//New Application OR New user via rego
+                if (!isset($this->user['can_login'][$this->application['route']])) {//New Application OR New user via rego
 
                     if ($this->application['can_login_role_ids']) {
 
@@ -141,7 +148,7 @@ class Auth
 
                     if (in_array($this->user['role_id'], $this->application['can_login_role_ids'])) {
 
-                        $this->user['can_login'][$this->application['name']] = true;
+                        $this->user['can_login'][$this->application['route']] = true;
 
                         $this->user['can_login'] = Json::encode($this->user['can_login']);
 
@@ -156,7 +163,7 @@ class Auth
 
                         return false;
                     }
-                } else if (isset($this->user['can_login'][$this->application['name']]) && !$this->user['can_login'][$this->application['name']]) {//Not allowed for application
+                } else if (isset($this->user['can_login'][$this->application['route']]) && !$this->user['can_login'][$this->application['route']]) {//Not allowed for application
                     $this->packagesData->responseCode = 1;
 
                     $this->packagesData->responseMessage = 'Error: Contact System Administrator';
@@ -199,12 +206,17 @@ class Auth
         if ($this->secTools->passwordNeedsRehash($this->user['password'])) {
 
             $this->user['password'] = $this->secTools->hashPassword($postData['pass']);
+            $this->user['can_login'] = Json::encode($this->user['can_login']);
 
             $this->users->update($this->user);
         }
 
         if ($this->setUserSession()) {
             $this->user['session_id'] = $this->session->getId();
+
+            if (is_array($this->user['can_login'])) {
+                $this->user['can_login'] = Json::encode($this->user['can_login']);
+            }
 
             $this->users->update($this->user);
         }
@@ -323,7 +335,7 @@ class Auth
 
     protected function setKey()
     {
-        $this->key = strtolower($this->application['name']);
+        $this->key = strtolower($this->application['route']);
     }
 
     public function setUserFromSession()

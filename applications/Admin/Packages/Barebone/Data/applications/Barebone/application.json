@@ -1,4 +1,5 @@
 {
+	"route"			: "barebone",
 	"name"			: "Barebone",
 	"displayName" 	: "Barebone Application",
 	"description" 	: "Barebone Application",

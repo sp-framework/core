@@ -37,6 +37,13 @@ class Domains
 						]
 					),
 					new Column(
+						'default_application_id',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'settings',
 						[
 							'type'    => Column::TYPE_TEXT,

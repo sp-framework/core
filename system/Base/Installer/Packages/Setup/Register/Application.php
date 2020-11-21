@@ -9,6 +9,7 @@ class Application
 		$insertApplication = $db->insertAsDict(
 			'applications',
 			[
+				'route' 				=> $applicationFile['route'],
 				'name' 					=> $applicationFile['name'],
 				'display_name' 			=> $applicationFile['displayName'],
 				'description' 			=> $applicationFile['description'],
@@ -22,7 +23,6 @@ class Application
 					isset($applicationFile['dependencies']) ?
 					json_encode($applicationFile['dependencies']) :
 					null,
-				'is_default'			=> 1,
 				'installed'				=> 1,
 				'files'					=> json_encode($installedFiles),
 				'mode'					=> $mode === 'true' ? 0 : 1

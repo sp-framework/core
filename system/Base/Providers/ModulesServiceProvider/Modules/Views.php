@@ -170,36 +170,50 @@ class Views extends BasePackage
     {
         if (!$this->application) {
             $this->application = $this->applications->getApplicationInfo();
-
+            // var_dump($this->application);
             if ($this->application) {
-
-                $applicationDefaults = $this->applications->getApplicationDefaults($this->application['name']);
+                if (isset($this->modules->domains->getDomain()['settings']['applications'][$this->application['id']])) {
+                    $applicationDefaults = $this->modules->domains->getDomain()['settings']['applications'][$this->application['id']];
+                } else {
+                    $applicationDefaults = null;
+                }
             } else {
                 $applicationDefaults = null;
             }
+
             if ($this->application && $applicationDefaults) {
 
-                $applicationName = $applicationDefaults['application'];
+                // $applicationName = ucfirst($this->application['route']);
 
-                $viewsName = $applicationDefaults['view'];
+                $viewsName = $this->getIdViews($applicationDefaults['defaultViews'])['name'];
 
-                if (!$this->view) {
+            } else {
+                $viewsName =  'Default';
+
+            }
+
+            if (!$this->view) {
+                //Make sure view has proper application ID.
+                if ($this->application) {
                     $this->view = $this->getApplicationView($this->application['id'], $viewsName);
                 }
-
-                if ($this->view) {
-                    $this->viewSettings = json_decode($this->view['settings'], true);
-
-                    $this->cache = $this->viewSettings['cache'];
-
-                    if (isset($this->viewSettings['tags']) && $this->viewSettings['tags']) {
-                        $this->tags = $this->checkTagsPackage($this->viewSettings['tags']);
-                    }
-                } else {
-                    $this->cache = false;
-                    $this->tags = false;
-                }
             }
+
+            if ($this->view) {
+                $this->viewSettings = json_decode($this->view['settings'], true);
+
+                $this->cache = $this->viewSettings['cache'];
+
+                if (isset($this->viewSettings['tags']) && $this->viewSettings['tags']) {
+                    $this->tags = $this->checkTagsPackage($this->viewSettings['tags']);
+                }
+            } else {
+                $this->cache = false;
+                $this->tags = false;
+            }
+            //     var_dump($this->viewSettings);
+            // var_dump($applicationDefaults);
+            // die();
         }
     }
 
@@ -217,7 +231,7 @@ class Views extends BasePackage
         $filter =
             $this->model->filter(
                 function($view) use ($id, $name) {
-                    if ($view->application_id === $id && $view->name === ucfirst($name)) {
+                    if ($view->application_id == $id && $view->name === ucfirst($name)) {
                         return $view;
                     }
                 }
@@ -239,7 +253,7 @@ class Views extends BasePackage
         $filter =
             $this->model->filter(
                 function($view) use ($id) {
-                    if ($view->application_id === $id && !$view->view_id) {
+                    if ($view->application_id == $id && !$view->view_id) {
                         return $view;
                     }
                 }
@@ -250,5 +264,25 @@ class Views extends BasePackage
         }
 
         return $views;
+    }
+
+    public function getIdViews($id)
+    {
+        $filter =
+            $this->model->filter(
+                function($view) use ($id) {
+                    if ($view->id == $id) {
+                        return $view;
+                    }
+                }
+            );
+
+        if (count($filter) > 1) {
+            throw new \Exception('Duplicate view Id found for id ' . $id);
+        } else if (count($filter) === 1) {
+            return $filter[0]->toArray();
+        } else {
+            return false;
+        }
     }
 }

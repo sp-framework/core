@@ -15,22 +15,22 @@ class ViewServiceProvider implements ServiceProviderInterface
 {
 	public function register(DiInterface $container) : void
 	{
-		$cache = $container->getShared('modules')->views->getCache();
-		$compiledPath = $container->getShared('modules')->views->getVoltCompiledPath();
 
 		$container->setShared(
 			'volt',
-			function(ViewBaseInterface $view) use ($container, $cache, $compiledPath) {
+			function(ViewBaseInterface $view) use ($container) {
+				$cache = $container->getShared('modules')->views->getCache();
+				$compiledPath = $container->getShared('modules')->views->getVoltCompiledPath();
 				return (new Volt($view))->init($container, $cache, $compiledPath);
 			}
 		);
 
-		$views = $container->getShared('modules')->views->init();
-		$events = $container->getShared('events');
 
 		$container->setShared(
 			'view',
-			function () use ($views, $events) {
+			function () use ($container) {
+				$views = $container->getShared('modules')->views->init();
+				$events = $container->getShared('events');
 				return (new View($views, $events))->init();
 			}
 		);
@@ -56,21 +56,21 @@ class ViewServiceProvider implements ServiceProviderInterface
 			}
 		);
 
-		$application = $container->getShared('modules')->applications->getApplicationInfo();
 		$tags = $container->getShared('modules')->views->getViewTags();
-		$view = $container->getShared('view');
-		$tag = $container->getShared('tag');
-		$escaper = $container->getShared('escaper');
-		$links = $container->getShared('links');
 
 		if ($tags) {
+			$application = $container->getShared('modules')->applications->getApplicationInfo();
 			$tagsName = strtolower($tags['name']);
 
 			$package = 'Applications\\' . ucfirst($application['name']) . '\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
 
 			$container->setShared(
 				$tagsName,
-				function () use ($package, $view, $tag, $links, $escaper) {
+				function () use ($package, $container) {
+					$view = $container->getShared('view');
+					$tag = $container->getShared('tag');
+					$links = $container->getShared('links');
+					$escaper = $container->getShared('escaper');
 					return new $package($view, $tag, $links, $escaper);
 				}
 			);

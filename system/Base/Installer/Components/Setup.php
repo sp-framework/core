@@ -102,7 +102,7 @@ Class Setup
 
 				if ($adminApplicationId) {
 
-					$this->setupPackage->registerModule('components', $adminApplicationId);
+					$homeComponentId = $this->setupPackage->registerModule('components', $adminApplicationId);
 
 					$this->setupPackage->registerModule('packages', $adminApplicationId);
 
@@ -110,7 +110,7 @@ Class Setup
 
 					$this->setupPackage->registerModule('views', $adminApplicationId);
 
-					$this->setupPackage->registerDomain();
+					$this->setupPackage->registerDomain($homeComponentId);
 
 					$adminRoleId = $this->setupPackage->registerRootAdminRole();
 

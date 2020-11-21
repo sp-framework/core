@@ -1,4 +1,5 @@
 {
+    "route"         : "user",
     "name"          : "User",
     "displayName"   : "Admin User Management",
     "description"   : "Manage admin users user via this component",

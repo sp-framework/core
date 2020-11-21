@@ -1,4 +1,5 @@
 {
+	"route"			: "barebone",
 	"name"			: "Barebone",
 	"displayName" 	: "Admin Barebone Management",
 	"description"	: "Manage admin barebone via this component",
