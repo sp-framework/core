@@ -30,7 +30,8 @@ class Users extends BasePackage
 
         if ($this->validateData($data)) {
 
-            $password = $this->random->base62(12);
+            $password = $this->generateNewPassword();
+
 
             $data['password'] = $this->secTools->hashPassword($password);
 
@@ -80,20 +81,20 @@ class Users extends BasePackage
 
         $data['email'] = strtolower($data['email']);
 
-        if ($data['email_new_password'] === '1') {
+        if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
 
-            $password = $this->random->base62(12);
+            $password = $this->generateNewPassword();
 
             $data['password'] = $this->secTools->hashPassword($password);
         }
 
-        if ($data['force_logout'] === '1') {
+        if (isset($data['force_logout']) && $data['force_logout'] === '1') {
             $data['session_id'] = null;
         }
 
         if ($this->update($data)) {
 
-            if ($data['email_new_password'] === '1') {
+            if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
                 if ($this->emailNewPassword($data['email'], $password) !== true) {
                     $this->packagesData->responseCode = 1;
 
@@ -196,27 +197,22 @@ class Users extends BasePackage
         }
     }
 
+    protected function generateNewPassword()
+    {
+        return $this->random->base62(12);
+    }
+
     protected function emailNewPassword($email, $password)
     {
-        $this->email->setup(
-            // [
-            //     'enabled'   =>  'true',
-            //     'host'      =>  'mail.bazaari.com.au',
-            //     'port'      => 465,
-            //     'auth'      => true,
-            //     'allow_html_body'=> true,
-            //     'username'  => 'no-reply@bazaari.com.au',
-            //     'test_email_address'  => 'guru@bazaari.com.au',
-            //     'password'  => 'ddU{&]ga3MQ&',
-            //     'encryption'=> 'true',
-            // ]
-        );
+        $this->email->setup();
 
         $emailSettings = $this->email->getEmailSettings();
+
         $this->email->setSender($emailSettings['username'], $emailSettings['username']);
         $this->email->setRecipientTo($email, $email);
         $this->email->setSubject('OTP for ' . $this->modules->domains->getDomain()['name']);
         $this->email->setBody($password);
+
         return $this->email->sendNewEmail();
     }
 

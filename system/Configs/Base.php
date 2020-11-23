@@ -24,16 +24,5 @@ return
 			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,
 			"emergencyEmails"	=> "",
-		],
-		"email"			=>
-		[
-			"enabled"			=> false,
-			"encryption"	 	=> "",
-			"allow_html_body"	=> "",
-			"host"				=> "",
-			"port"				=> "",
-			"auth" 				=> "",
-			"username"			=> "",
-			"password"			=> ""
 		]
 	];

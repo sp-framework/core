@@ -9,8 +9,7 @@ class Auth extends BaseMiddleware
     public function process()
     {
         $appName = strtolower($this->application['name']);
-
-        $givenRoute = $this->request->getUri();
+        $givenRoute = rtrim(explode('/q/', $this->request->getUri())[0], '/');
 
         $guestAccess =
         [
@@ -18,9 +17,7 @@ class Auth extends BaseMiddleware
             '/' . $appName . '/auth/login',
             '/' . $appName . '/auth/logout',
             '/' . $appName . '/auth/forgot',
-            '/' . $appName . '/auth/pwreset',
-            '/' . $appName . '/auth/pwresetlink',
-            '/' . $appName . '/auth/pwresetforgot',
+            '/' . $appName . '/auth/pwreset'
         ];
 
         if (!in_array($givenRoute, $guestAccess)) {

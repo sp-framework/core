@@ -4,10 +4,6 @@ BazCore.header({
     loadHeaderAt : 'login'
 });
 </script>
-<div class="pace-loading-text ml-1 fixed-top text-orange" hidden>
-    <span>Loading... </span>
-    <span></span>
-</div>
 <div id="{{componentId}}" class="login-box">
     <div class="card m-0">
         <div class="card-body login-card-body">
@@ -15,7 +11,7 @@ BazCore.header({
                 <img src="{{links.images('/baz/logo/fulllogo168x30.png')}}" data-rjs="3" alt="Bazaari Logo">
             </div>
             <div id="{{componentId}}-regular" hidden>
-                <p class="login-box-msg text-sm font-weight-bold">Login to start {{applicationName|lower}} session</p>
+                <p class="login-box-msg text-sm font-weight-bold">Forgot Password</p>
                 <div id="{{componentId}}-form">
                     {{adminltetags.useTag('fields',
                         [
@@ -30,43 +26,17 @@ BazCore.header({
                             'fieldGroupPostAddonIcon'               : 'user'
                         ]
                     )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'pass',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'password',
-                            'fieldPlaceholder'                      : 'Password',
-                            'fieldBazScan'                          : true,
-                            'fieldGroupPostAddonIcon'               : 'lock'
-                        ]
-                    )}}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'remember',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'checkbox',
-                            'fieldCheckboxType'                     : 'success',
-                            'fieldCheckboxLabel'                    : 'Remember',
-                            'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase',
-                            'fieldBazScan'                          : true
-                        ]
-                    )}}
                     <div class="row mt-2">
                         <div class="col mt-2">
-                            <a class="text-info" href="{{links.url('auth/q/forgot/password')}}">
-                                <span>Forgot password?</span>
+                            <a class="text-info" href="{{links.url('auth')}}">
+                                <span>Back to login</span>
                             </a>
                         </div>
                         <div class="col">
-                            <button id="{{componentId}}-form-auth" type="button" class="btn btn-info float-right">
+                            <button id="{{componentId}}-form-forgot" type="button" class="btn btn-info float-right">
                                 <i class="fa fa-cog fa-spin login-spinner" hidden></i>
                                 <span class="sr-only">Loading...</span>
-                                <span class="text-uppercase">Login</span>
+                                <span class="text-uppercase">Send Email</span>
                             </button>
                         </div>
                     </div>

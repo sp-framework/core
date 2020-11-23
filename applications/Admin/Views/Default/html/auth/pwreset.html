@@ -4,10 +4,6 @@ BazCore.header({
     loadHeaderAt : 'login'
 });
 </script>
-<div class="pace-loading-text ml-1 fixed-top text-orange" hidden>
-    <span>Loading... </span>
-    <span></span>
-</div>
 <div id="{{componentId}}" class="login-box">
     <div class="card m-0">
         <div class="card-body login-card-body">
@@ -15,7 +11,7 @@ BazCore.header({
                 <img src="{{links.images('/baz/logo/fulllogo168x30.png')}}" data-rjs="3" alt="Bazaari Logo">
             </div>
             <div id="{{componentId}}-regular" hidden>
-                <p class="login-box-msg text-sm font-weight-bold">Login to start {{applicationName|lower}} session</p>
+                <p class="login-box-msg text-sm font-weight-bold">Password Reset</p>
                 <div id="{{componentId}}-form">
                     {{adminltetags.useTag('fields',
                         [
@@ -38,7 +34,7 @@ BazCore.header({
                             'fieldLabel'                            : false,
                             'fieldType'                             : 'input',
                             'fieldInputType'                        : 'password',
-                            'fieldPlaceholder'                      : 'Password',
+                            'fieldPlaceholder'                      : 'Current Password',
                             'fieldBazScan'                          : true,
                             'fieldGroupPostAddonIcon'               : 'lock'
                         ]
@@ -47,26 +43,34 @@ BazCore.header({
                         [
                             'componentId'                           : componentId,
                             'sectionId'                             : 'form',
-                            'fieldId'                               : 'remember',
+                            'fieldId'                               : 'newpass',
                             'fieldLabel'                            : false,
-                            'fieldType'                             : 'checkbox',
-                            'fieldCheckboxType'                     : 'success',
-                            'fieldCheckboxLabel'                    : 'Remember',
-                            'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase',
-                            'fieldBazScan'                          : true
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'password',
+                            'fieldPlaceholder'                      : 'New Password',
+                            'fieldBazScan'                          : true,
+                            'fieldGroupPostAddonIcon'               : 'lock'
+                        ]
+                    )}}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'confirmnewpass',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'password',
+                            'fieldPlaceholder'                      : 'Confirm New Password',
+                            'fieldBazScan'                          : true,
+                            'fieldGroupPostAddonIcon'               : 'lock'
                         ]
                     )}}
                     <div class="row mt-2">
-                        <div class="col mt-2">
-                            <a class="text-info" href="{{links.url('auth/q/forgot/password')}}">
-                                <span>Forgot password?</span>
-                            </a>
-                        </div>
                         <div class="col">
-                            <button id="{{componentId}}-form-auth" type="button" class="btn btn-info float-right">
+                            <button id="{{componentId}}-form-reset" type="button" class="btn btn-info float-right">
                                 <i class="fa fa-cog fa-spin login-spinner" hidden></i>
                                 <span class="sr-only">Loading...</span>
-                                <span class="text-uppercase">Login</span>
+                                <span class="text-uppercase">Reset</span>
                             </button>
                         </div>
                     </div>

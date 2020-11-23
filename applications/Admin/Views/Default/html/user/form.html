@@ -120,6 +120,55 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
+                        'fieldId'                        : 'can_login',
+                        'fieldLabel'                     : 'Can Login To Application?',
+                        'fieldHelp'                      : true,
+                        'fieldAdditionalClass'           : 'mb-1',
+                        'fieldHelpTooltipContent'        : 'Select applications to which this user can login',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'html',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+                {% for application in applications %}
+                    {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ application['route']] = application['route'] %}
+                    {% if user['can_login'][application['route']] is defined %}
+                        {% if user['can_login'][application['route']] == true %}
+                            {% set checked = true %}
+                        {% else %}
+                            {% set checked = false %}
+                        {% endif %}
+                    {% else %}
+                        {% set checked = false %}
+                    {% endif %}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'can_login-' ~ application['route'],
+                            'fieldLabel'                     : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'success',
+                            'fieldCheckboxLabel'             : application['name'],
+                            'fieldCheckboxChecked'           : checked,
+                            'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                            'fieldBazScan'                   : false
+                        ]
+                    )}}
+                {% endfor %}
+                {% set checkboxIds = json_encode(checkboxIds, 16) %}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
                         'fieldId'                        : 'email_new_password',
                         'fieldLabel'                     : 'Email New Password',
                         'fieldHelp'                      : true,
@@ -136,13 +185,22 @@
                 )}}
             </div>
             <div class="col">
+                {% if user['force_pwreset'] is defined %}
+                    {% if user['force_pwreset'] == 1 %}
+                        {% set reset_checked = true %}
+                    {% else %}
+                        {% set reset_checked = false %}
+                    {% endif %}
+                {% else %}
+                    {% set reset_checked = false %}
+                {% endif %}
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'force_change_password',
+                        'fieldId'                        : 'force_pwreset',
                         'fieldLabel'                     : 'Force User Change Password',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Force use to change password at next login.',
@@ -153,58 +211,10 @@
                         'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
+                        'fieldBazScan'                   : true,
+                        'fieldCheckboxChecked'           : reset_checked
                     ]
                 )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'can_login',
-                        'fieldLabel'                     : 'Can Login?',
-                        'fieldHelp'                      : true,
-                        'fieldAdditionalClass'           : 'mb-1',
-                        'fieldHelpTooltipContent'        : 'Select applications to which this user can login',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'html',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-                {% for application in applications %}
-                    {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ application['name']] = application['name'] %}
-                    {% if user['can_login'][application['name']] is defined %}
-                        {% if user['can_login'][application['name']] == true %}
-                            {% set checked = true %}
-                        {% else %}
-                            {% set checked = false %}
-                        {% endif %}
-                    {% else %}
-                        {% set checked = false %}
-                    {% endif %}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'can_login-' ~ application['name'],
-                            'fieldLabel'                     : false,
-                            'fieldType'                      : 'checkbox',
-                            'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : application['name'],
-                            'fieldCheckboxChecked'           : checked,
-                            'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                            'fieldBazScan'                   : false
-                        ]
-                    )}}
-                {% endfor %}
-                {% set checkboxIds = json_encode(checkboxIds, 16) %}
             </div>
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -358,7 +368,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                          : { },
         '{{componentId}}-{{sectionId}}-email'                       : { },
         '{{componentId}}-{{sectionId}}-email_new_password'          : { },
-        '{{componentId}}-{{sectionId}}-force_change_password'       : { },
+        '{{componentId}}-{{sectionId}}-force_pwreset'               : { },
         '{{componentId}}-{{sectionId}}-force_logout'                : { },
         '{{componentId}}-{{sectionId}}-can_login'                   : {
             'afterInit'     : function () {

@@ -2,7 +2,7 @@
 
 namespace System\Base\Installer\Packages\Setup\Write;
 
-class DatabaseServiceProvider
+class Pdo
 {
 	public function write($localContent)
 	{
@@ -13,28 +13,24 @@ namespace System\Base\Providers\DatabaseServiceProvider;
 
 use Phalcon\Db\Adapter\PdoFactory;
 use Phalcon\Db\Adapter\Pdo\Mysql;
-use Phalcon\Di\DiInterface;
-use System\Base\Installer\Setup;
 
-class Db
+class Pdo
 {
-	private $container;
+	protected $dbConfig;
 
-	public function __construct(DiInterface $container)
+	public function __construct($dbConfig)
 	{
-		$this->container = $container;
-
-		$this->dbConfig = $container->getShared("config")->db;
+		$this->dbConfig = $dbConfig;
 	}
 
-	public function getPdo()
+	public function init()
 	{
 		return new Mysql($this->dbConfig->toArray());
 	}
 }';
 
 		$localContent->put(
-			'/system/Base/Providers/DatabaseServiceProvider/Db.php',
+			'/system/Base/Providers/DatabaseServiceProvider/Pdo.php',
 			$databaseServiceProvider
 		);
 	}

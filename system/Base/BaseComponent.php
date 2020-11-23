@@ -168,7 +168,6 @@ abstract class BaseComponent extends Controller
 	protected function checkLayout()
 	{
 		if ($this->request->isAjax()) {
-
 			if (count($this->dispatcher->getParams()) > 0) {
 				$this->buildGetQueryParamsArr();
 
@@ -243,7 +242,11 @@ abstract class BaseComponent extends Controller
 		$arr = Arr::chunk($this->dispatcher->getParams(), 2);
 
 		foreach ($arr as $value) {
-			$this->getQueryArr[$value[0]] = $value[1];
+			if (isset($value[1])) {
+				$this->getQueryArr[$value[0]] = $value[1];
+			} else {
+				$this->getQueryArr[$value[0]] = 0; //Value not set, so default to 0
+			}
 		}
 
 		// getQuery - /admin/setup/q/id/2/filter/4/search//layout/0

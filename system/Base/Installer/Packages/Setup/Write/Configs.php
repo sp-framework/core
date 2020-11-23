@@ -57,17 +57,6 @@ return
 			"service"			=> "' . $coreJson['settings']['logs']['service'] . '", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,
 			"emergencyEmails"	=> "' . $coreJson['settings']['logs']['emergencyEmails'] . '",
-		],
-		"email"			=>
-		[
-			"enabled"			=> false,
-			"encryption"	 	=> "",
-			"allow_html_body"	=> "",
-			"host"				=> "",
-			"port"				=> "",
-			"auth" 				=> "",
-			"username"			=> "",
-			"password"			=> ""
 		]
 	];';
 

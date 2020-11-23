@@ -24,16 +24,6 @@
 			"service"			: "streamLogs",
 			"email"				: "false",
 			"emergencyEmails"	: ""
-		},
-		"email"			: {
-			"enabled"			: false,
-			"encryption"	 	: "",
-			"allow_html_body"	: "",
-			"host"				: "",
-			"port"				: "",
-			"auth" 				: "",
-			"username"			: "",
-			"password"			: ""
 		}
 	}
 }

@@ -67,6 +67,13 @@ class Users
                         ]
                     ),
                     new Column(
+                        'force_pwreset',
+                        [
+                            'type'    => Column::TYPE_TINYINTEGER,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'session_id',
                         [
                             'type'    => Column::TYPE_VARCHAR,

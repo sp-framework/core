@@ -379,7 +379,7 @@ var BazCore = function() {
         dataCollection = window.dataCollection;
         if (dataCollection.env.libsLoaded === false) {
             Pace.restart();
-            if (options.loadFooterAt === 'login') {
+            if (options.loadFooterAt === 'auth') {
                 $('.pace-loading-text').attr('hidden', false);
                 $($('.pace-loading-text span')[1]).text(' core libs');
                 $.ajax({

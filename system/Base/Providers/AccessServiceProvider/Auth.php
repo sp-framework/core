@@ -3,6 +3,7 @@
 namespace System\Base\Providers\AccessServiceProvider;
 
 use Phalcon\Helper\Json;
+use Phalcon\Validation\Validator\Confirmation;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
@@ -28,9 +29,11 @@ class Auth
 
     protected $logger;
 
+    protected $links;
+
     public $packagesData;
 
-    public function __construct($session, $cookies, $users, $applications, $secTools, $validation, $logger)
+    public function __construct($session, $cookies, $users, $applications, $secTools, $validation, $logger, $links)
     {
         $this->session = $session;
 
@@ -45,6 +48,8 @@ class Auth
         $this->validation = $validation;
 
         $this->logger = $logger;
+
+        $this->links = $links;
 
         $this->packagesData = new PackagesData;
     }
@@ -121,9 +126,9 @@ class Auth
         }
     }
 
-    public function attempt($postData, $remember = false)
+    public function attempt($data, $remember = false)
     {
-        $validate = $this->validateData($postData);
+        $validate = $this->validateData($data, 'auth');
 
         if ($validate !== true) {
             $this->packagesData->responseCode = 1;
@@ -133,7 +138,42 @@ class Auth
             return false;
         }
 
-        $this->user = $this->users->checkUserByEmail($postData['user']);
+
+        if (!$this->checkUser($data)) {
+            return false;
+        }
+
+        $this->packagesData->responseCode = 0;
+
+        $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
+
+        if ($this->user['force_pwreset'] && $this->user['force_pwreset'] === '1') {
+
+            $this->packagesData->redirectUrl = $this->links->url('auth/q/pwreset/true');
+
+            return true;
+        }
+
+        $this->packagesData->redirectUrl = $this->links->url('/');
+
+        if ($this->secTools->passwordNeedsRehash($this->user['password'])) {
+
+            $this->user['password'] = $this->secTools->hashPassword($data['pass']);
+            $this->user['can_login'] = Json::encode($this->user['can_login']);
+
+            $this->users->update($this->user);
+        }
+
+        $this->setSessionAndToken($data);
+
+        $this->logger->log->debug($this->user['email'] . ' authenticated successfully on application ' . $this->application['name']);
+
+        return true;
+    }
+
+    protected function checkUser(array $data)
+    {
+        $this->user = $this->users->checkUserByEmail($data['user']);
 
         if ($this->user) {
             if ($this->user['can_login']) {
@@ -144,24 +184,24 @@ class Auth
                     if ($this->application['can_login_role_ids']) {
 
                         $this->application['can_login_role_ids'] = Json::decode($this->application['can_login_role_ids'], true);
-                    }
 
-                    if (in_array($this->user['role_id'], $this->application['can_login_role_ids'])) {
+                        if (in_array($this->user['role_id'], $this->application['can_login_role_ids'])) {
 
-                        $this->user['can_login'][$this->application['route']] = true;
+                            $this->user['can_login'][$this->application['route']] = true;
 
-                        $this->user['can_login'] = Json::encode($this->user['can_login']);
+                            $this->user['can_login'] = Json::encode($this->user['can_login']);
 
-                        $this->users->update($this->user);
+                            $this->users->update($this->user);
 
-                    } else {
-                        $this->packagesData->responseCode = 1;
+                        } else {
+                            $this->packagesData->responseCode = 1;
 
-                        $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+                            $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                        $this->logger->log->debug($this->user['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
+                            $this->logger->log->debug($this->user['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
 
-                        return false;
+                            return false;
+                        }
                     }
                 } else if (isset($this->user['can_login'][$this->application['route']]) && !$this->user['can_login'][$this->application['route']]) {//Not allowed for application
                     $this->packagesData->responseCode = 1;
@@ -182,7 +222,7 @@ class Auth
                 return false;
             }
 
-            if (!$this->secTools->checkPassword($postData['pass'], $this->user['password'])) {//Password Fail
+            if (!$this->secTools->checkPassword($data['pass'], $this->user['password'])) {//Password Fail
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
@@ -203,14 +243,11 @@ class Auth
             return false;
         }
 
-        if ($this->secTools->passwordNeedsRehash($this->user['password'])) {
+        return true;
+    }
 
-            $this->user['password'] = $this->secTools->hashPassword($postData['pass']);
-            $this->user['can_login'] = Json::encode($this->user['can_login']);
-
-            $this->users->update($this->user);
-        }
-
+    protected function setSessionAndToken(array $data)
+    {
         if ($this->setUserSession()) {
             $this->user['session_id'] = $this->session->getId();
 
@@ -221,17 +258,9 @@ class Auth
             $this->users->update($this->user);
         }
 
-        if ($postData['remember'] === 'true') {
+        if (isset($data['remember']) && $data['remember'] === 'true') {
             $this->setRememberToken();
         }
-
-        $this->packagesData->responseCode = 0;
-
-        $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
-
-        $this->logger->log->debug($this->user['email'] . ' authenticated successfully on application ' . $this->application['name']);
-
-        return true;
     }
 
     public function setUserFromCookie()
@@ -366,29 +395,24 @@ class Auth
         return true;
     }
 
-    public function loginPermit()
+    protected function validateData(array $data, $task)
     {
-        var_dump($this->user);
-        return false;
-    }
-    // public function generateNewPassword($complexity = 1, $length = 6)
-    // {
-            // return substr(str_shuffle($this->setPasswordComplexityChars($complexity)), 0, $length);
-    // }
-
-    // public function checkAdminUser()
-    // {
-    //     if ($this->userProvider->getByCompanyId()) {
-    //         return false;
-    //     }
-
-    //     return true;
-    // }
-
-    protected function validateData(array $data)
-    {
-        $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
-        $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
+        if ($task === 'auth') {
+            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+            $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
+        } else if ($task === 'forgot') {
+            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+        } else if ($task === 'reset') {
+            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+            $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
+            $this->validation->add('newpass', PresenceOf::class, ["message" => "Enter valid new password."]);
+            $this->validation->add('confirmnewpass', Confirmation::class,
+                [
+                    "message"   => "New password and confirm password don't match.",
+                    "with"      => "newpass"
+                ]
+        );
+        }
 
         $validated = $this->validation->validate($data)->jsonSerialize();
 
@@ -402,5 +426,68 @@ class Auth
         } else {
             return true;
         }
+    }
+
+    public function forgotPassword(array $data)
+    {
+        $validate = $this->validateData($data, 'forgot');
+
+        if ($validate !== true) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = $validate;
+
+            return false;
+        }
+
+        $this->user = $this->users->checkUserByEmail($data['user']);
+
+        if ($this->user) {
+            $this->user['force_logout'] = '1';
+
+            $this->user['email_new_password'] = '1';
+
+            $this->users->updateUser($this->user);
+
+            $this->logger->log->info('New password requested for user ' . $this->user['email'] . ' via forgot password. New password was emailed to the user.');
+        }
+
+        $this->packagesData->responseCode = 0;
+
+        $this->packagesData->responseMessage = 'Email Sent. Please follow password reset instructions from the email.';
+
+        return true;
+    }
+
+    public function resetPassword(array $data)
+    {
+        $validate = $this->validateData($data, 'reset');
+
+        if ($validate !== true) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = $validate;
+
+            return false;
+        }
+
+        if (!$this->checkUser($data)) {
+            return false;
+        }
+
+        $this->user['password'] = $this->secTools->hashPassword($data['newpass']);
+        $this->user['force_pwreset'] = null;
+        $this->setSessionAndToken($data);
+        $this->users->updateUser($this->user);
+
+        $this->logger->log->info('Password reset successfull for user ' . $this->user['email'] . ' via pwreset.');
+
+        $this->packagesData->responseCode = 0;
+
+        $this->packagesData->responseMessage = 'Authenticated. Password changed. Redirecting...';
+
+        $this->packagesData->redirectUrl = $this->links->url('/');
+
+        return true;
     }
 }
