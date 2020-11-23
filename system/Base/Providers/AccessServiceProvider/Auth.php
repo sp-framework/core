@@ -112,7 +112,11 @@ class Auth
         $this->cookies->set(
             $cookieKey,
             '0',
-            1
+            1,
+            '/',
+            null,
+            null,
+            true
         );
         $this->cookies->get($cookieKey)->setOptions(['samesite'=>'strict']);
         $this->cookies->send();
@@ -137,7 +141,6 @@ class Auth
 
             return false;
         }
-
 
         if (!$this->checkUser($data)) {
             return false;
@@ -238,7 +241,7 @@ class Auth
 
             $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
 
-            $this->logger->log->debug($this->user['email'] . ' is not in DB. Application: ' . $this->application['name']);
+            $this->logger->log->debug($data['user'] . ' is not in DB. Application: ' . $this->application['name']);
 
             return false;
         }
@@ -307,7 +310,11 @@ class Auth
         $this->cookies->set(
             $cookieKey,
             $identifier . $this->separator . $token,
-            time() + 86400
+            time() + 86400,
+            '/',
+            null,
+            null,
+            true
         );
 
         $this->cookies->get($cookieKey)->setOptions(['samesite'=>'strict']);

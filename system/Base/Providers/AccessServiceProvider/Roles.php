@@ -73,50 +73,6 @@ class Roles extends BasePackage
         }
     }
 
-    public function checkUserByEmail(string $email)
-    {
-        $user =
-            $this->getByParams(
-                    [
-                        'conditions'    => 'email = :email:',
-                        'bind'          =>
-                            [
-                                'email'  => $email
-                            ]
-                    ],
-                    false,
-                    false
-                );
-
-        if ($user) {
-            return $user[0];
-        } else {
-            return false;
-        }
-    }
-
-    public function checkUserByIdentifier(string $rememberIdentifier)
-    {
-        $user =
-            $this->getByParams(
-                    [
-                        'conditions'    => 'remember_identifier = :ri:',
-                        'bind'          =>
-                            [
-                                'ri'  => $rememberIdentifier
-                            ]
-                    ],
-                    false,
-                    false
-                );
-
-        if ($user) {
-            return $user[0];
-        } else {
-            return false;
-        }
-    }
-
     public function generateViewData(int $rid = null)
     {
         $acls = [];
