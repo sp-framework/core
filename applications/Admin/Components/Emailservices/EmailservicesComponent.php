@@ -23,6 +23,22 @@ class EmailservicesComponent extends BaseComponent
                 ]
             ];
 
+        if ($this->request->isPost()) {
+            $replaceColumns =
+                [
+                    'encryption' =>
+                        [
+                            'html'  =>
+                            [
+                                '0' => '<span class="badge badge-secondary text-uppercase">Disabled</span>',
+                                '1' => '<span class="badge badge-success text-uppercase">Enabled</span>'
+                            ]
+                        ]
+                ];
+        } else {
+            $replaceColumns = null;
+        }
+
         $this->generateDTContent(
             $emailservices,
             'emailservices/view',
@@ -32,7 +48,7 @@ class EmailservicesComponent extends BaseComponent
             ['name', 'host', 'port', 'encryption'],
             $controlActions,
             null,
-            null,
+            $replaceColumns,
             'name'
         );
     }
