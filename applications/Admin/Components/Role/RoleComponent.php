@@ -42,6 +42,9 @@ class RoleComponent extends BaseComponent
     public function addAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->roles->addRole($this->postData());
 
@@ -62,6 +65,9 @@ class RoleComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->roles->updateRole($this->postData());
 

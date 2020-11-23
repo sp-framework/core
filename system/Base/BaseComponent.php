@@ -71,6 +71,22 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	protected function checkCSRF()
+	{
+		if ($this->request->isPost() || $this->request->isPut() || $this->request->isDelete()) {
+			if (!$this->security->checkToken()) {
+				$this->view->responseCode = 2;
+
+				$this->view->responseMessage = 'CSRF TOKEN ERROR';
+
+				$this->sendJson();
+
+				return false;
+			}
+		}
+		return true;
+	}
+
 	protected function setDefaultViewData()
 	{
 		$this->view->widget = $this->widget;
@@ -266,6 +282,11 @@ abstract class BaseComponent extends Controller
 	protected function postData()
 	{
 		return $this->request->getPost();
+	}
+
+	protected function putData()
+	{
+		return $this->request->getPut();
 	}
 
 	protected function buildAssets()

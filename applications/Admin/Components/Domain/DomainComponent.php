@@ -33,7 +33,9 @@ class DomainComponent extends BaseComponent
     public function addAction()
     {
         if ($this->request->isPost()) {
-
+            if (!$this->checkCSRF()) {
+                return;
+            }
             $this->modules->domains->addDomain($this->postData());
 
             $this->view->responseCode = $this->modules->domains->packagesData->responseCode;
@@ -53,7 +55,9 @@ class DomainComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
-
+            if (!$this->checkCSRF()) {
+                return;
+            }
             $this->modules->domains->updateDomain($this->postData());
 
             $this->view->responseCode = $this->modules->domains->packagesData->responseCode;

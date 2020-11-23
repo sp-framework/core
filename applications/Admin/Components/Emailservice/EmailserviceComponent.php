@@ -25,6 +25,9 @@ class EmailserviceComponent extends BaseComponent
     public function addAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->emailservices->addEmailService($this->postData());
 
@@ -45,6 +48,9 @@ class EmailserviceComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->emailservices->updateEmailService($this->postData());
 
@@ -82,7 +88,9 @@ class EmailserviceComponent extends BaseComponent
     public function testEmailServiceAction()
     {
         if ($this->request->isPost()) {
-
+            if (!$this->checkCSRF()) {
+                return;
+            }
             $this->emailservices->testEmailService($this->postData());
 
             $this->view->responseCode = $this->emailservices->packagesData->responseCode;

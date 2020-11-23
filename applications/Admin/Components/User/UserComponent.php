@@ -42,6 +42,10 @@ class UserComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
             $this->users->addUser($this->postData());
 
             $this->view->responseCode = $this->users->packagesData->responseCode;
@@ -61,6 +65,10 @@ class UserComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
+
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->users->updateUser($this->postData());
 

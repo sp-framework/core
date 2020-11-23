@@ -320,6 +320,11 @@
                         dataCollection[componentId][sectionId]['dataToSubmit'][stripComponentId] = dataToSubmit;
                     });
                 }
+                //CSRF TOKEN
+                if ($('#' + sectionId + ' .token').length === 1) {
+                    dataCollection[componentId][sectionId]['dataToSubmit'][$('#' + sectionId + ' .token').attr('name')] =
+                        $('#' + sectionId + ' .token').val();
+                }
                 return dataCollection[componentId][sectionId]['dataToSubmit'];
             };
 

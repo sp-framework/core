@@ -26,7 +26,6 @@ class AuthComponent extends BaseComponent
             return;
         }
 
-
         $this->response->setHeader('NEED_AUTH', '1');
         $this->response->setHeader('REDIRECT_URL', '/' . strtolower($this->application['route'] . '/auth'));
 
@@ -37,14 +36,24 @@ class AuthComponent extends BaseComponent
 
     public function loginAction()
     {
-        $auth = $this->auth->attempt($this->postData());
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
-        $this->view->responseCode = $this->auth->packagesData->responseCode;
+            $auth = $this->auth->attempt($this->postData());
 
-        $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
 
-        if ($auth) {
-            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+
+            if ($auth) {
+                $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+            }
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
         }
     }
 
@@ -57,23 +66,43 @@ class AuthComponent extends BaseComponent
 
     public function forgotAction()
     {
-        $this->auth->forgotPassword($this->postData());
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
-        $this->view->responseCode = $this->auth->packagesData->responseCode;
+            $this->auth->forgotPassword($this->postData());
 
-        $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
     }
 
     public function pwresetAction()
     {
-        $pwreset = $this->auth->resetPassword($this->postData());
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
-        $this->view->responseCode = $this->auth->packagesData->responseCode;
+            $pwreset = $this->auth->resetPassword($this->postData());
 
-        $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
 
-        if ($pwreset) {
-            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+
+            if ($pwreset) {
+                $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+            }
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
         }
     }
 }

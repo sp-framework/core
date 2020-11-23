@@ -17,6 +17,7 @@ BazCore.header({
             <div id="{{componentId}}-regular" hidden>
                 <p class="login-box-msg text-sm font-weight-bold">Login to start {{applicationName|lower}} session</p>
                 <div id="{{componentId}}-form">
+                    <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
                     {{adminltetags.useTag('fields',
                         [
                             'componentId'                           : componentId,
@@ -26,7 +27,6 @@ BazCore.header({
                             'fieldType'                             : 'input',
                             'fieldInputType'                        : 'text',
                             'fieldPlaceholder'                      : 'Username',
-                            'fieldBazScan'                          : true,
                             'fieldGroupPostAddonIcon'               : 'user'
                         ]
                     )}}
@@ -39,7 +39,6 @@ BazCore.header({
                             'fieldType'                             : 'input',
                             'fieldInputType'                        : 'password',
                             'fieldPlaceholder'                      : 'Password',
-                            'fieldBazScan'                          : true,
                             'fieldGroupPostAddonIcon'               : 'lock'
                         ]
                     )}}
@@ -52,8 +51,7 @@ BazCore.header({
                             'fieldType'                             : 'checkbox',
                             'fieldCheckboxType'                     : 'success',
                             'fieldCheckboxLabel'                    : 'Remember',
-                            'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase',
-                            'fieldBazScan'                          : true
+                            'fieldCheckboxAdditionClass'            : 'text-sm text-uppercase'
                         ]
                     )}}
                     <div class="row mt-2">
@@ -119,6 +117,9 @@ $(document).ready(function(){
         $('#{{componentId}}-form-auth, #{{componentId}}-form-forgot, #{{componentId}}-form-reset').attr('disabled', true);
         $('.login-spinner').attr('hidden', false);
 
+        var tokenKey = $('.token').attr('name');
+        var token = $('.token').val();
+
         if ($('#{{componentId}}-form-auth').length > 0) {
             url = '{{links.url("auth/login")}}';
             data = {
@@ -126,11 +127,13 @@ $(document).ready(function(){
                 'pass'      : $('#{{componentId}}-form-pass').val().trim(),
                 'remember'  : $('#{{componentId}}-form-remember')[0].checked
             };
+            data[tokenKey] = token;
         } else if ($('#{{componentId}}-form-forgot').length > 0) {
             url = '{{links.url("auth/forgot")}}';
             data = {
-                'user' : $('#{{componentId}}-form-user').val().trim()
+                'user'      : $('#{{componentId}}-form-user').val().trim()
             };
+            data[tokenKey] = token;
         } else if ($('#{{componentId}}-form-reset').length > 0) {
             url = '{{links.url("auth/pwreset")}}';
             data = {
@@ -139,6 +142,7 @@ $(document).ready(function(){
                 'newpass'           : $('#{{componentId}}-form-newpass').val().trim(),
                 'confirmnewpass'    : $('#{{componentId}}-form-confirmnewpass').val().trim()
             }
+            data[tokenKey] = token;
         }
     }
 
@@ -180,6 +184,11 @@ $(document).ready(function(){
                                 } else if (data.responseCode == '1') {
                                     $('.login-box-msg').text(data.responseMessage);
                                     failed();
+                                } else if (data.responseCode == '2') {
+                                    $('.login-spinner').attr('hidden', true);
+                                    $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+                                    $('.login-box-msg').text(data.responseMessage);
+                                    window.location = '/{{applicationRoute}}/';
                                 }
                             }
         });
@@ -189,7 +198,7 @@ $(document).ready(function(){
         $('.login-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
         $('#{{componentId}}-form :input').prop('disabled', false);
-        $('#{{componentId}}-form :input').val('');
+        $('#{{componentId}}-form :input').not('.token').val('');
         $('#{{componentId}}-form-user').focus();
         $('#{{componentId}}-form-auth').attr('disabled', false);
         setTimeout(function () {

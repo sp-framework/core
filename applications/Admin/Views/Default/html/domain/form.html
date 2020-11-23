@@ -13,6 +13,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
+                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
