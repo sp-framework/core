@@ -61,9 +61,9 @@ abstract class BaseComponent extends Controller
 		if (!$this->isJson() || $this->request->isAjax()) {
 			$this->viewSettings = json_decode($this->views['settings'], true);
 
-			// if (!$this->isJson() && $this->request->isAjax()) {
+			if (!$this->isJson()) {
 				$this->setDefaultViewData();
-			// }
+			}
 
 			$this->checkLayout();
 
