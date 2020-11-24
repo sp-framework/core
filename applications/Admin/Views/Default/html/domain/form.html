@@ -310,6 +310,7 @@
     </fieldset>
 </form>
 <script>
+/* globals BazContentFieldsValidator */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -352,8 +353,18 @@ dataCollectionSection =
                     $('#' + checkbox).click(function() {
                         var id = $(this)[0].id;
                         extractData(id, null, null, $('#' + id).parents('.application').data('id'));
+                        enableDisableSelect2s(id);
+                        if ($('#' + id)[0].checked === false) {
+                            BazContentFieldsValidator.cancelValidatingForm({
+                                'type'            : 'section',
+                                'formLocation'    : '{{componentId}}-{{sectionId}}',
+                                'jstreeRefresh'   : null,
+                                'formId'          : null
+                            });
+                        }
                     });
                     extractData(checkbox, null, null, $('#' + checkbox).parents('.application').data('id'))
+                    enableDisableSelect2s(checkbox);
                 }
 
                 for (var select2 in dynamicFields['select2']) {
@@ -375,6 +386,16 @@ dataCollectionSection =
                         dataCollectionSection['data']['settings']['applications'][applicationId][select2Type] =
                             $($('#' + select2)[0].selectedOptions[0]).val();
                     }
+                }
+
+                function enableDisableSelect2s(checkbox) {
+                    $('#' + checkbox).parents('.application').find('select').each(function (index, select) {
+                        if ($('#' + checkbox)[0].checked === true) {
+                            $(select).attr('disabled', false);
+                        } else if ($('#' + checkbox)[0].checked === false) {
+                            $(select).attr('disabled', true);
+                        }
+                    });
                 }
             }
         },
