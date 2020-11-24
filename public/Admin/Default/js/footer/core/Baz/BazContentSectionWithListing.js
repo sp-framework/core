@@ -574,15 +574,15 @@
                         if (index === 0) {
                             query +=
                                 '-:' +
-                                data['admin-users-listing-filter-field'] + ':' +
-                                data['admin-users-listing-filter-operator'] + ':' +
-                                data['admin-users-listing-filter-value'] + '&';
+                                data[sectionId + '-filter-field'] + ':' +
+                                data[sectionId + '-filter-operator'] + ':' +
+                                data[sectionId + '-filter-value'] + '&';
                         } else {
                             query +=
-                                data['admin-users-listing-filter-andor'] + ':' +
-                                data['admin-users-listing-filter-field'] + ':' +
-                                data['admin-users-listing-filter-operator'] + ':' +
-                                data['admin-users-listing-filter-value']
+                                data[sectionId + '-filter-andor'] + ':' +
+                                data[sectionId + '-filter-field'] + ':' +
+                                data[sectionId + '-filter-operator'] + ':' +
+                                data[sectionId + '-filter-value']
                                 + '&';
                         }
                     });
@@ -629,7 +629,6 @@
                             if (data.filters) {
                                 redoFiltersOptions(query, sectionId, data);
                             }
-
                         } else {
                             PNotify.error({
                                 'title' : data.responseMessage
@@ -645,7 +644,6 @@
                         query
                     );
 
-                    toggleFilterButtons(sectionId + '-filter');
                     clearStoredData();
                 });
 
@@ -681,6 +679,7 @@
                         filtersOptions += '</option>';
                     });
                     $('#' + sectionId + '-filter-filters').empty().append(filtersOptions);
+                    toggleFilterButtons(sectionId + '-filter');
                 }
 
                 function clearStoredData() {

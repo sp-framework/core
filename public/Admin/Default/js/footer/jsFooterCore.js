@@ -6315,15 +6315,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         if (index === 0) {
                             query +=
                                 '-:' +
-                                data['admin-users-listing-filter-field'] + ':' +
-                                data['admin-users-listing-filter-operator'] + ':' +
-                                data['admin-users-listing-filter-value'] + '&';
+                                data[sectionId + '-filter-field'] + ':' +
+                                data[sectionId + '-filter-operator'] + ':' +
+                                data[sectionId + '-filter-value'] + '&';
                         } else {
                             query +=
-                                data['admin-users-listing-filter-andor'] + ':' +
-                                data['admin-users-listing-filter-field'] + ':' +
-                                data['admin-users-listing-filter-operator'] + ':' +
-                                data['admin-users-listing-filter-value']
+                                data[sectionId + '-filter-andor'] + ':' +
+                                data[sectionId + '-filter-field'] + ':' +
+                                data[sectionId + '-filter-operator'] + ':' +
+                                data[sectionId + '-filter-value']
                                 + '&';
                         }
                     });
@@ -6370,7 +6370,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             if (data.filters) {
                                 redoFiltersOptions(query, sectionId, data);
                             }
-
                         } else {
                             PNotify.error({
                                 'title' : data.responseMessage
@@ -6386,7 +6385,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         query
                     );
 
-                    toggleFilterButtons(sectionId + '-filter');
                     clearStoredData();
                 });
 
@@ -6422,6 +6420,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         filtersOptions += '</option>';
                     });
                     $('#' + sectionId + '-filter-filters').empty().append(filtersOptions);
+                    toggleFilterButtons(sectionId + '-filter');
                 }
 
                 function clearStoredData() {
