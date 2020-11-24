@@ -22,6 +22,8 @@ class EmailServices extends BaseModel
 
     public $password;
 
+    public $from_address;
+
     public $encryption;
 
     public $allow_html_body;

@@ -97,6 +97,10 @@ class EmailserviceComponent extends BaseComponent
 
             $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
 
+            $this->view->newTokenKey = $this->emailservices->packagesData->newTokenKey;
+
+            $this->view->newToken = $this->emailservices->packagesData->newToken;
+
         } else {
             $this->view->responseCode = 1;
 

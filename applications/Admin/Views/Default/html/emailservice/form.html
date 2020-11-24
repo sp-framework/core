@@ -7,6 +7,7 @@
     {% set emailserviceAuth = emailservice['auth'] %}
     {% set emailserviceUsername = emailservice['username'] %}
     {% set emailservicePassword = emailservice['password'] %}
+    {% set emailserviceFromAddress = emailservice['from_address'] %}
     {% set emailserviceEncryption = emailservice['encryption'] %}
     {% set emailserviceAllowHtmlBody = emailservice['allow_html_body'] %}
 {% else %}
@@ -18,6 +19,7 @@
     {% set emailserviceAuth = 0 %}
     {% set emailserviceUsername = '' %}
     {% set emailservicePassword = '' %}
+    {% set emailserviceFromAddress = '' %}
     {% set emailserviceEncryption = 0 %}
     {% set emailserviceAllowHtmlBody = 0 %}
 {% endif %}
@@ -217,7 +219,7 @@
                         'fieldLabel'                     : 'Allow HTML Body',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Allow email body to have HTML code?',
-                        'fieldRequired'                  : true,
+                        'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'info',
                         'fieldCheckboxChecked'           : htmlChecked,
@@ -271,6 +273,29 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDisabled'                  : true,
                         'fieldValue'                     : emailservicePassword
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'from_address',
+                        'fieldLabel'                     : 'From Address',
+                        'fieldType'                      : 'input',
+                        'fieldInputType'                 : 'text',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Email From Address.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : emailserviceFromAddress
                     ]
                 )}}
             </div>
@@ -335,6 +360,7 @@
                         'fieldLabel'                     : 'Test Debug Messages',
                         'fieldType'                      : 'textarea',
                         'fieldHelp'                      : true,
+                        'fieldInputAdditionalClass'      : 'text-dark',
                         'fieldHelpTooltipContent'        : 'Debug messages from test are shown here.',
                         'fieldRequired'                  : false,
                         'fieldBazScan'                   : false,
@@ -347,6 +373,7 @@
     </fieldset>
 </form>
 <script>
+/* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -400,6 +427,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-allow_html_body'         : { },
         '{{componentId}}-{{sectionId}}-username'                : { },
         '{{componentId}}-{{sectionId}}-password'                : { },
+        '{{componentId}}-{{sectionId}}-from_address'            : { },
         '{{componentId}}-{{sectionId}}-test'                    : {
             afterInit: function() {
                 'use strict';
@@ -424,9 +452,28 @@ dataCollectionSection =
                         var url = '{{links.url("emailservice/testemailservice")}}';
                         dataCollectionSection['data']['test_email_address'] = $('#{{componentId}}-{{sectionId}}-test_email_address').val();
                         var postData = dataCollectionSection['data'];
+                        var tokenKey = $('.token').attr('name');
+                        var token = $('.token').val();
+                        postData[tokenKey] = token;
                         $.post(url, postData, function(data) {
                             if (data.responseCode === 0) {
-                                $('#{{componentId}}-{{sectionId}}-debug').empty().val(data.responseMessage);
+                                if ($.isArray(data.responseMessage)) {
+                                    var message = '';
+                                    $.each(data.responseMessage, function(index, msg) {
+                                        message += msg;
+                                    });
+                                    $('#{{componentId}}-{{sectionId}}-debug').empty().val(message);
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-debug').empty().val(data.responseMessage);
+                                }
+                                if (data.newTokenKey && data.newToken) {
+                                    $('.token').attr('name', data.newTokenKey);
+                                    $('.token').val(data.newToken);
+                                }
+                            } else {
+                                PNotify.error({
+                                    'title' : data.responseMessage
+                                });
                             }
                             $('#{{componentId}}-{{sectionId}}-test_email_address-test').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-test_email_address-test').children('i').attr('hidden', true);
@@ -441,12 +488,18 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-host'                    : 'required',
                 '{{componentId}}-{{sectionId}}-port'                    : 'required',
+                '{{componentId}}-{{sectionId}}-username'                : 'required',
+                '{{componentId}}-{{sectionId}}-password'                : 'required',
+                '{{componentId}}-{{sectionId}}-from_address'            : 'required',
                 '{{componentId}}-{{sectionId}}-test_email_address'      : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter Service name',
                 '{{componentId}}-{{sectionId}}-host'                    : 'Please enter host information',
                 '{{componentId}}-{{sectionId}}-port'                    : 'Please enter port information',
+                '{{componentId}}-{{sectionId}}-username'                : 'Please enter username',
+                '{{componentId}}-{{sectionId}}-password'                : 'Please enter password',
+                '{{componentId}}-{{sectionId}}-from_address'            : 'Please enter from address',
                 '{{componentId}}-{{sectionId}}-test_email_address'      : 'Please enter test email address'
             }
         }

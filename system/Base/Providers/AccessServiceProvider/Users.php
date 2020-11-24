@@ -95,7 +95,7 @@ class Users extends BasePackage
         if ($this->update($data)) {
 
             if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
-                if ($this->emailNewPassword($data['email'], $password) !== true) {
+                if (!$this->emailNewPassword($data['email'], $password)) {
                     $this->packagesData->responseCode = 1;
 
                     $this->packagesData->responseMessage = 'Error sending email for new password.';
@@ -204,16 +204,18 @@ class Users extends BasePackage
 
     protected function emailNewPassword($email, $password)
     {
-        $this->email->setup();
+        if ($this->email->setup()) {
+            $emailSettings = $this->email->getEmailSettings();
 
-        $emailSettings = $this->email->getEmailSettings();
+            $this->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
+            $this->email->setRecipientTo($email, $email);
+            $this->email->setSubject('OTP for ' . $this->modules->domains->getDomain()['name']);
+            $this->email->setBody($password);
 
-        $this->email->setSender($emailSettings['username'], $emailSettings['username']);
-        $this->email->setRecipientTo($email, $email);
-        $this->email->setSubject('OTP for ' . $this->modules->domains->getDomain()['name']);
-        $this->email->setBody($password);
-
-        return $this->email->sendNewEmail();
+            return $this->email->sendNewEmail();
+        } else {
+            return false;
+        }
     }
 
     protected function updateRoleUsers(int $rid, int $id, int $oldRid = null)
@@ -251,6 +253,14 @@ class Users extends BasePackage
 
     public function generateViewData(int $uid = null)
     {
+        if (isset($this->modules->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService']) &&
+            $this->modules->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService'] !== ''
+        ) {
+            $this->packagesData->canEmail = true;
+        } else {
+            $this->packagesData->canEmail = false;
+        }
+
         $acls = [];
         $applicationsArr = $this->modules->applications->applications;
 

@@ -60,6 +60,6 @@ class Textarea
             '';
 
         $this->content .=
-            '<textarea ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control form-control-sm rounded-0" ' . $this->fieldParams['fieldId'] . '" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldTextareaRows'] . ' ' . $this->fieldParams['fieldTextareaCols'] . '>' . $this->fieldParams['fieldValue'] . '</textarea>';
+            '<textarea ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control form-control-sm rounded-0 ' . $this->fieldParams['fieldInputAdditionalClass'] .'" ' . $this->fieldParams['fieldId'] . '" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" ' . $this->fieldParams['fieldDataInputMinLength'] . ' ' . $this->fieldParams['fieldDataInputMaxLength'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldTextareaRows'] . ' ' . $this->fieldParams['fieldTextareaCols'] . '>' . $this->fieldParams['fieldValue'] . '</textarea>';
     }
 }

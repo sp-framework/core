@@ -1,3 +1,8 @@
+{% if not canEmail %}
+    {% set emailCheck = true %}
+{% else %}
+    {% set emailCheck = false %}
+{% endif %}
 {% if user['id'] is defined %}
     {% set userId = user['id'] %}
     {% set userEmail = user['email'] %}
@@ -17,7 +22,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
-                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
+                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -173,12 +178,13 @@
                         'fieldId'                        : 'email_new_password',
                         'fieldLabel'                     : 'Email New Password',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Email New Password to this user.<br>NOTE: Email Settings must be configured for this option to work.',
+                        'fieldHelpTooltipContent'        : 'Email New Password to this user.<br>NOTE: Email Settings must be configured and attached to the domain for this option to work.',
                         'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'info',
                         'fieldCheckboxLabel'             : '',
                         'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldDisabled'                  : emailCheck,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldBazScan'                   : true
@@ -379,7 +385,8 @@ dataCollectionSection =
                 var checkboxIds = JSON.parse('{{checkboxIds}}');
                 for (var checkbox in checkboxIds) {
                     $('#' + checkbox).click(function() {
-                        extractCheckboxData(checkbox, checkboxIds[checkbox])
+                        var id = $(this)[0].id;
+                        extractCheckboxData(id, checkboxIds[id])
                     });
                     extractCheckboxData(checkbox, checkboxIds[checkbox])
                 }

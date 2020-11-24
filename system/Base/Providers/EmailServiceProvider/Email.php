@@ -64,16 +64,19 @@ class Email
         if ($emailSettings) {
             $this->emailSettings = $emailSettings;
         } else {
-            if (isset($this->domain['settings']['applications'][$this->application['id']]['emailService'])) {
+            if (isset($this->domain['settings']['applications'][$this->application['id']]['emailService']) &&
+                $this->domain['settings']['applications'][$this->application['id']]['emailService'] !== ''
+            ) {
 
                 $emailService = $this->domain['settings']['applications'][$this->application['id']]['emailService'];
 
                 $this->emailSettings = $emailservices->init()->getById($emailService);
 
             } else {
-                throw new EmailException(
-                    'No Email Service Configured & attached to the Domain. Please setup email service and attach it to domain ' . $this->domain['name']
-                );
+                // throw new EmailException(
+                //     'No Email Service Configured & attached to the Domain. Please setup email service and attach it to domain ' . $this->domain['name']
+                // );
+                return false;
             }
         }
 
@@ -149,7 +152,7 @@ class Email
 
             return true;
         } catch (Exception $e) {
-            var_dump($this->email->ErrorInfo);
+
             return $this->email->ErrorInfo;
         }
 
@@ -230,8 +233,8 @@ class Email
             };
 
         $this->setSender(
-            $emailSettings['username'],
-            $emailSettings['username']
+            $emailSettings['from_address'],
+            $emailSettings['from_address']
         );
 
         $this->setRecipientTo(

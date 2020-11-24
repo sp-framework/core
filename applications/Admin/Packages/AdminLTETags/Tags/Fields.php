@@ -162,6 +162,11 @@ class Fields extends AdminLTETags
             $this->params['fieldAdditionalClass'] :
             '';
 
+        $this->fieldParams['fieldInputAdditionalClass'] =
+            isset($this->params['fieldInputAdditionalClass']) ?
+            $this->params['fieldInputAdditionalClass'] :
+            '';
+
         $this->fieldParams['fieldHidden'] =
             isset($this->params['fieldHidden']) && $this->params['fieldHidden'] === true ?
             'd-none' :

@@ -75,6 +75,14 @@ class EmailServices
                         ]
                     ),
                     new Column(
+                        'from_address',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 100,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'encryption',
                         [
                             'type'    => Column::TYPE_TINYINTEGER,

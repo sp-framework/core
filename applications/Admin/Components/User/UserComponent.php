@@ -28,6 +28,8 @@ class UserComponent extends BaseComponent
             $this->view->applications = $this->users->packagesData->applications;
 
             $this->view->roles = $this->users->packagesData->roles;
+
+            $this->view->canEmail = $this->users->packagesData->canEmail;
         }
 
         $this->view->responseCode = $this->users->packagesData->responseCode;
