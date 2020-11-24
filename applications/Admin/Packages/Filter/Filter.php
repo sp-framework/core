@@ -25,7 +25,7 @@ class Filter extends BasePackage
 				$this->packagesData->responseMessage = 'Filter Added';
 
 				$this->packagesData->filters =
-					$filtersArr = $this->usePackage(FiltersPackage::class)->getFiltersForComponent($data['component_id']);
+					$filtersArr = $this->getFiltersForComponent($data['component_id']);
 
 				return true;
 			}
@@ -50,7 +50,7 @@ class Filter extends BasePackage
 				$this->packagesData->responseMessage = 'Filter Updated';
 
 				$this->packagesData->filters =
-					$filtersArr = $this->usePackage(FiltersPackage::class)->getFiltersForComponent($data['component_id']);
+					$filtersArr = $this->getFiltersForComponent($data['component_id']);
 
 				return true;
 			}
@@ -73,7 +73,7 @@ class Filter extends BasePackage
 				$this->packagesData->responseMessage = 'Filter Removed';
 
 				$this->packagesData->filters =
-					$filtersArr = $this->usePackage(FiltersPackage::class)->getFiltersForComponent($data['component_id']);
+					$filtersArr = $this->getFiltersForComponent($data['component_id']);
 
 				return true;
 		}
@@ -95,7 +95,7 @@ class Filter extends BasePackage
 				$this->packagesData->responseMessage = 'Filter cloned successfully';
 
 				$this->packagesData->filters =
-					$filtersArr = $this->usePackage(FiltersPackage::class)->getFiltersForComponent($data['component_id']);
+					$filtersArr = $this->getFiltersForComponent($data['component_id']);
 
 				return true;
 		}

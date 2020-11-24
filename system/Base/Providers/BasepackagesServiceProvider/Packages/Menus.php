@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Providers\ModulesServiceProvider\Modules;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Menus as MenusModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Menus as MenusModel;
 
 class Menus extends BasePackage
 {

@@ -14,7 +14,7 @@ class RouterServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'router',
 			function () use ($container) {
-				$domains = $container->getShared('modules')->domains;
+				$domains = $container->getShared('basepackages')->domains;
 				$applications = $container->getShared('modules')->applications;
 				$components = $container->getShared('modules')->components;
 				$views = $container->getShared('modules')->views;

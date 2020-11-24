@@ -4,16 +4,16 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
-use System\Base\Providers\ModulesServiceProvider\Modules;
+use System\Base\Providers\BasepackagesServiceProvider\Basepackages;
 
-class ModulesServiceProvider implements ServiceProviderInterface
+class BasepackagesServiceProvider implements ServiceProviderInterface
 {
     public function register(DiInterface $container) : void
     {
         $container->setShared(
-            'modules',
+            'basepackages',
             function () {
-                return new Modules();
+                return new Basepackages();
             }
         );
     }

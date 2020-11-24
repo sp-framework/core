@@ -20,6 +20,6 @@ class FiltersComponent extends BaseComponent
                 ]
             ];
 
-        $this->generateDTContent(Filters::class, 'filters/view', null, ['name'], true, ['name'], $controlActions, null, null, 'name');
+        $this->generateDTContent($this->basepackages->filters, 'filters/view', null, ['name'], true, ['name'], $controlActions, null, null, 'name');
     }
 }

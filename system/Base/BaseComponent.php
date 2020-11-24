@@ -3,7 +3,6 @@
 namespace System\Base;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
-use Applications\Admin\Packages\Filters\Filters;
 use Phalcon\Assets\Collection;
 use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
@@ -156,7 +155,7 @@ abstract class BaseComponent extends Controller
 
 		if (!$this->isJson() || $this->request->isAjax()) {
 			$this->view->menus =
-				$this->modules->menus->getMenusForApplication($this->application['id']);
+				$this->basepackages->menus->getMenusForApplication($this->application['id']);
 		}
 	}
 
@@ -527,7 +526,7 @@ abstract class BaseComponent extends Controller
 
 			if ($withFilter) {
 				$table['withFilter'] = $withFilter;
-				$filtersArr = $this->usePackage(Filters::class)->getFiltersForComponent($componentId);
+				$filtersArr = $this->basepackages->filters->getFiltersForComponent($componentId);
 
 				$table['filterColumns'] = $package->getModelsColumnMap($columnsForFilter);
 				foreach ($filtersArr as $key => $filter) {

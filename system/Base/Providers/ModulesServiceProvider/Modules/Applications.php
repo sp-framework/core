@@ -43,8 +43,8 @@ class Applications extends BasePackage
 		$uri = explode('/q/', $uri);
 
 		if ($uri[0] === '/') {
-			if ($this->modules->domains->getDomain()) {
-				return $this->getIdApplication($this->modules->domains->getDomain()['default_application_id'])['route'];
+			if ($this->basepackages->domains->getDomain()) {
+				return $this->getIdApplication($this->basepackages->domains->getDomain()['default_application_id'])['route'];
 			}
 			return null;
 			// if (!$this->defaults) {

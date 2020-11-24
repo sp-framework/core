@@ -13,18 +13,18 @@ class DomainComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
-            $domain = $this->modules->domains->generateViewData($this->getData()['id']);
+            $domain = $this->basepackages->domains->generateViewData($this->getData()['id']);
         } else {
-            $domain = $this->modules->domains->generateViewData();
+            $domain = $this->basepackages->domains->generateViewData();
         }
 
         if ($domain) {
-            $this->view->domain = $this->modules->domains->packagesData->domain;
+            $this->view->domain = $this->basepackages->domains->packagesData->domain;
         }
 
-        $this->view->emailservices = $this->modules->domains->packagesData->emailservices;
+        $this->view->emailservices = $this->basepackages->domains->packagesData->emailservices;
 
-        $this->view->applications = $this->modules->domains->packagesData->applications;
+        $this->view->applications = $this->basepackages->domains->packagesData->applications;
     }
 
     /**
@@ -36,11 +36,11 @@ class DomainComponent extends BaseComponent
             if (!$this->checkCSRF()) {
                 return;
             }
-            $this->modules->domains->addDomain($this->postData());
+            $this->basepackages->domains->addDomain($this->postData());
 
-            $this->view->responseCode = $this->modules->domains->packagesData->responseCode;
+            $this->view->responseCode = $this->basepackages->domains->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->modules->domains->packagesData->responseMessage;
+            $this->view->responseMessage = $this->basepackages->domains->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -58,11 +58,11 @@ class DomainComponent extends BaseComponent
             if (!$this->checkCSRF()) {
                 return;
             }
-            $this->modules->domains->updateDomain($this->postData());
+            $this->basepackages->domains->updateDomain($this->postData());
 
-            $this->view->responseCode = $this->modules->domains->packagesData->responseCode;
+            $this->view->responseCode = $this->basepackages->domains->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->modules->domains->packagesData->responseMessage;
+            $this->view->responseMessage = $this->basepackages->domains->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -78,11 +78,11 @@ class DomainComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->modules->domains->removeDomain($this->postData());
+            $this->basepackages->domains->removeDomain($this->postData());
 
-            $this->view->responseCode = $this->modules->domains->packagesData->responseCode;
+            $this->view->responseCode = $this->basepackages->domains->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->modules->domains->packagesData->responseMessage;
+            $this->view->responseMessage = $this->basepackages->domains->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;

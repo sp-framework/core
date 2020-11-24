@@ -9,6 +9,7 @@ return
 		'System\Base\Providers\SessionServiceProvider',
 		'System\Base\Providers\DatabaseServiceProvider',
 		'System\Base\Providers\CacheServiceProvider',
+		'System\Base\Providers\BasepackagesServiceProvider',
 		'System\Base\Providers\ModulesServiceProvider',
 		'System\Base\Providers\HttpServiceProvider',
 		'System\Base\Providers\EmailServiceProvider',

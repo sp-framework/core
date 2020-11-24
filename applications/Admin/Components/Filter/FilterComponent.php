@@ -20,17 +20,15 @@ class FilterComponent extends BaseComponent
      */
     public function addAction()
     {
-        $filterPackage = $this->usePackage(Filter::class);
-
-        $add = $filterPackage->addFilter($this->postData());
+        $add = $this->basepackages->filters->addFilter($this->postData());
 
         if ($add) {
-            $this->view->filters = $filterPackage->packagesData->filters;
+            $this->view->filters = $this->basepackages->filters->packagesData->filters;
         }
 
-        $this->view->responseCode = $filterPackage->packagesData->responseCode;
+        $this->view->responseCode = $this->basepackages->filters->packagesData->responseCode;
 
-        $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
+        $this->view->responseMessage = $this->basepackages->filters->packagesData->responseMessage;
     }
 
     /**
@@ -38,17 +36,15 @@ class FilterComponent extends BaseComponent
      */
     public function updateAction()
     {
-        $filterPackage = $this->usePackage(Filter::class);
-
-        $update = $filterPackage->updateFilter($this->postData());
+        $update = $this->basepackages->filters->updateFilter($this->postData());
 
         if ($update) {
-            $this->view->filters = $filterPackage->packagesData->filters;
+            $this->view->filters = $this->basepackages->filters->packagesData->filters;
         }
 
-        $this->view->responseCode = $filterPackage->packagesData->responseCode;
+        $this->view->responseCode = $this->basepackages->filters->packagesData->responseCode;
 
-        $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
+        $this->view->responseMessage = $this->basepackages->filters->packagesData->responseMessage;
     }
 
     /**
@@ -56,17 +52,15 @@ class FilterComponent extends BaseComponent
      */
     public function removeAction()
     {
-        $filterPackage = $this->usePackage(Filter::class);
-
-        $remove = $filterPackage->removeFilter($this->postData());
+        $remove = $this->basepackages->filters->removeFilter($this->postData());
 
         if ($remove) {
-            $this->view->filters = $filterPackage->packagesData->filters;
+            $this->view->filters = $this->basepackages->filters->packagesData->filters;
         }
 
-        $this->view->responseCode = $filterPackage->packagesData->responseCode;
+        $this->view->responseCode = $this->basepackages->filters->packagesData->responseCode;
 
-        $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
+        $this->view->responseMessage = $this->basepackages->filters->packagesData->responseMessage;
     }
 
     /**
@@ -74,34 +68,30 @@ class FilterComponent extends BaseComponent
      */
     public function cloneAction()
     {
-        $filterPackage = $this->usePackage(Filter::class);
-
-        $clone = $filterPackage->cloneFilter($this->postData());
+        $clone = $this->basepackages->filters->cloneFilter($this->postData());
 
         if ($clone) {
-            $this->view->filters = $filterPackage->packagesData->filters;
+            $this->view->filters = $this->basepackages->filters->packagesData->filters;
         }
 
-        $this->view->filter = $filterPackage->packagesData->last;
+        $this->view->filter = $this->basepackages->filters->packagesData->last;
 
-        $this->view->responseCode = $filterPackage->packagesData->responseCode;
+        $this->view->responseCode = $this->basepackages->filters->packagesData->responseCode;
 
-        $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
+        $this->view->responseMessage = $this->basepackages->filters->packagesData->responseMessage;
     }
 
     //need to move to view
     public function getDefaultFilterAction()
     {
-        $filterPackage = $this->usePackage(Filter::class);
-
-        $defaultFilter = $filterPackage->getDefaultFilter($this->postData()['component_id']);
+        $defaultFilter = $this->basepackages->filters->getDefaultFilter($this->postData()['component_id']);
 
         if ($defaultFilter) {
-            $this->view->defaultFilter = $filterPackage->packagesData->defaultFilter;
+            $this->view->defaultFilter = $this->basepackages->filters->packagesData->defaultFilter;
         }
 
-        $this->view->responseCode = $filterPackage->packagesData->responseCode;
+        $this->view->responseCode = $this->basepackages->filters->packagesData->responseCode;
 
-        $this->view->responseMessage = $filterPackage->packagesData->responseMessage;
+        $this->view->responseMessage = $this->basepackages->filters->packagesData->responseMessage;
     }
 }

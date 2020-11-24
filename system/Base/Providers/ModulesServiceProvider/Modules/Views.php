@@ -172,8 +172,8 @@ class Views extends BasePackage
             $this->application = $this->applications->getApplicationInfo();
             // var_dump($this->application);
             if ($this->application) {
-                if (isset($this->modules->domains->getDomain()['settings']['applications'][$this->application['id']])) {
-                    $applicationDefaults = $this->modules->domains->getDomain()['settings']['applications'][$this->application['id']];
+                if (isset($this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']])) {
+                    $applicationDefaults = $this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']];
                 } else {
                     $applicationDefaults = null;
                 }

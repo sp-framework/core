@@ -11,7 +11,7 @@ class DomainsComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $domains = $this->modules->domains->init();
+        $domains = $this->basepackages->domains->init();
 
         $controlActions =
             [

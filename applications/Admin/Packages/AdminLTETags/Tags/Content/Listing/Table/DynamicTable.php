@@ -58,22 +58,22 @@ class DynamicTable
                 '<div class="row mb-2">';
 
             if (isset($this->params['dtFilter']) && $this->params['dtFilter'] === true) {
-                $filtersComponent =
-                    $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
-                        'Filters',
-                        $this->tag->getDi()->getShared('modules')->applications->getApplicationInfo()['id']
-                    );
+                // $filtersComponent =
+                //     $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
+                //         'Filters',
+                //         $this->tag->getDi()->getShared('modules')->applications->getApplicationInfo()['id']
+                //     );
 
-                $filterComponent =
-                    $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
-                        'Filter',
-                        $this->tag->getDi()->getShared('modules')->applications->getApplicationInfo()['id']
-                    );
+                // $filterComponent =
+                //     $this->tag->getDi()->getShared('modules')->components->getNamedComponentForApplication(
+                //         'Filter',
+                //         $this->tag->getDi()->getShared('modules')->applications->getApplicationInfo()['id']
+                //     );
 
-                if ((bool) $filtersComponent['installed'] && (bool) $filterComponent['installed']) {
+                // if ((bool) $filtersComponent['installed'] && (bool) $filterComponent['installed']) {
                     $this->content .=
                         (new Filter($this->view, $this->tag, $this->links, $this->escaper))->getContent($this->params);
-                }
+                // }
             }
 
             if (isset($this->params['dtPrimaryButtons'])) {

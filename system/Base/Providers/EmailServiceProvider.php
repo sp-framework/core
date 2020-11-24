@@ -15,7 +15,7 @@ class EmailServiceProvider implements ServiceProviderInterface
 			'email',
 			function () use ($container) {
 				$application = $container->getShared('modules')->applications->getApplicationInfo();
-				$domain = $container->getShared('modules')->domains->getDomain();
+				$domain = $container->getShared('basepackages')->domains->getDomain();
 				return (new Email($application, $domain))->init();
 			}
 		);

@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Providers\ModulesServiceProvider\Modules;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Domains as DomainsModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Domains as DomainsModel;
 
 class Domains extends BasePackage
 {
