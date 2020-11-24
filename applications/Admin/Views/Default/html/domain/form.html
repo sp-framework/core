@@ -13,7 +13,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
-                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
+                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -350,7 +350,8 @@ dataCollectionSection =
 
                 for (var checkbox in dynamicFields['checkboxes']) {
                     $('#' + checkbox).click(function() {
-                        extractData(checkbox, null, null, $('#' + checkbox).parents('.application').data('id'));
+                        var id = $(this)[0].id;
+                        extractData(id, null, null, $('#' + id).parents('.application').data('id'));
                     });
                     extractData(checkbox, null, null, $('#' + checkbox).parents('.application').data('id'))
                 }
