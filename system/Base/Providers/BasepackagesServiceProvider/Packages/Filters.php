@@ -40,9 +40,7 @@ class Filters extends BasePackage
     }
     protected function addShowAllFilter(int $componentId)
     {
-        $filter = $this->usePackage(Filter::class);
-
-        $filter->addFilter(
+        $this->addFilter(
             [
                 'name'          => 'Show All',
                 'conditions'    => '',

@@ -27,7 +27,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
-                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
+                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -449,7 +449,7 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'sectionToObj'});
                         $(this).attr('disabled', true);
                         $(this).children('i').attr('hidden', false);
-                        var url = '{{links.url("emailservice/testemailservice")}}';
+                        var url = '{{links.url("emailservices/testemailservice")}}';
                         dataCollectionSection['data']['test_email_address'] = $('#{{componentId}}-{{sectionId}}-test_email_address').val();
                         var postData = dataCollectionSection['data'];
                         var tokenKey = $('.token').attr('name');

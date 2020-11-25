@@ -11,6 +11,17 @@ class EmailservicesComponent extends BaseComponent
      */
     public function viewAction()
     {
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $emailservice = $this->emailservices->getById($this->getData()['id']);
+
+                $this->view->emailservice = $emailservice;
+            }
+            $this->view->pick('emailservices/view');
+
+            return;
+        }
+
         $emailservices = $this->emailservices->init();
 
         $controlActions =
@@ -18,8 +29,8 @@ class EmailservicesComponent extends BaseComponent
                 // 'disableActionsForIds'  => [1],
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'emailservice',
-                    'remove'    => 'emailservice/remove'
+                    'edit'      => 'emailservices',
+                    'remove'    => 'emailservices/remove'
                 ]
             ];
 
@@ -51,5 +62,96 @@ class EmailservicesComponent extends BaseComponent
             $replaceColumns,
             'name'
         );
+
+        $this->view->pick('emailservices/list');
+    }
+
+    /**
+     * @acl(name="add")
+     */
+    public function addAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->emailservices->addEmailService($this->postData());
+
+            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    /**
+     * @acl(name="update")
+     */
+    public function updateAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->emailservices->updateEmailService($this->postData());
+
+            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    /**
+     * @acl(name="remove")
+     */
+    public function removeAction()
+    {
+        if ($this->request->isPost()) {
+
+            $this->emailservices->removeEmailService($this->postData());
+
+            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function testEmailServiceAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+            $this->emailservices->testEmailService($this->postData());
+
+            $this->view->responseCode = $this->emailservices->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->emailservices->packagesData->responseMessage;
+
+            $this->view->newTokenKey = $this->emailservices->packagesData->newTokenKey;
+
+            $this->view->newToken = $this->emailservices->packagesData->newToken;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
     }
 }

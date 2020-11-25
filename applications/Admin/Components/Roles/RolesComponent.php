@@ -11,6 +11,34 @@ class RolesComponent extends BaseComponent
      */
     public function viewAction()
     {
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $role = $this->roles->generateViewData($this->getData()['id']);
+            } else {
+                $role = $this->roles->generateViewData();
+            }
+
+            if ($role) {
+                $this->view->components = $this->roles->packagesData->components;
+
+                $this->view->acls = $this->roles->packagesData->acls;
+
+                $this->view->role = $this->roles->packagesData->role;
+
+                $this->view->applications = $this->roles->packagesData->applications;
+
+                $this->view->roles = $this->roles->packagesData->roles;
+            }
+
+            $this->view->responseCode = $this->roles->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
+
+            $this->view->pick('roles/view');
+
+            return;
+        }
+
         $roles = $this->roles->init();
 
         $controlActions =
@@ -18,24 +46,10 @@ class RolesComponent extends BaseComponent
                 // 'disableActionsForIds'  => [1],
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'role',
-                    'remove'    => 'role/remove'
+                    'edit'      => 'roles',
+                    'remove'    => 'roles/remove'
                 ]
             ];
-
-        // if ($this->request->isPost()) {
-        //     $rolesIdToName = [];
-        //     foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
-        //         $rolesIdToName[$roleValue['id']] = $roleValue['name'];
-        //     }
-
-        //     $replaceColumns =
-        //         [
-        //             'parent_id' => ['html'  => $rolesIdToName]
-        //         ];
-        // } else {
-        //     $replaceColumns = null;
-        // }
 
         $this->generateDTContent(
             $roles,
@@ -49,5 +63,73 @@ class RolesComponent extends BaseComponent
             null,
             'name'
         );
+
+        $this->view->pick('roles/list');
+    }
+
+    /**
+     * @acl(name="add")
+     */
+    public function addAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->roles->addRole($this->postData());
+
+            $this->view->responseCode = $this->roles->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    /**
+     * @acl(name="update")
+     */
+    public function updateAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->roles->updateRole($this->postData());
+
+            $this->view->responseCode = $this->roles->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    /**
+     * @acl(name="remove")
+     */
+    public function removeAction()
+    {
+        if ($this->request->isPost()) {
+
+            $this->roles->removeRole($this->postData());
+
+            $this->view->responseCode = $this->roles->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
     }
 }

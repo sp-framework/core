@@ -209,7 +209,7 @@ class Users extends BasePackage
 
             $this->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
             $this->email->setRecipientTo($email, $email);
-            $this->email->setSubject('OTP for ' . $this->modules->domains->getDomain()['name']);
+            $this->email->setSubject('OTP for ' . $this->basepackages->domains->getDomain()['name']);
             $this->email->setBody($password);
 
             return $this->email->sendNewEmail();
@@ -253,8 +253,8 @@ class Users extends BasePackage
 
     public function generateViewData(int $uid = null)
     {
-        if (isset($this->modules->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService']) &&
-            $this->modules->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService'] !== ''
+        if (isset($this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService']) &&
+            $this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService'] !== ''
         ) {
             $this->packagesData->canEmail = true;
         } else {
@@ -267,16 +267,16 @@ class Users extends BasePackage
         foreach ($applicationsArr as $applicationKey => $application) {
             $componentsArr = $this->modules->components->getComponentsForApplication($application['id']);
             $components[strtolower($application['name'])] = ['title' => strtoupper($application['name'])];
-            foreach ($componentsArr as $key => $component) {
-                $components[strtolower($application['name'])]['childs'][$component['type']] = ['title' => strtoupper($component['type'])];
-            }
+            // foreach ($componentsArr as $key => $component) {
+            //     $components[strtolower($application['name'])]['childs'][$component['type']] = ['title' => strtoupper($component['type'])];
+            // }
             foreach ($componentsArr as $key => $component) {
                 $reflector = $this->annotations->get($component['class']);
                 $methods = $reflector->getMethodsAnnotations();
 
                 if ($methods) {
-                    $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['id'] = $component['id'];
-                    $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['title'] = $component['name'];
+                    $components[strtolower($application['name'])]['childs'][$key]['id'] = $component['id'];
+                    $components[strtolower($application['name'])]['childs'][$key]['title'] = $component['name'];
                 }
             }
         }

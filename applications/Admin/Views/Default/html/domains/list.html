@@ -1,0 +1,39 @@
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'globe-asia',
+        'cardTitle'             : componentName,
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize', 'collapse'],
+        'dtFixedHeader'         : true,
+        'dtPrimaryButtons'      : {
+                                    'add-domain' : {
+                                        'title'                   : 'Add New Domain',
+                                        'size'                    : 'sm',
+                                        'type'                    : 'primary',
+                                        'icon'                    : 'plus',
+                                        'buttonAdditionalClass'   : 'contentAjaxLink',
+                                        'position'                : 'right',
+                                        'url'                     : links.url('domains/q/id/0')
+                                    }
+                                },
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 6,
+        'dtTableCompact'        : true,
+        'dtZeroRecords'         : 'No domains data available. Add domain by clicking the Add new domain button.'
+    ]
+)}}

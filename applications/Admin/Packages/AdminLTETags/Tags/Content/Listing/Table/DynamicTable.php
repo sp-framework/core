@@ -3,7 +3,7 @@
 namespace Applications\Admin\Packages\AdminLTETags\Tags\Content\Listing\Table;
 
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
-use Applications\Admin\Packages\AdminLTETags\Tags\Content\Listing\Filter;
+use Applications\Admin\Packages\AdminLTETags\Tags\Content\Listing\Filters;
 use Phalcon\Helper\Json;
 
 class DynamicTable
@@ -72,7 +72,7 @@ class DynamicTable
 
                 // if ((bool) $filtersComponent['installed'] && (bool) $filterComponent['installed']) {
                     $this->content .=
-                        (new Filter($this->view, $this->tag, $this->links, $this->escaper))->getContent($this->params);
+                        (new Filters($this->view, $this->tag, $this->links, $this->escaper))->getContent($this->params);
                 // }
             }
 

@@ -1,39 +1,32 @@
+{% if email['id'] is defined %}
+    {% set emailserviceId = emailservice['id'] %}
+{% else %}
+    {% set emailserviceId = '' %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
-        'component'             : table['component'],
-        'componentName'         : componentName,
-        'componentId'           : componentId,
-        'parentComponentId'     : parent,
-        'sectionId'             : 'listing',
-        'contentType'           : 'sectionWithListing',
-        'cardHeader'            : true,
-        'cardType'              : 'primary',
-        'cardIcon'              : 'envelope',
-        'cardTitle'             : 'Email Services',
-        'cardAdditionalClass'   : 'rounded-0',
-        'cardShowTools'         : ['maximize', 'collapse'],
-        'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      : {
-                                    'add-email-service' : {
-                                        'title'                   : 'Add New Email Service',
-                                        'size'                    : 'sm',
-                                        'type'                    : 'primary',
-                                        'icon'                    : 'plus',
-                                        'buttonAdditionalClass'   : 'contentAjaxLink',
-                                        'position'                : 'right',
-                                        'url'                     : links.url('emailservice')
-                                    }
-                                },
-        'dtTable'               : table,
-        'dtColumns'             : table['columns'],
-        'dtPostUrl'             : table['postUrl'],
-        'dtPostUrlParams'       : table['postUrlParams'],
-        'dtStriped'             : true,
-        'dtStateSave'           : false,
-        'dtBordered'            : false,
-        'dtHideIdColumn'        : true,
-        'dtNoOfColumnsToShow'   : 6,
-        'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No email service available. Add by clicking the Add new email service button.'
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'envelope',
+        'cardTitle'                     : 'Email Service',
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'emailservices/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : emailserviceId,
+            'addActionUrl'                  : 'emailservices/add',
+            'addSuccessRedirectUrl'         : 'emailservices',
+            'updateActionUrl'               : 'emailservices/update',
+            'updateSuccessRedirectUrl'      : 'emailservices',
+            'cancelActionUrl'               : 'emailservices',
+            'closeActionUrl'                : 'emailservices'
+        ]
     ]
 )}}

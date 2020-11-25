@@ -8,20 +8,23 @@
         'contentType'           : 'sectionWithListing',
         'cardHeader'            : true,
         'cardType'              : 'primary',
-        'cardIcon'              : 'envelope',
-        'cardTitle'             : componentName ~ ' Services',
+        'cardIcon'              : 'sitemap',
+        'cardTitle'             : componentName,
         'cardAdditionalClass'   : 'rounded-0',
         'cardShowTools'         : ['maximize', 'collapse'],
+        'dtFilter'              : true,
+        'dtFilters'             : table['filters'],
+        'dtFilterColumns'       : table['filterColumns'],
         'dtFixedHeader'         : true,
         'dtPrimaryButtons'      : {
-                                    'add-email' : {
-                                        'title'                   : 'Add New Email Service',
+                                    'add-role' : {
+                                        'title'                   : 'Add New Role',
                                         'size'                    : 'sm',
                                         'type'                    : 'primary',
                                         'icon'                    : 'plus',
                                         'buttonAdditionalClass'   : 'contentAjaxLink',
                                         'position'                : 'right',
-                                        'url'                     : links.url('email')
+                                        'url'                     : links.url('roles/q/id/0')
                                     }
                                 },
         'dtTable'               : table,
@@ -34,6 +37,6 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No email service available. Add by clicking the Add new email service button.'
+        'dtZeroRecords'         : 'No roles data available. Add role by clicking the Add new role button.'
     ]
 )}}

@@ -6,7 +6,7 @@ use Phalcon\Acl\Component;
 use Phalcon\Acl\Role;
 use Phalcon\Helper\Json;
 use System\Base\BaseMiddleware;
-use System\Base\Providers\AccessServiceProvider\PermissionDeniedException;
+use System\Base\Providers\AccessServiceProvider\Exceptions\PermissionDeniedException;
 
 class Acl extends BaseMiddleware
 {

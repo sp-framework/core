@@ -22,7 +22,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
-                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
+                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -386,7 +386,7 @@ dataCollectionSection =
                 for (var checkbox in checkboxIds) {
                     $('#' + checkbox).click(function() {
                         var id = $(this)[0].id;
-                        extractCheckboxData(id, checkboxIds[id])
+                        extractCheckboxData(id, checkboxIds[checkbox])
                     });
                     extractCheckboxData(checkbox, checkboxIds[checkbox])
                 }

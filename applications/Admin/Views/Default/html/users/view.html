@@ -1,42 +1,32 @@
+{% if user['id'] is defined %}
+    {% set userId = user['id'] %}
+{% else %}
+    {% set userId = '' %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
-        'component'             : table['component'],
-        'componentName'         : componentName,
-        'componentId'           : componentId,
-        'parentComponentId'     : parent,
-        'sectionId'             : 'listing',
-        'contentType'           : 'sectionWithListing',
-        'cardHeader'            : true,
-        'cardType'              : 'primary',
-        'cardIcon'              : 'users',
-        'cardTitle'             : componentName,
-        'cardAdditionalClass'   : 'rounded-0',
-        'cardShowTools'         : ['maximize', 'collapse'],
-        'dtFilter'              : true,
-        'dtFilters'             : table['filters'],
-        'dtFilterColumns'       : table['filterColumns'],
-        'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      : {
-                                    'add-user' : {
-                                        'title'                   : 'Add New User',
-                                        'size'                    : 'sm',
-                                        'type'                    : 'primary',
-                                        'icon'                    : 'plus',
-                                        'buttonAdditionalClass'   : 'contentAjaxLink',
-                                        'position'                : 'right',
-                                        'url'                     : links.url('user')
-                                    }
-                                },
-        'dtTable'               : table,
-        'dtColumns'             : table['columns'],
-        'dtPostUrl'             : table['postUrl'],
-        'dtPostUrlParams'       : table['postUrlParams'],
-        'dtStriped'             : true,
-        'dtStateSave'           : false,
-        'dtBordered'            : false,
-        'dtHideIdColumn'        : true,
-        'dtNoOfColumnsToShow'   : 6,
-        'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No users data available. Add user by clicking the Add new user button.'
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'user',
+        'cardTitle'                     : componentName,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'users/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : userId,
+            'addActionUrl'                  : 'users/add',
+            'addSuccessRedirectUrl'         : 'users',
+            'updateActionUrl'               : 'users/update',
+            'updateSuccessRedirectUrl'      : 'users',
+            'cancelActionUrl'               : 'users',
+            'closeActionUrl'                : 'users'
+        ]
     ]
 )}}

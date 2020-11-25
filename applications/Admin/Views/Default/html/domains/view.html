@@ -1,39 +1,36 @@
+{% if domain['id'] is defined %}
+    {% set domainId = domain['id'] %}
+    {% set domainName = domain['name'] %}
+    {% set domainDescription = domain['description'] %}
+{% else %}
+    {% set domainId = '' %}
+    {% set domainName = '' %}
+    {% set domainDescription = '' %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
-        'component'             : table['component'],
-        'componentName'         : componentName,
-        'componentId'           : componentId,
-        'parentComponentId'     : parent,
-        'sectionId'             : 'listing',
-        'contentType'           : 'sectionWithListing',
-        'cardHeader'            : true,
-        'cardType'              : 'primary',
-        'cardIcon'              : 'globe-asia',
-        'cardTitle'             : componentName,
-        'cardAdditionalClass'   : 'rounded-0',
-        'cardShowTools'         : ['maximize', 'collapse'],
-        'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      : {
-                                    'add-domain' : {
-                                        'title'                   : 'Add New Domain',
-                                        'size'                    : 'sm',
-                                        'type'                    : 'primary',
-                                        'icon'                    : 'plus',
-                                        'buttonAdditionalClass'   : 'contentAjaxLink',
-                                        'position'                : 'right',
-                                        'url'                     : links.url('domain')
-                                    }
-                                },
-        'dtTable'               : table,
-        'dtColumns'             : table['columns'],
-        'dtPostUrl'             : table['postUrl'],
-        'dtPostUrlParams'       : table['postUrlParams'],
-        'dtStriped'             : true,
-        'dtStateSave'           : false,
-        'dtBordered'            : false,
-        'dtHideIdColumn'        : true,
-        'dtNoOfColumnsToShow'   : 6,
-        'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No domains data available. Add domain by clicking the Add new domain button.'
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'globe-asia',
+        'cardTitle'                     : componentName,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'domains/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : domainId,
+            'addActionUrl'                  : 'domains/add',
+            'addSuccessRedirectUrl'         : 'domains',
+            'updateActionUrl'               : 'domains/update',
+            'updateSuccessRedirectUrl'      : 'domains',
+            'cancelActionUrl'               : 'domains',
+            'closeActionUrl'                : 'domains'
+        ]
     ]
 )}}

@@ -2,7 +2,6 @@
 
 namespace Applications\Admin\Components\Filters;
 
-use Applications\Admin\Packages\Filters\Filters;
 use System\Base\BaseComponent;
 
 class FiltersComponent extends BaseComponent
@@ -19,7 +18,19 @@ class FiltersComponent extends BaseComponent
                     'view'      => 'filter'
                 ]
             ];
+        $this->generateDTContent(
+            $this->basepackages->filters,
+            'filters/view',
+            null,
+            ['name'],
+            true,
+            ['name'],
+            $controlActions,
+            null,
+            null,
+            'name'
+        );
 
-        $this->generateDTContent($this->basepackages->filters, 'filters/view', null, ['name'], true, ['name'], $controlActions, null, null, 'name');
+        $this->view->pick('filters/list');
     }
 }

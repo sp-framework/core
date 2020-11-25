@@ -81,16 +81,16 @@ class Roles extends BasePackage
         foreach ($applicationsArr as $applicationKey => $application) {
             $componentsArr = $this->modules->components->getComponentsForApplication($application['id']);
             $components[strtolower($application['name'])] = ['title' => strtoupper($application['name'])];
-            foreach ($componentsArr as $key => $component) {
-                $components[strtolower($application['name'])]['childs'][$component['type']] = ['title' => strtoupper($component['type'])];
-            }
+            // foreach ($componentsArr as $key => $component) {
+            //     $components[strtolower($application['name'])]['childs'] = ['title' => strtoupper($component['type'])];
+            // }
             foreach ($componentsArr as $key => $component) {
                 $reflector = $this->annotations->get($component['class']);
                 $methods = $reflector->getMethodsAnnotations();
 
                 if ($methods) {
-                    $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['id'] = $component['id'];
-                    $components[strtolower($application['name'])]['childs'][$component['type']]['childs'][$key]['title'] = $component['name'];
+                    $components[strtolower($application['name'])]['childs'][$key]['id'] = $component['id'];
+                    $components[strtolower($application['name'])]['childs'][$key]['title'] = $component['name'];
                 }
             }
         }

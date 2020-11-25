@@ -5,7 +5,7 @@ namespace Applications\Admin\Packages\AdminLTETags\Tags\Content\Listing;
 use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Helper\Arr;
 
-class Filter extends AdminLTETags
+class Filters extends AdminLTETags
 {
     protected $params;
 
