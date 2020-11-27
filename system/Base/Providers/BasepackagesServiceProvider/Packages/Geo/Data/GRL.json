@@ -1,0 +1,17 @@
+{
+    "GRL": {
+        "id": 86,
+        "name": "Greenland",
+        "iso3": "GRL",
+        "iso2": "GL",
+        "phone_code": "299",
+        "capital": "Nuuk",
+        "currency": "DKK",
+        "native": "Kalaallit Nunaat",
+        "region": "Americas",
+        "subregion": "Northern America",
+        "emoji": "🇬🇱",
+        "emojiU": "U+1F1EC U+1F1F1",
+        "states": []
+    }
+}

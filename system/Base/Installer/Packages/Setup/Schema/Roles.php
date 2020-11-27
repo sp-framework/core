@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Roles
 {
@@ -49,6 +50,15 @@ class Roles
                             'type'    => Column::TYPE_TEXT,
                             'notNull' => false,
                         ]
+                    )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'name',
+                        ],
+                        'UNIQUE'
                     )
                 ]
             ];

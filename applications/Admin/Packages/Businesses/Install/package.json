@@ -1,9 +1,9 @@
 {
-	"name"			: "Filters",
-	"displayName" 	: "Admin Filters Package",
-	"description"	: "Package for Filters component",
+	"name"			: "Businesses",
+	"displayName" 	: "Admin Businesses Package",
+	"description"	: "Package for Businesses component",
 	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/package-admin-filters",
+	"repo"			: "https://github.com/h-w-f/package-admin-businesses",
 	"path"			: "/",
 	"dependencies"	: {
 		"core"			: {
@@ -18,9 +18,9 @@
 		},
 		"components"	:
 		[{
-			"name"		: "Filters",
+			"name"		: "Businesses",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/component-admin-filters"
+			"repo"		: "https://github.com/h-w-f/component-admin-businesses"
 		}],
 		"packages"		: [],
 		"middlewares"	: [],

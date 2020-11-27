@@ -1,0 +1,17 @@
+{
+    "VIR": {
+        "id": 242,
+        "name": "Virgin Islands (US)",
+        "iso3": "VIR",
+        "iso2": "VI",
+        "phone_code": "+1-340",
+        "capital": "Charlotte Amalie",
+        "currency": "USD",
+        "native": "United States Virgin Islands",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇻🇮",
+        "emojiU": "U+1F1FB U+1F1EE",
+        "states": []
+    }
+}

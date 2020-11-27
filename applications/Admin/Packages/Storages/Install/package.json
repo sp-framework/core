@@ -1,0 +1,31 @@
+{
+	"name"			: "Storages",
+	"displayName" 	: "Admin Storages Package",
+	"description"	: "Package for Storages component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-storages",
+	"path"			: "/",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Admin",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-admin"
+		},
+		"components"	:
+		[{
+			"name"		: "Storages",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/component-admin-storages"
+		}],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

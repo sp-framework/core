@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
+use System\Base\Providers\ModulesServiceProvider\Installer;
 use System\Base\Providers\ModulesServiceProvider\Modules\Applications;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Core;
@@ -108,5 +109,12 @@ class Modules
 		$this->menus = (new Menus())->init();
 
 		return $this->menus;
+	}
+
+	protected function initInstaller()
+	{
+		$this->installer = (new Installer())->init();
+
+		return $this->installer;
 	}
 }

@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Applications
 {
@@ -150,6 +151,15 @@ class Applications
 						'size'    => 2048,
 						'notNull' => false,
 					]
+				)
+			],
+			'indexes' => [
+				new Index(
+					'column_UNIQUE',
+					[
+						'route',
+					],
+					'UNIQUE'
 				)
 			]
 		];

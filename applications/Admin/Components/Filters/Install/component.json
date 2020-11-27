@@ -7,7 +7,6 @@
     "repo"          : "https://github.com/h-w-f/component-admin-filters",
     "path"          : "/",
     "class"         : "Applications\\Admin\\Components\\Filters\\FiltersComponent",
-    "type"          : "listing",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",

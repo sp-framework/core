@@ -1,0 +1,17 @@
+{
+    "FLK": {
+        "id": 71,
+        "name": "Falkland Islands",
+        "iso3": "FLK",
+        "iso2": "FK",
+        "phone_code": "500",
+        "capital": "Stanley",
+        "currency": "FKP",
+        "native": "Falkland Islands",
+        "region": "Americas",
+        "subregion": "South America",
+        "emoji": "🇫🇰",
+        "emojiU": "U+1F1EB U+1F1F0",
+        "states": []
+    }
+}

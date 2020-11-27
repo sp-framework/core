@@ -1,0 +1,17 @@
+{
+    "ATA": {
+        "id": 9,
+        "name": "Antarctica",
+        "iso3": "ATA",
+        "iso2": "AQ",
+        "phone_code": "",
+        "capital": "",
+        "currency": "",
+        "native": "Antarctica",
+        "region": "Polar",
+        "subregion": "",
+        "emoji": "🇦🇶",
+        "emojiU": "U+1F1E6 U+1F1F6",
+        "states": []
+    }
+}

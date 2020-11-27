@@ -1,0 +1,17 @@
+{
+    "CXR": {
+        "id": 46,
+        "name": "Christmas Island",
+        "iso3": "CXR",
+        "iso2": "CX",
+        "phone_code": "61",
+        "capital": "Flying Fish Cove",
+        "currency": "AUD",
+        "native": "Christmas Island",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "emoji": "🇨🇽",
+        "emojiU": "U+1F1E8 U+1F1FD",
+        "states": []
+    }
+}

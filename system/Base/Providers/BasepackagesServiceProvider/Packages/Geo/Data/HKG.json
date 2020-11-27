@@ -1,0 +1,17 @@
+{
+    "HKG": {
+        "id": 98,
+        "name": "Hong Kong S.A.R.",
+        "iso3": "HKG",
+        "iso2": "HK",
+        "phone_code": "852",
+        "capital": "Hong Kong",
+        "currency": "HKD",
+        "native": "香港",
+        "region": "Asia",
+        "subregion": "Eastern Asia",
+        "emoji": "🇭🇰",
+        "emojiU": "U+1F1ED U+1F1F0",
+        "states": []
+    }
+}

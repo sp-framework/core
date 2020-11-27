@@ -1,0 +1,17 @@
+{
+    "BVT": {
+        "id": 30,
+        "name": "Bouvet Island",
+        "iso3": "BVT",
+        "iso2": "BV",
+        "phone_code": "",
+        "capital": "",
+        "currency": "NOK",
+        "native": "Bouvetøya",
+        "region": "",
+        "subregion": "",
+        "emoji": "🇧🇻",
+        "emojiU": "U+1F1E7 U+1F1FB",
+        "states": []
+    }
+}

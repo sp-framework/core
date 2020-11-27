@@ -1,0 +1,36 @@
+{
+    "route"         : "locations",
+    "name"          : "Locations",
+    "displayName"   : "Admin Locations Management",
+    "description"   : "List locations via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-locations",
+    "path"          : "/",
+    "class"         : "Applications\\Admin\\Components\\Locations\\LocationsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "application" : {
+            "name"      : "Admin",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/application-admin"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 2,
+        "locations" : {
+            "icon"      : "map-marker-alt",
+            "title"     : "locations",
+            "link"      : "locations"
+        }
+    },
+    "settings"          : {
+    }
+}

@@ -768,13 +768,13 @@ abstract class BasePackage extends Controller
 		return $this->db->tableExists($table);
 	}
 
-	public function createTable(string $table, array $columns, $drop = false)
+	public function createTable(string $table, string $dbName = '', array $columns, $drop = false)
 	{
 		if ($drop) {
 			$this->dropTable($table);
 		}
 
-		return $this->db->createTable($table, '', $columns);
+		return $this->db->createTable($table, $dbName, $columns);
 	}
 
 	public function alterTable()
@@ -785,5 +785,28 @@ abstract class BasePackage extends Controller
 	public function dropTable(string $table)
 	{
 		$this->db->dropTable($table);
+	}
+
+	protected function getInstalledFiles($directory = null, $sub = true)
+	{
+		$installedFiles = [];
+		$installedFiles['dir'] = [];
+		$installedFiles['files'] = [];
+
+		if ($directory) {
+			$contents = $this->localContent->listContents($directory, $sub);
+
+			foreach ($contents as $contentKey => $content) {
+				if ($content['type'] === 'dir') {
+					array_push($installedFiles['dir'], $content['path']);
+				} else if ($content['type'] === 'file') {
+					array_push($installedFiles['files'], $content['path']);
+				}
+			}
+
+			return $installedFiles;
+		} else {
+			return null;
+		}
 	}
 }

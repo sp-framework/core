@@ -1,0 +1,17 @@
+{
+    "BLM": {
+        "id": 189,
+        "name": "Saint-Barthelemy",
+        "iso3": "BLM",
+        "iso2": "BL",
+        "phone_code": "590",
+        "capital": "Gustavia",
+        "currency": "EUR",
+        "native": "Saint-Barthélemy",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇧🇱",
+        "emojiU": "U+1F1E7 U+1F1F1",
+        "states": []
+    }
+}

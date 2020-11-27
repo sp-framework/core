@@ -1,0 +1,17 @@
+{
+    "GIB": {
+        "id": 84,
+        "name": "Gibraltar",
+        "iso3": "GIB",
+        "iso2": "GI",
+        "phone_code": "350",
+        "capital": "Gibraltar",
+        "currency": "GIP",
+        "native": "Gibraltar",
+        "region": "Europe",
+        "subregion": "Southern Europe",
+        "emoji": "🇬🇮",
+        "emojiU": "U+1F1EC U+1F1EE",
+        "states": []
+    }
+}

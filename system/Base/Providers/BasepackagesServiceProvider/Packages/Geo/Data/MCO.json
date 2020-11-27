@@ -1,0 +1,17 @@
+{
+    "MCO": {
+        "id": 145,
+        "name": "Monaco",
+        "iso3": "MCO",
+        "iso2": "MC",
+        "phone_code": "377",
+        "capital": "Monaco",
+        "currency": "EUR",
+        "native": "Monaco",
+        "region": "Europe",
+        "subregion": "Western Europe",
+        "emoji": "🇲🇨",
+        "emojiU": "U+1F1F2 U+1F1E8",
+        "states": []
+    }
+}

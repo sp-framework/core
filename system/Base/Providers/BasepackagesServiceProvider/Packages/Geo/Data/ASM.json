@@ -1,0 +1,17 @@
+{
+    "ASM": {
+        "id": 5,
+        "name": "American Samoa",
+        "iso3": "ASM",
+        "iso2": "AS",
+        "phone_code": "+1-684",
+        "capital": "Pago Pago",
+        "currency": "USD",
+        "native": "American Samoa",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "emoji": "🇦🇸",
+        "emojiU": "U+1F1E6 U+1F1F8",
+        "states": []
+    }
+}

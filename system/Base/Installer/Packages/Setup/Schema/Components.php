@@ -77,14 +77,6 @@ class Components
 						]
 					),
 					new Column(
-						'type',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 20,
-							'notNull' => true,
-						]
-					),
-					new Column(
 						'settings',
 						[
 							'type'    => Column::TYPE_TEXT,

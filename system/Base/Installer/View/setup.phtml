@@ -105,6 +105,19 @@
 												<input type="password" name="pass" id="pass" class="form-control">
 											</div>
 										</div>
+										<hr>
+										<legend>Geo Location (Country of operation)</legend>
+										<div class="input-group mb-3">
+											<div class="input-group-prepend">
+												<label class="input-group-text" for="country">Country *</label>
+											</div>
+												<select class="custom-select" id="country">
+													<?php foreach ($countries as $key => $value) {
+														echo '<option value="' . $value['iso3'] . '">' . $value['name'] . '</option>';
+													} ?>
+												</select>
+											</div>
+										</div>
 									</div>
 								</div>
 								<hr>
@@ -116,7 +129,7 @@
 										</button>
 									</div>
 									<div class="col" id="next-div" hidden>
-										<a href='/admin/modules' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Install Modules</a>
+										<a href='/' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
 									</div>
 								</div>
 								<hr>
@@ -206,6 +219,7 @@
 								"mode"          : $("input[name='mode-options']:checked")[0].id,
 								"email"      	: $('#email').val(),
 								"pass"      	: $('#pass').val(),
+								"country"      	: $('#country').val()
 							},
 						dataType: 'json',
 						success: function (data) {

@@ -1,0 +1,41 @@
+{
+    "route"         : "taxes",
+    "name"          : "Taxes",
+    "displayName"   : "Admin Taxes Management",
+    "description"   : "List taxes via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-taxes",
+    "path"          : "/",
+    "class"         : "Applications\\Admin\\Components\\Taxes\\TaxesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "application" : {
+            "name"      : "Admin",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/application-admin"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "finance"       : {
+            "title"     : "finance",
+            "icon"      : "dollar-sign",
+            "childs"    : {
+                "taxes" : {
+                    "title"     : "taxes",
+                    "link"      : "taxes"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

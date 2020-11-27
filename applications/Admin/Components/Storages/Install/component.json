@@ -1,0 +1,36 @@
+{
+    "route"         : "storages",
+    "name"          : "Storages",
+    "displayName"   : "Admin Storages Management",
+    "description"   : "List storages via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-storages",
+    "path"          : "/",
+    "class"         : "Applications\\Admin\\Components\\Storages\\StoragesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "application" : {
+            "name"      : "Admin",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/application-admin"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 9,
+        "storages" : {
+            "icon"      : "boxes",
+            "title"     : "storages",
+            "link"      : "storages"
+        }
+    },
+    "settings"          : {
+    }
+}

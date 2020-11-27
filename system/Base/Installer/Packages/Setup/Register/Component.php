@@ -16,7 +16,6 @@ class Component
 				'version'				=> $componentFile['version'],
 				'class'					=> $componentFile['class'],
 				'repo'					=> $componentFile['repo'],
-				'type'					=> $componentFile['type'],//listing, crud, other
 				'settings'				=>
 					isset($componentFile['settings']) ?
 					json_encode($componentFile['settings']) :

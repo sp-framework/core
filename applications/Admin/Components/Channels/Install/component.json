@@ -1,0 +1,36 @@
+{
+    "route"         : "channels",
+    "name"          : "Channels",
+    "displayName"   : "Admin Channels Management",
+    "description"   : "List channels via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-channels",
+    "path"          : "/",
+    "class"         : "Applications\\Admin\\Components\\Channels\\ChannelsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "application" : {
+            "name"      : "Admin",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/application-admin"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 4,
+        "channels" : {
+            "icon"      : "store",
+            "title"     : "channels",
+            "link"      : "channels"
+        }
+    },
+    "settings"          : {
+    }
+}

@@ -1,0 +1,60 @@
+{
+    "XKX": {
+        "id": 248,
+        "name": "Kosovo",
+        "iso3": "XKX",
+        "iso2": "XK",
+        "phone_code": "383",
+        "capital": "Pristina",
+        "currency": "EUR",
+        "native": "Republika e Kosovës",
+        "region": "Europe",
+        "subregion": "Eastern Europe",
+        "emoji": "🇽🇰",
+        "emojiU": "U+1F1FD U+1F1F0",
+        "states": [
+            {
+                "id": 4876,
+                "name": "Đakovica District (Gjakove)",
+                "state_code": null,
+                "cities": []
+            },
+            {
+                "id": 4877,
+                "name": "Gjilan District",
+                "state_code": null,
+                "cities": []
+            },
+            {
+                "id": 4878,
+                "name": "Kosovska Mitrovica District",
+                "state_code": null,
+                "cities": []
+            },
+            {
+                "id": 3738,
+                "name": "Peć District",
+                "state_code": null,
+                "cities": []
+            },
+            {
+                "id": 4879,
+                "name": "Pristina (Priştine)",
+                "state_code": null,
+                "cities": []
+            },
+            {
+                "id": 3723,
+                "name": "Prizren District",
+                "state_code": null,
+                "cities": []
+            },
+            {
+                "id": 4874,
+                "name": "Uroševac District (Ferizaj)",
+                "state_code": null,
+                "cities": []
+            }
+        ]
+    }
+}

@@ -4,6 +4,9 @@ namespace System\Base\Providers\BasepackagesServiceProvider;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Domains;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 
 class Basepackages
@@ -14,13 +17,11 @@ class Basepackages
 
 	protected $menus;
 
-	protected $businesses;
+	protected $geoCountries;
 
-	protected $channels;
+	protected $geoStates;
 
-	protected $currencies;
-
-	protected $taxes;
+	protected $geoCities;
 
 	public function __construct()
 	{
@@ -56,5 +57,26 @@ class Basepackages
 		$this->menus = (new Menus())->init();
 
 		return $this->menus;
+	}
+
+	protected function initGeoCountries()
+	{
+		$this->geoCountries = (new GeoCountries())->init();
+
+		return $this->geoCountries;
+	}
+
+	protected function initGeoStates()
+	{
+		$this->geoStates = (new GeoStates())->init();
+
+		return $this->geoStates;
+	}
+
+	protected function initGeoCities()
+	{
+		$this->geoCities = (new GeoCities())->init();
+
+		return $this->geoCities;
 	}
 }

@@ -1,0 +1,17 @@
+{
+    "IOT": {
+        "id": 32,
+        "name": "British Indian Ocean Territory",
+        "iso3": "IOT",
+        "iso2": "IO",
+        "phone_code": "246",
+        "capital": "Diego Garcia",
+        "currency": "USD",
+        "native": "British Indian Ocean Territory",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "emoji": "🇮🇴",
+        "emojiU": "U+1F1EE U+1F1F4",
+        "states": []
+    }
+}

@@ -1,22 +1,36 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model;
+namespace Applications\Admin\Packages\Businesses\Model;
 
 use System\Base\BaseModel;
 
-class Filters extends BaseModel
+class Businesses extends BaseModel
 {
     public $id;
 
     public $name;
 
-    public $conditions;
+    public $abn;
 
-    public $component_id;
+    public $type;
 
-    public $permission;
+    public $parent;
 
-    public $is_default;
+    public $street_address;
 
-    public $shared_ids;
+    public $street_address_2;
+
+    public $city_id;
+
+    public $city_name;
+
+    public $pin_code;
+
+    public $state_id;
+
+    public $state_name;
+
+    public $country_id;
+
+    public $country_name;
 }

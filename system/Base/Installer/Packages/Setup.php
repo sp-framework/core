@@ -10,6 +10,7 @@ use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplication;
 use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
+use System\Base\Installer\Packages\Setup\Register\CountriesStatesCities;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
@@ -25,6 +26,9 @@ use System\Base\Installer\Packages\Setup\Schema\Core;
 use System\Base\Installer\Packages\Setup\Schema\Domains;
 use System\Base\Installer\Packages\Setup\Schema\EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Filters;
+use System\Base\Installer\Packages\Setup\Schema\Geo\Cities;
+use System\Base\Installer\Packages\Setup\Schema\Geo\Countries;
+use System\Base\Installer\Packages\Setup\Schema\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Logs;
 use System\Base\Installer\Packages\Setup\Schema\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Middlewares;
@@ -118,53 +122,66 @@ class Setup
 
 	public function buildSchema()
 	{
-		$this->db->createTable('repositories', '', (new Repositories)->columns());
-		$this->db->createTable('core', '', (new Core)->columns());
-		$this->db->createTable('applications', '', (new Applications)->columns());
-		$applicationsRouteUnique = new Index(
-			'column_UNIQUE',
-			[
-				'route',
-			],
-			'UNIQUE'
-		);
-		$this->db->addIndex('applications', $this->dbConfig['db']['dbname'], $applicationsRouteUnique);
-		$this->db->createTable('components', '', (new Components)->columns());
-		$this->db->createTable('packages', '', (new Packages)->columns());
-		$this->db->createTable('middlewares', '', (new Middlewares)->columns());
-		$this->db->createTable('views', '', (new Views)->columns());
-		$this->db->createTable('cache', '', (new Cache)->columns());
-		$this->db->createTable('logs', '', (new Logs)->columns());
-		$this->db->createTable('email_services', '', (new EmailServices)->columns());
-		$this->db->createTable('domains', '', (new Domains)->columns());
-		$domainUnique = new Index(
-			'column_UNIQUE',
-			[
-				'name',
-			],
-			'UNIQUE'
-		);
-		$this->db->addIndex('domains', $this->dbConfig['db']['dbname'], $domainUnique);
-		$this->db->createTable('menus', '', (new Menus)->columns());
-		$this->db->createTable('filters', '', (new Filters)->columns());
-		$this->db->createTable('users', '', (new Users)->columns());
-		$emailUnique = new Index(
-			'column_UNIQUE',
-			[
-				'email',
-			],
-			'UNIQUE'
-		);
-		$this->db->addIndex('users', $this->dbConfig['db']['dbname'], $emailUnique);
-		$this->db->createTable('roles', '', (new Roles)->columns());
-		$roleNameUnique = new Index(
-			'column_UNIQUE',
-			[
-				'name',
-			],
-			'UNIQUE'
-		);
-		$this->db->addIndex('roles', $this->dbConfig['db']['dbname'], $roleNameUnique);
+		$dbName = $this->dbConfig['db']['dbname'];
+
+		$this->db->createTable('repositories', $dbName, (new Repositories)->columns());
+		$this->db->createTable('core', $dbName, (new Core)->columns());
+		$this->db->createTable('applications', $dbName, (new Applications)->columns(),);
+		// $applicationsRouteUnique = new Index(
+		// 	'column_UNIQUE',
+		// 	[
+		// 		'route',
+		// 	],
+		// 	'UNIQUE'
+		// );
+		// $this->db->addIndex('applications', $this->dbConfig['db']['dbname'], $applicationsRouteUnique);
+		$this->db->createTable('components', $dbName, (new Components)->columns());
+		$this->db->createTable('packages', $dbName, (new Packages)->columns());
+		$this->db->createTable('middlewares', $dbName, (new Middlewares)->columns());
+		$this->db->createTable('views', $dbName, (new Views)->columns());
+		$this->db->createTable('cache', $dbName, (new Cache)->columns());
+		$this->db->createTable('logs', $dbName, (new Logs)->columns());
+		$this->db->createTable('email_services', $dbName, (new EmailServices)->columns());
+		$this->db->createTable('domains', $dbName, (new Domains)->columns());
+		// $domainUnique = new Index(
+		// 	'column_UNIQUE',
+		// 	[
+		// 		'name',
+		// 	],
+		// 	'UNIQUE'
+		// );
+		// $this->db->addIndex('domains', $this->dbConfig['db']['dbname'], $domainUnique);
+		$this->db->createTable('menus', $dbName, (new Menus)->columns());
+		$this->db->createTable('filters', $dbName, (new Filters)->columns());
+		$this->db->createTable('users', $dbName, (new Users)->columns());
+		// $emailUnique = new Index(
+		// 	'column_UNIQUE',
+		// 	[
+		// 		'email',
+		// 	],
+		// 	'UNIQUE'
+		// );
+		// $this->db->addIndex('users', $this->dbConfig['db']['dbname'], $emailUnique);
+		$this->db->createTable('roles', $dbName, (new Roles)->columns());
+		// $roleNameUnique = new Index(
+		// 	'column_UNIQUE',
+		// 	[
+		// 		'name',
+		// 	],
+		// 	'UNIQUE'
+		// );
+		// $this->db->addIndex('roles', $this->dbConfig['db']['dbname'], $roleNameUnique);
+		$this->db->createTable('geo_countries', $dbName, (new Countries)->columns());
+		// $countriesNameUnique = new Index(
+		// 	'column_UNIQUE',
+		// 	[
+		// 		'name',
+		// 	],
+		// 	'UNIQUE'
+		// );
+		// $this->db->addIndex('geo_countries', $this->dbConfig['db']['dbname'], $countriesNameUnique);
+		$this->db->createTable('geo_states', $dbName, (new States)->columns());
+		$this->db->createTable('geo_cities', $dbName, (new Cities)->columns());
 	}
 
 	public function registerRepository()//Change this to SP
@@ -378,6 +395,11 @@ class Setup
 		$password = $this->security->hash($this->postData['pass']);
 
 		return (new RegisterUser())->register($this->db, $this->postData['email'], $password, $newApplicationId, $adminRoleId);
+	}
+
+	public function registerCountryStatesCities()
+	{
+		return (new CountriesStatesCities())->register($this->db, $this->postData['country'], $this->localContent);
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true)

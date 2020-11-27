@@ -1,0 +1,17 @@
+{
+    "GLP": {
+        "id": 88,
+        "name": "Guadeloupe",
+        "iso3": "GLP",
+        "iso2": "GP",
+        "phone_code": "590",
+        "capital": "Basse-Terre",
+        "currency": "EUR",
+        "native": "Guadeloupe",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇬🇵",
+        "emojiU": "U+1F1EC U+1F1F5",
+        "states": []
+    }
+}

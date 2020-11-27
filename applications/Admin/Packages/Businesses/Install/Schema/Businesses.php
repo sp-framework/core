@@ -1,10 +1,10 @@
 <?php
 
-namespace Applications\Admin\Packages\Filters\Install\Schema;
+namespace Applications\Admin\Packages\Businesses\Install\Schema;
 
 use Phalcon\Db\Column;
 
-class Filters
+class Businesses
 {
     public function columns()
     {
@@ -21,50 +21,102 @@ class Filters
                     ]
                 ),
                 new Column(
+                    'abn',
+                    [
+                        'type'    => Column::TYPE_BIGINTEGER,
+                        'size'    => 11,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'size'    => 100,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'conditions',
-                    [
-                        'type'    => Column::TYPE_TEXT,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'component_id',
+                    'type',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
-                        'size'    => 1,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'permission',
+                    'parent',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
-                        'size'    => 1,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'is_default',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'size'    => 1,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'shared_ids',
+                    'street_address',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
+                        'size'    => 100,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'street_address_2',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
                         'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'city_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'city_name',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 255,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'post_code',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'size'    => 20,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'state_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'state_name',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 255,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'country_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'country_name',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 255,
+                        'notNull' => true,
                     ]
                 ),
             ]

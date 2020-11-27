@@ -1,0 +1,17 @@
+{
+    "TCA": {
+        "id": 227,
+        "name": "Turks And Caicos Islands",
+        "iso3": "TCA",
+        "iso2": "TC",
+        "phone_code": "+1-649",
+        "capital": "Cockburn Town",
+        "currency": "USD",
+        "native": "Turks and Caicos Islands",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇹🇨",
+        "emojiU": "U+1F1F9 U+1F1E8",
+        "states": []
+    }
+}

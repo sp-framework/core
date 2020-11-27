@@ -1,0 +1,17 @@
+{
+    "AIA": {
+        "id": 8,
+        "name": "Anguilla",
+        "iso3": "AIA",
+        "iso2": "AI",
+        "phone_code": "+1-264",
+        "capital": "The Valley",
+        "currency": "XCD",
+        "native": "Anguilla",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇦🇮",
+        "emojiU": "U+1F1E6 U+1F1EE",
+        "states": []
+    }
+}

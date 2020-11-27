@@ -1,0 +1,17 @@
+{
+    "REU": {
+        "id": 180,
+        "name": "Reunion",
+        "iso3": "REU",
+        "iso2": "RE",
+        "phone_code": "262",
+        "capital": "Saint-Denis",
+        "currency": "EUR",
+        "native": "La Réunion",
+        "region": "Africa",
+        "subregion": "Eastern Africa",
+        "emoji": "🇷🇪",
+        "emojiU": "U+1F1F7 U+1F1EA",
+        "states": []
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "MAF": {
+        "id": 190,
+        "name": "Saint-Martin (French part)",
+        "iso3": "MAF",
+        "iso2": "MF",
+        "phone_code": "590",
+        "capital": "Marigot",
+        "currency": "EUR",
+        "native": "Saint-Martin",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇲🇫",
+        "emojiU": "U+1F1F2 U+1F1EB",
+        "states": []
+    }
+}

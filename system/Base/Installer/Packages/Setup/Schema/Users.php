@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Users
 {
@@ -95,6 +96,18 @@ class Users
                             'notNull' => false,
                         ]
                     )
+                ],
+                'indexes' => [
+                    new Index(
+                        'column_UNIQUE',
+                        [
+                            'email',
+                        ],
+                        'UNIQUE'
+                    )
+                ],
+                'options' => [
+                    'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
                 ]
             ];
     }

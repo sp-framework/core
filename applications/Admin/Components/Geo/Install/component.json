@@ -1,0 +1,41 @@
+{
+    "route"         : "geo",
+    "name"          : "Geo",
+    "displayName"   : "Admin Geo Management",
+    "description"   : "Manage admin geo via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-geo",
+    "path"          : "/",
+    "class"         : "Applications\\Admin\\Components\\Geo\\GeoComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "application" : {
+            "name"      : "Admin",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/application-admin"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "settings"      : {
+            "title"     : "settings",
+            "icon"      : "cogs",
+            "childs"    : {
+                "geo"   : {
+                    "title"     : "Geo Locations",
+                    "link"      : "geo"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

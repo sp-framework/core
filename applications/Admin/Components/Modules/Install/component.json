@@ -7,7 +7,6 @@
 	"repo"			: "https://github.com/h-w-f/component-admin-modules",
 	"path"			: "/",
 	"class"         : "Applications\\Admin\\Components\\Modules\\ModulesComponent",
-	"type"          : "listing",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

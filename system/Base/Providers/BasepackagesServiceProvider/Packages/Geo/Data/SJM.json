@@ -1,0 +1,17 @@
+{
+    "SJM": {
+        "id": 211,
+        "name": "Svalbard And Jan Mayen Islands",
+        "iso3": "SJM",
+        "iso2": "SJ",
+        "phone_code": "47",
+        "capital": "Longyearbyen",
+        "currency": "NOK",
+        "native": "Svalbard og Jan Mayen",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "emoji": "🇸🇯",
+        "emojiU": "U+1F1F8 U+1F1EF",
+        "states": []
+    }
+}

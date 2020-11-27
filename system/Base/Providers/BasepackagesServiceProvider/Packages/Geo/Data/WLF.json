@@ -1,0 +1,17 @@
+{
+    "WLF": {
+        "id": 243,
+        "name": "Wallis And Futuna Islands",
+        "iso3": "WLF",
+        "iso2": "WF",
+        "phone_code": "681",
+        "capital": "Mata Utu",
+        "currency": "XPF",
+        "native": "Wallis et Futuna",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "emoji": "🇼🇫",
+        "emojiU": "U+1F1FC U+1F1EB",
+        "states": []
+    }
+}

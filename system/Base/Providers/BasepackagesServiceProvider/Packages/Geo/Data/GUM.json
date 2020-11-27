@@ -1,0 +1,17 @@
+{
+    "GUM": {
+        "id": 89,
+        "name": "Guam",
+        "iso3": "GUM",
+        "iso2": "GU",
+        "phone_code": "+1-671",
+        "capital": "Hagatna",
+        "currency": "USD",
+        "native": "Guam",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "emoji": "🇬🇺",
+        "emojiU": "U+1F1EC U+1F1FA",
+        "states": []
+    }
+}

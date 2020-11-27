@@ -7,7 +7,6 @@
     "repo"          : "https://github.com/h-w-f/component-admin-emailservices",
     "path"          : "/",
     "class"         : "Applications\\Admin\\Components\\Emailservices\\EmailservicesComponent",
-    "type"          : "listing",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",

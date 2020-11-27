@@ -7,7 +7,6 @@
     "repo"          : "https://github.com/h-w-f/component-admin-domains",
     "path"          : "/",
     "class"         : "Applications\\Admin\\Components\\Domains\\DomainsComponent",
-    "type"          : "listing",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -25,7 +24,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 2,
+        "seq"           : 3,
         "domains"       : {
             "title"     : "domains",
             "icon"      : "globe-asia",

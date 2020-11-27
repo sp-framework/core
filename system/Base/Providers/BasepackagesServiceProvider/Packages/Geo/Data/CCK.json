@@ -1,0 +1,17 @@
+{
+    "CCK": {
+        "id": 47,
+        "name": "Cocos (Keeling) Islands",
+        "iso3": "CCK",
+        "iso2": "CC",
+        "phone_code": "61",
+        "capital": "West Island",
+        "currency": "AUD",
+        "native": "Cocos (Keeling) Islands",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "emoji": "🇨🇨",
+        "emojiU": "U+1F1E8 U+1F1E8",
+        "states": []
+    }
+}

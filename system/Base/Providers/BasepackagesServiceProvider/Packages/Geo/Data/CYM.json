@@ -1,0 +1,17 @@
+{
+    "CYM": {
+        "id": 41,
+        "name": "Cayman Islands",
+        "iso3": "CYM",
+        "iso2": "KY",
+        "phone_code": "+1-345",
+        "capital": "George Town",
+        "currency": "KYD",
+        "native": "Cayman Islands",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇰🇾",
+        "emojiU": "U+1F1F0 U+1F1FE",
+        "states": []
+    }
+}

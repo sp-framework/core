@@ -1,0 +1,17 @@
+{
+    "IMN": {
+        "id": 136,
+        "name": "Man (Isle of)",
+        "iso3": "IMN",
+        "iso2": "IM",
+        "phone_code": "+44-1624",
+        "capital": "Douglas, Isle of Man",
+        "currency": "GBP",
+        "native": "Isle of Man",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "emoji": "🇮🇲",
+        "emojiU": "U+1F1EE U+1F1F2",
+        "states": []
+    }
+}

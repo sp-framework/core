@@ -1,0 +1,17 @@
+{
+    "TKL": {
+        "id": 221,
+        "name": "Tokelau",
+        "iso3": "TKL",
+        "iso2": "TK",
+        "phone_code": "690",
+        "capital": "",
+        "currency": "NZD",
+        "native": "Tokelau",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "emoji": "🇹🇰",
+        "emojiU": "U+1F1F9 U+1F1F0",
+        "states": []
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "ATF": {
+        "id": 78,
+        "name": "French Southern Territories",
+        "iso3": "ATF",
+        "iso2": "TF",
+        "phone_code": "",
+        "capital": "Port-aux-Francais",
+        "currency": "EUR",
+        "native": "Territoire des Terres australes et antarctiques fr",
+        "region": "Africa",
+        "subregion": "Southern Africa",
+        "emoji": "🇹🇫",
+        "emojiU": "U+1F1F9 U+1F1EB",
+        "states": []
+    }
+}

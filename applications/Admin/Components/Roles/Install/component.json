@@ -7,7 +7,6 @@
     "repo"          : "https://github.com/h-w-f/component-admin-roles",
     "path"          : "/",
     "class"         : "Applications\\Admin\\Components\\Roles\\RolesComponent",
-    "type"          : "listing",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",

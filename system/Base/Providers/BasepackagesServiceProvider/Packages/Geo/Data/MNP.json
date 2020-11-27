@@ -1,0 +1,17 @@
+{
+    "MNP": {
+        "id": 164,
+        "name": "Northern Mariana Islands",
+        "iso3": "MNP",
+        "iso2": "MP",
+        "phone_code": "+1-670",
+        "capital": "Saipan",
+        "currency": "USD",
+        "native": "Northern Mariana Islands",
+        "region": "Oceania",
+        "subregion": "Micronesia",
+        "emoji": "🇲🇵",
+        "emojiU": "U+1F1F2 U+1F1F5",
+        "states": []
+    }
+}

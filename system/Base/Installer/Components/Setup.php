@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Components;
 
 use Phalcon\Di\FactoryDefault;
+use Phalcon\Helper\Json;
 use Phalcon\Mvc\View\Simple;
 use System\Base\Installer\Packages\Setup as SetupPackage;
 use System\Base\Providers\ContentServiceProvider\Local\Content as LocalContent;
@@ -15,6 +16,8 @@ Class Setup
 	private $setupPackage;
 
 	private $view;
+
+	private $localContent;
 
 	public function __construct()
 	{
@@ -54,6 +57,8 @@ Class Setup
 		$this->postData = $this->request->getPost();
 
 		$this->view = $this->container->getShared('view');
+
+		$this->localContent = $this->container->getShared('localContent');
 	}
 
 	public function run()
@@ -117,6 +122,8 @@ Class Setup
 					if ($adminRoleId) {
 						$this->setupPackage->registerAdminUser($adminApplicationId, $adminRoleId);
 					}
+
+					$this->setupPackage->registerCountryStatesCities();
 				}
 
 				// $this->setupPackage->removeInstaller();
@@ -138,6 +145,12 @@ Class Setup
 				throw $e;
 			}
 		} else {
+
+			$this->view->countries =
+				Json::decode(
+					$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/Countries.json'),
+					true
+				);
 
 			echo $this->container->getShared('view')->render('setup');
 		}

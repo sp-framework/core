@@ -1,21 +1,24 @@
 <?php
 
-namespace Applications\Admin\Packages\Filters\Install;
+namespace Applications\Admin\Packages\Businesses\Install;
 
-use Applications\Admin\Packages\Filters\Filters;
-use Applications\Admin\Packages\Filters\Install\Schema\Filters as FiltersSchema;
-use Applications\Admin\Packages\Module\Install;
+use Applications\Admin\Packages\Businesses\Businesses;
+use Applications\Admin\Packages\Businesses\Install\Schema\Businesses as BusinessesSchema;
+use Phalcon\Helper\Json;
+use System\Base\BasePackage;
 
-class Package extends Install
+class Package extends BasePackage
 {
-    protected $schemaToUse = FiltersSchema::class;
+    protected $schemaToUse = BusinessesSchema::class;
 
-    protected $packageToUse = Filters::class;
+    protected $packageToUse = Businesses::class;
 
-    public $menus;
+    public $businesses;
 
     public function installPackage(bool $dropTables = false)
     {
+        // $this->init();
+
         // if ($this->checkPackage($this->packageToUse)) {
 
         //     $this->packagesData->responseCode = 1;
@@ -25,15 +28,11 @@ class Package extends Install
         //     return;
         // }
 
-
-
-        // var_dump($dropTables);
-        // die();
         try {
             if ($dropTables) {
-                $this->createTable('filters', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('businesses', '', (new $this->schemaToUse)->columns(), $dropTables);
             } else {
-                $this->createTable('filters', (new $this->schemaToUse)->columns());
+                $this->createTable('businesses', '', (new $this->schemaToUse)->columns());
             }
 
             return true;
@@ -43,6 +42,30 @@ class Package extends Install
 
             $this->packagesData->responseMessage = $e->getMessage();
         }
+
+        // $this->registerPackage();
+    }
+
+    protected function registerPackage()
+    {
+        $packagePath = '/applications/Admin/Packages/Businesses/';
+
+        $jsonFile =
+            Json::decode($this->localContent->read($packagePath . '/Install/package.json'), true);
+
+        if (!$jsonFile) {
+            throw new \Exception('Problem reading package.json at location ' . $packagePath);
+        }
+
+        $jsonFile['display_name'] = $jsonFile['displayName'];
+        $jsonFile['dependencies'] = Json::encode($jsonFile['dependencies']);
+        $jsonFile['settings'] = Json::encode($jsonFile['settings']);
+        $jsonFile['application_id'] = $this->init()->application['id'];
+        $jsonFile['installed'] = 1;
+        $jsonFile['files'] = Json::encode($this->getInstalledFiles($packagePath));
+
+        $this->modules->packages->add($jsonFile);
+        $this->logger->log->info('Package ' . $jsonFile['display_name'] . ' installed successfully on application ' . $this->application['name']);
     }
 
     public function updatePackage()

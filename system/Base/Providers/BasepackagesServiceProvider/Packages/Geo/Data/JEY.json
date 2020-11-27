@@ -1,0 +1,17 @@
+{
+    "JEY": {
+        "id": 110,
+        "name": "Jersey",
+        "iso3": "JEY",
+        "iso2": "JE",
+        "phone_code": "+44-1534",
+        "capital": "Saint Helier",
+        "currency": "GBP",
+        "native": "Jersey",
+        "region": "Europe",
+        "subregion": "Northern Europe",
+        "emoji": "🇯🇪",
+        "emojiU": "U+1F1EF U+1F1EA",
+        "states": []
+    }
+}

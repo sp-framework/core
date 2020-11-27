@@ -1,0 +1,17 @@
+{
+    "SGS": {
+        "id": 205,
+        "name": "South Georgia",
+        "iso3": "SGS",
+        "iso2": "GS",
+        "phone_code": "",
+        "capital": "Grytviken",
+        "currency": "GBP",
+        "native": "South Georgia",
+        "region": "Americas",
+        "subregion": "South America",
+        "emoji": "🇬🇸",
+        "emojiU": "U+1F1EC U+1F1F8",
+        "states": []
+    }
+}

@@ -43,6 +43,7 @@ return
 			"username" 			=> "' . $postData['username'] . '",
 			"password" 			=> "' . $postData['password'] . '",
 			"port" 				=> "' . $postData['port'] . '",
+			"charset" 	 	    => "utf8"
 		],
 		"cache"			=>
 		[

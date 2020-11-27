@@ -1,0 +1,17 @@
+{
+    "PYF": {
+        "id": 77,
+        "name": "French Polynesia",
+        "iso3": "PYF",
+        "iso2": "PF",
+        "phone_code": "689",
+        "capital": "Papeete",
+        "currency": "XPF",
+        "native": "Polynésie française",
+        "region": "Oceania",
+        "subregion": "Polynesia",
+        "emoji": "🇵🇫",
+        "emojiU": "U+1F1F5 U+1F1EB",
+        "states": []
+    }
+}

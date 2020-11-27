@@ -1,0 +1,17 @@
+{
+    "PRI": {
+        "id": 178,
+        "name": "Puerto Rico",
+        "iso3": "PRI",
+        "iso2": "PR",
+        "phone_code": "+1-787 and 1-939",
+        "capital": "San Juan",
+        "currency": "USD",
+        "native": "Puerto Rico",
+        "region": "Americas",
+        "subregion": "Caribbean",
+        "emoji": "🇵🇷",
+        "emojiU": "U+1F1F5 U+1F1F7",
+        "states": []
+    }
+}

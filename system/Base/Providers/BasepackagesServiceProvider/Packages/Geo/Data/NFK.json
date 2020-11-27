@@ -1,0 +1,17 @@
+{
+    "NFK": {
+        "id": 163,
+        "name": "Norfolk Island",
+        "iso3": "NFK",
+        "iso2": "NF",
+        "phone_code": "672",
+        "capital": "Kingston",
+        "currency": "AUD",
+        "native": "Norfolk Island",
+        "region": "Oceania",
+        "subregion": "Australia and New Zealand",
+        "emoji": "🇳🇫",
+        "emojiU": "U+1F1F3 U+1F1EB",
+        "states": []
+    }
+}

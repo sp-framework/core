@@ -1,0 +1,31 @@
+{
+	"name"			: "Currencies",
+	"displayName" 	: "Admin Currencies Package",
+	"description"	: "Package for Currencies component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-currencies",
+	"path"			: "/",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"application" : {
+			"name"		: "Admin",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/application-admin"
+		},
+		"components"	:
+		[{
+			"name"		: "Currencies",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/component-admin-currencies"
+		}],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

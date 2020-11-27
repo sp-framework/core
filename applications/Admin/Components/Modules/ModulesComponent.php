@@ -12,6 +12,12 @@ class ModulesComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		// $infoModule = $this->usePackage(Module::class)->moduleInfo();
+
+		// $infoModule->runProcess($this->getData());
+
+		// $this->view->module = $infoModule->packagesData->info;
+
 		$modules = $this->usePackage(ModulesPackage::class);
 
 		if (isset($this->getData()['filter']) && $this->getData()['filter'] !== '0') { //Filtering
@@ -84,6 +90,80 @@ class ModulesComponent extends BaseComponent
 			$this->view->responseCode = $modules->packagesData->responseCode;
 
 			$this->view->responseMessage = $modules->packagesData->responseMessage;
+		}
+	}
+
+	/**
+	 * @acl(name=add)
+	 */
+	public function addAction()
+	{
+		$modules = $this->usePackage(ModulesPackage::class);
+
+		$installModule = $modules->installModule($this->postData);
+
+		if ($installModule->packagesData['responseCode'] === 0) {
+
+			$this->view->responseCode = 0;
+
+			$this->view->responseMessage =
+				rtrim(ucfirst($this->postData['type'])) . ' ' . ucfirst($this->postData['name']) . ' Installed Successfully! ' .
+				'<br>Backup was successfully taken at location .backups/' . $installModule->packagesData['backupFile'];
+
+			$this->flash->now(
+				'success',
+				rtrim(ucfirst($this->postData['type'])) . ' ' .
+					ucfirst($this->postData['name']) . ' Installed Successfully! ' .
+					'<br>Backup was successfully taken at location .backups/' .
+					$installModule->packagesData['backupFile']
+			);
+
+			return $this->generateView();
+
+		} else if ($installModule->packagesData['responseCode'] === 1) {
+
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = $installModule->packagesData['responseMessage'];
+
+			return $this->generateView();
+		}
+	}
+
+	/**
+	 * @acl(name=update)
+	 */
+	public function updateAction()
+	{
+		$modules = $this->usePackage(ModulesPackage::class);
+
+		$updateModule = $modules->installModule($this->postData);
+
+		if ($updateModule->packagesData['responseCode'] === 0) {
+
+			$this->view->responseCode = 0;
+
+			$this->view->responseMessage =
+				rtrim(ucfirst($this->postData['type'])) . ' ' . ucfirst($this->postData['name']) . ' Updated Successfully! ' .
+				'<br>Backup was successfully taken at location .backups/' . $updateModule->packagesData['backupFile'];
+
+			$this->flash->now(
+				'success',
+				rtrim(ucfirst($this->postData['type'])) . ' ' .
+					ucfirst($this->postData['name']) . ' Updated Successfully! ' .
+					'<br>Backup was successfully taken at location .backups/' .
+					$updateModule->packagesData['backupFile']
+			);
+
+			return $this->generateView();
+
+		} else if ($updateModule->packagesData['responseCode'] === 1) {
+
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = $updateModule->packagesData['responseMessage'];
+
+			return $this->generateView();
 		}
 	}
 }

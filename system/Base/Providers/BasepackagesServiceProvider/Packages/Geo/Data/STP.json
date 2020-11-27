@@ -1,0 +1,62 @@
+{
+    "STP": {
+        "id": 193,
+        "name": "Sao Tome and Principe",
+        "iso3": "STP",
+        "iso2": "ST",
+        "phone_code": "239",
+        "capital": "Sao Tome",
+        "currency": "STD",
+        "native": "São Tomé e Príncipe",
+        "region": "Africa",
+        "subregion": "Middle Africa",
+        "emoji": "🇸🇹",
+        "emojiU": "U+1F1F8 U+1F1F9",
+        "states": [
+            {
+                "id": 270,
+                "name": "Príncipe Province",
+                "state_code": "P",
+                "cities": [
+                    {
+                        "id": 104837,
+                        "name": "Santo António",
+                        "latitude": "1.63943000",
+                        "longitude": "7.41951000"
+                    }
+                ]
+            },
+            {
+                "id": 271,
+                "name": "São Tomé Province",
+                "state_code": "S",
+                "cities": [
+                    {
+                        "id": 104835,
+                        "name": "Cantagalo District",
+                        "latitude": "0.21667000",
+                        "longitude": "6.70000000"
+                    },
+                    {
+                        "id": 104836,
+                        "name": "Caué District",
+                        "latitude": "0.13415000",
+                        "longitude": "6.63825000"
+                    },
+                    {
+                        "id": 104838,
+                        "name": "São Tomé",
+                        "latitude": "0.33654000",
+                        "longitude": "6.72732000"
+                    },
+                    {
+                        "id": 104839,
+                        "name": "Trindade",
+                        "latitude": "0.29667000",
+                        "longitude": "6.68139000"
+                    }
+                ]
+            }
+        ]
+    }
+}
