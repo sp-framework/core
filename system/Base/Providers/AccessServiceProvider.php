@@ -7,16 +7,16 @@ use Phalcon\Di\ServiceProviderInterface;
 use System\Base\Providers\AccessServiceProvider\Acl;
 use System\Base\Providers\AccessServiceProvider\Auth;
 use System\Base\Providers\AccessServiceProvider\Roles;
-use System\Base\Providers\AccessServiceProvider\Users;
+use System\Base\Providers\AccessServiceProvider\Accounts;
 
 class AccessServiceProvider implements ServiceProviderInterface
 {
     public function register(DiInterface $container) : void
     {
         $container->setShared(
-            'users',
+            'accounts',
             function () {
-                return (new Users())->init();
+                return (new Accounts())->init();
             }
         );
 
@@ -33,13 +33,13 @@ class AccessServiceProvider implements ServiceProviderInterface
             function () use ($container) {
                 $session = $container->getShared('session');
                 $cookies = $container->getShared('cookies');
-                $users = $container->getShared('users');
+                $accounts = $container->getShared('accounts');
                 $applications = $container->getShared('modules')->applications;
                 $secTools = $container->getShared('secTools');
                 $validation = $container->getShared('validation');
                 $logger = $container->getShared('logger');
                 $links = $container->getShared('links');
-                return (new Auth($session, $cookies, $users, $applications, $secTools, $validation, $logger, $links))->init();
+                return (new Auth($session, $cookies, $accounts, $applications, $secTools, $validation, $logger, $links))->init();
             }
         );
 

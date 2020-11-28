@@ -494,7 +494,8 @@ abstract class BaseComponent extends Controller
 		array $controlActions = null,
 		array $dtReplaceColumnsTitle = null,
 		array $dtReplaceColumns = null,
-		string $dtNotificationTextFromColumn = null
+		string $dtNotificationTextFromColumn = null,
+		array $dtAdditionControlButtons = null
 	)
 	{
 		if (gettype($package) === 'string') {
@@ -589,7 +590,8 @@ abstract class BaseComponent extends Controller
 						'dtNotificationTextFromColumn'  => $dtNotificationTextFromColumn,
 						'dtPagination'                  => true,
 						'dtPaginationCounters'          => $package->packagesData->paginationCounters,
-						'dtReplaceColumns'				=> $dtReplaceColumns
+						'dtReplaceColumns'				=> $dtReplaceColumns,
+						'dtAdditionControlButtons'		=> $dtAdditionControlButtons
 					]
 				);
 		}

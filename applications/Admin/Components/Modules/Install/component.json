@@ -39,10 +39,10 @@
 		"views"			: []
 	},
 	"menu"				: {
-		"seq"			: 1,
+		"seq"			: 2,
 		"modules"		: {
 			"title"		: "modules",
-			"icon"		: "th-large",
+			"icon"		: "th",
 			"link"		: "modules"
 		}
 	},

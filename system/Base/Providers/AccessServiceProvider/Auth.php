@@ -17,9 +17,9 @@ class Auth
 
     protected $cookies;
 
-    protected $users;
+    protected $accounts;
 
-    protected $user;
+    protected $account;
 
     protected $application;
 
@@ -33,13 +33,13 @@ class Auth
 
     public $packagesData;
 
-    public function __construct($session, $cookies, $users, $applications, $secTools, $validation, $logger, $links)
+    public function __construct($session, $cookies, $accounts, $applications, $secTools, $validation, $logger, $links)
     {
         $this->session = $session;
 
         $this->cookies = $cookies;
 
-        $this->users = $users;
+        $this->accounts = $accounts;
 
         $this->application = $applications->getApplicationInfo();
 
@@ -61,14 +61,14 @@ class Auth
 
     public function logout()
     {
-        if (!$this->user) {
+        if (!$this->account) {
             $this->setUserFromSession();
         }
 
-        $cookieKey = 'remember_' . $this->user['id'] . '_' . $this->getKey();
+        $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
 
-        if ($this->user) {
-            $this->clearUserRememberToken($cookieKey);
+        if ($this->account) {
+            $this->clearAccountRememberToken($cookieKey);
         }
 
         if ($this->cookies->has($cookieKey)) {
@@ -83,30 +83,30 @@ class Auth
             $this->session->remove($this->key);
         }
 
-        $this->logger->log->debug($this->user['email'] . ' logged out successfully from application: ' . $this->application['name']);
+        $this->logger->log->debug($this->account['email'] . ' logged out successfully from application: ' . $this->application['name']);
 
         return true;
     }
 
-    protected function clearUserRememberToken($cookieKey)
+    protected function clearAccountRememberToken($cookieKey)
     {
-        if ($this->user['session_id']) {
-            $this->user['session_id'] = null;
+        if ($this->account['session_id']) {
+            $this->account['session_id'] = null;
         }
 
-        if ($this->user['remember_identifier']) {
-            $this->user['remember_identifier'] = Json::decode($this->user['remember_identifier'], true);
-            unset($this->user['remember_identifier'][$cookieKey]);
-            $this->user['remember_identifier'] = Json::encode($this->user['remember_identifier']);
+        if ($this->account['remember_identifier']) {
+            $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
+            unset($this->account['remember_identifier'][$cookieKey]);
+            $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
         }
 
-        if ($this->user['remember_token']) {
-            $this->user['remember_token'] = Json::decode($this->user['remember_token'], true);
-            unset($this->user['remember_token'][$cookieKey]);
-            $this->user['remember_token'] = Json::encode($this->user['remember_token']);
+        if ($this->account['remember_token']) {
+            $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
+            unset($this->account['remember_token'][$cookieKey]);
+            $this->account['remember_token'] = Json::encode($this->account['remember_token']);
         }
 
-        $this->users->update($this->user);
+        $this->accounts->update($this->account);
 
         //Set cookies to 1 second so browser removes them.
         $this->cookies->set(
@@ -142,7 +142,7 @@ class Auth
             return false;
         }
 
-        if (!$this->checkUser($data)) {
+        if (!$this->checkAccount($data)) {
             return false;
         }
 
@@ -150,7 +150,7 @@ class Auth
 
         $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
 
-        if ($this->user['force_pwreset'] && $this->user['force_pwreset'] === '1') {
+        if ($this->account['force_pwreset'] && $this->account['force_pwreset'] === '1') {
 
             $this->packagesData->redirectUrl = $this->links->url('auth/q/pwreset/true');
 
@@ -159,59 +159,59 @@ class Auth
 
         $this->packagesData->redirectUrl = $this->links->url('/');
 
-        if ($this->secTools->passwordNeedsRehash($this->user['password'])) {
+        if ($this->secTools->passwordNeedsRehash($this->account['password'])) {
 
-            $this->user['password'] = $this->secTools->hashPassword($data['pass']);
-            $this->user['can_login'] = Json::encode($this->user['can_login']);
+            $this->account['password'] = $this->secTools->hashPassword($data['pass']);
+            $this->account['can_login'] = Json::encode($this->account['can_login']);
 
-            $this->users->update($this->user);
+            $this->accounts->update($this->account);
         }
 
         $this->setSessionAndToken($data);
 
-        $this->logger->log->debug($this->user['email'] . ' authenticated successfully on application ' . $this->application['name']);
+        $this->logger->log->debug($this->account['email'] . ' authenticated successfully on application ' . $this->application['name']);
 
         return true;
     }
 
-    protected function checkUser(array $data)
+    protected function checkAccount(array $data)
     {
-        $this->user = $this->users->checkUserByEmail($data['user']);
+        $this->account = $this->accounts->checkAccountByEmail($data['user']);
 
-        if ($this->user) {
-            if ($this->user['can_login']) {
-                $this->user['can_login'] = Json::decode($this->user['can_login'], true);
+        if ($this->account) {
+            if ($this->account['can_login']) {
+                $this->account['can_login'] = Json::decode($this->account['can_login'], true);
 
-                if (!isset($this->user['can_login'][$this->application['route']])) {//New Application OR New user via rego
+                if (!isset($this->account['can_login'][$this->application['route']])) {//New Application OR New account via rego
 
                     if ($this->application['can_login_role_ids']) {
 
                         $this->application['can_login_role_ids'] = Json::decode($this->application['can_login_role_ids'], true);
 
-                        if (in_array($this->user['role_id'], $this->application['can_login_role_ids'])) {
+                        if (in_array($this->account['role_id'], $this->application['can_login_role_ids'])) {
 
-                            $this->user['can_login'][$this->application['route']] = true;
+                            $this->account['can_login'][$this->application['route']] = true;
 
-                            $this->user['can_login'] = Json::encode($this->user['can_login']);
+                            $this->account['can_login'] = Json::encode($this->account['can_login']);
 
-                            $this->users->update($this->user);
+                            $this->accounts->update($this->account);
 
                         } else {
                             $this->packagesData->responseCode = 1;
 
                             $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                            $this->logger->log->debug($this->user['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
+                            $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
 
                             return false;
                         }
                     }
-                } else if (isset($this->user['can_login'][$this->application['route']]) && !$this->user['can_login'][$this->application['route']]) {//Not allowed for application
+                } else if (isset($this->account['can_login'][$this->application['route']]) && !$this->account['can_login'][$this->application['route']]) {//Not allowed for application
                     $this->packagesData->responseCode = 1;
 
                     $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                    $this->logger->log->debug($this->user['email'] . ' is not allowed to login to application ' . $this->application['name']);
+                    $this->logger->log->debug($this->account['email'] . ' is not allowed to login to application ' . $this->application['name']);
 
                     return false;
                 }
@@ -220,28 +220,28 @@ class Auth
 
                 $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                $this->logger->log->debug($this->user['email'] . ' is not allowed to login to application ' . $this->application['name']);
+                $this->logger->log->debug($this->account['email'] . ' is not allowed to login to application ' . $this->application['name']);
 
                 return false;
             }
 
-            if (!$this->secTools->checkPassword($data['pass'], $this->user['password'])) {//Password Fail
+            if (!$this->secTools->checkPassword($data['pass'], $this->account['password'])) {//Password Fail
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
 
-                $this->logger->log->debug('Incorrect username/password entered by user ' . $this->user['email'] . ' on application ' . $this->application['name']);
+                $this->logger->log->debug('Incorrect username/password entered by account ' . $this->account['email'] . ' on application ' . $this->application['name']);
 
                 return false;
             }
         } else {
-            $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the user exists.
+            $this->secTools->hashPassword(rand());//Randomize so we take same time to respond as if the account exists.
 
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
 
-            $this->logger->log->debug($data['user'] . ' is not in DB. Application: ' . $this->application['name']);
+            $this->logger->log->debug($data['account'] . ' is not in DB. Application: ' . $this->application['name']);
 
             return false;
         }
@@ -252,13 +252,13 @@ class Auth
     protected function setSessionAndToken(array $data)
     {
         if ($this->setUserSession()) {
-            $this->user['session_id'] = $this->session->getId();
+            $this->account['session_id'] = $this->session->getId();
 
-            if (is_array($this->user['can_login'])) {
-                $this->user['can_login'] = Json::encode($this->user['can_login']);
+            if (is_array($this->account['can_login'])) {
+                $this->account['can_login'] = Json::encode($this->account['can_login']);
             }
 
-            $this->users->update($this->user);
+            $this->accounts->update($this->account);
         }
 
         if (isset($data['remember']) && $data['remember'] === 'true') {
@@ -268,31 +268,31 @@ class Auth
 
     public function setUserFromCookie()
     {
-        $cookieKey = 'remember_' . $this->user['id'] . '_' . $this->getKey();
+        $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
 
-        $userToken = Json::decode($this->user['remember_token'], true)[$cookieKey];
+        $accountToken = Json::decode($this->account['remember_token'], true)[$cookieKey];
 
         list($identifier, $token) =
             explode($this->separator, $this->cookies->get($cookieKey)->getValue());
 
-        $identifierUser = $this->users->checkUserByIdentifier($identifier);
+        $identifierUser = $this->accounts->checkAccount($identifier);
 
-        if ($this->user !== $identifierUser) {
+        if ($this->account !== $identifierUser) {
 
             $this->cookies->delete($cookieKey);
 
             return;
         }
 
-        if (!$this->secTools->checkPassword($token, $userToken)) {
+        if (!$this->secTools->checkPassword($token, $accountToken)) {
 
-            $this->clearUserRememberToken($cookieKey);
+            $this->clearAccountRememberToken($cookieKey);
 
             $this->cookies->delete($cookieKey);
 
-            $this->logger->log->debug('Cannot set user : ' . $this->user['email'] . ' via cookie for application: ' . $this->application['name']);
+            $this->logger->log->debug('Cannot set account : ' . $this->account['email'] . ' via cookie for application: ' . $this->application['name']);
 
-            throw new \Exception('Cannot set user from cookie');
+            throw new \Exception('Cannot set account from cookie');
         }
     }
 
@@ -303,7 +303,7 @@ class Auth
 
     protected function setRememberToken()
     {
-        $cookieKey = 'remember_' . $this->user['id'] . '_' . $this->getKey();
+        $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
 
         list($identifier, $token) = $this->recallerGenerate();
 
@@ -321,23 +321,23 @@ class Auth
 
         $this->cookies->send();
 
-        if ($this->user['remember_identifier'] && $this->user['remember_identifier'] !== '') {
-            $this->user['remember_identifier'] = Json::decode($this->user['remember_identifier'], true);
+        if ($this->account['remember_identifier'] && $this->account['remember_identifier'] !== '') {
+            $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
         } else {
-            $this->user['remember_identifier'] = [];
+            $this->account['remember_identifier'] = [];
         }
-        $this->user['remember_identifier'][$cookieKey] = $identifier;
-        $this->user['remember_identifier'] = Json::encode($this->user['remember_identifier']);
+        $this->account['remember_identifier'][$cookieKey] = $identifier;
+        $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
 
-        if ($this->user['remember_token'] && $this->user['remember_token'] !== '') {
-            $this->user['remember_token'] = Json::decode($this->user['remember_token'], true);
+        if ($this->account['remember_token'] && $this->account['remember_token'] !== '') {
+            $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
         } else {
-            $this->user['remember_token'] = [];
+            $this->account['remember_token'] = [];
         }
-        $this->user['remember_token'][$cookieKey] = $this->secTools->hashPassword($token);
-        $this->user['remember_token'] = Json::encode($this->user['remember_token']);
+        $this->account['remember_token'][$cookieKey] = $this->secTools->hashPassword($token);
+        $this->account['remember_token'] = Json::encode($this->account['remember_token']);
 
-        $this->users->update($this->user);
+        $this->accounts->update($this->account);
     }
 
     protected function recallerGenerate()
@@ -345,9 +345,9 @@ class Auth
         return [bin2hex($this->secTools->random->bytes()), bin2hex($this->secTools->random->bytes())];
     }
 
-    public function user()
+    public function account()
     {
-        return $this->user;
+        return $this->account;
     }
 
     public function check()
@@ -377,19 +377,19 @@ class Auth
     public function setUserFromSession()
     {
         if ($this->session->get($this->getKey())) {
-            $this->user = $this->users->getById($this->session->get($this->getKey()));
+            $this->account = $this->accounts->getById($this->session->get($this->getKey()));
         } else {
             return false;
         }
 
-        if (!$this->user['session_id']) {
-            $this->logger->log->debug($this->user['email'] . ' session null, perhaps was forced logged out by Administrator.');
+        if (!$this->account['session_id']) {
+            $this->logger->log->debug($this->account['email'] . ' session null, perhaps was forced logged out by Administrator.');
 
             throw new \Exception('User session deleted in DB by administrator via force logout.');
         }
 
-        if (!$this->user) {
-            $this->logger->log->debug($this->user['email'] . ' not found in session for application: ' . $this->application['name']);
+        if (!$this->account) {
+            $this->logger->log->debug($this->account['email'] . ' not found in session for application: ' . $this->application['name']);
 
             throw new \Exception('User not found in session');
         }
@@ -397,7 +397,7 @@ class Auth
 
     protected function setUserSession()
     {
-        $this->session->set($this->getKey(), $this->user['id']);
+        $this->session->set($this->getKey(), $this->account['id']);
 
         return true;
     }
@@ -405,12 +405,12 @@ class Auth
     protected function validateData(array $data, $task)
     {
         if ($task === 'auth') {
-            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
         } else if ($task === 'forgot') {
-            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
         } else if ($task === 'reset') {
-            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid username."]);
+            $this->validation->add('user', PresenceOf::class, ["message" => "Enter valid user name."]);
             $this->validation->add('pass', PresenceOf::class, ["message" => "Enter valid password."]);
             $this->validation->add('newpass', PresenceOf::class, ["message" => "Enter valid new password."]);
             $this->validation->add('confirmnewpass', Confirmation::class,
@@ -447,16 +447,16 @@ class Auth
             return false;
         }
 
-        $this->user = $this->users->checkUserByEmail($data['user']);
+        $this->account = $this->accounts->checkAccount($data['account']);
 
-        if ($this->user) {
-            $this->user['force_logout'] = '1';
+        if ($this->account) {
+            $this->account['force_logout'] = '1';
 
-            $this->user['email_new_password'] = '1';
+            $this->account['email_new_password'] = '1';
 
-            $this->users->updateUser($this->user);
+            $this->accounts->updateAccount($this->account);
 
-            $this->logger->log->info('New password requested for user ' . $this->user['email'] . ' via forgot password. New password was emailed to the user.');
+            $this->logger->log->info('New password requested for account ' . $this->account['email'] . ' via forgot password. New password was emailed to the account.');
         }
 
         $this->packagesData->responseCode = 0;
@@ -478,16 +478,16 @@ class Auth
             return false;
         }
 
-        if (!$this->checkUser($data)) {
+        if (!$this->checkAccount($data)) {
             return false;
         }
 
-        $this->user['password'] = $this->secTools->hashPassword($data['newpass']);
-        $this->user['force_pwreset'] = null;
+        $this->account['password'] = $this->secTools->hashPassword($data['newpass']);
+        $this->account['force_pwreset'] = null;
         $this->setSessionAndToken($data);
-        $this->users->updateUser($this->user);
+        $this->accounts->updateAccount($this->account);
 
-        $this->logger->log->info('Password reset successfull for user ' . $this->user['email'] . ' via pwreset.');
+        $this->logger->log->info('Password reset successful for account ' . $this->account['email'] . ' via pwreset.');
 
         $this->packagesData->responseCode = 0;
 

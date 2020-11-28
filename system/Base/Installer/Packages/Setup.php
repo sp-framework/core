@@ -16,8 +16,8 @@ use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Repository as RegisterRepository;
-use System\Base\Installer\Packages\Setup\Register\Role as RegisterRootAdminRole;
-use System\Base\Installer\Packages\Setup\Register\User as RegisterUser;
+use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
+use System\Base\Installer\Packages\Setup\Register\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
@@ -34,8 +34,8 @@ use System\Base\Installer\Packages\Setup\Schema\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Repositories;
-use System\Base\Installer\Packages\Setup\Schema\Roles;
-use System\Base\Installer\Packages\Setup\Schema\Users;
+use System\Base\Installer\Packages\Setup\Schema\Users\Accounts;
+use System\Base\Installer\Packages\Setup\Schema\Users\Roles;
 use System\Base\Installer\Packages\Setup\Schema\Views;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
@@ -127,14 +127,6 @@ class Setup
 		$this->db->createTable('repositories', $dbName, (new Repositories)->columns());
 		$this->db->createTable('core', $dbName, (new Core)->columns());
 		$this->db->createTable('applications', $dbName, (new Applications)->columns(),);
-		// $applicationsRouteUnique = new Index(
-		// 	'column_UNIQUE',
-		// 	[
-		// 		'route',
-		// 	],
-		// 	'UNIQUE'
-		// );
-		// $this->db->addIndex('applications', $this->dbConfig['db']['dbname'], $applicationsRouteUnique);
 		$this->db->createTable('components', $dbName, (new Components)->columns());
 		$this->db->createTable('packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('middlewares', $dbName, (new Middlewares)->columns());
@@ -143,43 +135,11 @@ class Setup
 		$this->db->createTable('logs', $dbName, (new Logs)->columns());
 		$this->db->createTable('email_services', $dbName, (new EmailServices)->columns());
 		$this->db->createTable('domains', $dbName, (new Domains)->columns());
-		// $domainUnique = new Index(
-		// 	'column_UNIQUE',
-		// 	[
-		// 		'name',
-		// 	],
-		// 	'UNIQUE'
-		// );
-		// $this->db->addIndex('domains', $this->dbConfig['db']['dbname'], $domainUnique);
 		$this->db->createTable('menus', $dbName, (new Menus)->columns());
 		$this->db->createTable('filters', $dbName, (new Filters)->columns());
-		$this->db->createTable('users', $dbName, (new Users)->columns());
-		// $emailUnique = new Index(
-		// 	'column_UNIQUE',
-		// 	[
-		// 		'email',
-		// 	],
-		// 	'UNIQUE'
-		// );
-		// $this->db->addIndex('users', $this->dbConfig['db']['dbname'], $emailUnique);
+		$this->db->createTable('accounts', $dbName, (new Accounts)->columns());
 		$this->db->createTable('roles', $dbName, (new Roles)->columns());
-		// $roleNameUnique = new Index(
-		// 	'column_UNIQUE',
-		// 	[
-		// 		'name',
-		// 	],
-		// 	'UNIQUE'
-		// );
-		// $this->db->addIndex('roles', $this->dbConfig['db']['dbname'], $roleNameUnique);
 		$this->db->createTable('geo_countries', $dbName, (new Countries)->columns());
-		// $countriesNameUnique = new Index(
-		// 	'column_UNIQUE',
-		// 	[
-		// 		'name',
-		// 	],
-		// 	'UNIQUE'
-		// );
-		// $this->db->addIndex('geo_countries', $this->dbConfig['db']['dbname'], $countriesNameUnique);
 		$this->db->createTable('geo_states', $dbName, (new States)->columns());
 		$this->db->createTable('geo_cities', $dbName, (new Cities)->columns());
 	}
@@ -198,21 +158,13 @@ class Setup
 		(new RegisterCore())->register($installedFiles, $baseConfig, $this->db);
 	}
 
-	public function registerModule($type, $newApplicationId)
+	public function registerModule($type, $newApplicationId = null)
 	{
 
 		if ($type === 'applications') {
-			$jsonFile =
-				json_decode(
-					$this->localContent->read('applications/Admin/application.json'),
-					true
-				);
 
-			if (!$jsonFile) {
-				throw new \Exception('Problem reading application.json');
-			}
+			return $this->registerAdminApplication();
 
-			return $this->registerAdminApplication($jsonFile);
 		} else if ($type === 'components') {
 
 			$homeComponentId = null;
@@ -305,17 +257,18 @@ class Setup
 		}
 	}
 
-	protected function registerAdminApplication(array $applicationFile)
+	protected function registerAdminApplication()
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Admin/', false);
-
 		return
 			(new RegisterApplication())->register(
 				$this->db,
-				$applicationFile,
-				$installedFiles,
-				$this->postData['mode']
+				// $this->postData['mode']
 			);
+	}
+
+	public function updateAdminApplicationComponents()
+	{
+		return (new RegisterApplication())->update($this->db);
 	}
 
 	protected function registerAdminComponent(array $componentFile, $newApplicationId, $menuId)
@@ -390,11 +343,11 @@ class Setup
 		return (new RegisterRootAdminRole())->register($this->db);
 	}
 
-	public function registerAdminUser($newApplicationId, $adminRoleId)
+	public function registerAdminAccount($newApplicationId, $adminRoleId)
 	{
 		$password = $this->security->hash($this->postData['pass']);
 
-		return (new RegisterUser())->register($this->db, $this->postData['email'], $password, $newApplicationId, $adminRoleId);
+		return (new RegisterRootAdminAccount())->register($this->db, $this->postData['email'], $password, $newApplicationId, $adminRoleId);
 	}
 
 	public function registerCountryStatesCities()

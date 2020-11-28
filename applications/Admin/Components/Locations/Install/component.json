@@ -24,7 +24,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 2,
+        "seq"           : 3,
         "locations" : {
             "icon"      : "map-marker-alt",
             "title"     : "locations",

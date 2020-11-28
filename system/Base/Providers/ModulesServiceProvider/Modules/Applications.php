@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Applications as ApplicationsModel;
 
@@ -224,6 +225,71 @@ class Applications extends BasePackage
 			$defaultApplication['is_default'] = 0;
 
 			$this->modules->applications->update($defaultApplication);
+		}
+	}
+
+	public function addApplication(array $data)
+	{
+		if ($this->add($data)) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Added ' . $data['name'] . ' application';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error adding new application.';
+		}
+	}
+
+	public function updateApplication(array $data)
+	{
+		if ($data['middlewares']) {
+			$this->updateMiddlewares(Json::decode($data['middlewares'], true));
+		}
+
+		if ($this->update($data)) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' application';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error updating application.';
+		}
+	}
+
+	protected function updateMiddlewares(array $data)
+	{
+		foreach ($data['middlewares'] as $middlewareId => $status) {
+			$middleware = [];
+			$middleware['id'] = $middlewareId;
+			if ($status === true) {
+				$middleware['enabled'] = 1;
+			} else if ($status === false) {
+				$middleware['enabled'] = 0;
+			}
+			$this->modules->middlewares->update($middleware);
+		}
+
+		foreach ($data['sequence'] as $sequence => $middlewareId) {
+			$middleware = [];
+			$middleware['id'] = $middlewareId;
+			$middleware['sequence'] = $sequence;
+			$this->modules->middlewares->update($middleware);
+		}
+	}
+
+	public function removeApplication(array $data)
+	{
+		//Check relations before removing.
+		if ($this->remove($data['id'])) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Removed application';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error removing application.';
 		}
 	}
 }

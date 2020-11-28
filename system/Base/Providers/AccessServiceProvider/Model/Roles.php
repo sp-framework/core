@@ -16,5 +16,5 @@ class Roles extends BaseModel
 
     public $permissions;
 
-    public $users;
+    public $accounts;
 }

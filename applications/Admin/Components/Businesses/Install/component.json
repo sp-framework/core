@@ -24,7 +24,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 2,
+        "seq"           : 3,
         "businesses" : {
             "icon"      : "suitcase",
             "title"     : "businesses",

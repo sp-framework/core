@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Schema;
+namespace System\Base\Installer\Packages\Setup\Schema\Users;
 
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
@@ -45,7 +45,7 @@ class Roles
                         ]
                     ),
                     new Column(
-                        'users',
+                        'accounts',
                         [
                             'type'    => Column::TYPE_TEXT,
                             'notNull' => false,

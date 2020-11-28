@@ -44,18 +44,18 @@ class Domains extends BasePackage
 		$this->domain = $this->getNamedDomain($this->request->getHttpHost());
 
 		if ($this->domain) {
-			if ($this->domain['settings']) {
-				$this->domain['settings'] = Json::decode($this->domain['settings'], true);
+			if ($this->domain['allowed_application_ids']) {
+				$this->domain['allowed_application_ids'] = Json::decode($this->domain['allowed_application_ids'], true);
 			}
 		}
-		// foreach ($this->domain['settings'] as $key => $value) {
+		// foreach ($this->domain['allowed_application_ids'] as $key => $value) {
 		// 	if ($key !== 'defaultApplication') {
 		// 		if ($value['defaultComponent']) {
-		// 			$this->domain['settings'][$key]['defaultComponent'] =
+		// 			$this->domain['allowed_application_ids'][$key]['defaultComponent'] =
 		// 				$this->modules->components->getIdComponent($value['defaultComponent']);
 		// 		}
 		// 		if ($value['defaultViews']) {
-		// 			$this->domain['settings'][$key]['defaultViews'] =
+		// 			$this->domain['allowed_application_ids'][$key]['defaultViews'] =
 		// 				$this->modules->views->getIdView($value['defaultViews']);
 		// 		}
 		// 	}
@@ -161,12 +161,12 @@ class Domains extends BasePackage
 
 		$this->packagesData->applications = $applications;
 
-		$this->packagesData->emailservices = $this->emailservices->init()->getAll()->emailservices;
+		$this->packagesData->emailservices = $this->emailservices->init()->emailservices;
 
 		if ($did) {
 			$domain = $this->getById($did);
 
-			$domain['settings'] = Json::decode($domain['settings'], true);
+			$domain['allowed_application_ids'] = Json::decode($domain['allowed_application_ids'], true);
 
 			$this->packagesData->domain = $domain;
 

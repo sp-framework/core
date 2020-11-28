@@ -45,9 +45,7 @@ class BusinessesComponent extends BaseComponent
             }
 
             if ($this->getData()['id'] != 0) {
-                $business = $this->businesses->getById($this->getData()['id']);
-
-                $this->view->business = $business;
+                $this->view->business = $businesses[$this->getData()['id']];
 
                 unset($businesses[$this->getData()['id']]);
             }

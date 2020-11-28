@@ -1,12 +1,12 @@
 {
-    "route"         : "roles",
-    "name"          : "Roles",
-    "displayName"   : "Admin Roles Management",
-    "description"   : "Manage admin roles via this component",
+    "route"         : "accounts",
+    "name"          : "Accounts",
+    "displayName"   : "Admin Accounts Management",
+    "description"   : "List accounts via this component",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-admin-roles",
+    "repo"          : "https://github.com/h-w-f/component-admin-accounts",
     "path"          : "/",
-    "class"         : "Applications\\Admin\\Components\\Roles\\RolesComponent",
+    "class"         : "Applications\\Admin\\Components\\Accounts\\AccountsComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -29,9 +29,9 @@
             "title"     : "users",
             "icon"      : "users",
             "childs"    : {
-                "roles"   : {
-                    "title"     : "Roles",
-                    "link"      : "roles"
+                "accounts"   : {
+                    "title"     : "Accounts",
+                    "link"      : "accounts"
                 }
             }
         }

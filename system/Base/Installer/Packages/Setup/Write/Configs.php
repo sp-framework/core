@@ -20,15 +20,15 @@ class Configs
 			$postData['username'] = '';
 		}
 
-		if ($postData['mode'] === 'production') {
-			$debug = "false";
-			$cache = "true";
-			$logLevel = "INFO";
-		} else if ($postData['mode'] === 'development') {
+		// if ($postData['mode'] === 'production') {
+		// 	$debug = "false";
+		// 	$cache = "true";
+		// 	$logLevel = "INFO";
+		// } else if ($postData['mode'] === 'development') {
 			$debug = "true";
 			$cache = "false";
 			$logLevel = "DEBUG";
-		}
+		// }
 
 		$baseContent =
 '<?php

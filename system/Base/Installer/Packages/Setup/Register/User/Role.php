@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Register;
+namespace System\Base\Installer\Packages\Setup\Register\User;
 
 use Phalcon\Helper\Json;
 
@@ -14,7 +14,7 @@ class Role
                 'name'              => 'System Administrators',
                 'description'       => 'System Administrators Role',
                 'permissions'       => Json::encode([]),
-                'users'             => Json::encode([1])
+                'accounts'          => Json::encode([1])
             ]
         );
 

@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Register;
+namespace System\Base\Installer\Packages\Setup\Register\User;
 
 use Phalcon\Helper\Json;
 
-class User
+class Account
 {
     public function register($db, $email, $password, $newApplicationId, $adminRoleId)
     {
@@ -16,7 +16,7 @@ class User
             );
 
         $insertAdmin = $db->insertAsDict(
-            'users',
+            'accounts',
             [
                 'email'                 => $email,
                 'password'              => $password,

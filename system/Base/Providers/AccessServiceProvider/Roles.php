@@ -14,6 +14,13 @@ class Roles extends BasePackage
 
     public $roles;
 
+    public function init(bool $resetCache = false)
+    {
+        $this->getAll($resetCache);
+
+        return $this;
+    }
+
     public function addRole(array $data)
     {
         if ($this->add($data)) {
@@ -46,18 +53,18 @@ class Roles extends BasePackage
 
             $role = $this->getById($data['id']);
 
-            $users = Json::decode($role['users'], true);
+            $accounts = Json::decode($role['accounts'], true);
 
-            if (count($users) > 0) {
+            if (count($accounts) > 0) {
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Role has users assigned to it. Cannot removes role.';
+                $this->packagesData->responseMessage = 'Role has accounts assigned to it. Cannot removes role.';
 
                 return false;
             }
 
             if ($this->remove($data['id'])) {
-                //Check users assigned to the role
+                //Check accounts assigned to the role
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = 'Removed role';

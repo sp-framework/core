@@ -2,30 +2,24 @@
 
 namespace System\Base\Installer\Packages\Setup\Register;
 
+use Phalcon\Db\Enum;
+use Phalcon\Helper\Json;
+
 class Application
 {
-	public function register($db, $applicationFile, $installedFiles, $mode)
+	public function register($db)
 	{
 		$insertApplication = $db->insertAsDict(
 			'applications',
 			[
-				'route' 				=> $applicationFile['route'],
-				'name' 					=> $applicationFile['name'],
-				'display_name' 			=> $applicationFile['displayName'],
-				'description' 			=> $applicationFile['description'],
-				'version'				=> $applicationFile['version'],
-				'repo'					=> $applicationFile['repo'],
-				'settings'			 	=>
-					isset($applicationFile['settings']) ?
-					json_encode($applicationFile['settings']) :
-					null,
-				'dependencies'		 	=>
-					isset($applicationFile['dependencies']) ?
-					json_encode($applicationFile['dependencies']) :
-					null,
-				'installed'				=> 1,
-				'files'					=> json_encode($installedFiles),
-				'mode'					=> $mode === 'true' ? 0 : 1
+				'name' 						=> 'Admin',
+				'route' 					=> 'admin',
+				'description' 				=> 'Application Admin',
+				'category'	    			=> 0,
+				'default_component'			=> 0,
+				'default_errors_component'	=> 0,
+				'default_view'				=> 1,
+				'can_login_role_ids'		=> Json::encode(['1']),
 			]
 		);
 
@@ -34,5 +28,35 @@ class Application
 		} else {
 			return null;
 		}
+	}
+
+	public function update($db)
+	{
+		$homeComponent =
+			$db->fetchAll(
+				"SELECT * FROM components WHERE route LIKE :route",
+				Enum::FETCH_ASSOC,
+				[
+					"route" => "home",
+				]
+			);
+
+		$errorsComponent =
+			$db->fetchAll(
+				"SELECT * FROM components WHERE route LIKE :route",
+				Enum::FETCH_ASSOC,
+				[
+					"route" => "errors",
+				]
+			);
+
+		$db->updateAsDict(
+			'applications',
+			[
+				'default_component' 			=> $homeComponent[0]['id'],
+				'default_errors_component' 		=> $errorsComponent[0]['id']
+			],
+			"id = 1"
+		);
 	}
 }

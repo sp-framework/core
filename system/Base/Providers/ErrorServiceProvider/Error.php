@@ -31,17 +31,17 @@ class Error
 
 	public function init()
 	{
-		if ($this->applicationInfo) {
-			if ($this->applicationInfo['mode'] === 0) {
-				$this->applicationDebug = false;
-			} else if ($this->applicationInfo['mode'] === 1) {
-				$this->applicationDebug = true;
-			} else {
-				$this->applicationDebug = (bool) $this->config->debug;
-			}
-		} else {
+		// if ($this->applicationInfo) {
+		// 	if ($this->applicationInfo['mode'] === 0) {
+		// 		$this->applicationDebug = false;
+		// 	} else if ($this->applicationInfo['mode'] === 1) {
+		// 		$this->applicationDebug = true;
+		// 	} else {
+		// 		$this->applicationDebug = (bool) $this->config->debug;
+		// 	}
+		// } else {
 			$this->applicationDebug = (bool) $this->config->debug;
-		}
+		// }
 
 		if ($this->applicationDebug) {
 			error_reporting(-1);

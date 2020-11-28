@@ -6,11 +6,11 @@ class Component
 {
 	public function register($db, $componentFile, $installedFiles, $newApplicationId, $menuId)
 	{
-		$insertComponent =  $db->insertAsDict(
+		$db->insertAsDict(
 			'components',
 			[
-				'route'					=> $componentFile['route'],
 				'name' 					=> $componentFile['name'],
+				'route'					=> $componentFile['route'],
 				'display_name' 			=> $componentFile['displayName'],
 				'description' 			=> $componentFile['description'],
 				'version'				=> $componentFile['version'],
@@ -30,12 +30,5 @@ class Component
 				'files'					=> json_encode($installedFiles)
 			]
 		);
-
-		if ($insertComponent) {
-			if ($componentFile['route'] === 'home') {
-				return $db->lastInsertId();
-			}
-		}
-		return null;
 	}
 }

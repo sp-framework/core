@@ -6,21 +6,21 @@ use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
-use System\Base\Providers\AccessServiceProvider\Model\Users as UsersModel;
+use System\Base\Providers\AccessServiceProvider\Model\Accounts as AccountsModel;
 
-class Users extends BasePackage
+class Accounts extends BasePackage
 {
-    protected $modelToUse = UsersModel::class;
+    protected $modelToUse = AccountsModel::class;
 
-    protected $packageName = 'users';
+    protected $packageName = 'accounts';
 
-    public $users;
+    public $accounts;
 
-    public function addUser(array $data)
+    public function addAccount(array $data)
     {
         $data['email'] = strtolower($data['email']);
 
-        if ($this->checkUserByEmail($data['email'])) {
+        if ($this->checkAccountByEmail($data['email'])) {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'Account already exists!';
@@ -35,9 +35,9 @@ class Users extends BasePackage
 
             $data['password'] = $this->secTools->hashPassword($password);
 
-            $newUser = $this->add($data);
+            $newAccount = $this->add($data);
 
-            if ($newUser) {
+            if ($newAccount) {
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = 'Account added';
@@ -52,14 +52,14 @@ class Users extends BasePackage
 
                 $id = $this->packagesData->last['id'];
 
-                $this->updateRoleUsers($data['role_id'], $id);
+                $this->updateRoleAccounts($data['role_id'], $id);
 
                 return true;
             }
         } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error adding user account.';
+            $this->packagesData->responseMessage = 'Error adding account.';
 
             return false;
         }
@@ -67,14 +67,14 @@ class Users extends BasePackage
         return true;
     }
 
-    public function updateUser(array $data)
+    public function updateAccount(array $data)
     {
-        $user = $this->getById($data['id']);
+        $account = $this->getById($data['id']);
 
-        if (!$user) {
+        if (!$account) {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'User Not Found.';
+            $this->packagesData->responseMessage = 'Account Not Found.';
 
             return false;
         }
@@ -102,41 +102,41 @@ class Users extends BasePackage
                 }
             }
 
-            $this->updateRoleUsers($data['role_id'], $data['id'], $user['role_id']);
+            $this->updateRoleAccounts($data['role_id'], $data['id'], $account['role_id']);
 
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['email'] . ' user';
+            $this->packagesData->responseMessage = 'Updated ' . $data['email'] . ' account';
         } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error updating user.';
+            $this->packagesData->responseMessage = 'Error updating account.';
         }
     }
 
-    public function removeUser(array $data)
+    public function removeAccount(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
 
             if ($this->remove($data['id'])) {
                 $this->packagesData->responseCode = 0;
 
-                $this->packagesData->responseMessage = 'Removed user';
+                $this->packagesData->responseMessage = 'Removed account';
             } else {
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Error removing user.';
+                $this->packagesData->responseMessage = 'Error removing account.';
             }
         } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Cannot remove default user.';
+            $this->packagesData->responseMessage = 'Cannot remove default account.';
         }
     }
 
-    public function checkUserByEmail(string $email)
+    public function checkAccountByEmail(string $email)
     {
-        $user =
+        $account =
             $this->getByParams(
                     [
                         'conditions'    => 'email = :email:',
@@ -149,16 +149,16 @@ class Users extends BasePackage
                     false
                 );
 
-        if ($user) {
-            return $user[0];
+        if ($account) {
+            return $account[0];
         } else {
             return false;
         }
     }
 
-    public function checkUserByIdentifier(string $rememberIdentifier)
+    public function checkAccountByIdentifier(string $rememberIdentifier)
     {
-        $user =
+        $account =
             $this->getByParams(
                     [
                         'conditions'    => 'remember_identifier = :ri:',
@@ -171,8 +171,8 @@ class Users extends BasePackage
                     false
                 );
 
-        if ($user) {
-            return $user[0];
+        if ($account) {
+            return $account[0];
         } else {
             return false;
         }
@@ -218,35 +218,35 @@ class Users extends BasePackage
         }
     }
 
-    protected function updateRoleUsers(int $rid, int $id, int $oldRid = null)
+    protected function updateRoleAccounts(int $rid, int $id, int $oldRid = null)
     {
         if ($oldRid) {
             $oldRole = $this->roles->getById($oldRid);
 
-            if ($oldRole['users']) {
-                $oldRole['users'] = Json::decode($oldRole['users'], true);
+            if ($oldRole['accounts']) {
+                $oldRole['accounts'] = Json::decode($oldRole['accounts'], true);
 
-                $key = array_keys($oldRole['users'], $id);
+                $key = array_keys($oldRole['accounts'], $id);
                 if ($key) {
-                    unset($oldRole['users'][$key[0]]);
+                    unset($oldRole['accounts'][$key[0]]);
                 }
 
-                $oldRole['users'] = Json::encode($oldRole['users']);
+                $oldRole['accounts'] = Json::encode($oldRole['accounts']);
 
                 $this->roles->update($oldRole);
             }
         }
         $role = $this->roles->getById($rid);
 
-        if ($role['users']) {
-            $role['users'] = Json::decode($role['users'], true);
+        if ($role['accounts']) {
+            $role['accounts'] = Json::decode($role['accounts'], true);
         } else {
-            $role['users'] = [];
+            $role['accounts'] = [];
         }
 
-        array_push($role['users'], $id);
+        array_push($role['accounts'], $id);
 
-        $role['users'] = Json::encode($role['users']);
+        $role['accounts'] = Json::encode($role['accounts']);
 
         $this->roles->update($role);
     }
@@ -294,18 +294,18 @@ class Users extends BasePackage
         }
 
         if ($uid) {
-            $user = $this->getById($uid);
+            $account = $this->getById($uid);
 
-            if ($user) {
+            if ($account) {
 
-                if ($user['can_login'] && $user['can_login'] !== '') {
-                    $user['can_login'] = Json::decode($user['can_login'], true);
+                if ($account['can_login'] && $account['can_login'] !== '') {
+                    $account['can_login'] = Json::decode($account['can_login'], true);
                 } else {
-                    $user['can_login'] = [];
+                    $account['can_login'] = [];
                 }
 
-                if ($user['permissions'] && $user['permissions'] !== '') {
-                    $permissionsArr = Json::decode($user['permissions'], true);
+                if ($account['permissions'] && $account['permissions'] !== '') {
+                    $permissionsArr = Json::decode($account['permissions'], true);
                 } else {
                     $permissionsArr = [];
                 }
@@ -334,21 +334,21 @@ class Users extends BasePackage
                 }
                 $this->packagesData->acls = Json::encode($acls);
 
-                $user['permissions'] = Json::encode($permissions);
+                $account['permissions'] = Json::encode($permissions);
 
-                $this->packagesData->user = $user;
+                $this->packagesData->account = $account;
 
             } else {
 
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'User Not Found!';
+                $this->packagesData->responseMessage = 'Account Not Found!';
 
                 return false;
             }
 
         } else {
-            $user = [];
+            $account = [];
             $permissions = [];
 
             foreach ($applicationsArr as $applicationKey => $application) {
@@ -371,8 +371,8 @@ class Users extends BasePackage
             }
 
             $this->packagesData->acls = Json::encode($acls);
-            $user['permissions'] = Json::encode($permissions);
-            $this->packagesData->user = $user;
+            $account['permissions'] = Json::encode($permissions);
+            $this->packagesData->account = $account;
         }
 
         $this->packagesData->applications = $applicationsArr;

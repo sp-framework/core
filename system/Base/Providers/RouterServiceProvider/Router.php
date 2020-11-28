@@ -297,8 +297,8 @@ class Router
 
 		$this->applicationInfo = $this->applications->getApplicationInfo();
 
-		if (isset($this->domain['settings']['applications'][$this->applicationInfo['id']]['allowed']) &&
-			!$this->domain['settings']['applications'][$this->applicationInfo['id']]['allowed']
+		if (isset($this->domain['allowed_application_ids'][$this->applicationInfo['id']]) &&
+			!$this->domain['allowed_application_ids'][$this->applicationInfo['id']]
 		) {
 			$this->logger->log->alert(
 				'Trying to access application ' . $this->applicationInfo['name'] .
@@ -308,18 +308,18 @@ class Router
 			return false;
 		}
 
-		if (!isset($this->domain['settings']['applications'][$this->applicationInfo['id']])) {
+		if (!isset($this->domain['allowed_application_ids'][$this->applicationInfo['id']])) {
 			return false;
 		}
 
 		$this->applicationDefaults['id'] = $this->applicationInfo['id'];
 		$this->applicationDefaults['application'] = $this->applicationInfo['route'];
 		$this->applicationDefaults['component'] =
-			$this->components->getIdComponent($this->domain['settings']['applications'][$this->applicationInfo['id']]['defaultComponent'])['route'];
+			$this->components->getIdComponent($this->applicationInfo['default_component'])['route'];
 		$this->applicationDefaults['errorComponent'] =
-			$this->components->getIdComponent($this->domain['settings']['applications'][$this->applicationInfo['id']]['errorComponent'])['route'];
+			$this->components->getIdComponent($this->applicationInfo['default_errors_component'])['route'];
 		$this->applicationDefaults['view'] =
-			$this->views->getIdViews($this->domain['settings']['applications'][$this->applicationInfo['id']]['defaultViews'])['name'];
+			$this->views->getIdViews($this->applicationInfo['default_view'])['name'];
 
 		return true;
 	}

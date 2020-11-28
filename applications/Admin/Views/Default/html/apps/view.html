@@ -1,0 +1,32 @@
+{% if application['id'] is defined %}
+    {% set applicationId = application['id'] %}
+{% else %}
+    {% set applicationId = '' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'th-large',
+        'cardTitle'                     : componentName,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'apps/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : applicationId,
+            'addActionUrl'                  : 'apps/add',
+            'addSuccessRedirectUrl'         : 'apps',
+            'updateActionUrl'               : 'apps/update',
+            'updateSuccessRedirectUrl'      : 'apps',
+            'cancelActionUrl'               : 'apps',
+            'closeActionUrl'                : 'apps'
+        ]
+    ]
+)}}

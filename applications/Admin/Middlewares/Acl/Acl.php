@@ -16,9 +16,9 @@ class Acl extends BaseMiddleware
 
     protected $action;
 
-    protected $user;
+    protected $account;
 
-    protected $userEmail;
+    protected $accountEmail;
 
     protected $role;
 
@@ -49,9 +49,13 @@ class Acl extends BaseMiddleware
             $roles[$value['id']] = $value;
         }
 
-        $this->user = $this->auth->user();
+        $this->account = $this->auth->account();
 
-        if ($this->user['role_id'] === '1') {//Systems Administrators
+        if (!$this->account) {
+            $this->checkAuthAclMiddlewareSequence();
+        }
+
+        if ($this->account['role_id'] === '1') {//Systems Administrators
             return;
         }
 
@@ -61,36 +65,36 @@ class Acl extends BaseMiddleware
         $this->controller = $this->dispatcher->getControllerName();
         $this->action = str_replace('Action', '', $this->dispatcher->getActiveMethod());
 
-        if ($this->user && $this->user['override_role'] === '1') {
-            $this->userEmail = str_replace('.', '', str_replace('@', '', $this->user['email']));
+        if ($this->account && $this->account['override_role'] === '1') {
+            $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
-            if ($this->localContent->has($aclFileDir . $this->userEmail . $this->user['id'])) {
+            if ($this->localContent->has($aclFileDir . $this->accountEmail . $this->account['id'])) {
 
-                $this->acl = unserialize($this->localContent->read($aclFileDir . $this->userEmail . $this->user['id']));
+                $this->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
 
             } else {
 
                 $this->acl->addRole(
-                    new Role($this->userEmail, 'User Override Role')
+                    new Role($this->accountEmail, 'User Override Role')
                 );
-                $permissions = Json::decode($this->user['permissions'], true);
+                $permissions = Json::decode($this->account['permissions'], true);
 
                 $this->generateComponentsArr();
 
                 foreach ($permissions as $componentKey => $permission) {
-                    $this->buildAndTestAcl($this->userEmail, $componentKey, $permission);
+                    $this->buildAndTestAcl($this->accountEmail, $componentKey, $permission);
                 }
 
                 if ($this->config->cache->enabled) {
-                    $this->localContent->put($aclFileDir . $this->userEmail . $this->user['id'], serialize($this->acl));
+                    $this->localContent->put($aclFileDir . $this->accountEmail . $this->account['id'], serialize($this->acl));
                 }
             }
 
-            if (!$this->acl->isAllowed($this->userEmail, $this->controller, $this->action)) {
+            if (!$this->acl->isAllowed($this->accountEmail, $this->controller, $this->action)) {
                 throw new PermissionDeniedException();
             }
         } else {
-            $this->role = $roles[$this->user['role_id']];
+            $this->role = $roles[$this->account['role_id']];
 
             $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
 
@@ -138,9 +142,9 @@ class Acl extends BaseMiddleware
         // var_dump($permission[$this->action]);
         if ($permission[$this->action] === 1) {
             $this->acl->allow($name, $componentName, $this->action);
-            $this->logger->log->debug('User ' . $this->userEmail . ' granted access to component ' . $componentName . ' for action ' . $this->action);
+            $this->logger->log->debug('User ' . $this->accountEmail . ' granted access to component ' . $componentName . ' for action ' . $this->action);
         } else {
-            $this->logger->log->debug('User ' . $this->userEmail . ' denied access to component ' . $componentName . ' for action ' . $this->action);
+            $this->logger->log->debug('User ' . $this->accountEmail . ' denied access to component ' . $componentName . ' for action ' . $this->action);
         }
     }
 
@@ -175,6 +179,21 @@ class Acl extends BaseMiddleware
                     }
                 }
             }
+        }
+    }
+
+    protected function checkAuthAclMiddlewareSequence()
+    {
+        $acl = $this->modules->middlewares->getNamedMiddlewareForApplication('Acl', $this->modules->applications->getApplicationInfo()['id']);
+        $aclSequence = (int) $acl['sequence'];
+
+        $authSequence = (int) $this->modules->middlewares->getNamedMiddlewareForApplication('Auth', $this->modules->applications->getApplicationInfo()['id'])['sequence'];
+
+        if ($aclSequence < $authSequence) {
+            $acl['sequence'] = 99;
+            $this->modules->middlewares->update($acl);
+
+            throw new \Exception('ACL middleware sequence is lower then Auth middleware sequence, which is wrong. You need to authenticate before we can apply ACL. I have fixed the problem by changing the ACL middleware sequence to 99.');
         }
     }
 }

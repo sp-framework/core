@@ -79,20 +79,20 @@
 													</div>
 												</div>
 											</div>
-											<div class="col text-center">
+<!-- 											<div class="col text-center">
 												<div class="btn-group btn-group-toggle" data-toggle="buttons">
 													<label class="btn btn-secondary">
-														<input type="radio" name="mode-options" class="mode-options" id="production">Production
+														<input type="radio" name="debug-options" class="debug-options" id="production">Production
 													</label>
 													<label class="btn btn-primary active">
-														<input type="radio" name="mode-options" class="mode-options" id="development" checked>Development
+														<input type="radio" name="debug-options" class="debug-options" id="development" checked>Development
 													</label>
 												</div>
-											</div>
+											</div> -->
 										</div>
 									</div>
 									<div class="col-6 p-3">
-										<legend>Admin User</legend>
+										<legend>Admin Account</legend>
 										<div class="form-group">
 											<label for="email">Email *</label>
 											<div class="input-group">
@@ -216,7 +216,7 @@
 								"username"      : $('#username').val(),
 								"password"      : $('#password').val(),
 								"drop"          : $('#drop')[0].checked,
-								"mode"          : $("input[name='mode-options']:checked")[0].id,
+								// "debug"         : $("input[name='debug-options']:checked")[0].id,
 								"email"      	: $('#email').val(),
 								"pass"      	: $('#pass').val(),
 								"country"      	: $('#country').val()
@@ -257,7 +257,7 @@
 				}
 			});
 
-			$('.mode-options').each(function(index, option) {
+			$('.debug-options').each(function(index, option) {
 				$($(option).parent()).click(function() {
 					var selectedOptionId = $(this).children()[0].id;
 

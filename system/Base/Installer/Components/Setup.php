@@ -103,11 +103,13 @@ Class Setup
 
 				$this->setupPackage->registerCore($baseConfig);
 
-				$adminApplicationId = $this->setupPackage->registerModule('applications', null);
+				$adminApplicationId = $this->setupPackage->registerModule('applications');
 
 				if ($adminApplicationId) {
 
-					$homeComponentId = $this->setupPackage->registerModule('components', $adminApplicationId);
+					$this->setupPackage->registerModule('components', $adminApplicationId);
+
+					$this->setupPackage->updateAdminApplicationComponents();
 
 					$this->setupPackage->registerModule('packages', $adminApplicationId);
 
@@ -115,15 +117,15 @@ Class Setup
 
 					$this->setupPackage->registerModule('views', $adminApplicationId);
 
-					$this->setupPackage->registerDomain($homeComponentId);
+					$this->setupPackage->registerDomain();
 
 					$adminRoleId = $this->setupPackage->registerRootAdminRole();
 
 					if ($adminRoleId) {
-						$this->setupPackage->registerAdminUser($adminApplicationId, $adminRoleId);
+						$this->setupPackage->registerAdminAccount($adminApplicationId, $adminRoleId);
 					}
 
-					$this->setupPackage->registerCountryStatesCities();
+					// $this->setupPackage->registerCountryStatesCities();
 				}
 
 				// $this->setupPackage->removeInstaller();

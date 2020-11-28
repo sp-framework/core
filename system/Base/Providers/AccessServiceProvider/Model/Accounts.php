@@ -4,7 +4,7 @@ namespace System\Base\Providers\AccessServiceProvider\Model;
 
 use System\Base\BaseModel;
 
-class Users extends BaseModel
+class Accounts extends BaseModel
 {
     public $id;
 

@@ -327,12 +327,26 @@ class Tree extends AdminLTETags
                 //     $numeric = '';
                 // }
                 // var_dump($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']);
-                if ($key == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
-                    $this->content .=
-                        '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . ucfirst($value) . '</option>';
+                if (is_array($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) &&
+                    count($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) > 0
+                ) {
+                    foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'] as $selectArrKey => $selectArrValue) {
+                        if ($key == $selectArrValue) {
+                            $this->content .=
+                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . ucfirst($value) . '</option>';
+                        } else {
+                            $this->content .=
+                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . ucfirst($value) . '</option>';
+                        }
+                    }
                 } else {
-                    $this->content .=
-                        '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . ucfirst($value) . '</option>';
+                    if ($key == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
+                        $this->content .=
+                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . ucfirst($value) . '</option>';
+                    } else {
+                        $this->content .=
+                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . ucfirst($value) . '</option>';
+                    }
                 }
             }
         }

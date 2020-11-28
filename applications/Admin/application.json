@@ -1,46 +1,6 @@
 {
-	"route"			: "admin",
 	"name"			: "Admin",
-	"displayName" 	: "Admin Application",
+	"route"			: "admin",
 	"description" 	: "Admin Application",
-	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/application-admin",
-	"dependencies"	: {
-		"core"			: {
-			"name"		: "Core",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/core"
-		},
-		"components"	:
-		[{
-			"name"		: "Modules",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/component-admin-modules"
-		}],
-		"packages"		:
-		[{
-			"name"		: "Modules",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/package-admin-modules"
-		}],
-		"middlewares"	: [],
-		"views"			:
-		[{
-			"name"		: "Default",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/view-admin-default"
-		}]
-	},
-	"settings"		: {
-		"email"				: {
-			"enabled"			: false,
-			"encryption"	 	: "",
-			"allow_html_body"	: "",
-			"host"				: "",
-			"port"				: "",
-			"auth" 				: "",
-			"username"			: "",
-			"password"			: ""
-		}
-	}
+	"settings"		: { }
 }

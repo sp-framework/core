@@ -1,11 +1,11 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Schema;
+namespace System\Base\Installer\Packages\Setup\Schema\Users;
 
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 
-class Users
+class Accounts
 {
     public function columns()
     {

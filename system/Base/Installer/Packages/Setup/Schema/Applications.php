@@ -22,14 +22,6 @@ class Applications
 					]
 				),
 				new Column(
-					'route',
-					[
-						'type'    => Column::TYPE_VARCHAR,
-						'size'    => 50,
-						'notNull' => true,
-					]
-				),
-				new Column(
 					'name',
 					[
 						'type'    => Column::TYPE_VARCHAR,
@@ -38,11 +30,11 @@ class Applications
 					]
 				),
 				new Column(
-					'display_name',
+					'route',
 					[
 						'type'    => Column::TYPE_VARCHAR,
 						'size'    => 50,
-						'notNull' => false,
+						'notNull' => true,
 					]
 				),
 				new Column(
@@ -54,72 +46,47 @@ class Applications
 					]
 				),
 				new Column(
-					'version',
-					[
-						'type'    => Column::TYPE_VARCHAR,
-						'size'    => 15,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'repo',
-					[
-						'type'    => Column::TYPE_VARCHAR,
-						'size'    => 2048,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'settings',
-					[
-						'type'    => Column::TYPE_TEXT,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'dependencies',
-					[
-						'type'    => Column::TYPE_TEXT,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'installed',
+					'category',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
 						'size'    => 1,
 						'notNull' => true,
 					]
 				),
+				// new Column(
+				// 	'debug',
+				// 	[
+				// 		'type'    => Column::TYPE_TINYINTEGER,
+				// 		'size'    => 1,
+				// 		'notNull' => true,
+				// 	]
+				// ),
 				new Column(
-					'files',
-					[
-						'type'    => Column::TYPE_TEXT,
-						'notNull' => false,
-					]
-				),
-				new Column(
-					'update_available',
-					[
-						'type'    => Column::TYPE_TINYINTEGER,
-						'size'    => 1,
-						'notNull' => false,
-					]
-				),
-				new Column(
-					'update_version',
-					[
-						'type'    => Column::TYPE_VARCHAR,
-						'size'    => 15,
-						'notNull' => false,
-					]
-				),
-				new Column(
-					'mode',
+					'default_component',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
-						'size'    => 1,
 						'notNull' => true,
+					]
+				),
+				new Column(
+					'default_errors_component',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => true,
+					]
+				),
+				new Column(
+					'default_view',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => true,
+					]
+				),
+				new Column(
+					'default_email_service',
+					[
+						'type'    => Column::TYPE_TINYINTEGER,
+						'notNull' => false,
 					]
 				),
 				new Column(
@@ -148,16 +115,78 @@ class Applications
 					'can_login_role_ids',
 					[
 						'type'    => Column::TYPE_VARCHAR,
-						'size'    => 2048,
+						'size'    => 4096,
 						'notNull' => false,
 					]
-				)
+				),
+				new Column(
+					'settings',
+					[
+						'type'    => Column::TYPE_TEXT,
+						'notNull' => false,
+					]
+				),
+				// new Column(
+				// 	'version',
+				// 	[
+				// 		'type'    => Column::TYPE_VARCHAR,
+				// 		'size'    => 15,
+				// 		'notNull' => true,
+				// 	]
+				// ),
+				// new Column(
+				// 	'repo',
+				// 	[
+				// 		'type'    => Column::TYPE_VARCHAR,
+				// 		'size'    => 2048,
+				// 		'notNull' => true,
+				// 	]
+				// ),
+				// new Column(
+				// 	'dependencies',
+				// 	[
+				// 		'type'    => Column::TYPE_TEXT,
+				// 		'notNull' => true,
+				// 	]
+				// ),
+				// new Column(
+				// 	'installed',
+				// 	[
+				// 		'type'    => Column::TYPE_TINYINTEGER,
+				// 		'size'    => 1,
+				// 		'notNull' => true,
+				// 	]
+				// ),
+				// new Column(
+				// 	'files',
+				// 	[
+				// 		'type'    => Column::TYPE_TEXT,
+				// 		'notNull' => false,
+				// 	]
+				// ),
+				// new Column(
+				// 	'update_available',
+				// 	[
+				// 		'type'    => Column::TYPE_TINYINTEGER,
+				// 		'size'    => 1,
+				// 		'notNull' => false,
+				// 	]
+				// ),
+				// new Column(
+				// 	'update_version',
+				// 	[
+				// 		'type'    => Column::TYPE_VARCHAR,
+				// 		'size'    => 15,
+				// 		'notNull' => false,
+				// 	]
+				// ),
 			],
 			'indexes' => [
 				new Index(
 					'column_UNIQUE',
 					[
 						'route',
+						'name'
 					],
 					'UNIQUE'
 				)

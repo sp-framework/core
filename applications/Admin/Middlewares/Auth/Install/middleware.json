@@ -1,7 +1,7 @@
 {
 	"name"			: "Auth",
-	"displayName" 	: "Admin Auth Middleware",
-	"description"	: "Admin Auth Middleware",
+	"displayName" 	: "Authentication Middleware",
+	"description"	: "This middleware is used by authentication package. Once enabled, user need to authentication to this application to access any resource.",
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/middleware-admin-auth",
 	"path"			: "/",

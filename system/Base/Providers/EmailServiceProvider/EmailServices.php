@@ -15,6 +15,13 @@ class EmailServices extends BasePackage
 
     public $emailservices;
 
+    public function init(bool $resetCache = false)
+    {
+        $this->getAll($resetCache);
+
+        return $this;
+    }
+
     public function addEmailService(array $data)
     {
         $add = $this->add($data);

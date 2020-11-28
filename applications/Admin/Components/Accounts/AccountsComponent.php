@@ -1,10 +1,10 @@
 <?php
 
-namespace Applications\Admin\Components\Users;
+namespace Applications\Admin\Components\Accounts;
 
 use System\Base\BaseComponent;
 
-class UsersComponent extends BaseComponent
+class AccountsComponent extends BaseComponent
 {
     /**
      * @acl(name=view)
@@ -13,35 +13,35 @@ class UsersComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $user = $this->users->generateViewData($this->getData()['id']);
+                $account = $this->accounts->generateViewData($this->getData()['id']);
             } else {
-                $user = $this->users->generateViewData();
+                $account = $this->accounts->generateViewData();
             }
 
-            if ($user) {
-                $this->view->components = $this->users->packagesData->components;
+            if ($account) {
+                $this->view->components = $this->accounts->packagesData->components;
 
-                $this->view->acls = $this->users->packagesData->acls;
+                $this->view->acls = $this->accounts->packagesData->acls;
 
-                $this->view->user = $this->users->packagesData->user;
+                $this->view->account = $this->accounts->packagesData->account;
 
-                $this->view->applications = $this->users->packagesData->applications;
+                $this->view->applications = $this->accounts->packagesData->applications;
 
-                $this->view->roles = $this->users->packagesData->roles;
+                $this->view->roles = $this->accounts->packagesData->roles;
 
-                $this->view->canEmail = $this->users->packagesData->canEmail;
+                $this->view->canEmail = $this->accounts->packagesData->canEmail;
             }
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->accounts->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
 
-            $this->view->pick('users/view');
+            $this->view->pick('accounts/view');
 
             return;
         }
 
-        $users = $this->users->init();
+        $accounts = $this->accounts->init();
 
         if ($this->request->isPost()) {
             $rolesIdToName = [];
@@ -61,14 +61,14 @@ class UsersComponent extends BaseComponent
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'users',
-                    'remove'    => 'users/remove'
+                    'edit'      => 'accounts',
+                    'remove'    => 'accounts/remove'
                 ]
             ];
 
         $this->generateDTContent(
-            $users,
-            'users/view',
+            $accounts,
+            'accounts/view',
             null,
             ['email', 'role_id'],
             true,
@@ -79,7 +79,7 @@ class UsersComponent extends BaseComponent
             'email'
         );
 
-        $this->view->pick('users/list');
+        $this->view->pick('accounts/list');
     }
 
     /**
@@ -93,11 +93,11 @@ class UsersComponent extends BaseComponent
                 return;
             }
 
-            $this->users->addUser($this->postData());
+            $this->accounts->addUser($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->accounts->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -117,11 +117,11 @@ class UsersComponent extends BaseComponent
                 return;
             }
 
-            $this->users->updateUser($this->postData());
+            $this->accounts->updateUser($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->accounts->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -137,11 +137,11 @@ class UsersComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->users->removeUser($this->postData());
+            $this->accounts->removeUser($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->accounts->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;

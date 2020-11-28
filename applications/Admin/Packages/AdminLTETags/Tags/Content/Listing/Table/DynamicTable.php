@@ -489,7 +489,7 @@ class DynamicTable
                                                 isset($additionControlButton['buttonType']) ?
                                                 $additionControlButton['buttonType'] :
                                                 'primary',
-                                            'link'              => $control
+                                            'link'              => $additionControlButton['link']
                                         ]
                                 ]
                             );

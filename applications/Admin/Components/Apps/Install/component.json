@@ -1,12 +1,12 @@
 {
-    "route"         : "users",
-    "name"          : "Users",
-    "displayName"   : "Admin Users Management",
-    "description"   : "List users via this component",
+    "route"         : "apps",
+    "name"          : "Apps",
+    "displayName"   : "Admin Apps Management",
+    "description"   : "List applications via this component",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-admin-users",
+    "repo"          : "https://github.com/h-w-f/component-admin-apps",
     "path"          : "/",
-    "class"         : "Applications\\Admin\\Components\\Users\\UsersComponent",
+    "class"         : "Applications\\Admin\\Components\\Apps\\AppsComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -24,11 +24,11 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 4,
-        "users" : {
-            "icon"      : "users",
-            "title"     : "users",
-            "link"      : "users"
+        "seq"           : 2,
+        "apps" : {
+            "icon"      : "th-large",
+            "title"     : "apps",
+            "link"      : "apps"
         }
     },
     "settings"          : {
