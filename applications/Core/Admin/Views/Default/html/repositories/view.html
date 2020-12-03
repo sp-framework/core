@@ -1,0 +1,32 @@
+{% if repository['id'] is defined %}
+    {% set repositoryId = repository['id'] %}
+{% else %}
+    {% set repositoryId = '' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'cloud-download-alt',
+        'cardTitle'                     : componentName,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'repositories/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : repositoryId,
+            'addActionUrl'                  : 'repositories/add',
+            'addSuccessRedirectUrl'         : 'modules',
+            'updateActionUrl'               : 'repositories/update',
+            'updateSuccessRedirectUrl'      : 'modules',
+            'cancelActionUrl'               : 'modules',
+            'closeActionUrl'                : 'modules'
+        ]
+    ]
+)}}

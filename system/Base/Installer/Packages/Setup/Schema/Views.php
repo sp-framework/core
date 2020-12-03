@@ -29,19 +29,27 @@ class Views
 						]
 					),
 					new Column(
-						'display_name',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 50,
-							'notNull' => false,
-						]
-					),
-					new Column(
 						'description',
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 2048,
 							'notNull' => false,
+						]
+					),
+					new Column(
+						'category',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'sub_category',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
 						]
 					),
 					new Column(
@@ -75,24 +83,10 @@ class Views
 						]
 					),
 					new Column(
-						'application_id',
+						'applications',
 						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'view_id',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'notNull' => false,
-						]
-					),
-					new Column(
-						'installed',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 2048,
 							'notNull' => true,
 						]
 					),

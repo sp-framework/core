@@ -1,0 +1,8 @@
+{
+	"name"			: "Businesses",
+	"displayName" 	: "Admin Businesses Package",
+	"description"	: "Package for Businesses component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-businesses",
+	"settings"		: { }
+}

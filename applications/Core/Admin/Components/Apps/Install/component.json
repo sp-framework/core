@@ -1,0 +1,31 @@
+{
+    "route"         : "apps",
+    "name"          : "Apps",
+    "description"   : "List applications via this component",
+    "category"      : "core",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-apps",
+    "class"         : "Applications\\Core\\Admin\\Components\\Apps\\AppsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 2,
+        "apps" : {
+            "icon"      : "th-large",
+            "title"     : "apps",
+            "link"      : "apps"
+        }
+    },
+    "settings"          : {
+    }
+}

@@ -61,14 +61,6 @@ class Packages
 						]
 					),
 					new Column(
-						'path',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 2048,
-							'notNull' => true,
-						]
-					),
-					new Column(
 						'settings',
 						[
 							'type'    => Column::TYPE_TEXT,
@@ -76,24 +68,10 @@ class Packages
 						]
 					),
 					new Column(
-						'dependencies',
+						'applications',
 						[
-							'type'    => Column::TYPE_TEXT,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'application_id',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'installed',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 2048,
 							'notNull' => true,
 						]
 					),

@@ -18,8 +18,6 @@ class Core extends BaseModel
 
     public $repo;
 
-    public $installed;
-
     public $settings;
 
     public $files;

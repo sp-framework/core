@@ -61,14 +61,6 @@ class Middlewares
 						]
 					),
 					new Column(
-						'path',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 2048,
-							'notNull' => true,
-						]
-					),
-					new Column(
 						'class',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -84,32 +76,10 @@ class Middlewares
 						]
 					),
 					new Column(
-						'dependencies',
+						'applications',
 						[
-							'type'    => Column::TYPE_TEXT,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'application_id',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'sequence',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
-							'notNull' => true,
-						]
-					),
-					new Column(
-						'installed',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 2048,
 							'notNull' => true,
 						]
 					),
@@ -118,14 +88,6 @@ class Middlewares
 						[
 							'type'    => Column::TYPE_TEXT,
 							'notNull' => false,
-						]
-					),
-					new Column(
-						'enabled',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
-							'notNull' => true,
 						]
 					),
 					new Column(

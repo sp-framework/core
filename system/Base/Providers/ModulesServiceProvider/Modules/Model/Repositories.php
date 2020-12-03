@@ -14,9 +14,11 @@ class Repositories extends BaseModel
 
     public $url;
 
-    public $need_auth;
+    public $auth_token;
 
     public $username;
+
+    public $password;
 
     public $token;
 

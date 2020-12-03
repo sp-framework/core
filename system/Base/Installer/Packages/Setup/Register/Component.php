@@ -2,32 +2,38 @@
 
 namespace System\Base\Installer\Packages\Setup\Register;
 
+use Phalcon\Helper\Json;
+
 class Component
 {
-	public function register($db, $componentFile, $installedFiles, $newApplicationId, $menuId)
+	public function register($db, $componentFile, $installedFiles, $menuId)
 	{
 		$db->insertAsDict(
 			'components',
 			[
 				'name' 					=> $componentFile['name'],
 				'route'					=> $componentFile['route'],
-				'display_name' 			=> $componentFile['displayName'],
 				'description' 			=> $componentFile['description'],
+				'category'  			=> $componentFile['category'],
+				'sub_category'  		=> $componentFile['sub_category'],
 				'version'				=> $componentFile['version'],
 				'class'					=> $componentFile['class'],
 				'repo'					=> $componentFile['repo'],
 				'settings'				=>
 					isset($componentFile['settings']) ?
-					json_encode($componentFile['settings']) :
+					Json::encode($componentFile['settings']) :
 					null,
 				'dependencies'		 	=>
 					isset($componentFile['dependencies']) ?
-					json_encode($componentFile['dependencies']) :
+					Json::encode($componentFile['dependencies']) :
 					null,
-				'menu_id'		 		=> $menuId,
-				'application_id'		=> $newApplicationId,
-				'installed'				=> 1,
-				'files'					=> json_encode($installedFiles)
+				'menu'		 			=>
+					isset($componentFile['menu']) ?
+					Json::encode($componentFile['menu']) :
+					null,
+				'applications'			=>
+					Json::encode(['1'=>['installed'=>true,'menu_id'=>$menuId]]),
+				'files'					=> Json::encode($installedFiles)
 			]
 		);
 	}

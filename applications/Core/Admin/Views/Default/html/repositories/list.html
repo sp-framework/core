@@ -1,0 +1,207 @@
+{{adminltetags.useTag('fields',
+    [
+        'component'                         : component,
+        'componentName'                     : componentName,
+        'componentId'                       : 'repositories',
+        'sectionId'                         : 'options',
+        'parentComponentId'                 : parent,
+        'fieldId'                           : 'repositories',
+        'fieldLabel'                        : false,
+        'fieldType'                         : 'input',
+        'fieldAdditionalClass'              : 'mb-1',
+        'fieldGroupPreAddonIcon'            : 'cloud-download-alt',
+        'fieldGroupPostAddonButtons'        :
+            [
+                'sync'   : [
+                    'title'                   : false,
+                    'type'                    : 'primary',
+                    'tooltipTitle'            : 'Sync Repository',
+                    'icon'                    : 'sync-alt',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'buttonAdditionalClass'   : 'rounded-0',
+                    'position'                : 'right'
+                ],
+                'edit'   : [
+                    'title'                   : false,
+                    'type'                    : 'warning',
+                    'icon'                    : 'edit',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'url'                     : 'repositories/q/id/0',
+                    'buttonAdditionalClass'   : 'rounded-0 text-white contentAjaxLink disabled',
+                    'position'                : 'right'
+                ],
+                'delete'   : [
+                    'title'                   : false,
+                    'type'                    : 'danger',
+                    'icon'                    : 'trash',
+                    'noMargin'                : true,
+                    'disabled'                : true,
+                    'buttonAdditionalClass'   : 'rounded-0',
+                    'position'                : 'right'
+                ],
+                'add'   : [
+                    'title'                   : false,
+                    'type'                    : 'success',
+                    'icon'                    : 'plus',
+                    'noMargin'                : true,
+                    'url'                     : 'repositories/q/id/0',
+                    'buttonAdditionalClass'   : 'rounded-0 contentAjaxLink',
+                    'position'                : 'right'
+                ]
+            ],
+        'fieldInputType'                      : 'select',
+        'fieldHelp'                           : false,
+        'fieldDataSelectOptions'              : repositories,
+        'fieldDataSelectOptionsArray'         : true,
+        'fieldDataSelectOptionsKey'           : 'id',
+        'fieldDataSelectOptionsValue'         : 'name',
+        'fieldDataSelectOptionsSelected'      : '',
+        'fieldDataSelectOptionsZero'          : true,
+        'fieldDataSelectOptionsZeroTitle'     : 'Select Repository'
+    ]
+)}}
+<script>
+/*global PNotify Swal initModuleButtons */
+initSync();
+
+function changeRepoButtons(val = '0') {
+    if (val == '1') {
+        $('#repositories-options-sync').attr('disabled', false);
+        $('#repositories-options-delete').attr('disabled', true);
+        $('#repositories-options-edit').removeClass('disabled');
+        $('#repositories-options-edit').attr('href', 'repositories/q/id/' + val);
+    } else if (val == '0') {
+        $('#repositories-options-sync, #repositories-options-delete').attr('disabled', true);
+        $('#repositories-options-edit').addClass('disabled');
+    } else if (val != '1') {
+        $('#repositories-options-sync, #repositories-options-delete').attr('disabled', false);
+        $('#repositories-options-edit').removeClass('disabled');
+    }
+}
+
+function initSync(val) {
+    $('#repositories-options-sync').off();
+
+    changeRepoButtons(val);
+
+    $('#repositories-options-sync').click(function() {
+        $('#repositories-options-sync, #repositories-options-delete, #repositories-options-add').attr('disabled', true);
+        $('#repositories-options-edit').addClass('disabled');
+        $('#modules-loader').attr('hidden', false);
+        $('#modules-data').attr('hidden', true);
+
+        $.get(
+            'repositories/sync/q/' +
+            'repoId/' + $('#repositories-options-repositories option:selected').val(),
+            function(data) {
+                if (typeof data === 'string') {
+                    $('#modules-data').empty().html(data);
+                    $('#modules-data').attr('hidden', false);
+                    $('#modules-loader').attr('hidden', true);
+                    $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
+
+                    var text, registerCounter, updateCounter;
+
+                    registerCounter = Number($('#register-counter').val());
+                    updateCounter = Number($('#update-counter').val());
+
+                    if (registerCounter > 0 || updateCounter > 0) {
+                        if (registerCounter !== 0 && updateCounter === 0) {
+                            text =
+                                'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
+                        } else if (registerCounter === 0 && updateCounter !== 0) {
+                            text =
+                                'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
+                        } else if (registerCounter !== 0 && updateCounter !== 0) {
+                            text =
+                                'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
+                        }
+                        PNotify.info({
+                            text        : text,
+                            textTrusted : true
+                        });
+                    } else {
+                        PNotify.info({
+                            text        : 'Sync Complete.<br>No new modules or updates available.',
+                            textTrusted : true
+                        });
+                    }
+                    initModuleButtons();
+                } else {
+                    PNotify.error({
+                            text        : data.responseMessage,
+                            textTrusted : true
+                        });
+                    $('#modules-data').attr('hidden', false);
+                    $('#modules-loader').attr('hidden', true);
+                    $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
+                }
+            }
+        );
+    });
+}
+
+$('#repositories-options-repositories').change(function() {
+    initSync($(this).val());
+});
+
+$('#repositories-options-delete').click(function() {
+    var repoName = $('#repositories-options-repositories option:selected').html();
+    var repoId = $('#repositories-options-repositories option:selected').val();
+
+    Swal.fire({
+        title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
+                                      '</i> <span style="font-size:40px;" class="text-danger"> Delete Repo ' +
+                                      repoName + '?</span>',
+        width                       : '100%',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Delete',
+        customClass                 : {
+            'container'                 : 'rounded-0 animated fadeIn',
+            'confirmButton'             : 'btn btn-danger text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+        },
+        showClass                   : {
+            'popup'                     : 'swal2-noanimation',
+            'backdrop'                  : 'swal2-noanimation'
+        },
+        hideClass                   : {
+            'popup'                     : '',
+            'backdrop'                  : ''
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : false,
+        allowEscapeKey              : false,
+        allowEnterKey               : false,
+        didOpen                      : function() {
+            window.dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            var postData = { };
+            if ($('.token').length === 1) {
+                postData[$('.token').attr('name')] = $('.token').val();
+            }
+            postData['id'] = repoId;
+            $.post('repositories/remove', postData,
+                    function(data) {
+                        if (data && data.responseCode === 0) {
+                            $('#repositories-options-repositories').find('[data-value="' + repoId + '"]').remove();
+                        } else {
+                            PNotify.error({
+                                text        : data.responseMessage,
+                                textTrusted : true
+                            });
+                        }
+                    },
+                    'json'
+                );
+        }
+    });
+});
+</script>

@@ -23,6 +23,8 @@ class Menus extends BasePackage
 
     public function getMenusForApplication($applicationId)
     {
+        $menus = $this->filterMenu($applicationId);
+
         $cachedMenu = $this->cacheTools->getCache('menus');
 
         if ($cachedMenu) {
@@ -31,15 +33,35 @@ class Menus extends BasePackage
 
         $buildMenu = [];
 
-        foreach (msort($this->menus, 'sequence') as $key => $menu) {
+        foreach (msort($menus, 'sequence') as $key => $menu) {
             $menu = Json::decode($menu['menu'], true);
             if ($menu) {
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
             }
         }
-        // var_dump($buildMenu);
+
         $this->cacheTools->setCache('menus', $buildMenu);
 
         return $buildMenu;
+    }
+
+    protected function filterMenu($applicationId)
+    {
+        $menus = [];
+
+        $filter =
+            $this->model->filter(
+                function($menu) use ($applicationId) {
+                    if ($menu->application_id === $applicationId) {
+                        return $menu;
+                    }
+                }
+            );
+
+        foreach ($filter as $key => $value) {
+            $menus[$key] = $value->toArray();
+        }
+
+        return $menus;
     }
 }

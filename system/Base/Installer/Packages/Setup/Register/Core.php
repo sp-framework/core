@@ -25,7 +25,6 @@ class Core
 				'description' 			=> $baseConfig['description'],
 				'version'	 			=> $baseConfig['version'],
 				'repo'					=> $baseConfig['repo'],
-				'installed'				=> 1,
 				'settings'			 	=>
 					isset($baseConfig['settings']) ?
 					json_encode($baseConfig['settings']) :

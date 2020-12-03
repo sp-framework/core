@@ -124,13 +124,13 @@ class Setup
 	{
 		$dbName = $this->dbConfig['db']['dbname'];
 
-		$this->db->createTable('repositories', $dbName, (new Repositories)->columns());
 		$this->db->createTable('core', $dbName, (new Core)->columns());
 		$this->db->createTable('applications', $dbName, (new Applications)->columns(),);
 		$this->db->createTable('components', $dbName, (new Components)->columns());
 		$this->db->createTable('packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('middlewares', $dbName, (new Middlewares)->columns());
 		$this->db->createTable('views', $dbName, (new Views)->columns());
+		$this->db->createTable('repositories', $dbName, (new Repositories)->columns());
 		$this->db->createTable('cache', $dbName, (new Cache)->columns());
 		$this->db->createTable('logs', $dbName, (new Logs)->columns());
 		$this->db->createTable('email_services', $dbName, (new EmailServices)->columns());
@@ -158,9 +158,8 @@ class Setup
 		(new RegisterCore())->register($installedFiles, $baseConfig, $this->db);
 	}
 
-	public function registerModule($type, $newApplicationId = null)
+	public function registerModule($type)
 	{
-
 		if ($type === 'applications') {
 
 			return $this->registerAdminApplication();
@@ -169,7 +168,7 @@ class Setup
 
 			$homeComponentId = null;
 
-			$adminComponents = $this->localContent->listContents('applications/Admin/Components/', true);
+			$adminComponents = $this->localContent->listContents('applications/Core/Admin/Components/', true);
 
 			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
 				if ($adminComponent['basename'] === 'component.json') {
@@ -184,12 +183,12 @@ class Setup
 					}
 
 					if ($jsonFile['menu']) {
-						$menuId = $this->registerAdminMenu($jsonFile['menu'], $newApplicationId);
+						$menuId = $this->registerAdminMenu($jsonFile['menu']);
 					} else {
 						$menuId = null;
 					}
 
-					$component = $this->registerAdminComponent($jsonFile, $newApplicationId, $menuId);
+					$component = $this->registerAdminComponent($jsonFile, $menuId);
 
 					if ($component) {
 						$homeComponentId = $component;
@@ -201,12 +200,12 @@ class Setup
 
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->localContent->listContents('applications/Admin/Packages/', true);
+			$adminPackages = $this->localContent->listContents('applications/Core/Admin/Packages/', true);
 
 			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
 				if ($adminPackage['basename'] === 'package.json') {
 					if ($adminPackage['path'] !==
-						'applications/Admin/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
+						'applications/Core/Admin/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
 					) {
 						$jsonFile =
 							json_decode(
@@ -218,14 +217,14 @@ class Setup
 							throw new \Exception('Problem reading package.json at location ' . $adminPackage['path']);
 						}
 
-						$this->registerAdminPackage($jsonFile, $newApplicationId);
+						$this->registerAdminPackage($jsonFile);
 					}
 				}
 			}
 		} else if ($type === 'middlewares') {
 
 			$adminMiddlewares =
-				$this->localContent->listContents('applications/Admin/Middlewares/', true);
+				$this->localContent->listContents('applications/Core/Admin/Middlewares/', true);
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
@@ -239,13 +238,13 @@ class Setup
 						throw new \Exception('Problem reading middleware.json at location ' . $adminMiddleware['path']);
 					}
 
-					$this->registerAdminMiddleware($jsonFile, $newApplicationId);
+					$this->registerAdminMiddleware($jsonFile);
 				}
 			}
 		} else if ($type === 'views') {
 			$jsonFile =
 				json_decode(
-					$this->localContent->read('applications/Admin/Views/Default/view.json'),
+					$this->localContent->read('applications/Core/Admin/Views/Default/view.json'),
 					true
 				);
 
@@ -253,17 +252,13 @@ class Setup
 				throw new \Exception('Problem reading view.json');
 			}
 
-			$this->registerAdminView($jsonFile, $newApplicationId);
+			$this->registerAdminView($jsonFile);
 		}
 	}
 
 	protected function registerAdminApplication()
 	{
-		return
-			(new RegisterApplication())->register(
-				$this->db,
-				// $this->postData['mode']
-			);
+		return (new RegisterApplication())->register($this->db);
 	}
 
 	public function updateAdminApplicationComponents()
@@ -271,14 +266,14 @@ class Setup
 		return (new RegisterApplication())->update($this->db);
 	}
 
-	protected function registerAdminComponent(array $componentFile, $newApplicationId, $menuId)
+	protected function registerAdminComponent(array $componentFile, $menuId)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Admin/Components/' . $componentFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Core/Admin/Components/' . $componentFile['name']);
 
-		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $newApplicationId, $menuId);
+		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
 	}
 
-	protected function registerAdminMenu(array $menu, $newApplicationId)
+	protected function registerAdminMenu(array $menu)
 	{
 		if (isset($menu['seq'])) {
 			$sequence = $menu['seq'];
@@ -287,36 +282,36 @@ class Setup
 			$sequence = 99;
 		}
 
-		return (new RegisterMenu())->register($this->db, $menu, $newApplicationId, $sequence);
+		return (new RegisterMenu())->register($this->db, $menu, $sequence);
 	}
 
-	protected function registerAdminPackage(array $packageFile, $newApplicationId)
+	protected function registerAdminPackage(array $packageFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Admin/Packages/' . $packageFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Core/Admin/Packages/' . $packageFile['name']);
 
-		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles, $newApplicationId);
+		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
 
-	public function registerAdminMiddleware(array $middlewareFile, $newApplicationId)
+	public function registerAdminMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Admin/Middlewares/' . $middlewareFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Core/Admin/Middlewares/' . $middlewareFile['name']);
 
-		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles, $newApplicationId);
+		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
 
-	protected function registerAdminView(array $viewFile, $newApplicationId)
+	protected function registerAdminView(array $viewFile)
 	{
-		$applicationInstalledFiles = $this->getInstalledFiles('applications/Admin/Views/');
+		$applicationInstalledFiles = $this->getInstalledFiles('applications/Core/Admin/Views/');
 		$publicInstalledFiles = $this->getInstalledFiles('public/Admin/');
 
 		$installedFiles = array_merge($applicationInstalledFiles, $publicInstalledFiles);
 
-		return (new RegisterView())->register($this->db, $viewFile, $installedFiles, $newApplicationId);
+		return (new RegisterView())->register($this->db, $viewFile, $installedFiles);
 	}
 
-	public function registerDomain($homeComponentId = null)
+	public function registerDomain()
 	{
-		return (new RegisterDomain())->register($this->db, $this->request, $homeComponentId);
+		return (new RegisterDomain())->register($this->db, $this->request);
 	}
 
 	public function validateData()
@@ -343,11 +338,11 @@ class Setup
 		return (new RegisterRootAdminRole())->register($this->db);
 	}
 
-	public function registerAdminAccount($newApplicationId, $adminRoleId)
+	public function registerAdminAccount($adminRoleId)
 	{
 		$password = $this->security->hash($this->postData['pass']);
 
-		return (new RegisterRootAdminAccount())->register($this->db, $this->postData['email'], $password, $newApplicationId, $adminRoleId);
+		return (new RegisterRootAdminAccount())->register($this->db, $this->postData['email'], $password, $adminRoleId);
 	}
 
 	public function registerCountryStatesCities()

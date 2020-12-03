@@ -6,12 +6,12 @@ use Phalcon\Helper\Json;
 
 class Menu
 {
-    public function register($db, array $menu, int $newApplicationId, int $sequence)
+    public function register($db, array $menu, int $sequence)
     {
         $insertMenu = $db->insertAsDict(
             'menus',
             [
-                'application_id'    => $newApplicationId,
+                'application_id'    => 1,
                 'menu'              => Json::encode($menu),
                 'sequence'          => $sequence
             ]

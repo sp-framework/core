@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Middlewares as MiddlewaresModel;
 
@@ -23,8 +24,10 @@ class Middlewares extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($middleware) use ($name, $applicationId) {
-					if ($middleware->name === ucfirst($name) &&
-						$middleware->application_id === $applicationId
+					$middleware = $middleware->toArray();
+					$middleware['applications'] = Json::decode($middleware['applications'], true);
+					if ($middleware['applications'][$applicationId]['installed'] === true &&
+						$middleware['name'] === ucfirst($name)
 					) {
 						return $middleware;
 					}
@@ -34,7 +37,7 @@ class Middlewares extends BasePackage
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate middleware name found for middleware ' . $name);
 		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
+			return $filter[0];
 		} else {
 			return false;
 		}
@@ -45,7 +48,11 @@ class Middlewares extends BasePackage
 		$filters =
 			$this->model->filter(
 				function($middleware) use ($applicationId) {
-					if ($middleware->application_id === $applicationId) {
+					$middleware = $middleware->toArray();
+					$middleware['applications'] = Json::decode($middleware['applications'], true);
+					if (isset($middleware['applications'][$applicationId]['installed']) &&
+						$middleware['applications'][$applicationId]['installed'] === true
+					) {
 						return $middleware;
 					}
 				}
@@ -54,10 +61,35 @@ class Middlewares extends BasePackage
 		$middlewares = [];
 
 		foreach ($filters as $key => $filter) {
-			$middlewares[$key] = $filter->toArray();
+			$middlewares[$key] = $filter;
+			$middlewares[$key]['sequence'] = $filter['applications'][$applicationId]['sequence'];
+			$middlewares[$key]['enabled'] = $filter['applications'][$applicationId]['enabled'];
 		}
 
 		return $middlewares;
+	}
+
+	public function updateMiddlewares(array $data)
+	{
+		foreach ($data['middlewares'] as $middlewareId => $status) {
+			$middleware = [];
+			$middleware['id'] = $middlewareId;
+			if ($status === true) {
+				$middleware['enabled'] = 1;
+			} else if ($status === false) {
+				$middleware['enabled'] = 0;
+			}
+			$this->update($middleware);
+		}
+
+		foreach ($data['sequence'] as $sequence => $middlewareId) {
+			$middleware = [];
+			$middleware['id'] = $middlewareId;
+			$middleware['sequence'] = $sequence;
+			$this->update($middleware);
+		}
+
+		return true;
 	}
 
 	// public function getAll($params = [], bool $resetCache = false)

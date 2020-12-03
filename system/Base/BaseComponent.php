@@ -2,7 +2,7 @@
 
 namespace System\Base;
 
-use Applications\Admin\Packages\AdminLTETags\AdminLTETags;
+use Applications\Core\Admin\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Assets\Collection;
 use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
@@ -33,7 +33,6 @@ abstract class BaseComponent extends Controller
 	protected function onConstruct()
 	{
 		$this->setDefaultViewResponse();
-
 		$this->application = $this->modules->applications->getApplicationInfo();
 
 		$this->views = $this->modules->views->getViewInfo();
@@ -58,15 +57,18 @@ abstract class BaseComponent extends Controller
 		}
 
 		if (!$this->isJson() || $this->request->isAjax()) {
-			$this->viewSettings = json_decode($this->views['settings'], true);
 
-			if (!$this->isJson()) {
-				$this->setDefaultViewData();
+			if ($this->views) {
+				$this->viewSettings = json_decode($this->views['settings'], true);
+
+				if (!$this->isJson()) {
+					$this->setDefaultViewData();
+				}
+
+				$this->checkLayout();
+
+				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 			}
-
-			$this->checkLayout();
-
-			$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 		}
 	}
 

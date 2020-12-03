@@ -45,7 +45,15 @@ class Repositories
 						]
 					),
 					new Column(
-						'need_auth',
+						'repo_provider',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'size'    => 1,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'auth_token',
 						[
 							'type'    => Column::TYPE_TINYINTEGER,
 							'size'    => 1,
@@ -54,6 +62,14 @@ class Repositories
 					),
 					new Column(
 						'username',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 50,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'password',
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 50,

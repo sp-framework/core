@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Packages as PackagesModel;;
 
@@ -23,8 +24,10 @@ class Packages extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($package) use ($name, $applicationId) {
-					if ($package->name === ucfirst($name) &&
-						$package->application_id === $applicationId
+					$package = $package->toArray();
+					$package['applications'] = Json::decode($package['applications'], true);
+					if ($package['name'] === ucfirst($name) &&
+						$package['applications'][$applicationId]['installed'] === true
 					) {
 						return $package;
 					}
@@ -34,11 +37,51 @@ class Packages extends BasePackage
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate package name found for package ' . $name);
 		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
+			return $filter[0];
 		} else {
 			return false;
 		}
 	}
+
+	public function addPackage(array $data)
+	{
+		if ($this->add($data)) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Added ' . $data['name'] . ' package';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error adding new package.';
+		}
+	}
+
+	public function updatePackage(array $data)
+	{
+		if ($this->update($data)) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' package';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error updating package.';
+		}
+	}
+
+	public function removePackage(array $data)
+	{
+		if ($this->remove($data['id'])) {
+			$this->packagesData->responseCode = 0;
+
+			$this->packagesData->responseMessage = 'Removed package';
+		} else {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Error removing package.';
+		}
+	}
+
 	// public function getAll($params = [], bool $resetCache = false)
 	// {
 	// 	if ($this->cacheKey) {

@@ -107,22 +107,22 @@ Class Setup
 
 				if ($adminApplicationId) {
 
-					$this->setupPackage->registerModule('components', $adminApplicationId);
+					$this->setupPackage->registerModule('components');
 
 					$this->setupPackage->updateAdminApplicationComponents();
 
-					$this->setupPackage->registerModule('packages', $adminApplicationId);
+					$this->setupPackage->registerModule('packages');
 
-					$this->setupPackage->registerModule('middlewares', $adminApplicationId);
+					$this->setupPackage->registerModule('middlewares');
 
-					$this->setupPackage->registerModule('views', $adminApplicationId);
+					$this->setupPackage->registerModule('views');
 
 					$this->setupPackage->registerDomain();
 
 					$adminRoleId = $this->setupPackage->registerRootAdminRole();
 
 					if ($adminRoleId) {
-						$this->setupPackage->registerAdminAccount($adminApplicationId, $adminRoleId);
+						$this->setupPackage->registerAdminAccount($adminRoleId);
 					}
 
 					// $this->setupPackage->registerCountryStatesCities();

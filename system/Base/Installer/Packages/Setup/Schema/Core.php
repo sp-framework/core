@@ -61,14 +61,6 @@ class Core
 						]
 					),
 					new Column(
-						'installed',
-						[
-							'type'    => Column::TYPE_TINYINTEGER,
-							'size'    => 1,
-							'notNull' => true,
-						]
-					),
-					new Column(
 						'settings',
 						[
 							'type'    => Column::TYPE_TEXT,

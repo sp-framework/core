@@ -1,0 +1,8 @@
+{
+	"name"			: "Module",
+	"displayName" 	: "Admin Module Package",
+	"description"	: "Package for Module component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-module",
+	"settings"		: {	}
+}

@@ -1,0 +1,8 @@
+{
+	"name"			: "Currencies",
+	"displayName" 	: "Admin Currencies Package",
+	"description"	: "Package for Currencies component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-currencies",
+	"settings"		: {	}
+}

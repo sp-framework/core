@@ -2,9 +2,11 @@
 
 namespace System\Base\Installer\Packages\Setup\Register;
 
+use Phalcon\Helper\Json;
+
 class Package
 {
-	public function register($db, $packageFile, $installedFiles, $newApplicationId)
+	public function register($db, $packageFile, $installedFiles)
 	{
 		return $db->insertAsDict(
 			'packages',
@@ -13,19 +15,14 @@ class Package
 				'display_name'			=> $packageFile['displayName'],
 				'description' 			=> $packageFile['description'],
 				'version'				=> $packageFile['version'],
-				'path'					=> $packageFile['path'],
 				'repo'					=> $packageFile['repo'],
 				'settings'				=>
 					isset($packageFile['settings']) ?
-					json_encode($packageFile['settings']) :
+					Json::encode($packageFile['settings']) :
 					null,
-				'dependencies'		 	=>
-					isset($packageFile['dependencies']) ?
-					json_encode($packageFile['dependencies']) :
-					null,
-				'application_id'		=> $newApplicationId,
-				'installed'				=> 1,
-				'files'					=> json_encode($installedFiles)
+				'applications'			=>
+					Json::encode(['1'=>['installed'=>true]]),
+				'files'					=> Json::encode($installedFiles)
 			]
 		);
 	}

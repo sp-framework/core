@@ -18,15 +18,9 @@ class Packages extends BaseModel
 
     public $repo;
 
-    public $path;
-
     public $settings;
 
-    public $dependencies;
-
-    public $application_id;
-
-    public $installed;
+    public $applications;
 
     public $files;
 

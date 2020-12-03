@@ -9,11 +9,13 @@ class Repository
 		$db->insertAsDict(
 			'repositories',
 			[
-				'name' 					=> 'Hello World Framework (h-w-f)',
-				'description' 			=> 'Hello World Framework Repositories',
-				'url'		 			=> 'https://api.github.com/orgs/h-w-f/repos',
-				'need_auth'				=> 0,
+				'name' 					=> 'Baz-Dev',
+				'description' 			=> 'Bazaari Development Repository',
+				'url'		 			=> 'https://dev.bazaari.com.au/api/v1/orgs/sp-dev/repos',
+				'repo_provider'			=> 1,
+				'auth_token'			=> 0,
 				'username'				=> '',
+				'password'				=> '',
 				'token'					=> ''
 			]
 		);

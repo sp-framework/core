@@ -1,0 +1,31 @@
+{
+    "route"         : "businesses",
+    "name"          : "Businesses",
+    "description"   : "List businesses via this component",
+    "category"      : "core",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-businesses",
+    "class"         : "Applications\\Core\\Admin\\Components\\Businesses\\BusinessesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "businesses" : {
+            "icon"      : "suitcase",
+            "title"     : "businesses",
+            "link"      : "businesses"
+        }
+    },
+    "settings"          : {
+    }
+}

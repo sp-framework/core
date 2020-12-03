@@ -1,0 +1,31 @@
+{
+    "route"         : "domains",
+    "name"          : "Domains",
+    "description"   : "Manage admin domains via this component",
+    "category"      : "core",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-domains",
+    "class"         : "Applications\\Core\\Admin\\Components\\Domains\\DomainsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "domains"       : {
+            "title"     : "domains",
+            "icon"      : "globe-asia",
+            "link"      : "domains"
+        }
+    },
+    "settings"          : {
+    }
+}

@@ -108,7 +108,9 @@ class Router
 		if ($home) {
 			$this->defaultNamespace =
 				'Applications\\' .
-				ucfirst($this->applicationDefaults['application']) .
+				ucfirst($this->applicationDefaults['category']) .
+				'\\' .
+				ucfirst($this->applicationDefaults['sub_category']) .
 				'\\Components\\' .
 				ucfirst($this->applicationDefaults['component'])
 				;
@@ -116,7 +118,9 @@ class Router
 			if ($this->givenRouteClass !== '') {
 				$this->defaultNamespace =
 					'Applications\\' .
-					ucfirst($this->applicationDefaults['application']) .
+					ucfirst($this->applicationDefaults['category']) .
+					'\\' .
+					ucfirst($this->applicationDefaults['sub_category']) .
 					'\\Components' .
 					$this->givenRouteClass . '\\' .
 					ucfirst($this->controller)
@@ -124,7 +128,9 @@ class Router
 			} else {
 				$this->defaultNamespace =
 					'Applications\\' .
-					ucfirst($this->applicationDefaults['application']) .
+					ucfirst($this->applicationDefaults['category']) .
+					'\\' .
+					ucfirst($this->applicationDefaults['sub_category']) .
 					'\\Components\\' .
 					$this->givenRouteClass .
 					ucfirst($this->controller)
@@ -226,7 +232,6 @@ class Router
 
 	protected function regitserNotFound()
 	{
-
 		if ($this->applicationDefaults) {
 
 			if (isset($this->applicationDefaults['errorComponent'])) {
@@ -259,34 +264,9 @@ class Router
 		);
 	}
 
-	// protected function setApplicationInfo()
-	// {
-	// 	if (!$this->validateDomain()) {
-	// 		return false;
-	// 	}
-
-	// 	$this->applicationInfo = $this->applications->getApplicationInfo();
-
-	// 	if ($this->applicationInfo) {
-
-
-	// 		$this->applicationDefaults = $this->applications->getApplicationDefaults();
-
-	// 		if (!$this->applicationDefaults ||
-	// 			$this->applicationInfo['name'] !== $this->applicationDefaults['application']
-	// 		) {
-	// 			$this->applicationDefaults =
-	// 				$this->applications->getApplicationDefaults($this->applicationInfo['name']);
-	// 		}
-	// 		return true;
-	// 	}
-	// 	return false;
-	// }
-
 	protected function validateDomain()
 	{
 		$this->domain = $this->domains->getDomain();
-
 		if (!$this->domain) {
 			$this->logger->log->alert(
 				'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
@@ -297,8 +277,8 @@ class Router
 
 		$this->applicationInfo = $this->applications->getApplicationInfo();
 
-		if (isset($this->domain['allowed_application_ids'][$this->applicationInfo['id']]) &&
-			!$this->domain['allowed_application_ids'][$this->applicationInfo['id']]
+		if (isset($this->domain['allowed_applications'][$this->applicationInfo['id']]) &&
+			!$this->domain['allowed_applications'][$this->applicationInfo['id']]
 		) {
 			$this->logger->log->alert(
 				'Trying to access application ' . $this->applicationInfo['name'] .
@@ -308,12 +288,14 @@ class Router
 			return false;
 		}
 
-		if (!isset($this->domain['allowed_application_ids'][$this->applicationInfo['id']])) {
+		if (!isset($this->domain['allowed_applications'][$this->applicationInfo['id']])) {
 			return false;
 		}
 
 		$this->applicationDefaults['id'] = $this->applicationInfo['id'];
 		$this->applicationDefaults['application'] = $this->applicationInfo['route'];
+		$this->applicationDefaults['category'] = $this->applicationInfo['category'];
+		$this->applicationDefaults['sub_category'] = $this->applicationInfo['sub_category'];
 		$this->applicationDefaults['component'] =
 			$this->components->getIdComponent($this->applicationInfo['default_component'])['route'];
 		$this->applicationDefaults['errorComponent'] =

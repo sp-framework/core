@@ -2,29 +2,32 @@
 
 namespace System\Base\Installer\Packages\Setup\Register;
 
+use Phalcon\Helper\Json;
+
 class View
 {
-	public function register($db, $viewFile, $installedFiles, $newApplicationId)
+	public function register($db, $viewFile, $installedFiles)
 	{
 		return $db->insertAsDict(
 			'views',
 			[
 				'name' 					=> $viewFile['name'],
-				'display_name' 			=> $viewFile['displayName'],
 				'description' 			=> $viewFile['description'],
+				'category'  			=> $viewFile['category'],
+				'sub_category'  		=> $viewFile['sub_category'],
 				'version'				=> $viewFile['version'],
 				'repo'		 			=> $viewFile['repo'],
 				'settings'				=>
 					isset($viewFile['settings']) ?
-					json_encode($viewFile['settings']) :
+					Json::encode($viewFile['settings']) :
 					null,
 				'dependencies'			=>
 					isset($viewFile['dependencies']) ?
-					json_encode($viewFile['dependencies']) :
+					Json::encode($viewFile['dependencies']) :
 					null,
-				'application_id'		=> $newApplicationId,
-				'installed'				=> 1,
-				'files'					=> json_encode($installedFiles)
+				'applications'			=>
+					Json::encode(['1'=>['installed'=>true]]),
+				'files'					=> Json::encode($installedFiles)
 			]
 		);
 	}

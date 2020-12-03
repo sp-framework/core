@@ -42,7 +42,7 @@ class Links
 	{
 		if ($link) {
 			return $this->url->getStatic(
-				strtolower($this->application['name']) . '/' . $link
+				strtolower($this->application['route']) . '/' . $link
 			);
 		} else {
 			return $this->url->getStatic('/');
@@ -52,35 +52,40 @@ class Links
 	public function images($link)
 	{
 		return $this->url->getStatic(
-			ucfirst($this->application['name']) . '/' .
-			ucfirst($this->view['name']) . '/images/' . $link);
+			$this->application['category'] . '/' .
+			$this->application['sub_category'] . '/' .
+			strtolower($this->view['name']) . '/images/' . $link);
 	}
 
 	public function css($link)
 	{
 		return $this->url->getStatic(
-			ucfirst($this->application['name']) . '/' .
-			ucfirst($this->view['name']) . '/css/' . $link);
+			$this->application['category'] . '/' .
+			$this->application['sub_category'] . '/' .
+			strtolower($this->view['name']) . '/css/' . $link);
 	}
 
 	public function js($link)
 	{
 		return $this->url->getStatic(
-			ucfirst($this->application['name']) . '/' .
-			ucfirst($this->view['name']) . '/js/' . $link);
+			$this->application['category'] . '/' .
+			$this->application['sub_category'] . '/' .
+			strtolower($this->view['name']) . '/js/' . $link);
 	}
 
 	public function fonts($link)
 	{
 		return $this->url->getStatic(
-			ucfirst($this->application['name']) . '/' .
-			ucfirst($this->view['name']) . '/fonts/' . $link);
+			$this->application['category'] . '/' .
+			$this->application['sub_category'] . '/' .
+			strtolower($this->view['name']) . '/fonts/' . $link);
 	}
 
 	public function sounds($link)
 	{
 		return $this->url->getStatic(
-			ucfirst($this->application['name']) . '/' .
-			ucfirst($this->view['name']) . '/sounds/' . $link);
+			$this->application['category'] . '/' .
+			$this->application['sub_category'] . '/' .
+			strtolower($this->view['name']) . '/sounds/' . $link);
 	}
 }

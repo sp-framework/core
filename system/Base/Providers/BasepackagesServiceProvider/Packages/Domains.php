@@ -44,18 +44,18 @@ class Domains extends BasePackage
 		$this->domain = $this->getNamedDomain($this->request->getHttpHost());
 
 		if ($this->domain) {
-			if ($this->domain['allowed_application_ids']) {
-				$this->domain['allowed_application_ids'] = Json::decode($this->domain['allowed_application_ids'], true);
+			if ($this->domain['allowed_applications']) {
+				$this->domain['allowed_applications'] = Json::decode($this->domain['allowed_applications'], true);
 			}
 		}
-		// foreach ($this->domain['allowed_application_ids'] as $key => $value) {
+		// foreach ($this->domain['allowed_applications'] as $key => $value) {
 		// 	if ($key !== 'defaultApplication') {
 		// 		if ($value['defaultComponent']) {
-		// 			$this->domain['allowed_application_ids'][$key]['defaultComponent'] =
+		// 			$this->domain['allowed_applications'][$key]['defaultComponent'] =
 		// 				$this->modules->components->getIdComponent($value['defaultComponent']);
 		// 		}
 		// 		if ($value['defaultViews']) {
-		// 			$this->domain['allowed_application_ids'][$key]['defaultViews'] =
+		// 			$this->domain['allowed_applications'][$key]['defaultViews'] =
 		// 				$this->modules->views->getIdView($value['defaultViews']);
 		// 		}
 		// 	}
@@ -166,7 +166,7 @@ class Domains extends BasePackage
 		if ($did) {
 			$domain = $this->getById($did);
 
-			$domain['allowed_application_ids'] = Json::decode($domain['allowed_application_ids'], true);
+			$domain['allowed_applications'] = Json::decode($domain['allowed_applications'], true);
 
 			$this->packagesData->domain = $domain;
 

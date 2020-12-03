@@ -2,7 +2,6 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
-use System\Base\Providers\ModulesServiceProvider\Installer;
 use System\Base\Providers\ModulesServiceProvider\Modules\Applications;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
 use System\Base\Providers\ModulesServiceProvider\Modules\Core;
@@ -12,6 +11,8 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
 use System\Base\Providers\ModulesServiceProvider\Modules\Views;
+use System\Base\Providers\ModulesServiceProvider\Manager;
+use System\Base\Providers\ModulesServiceProvider\Installer;
 
 class Modules
 {
@@ -32,6 +33,10 @@ class Modules
 	protected $domains;
 
 	protected $menus;
+
+	protected $manager;
+
+	protected $installer;
 
 	public function __construct()
 	{
@@ -109,6 +114,13 @@ class Modules
 		$this->menus = (new Menus())->init();
 
 		return $this->menus;
+	}
+
+	protected function initManager()
+	{
+		$this->manager = (new Manager())->init();
+
+		return $this->manager;
 	}
 
 	protected function initInstaller()

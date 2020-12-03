@@ -48,19 +48,19 @@ class Applications
 				new Column(
 					'category',
 					[
-						'type'    => Column::TYPE_TINYINTEGER,
-						'size'    => 1,
+						'type'    => Column::TYPE_VARCHAR,
+						'size'	  => 50,
 						'notNull' => true,
 					]
 				),
-				// new Column(
-				// 	'debug',
-				// 	[
-				// 		'type'    => Column::TYPE_TINYINTEGER,
-				// 		'size'    => 1,
-				// 		'notNull' => true,
-				// 	]
-				// ),
+				new Column(
+					'sub_category',
+					[
+						'type'    => Column::TYPE_VARCHAR,
+						'size'	  => 50,
+						'notNull' => true,
+					]
+				),
 				new Column(
 					'default_component',
 					[
@@ -185,7 +185,6 @@ class Applications
 				new Index(
 					'column_UNIQUE',
 					[
-						'route',
 						'name'
 					],
 					'UNIQUE'

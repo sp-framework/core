@@ -2,20 +2,15 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
-use GuzzleHttp\Client;
-use League\Flysystem\Adapter\Local;
-use League\Flysystem\Filesystem;
-use Packages\Admin\Modules;
 use System\Base\BasePackage;
-use System\Base\Providers\CoreServiceProvider\Core;
 
 class Installer extends BasePackage
 {
+    protected $token = 'f21251a1fd1d764a7cca2ad127f16521aa76ea2d';
+
     protected $applicationName = null;
 
     protected $postData;
-
-    // protected $postDataArr;
 
     protected $downloadClient;
 
@@ -31,23 +26,22 @@ class Installer extends BasePackage
 
     protected $modulesToInstall = [];
 
-    public function runProcess($postData)
+    public function onConstruct()
     {
-        $this->postData = $postData;
-
-        $this->downloadClient = new Client();
-
-        $this->fileSystem = new Filesystem(new Local(base_path('/')));
-
         $this->zip = new \ZipArchive;
 
-        if (!$this->fileSystem->has('.backups')) {
-            $this->fileSystem->createDir('.backups');
+        if (!$this->localContent->has('.backups')) {
+            $this->localContent->createDir('.backups');
         }
 
-        if (!$this->fileSystem->has('.downloads')) {
-            $this->fileSystem->createDir('.downloads');
+        if (!$this->localContent->has('.downloads')) {
+            $this->localContent->createDir('.downloads');
         }
+    }
+
+    public function runProcess(array $postData)
+    {
+        $this->postData = $postData;
 
         if (!$this->{$this->postData['type']}->getById($this->postData['id'])) {
 
@@ -103,7 +97,7 @@ class Installer extends BasePackage
 
         $this->packagesData->responseMessage = 'Nothing to do!';
 
-        return $this->packagesData;
+        // return $this->packagesData;
     }
 
     protected function processInstall()
@@ -359,7 +353,7 @@ class Installer extends BasePackage
         $framework['dir'] = [];
         $framework['file'] = [];
 
-        $rootContents = $this->fileSystem->listContents('/');
+        $rootContents = $this->localContent->listContents('/');
 
         foreach ($rootContents as $rootKey => $rootValue) {
             if ($rootValue['type'] === 'dir') {
@@ -379,7 +373,7 @@ class Installer extends BasePackage
         }
 
         foreach ($framework['dir'] as $dirKey => $dirValue) {
-            $rootDirContents[$dirValue] = $this->fileSystem->listContents($dirValue, true);
+            $rootDirContents[$dirValue] = $this->localContent->listContents($dirValue, true);
         }
 
         foreach ($rootDirContents as $rootDirContentsKey => $rootDirContentsValue) {
@@ -410,7 +404,7 @@ class Installer extends BasePackage
     protected function downloadPackagesAndDependencies($module)
     {
         try {
-            $downloadedContents = $this->downloadClient
+            $downloadedContents = $this->remoteContent
                     ->request('GET', $module['repo'] . '/archive/master.zip')
                     ->getBody()
                     ->getContents();
@@ -425,29 +419,29 @@ class Installer extends BasePackage
 
         $this->downloadLocation = '.downloads/';
 
-        if (!$this->fileSystem->has($this->downloadLocation . ucfirst($module['type']))) {
-            $this->fileSystem->createDir($this->downloadLocation . ucfirst($module['type']));
+        if (!$this->localContent->has($this->downloadLocation . ucfirst($module['type']))) {
+            $this->localContent->createDir($this->downloadLocation . ucfirst($module['type']));
             $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
         } else {
             $this->downloadLocation = $this->downloadLocation . ucfirst($module['type']);
         }
 
-        if (!$this->fileSystem->has($this->downloadLocation . '/' . $module['name'])) {
-            $this->fileSystem->createDir($this->downloadLocation . '/' . $module['name']);
+        if (!$this->localContent->has($this->downloadLocation . '/' . $module['name'])) {
+            $this->localContent->createDir($this->downloadLocation . '/' . $module['name']);
             $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
         } else {
             $this->downloadLocation = $this->downloadLocation . '/' . $module['name'];
         }
 
-        if (!$this->fileSystem->has($this->downloadLocation . '/' . $module['version'])) {
-            $this->fileSystem->createDir($this->downloadLocation . '/' . $module['version']);
+        if (!$this->localContent->has($this->downloadLocation . '/' . $module['version'])) {
+            $this->localContent->createDir($this->downloadLocation . '/' . $module['version']);
             $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
         } else {
             $this->downloadLocation = $this->downloadLocation . '/' . $module['version'];
         }
 
-        // if (!$this->fileSystem->has($this->downloadLocation . '/' . $module['repobranch'])) {
-        //  $this->fileSystem->createDir($this->downloadLocation . '/' . $module['repobranch']);
+        // if (!$this->localContent->has($this->downloadLocation . '/' . $module['repobranch'])) {
+        //  $this->localContent->createDir($this->downloadLocation . '/' . $module['repobranch']);
         //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
         // } else {
         //  $this->downloadLocation = $this->downloadLocation . '/' . $module['repobranch'];
@@ -455,7 +449,7 @@ class Installer extends BasePackage
 
         // var_dump($this->downloadLocation);
 
-        $this->fileSystem->put(
+        $this->localContent->put(
             $this->downloadLocation . '/master.zip',
             $downloadedContents
         );
@@ -480,7 +474,7 @@ class Installer extends BasePackage
                     '-master/' . $type . '/';
             }
 
-            return $this->fileSystem->listContents($extractedLocation, true);
+            return $this->localContent->listContents($extractedLocation, true);
         } else {
 
             return false;
@@ -503,7 +497,7 @@ class Installer extends BasePackage
 
             if ($content['type'] === 'dir') {
 
-                $this->fileSystem->createDir($destDir . '/' . $content['basename']);
+                $this->localContent->createDir($destDir . '/' . $content['basename']);
 
                 array_push($installedFiles['dir'], $destDir . '/' . $content['basename']);
 
@@ -511,7 +505,7 @@ class Installer extends BasePackage
 
                 if ($content['basename'] !== '.gitkeep') {
 
-                    $this->fileSystem->copy($content['path'], $destDir . '/' . $content['basename']);
+                    $this->localContent->copy($content['path'], $destDir . '/' . $content['basename']);
 
                     array_push($installedFiles['files'], $destDir . '/' . $content['basename']);
                 }
@@ -522,26 +516,26 @@ class Installer extends BasePackage
         return $installedFiles;
         // if ($type === 'components' || $type === 'packages' || $type === 'middlewares') {
         //  if ($type === 'components') {
-        //      $this->fileSystem->put(
+        //      $this->localContent->put(
         //          $type . '/'. $this->applicationName . '/Install/' . $this->componentName . '/files.info', json_encode($installedFiles)
         //      );
         //  } else if ($type === 'packages') {
-        //      $this->fileSystem->put(
+        //      $this->localContent->put(
         //          $type . '/'. $this->applicationName . '/Install/' . $this->packageName . '/files.info', json_encode($installedFiles)
         //      );
         //  } else if ($type === 'middlewares') {
-        //      $this->fileSystem->put(
+        //      $this->localContent->put(
         //          $type . '/'. $this->applicationName . '/Install/' . $this->middlewareName . '/files.info', json_encode($installedFiles)
         //      );
         //  }
         // } else {
-        //  $this->fileSystem->put($type . '/'. $this->applicationName . '/files.info', json_encode($installedFiles));
+        //  $this->localContent->put($type . '/'. $this->applicationName . '/files.info', json_encode($installedFiles));
         // }
     }
 
     protected function deleteDownloads()
     {
-        $downloadsToDelete = $this->fileSystem->listContents('.downloads', true);
+        $downloadsToDelete = $this->localContent->listContents('.downloads', true);
 
         $downloadedFiles = [];
         $downloadedFiles['dir'] = [];
@@ -557,13 +551,13 @@ class Installer extends BasePackage
 
         if (count($downloadedFiles['files']) > 0) {
             foreach ($downloadedFiles['files'] as $fileKey => $file) {
-                $this->fileSystem->delete($file);
+                $this->localContent->delete($file);
             }
         }
 
         if (count($downloadedFiles['dir']) > 0) {
             foreach ($downloadedFiles['dir'] as $dirKey => $dir) {
-                $this->fileSystem->deleteDir($dir);
+                $this->localContent->deleteDir($dir);
             }
         }
     }

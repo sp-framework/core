@@ -1,0 +1,8 @@
+{
+    "name"          : "ABN Lookup",
+    "displayName"   : "Admin ABN Lookup Package",
+    "description"   : "Package for making ABN Search via Businesses component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/package-admin-abnlookup",
+    "settings"      : { }
+}

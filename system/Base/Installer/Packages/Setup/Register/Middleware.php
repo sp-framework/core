@@ -2,9 +2,11 @@
 
 namespace System\Base\Installer\Packages\Setup\Register;
 
+use Phalcon\Helper\Json;
+
 class Middleware
 {
-	public function register($db, $middlewareFile, $installedFiles, $newApplicationId)
+	public function register($db, $middlewareFile, $installedFiles)
 	{
 		return $db->insertAsDict(
 			'middlewares',
@@ -14,21 +16,14 @@ class Middleware
 				'description' 			=> $middlewareFile['description'],
 				'version'				=> $middlewareFile['version'],
 				'repo'		 			=> $middlewareFile['repo'],
-				'path'					=> $middlewareFile['path'],
 				'class'					=> $middlewareFile['class'],
 				'settings'				=>
 					isset($middlewareFile['settings']) ?
-					json_encode($middlewareFile['settings']) :
+					Json::encode($middlewareFile['settings']) :
 					null,
-				'dependencies'			=>
-					isset($middlewareFile['dependencies']) ?
-					json_encode($middlewareFile['dependencies']) :
-					null,
-				'application_id'		=> $newApplicationId,
-				'sequence'				=> 0,
-				'enabled'				=> 0,
-				'installed'				=> 1,
-				'files'					=> json_encode($installedFiles)
+				'applications'			=>
+					Json::encode(['1'=>['installed'=>true,'sequence'=>0,'enabled'=>false]]),
+				'files'					=> Json::encode($installedFiles)
 			]
 		);
 	}

@@ -44,10 +44,10 @@ class Domains
 						]
 					),
 					new Column(
-						'allowed_application_ids',
+						'allowed_applications',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 1024,
+							'size'    => 2048,
 							'notNull' => false,
 						]
 					),

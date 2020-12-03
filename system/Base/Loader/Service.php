@@ -10,6 +10,8 @@ class Service
 
 	protected static $base;
 
+	public static $loader;
+
 	/**
 	 * @var null|\System\Base\Service Singleton instance.
 	 */
@@ -43,13 +45,13 @@ class Service
 
 		$files = include(self::$base . 'system/Base/Loader/Files.php');
 
-		$loader = new Loader();
+		self::$loader = new Loader();
 
-		$loader->registerNamespaces($this->getNamespaces());
+		self::$loader->registerNamespaces($this->getNamespaces());
 
-		$loader->registerFiles($this->getFiles());
+		self::$loader->registerFiles($this->getFiles());
 
-		$loader->register();
+		self::$loader->register();
 	}
 
 	protected function getNamespaces()

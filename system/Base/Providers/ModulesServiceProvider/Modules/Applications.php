@@ -216,20 +216,28 @@ class Applications extends BasePackage
 		}
 	}
 
-	public function removeDefaultFlag()
-	{
-		$defaultApplication = $this->getDefaultApplication();
+	// public function removeDefaultFlag()
+	// {
+	// 	$defaultApplication = $this->getDefaultApplication();
 
-		if ($defaultApplication) {
+	// 	if ($defaultApplication) {
 
-			$defaultApplication['is_default'] = 0;
+	// 		$defaultApplication['is_default'] = 0;
 
-			$this->modules->applications->update($defaultApplication);
-		}
-	}
+	// 		$this->modules->applications->update($defaultApplication);
+	// 	}
+	// }
 
 	public function addApplication(array $data)
 	{
+		// if (!$this->addApplicationStructure($data['route'])) {
+		// 	$this->packagesData->responseCode = 1;
+
+		// 	$this->packagesData->responseMessage = 'App files already exists.';
+
+		// 	return false;
+		// }
+
 		if ($this->add($data)) {
 			$this->packagesData->responseCode = 0;
 
@@ -244,7 +252,7 @@ class Applications extends BasePackage
 	public function updateApplication(array $data)
 	{
 		if ($data['middlewares']) {
-			$this->updateMiddlewares(Json::decode($data['middlewares'], true));
+			$this->modules->middlewares->updateMiddlewares(Json::decode($data['middlewares'], true));
 		}
 
 		if ($this->update($data)) {
@@ -258,29 +266,17 @@ class Applications extends BasePackage
 		}
 	}
 
-	protected function updateMiddlewares(array $data)
-	{
-		foreach ($data['middlewares'] as $middlewareId => $status) {
-			$middleware = [];
-			$middleware['id'] = $middlewareId;
-			if ($status === true) {
-				$middleware['enabled'] = 1;
-			} else if ($status === false) {
-				$middleware['enabled'] = 0;
-			}
-			$this->modules->middlewares->update($middleware);
-		}
-
-		foreach ($data['sequence'] as $sequence => $middlewareId) {
-			$middleware = [];
-			$middleware['id'] = $middlewareId;
-			$middleware['sequence'] = $sequence;
-			$this->modules->middlewares->update($middleware);
-		}
-	}
-
 	public function removeApplication(array $data)
 	{
+		$application = $this->getById($data['id']);
+
+		// if (!$this->removeApplicationStructure($application['route'])) {
+		// 	$this->packagesData->responseCode = 1;
+
+		// 	$this->packagesData->responseMessage = 'App files already exists.';
+
+		// 	return false;
+		// }
 		//Check relations before removing.
 		if ($this->remove($data['id'])) {
 			$this->packagesData->responseCode = 0;
@@ -291,5 +287,116 @@ class Applications extends BasePackage
 
 			$this->packagesData->responseMessage = 'Error removing application.';
 		}
+	}
+
+	// protected function addApplicationStructure(string $route)
+	// {
+	// 	if ($this->localContent->has('applications/' . ucfirst($route))) {
+	// 		return false;
+	// 	}
+	// 	if ($this->localContent->has('public/' . ucfirst($route))) {
+	// 		return false;
+	// 	}
+
+	// 	$this->localContent->createDir('public/' . ucfirst($route));
+	// 	$this->localContent->createDir('applications/' . ucfirst($route));
+	// 	$this->localContent->createDir('applications/' . ucfirst($route) . '/Components');
+	// 	$this->localContent->createDir('applications/' . ucfirst($route) . '/Packages');
+	// 	$this->localContent->createDir('applications/' . ucfirst($route) . '/Middlewares');
+	// 	$this->localContent->createDir('applications/' . ucfirst($route) . '/Views');
+
+	// 	return true;
+	// }
+
+	// protected function removeApplicationStructure(string $route)
+	// {
+	// 	$structure = [];
+	// 	$structure =
+	// 		array_merge(
+	// 			$this->localContent->listContents('applications/' . ucfirst($route), true),
+	// 			$this->localContent->listContents('public/' . ucfirst($route), true),
+	// 		);
+
+	// 	$appStructure = [];
+	// 	$appStructure['dir'] = [];
+	// 	$appStructure['files'] = [];
+
+	// 	foreach ($structure as $key => $value) {
+	// 		if ($value['type'] === 'dir') {
+	// 			array_push($appStructure['dir'], $value['path']);
+	// 		} else if ($value['type'] === 'file') {
+	// 			array_push($appStructure['files'], $value['path']);
+	// 		}
+	// 	}
+
+	// 	if (count($appStructure['files']) > 0) {
+	// 		foreach ($appStructure['files'] as $fileKey => $file) {
+	// 			$this->localContent->delete($file);
+	// 		}
+	// 	}
+
+	// 	if (count($appStructure['dir']) > 0) {
+	// 		foreach ($appStructure['dir'] as $dirKey => $dir) {
+	// 			$this->localContent->deleteDir($dir);
+	// 		}
+	// 	}
+
+	// 	$this->localContent->deleteDir('public/' . ucfirst($route));
+	// 	$this->localContent->deleteDir('applications/' . ucfirst($route));
+
+	// 	return true;
+	// }
+
+	public function getAppCategories()
+	{
+		return
+			[
+				'0'   =>
+					[
+						'id'   => 'core',
+						'name' => 'Core'
+					],
+				'1'   =>
+					[
+						'id'   => 'ecom',
+						'name' => 'E-Commerce Management System'
+					],
+				'2'    =>
+					[
+						'id'   => 'tms',
+						'name' => 'Transport Management System'
+					]
+			];
+	}
+
+	public function getAppSubCategories()
+	{
+		return
+			[
+				'0'	  =>
+					[
+						'id'  		=> 'admin',
+						'parent'	=> 'core',
+						'name' 		=> 'Admin'
+					],
+				'1'   =>
+					[
+						'id'  		=> 'dashboard',
+						'parent'	=> 'ecom',
+						'name' 		=> 'Dashboard'
+					],
+				'2'   =>
+					[
+						'id'  		=> 'eshop',
+						'parent'	=> 'ecom',
+						'name' 		=> 'EShop'
+					],
+				'3'   =>
+					[
+						'id'  		=> 'pos',
+						'parent'	=> 'ecom',
+						'name' 		=> 'PoS'
+					]
+			];
 	}
 }

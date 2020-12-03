@@ -1,9 +1,9 @@
 {
 	"name" 			: "Core",
-	"displayName" 	: "Hello World Framework (Core)",
-	"description" 	: "Hello World Framework Core",
+	"displayName" 	: "Bazaari Core",
+	"description" 	: "Bazaari Framework Core Module",
 	"version" 		: "0.0.1",
-	"repo" 			: "https://github.com/h-w-f/core",
+	"repo" 			: "https://dev.bazaari.com.au/sp-dev/core",
 	"settings"      : {
 		"debug"			: "",
 		"db"			: {

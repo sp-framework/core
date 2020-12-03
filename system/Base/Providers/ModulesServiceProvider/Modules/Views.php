@@ -3,6 +3,7 @@
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Views as ViewsModel;
 
@@ -61,12 +62,14 @@ class Views extends BasePackage
         if (!isset($this->voltCompiledPath)) {
             if ($this->application && $this->view) {
                 $this->voltCompiledPath =
-                    base_path('applications/' . $this->application['name'] .
-                              '/Views/' . $this->view['name'] .
-                              '/html_compiled/');
+                    base_path('applications/' .
+                              ucfirst($this->application['category']) . '/' .
+                              ucfirst($this->application['sub_category']) . '/' .
+                              '/Views/Html_compiled/' . ucfirst($this->application['route']) . '/' . $this->view['name'] . '/'
+                          );
             } else {
                 $this->voltCompiledPath =
-                    base_path('applications/Admin/Views/Default/html_compiled/');
+                    base_path('applications/Core/Admin/Admin/Views/Default/Html_compiled/');
             }
 
             if (!is_dir($this->voltCompiledPath)) {
@@ -89,12 +92,12 @@ class Views extends BasePackage
         if (!isset($this->phalconViewPath)) {
             if ($this->application && $this->view) {
                 $this->phalconViewPath =
-                    base_path('applications/' . $this->application['name'] .
+                    base_path('applications/' . ucfirst($this->application['category']) . '/' . ucfirst($this->application['sub_category']) .
                               '/Views/' . $this->view['name'] .
                               '/html/');
             } else {
                 $this->phalconViewPath =
-                    base_path('applications/Admin/Views/Default/html/');
+                    base_path('applications/Core/Admin/Views/Default/html/');
             }
         }
     }
@@ -109,12 +112,12 @@ class Views extends BasePackage
         if (!isset($this->phalconViewLayoutPath)) {
             if ($this->application && $this->view) {
                 $this->phalconViewLayoutPath =
-                    base_path('applications/' . $this->application['name'] .
+                    base_path('applications/' . ucfirst($this->application['category']) . '/' . ucfirst($this->application['sub_category']) .
                               '/Views/' . $this->view['name'] .
                               '/html/layouts/');
             } else {
                 $this->phalconViewLayoutPath =
-                    base_path('applications/Admin/Views/Default/html/layouts/');
+                    base_path('applications/Core/Admin/Views/Default/html/layouts/');
             }
         }
     }
@@ -170,26 +173,11 @@ class Views extends BasePackage
     {
         if (!$this->application) {
             $this->application = $this->applications->getApplicationInfo();
-            // var_dump($this->application);
+
             if ($this->application) {
-                if (isset($this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']])) {
-                    $applicationDefaults = $this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']];
-                } else {
-                    $applicationDefaults = null;
-                }
-            } else {
-                $applicationDefaults = null;
-            }
-
-            if ($this->application && $applicationDefaults) {
-
-                // $applicationName = ucfirst($this->application['route']);
-
-                $viewsName = $this->getIdViews($applicationDefaults['defaultViews'])['name'];
-
+                $viewsName = $this->getIdViews($this->application['default_view'])['name'];
             } else {
                 $viewsName =  'Default';
-
             }
 
             if (!$this->view) {
@@ -198,9 +186,8 @@ class Views extends BasePackage
                     $this->view = $this->getApplicationView($this->application['id'], $viewsName);
                 }
             }
-
             if ($this->view) {
-                $this->viewSettings = json_decode($this->view['settings'], true);
+                $this->viewSettings = Json::decode($this->view['settings'], true);
 
                 $this->cache = $this->viewSettings['cache'];
 
@@ -211,9 +198,6 @@ class Views extends BasePackage
                 $this->cache = false;
                 $this->tags = false;
             }
-            //     var_dump($this->viewSettings);
-            // var_dump($applicationDefaults);
-            // die();
         }
     }
 
@@ -226,12 +210,16 @@ class Views extends BasePackage
             );
     }
 
-    public function getApplicationView($id, $name)
+    public function getApplicationView($applicationId, $name)
     {
         $filter =
             $this->model->filter(
-                function($view) use ($id, $name) {
-                    if ($view->application_id == $id && $view->name === ucfirst($name)) {
+                function($view) use ($applicationId, $name) {
+                    $view = $view->toArray();
+                    $view['applications'] = Json::decode($view['applications'], true);
+                    if ($view['applications'][$applicationId]['installed'] === true &&
+                        $view['name'] === ucfirst($name)
+                    ) {
                         return $view;
                     }
                 }
@@ -240,30 +228,28 @@ class Views extends BasePackage
         if (count($filter) > 1) {
             throw new \Exception('Duplicate default view for application ' . $name);
         } else if (count($filter) === 1) {
-            return $filter[0]->toArray();
+            return $filter[0];
         } else {
             return false;
         }
     }
 
-    public function getViewsForApplication($id)
+    public function getViewsForApplication($applicationId)
     {
-        $views = [];
-
         $filter =
             $this->model->filter(
-                function($view) use ($id) {
-                    if ($view->application_id == $id && !$view->view_id) {
+                function($view) use ($applicationId) {
+                    $view = $view->toArray();
+                    $view['applications'] = Json::decode($view['applications'], true);
+                    if (isset($view['applications'][$applicationId]['installed']) &&
+                        $view['applications'][$applicationId]['installed'] === true
+                    ) {
                         return $view;
                     }
                 }
             );
 
-        foreach ($filter as $key => $value) {
-            array_push($views, $value->toArray());
-        }
-
-        return $views;
+        return $filter;
     }
 
     public function getIdViews($id)
@@ -284,5 +270,27 @@ class Views extends BasePackage
         } else {
             return false;
         }
+    }
+
+    public function getViewsForCategoryAndSubcategory($category, $subCategory)
+    {
+        $views = [];
+
+        $filter =
+            $this->model->filter(
+                function($views) use ($category, $subCategory) {
+                    if ($views->category === $category &&
+                        $views->sub_category === $subCategory
+                    ) {
+                        return $views;
+                    }
+                }
+            );
+
+        foreach ($filter as $key => $value) {
+            $views[$key] = $value->toArray();
+        }
+
+        return $views;
     }
 }

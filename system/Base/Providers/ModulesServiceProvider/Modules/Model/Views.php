@@ -10,9 +10,11 @@ class Views extends BaseModel
 
     public $name;
 
-    public $display_name;
-
     public $description;
+
+    public $category;
+
+    public $sub_category;
 
     public $version;
 
@@ -22,9 +24,7 @@ class Views extends BaseModel
 
     public $dependencies;
 
-    public $application_id;
-
-    public $installed;
+    public $applications;
 
     public $files;
 

@@ -62,7 +62,7 @@ class ViewServiceProvider implements ServiceProviderInterface
 			$application = $container->getShared('modules')->applications->getApplicationInfo();
 			$tagsName = strtolower($tags['name']);
 
-			$package = 'Applications\\' . ucfirst($application['name']) . '\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
+			$package = 'Applications\\' . ucfirst($application['category']) . '\\' . ucfirst($application['sub_category']) . '\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
 
 			$container->setShared(
 				$tagsName,

@@ -8,29 +8,29 @@ class Components extends BaseModel
 {
     public $id;
 
+    public $route;
+
     public $name;
 
-    public $display_name;
-
     public $description;
+
+    public $category;
+
+    public $subcategory;
 
     public $version;
 
     public $repo;
 
-    public $path;
-
     public $class;
 
     public $settings;
 
-    public $menu_id;
-
     public $dependencies;
 
-    public $application_id;
+    public $menu;
 
-    public $installed;
+    public $applications;
 
     public $files;
 

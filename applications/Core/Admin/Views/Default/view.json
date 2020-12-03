@@ -1,0 +1,60 @@
+{
+    "name"          : "Default",
+    "description"   : "Default Admin View",
+    "category"      : "core",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/view-admin-default",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "settings"      : {
+        "cache"     : false,
+        "layout"    : "default",
+        "tags"      : "AdminLTETags",
+        "head"      : {
+            "title" : "Admin",
+            "meta"  : {
+                "charset"       : "UTF-8",
+                "viewport"      : "width=device-width, initial-scale=1, shrink-to-fit=no",
+                "description"   : "Admin Views",
+                "author"        : "Guru",
+                "keywords"      : "HTML, CSS, JavaScript"
+            },
+            "link"      : {
+                "href"      : [
+                    "core/admin/default/css/plugins.css",
+                    "core/admin/default/css/core.css"
+                ]
+            },
+            "script"    : {
+                "src"   : [
+                    "core/admin/default/js/header/jsHeaderDependencies.js",
+                    "core/admin/default/js/header/jsHeaderCore.js",
+                    "core/admin/default/js/header/jsHeaderPlugins.js"
+                ]
+            }
+        },
+        "body"          : {
+            "params"    : "",
+            "jsscript"  : ""
+        },
+        "footer"        : {
+            "params"    : "",
+            "script"    : {
+                "src"   : [
+                    "core/admin/default/js/footer/jsFooterDependencies.js"
+                ]
+            },
+            "jsscript"  : ""
+        }
+    }
+}

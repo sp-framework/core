@@ -1,0 +1,48 @@
+{% if modules|length != 0 %}
+    <div class="row">
+        {% for moduleKey, module in modules %}
+            {% if modulesKey == 'core' %}
+                {% set colSize = '12' %}
+            {% else %}
+                {% set colSize = '6' %}
+            {% endif %}
+            <div class="col-md-{{colSize}} mb-3">
+                {{adminltetags.useTag('content',
+                    [
+                        'component'                   : component,
+                        'componentId'                 : componentId,
+                        'parentComponentId'           : parent,
+                        'sectionId'                   : 'module-data-' ~ moduleKey ,
+                        'contentType'                 : 'section',
+                        'cardId'                      : module['name']|lower,
+                        'cardHeader'                  : true,
+                        'cardFooter'                  : true,
+                        'cardType'                    : 'info',
+                        'cardTitle'                   : module['name'],
+                        'cardAdditionalClass'         : 'rounded-0',
+                        'cardCollapsed'               : false,
+                        'cardBodyInclude'             : 'modules/modulecard',
+                        'cardBodyIncludeParams'       :
+                                                        [
+                                                            'module'        : module
+                                                        ],
+                        'cardFooterInclude'           : 'modules/modulecardfooter',
+                        'cardFooterIncludeParams'     :
+                                                        [
+                                                            'modulesKey'    : modulesKey,
+                                                            'module'        : module
+                                                        ]
+                    ]
+                )}}
+            </div>
+        {% endfor %}
+    </div>
+{% elseif modules|length == 0 %}
+    <div class="row">
+        <div class="col">
+            <span class="text-warning">
+                No {{modulesKey}} available. Sync modules with remote repository.
+            </span>
+        </div>
+    </div>
+{% endif %}

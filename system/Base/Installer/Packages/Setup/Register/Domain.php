@@ -6,23 +6,9 @@ use Phalcon\Helper\Json;
 
 class Domain
 {
-	public function register($db, $request, $homeComponentId)
+	public function register($db, $request)
 	{
 		$request->setStrictHostCheck(true);
-
-		// $settings =
-		// 	[
-		// 		"applications" 		=>
-		// 			[
-		// 				"1" 				=>
-		// 					[
-		// 						"allowed" 			=> true,
-		// 						"defaultComponent" 	=> $homeComponentId,
-		// 						"defaultViews" 		=> "1",
-		// 						"errorComponent"	=> "5"
-		// 					]
-		// 			]
-		// 	];
 
 		$db->insertAsDict(
 			'domains',
@@ -30,8 +16,8 @@ class Domain
 				'name'   					=> $request->getHttpHost(),
 				'description' 				=> '',
 				"default_application_id"	=> 1,
-				"allowed_application_ids"	=> Json::encode(["1" => true])
-				// 'settings'			 		=> json_encode($settings)
+				"allowed_applications"	    => Json::encode(["1" => true]),
+				'settings'			 		=> json_encode([])
 			]
 		);
 	}

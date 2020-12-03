@@ -18,23 +18,13 @@ class Middlewares extends BaseModel
 
     public $repo;
 
-    public $path;
-
     public $class;
 
     public $settings;
 
-    public $dependencies;
-
-    public $application_id;
-
-    public $sequence;
-
-    public $installed;
+    public $applications;
 
     public $files;
-
-    public $enabled;
 
     public $update_available;
 

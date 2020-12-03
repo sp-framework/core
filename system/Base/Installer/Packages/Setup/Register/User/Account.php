@@ -6,7 +6,7 @@ use Phalcon\Helper\Json;
 
 class Account
 {
-    public function register($db, $email, $password, $newApplicationId, $adminRoleId)
+    public function register($db, $email, $password, $adminRoleId)
     {
         $permissions =
             Json::encode(

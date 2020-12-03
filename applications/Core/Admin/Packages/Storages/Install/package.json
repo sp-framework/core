@@ -1,0 +1,8 @@
+{
+	"name"			: "Storages",
+	"displayName" 	: "Admin Storages Package",
+	"description"	: "Package for Storages component",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/package-admin-storages",
+	"settings"		: {	}
+}
