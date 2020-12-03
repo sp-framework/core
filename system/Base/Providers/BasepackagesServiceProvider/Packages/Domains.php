@@ -44,8 +44,8 @@ class Domains extends BasePackage
 		$this->domain = $this->getNamedDomain($this->request->getHttpHost());
 
 		if ($this->domain) {
-			if ($this->domain['allowed_applications']) {
-				$this->domain['allowed_applications'] = Json::decode($this->domain['allowed_applications'], true);
+			if ($this->domain['applications']) {
+				$this->domain['applications'] = Json::decode($this->domain['applications'], true);
 			}
 		}
 		// foreach ($this->domain['allowed_applications'] as $key => $value) {
@@ -153,8 +153,6 @@ class Domains extends BasePackage
 
 		foreach ($applicationsArr as $key => $value) {
 			$applications[$value['id']] = $value;
-			$applications[$value['id']]['components'] =
-				$this->modules->components->getComponentsForApplication($value['id']);
 			$applications[$value['id']]['views'] =
 				$this->modules->views->getViewsForApplication($value['id']);
 		}
@@ -166,7 +164,8 @@ class Domains extends BasePackage
 		if ($did) {
 			$domain = $this->getById($did);
 
-			$domain['allowed_applications'] = Json::decode($domain['allowed_applications'], true);
+			$domain['applications'] = Json::decode($domain['applications'], true);
+			$domain['settings'] = Json::decode($domain['settings'], true);
 
 			$this->packagesData->domain = $domain;
 

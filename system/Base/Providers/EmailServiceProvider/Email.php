@@ -64,14 +64,11 @@ class Email
         if ($emailSettings) {
             $this->emailSettings = $emailSettings;
         } else {
-            if (isset($this->domain['settings']['applications'][$this->application['id']]['emailService']) &&
-                $this->domain['settings']['applications'][$this->application['id']]['emailService'] !== ''
+            if (isset($this->domain['applications'][$this->application['id']]['email_service']) &&
+                $this->domain['applications'][$this->application['id']]['email_service'] !== ''
             ) {
-
-                $emailService = $this->domain['settings']['applications'][$this->application['id']]['emailService'];
-
-                $this->emailSettings = $emailservices->init()->getById($emailService);
-
+                $this->emailSettings =
+                    $emailservices->init()->getById($this->domain['applications'][$this->application['id']]['email_service']);
             } else {
                 // throw new EmailException(
                 //     'No Email Service Configured & attached to the Domain. Please setup email service and attach it to domain ' . $this->domain['name']

@@ -15,11 +15,11 @@
     {% set applicationDescription = application['description'] %}
     {% set applicationDefaultComponent = application['default_component'] %}
     {% set applicationDefaultComponentDisabled = false %}
-    {% set applicationDefaultErrorsComponent = application['default_errors_component'] %}
-    {% set applicationDefaultErrorsComponentDisabled = false %}
-    {% set applicationDefaultView = application['default_view'] %}
+    {% set applicationErrorsComponent = application['errors_component'] %}
+    {% set applicationErrorsComponentDisabled = false %}
+    {# {% set applicationDefaultView = application['default_view'] %}
     {% set applicationDefaultViewDisabled = false %}
-    {% set applicationDefaultEmailService = application['default_email_service'] %}
+    {% set applicationDefaultEmailService = application['default_email_service'] %} #}
     {% if application['registration_allowed'] == true %}
         {% set registrationAllowed = true %}
     {% else %}
@@ -40,13 +40,13 @@
     {% set applicationDescription = '' %}
     {% set applicationDefaultComponent = '' %}
     {% set applicationDefaultComponentDisabled = true %}
-    {% set applicationDefaultErrorsComponent = '' %}
-    {% set applicationDefaultErrorsComponentDisabled = true %}
-    {% set applicationDefaultView = '' %}
+    {% set applicationErrorsComponent = '' %}
+    {% set applicationErrorsComponentDisabled = true %}
+    {# {% set applicationDefaultView = '' %}
     {% set applicationDefaultViewDisabled = true %}
-    {% set applicationDefaultEmailService = '' %}
+    {% set applicationDefaultEmailService = '' %} #}
     {% set components = [] %}
-    {% set views = [] %}
+    {# {% set views = [] %} #}
     {% set registrationAllowed = '' %}
     {% set applicationRegistrationRoleId = '' %}
     {% set applicationGuestRoleId = '' %}
@@ -235,25 +235,25 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'default_errors_component',
-                        'fieldLabel'                     : 'Default Error Component',
+                        'fieldId'                        : 'errors_component',
+                        'fieldLabel'                     : 'Errors Component',
                         'fieldType'                      : 'select2',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a default error component for this application.',
+                        'fieldHelpTooltipContent'        : 'Select an errors component for this application.',
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : applicationDefaultErrorsComponentDisabled,
+                        'fieldRequired'                  : false,
+                        'fieldDisabled'                  : applicationErrorsComponentDisabled,
                         'fieldDataSelect2Options'        : components,
                         'fieldDataSelect2OptionsKey'     : 'id',
                         'fieldDataSelect2OptionsValue'   : 'name',
                         'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': applicationDefaultErrorsComponent
+                        'fieldDataSelect2OptionsSelected': applicationErrorsComponent
                     ]
                 )}}
             </div>
-            <div class="col">
+{#             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -301,7 +301,7 @@
                         'fieldDataSelect2OptionsSelected': applicationDefaultEmailService
                     ]
                 )}}
-            </div>
+            </div> #}
         </div>
         <hr>
         <div class="row">
@@ -539,15 +539,15 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-default_component'               : {
             'placeholder'   : 'SELECT DEFAULT COMPONENT'
         },
-        '{{componentId}}-{{sectionId}}-default_errors_component'        : {
-            'placeholder'   : 'SELECT DEFAULT ERRORS COMPONENT'
+        '{{componentId}}-{{sectionId}}-errors_component'        : {
+            'placeholder'   : 'SELECT ERRORS COMPONENT'
         },
-        '{{componentId}}-{{sectionId}}-default_view'                    : {
-            'placeholder'   : 'SELECT DEFAULT VIEW (TEMPLATE)'
-        },
-        '{{componentId}}-{{sectionId}}-default_email_service'           : {
-            'placeholder'   : 'SELECT DEFAULT EMAIL SERVICE'
-        },
+        // '{{componentId}}-{{sectionId}}-default_view'                    : {
+        //     'placeholder'   : 'SELECT DEFAULT VIEW (TEMPLATE)'
+        // },
+        // '{{componentId}}-{{sectionId}}-default_email_service'           : {
+        //     'placeholder'   : 'SELECT DEFAULT EMAIL SERVICE'
+        // },
         '{{componentId}}-{{sectionId}}-registration_allowed'            : {
             afterInit: function() {
 
@@ -631,6 +631,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-route'                   : 'required',
                 '{{componentId}}-{{sectionId}}-category'                : 'required',
                 '{{componentId}}-{{sectionId}}-sub_category'            : 'required',
+                '{{componentId}}-{{sectionId}}-default_component'       : 'required',
                 '{{componentId}}-{{sectionId}}-registration_role_id'    : 'required',
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'required'
             },
@@ -639,6 +640,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
                 '{{componentId}}-{{sectionId}}-category'                : 'Please select app category',
                 '{{componentId}}-{{sectionId}}-sub_category'            : 'Please select app sub category',
+                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
                 '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role'
             }

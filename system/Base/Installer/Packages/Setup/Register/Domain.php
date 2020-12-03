@@ -10,14 +10,24 @@ class Domain
 	{
 		$request->setStrictHostCheck(true);
 
+		$applications =
+		[
+			'1' =>
+			[
+				'allowed'			=> true,
+				'view'				=> '1',
+				'email_service'		=> 0
+			]
+		];
+
 		$db->insertAsDict(
 			'domains',
 			[
 				'name'   					=> $request->getHttpHost(),
 				'description' 				=> '',
 				"default_application_id"	=> 1,
-				"allowed_applications"	    => Json::encode(["1" => true]),
-				'settings'			 		=> json_encode([])
+				"applications"			    => Json::encode($applications),
+				'settings'			 		=> Json::encode([])
 			]
 		);
 	}

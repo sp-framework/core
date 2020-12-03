@@ -174,8 +174,10 @@ class Views extends BasePackage
         if (!$this->application) {
             $this->application = $this->applications->getApplicationInfo();
 
-            if ($this->application) {
-                $viewsName = $this->getIdViews($this->application['default_view'])['name'];
+            $this->domain = $this->basepackages->domains->getDomain();
+
+            if (isset($this->domain['applications'][$this->application['id']]['view'])) {
+                $viewsName = $this->getIdViews($this->domain['applications'][$this->application['id']]['view'])['name'];
             } else {
                 $viewsName =  'Default';
             }
