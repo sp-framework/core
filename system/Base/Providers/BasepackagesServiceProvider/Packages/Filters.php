@@ -40,9 +40,11 @@ class Filters extends BasePackage
     }
     protected function addShowAllFilter(int $componentId)
     {
+        $component = $this->modules->components->getById($componentId);
+
         $this->addFilter(
             [
-                'name'          => 'Show All',
+                'name'          => 'Show All ' . $component['name'],
                 'conditions'    => '',
                 'component_id'  => $componentId,
                 'permission'    => 0,//System

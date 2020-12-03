@@ -24,8 +24,10 @@ class Components extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($component) use ($route, $applicationId) {
-					if ($component->route === $route &&
-						$component->application_id === $applicationId
+					$component = $component->toArray();
+					$component['applications'] = Json::decode($component['applications'], true);
+					if ($component['applications'][$applicationId]['installed'] === true &&
+						$component['route'] === $route
 					) {
 						return $component;
 					}
@@ -35,7 +37,7 @@ class Components extends BasePackage
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate component route found for component ' . $route);
 		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
+			return $filter[0];
 		} else {
 			return false;
 		}

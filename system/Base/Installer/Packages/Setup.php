@@ -168,7 +168,7 @@ class Setup
 
 			$homeComponentId = null;
 
-			$adminComponents = $this->localContent->listContents('applications/Core/Admin/Components/', true);
+			$adminComponents = $this->localContent->listContents('applications/Ecom/Admin/Components/', true);
 
 			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
 				if ($adminComponent['basename'] === 'component.json') {
@@ -200,12 +200,12 @@ class Setup
 
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->localContent->listContents('applications/Core/Admin/Packages/', true);
+			$adminPackages = $this->localContent->listContents('applications/Ecom/Admin/Packages/', true);
 
 			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
 				if ($adminPackage['basename'] === 'package.json') {
 					if ($adminPackage['path'] !==
-						'applications/Core/Admin/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
+						'applications/Ecom/Admin/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
 					) {
 						$jsonFile =
 							json_decode(
@@ -224,7 +224,7 @@ class Setup
 		} else if ($type === 'middlewares') {
 
 			$adminMiddlewares =
-				$this->localContent->listContents('applications/Core/Admin/Middlewares/', true);
+				$this->localContent->listContents('applications/Ecom/Admin/Middlewares/', true);
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
@@ -244,7 +244,7 @@ class Setup
 		} else if ($type === 'views') {
 			$jsonFile =
 				json_decode(
-					$this->localContent->read('applications/Core/Admin/Views/Default/view.json'),
+					$this->localContent->read('applications/Ecom/Admin/Views/Default/view.json'),
 					true
 				);
 
@@ -268,7 +268,7 @@ class Setup
 
 	protected function registerAdminComponent(array $componentFile, $menuId)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Core/Admin/Components/' . $componentFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Ecom/Admin/Components/' . $componentFile['name']);
 
 		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
 	}
@@ -287,21 +287,21 @@ class Setup
 
 	protected function registerAdminPackage(array $packageFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Core/Admin/Packages/' . $packageFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Ecom/Admin/Packages/' . $packageFile['name']);
 
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
 
 	public function registerAdminMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Core/Admin/Middlewares/' . $middlewareFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Ecom/Admin/Middlewares/' . $middlewareFile['name']);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
 
 	protected function registerAdminView(array $viewFile)
 	{
-		$applicationInstalledFiles = $this->getInstalledFiles('applications/Core/Admin/Views/');
+		$applicationInstalledFiles = $this->getInstalledFiles('applications/Ecom/Admin/Views/');
 		$publicInstalledFiles = $this->getInstalledFiles('public/Admin/');
 
 		$installedFiles = array_merge($applicationInstalledFiles, $publicInstalledFiles);

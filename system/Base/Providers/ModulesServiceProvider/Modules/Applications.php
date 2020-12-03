@@ -351,11 +351,6 @@ class Applications extends BasePackage
 	{
 		return
 			[
-				'0'   =>
-					[
-						'id'   => 'core',
-						'name' => 'Core'
-					],
 				'1'   =>
 					[
 						'id'   => 'ecom',
@@ -373,25 +368,25 @@ class Applications extends BasePackage
 	{
 		return
 			[
-				'0'	  =>
+				'1'	  =>
 					[
 						'id'  		=> 'admin',
-						'parent'	=> 'core',
+						'parent'	=> 'ecom',
 						'name' 		=> 'Admin'
 					],
-				'1'   =>
+				'2'   =>
 					[
 						'id'  		=> 'dashboard',
 						'parent'	=> 'ecom',
 						'name' 		=> 'Dashboard'
 					],
-				'2'   =>
+				'3'   =>
 					[
 						'id'  		=> 'eshop',
 						'parent'	=> 'ecom',
 						'name' 		=> 'EShop'
 					],
-				'3'   =>
+				'4'   =>
 					[
 						'id'  		=> 'pos',
 						'parent'	=> 'ecom',

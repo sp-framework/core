@@ -1,9 +1,0 @@
-{
-    "name"          : "Auth",
-    "displayName"   : "Authentication Middleware",
-    "description"   : "This middleware is used by authentication package. Once enabled, user need to authentication to this application to access any resource.",
-    "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/middleware-admin-auth",
-    "class"         : "Applications\\Core\\Admin\\Middlewares\\Auth",
-    "settings"      : { }
-}

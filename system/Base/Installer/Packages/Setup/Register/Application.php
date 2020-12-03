@@ -14,12 +14,11 @@ class Application
 			[
 				'name' 						=> 'Admin',
 				'route' 					=> 'admin',
-				'description' 				=> 'Application Admin',
-				'category'	    			=> 'core',
+				'description' 				=> 'Ecom Admin App',
+				'category'	    			=> 'ecom',
 				'sub_category'  			=> 'admin',
 				'default_component'			=> 0,
-				'default_errors_component'	=> 0,
-				'default_view'				=> 1,
+				'errors_component'			=> 0,
 				'can_login_role_ids'		=> Json::encode(['1']),
 			]
 		);
@@ -54,8 +53,8 @@ class Application
 		$db->updateAsDict(
 			'applications',
 			[
-				'default_component' 			=> $homeComponent[0]['id'],
-				'default_errors_component' 		=> $errorsComponent[0]['id']
+				'default_component' 	=> $homeComponent[0]['id'],
+				'errors_component' 		=> $errorsComponent[0]['id']
 			],
 			"id = 1"
 		);

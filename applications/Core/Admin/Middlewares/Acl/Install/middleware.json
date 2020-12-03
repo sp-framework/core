@@ -1,9 +1,0 @@
-{
-    "name"          : "Acl",
-    "displayName"   : "Access Control List Middleware",
-    "description"   : "This middleware is used by user roles. It checks the role configuration and allows/blocks user's connection to a particular resource.",
-    "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/middleware-admin-acl",
-    "class"         : "Applications\\Core\\Admin\\Middlewares\\Acl",
-    "settings"      : { }
-}

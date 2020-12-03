@@ -1,0 +1,36 @@
+{
+    "route"         : "currencies",
+    "name"          : "Currencies",
+    "description"   : "List currencies via this component",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-currencies",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Currencies\\CurrenciesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "finance"       : {
+            "title"     : "finance",
+            "icon"      : "dollar-sign",
+            "childs"    : {
+                "currencies" : {
+                    "title"     : "currencies",
+                    "link"      : "currencies"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

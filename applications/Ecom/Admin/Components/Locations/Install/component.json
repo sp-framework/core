@@ -1,0 +1,31 @@
+{
+    "route"         : "locations",
+    "name"          : "Locations",
+    "description"   : "List locations via this component",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-locations",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Locations\\LocationsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "locations" : {
+            "icon"      : "map-marker-alt",
+            "title"     : "locations",
+            "link"      : "locations"
+        }
+    },
+    "settings"          : {
+    }
+}

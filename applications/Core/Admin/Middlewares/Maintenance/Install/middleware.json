@@ -1,9 +1,0 @@
-{
-    "name"          : "Maintenance",
-    "displayName"   : "Maintenance Mode Middleware",
-    "description"   : "This middleware is used when you want to perform any maintenance on this application. It blocks every connection to this application.",
-    "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/middleware-admin-maintenance",
-    "class"         : "Applications\\Core\\Admin\\Middlewares\\Maintenance",
-    "settings"      : { }
-}

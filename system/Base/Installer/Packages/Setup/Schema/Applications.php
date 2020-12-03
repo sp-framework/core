@@ -69,21 +69,14 @@ class Applications
 					]
 				),
 				new Column(
-					'default_errors_component',
+					'errors_component',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
 						'notNull' => true,
 					]
 				),
 				new Column(
-					'default_view',
-					[
-						'type'    => Column::TYPE_TINYINTEGER,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'default_email_service',
+					'email_service',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
 						'notNull' => false,

@@ -1,0 +1,36 @@
+{
+	"route"			: "barebone",
+	"name"			: "Barebone",
+	"description"	: "Manage admin barebone via this component",
+	"category"      : "ecom",
+	"sub_category"  : "admin",
+	"version"		: "0.0.1",
+	"repo"			: "https://github.com/h-w-f/component-admin-barebone",
+	"class"			: "Applications\\Ecom\\Admin\\Components\\Barebone\\BareboneComponent",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/core"
+		},
+		"components"	: [],
+		"packages"		:
+		[{
+			"name"		: "Barebone",
+			"version"	: "0.0.1",
+			"repo"		: "https://github.com/h-w-f/package-admin-barebone"
+		}],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"menu"				: {
+		"seq"			: 99,
+		"barebone"		: {
+			"title"		: "barebone",
+			"icon"		: "wrench",
+			"link"		: "barebone"
+		}
+	},
+	"settings"			: {
+	}
+}
