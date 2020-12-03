@@ -7,7 +7,7 @@ public/.htaccess
 composer.json
 composer.lock
 var/*
-*Html_compiled/*
+*Html_compiled*
 .vscode*
 linter-backup*
 public/Tms/*
