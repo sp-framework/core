@@ -1,0 +1,157 @@
+<?php
+
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
+
+use Applications\Ecom\Admin\Packages\Channels\Channels;
+use Phalcon\Helper\Json;
+use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages as StoragesModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages\Local;
+
+class Storages extends BasePackage
+{
+    protected $modelToUse = StoragesModel::class;
+
+    public $storages;
+
+    public $storage;
+
+    public function init(bool $resetCache = false)
+    {
+        $this->getAll($resetCache);
+
+        return $this;
+    }
+
+    public function addStorage(array $data)
+    {
+        $add = $this->add($data);
+
+        if ($add) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Storage Added';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error Adding Storage';
+        }
+    }
+
+    public function updateStorage(array $data)
+    {
+        $update = $this->update($data);
+
+        if ($update) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Storage Updated';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error Updating Storage';
+        }
+        //
+    }
+
+    public function removeStorage(array $data)
+    {
+        $remove = $this->remove($data['id']);
+
+        if ($remove) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Storage Removed';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error Removing Storage';
+        }
+    }
+
+    public function getFile(array $getData)
+    {
+        return $this->initStorage()->get($getData);
+    }
+
+    public function storeFile()
+    {
+        $storage = $this->initStorage();
+
+        if ($storage->store()) {
+            $this->packagesData->storageData = $storage->packagesData->storageData;
+
+            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+
+            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+
+            return true;
+        } else {
+            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+
+            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+
+            return false;
+        }
+    }
+
+    public function removeFile(string $uuid)
+    {
+        $storage = $this->initStorage();
+
+        if ($storage->removeFile($uuid)) {
+            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+
+            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+
+            return true;
+        } else {
+            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+
+            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+
+            return false;
+        }
+    }
+
+    protected function initStorage()
+    {
+        if (isset($this->request->getPost()['channel']) && $this->request->getPost()['channel'] !== '') {
+            $channels = $this->usePackage(Channels::class);
+
+            $channel = $channels->getById($this->request->getPost()['channel']);
+
+            $channel['settings'] = Json::decode($channel['settings'], true);
+
+            $domain = $this->basepackages->domains->getById($channel['settings']['domain_id']);
+            $domain['applications'] = Json::decode($domain['applications'], true);
+
+            $application = $this->modules->applications->getById($channel['settings']['application_id']);
+
+        } else {
+            $domain = $this->basepackages->domains->domain;
+
+            $application = $this->modules->applications->getApplicationInfo();
+        }
+
+        if (isset($domain['applications'][$application['id']]['storage']) &&
+            $domain['applications'][$application['id']]['storage'] !== ''
+        ) {
+            $storage =
+                $this->getById($domain['applications'][$application['id']]['storage']);
+        } else {
+            return false;
+        }
+
+        if ($storage['type'] === 'local') {
+            $this->storage = (new Local())->initLocal($storage);
+        }
+
+        return $this->storage;
+    }
+
+    public function getPublicLink($uuid, $width = null)
+    {
+        return $this->initStorage()->getPublicLink($uuid, $width);
+    }
+}

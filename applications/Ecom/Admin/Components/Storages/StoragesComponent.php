@@ -2,84 +2,79 @@
 
 namespace Applications\Ecom\Admin\Components\Storages;
 
+use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class StoragesComponent extends BaseComponent
 {
+    use DynamicTable;
+
+    protected $storages;
+
+    public function initialize()
+    {
+        $this->storages = $this->basepackages->storages;
+    }
+
     /**
      * @acl(name=view)
      */
     public function viewAction()
     {
-        if (isset($this->getData()['id'])) {
-            if ($this->getData()['id'] != 0) {
-                $user = $this->users->generateViewData($this->getData()['id']);
-            } else {
-                $user = $this->users->generateViewData();
-            }
-
-            if ($user) {
-                $this->view->components = $this->users->packagesData->components;
-
-                $this->view->acls = $this->users->packagesData->acls;
-
-                $this->view->user = $this->users->packagesData->user;
-
-                $this->view->applications = $this->users->packagesData->applications;
-
-                $this->view->roles = $this->users->packagesData->roles;
-
-                $this->view->canEmail = $this->users->packagesData->canEmail;
-            }
-
-            $this->view->responseCode = $this->users->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
-
-            $this->view->pick('users/view');
-
-            return;
+        if (isset($this->getData()['uuid']) && $this->getData()['uuid'] !== '') {
+            return $this->storages->getFile($this->getData());
+            // var_dump($this->storages->getPublicLink('f8c7c7ef-1ab6-4236-8582-36d9ebaa86f9'));
+            // die();
         }
 
-        $users = $this->users->init();
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $storage = $this->storages->getById($this->getData()['id']);
 
-        if ($this->request->isPost()) {
-            $rolesIdToName = [];
-            foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
-                $rolesIdToName[$roleValue['id']] = $roleValue['name'] . ' (' . $roleValue['id'] . ')';
+                $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
+                $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
+                $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
+
+                $this->view->storage = $storage;
+
+                $this->view->storageType = $storage['type'];
+            } else {
+                $this->view->storageType = $this->getData()['type'];
             }
 
-            $replaceColumns =
-                [
-                    'role_id' => ['html'  => $rolesIdToName]
-                ];
-        } else {
-            $replaceColumns = null;
+            $this->view->responseCode = $this->storages->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
+
+            $this->view->pick('storages/view');
+
+            return;
         }
 
         $controlActions =
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'users',
-                    'remove'    => 'users/remove'
+                    'edit'      => 'storages',
+                    'remove'    => 'storages/remove'
                 ]
             ];
 
         $this->generateDTContent(
-            $users,
-            'users/view',
+            $this->storages,
+            'storages/view',
             null,
-            ['email', 'role_id'],
+            ['name', 'type', 'permission'],
             true,
-            ['email', 'role_id'],
+            ['name', 'type', 'permission'],
             $controlActions,
-            ['role_id' => 'role (ID)'],
-            $replaceColumns,
-            'email'
+            null,
+            null,
+            'name'
         );
 
-        $this->view->pick('users/list');
+        $this->view->pick('storages/list');
     }
 
     /**
@@ -87,17 +82,29 @@ class StoragesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
+        if ($this->request->hasFiles()) {
 
+            if ($this->storages->storeFile()) {
+                $this->view->storageData = $this->storages->packagesData->storageData;
+            }
+
+            $this->view->responseCode = $this->storages->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
+
+            return;
+        }
+
+        if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            $this->users->addUser($this->postData());
+            $this->storages->addStorage($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->storages->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -117,11 +124,11 @@ class StoragesComponent extends BaseComponent
                 return;
             }
 
-            $this->users->updateUser($this->postData());
+            $this->storages->updateStorage($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->storages->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -135,13 +142,24 @@ class StoragesComponent extends BaseComponent
      */
     public function removeAction()
     {
+        if ($this->request->isPost() && isset($this->postData()['uuid'])) {
+
+            $this->storages->removeFile($this->postData()['uuid']);
+
+            $this->view->responseCode = $this->storages->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
+
+            return;
+        }
+
         if ($this->request->isPost()) {
 
-            $this->users->removeUser($this->postData());
+            $this->storages->removeStorage($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->storages->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;

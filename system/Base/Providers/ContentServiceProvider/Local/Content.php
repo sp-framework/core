@@ -7,13 +7,16 @@ use League\Flysystem\Filesystem;
 
 class Content
 {
-	public function __construct()
-	{
-		include (__DIR__ . '/vendor/autoload.php');
-	}
+    public function __construct()
+    {
+        include (__DIR__ . '/vendor/autoload.php');
+    }
 
-	public function init()
-	{
-		return new Filesystem(new Local(base_path()));
-	}
+    public function init(string $path = null, array $visibility = [])
+    {
+        return new Filesystem(
+            new Local(base_path($path)),
+            $visibility
+        );
+    }
 }

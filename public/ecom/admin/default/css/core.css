@@ -29232,6 +29232,7 @@ a.text-muted:hover {
 .select2-container--default .select2-selection--single .select2-selection__rendered,
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
   margin-top: -5px !important;
+  padding: 0 0.25rem 0 0.25rem !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow,

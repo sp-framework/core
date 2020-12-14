@@ -24,6 +24,8 @@ class DomainsComponent extends BaseComponent
             }
             $this->view->emailservices = $this->basepackages->domains->packagesData->emailservices;
 
+            $this->view->storages = $this->basepackages->domains->packagesData->storages;
+
             $this->view->applications = $this->basepackages->domains->packagesData->applications;
 
             $this->view->pick('domains/view');

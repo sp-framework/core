@@ -8,6 +8,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 class Basepackages
 {
@@ -22,6 +23,8 @@ class Basepackages
 	protected $geoStates;
 
 	protected $geoCities;
+
+	protected $storages;
 
 	public function __construct()
 	{
@@ -78,5 +81,12 @@ class Basepackages
 		$this->geoCities = (new GeoCities())->init();
 
 		return $this->geoCities;
+	}
+
+	protected function initStorages()
+	{
+		$this->storages = (new Storages())->init();
+
+		return $this->storages;
 	}
 }
