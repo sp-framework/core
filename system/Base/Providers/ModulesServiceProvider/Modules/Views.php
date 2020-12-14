@@ -219,7 +219,8 @@ class Views extends BasePackage
                 function($view) use ($applicationId, $name) {
                     $view = $view->toArray();
                     $view['applications'] = Json::decode($view['applications'], true);
-                    if ($view['applications'][$applicationId]['installed'] === true &&
+                    if ((isset($view['applications'][$applicationId]['installed']) &&
+                        $view['applications'][$applicationId]['installed'] === true) &&
                         $view['name'] === ucfirst($name)
                     ) {
                         return $view;

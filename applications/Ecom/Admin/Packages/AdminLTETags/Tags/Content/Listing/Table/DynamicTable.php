@@ -66,15 +66,11 @@ class DynamicTable
                 $this->content .=
                     '<div class="col" id="listing-primary-buttons" hidden>';
 
+
                 $this->content .=
                     $this->adminLTETags->useTag(
                             'buttons',
-                            [
-                                'componentId'           => $this->params['componentId'],
-                                'sectionId'             => $this->params['sectionId'] . '-filter',
-                                'buttonType'            => 'button',
-                                'buttons'               => $this->params['dtPrimaryButtons']
-                            ]
+                            $this->params['dtPrimaryButtons']
                         );
 
                 $this->content .= '</div>';

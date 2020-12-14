@@ -12,29 +12,15 @@ class Applications extends BaseModel
 
     public $route;
 
-    public $display_name;
-
     public $description;
 
-    public $version;
+    public $category;
 
-    public $repo;
+    public $sub_category;
 
-    public $settings;
+    public $default_component;
 
-    public $dependencies;
-
-    public $is_default;
-
-    public $installed;
-
-    public $files;
-
-    public $update_available;
-
-    public $update_version;
-
-    public $mode;
+    public $errors_component;
 
     public $registration_allowed;
 
@@ -43,4 +29,6 @@ class Applications extends BaseModel
     public $guest_role_id;
 
     public $can_login_role_ids;
+
+    public $settings;
 }

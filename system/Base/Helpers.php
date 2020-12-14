@@ -15,6 +15,12 @@ if (!function_exists('base_path')) {
     }
 }
 
+// if (!function_exists('uploads_path')) {
+//     function uploads_path($path = '') {
+//         return base_path('public/' . $path);
+//     }
+// }
+
 if (!function_exists('flatten_array')) {
     function flatten_array(array $items) {
         return iterator_to_array(

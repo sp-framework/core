@@ -229,37 +229,64 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                 window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-form']['autoCompleteCities'] =
                     new autoComplete({
                         data: {                              // Data src [Array, Function, Async] | (REQUIRED)
-                            src: function () {
-                                var postData = { };
+                            src: async() => {
+                                const url = '{{links.url("geo/searchCity")}}';
 
-                                var tokenKey = $('.token').attr('name');
-                                var token = $('.token').val();
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
 
-                                postData['search'] = document.querySelector("#{{componentId}}-{{sectionId}}-city_name").value;
-                                postData[tokenKey] = token;
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-city_name").value);
+                                formdata.append($('.token').attr('name'), $('.token').val());
 
-                                var source;
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
 
-                                $.ajax({
-                                    url             : '{{links.url("geo/searchCity")}}',
-                                    dataType        : 'json',
-                                    method          : 'post',
-                                    async           : false,
-                                    data            : postData,
-                                }).done(function (data) {
-                                    if (data.responseCode === 0) {
-                                        source = data.cities;
-                                    } else {
-                                        source = [];
-                                    }
-                                });
+                                const response = await fetch(url, requestOptions);
 
-                                return source;
+                                const data = await response.json();
+
+                                if (data.cities) {
+                                    return data.cities;
+                                } else {
+                                    return [];
+                                }
+
+                            // src: function () {
+                            //     var postData = { };
+
+                            //     var tokenKey = $('.token').attr('name');
+                            //     var token = $('.token').val();
+
+                            //     postData['search'] = document.querySelector("#{{componentId}}-{{sectionId}}-city_name").value;
+                            //     postData[tokenKey] = token;
+
+                            //     var source;
+
+                            //     $.ajax({
+                            //         url             : '{{links.url("geo/searchCity")}}',
+                            //         dataType        : 'json',
+                            //         method          : 'post',
+                            //         async           : false,
+                            //         data            : postData,
+                            //     }).done(function (data) {
+                            //         if (data.responseCode === 0) {
+                            //             source = data.cities;
+                            //         } else {
+                            //             source = [];
+                            //         }
+                            //     });
+
+                            //     return source;
                             },
                             key: ["name"],
                             cache: false
                         },
                         selector: "#{{componentId}}-{{sectionId}}-city_name",                  // Input field selector              | (Optional)
+                        threshold : 4,
                         debounce: 500,                       // Post duration for engine to start | (Optional)
                         searchEngine: "strict",              // Search Engine type/mode           | (Optional)
                         resultsList: {                       // Rendered results list object      | (Optional)

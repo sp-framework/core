@@ -74,6 +74,11 @@ class Button
                 $this->buttonParams['title'] = 'Missing Button Title';
             }
 
+            $this->buttonParams['content'] =
+                isset($button['content']) ?
+                $button['content'] :
+                '';
+
             $this->buttonParams['hidden'] =
                 isset($button['hidden']) && $button['hidden'] === true ?
                 'hidden' :
@@ -282,6 +287,9 @@ class Button
                 $this->content .=
                     strtoupper($this->buttonParams['title']);
             }
+
+            $this->content .=
+                $this->buttonParams['content'];
 
         if ($this->buttonParams['url'] !== '') {
             $this->content .=

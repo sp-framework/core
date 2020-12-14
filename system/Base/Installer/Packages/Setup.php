@@ -16,8 +16,8 @@ use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Repository as RegisterRepository;
-use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
 use System\Base\Installer\Packages\Setup\Register\User\Account as RegisterRootAdminAccount;
+use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
@@ -34,6 +34,8 @@ use System\Base\Installer\Packages\Setup\Schema\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Packages;
 use System\Base\Installer\Packages\Setup\Schema\Repositories;
+use System\Base\Installer\Packages\Setup\Schema\Storages;
+use System\Base\Installer\Packages\Setup\Schema\StoragesLocal;
 use System\Base\Installer\Packages\Setup\Schema\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Users\Roles;
 use System\Base\Installer\Packages\Setup\Schema\Views;
@@ -142,6 +144,8 @@ class Setup
 		$this->db->createTable('geo_countries', $dbName, (new Countries)->columns());
 		$this->db->createTable('geo_states', $dbName, (new States)->columns());
 		$this->db->createTable('geo_cities', $dbName, (new Cities)->columns());
+		$this->db->createTable('storages', $dbName, (new Storages)->columns());
+		$this->db->createTable('storages_local', $dbName, (new StoragesLocal)->columns());
 	}
 
 	public function registerRepository()//Change this to SP

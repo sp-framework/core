@@ -1,7 +1,7 @@
 {
     "name"          : "Default",
     "description"   : "Default Ecom Admin View",
-    "category"      : "core",
+    "category"      : "ecom",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
     "repo"          : "https://github.com/h-w-f/view-admin-default",

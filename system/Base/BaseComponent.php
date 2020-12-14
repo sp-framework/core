@@ -33,6 +33,7 @@ abstract class BaseComponent extends Controller
 	protected function onConstruct()
 	{
 		$this->setDefaultViewResponse();
+
 		$this->application = $this->modules->applications->getApplicationInfo();
 
 		$this->views = $this->modules->views->getViewInfo();
@@ -61,7 +62,7 @@ abstract class BaseComponent extends Controller
 			if ($this->views) {
 				$this->viewSettings = json_decode($this->views['settings'], true);
 
-				if (!$this->isJson()) {
+				if (!$this->isJson() && $this->request->isGet()) {
 					$this->setDefaultViewData();
 				}
 

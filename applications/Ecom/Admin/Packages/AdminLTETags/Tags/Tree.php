@@ -334,9 +334,9 @@ class Tree extends AdminLTETags
                         if ($key == $selectArrValue) {
                             $this->content .=
                                 '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
-                        } else {
-                            $this->content .=
-                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
+                        // } else {
+                        //     $this->content .=
+                        //         '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
                         }
                     }
                 } else {

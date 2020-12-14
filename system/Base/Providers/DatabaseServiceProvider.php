@@ -4,7 +4,7 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
-use System\Base\Providers\DatabaseServiceProvider\GeoPdo;
+use System\Base\Providers\DatabaseServiceProvider\ModelsManager;
 use System\Base\Providers\DatabaseServiceProvider\Pdo;
 
 class DatabaseServiceProvider implements ServiceProviderInterface
@@ -20,10 +20,9 @@ class DatabaseServiceProvider implements ServiceProviderInterface
 		);
 
 		$container->setShared(
-			'geodb',
-			function () use ($container) {
-				$dbConfig = $container->getShared('config')->db;
-				return (new GeoPdo($dbConfig))->init();
+			'modelsManager',
+			function () {
+				return (new ModelsManager())->init();
 			}
 		);
 	}

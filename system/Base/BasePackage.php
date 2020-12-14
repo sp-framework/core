@@ -16,6 +16,8 @@ abstract class BasePackage extends Controller
 
 	protected $application;
 
+	protected $domain;
+
 	protected $packageName;
 
 	protected $packageNameP;
@@ -581,10 +583,10 @@ abstract class BasePackage extends Controller
 
 	protected function usePackage($packageClass)
 	{
-		$this->init();
+		$this->application = $this->modules->applications->getApplicationInfo();
 
 		if ($this->checkPackage($packageClass)) {
-			return new $packageClass($this->container);
+			return (new $packageClass())->init();
 		} else {
 			throw new \Exception(
 				'Package class : ' . $packageClass .

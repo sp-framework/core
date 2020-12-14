@@ -93,7 +93,6 @@ class DropdownSplitButtons
             'dropdown-menu-right' :
             '';
 
-            // var_dump($this->params);
         //Dropdown Button (No Split Button)
         if (!$this->buttonParams['dropdownSplitButtonsSplit']) {
             $this->buildButtonParamsArrNoSplit();
@@ -187,12 +186,12 @@ class DropdownSplitButtons
             'btn-primary';
 
         $this->buttonParams['splitMainButtonHidden'] =
-            isset($this->params['splitMainButtonHidden']) ?
+            isset($this->params['splitMainButtonHidden']) && $this->params['splitMainButtonHidden'] === true ?
             'hidden' :
             '';
 
         $this->buttonParams['splitMainButtonDisabled'] =
-            isset($this->params['splitMainButtonDisabled']) ?
+            isset($this->params['splitMainButtonDisabled']) && $this->params['splitMainButtonDisabled'] === true?
             'disabled' :
             '';
 
@@ -241,13 +240,12 @@ class DropdownSplitButtons
     protected function buildButton()
     {
         $this->content .=
-            '<div class="btn-group ' . $this->buttonParams['dropdownDirection'] . '">';
+            '<div class="btn-group ' . $this->buttonParams['dropdownDirection'] . ' ' . $this->buttonParams['buttonPosition'] . '">';
 
         $this->content .=
             '<button class="btn ' .
                 $this->buttonParams['buttonSize'] . ' ' .
-                $this->buttonParams['buttonFlat'] . ' ' .
-                $this->buttonParams['buttonPosition'] . ' ';
+                $this->buttonParams['buttonFlat'] . ' ';
 
         if (!$this->buttonParams['dropdownSplitButtonsSplit']) {
             $this->content .=
@@ -259,10 +257,23 @@ class DropdownSplitButtons
                 $this->buttonParams['dropdownButtonTooltipTitle'] . '" ' .
                 'id="' . $this->buttonParams['dropdownButtonId'] . '" ' .
                 $this->buttonParams['dropdownButtonDisabled'] . ' ' .
-                $this->buttonParams['dropdownButtonHidden'] . ' >' .
-                $this->buttonParams['dropdownButtonTitle'] .
+                $this->buttonParams['dropdownButtonHidden'] . ' >';
+
+                if ($this->buttonParams['dropdownButtonIcon'] !== '') {
+                    if ($this->buttonParams['dropdownButtonIconPosition'] === 'after') {
+                        $this->content .=
+                            strtoupper($this->buttonParams['dropdownButtonTitle']) . ' ' . $this->buttonParams['dropdownButtonIcon'];
+                    } else {
+                        $this->content .=
+                            $this->buttonParams['dropdownButtonIcon'] . ' ' . strtoupper($this->buttonParams['dropdownButtonTitle']);
+                    }
+                } else {
+                    $this->content .=
+                        strtoupper($this->buttonParams['dropdownButtonTitle']);
+                }
+
+            $this->content .=
                 '</button>';
-        // var_dump($this->content);
         } else {
             $this->content .=
                 $this->buttonParams['splitMainButtonType'] . ' ' .
@@ -273,8 +284,21 @@ class DropdownSplitButtons
                 $this->buttonParams['splitMainButtonTooltipTitle'] . '" ' .
                 'id="' . $this->buttonParams['splitMainButtonId'] . '" ' .
                 $this->buttonParams['splitMainButtonDisabled'] . ' ' .
-                $this->buttonParams['splitMainButtonHidden'] . ' >' .
-                $this->buttonParams['splitMainButtonTitle'] .
+                $this->buttonParams['splitMainButtonHidden'] . ' >';
+                if ($this->buttonParams['splitMainButtonIcon'] !== '') {
+                    if ($this->buttonParams['splitMainButtonIconPosition'] === 'after') {
+                        $this->content .=
+                            strtoupper($this->buttonParams['splitMainButtonTitle']) . ' ' . $this->buttonParams['splitMainButtonIcon'];
+                    } else {
+                        $this->content .=
+                            $this->buttonParams['splitMainButtonIcon'] . ' ' . strtoupper($this->buttonParams['splitMainButtonTitle']);
+                    }
+                } else {
+                    $this->content .=
+                        strtoupper($this->buttonParams['splitMainButtonTitle']);
+                }
+
+            $this->content .=
                 '</button>
                 <button class="btn ' .
                 $this->buttonParams['buttonSize'] . ' ' .
@@ -335,38 +359,3 @@ class DropdownSplitButtons
         $this->content .= '</div></div>';
     }
 }
-
-    // <div class="btn-group {{hasSplitDropdownDirection}} {{hasSplitDropdownPosition}}">
-    //     {% if splitMainButtonUrl %}
-    //         <a href="{{splitMainButtonUrl}}" id="{{hasMainSplitButtonId}}" class="text-white btn btn-{{splitMainButtonType|default('primary')}} btn-{{hasSplitButtonSize}} {{splitMainButtonAdditionalClass}}" {{hasSplitMainButtonDisabled}} {{hasSplitMainButtonHidden}} role="button" {{hasButtonHidden}}>
-    //             {{hasSplitMainButtonIcon|raw}} {{splitButtonIdMissing|upper}}{{hasSplitMainButtonTitle|upper}}
-    //         </a>
-    //     {% else %}
-    //         <button type="button" id="{{hasMainSplitButtonId}}" class="text-white btn btn-{{splitMainButtonType|default('primary')}} btn-{{hasSplitButtonSize}} {{splitMainButtonAdditionalClass}}" {{hasSplitMainButtonDisabled}} {{hasSplitMainButtonHidden}} {{hasButtonHidden}}>
-    //             {{hasSplitMainButtonIcon|raw}} {{splitButtonIdMissing|upper}}{{hasSplitMainButtonTitle|upper}}
-    //         </button>
-    //     {% endif %}
-    //     <button type="button" id="{{hasMainSplitButtonId}}-split-dropdown" class="btn btn-{{splitDropdownButtonType|default('default')}} btn-{{hasSplitButtonSize}} dropdown-toggle {{hasSplitDropdownButtonHover}} dropdown-icon {{splitDropdownButtonAdditionalClass}}" data-toggle="dropdown" {{hasSplitDropdownButtonDisabled}} {{hasSplitDropdownButtonHidden}}>
-    //         <div class="dropdown-menu {{hasSplitDropdownAlign}}" role="menu">
-    //         {% for index, links in splitDropdownButtonListLinks %}
-    //             {% if links.icon %}
-    //                 {% set hasLinkIcon = '<i class="fas fa-fw fa-' ~ links.icon ~ ' mr-1"></i>' %}
-    //             {% else %}
-    //                 {% set hasLinkIcon = '' %}
-    //             {% endif %}
-    //             {% if componentId and sectionId %}
-    //                 {% set hasLinkId = componentId ~ '-' ~ sectionId ~ '-' ~ index %}
-    //             {% elseif sectionId %}
-    //                 {% set hasLinkId = sectionId ~ '-' ~ index %}
-    //             {% else %}
-    //                 {% set hasLinkId = index %}
-    //             {% endif %}
-    //             {% if index == 'divider' %}
-    //                 <div class="dropdown-divider"></div>
-    //             {% else %}
-    //                 <a id="{{hasLinkId}}" class="dropdown-item {{links.additionalClass}}" href="{{links.url|default('#')}}">{{hasLinkIcon|raw}} {{links.title}}</a>
-    //             {% endif %}
-    //         {% endfor %}
-    //         </div>
-    //     </button>
-    // </div>

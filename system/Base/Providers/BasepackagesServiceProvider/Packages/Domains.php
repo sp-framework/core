@@ -12,7 +12,7 @@ class Domains extends BasePackage
 
 	public $domains;
 
-	protected $domain = null;
+	public $domain = null;
 
 	protected $applicationDefaults;
 
@@ -161,11 +161,17 @@ class Domains extends BasePackage
 
 		$this->packagesData->emailservices = $this->emailservices->init()->emailservices;
 
+		$this->packagesData->storages = $this->basepackages->storages->storages;
+
 		if ($did) {
 			$domain = $this->getById($did);
 
 			$domain['applications'] = Json::decode($domain['applications'], true);
-			$domain['settings'] = Json::decode($domain['settings'], true);
+			if ($domain['settings']) {
+				$domain['settings'] = Json::decode($domain['settings'], true);
+			} else {
+				$domain['settings'] = [];
+			}
 
 			$this->packagesData->domain = $domain;
 

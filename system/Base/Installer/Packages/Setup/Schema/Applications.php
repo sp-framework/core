@@ -76,13 +76,6 @@ class Applications
 					]
 				),
 				new Column(
-					'email_service',
-					[
-						'type'    => Column::TYPE_TINYINTEGER,
-						'notNull' => false,
-					]
-				),
-				new Column(
 					'registration_allowed',
 					[
 						'type'    => Column::TYPE_TINYINTEGER,
@@ -118,61 +111,7 @@ class Applications
 						'type'    => Column::TYPE_TEXT,
 						'notNull' => false,
 					]
-				),
-				// new Column(
-				// 	'version',
-				// 	[
-				// 		'type'    => Column::TYPE_VARCHAR,
-				// 		'size'    => 15,
-				// 		'notNull' => true,
-				// 	]
-				// ),
-				// new Column(
-				// 	'repo',
-				// 	[
-				// 		'type'    => Column::TYPE_VARCHAR,
-				// 		'size'    => 2048,
-				// 		'notNull' => true,
-				// 	]
-				// ),
-				// new Column(
-				// 	'dependencies',
-				// 	[
-				// 		'type'    => Column::TYPE_TEXT,
-				// 		'notNull' => true,
-				// 	]
-				// ),
-				// new Column(
-				// 	'installed',
-				// 	[
-				// 		'type'    => Column::TYPE_TINYINTEGER,
-				// 		'size'    => 1,
-				// 		'notNull' => true,
-				// 	]
-				// ),
-				// new Column(
-				// 	'files',
-				// 	[
-				// 		'type'    => Column::TYPE_TEXT,
-				// 		'notNull' => false,
-				// 	]
-				// ),
-				// new Column(
-				// 	'update_available',
-				// 	[
-				// 		'type'    => Column::TYPE_TINYINTEGER,
-				// 		'size'    => 1,
-				// 		'notNull' => false,
-				// 	]
-				// ),
-				// new Column(
-				// 	'update_version',
-				// 	[
-				// 		'type'    => Column::TYPE_VARCHAR,
-				// 		'size'    => 15,
-				// 		'notNull' => false,
-				// 	]
-				// ),
+				)
 			],
 			'indexes' => [
 				new Index(

@@ -137,15 +137,18 @@
                             {% set checked = true %}
                             {% set viewDisabled = false %}
                             {% set emailServiceDisabled = false %}
+                            {% set storageServiceDisabled = false %}
                         {% else %}
                             {% set checked = false %}
                             {% set viewDisabled = true %}
                             {% set emailServiceDisabled = true %}
+                            {% set storageServiceDisabled = true %}
                         {% endif %}
                     {% else %}
                         {% set checked = false %}
                         {% set viewDisabled = true %}
                         {% set emailServiceDisabled = true %}
+                        {% set storageServiceDisabled = true %}
                     {% endif %}
                     <hr>
                     <div class="application" data-id="{{application['id']}}">
@@ -215,6 +218,8 @@
                                     ]
                                 )}}
                             </div>
+                        </div>
+                        <div class="row">
                             <div class="col">
                                 {% if domain['applications'][application['id']]['email_service'] is defined %}
                                     {% set email_service = domain['applications'][application['id']]['email_service'] %}
@@ -244,6 +249,38 @@
                                         'fieldDataSelect2OptionsValue'   : 'name',
                                         'fieldDataSelect2OptionsArray'   : true,
                                         'fieldDataSelect2OptionsSelected': email_service
+                                    ]
+                                )}}
+                            </div>
+                            <div class="col">
+                                {% if domain['applications'][application['id']]['storage'] is defined %}
+                                    {% set storage = domain['applications'][application['id']]['storage'] %}
+                                {% else %}
+                                    {% set storage = 0 %}
+                                {% endif %}
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'component'                      : component,
+                                        'componentName'                  : componentName,
+                                        'componentId'                    : componentId,
+                                        'sectionId'                      : sectionId,
+                                        'fieldId'                        : application['id'] ~ '-storage',
+                                        'fieldLabel'                     : 'Use Storage',
+                                        'fieldType'                      : 'select2',
+                                        'fieldHelp'                      : true,
+                                        'fieldHelpTooltipContent'        : 'Select storage for this domain and application.',
+                                        'fieldBazScan'                   : true,
+                                        'fieldRequired'                  : false,
+                                        'fieldDisabled'                  : storageServiceDisabled,
+                                        'fieldDataAttributes'            :
+                                            [
+                                                'type' : 'storage'
+                                            ],
+                                        'fieldDataSelect2Options'        : storages,
+                                        'fieldDataSelect2OptionsKey'     : 'id',
+                                        'fieldDataSelect2OptionsValue'   : 'name',
+                                        'fieldDataSelect2OptionsArray'   : true,
+                                        'fieldDataSelect2OptionsSelected': storage
                                     ]
                                 )}}
                             </div>
@@ -294,7 +331,8 @@ dataCollectionSection =
             afterInit : function () {
                 for (var checkbox in dynamicFields['checkboxes']) {
                     $('#' + checkbox).click(function() {
-                        extractData(checkbox, null, null, $('#' + checkbox).parents('.application').data('id'));
+                        var id = $(this)[0].id;
+                        extractData(id, null, null, $('#' + id).parents('.application').data('id'));
                     });
                     extractData(checkbox, null, null, $('#' + checkbox).parents('.application').data('id'))
                 }
@@ -311,8 +349,14 @@ dataCollectionSection =
                     if (checkbox) {
                         if ($('#' + checkbox)[0].checked === true) {
                             dataCollectionSection['data']['applications'][applicationId]['allowed'] = true;
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-view').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-email-service').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-storage').attr('disabled', false);
                         } else {
                             dataCollectionSection['data']['applications'][applicationId]['allowed'] = false;
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-view').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-email-service').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-storage').attr('disabled', true);
                         }
                     } else if (select2 && select2Type) {
                         dataCollectionSection['data']['applications'][applicationId][select2Type] =
@@ -348,6 +392,8 @@ for (var id in applicationIds) {
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-view'] = {"placeholder": "SELECT VIEW (TEMPLATE)"};
     dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = {"placeholder": "SELECT EMAIL SERVICE"};
+    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-storage'] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-storage'] = {"placeholder": "SELECT STORAGE"};
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "required";
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "please select a view (template)";
 }
