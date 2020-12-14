@@ -1,18 +1,18 @@
 <?php
 
-namespace Applications\Ecom\Admin\Packages\Filters\Install;
+namespace Applications\Ecom\Admin\Packages\Channels\Install;
 
-use Applications\Ecom\Admin\Packages\Filters\Filters;
-use Applications\Ecom\Admin\Packages\Filters\Install\Schema\Filters as FiltersSchema;
-use Applications\Ecom\Admin\Packages\Module\Install;
+use Applications\Ecom\Admin\Packages\Channels\Channels;
+use Applications\Ecom\Admin\Packages\Channels\Install\Schema\Channels as ChannelsSchema;
+use System\Base\BasePackage;
 
-class Package extends Install
+class Package extends BasePackage
 {
-    protected $schemaToUse = FiltersSchema::class;
+    protected $schemaToUse = ChannelsSchema::class;
 
-    protected $packageToUse = Filters::class;
+    protected $packageToUse = Channels::class;
 
-    public $menus;
+    public $channels;
 
     public function installPackage(bool $dropTables = false)
     {
@@ -31,9 +31,9 @@ class Package extends Install
         // die();
         try {
             if ($dropTables) {
-                $this->createTable('filters', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('channels', '', (new $this->schemaToUse)->columns(), $dropTables);
             } else {
-                $this->createTable('filters', (new $this->schemaToUse)->columns());
+                $this->createTable('channels', '', (new $this->schemaToUse)->columns());
             }
 
             return true;

@@ -28,20 +28,20 @@ class Package extends BasePackage
         //     return;
         // }
 
-        try {
-            if ($dropTables) {
-                $this->createTable('businesses', '', (new $this->schemaToUse)->columns(), $dropTables);
-            } else {
-                $this->createTable('businesses', '', (new $this->schemaToUse)->columns());
-            }
+        // try {
+        //     if ($dropTables) {
+        //         $this->createTable('businesses', '', (new $this->schemaToUse)->columns(), $dropTables);
+        //     } else {
+        //         $this->createTable('businesses', '', (new $this->schemaToUse)->columns());
+        //     }
 
-            return true;
-        } catch (\PDOException $e) {
+        //     return true;
+        // } catch (\PDOException $e) {
 
-            $this->packagesData->responseCode = 1;
+        //     $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = $e->getMessage();
-        }
+        //     $this->packagesData->responseMessage = $e->getMessage();
+        // }
 
         // $this->registerPackage();
     }

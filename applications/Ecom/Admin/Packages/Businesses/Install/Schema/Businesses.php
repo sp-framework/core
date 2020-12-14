@@ -21,6 +21,14 @@ class Businesses
                     ]
                 ),
                 new Column(
+                    'logo',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 1024,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'abn',
                     [
                         'type'    => Column::TYPE_BIGINTEGER,
