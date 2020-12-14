@@ -1,0 +1,64 @@
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'store',
+        'cardTitle'             : componentName,
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize', 'collapse'],
+        'dtFilter'              : false,
+        'dtFilters'             : table['filters'],
+        'dtFilterColumns'       : table['filterColumns'],
+        'dtFixedHeader'         : true,
+        'dtPrimaryButtons'      :
+            {
+                'componentId'                       : componentId,
+                'sectionId'                         : 'listing',
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownButtonId'                  : 'main',
+                'dropdownButtonTitle'               : 'Add New Channel',
+                'dropdownButtonIcon'                : 'plus',
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'                           :
+                    {
+                        'eshop-channel' : {
+                            'title'                   : 'Eshop Channel',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('channels/q/type/eshop/id/0')
+                        },
+                        'pos-channel' : {
+                            'title'                   : 'PoS Channel',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('channels/q/type/pos/id/0')
+                        },
+                        'ebay-channel' : {
+                            'title'                   : 'eBay Channel',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('channels/q/type/ebay/id/0')
+                        }
+                    }
+            },
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 6,
+        'dtTableCompact'        : true,
+        'dtZeroRecords'         : 'No channels data available. Add channel by clicking the Add new channel button.'
+    ]
+)}}

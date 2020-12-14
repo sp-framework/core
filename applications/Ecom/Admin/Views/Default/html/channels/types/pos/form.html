@@ -1,0 +1,18 @@
+{% if channel['id'] is defined %}
+    {% set channelId = channel['id'] %}
+    {% set channelName = channel['name'] %}
+    {% set channelDescription = channel['description'] %}
+{% else %}
+    {% set channelId = '' %}
+    {% set channelName = '' %}
+    {% set channelDescription = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {% include 'channels/types/common.html' %}
+
+    </fieldset>
+</form>
+<script>
+
+</script>

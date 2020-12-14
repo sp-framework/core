@@ -3,85 +3,84 @@
 namespace Applications\Ecom\Admin\Components\Channels;
 
 use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Admin\Packages\Channels\Channels;
+use Applications\Ecom\Admin\Packages\Locations\Model\Locations;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class ChannelsComponent extends BaseComponent
 {
     use DynamicTable;
+
+    protected $channels;
+
+    public function initialize()
+    {
+        $this->channels = $this->usePackage(Channels::class);
+    }
+
     /**
      * @acl(name=view)
      */
     public function viewAction()
     {
+        // $locations = $this->modelsManager->executeQuery('SELECT * FROM Applications\Ecom\Admin\Packages\Locations\Model\Locations');
+
+        // foreach ($locations as $key => $value) {
+        //     var_dump($value->toArray());
+        // }
+
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $user = $this->users->generateViewData($this->getData()['id']);
+                $channel = $this->channels->getById($this->getData()['id']);
+
+                $channel['settings'] = Json::decode($channel['settings'], true);
+
+                $this->view->channel = $channel;
+
+                $this->view->channelType = $channel['type'];
             } else {
-                $user = $this->users->generateViewData();
+                $this->view->channelType = $this->getData()['type'];
             }
 
-            if ($user) {
-                $this->view->components = $this->users->packagesData->components;
+            $this->view->domains = $this->basepackages->domains->domains;
 
-                $this->view->acls = $this->users->packagesData->acls;
+            $this->view->applications = $this->modules->applications->applications;
 
-                $this->view->user = $this->users->packagesData->user;
+            $this->view->responseCode = $this->channels->packagesData->responseCode;
 
-                $this->view->applications = $this->users->packagesData->applications;
+            $this->view->responseMessage = $this->channels->packagesData->responseMessage;
 
-                $this->view->roles = $this->users->packagesData->roles;
-
-                $this->view->canEmail = $this->users->packagesData->canEmail;
-            }
-
-            $this->view->responseCode = $this->users->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
-
-            $this->view->pick('users/view');
+            $this->view->pick('channels/view');
 
             return;
         }
 
-        $users = $this->users->init();
-
-        if ($this->request->isPost()) {
-            $rolesIdToName = [];
-            foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
-                $rolesIdToName[$roleValue['id']] = $roleValue['name'] . ' (' . $roleValue['id'] . ')';
-            }
-
-            $replaceColumns =
-                [
-                    'role_id' => ['html'  => $rolesIdToName]
-                ];
-        } else {
-            $replaceColumns = null;
-        }
+        $channels = $this->channels->init();
 
         $controlActions =
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'users',
-                    'remove'    => 'users/remove'
+                    'edit'      => 'channels',
+                    'remove'    => 'channels/remove'
                 ]
             ];
 
         $this->generateDTContent(
-            $users,
-            'users/view',
+            $channels,
+            'channels/view',
             null,
-            ['email', 'role_id'],
+            ['name', 'type'],
             true,
-            ['email', 'role_id'],
+            ['name', 'type'],
             $controlActions,
-            ['role_id' => 'role (ID)'],
-            $replaceColumns,
-            'email'
+            null,
+            null,
+            'name'
         );
 
-        $this->view->pick('users/list');
+        $this->view->pick('channels/list');
     }
 
     /**
@@ -95,11 +94,11 @@ class ChannelsComponent extends BaseComponent
                 return;
             }
 
-            $this->users->addUser($this->postData());
+            $this->channels->addChannel($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->channels->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->channels->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -119,11 +118,11 @@ class ChannelsComponent extends BaseComponent
                 return;
             }
 
-            $this->users->updateUser($this->postData());
+            $this->channels->updateChannel($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->channels->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->channels->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -139,11 +138,11 @@ class ChannelsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->users->removeUser($this->postData());
+            $this->channels->removeChannel($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->channels->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = $this->channels->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
