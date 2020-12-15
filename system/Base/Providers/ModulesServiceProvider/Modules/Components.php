@@ -26,10 +26,13 @@ class Components extends BasePackage
 				function($component) use ($route, $applicationId) {
 					$component = $component->toArray();
 					$component['applications'] = Json::decode($component['applications'], true);
-					if ($component['applications'][$applicationId]['installed'] === true &&
-						$component['route'] === $route
-					) {
-						return $component;
+
+					if (isset($component['applications'][$applicationId])) {
+						if ($component['applications'][$applicationId]['installed'] === true &&
+							$component['route'] === $route
+						) {
+							return $component;
+						}
 					}
 				}
 			);
@@ -50,10 +53,13 @@ class Components extends BasePackage
 				function($component) use ($name, $applicationId) {
 					$component = $component->toArray();
 					$component['applications'] = Json::decode($component['applications'], true);
-					if ($component['applications'][$applicationId]['installed'] === true &&
-						$component['name'] === ucfirst($name)
-					) {
-						return $component;
+
+					if (isset($component['applications'][$applicationId])) {
+						if ($component['applications'][$applicationId]['installed'] === true &&
+							$component['name'] === ucfirst($name)
+						) {
+							return $component;
+						}
 					}
 				}
 			);

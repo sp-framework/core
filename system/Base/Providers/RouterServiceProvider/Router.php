@@ -154,7 +154,7 @@ class Router
 		);
 
 		$this->router->add(
-			'/' . strtolower($this->applicationInfo['name']),
+			'/' . strtolower($this->applicationInfo['route']),
 			[
 				'controller'	=> 	strtolower($this->applicationDefaults['component']),
 				'action'		=> 'view'
@@ -162,7 +162,7 @@ class Router
 		);
 
 		$this->router->add(
-			'/' . strtolower($this->applicationInfo['route']),
+			'/' . strtolower($this->applicationInfo['route']) . '/',
 			[
 				'controller'	=> 	strtolower($this->applicationDefaults['component']),
 				'action'		=> 'view'
@@ -233,33 +233,29 @@ class Router
 	protected function regitserNotFound()
 	{
 		if ($this->applicationDefaults) {
-
 			if (isset($this->applicationDefaults['errorComponent'])) {
 
 				$errorComponent = ucfirst($this->applicationDefaults['errorComponent']);
 
 			} else {
-				$this->router->setDefaultNamespace
-				(
-					'System\Base\Providers\ErrorServiceProvider'
-				);
 
 				$errorComponent = 'Errors';
 			}
 
 		} else {
-			$this->router->setDefaultNamespace
-			(
-				'System\Base\Providers\ErrorServiceProvider'
-			);
+			// $this->router->setDefaultNamespace
+			// (
+			// 	'System\Base\Providers\ErrorServiceProvider'
+			// );
 
 			$errorComponent = 'Errors';
+			// $errorComponent = 'Errors';
 		}
 
 		$this->router->notFound(
 			[
 				'controller' => $errorComponent,
-				'action'     => 'routenotfound',
+				'action'     => 'routeNotFound',
 			]
 		);
 	}
@@ -267,6 +263,7 @@ class Router
 	protected function validateDomain()
 	{
 		$this->domain = $this->domains->getDomain();
+
 		if (!$this->domain) {
 			$this->logger->log->alert(
 				'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
@@ -276,6 +273,10 @@ class Router
 		}
 
 		$this->applicationInfo = $this->applications->getApplicationInfo();
+
+		if (!$this->applicationInfo) {
+			return false;
+		}
 
 		if (isset($this->domain['applications'][$this->applicationInfo['id']]['allowed']) &&
 			!$this->domain['applications'][$this->applicationInfo['id']]['allowed']
@@ -291,7 +292,6 @@ class Router
 		if (!isset($this->domain['applications'][$this->applicationInfo['id']])) {
 			return false;
 		}
-
 		$this->applicationDefaults['id'] = $this->applicationInfo['id'];
 		$this->applicationDefaults['application'] = $this->applicationInfo['route'];
 		$this->applicationDefaults['category'] = $this->applicationInfo['category'];
@@ -299,7 +299,9 @@ class Router
 		$this->applicationDefaults['component'] =
 			$this->components->getIdComponent($this->applicationInfo['default_component'])['route'];
 		$this->applicationDefaults['errorComponent'] =
-			$this->components->getIdComponent($this->applicationInfo['errors_component'])['route'];
+			isset($this->applicationInfo['errors_component']) && $this->applicationInfo['errors_component'] != 0 ?
+			$this->components->getIdComponent($this->applicationInfo['errors_component'])['route'] :
+			null;
 		$this->applicationDefaults['view'] =
 			$this->views->getIdViews($this->domain['applications'][$this->applicationInfo['id']]['view'])['name'];
 

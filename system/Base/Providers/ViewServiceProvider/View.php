@@ -32,7 +32,7 @@ class View
 
 					$path = $view->getViewsDir();
 
-					$path .= $view->getControllerName() . '/';
+					$path .= strtolower($view->getControllerName()) . '/';
 
 					$path .= $view->getActionName() . '.html';
 

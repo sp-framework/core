@@ -26,10 +26,12 @@ class Packages extends BasePackage
 				function($package) use ($name, $applicationId) {
 					$package = $package->toArray();
 					$package['applications'] = Json::decode($package['applications'], true);
-					if ($package['name'] === ucfirst($name) &&
-						$package['applications'][$applicationId]['installed'] === true
-					) {
-						return $package;
+					if (isset($package['applications'][$applicationId])) {
+						if ($package['name'] === ucfirst($name) &&
+							$package['applications'][$applicationId]['installed'] === true
+						) {
+							return $package;
+						}
 					}
 				}
 			);

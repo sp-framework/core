@@ -64,12 +64,12 @@ class Views extends BasePackage
                 $this->voltCompiledPath =
                     base_path('applications/' .
                               ucfirst($this->application['category']) . '/' .
-                              ucfirst($this->application['sub_category']) . '/' .
+                              ucfirst($this->application['sub_category']) .
                               '/Views/Html_compiled/' . ucfirst($this->application['route']) . '/' . $this->view['name'] . '/'
                           );
             } else {
                 $this->voltCompiledPath =
-                    base_path('applications/Core/Admin/Admin/Views/Default/Html_compiled/');
+                    base_path('system/Base/Providers/ErrorServiceProvider/View/Html_compiled/');
             }
 
             if (!is_dir($this->voltCompiledPath)) {
@@ -97,7 +97,7 @@ class Views extends BasePackage
                               '/html/');
             } else {
                 $this->phalconViewPath =
-                    base_path('applications/Core/Admin/Views/Default/html/');
+                    base_path('system/Base/Providers/ErrorServiceProvider/View/');
             }
         }
     }
@@ -117,7 +117,7 @@ class Views extends BasePackage
                               '/html/layouts/');
             } else {
                 $this->phalconViewLayoutPath =
-                    base_path('applications/Core/Admin/Views/Default/html/layouts/');
+                    base_path('system/Base/Providers/ErrorServiceProvider/View/layouts/');
             }
         }
     }
@@ -131,6 +131,8 @@ class Views extends BasePackage
             } else {
                 $this->phalconViewLayoutFile = 'default';
             }
+        } else {
+            $this->phalconViewLayoutFile = 'default';
         }
     }
 
@@ -176,7 +178,9 @@ class Views extends BasePackage
 
             $this->domain = $this->basepackages->domains->getDomain();
 
-            if (isset($this->domain['applications'][$this->application['id']]['view'])) {
+            if ($this->application &&
+                isset($this->domain['applications'][$this->application['id']]['view'])
+            ) {
                 $viewsName = $this->getIdViews($this->domain['applications'][$this->application['id']]['view'])['name'];
             } else {
                 $viewsName =  'Default';

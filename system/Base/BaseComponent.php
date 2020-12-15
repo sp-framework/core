@@ -32,9 +32,13 @@ abstract class BaseComponent extends Controller
 
 	protected function onConstruct()
 	{
-		$this->setDefaultViewResponse();
-
 		$this->application = $this->modules->applications->getApplicationInfo();
+
+		if (!$this->application) {
+			return;
+		}
+
+		$this->setDefaultViewResponse();
 
 		$this->views = $this->modules->views->getViewInfo();
 
@@ -157,8 +161,10 @@ abstract class BaseComponent extends Controller
 		}
 
 		if (!$this->isJson() || $this->request->isAjax()) {
-			$this->view->menus =
-				$this->basepackages->menus->getMenusForApplication($this->application['id']);
+			if ($this->application) {
+				$this->view->menus =
+					$this->basepackages->menus->getMenusForApplication($this->application['id']);
+			}
 		}
 	}
 

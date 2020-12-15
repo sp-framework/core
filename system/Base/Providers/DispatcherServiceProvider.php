@@ -16,7 +16,9 @@ class DispatcherServiceProvider implements ServiceProviderInterface
 				$applicationInfo = $container->getShared('modules')->applications->getApplicationInfo();
 				$config = $container->getShared('config');
 				$events = $container->getShared('events');
-				return (new Dispatcher($applicationInfo, $config, $events))->init();
+				$components = $container->getShared('modules')->components;
+				$router = $container->getShared('router');
+				return (new Dispatcher($applicationInfo, $config, $events, $components, $router))->init();
 			}
 		);
 	}
