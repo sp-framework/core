@@ -1,12 +1,12 @@
 {
     "route"         : "home",
     "name"          : "Home",
-    "description"   : "Admin home",
+    "description"   : "Dashboard home",
     "category"      : "ecom",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
     "repo"          : "https://github.com/h-w-f/component-admin-home",
-    "class"         : "Applications\\Ecom\\Admin\\Components\\Home\\HomeComponent",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Home\\HomeComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",

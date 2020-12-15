@@ -1,12 +1,12 @@
 {
 	"route"			: "errors",
 	"name"			: "Errors",
-	"description"	: "Component to manage Errors on Admin Application",
+	"description"	: "Component to manage Errors on Dashboard Application",
 	"category"      : "ecom",
 	"sub_category"  : "admin",
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/component-admin-errors",
-	"class"			: "Applications\\Ecom\\Admin\\Components\\Errors\\ErrorsComponent",
+	"class"			: "Applications\\Ecom\\Dashboard\\Components\\Errors\\ErrorsComponent",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
