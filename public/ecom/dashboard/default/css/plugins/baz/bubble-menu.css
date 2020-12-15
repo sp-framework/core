@@ -1,0 +1,217 @@
+.bubble-backdrop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 509;
+	background-color: #000;
+	opacity: 0.5 !important;
+	visibility: hidden;
+}
+.bubble-backdrop-visible{
+	visibility: visible !important;
+}
+.bubble{
+	border: 0 !important;
+	border-radius: 70px !important;
+	width: 50px;
+	height: 50px;
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),
+	0 3px 1px -2px rgba(0,0,0,0.12),
+	0 1px 5px 0 rgba(0,0,0,0.2);
+	-webkit-box-shadow: 0 2px 2px 0 rgba(0,0,0,0.14),
+	0 3px 1px -2px rgba(0,0,0,0.12),
+	0 1px 5px 0 rgba(0,0,0,0.2);
+	margin: 5px;
+	background: #e0e1e2;
+	color: rgba(0,0,0,.8);
+	cursor: pointer;
+	outline: none;
+	opacity: .7;
+}
+.bubble i{
+	font-size: 24px;
+	margin: 0;
+	z-index: 520;
+}
+.bubble.active {
+	opacity: 1; 
+}
+.bubble:hover{
+	background: #cacbcd;
+	opacity: 1;
+}
+.bubble_menu{
+	position: absolute;
+	display: flex;
+	flex-direction: column-reverse;
+	justify-content: center;
+	align-items: center;
+	z-index: 510;
+}
+.bubble_menu dl{
+	transition: .2s;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	opacity: 0;
+}
+.bubble_menu dl dt button{
+	transition: .2s;
+	transform: scale(.4) translateY(-40px) translateX(0px);
+}
+.visible{
+	visibility: visible !important;
+	opacity: 1 !important;
+}
+.bubble.huge{
+	width: 80px !important;
+	height: 80px !important;
+	min-width: 80px;
+	max-width: 80px;
+	min-height: 80px;
+	max-height: 80px;
+}
+.bubble.huge i{
+	font-size: 28px !important;
+}
+.bubble.big{
+	width: 70px !important;
+	height: 70px !important;
+	min-width: 70px;
+	max-width: 70px;
+	min-height: 70px;
+	max-height: 70px;
+}
+.bubble.big i{
+	font-size: 23px !important;
+}
+.bubble.large{
+	width: 60px !important;
+	height: 60px !important;
+	min-width: 60px;
+	max-width: 60px;
+	min-height: 60px;
+	max-height: 60px;
+
+}
+.bubble.large i{
+	font-size: 20px !important;
+}
+.bubble.medium{
+	width: 50px !important;
+	height: 50px !important;
+	min-width: 50px;
+	max-width: 50px;
+	min-height: 50px;
+	max-height: 50px;
+}
+.bubble.medium i{
+	font-size: 17px !important;
+}
+.bubble.small{
+	width: 40px !important;
+	height: 40px !important;
+	min-width: 40px;
+	max-width: 40px;
+	min-height: 40px;
+	max-height: 40px;
+}
+.bubble.small i{
+	font-size: 13px !important;
+}
+.bubble.tiny{
+	width: 30px !important;
+	height: 30px !important;
+	min-width: 30px;
+	max-width: 30px;
+	min-height: 30px;
+	max-height: 30px;
+}
+.bubble.tiny i{
+	font-size: 11px !important;
+}
+.transform{
+	transform: scale(1) translateY(0px) translateX(0px) !important;
+}
+.bubble_menu.top-left.vertical dl button,
+.bubble_menu.top-right.vertical dl button,
+.bubble_menu.top-left dl button,
+.bubble_menu.top-right dl button{
+	transform: scale(.4) translateY(-40px) translateX(0px);
+}
+.bubble_menu.bottom-left.vertical dl button,
+.bubble_menu.bottom-right.vertical dl button,
+.bubble_menu.bottom-left dl button,
+.bubble_menu.bottom-right dl button{
+	transform: scale(.4) translateY(40px) translateX(0px);
+}
+.bubble_menu.default{
+	left: 10px;
+	top: 10px;
+}
+.bubble_menu.click {
+	display: block !important;
+}
+.bubble_menu.top-left{
+	left: 10px;
+	top: 10px;
+	display: flex;
+	flex-direction: column-reverse;
+}
+.bubble_menu.top-left.vertical , .bubble_menu.top-left.vertical dl{
+	flex-direction: column !important;
+}
+.bubble_menu.top-left.horizontal, .bubble_menu.top-left.horizontal dl{
+	flex-direction: row !important;
+}
+.bubble_menu.top-left.horizontal dl button{
+	transform: scale(.4) translateY(0px) translateX(-40px);
+}
+.bubble_menu.top-right{
+	right: 10px;
+	top: 10px;
+	display: flex;
+	flex-direction: column-reverse;
+}
+.bubble_menu.top-right.vertical , .bubble_menu.top-right.vertical dl{
+	flex-direction: column !important;
+}
+.bubble_menu.top-right.horizontal, .bubble_menu.top-right.horizontal dl{
+	flex-direction: row-reverse !important;
+}
+.bubble_menu.top-right.horizontal dl button{
+	transform: scale(.4) translateY(0px) translateX(40px);
+}
+.bubble_menu.bottom-left{
+	left: 10px;
+	bottom: 10px;
+	display: flex;
+	flex-direction: column;
+}
+.bubble_menu.bottom-left.vertical , .bubble_menu.bottom-left.vertical dl{
+	flex-direction: column-reverse !important;
+}
+.bubble_menu.bottom-left.horizontal, .bubble_menu.bottom-left.horizontal dl{
+	flex-direction: row !important;
+}
+.bubble_menu.bottom-left.horizontal dl button{
+	transform: scale(.4) translateY(0px) translateX(-40px);
+}
+.bubble_menu.bottom-right{
+	right: 10px;
+	bottom: 10px;
+	display: flex;
+	flex-direction: column;
+}
+.bubble_menu.bottom-right.vertical , .bubble_menu.bottom-right.vertical dl{
+	flex-direction: column-reverse !important;
+}
+.bubble_menu.bottom-right.horizontal, .bubble_menu.bottom-right.horizontal dl{
+	flex-direction: row-reverse !important;
+}
+.bubble_menu.bottom-right.horizontal dl button{
+	transform: scale(.4) translateY(0px) translateX(40px);
+}

@@ -1,0 +1,31 @@
+{
+    "route"         : "home",
+    "name"          : "Home",
+    "description"   : "Admin home",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-home",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Home\\HomeComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"             : {
+        "seq"           : 0,
+        "home"          : {
+            "title"     : "home",
+            "icon"      : "home",
+            "link"      : "home"
+        }
+    },
+    "settings"      : {
+    }
+}

@@ -1,0 +1,60 @@
+{
+    "name"          : "Default",
+    "description"   : "Default Ecom Dashboard View",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/view-dashboard-default",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "settings"      : {
+        "cache"     : false,
+        "layout"    : "default",
+        "tags"      : "AdminLTETags",
+        "head"      : {
+            "title" : "Ecom Dashboard",
+            "meta"  : {
+                "charset"       : "UTF-8",
+                "viewport"      : "width=device-width, initial-scale=1, shrink-to-fit=no",
+                "description"   : "Dashboard Views",
+                "author"        : "Guru",
+                "keywords"      : "HTML, CSS, JavaScript"
+            },
+            "link"      : {
+                "href"      : [
+                    "ecom/dashboard/default/css/plugins.css",
+                    "ecom/dashboard/default/css/core.css"
+                ]
+            },
+            "script"    : {
+                "src"   : [
+                    "ecom/dashboard/default/js/header/jsHeaderDependencies.js",
+                    "ecom/dashboard/default/js/header/jsHeaderCore.js",
+                    "ecom/dashboard/default/js/header/jsHeaderPlugins.js"
+                ]
+            }
+        },
+        "body"          : {
+            "params"    : "",
+            "jsscript"  : ""
+        },
+        "footer"        : {
+            "params"    : "",
+            "script"    : {
+                "src"   : [
+                    "ecom/dashboard/default/js/footer/jsFooterDependencies.js"
+                ]
+            },
+            "jsscript"  : ""
+        }
+    }
+}

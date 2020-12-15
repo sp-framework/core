@@ -1,0 +1,51 @@
+.sectionWithListingDatatable .custom-select {
+    -webkit-appearance  : none;
+}
+.dataTable-pointer {
+    cursor: pointer;
+}
+table.dataTable > thead .sorting::before,
+table.dataTable > thead .sorting::after,
+table.dataTable > thead .sorting_asc::before,
+table.dataTable > thead .sorting_asc::after,
+table.dataTable > thead .sorting_desc::before,
+table.dataTable > thead .sorting_desc::after,
+table.dataTable > thead .sorting_asc_disabled::before,
+table.dataTable > thead .sorting_asc_disabled::after,
+table.dataTable > thead .sorting_desc_disabled::before,
+table.dataTable > thead .sorting_desc_disabled::after {
+    bottom: 0.9em !important;
+    opacity: 1 !important;
+}
+table.dataTable.compact > thead .sorting::before,
+table.dataTable.compact > thead .sorting::after,
+table.dataTable.compact > thead .sorting_asc::before,
+table.dataTable.compact > thead .sorting_asc::after,
+table.dataTable.compact > thead .sorting_desc::before,
+table.dataTable.compact > thead .sorting_desc::after,
+table.dataTable.compact > thead .sorting_asc_disabled::before,
+table.dataTable.compact > thead .sorting_asc_disabled::after,
+table.dataTable.compact > thead .sorting_desc_disabled::before,
+table.dataTable.compact > thead .sorting_desc_disabled::after {
+    bottom: 0.4em !important;
+    opacity: 1 !important;
+}
+
+.dt-colTextTruncate {
+    max-width: 30rem;
+}
+table.dataTable.compact > tbody > tr.child > td.child {
+    padding: 6px;
+}
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td.dtr-control,
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th.dtr-control {
+    padding-left: 30px !important;
+}
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > td.dtr-control::before,
+table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th.dtr-control::before {
+    line-height: 1.1rem !important;
+    top: 49%;
+}
+.dataTables_filter > label {
+    margin-bottom: 0;
+}
