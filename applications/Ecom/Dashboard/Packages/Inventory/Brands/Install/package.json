@@ -1,0 +1,8 @@
+{
+    "name"          : "Brands",
+    "displayName"   : "Admin Brands Package",
+    "description"   : "Package for Brands component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/package-admin-brands",
+    "settings"      : { }
+}

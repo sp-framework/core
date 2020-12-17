@@ -1,44 +1,48 @@
-{% if business['id'] is defined %}
-    {% set businessId = business['id'] %}
-    {% set businessLogo = business['logo'] %}
-    {% set businessName = business['name'] %}
-    {% set businessAbn = business['abn'] %}
-    {% set businessType = business['type'] %}
-    {% set businessParentId = business['parent'] %}
-    {% set businessStreetAddress = business['street_address'] %}
-    {% set businessStreetAddress2 = business['street_address_2'] %}
-    {% set businessCityId = business['city_id'] %}
-    {% set businessCity = business['city_name'] %}
-    {% set businessPostCode = business['post_code'] %}
-    {% set businessStateId = business['state_id'] %}
-    {% set businessState = business['state_name'] %}
-    {% set businessCountryId = business['country_id'] %}
-    {% set businessCountry = business['country_name'] %}
+{% if supplier['id'] is defined %}
+    {% set supplierId = supplier['id'] %}
+    {% set supplierLogo = supplier['logo'] %}
+    {% set supplierName = supplier['name'] %}
+    {% set supplierAbn = supplier['abn'] %}
+    {% set supplierType = supplier['type'] %}
+    {% set supplierIsManufacturer = supplier['is_manufacturer'] %}
+    {% set supplierDoesDropship = supplier['does_dropship'] %}
+    {% set supplierBrands = supplier['brands'] %}
+    {% set supplierContactFirstName = supplier['contact_first_name'] %}
+    {% set supplierContactLastName = supplier['contact_last_name'] %}
+    {% set supplierContactPhone = supplier['contact_phone'] %}
+    {% set supplierContactEmail = supplier['contact_email'] %}
+    {% set supplierStreetAddress = supplier['street_address'] %}
+    {% set supplierStreetAddress2 = supplier['street_address_2'] %}
+    {% set supplierCityId = supplier['city_id'] %}
+    {% set supplierCity = supplier['city_name'] %}
+    {% set supplierPostCode = supplier['post_code'] %}
+    {% set supplierStateId = supplier['state_id'] %}
+    {% set supplierState = supplier['state_name'] %}
+    {% set supplierCountryId = supplier['country_id'] %}
+    {% set supplierCountry = supplier['country_name'] %}
 {% else %}
-    {% set businessId = '' %}
-    {% set businessLogo = '' %}
-    {% set businessName = '' %}
-    {% set businessAbn = '' %}
-    {% set businessType = '1' %}
-    {% set businessParentId = '' %}
-    {% set businessStreetAddress = '' %}
-    {% set businessStreetAddress2 = '' %}
-    {% set businessCityId = '' %}
-    {% set businessCity = '' %}
-    {% set businessPostCode = '' %}
-    {% set businessStateId = '' %}
-    {% set businessState = '' %}
-    {% set businessCountryId = '' %}
-    {% set businessCountry = '' %}
+    {% set supplierId = '' %}
+    {% set supplierLogo = '' %}
+    {% set supplierName = '' %}
+    {% set supplierAbn = '' %}
+    {% set supplierType = 'local' %}
+    {% set supplierIsManufacturer = '' %}
+    {% set supplierDoesDropship = '' %}
+    {% set supplierBrands = '' %}
+    {% set supplierContactFirstName = '' %}
+    {% set supplierContactLastName = '' %}
+    {% set supplierContactPhone = '' %}
+    {% set supplierContactEmail = '' %}
+    {% set supplierStreetAddress = '' %}
+    {% set supplierStreetAddress2 = '' %}
+    {% set supplierCityId = '' %}
+    {% set supplierCity = '' %}
+    {% set supplierPostCode = '' %}
+    {% set supplierStateId = '' %}
+    {% set supplierState = '' %}
+    {% set supplierCountryId = '' %}
+    {% set supplierCountry = '' %}
 {% endif %}
-{% if businessType === '2' or businessType === '3' %}
-    {% set businessParentHidden = false %}
-    {% set businessParentDisabled = false %}
-{% elseif businessType === '1' %}
-    {% set businessParentHidden = true %}
-    {% set businessParentDisabled = true %}
-{% endif %}
-{% set businessesJson = json_encode(businesses, 16) %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row vdivide">
@@ -52,17 +56,17 @@
                                 'componentId'                    : componentId,
                                 'sectionId'                      : sectionId,
                                 'fieldId'                        : 'logo',
-                                'fieldLabel'                     : 'Business Logo',
+                                'fieldLabel'                     : 'Supplier Logo',
                                 'fieldType'                      : 'input',
                                 'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Business Logo',
+                                'fieldHelpTooltipContent'        : 'Supplier Logo',
                                 'fieldRequired'                  : true,
                                 'fieldBazScan'                   : true,
                                 'fieldBazPostOnCreate'           : true,
                                 'fieldBazPostOnUpdate'           : true,
                                 'fieldHidden'                    : true,
                                 'fieldDisabled'                  : true,
-                                'fieldValue'                     : businessLogo
+                                'fieldValue'                     : supplierLogo
                             ]
                         )}}
                         {{adminltetags.useTag('buttons',
@@ -111,7 +115,7 @@
                     {% if logoLink is defined %}
                         <img alt="logo" src="{{logoLink}}" class="user-image img-fluid img-thumbnail">
                     {% else %}
-                        <img alt="logo" src="/ecom/admin/default/images/general/logo.png" class="user-image img-fluid img-thumbnail">
+                        <img alt="logo" src="/ecom/dashboard/default/images/general/logo.png" class="user-image img-fluid img-thumbnail">
                     {% endif %}
                     <div id="{{componentId}}-{{sectionId}}-croppie" hidden></div>
                 </div>
@@ -127,17 +131,17 @@
                                 'componentId'                    : componentId,
                                 'sectionId'                      : sectionId,
                                 'fieldId'                        : 'id',
-                                'fieldLabel'                     : 'Business ID',
+                                'fieldLabel'                     : 'Supplier ID',
                                 'fieldType'                      : 'input',
                                 'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Business ID',
+                                'fieldHelpTooltipContent'        : 'Supplier ID',
                                 'fieldRequired'                  : true,
                                 'fieldBazScan'                   : true,
                                 'fieldBazPostOnCreate'           : false,
                                 'fieldBazPostOnUpdate'           : true,
                                 'fieldHidden'                    : true,
                                 'fieldDisabled'                  : true,
-                                'fieldValue'                     : businessId
+                                'fieldValue'                     : supplierId
                             ]
                         )}}
                     </div>
@@ -176,14 +180,14 @@
                                     ],
                                 'fieldInputTypeTextFilter'              : 'positiveInt',
                                 'fieldHelp'                             : true,
-                                'fieldHelpTooltipContent'               : 'Australia Business Number',
+                                'fieldHelpTooltipContent'               : 'Australia Supplier Number',
                                 'fieldRequired'                         : true,
                                 'fieldBazScan'                          : true,
                                 'fieldBazPostOnCreate'                  : true,
                                 'fieldBazPostOnUpdate'                  : true,
                                 'fieldDataInputMinLength'               : 11,
                                 'fieldDataInputMaxLength'               : 11,
-                                'fieldValue'                            : businessAbn
+                                'fieldValue'                            : supplierAbn
                             ]
                         )}}
                     </div>
@@ -197,17 +201,17 @@
                                 'componentId'                    : componentId,
                                 'sectionId'                      : sectionId,
                                 'fieldId'                        : 'name',
-                                'fieldLabel'                     : 'Business Name',
+                                'fieldLabel'                     : 'Supplier Name',
                                 'fieldType'                      : 'input',
                                 'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Business Name Example: My Business Pty Ltd',
+                                'fieldHelpTooltipContent'        : 'Supplier Name Example: My Supplier Pty Ltd',
                                 'fieldRequired'                  : true,
                                 'fieldBazScan'                   : true,
                                 'fieldBazPostOnCreate'           : true,
                                 'fieldBazPostOnUpdate'           : true,
                                 'fieldDataInputMinLength'        : 1,
                                 'fieldDataInputMaxLength'        : 100,
-                                'fieldValue'                     : businessName
+                                'fieldValue'                     : supplierName
                             ]
                         )}}
                     </div>
@@ -221,62 +225,104 @@
                                 'componentId'                    : componentId,
                                 'sectionId'                      : sectionId,
                                 'fieldId'                        : 'type',
-                                'fieldLabel'                     : 'Business Type',
-                                'fieldType'                      : 'select2',
+                                'fieldLabel'                     : 'Supplier Type',
+                                'fieldType'                      : 'input',
                                 'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Business Type',
+                                'fieldHelpTooltipContent'        : 'Supplier Type: Local/Remote',
                                 'fieldRequired'                  : true,
+                                'fieldHidden'                    : true,
+                                'fieldDisabled'                  : true,
                                 'fieldBazScan'                   : true,
                                 'fieldBazPostOnCreate'           : true,
                                 'fieldBazPostOnUpdate'           : true,
-                                'fieldDataSelect2Options'        :
-                                    {
-                                        '1'            :
-                                            {
-                                                'id'            : '1',
-                                                'name'          : 'Primary'
-                                            },
-                                        '2'            :
-                                            {
-                                                'id'            : '2',
-                                                'name'          : 'Subsidiary'
-                                            },
-                                        '3'            :
-                                            {
-                                                'id'            : '3',
-                                                'name'          : 'Branch'
-                                            }
-                                    },
-                                'fieldDataSelect2OptionsKey'           : 'id',
-                                'fieldDataSelect2OptionsValue'         : 'name',
-                                'fieldDataSelect2OptionsArray'         : true,
-                                'fieldDataSelect2OptionsSelected'      : businessType
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 100,
+                                'fieldValue'                     : supplierType
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {% if supplierIsManufacturer is defined %}
+                            {% if supplierIsManufacturer == 1 %}
+                                {% set supplierIsManufacturerChecked = true %}
+                            {% else %}
+                                {% set supplierIsManufacturerChecked = false %}
+                            {% endif %}
+                        {% endif %}
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'is_manufacturer',
+                                'fieldLabel'                     : 'Supplier is Manufacturer?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Is supplier also the manufacturer for their brand?',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'info',
+                                'fieldCheckboxChecked'           : supplierIsManufacturerChecked,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true
                             ]
                         )}}
                     </div>
                     <div class="col">
+                        {% if supplierDoesDropship is defined %}
+                            {% if supplierDoesDropship == 1 %}
+                                {% set supplierDoesDropshipChecked = true %}
+                            {% else %}
+                                {% set supplierDoesDropshipChecked = false %}
+                            {% endif %}
+                        {% endif %}
                         {{adminltetags.useTag('fields',
                             [
-                                'component'                                 : component,
-                                'componentName'                             : componentName,
-                                'componentId'                               : componentId,
-                                'sectionId'                                 : sectionId,
-                                'fieldId'                                   : 'parent',
-                                'fieldLabel'                                : 'Parent Business',
-                                'fieldType'                                 : 'select2',
-                                'fieldHelp'                                 : true,
-                                'fieldHelpTooltipContent'                   : 'Select parent business.',
-                                'fieldBazScan'                              : true,
-                                'fieldBazPostOnCreate'                      : true,
-                                'fieldBazPostOnUpdate'                      : true,
-                                'fieldRequired'                             : true,
-                                'fieldHidden'                               : businessParentHidden,
-                                'fieldDisabled'                             : businessParentDisabled,
-                                'fieldDataSelect2Options'                   : businesses,
-                                'fieldDataSelect2OptionsKey'                : 'id',
-                                'fieldDataSelect2OptionsValue'              : 'name',
-                                'fieldDataSelect2OptionsArray'              : true,
-                                'fieldDataSelect2OptionsSelected'           : businessParentId
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'does_dropship',
+                                'fieldLabel'                     : 'Supplier does dropship?',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Does supplier provide dropship service to end customers?',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'info',
+                                'fieldCheckboxChecked'           : supplierDoesDropshipChecked,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                            : component,
+                                'componentName'                        : componentName,
+                                'componentId'                          : componentId,
+                                'sectionId'                            : sectionId,
+                                'fieldId'                              : 'brands',
+                                'fieldLabel'                           : 'Supplier Brand(s)',
+                                'fieldType'                            : 'select2',
+                                'fieldHelp'                            : true,
+                                'fieldHelpTooltipContent'              : 'Select or add new brand',
+                                'fieldRequired'                        : true,
+                                'fieldBazScan'                         : true,
+                                'fieldBazPostOnCreate'                 : true,
+                                'fieldBazPostOnUpdate'                 : true,
+                                'fieldSelect2Multiple'                 : true,
+                                'fieldDataSelect2Options'              : brands,
+                                'fieldDataSelect2OptionsKey'           : 'id',
+                                'fieldDataSelect2OptionsValue'         : 'name',
+                                'fieldDataSelect2OptionsArray'         : true,
+                                'fieldDataSelect2OptionsSelected'      : supplierBrands
                             ]
                         )}}
                     </div>
@@ -285,8 +331,100 @@
         </div>
         <hr>
         <div class="row">
-            <div class="col-md-12 col-sm-12">
-                {% include 'common/address/view' with
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_first_name',
+                        'fieldLabel'                     : "Supplier's Contact First Name",
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : "Supplier's Contact First Name",
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : supplierContactFirstName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_last_name',
+                        'fieldLabel'                     : "Supplier's Contact Last Name",
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : "Supplier's Contact Last Name",
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : supplierContactLastName
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_phone',
+                        'fieldLabel'                     : "Supplier's Contact Phone",
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : "Supplier's Contact Phone",
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 25,
+                        'fieldValue'                     : supplierContactPhone
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_email',
+                        'fieldLabel'                     : "Supplier's Contact Email",
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : "Supplier's Contact Email",
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : supplierContactEmail
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% include '../common/address/view' with
                     [
                         'component'                                   : component,
                         'componentName'                               : componentName,
@@ -294,25 +432,25 @@
                         'sectionId'                                   : sectionId,
                         'includeStreet'                               : true,
                         'searchType'                                  : 'city',
-                        'streetAddress'                               : businessStreetAddress,
+                        'streetAddress'                               : supplierStreetAddress,
                         'streetAddressFieldBazPostOnCreate'           : true,
                         'streetAddressFieldBazPostOnUpdate'           : true,
-                        'streetAddress2'                              : businessStreetAddress2,
+                        'streetAddress2'                              : supplierStreetAddress2,
                         'streetAddress2FieldBazPostOnCreate'          : true,
                         'streetAddress2FieldBazPostOnUpdate'          : true,
-                        'cityId'                                      : businessCityId,
-                        'cityName'                                    : businessCity,
+                        'cityId'                                      : supplierCityId,
+                        'cityName'                                    : supplierCity,
                         'cityFieldBazPostOnCreate'                    : true,
                         'cityFieldBazPostOnUpdate'                    : true,
-                        'postCode'                                    : businessPostCode,
+                        'postCode'                                    : supplierPostCode,
                         'postCodeFieldBazPostOnCreate'                : true,
                         'postCodeFieldBazPostOnUpdate'                : true,
-                        'stateId'                                     : businessStateId,
-                        'stateName'                                   : businessState,
+                        'stateId'                                     : supplierStateId,
+                        'stateName'                                   : supplierState,
                         'stateFieldBazPostOnCreate'                   : true,
                         'stateFieldBazPostOnUpdate'                   : true,
-                        'countryId'                                   : businessCountryId,
-                        'countryName'                                 : businessCountry,
+                        'countryId'                                   : supplierCountryId,
+                        'countryName'                                 : supplierCountry,
                         'countryFieldBazPostOnCreate'                 : true,
                         'countryFieldBazPostOnUpdate'                 : true
                     ]
@@ -329,11 +467,11 @@
             'componentId'               : componentId,
             'sectionId'                 : sectionId,
             'modalId'                   : 'info-modal',
-            'modalBodyInclude'          : 'businesses/info',
+            'modalBodyInclude'          : 'suppliers/types/local/info',
             'modalSize'                 : 'lg',
             'modalHeader'               : true,
             'modalFooter'               : true,
-            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> BUSINESS INFORMATION',
+            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> SUPPLIER INFORMATION',
             'modalEscClose'             : 'true'
         ]
     )}}
@@ -495,7 +633,7 @@ dataCollectionSection =
                     var formData = new FormData();
 
                     formData.append('file', imageBlob);
-                    formData.append('directory', 'businesses');
+                    formData.append('directory', 'suppliers');
                     formData.append('fileName', imageName);
 
                     var url = '{{links.url("storages/add")}}';
@@ -536,21 +674,21 @@ dataCollectionSection =
                     var postData = { };
                     postData['abn'] = $('#{{componentId}}-{{sectionId}}-abn').val();
 
-                    $.post('{{links.url("businesses/searchABN")}}', postData, function(data) {
+                    $.post('{{links.url("inventory/suppliers/searchABN")}}', postData, function(data) {
                         $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-abn-search').children('i').attr('hidden', true);
 
                         if (data.responseCode === 0) {
-                            if (data.businessDetails.exception) {
+                            if (data.supplierDetails.exception) {
                                 PNotify.error({
-                                    text : data.businessDetails.exception.exceptionDescription
+                                    text : data.supplierDetails.exception.exceptionDescription
                                 });
                                 return;
                             }
                             $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-name').val(data.businessDetails.businessEntity202001.mainName.organisationName);
-                            $('#{{componentId}}-{{sectionId}}-post_code').val(data.businessDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
-                            updateModalInfo(data.businessDetails);
+                            $('#{{componentId}}-{{sectionId}}-name').val(data.supplierDetails.businessEntity202001.mainName.organisationName);
+                            $('#{{componentId}}-{{sectionId}}-post_code').val(data.supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                            updateModalInfo(data.supplierDetails);
                         }
                     }, 'json');
                 });
@@ -560,19 +698,19 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-info-modal').modal('show');
                 });
 
-                function updateModalInfo(businessDetails) {
-                    if (businessDetails) {
-                        $('#company-name').html(businessDetails.businessEntity202001.mainName.organisationName);
-                        $('#company-status').html(businessDetails.businessEntity202001.entityStatus.entityStatusCode);
-                        $('#company-abn').html(businessDetails.businessEntity202001.ABN.identifierValue);
-                        $('#company-asic').html(businessDetails.businessEntity202001.ASICNumber);
-                        $('#company-code').html(businessDetails.businessEntity202001.entityType.entityTypeCode);
-                        $('#company-description').html(businessDetails.businessEntity202001.entityType.entityDescription);
-                        $('#company-post-code').html(businessDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
-                        $('#company-state').html(businessDetails.businessEntity202001.mainBusinessPhysicalAddress.stateCode);
-                        $('#company-record-updated').html(businessDetails.businessEntity202001.recordLastUpdatedDate);
-                        $('#company-register-updated').html(businessDetails.dateRegisterLastUpdated);
-                        $('#company-disclaimer').html(businessDetails.usageStatement);
+                function updateModalInfo(supplierDetails) {
+                    if (supplierDetails) {
+                        $('#company-name').html(supplierDetails.businessEntity202001.mainName.organisationName);
+                        $('#company-status').html(supplierDetails.businessEntity202001.entityStatus.entityStatusCode);
+                        $('#company-abn').html(supplierDetails.businessEntity202001.ABN.identifierValue);
+                        $('#company-asic').html(supplierDetails.businessEntity202001.ASICNumber);
+                        $('#company-code').html(supplierDetails.businessEntity202001.entityType.entityTypeCode);
+                        $('#company-description').html(supplierDetails.businessEntity202001.entityType.entityDescription);
+                        $('#company-post-code').html(supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                        $('#company-state').html(supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.stateCode);
+                        $('#company-record-updated').html(supplierDetails.businessEntity202001.recordLastUpdatedDate);
+                        $('#company-register-updated').html(supplierDetails.dateRegisterLastUpdated);
+                        $('#company-disclaimer').html(supplierDetails.usageStatement);
                     } else {
                         $('#company-name').html('');
                         $('#company-status').html('');
@@ -590,62 +728,39 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-name'                    : { },
-        '{{componentId}}-{{sectionId}}-type'                    : {
-            'placeholder' : 'SELECT BUSINESS TYPE',
-            afterInit: function() {
-                //Disable Subsidiary and branch if there are no other businesses.
-                var businesses = JSON.parse('{{businessesJson}}');
-                if (Object.keys(businesses).length === 0) {
-                    $('#{{componentId}}-{{sectionId}}-type').find('[data-value="2"]').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-type').find('[data-value="3"]').attr('disabled', true);
+        '{{componentId}}-{{sectionId}}-type'                    : { },
+        '{{componentId}}-{{sectionId}}-is_manufacturer'         : { },
+        '{{componentId}}-{{sectionId}}-does_dropship'           : { },
+        '{{componentId}}-{{sectionId}}-brands'                  : {
+            'placeholder'   : "SUPPLIER BRAND(s)",
+            'tags'          : true,
+            'createTag'     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
                 }
 
-                $('#{{componentId}}-{{sectionId}}-type').on('select2:select', function(e) {
-                    var typeID = e.params.data.id;
-                    //Get Parent on type selection
-                    if (typeID === '2' || typeID === '3') {
-                        $('#{{componentId}}-{{sectionId}}-parent').parent('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-parent').attr('disabled', false);
-                        var url = '{{links.url("businesses/getAllBusinesses")}}';
-                        $.post(url, function(data) {
-                            if (data.businesses.length > 0) {
-                                var newOption;
-                                $('#{{componentId}}-{{sectionId}}-parent').val(null).trigger('change');
-                                $('#{{componentId}}-{{sectionId}}-parent').empty().trigger('change');
-                                $(data.businesses).each(function(index,business){
-                                    if (typeID === '2') { // if subsidiary, we only show type 0 (primary business)
-                                        if (business.type === '1') {
-                                            newOption = new Option(business.name, business.id, false, false);
-                                            $('#{{componentId}}-{{sectionId}}-parent').append(newOption).trigger('change');
-                                        }
-                                    } else if (typeID === '3') { // if branch, we show type 0 and type 1 (primary and subsidiary businesses)
-                                        if (business.type === '1' || business.type === '2') {
-                                            if (business.id !== window['dataCollection'].env.currentId) {
-                                                newOption = new Option(business.name, business.id, false, false);
-                                                $('#{{componentId}}-{{sectionId}}-parent').append(newOption).trigger('change');
-                                            }
-                                        }
-                                    }
-                                });
-                            }
-                        }, 'json');
-                    } else if (typeID === '1') {
-                        $('#{{componentId}}-{{sectionId}}-parent').parent('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-parent').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-parent').val(null).trigger('change');
-                    }
-                })
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
             }
         },
-        '{{componentId}}-{{sectionId}}-parent'                  : {
-            'placeholder' : 'SELECT PARENT BUSINESS'
-        },
+        '{{componentId}}-{{sectionId}}-contact_first_name'      : { },
+        '{{componentId}}-{{sectionId}}-contact_last_name'       : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : { },
+        '{{componentId}}-{{sectionId}}-contact_email'           : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-abn'                    : 'required',
                 '{{componentId}}-{{sectionId}}-name'                   : 'required',
-                '{{componentId}}-{{sectionId}}-type'                   : 'required',
-                '{{componentId}}-{{sectionId}}-parent'                 : 'required',
+                '{{componentId}}-{{sectionId}}-brands'                 : 'required',
+                '{{componentId}}-{{sectionId}}-contact_first_name'     : 'required',
+                '{{componentId}}-{{sectionId}}-contact_last_name'      : 'required',
+                '{{componentId}}-{{sectionId}}-contact_phone'          : 'required',
+                '{{componentId}}-{{sectionId}}-contact_email'          : 'required',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'required',
                 '{{componentId}}-{{sectionId}}-city_name'              : 'required',
                 '{{componentId}}-{{sectionId}}-post_code'              : 'required',
@@ -654,9 +769,13 @@ dataCollectionSection =
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
-                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter business name',
-                '{{componentId}}-{{sectionId}}-type'                   : 'Please select business type',
-                '{{componentId}}-{{sectionId}}-parent'                 : 'Please select parent business',
+                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name',
+                '{{componentId}}-{{sectionId}}-brands'                 : 'Please select supplier brands',
+                '{{componentId}}-{{sectionId}}-contact_first_name'     : 'Please enter contact first name',
+                '{{componentId}}-{{sectionId}}-contact_last_name'      : 'Please enter contact last name',
+                '{{componentId}}-{{sectionId}}-contact_phone'          : 'Please enter contact phone',
+                '{{componentId}}-{{sectionId}}-contact_email'          : 'Please enter contact email',
+                '{{componentId}}-{{sectionId}}-parent'                 : 'Please select parent supplier',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'Please enter street address',
                 '{{componentId}}-{{sectionId}}-city_name'              : 'Please enter city',
                 '{{componentId}}-{{sectionId}}-post_code'              : 'Please enter post code',

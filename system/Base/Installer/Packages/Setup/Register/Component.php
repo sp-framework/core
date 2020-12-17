@@ -30,7 +30,7 @@ class Component
 				'menu'		 			=>
 					isset($componentFile['menu']) ?
 					Json::encode($componentFile['menu']) :
-					null,
+					false,
 				'applications'			=>
 					Json::encode(['1'=>['installed'=>true,'menu_id'=>$menuId]]),
 				'files'					=> Json::encode($installedFiles)

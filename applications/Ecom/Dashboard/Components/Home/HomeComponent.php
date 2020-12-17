@@ -2,6 +2,12 @@
 
 namespace Applications\Ecom\Dashboard\Components\Home;
 
+use Applications\Ecom\Dashboard\Components\Inventory\Brands\Install\Component as BrandsComponent;
+use Applications\Ecom\Dashboard\Components\Inventory\Suppliers\Install\Component as SuppliersComponent;
+use Applications\Ecom\Dashboard\Components\Storages\Install\Component as StoragesComponent;
+use Applications\Ecom\Dashboard\Packages\ABNLookup\Install\Package as ABNLookupPackage;
+use Applications\Ecom\Dashboard\Packages\Inventory\Brands\Install\Package as BrandsPackage;
+use Applications\Ecom\Dashboard\Packages\Inventory\Suppliers\Install\Package as SuppliersPackage;
 use System\Base\BaseComponent;
 
 class HomeComponent extends BaseComponent
@@ -11,26 +17,25 @@ class HomeComponent extends BaseComponent
      */
     public function viewAction()
     {
-        // var_dump($this->basepackages->geoCountries->getById(1));
-        // var_dump($this->geodb);
+        // For Installing ABNLookup
+        // $abnLookupPackage = new ABNLookupPackage();
+        // $abnLookupPackage->installPackage();
+        // For Installing Suppliers
+        // $suppliersComponent = new SuppliersComponent();
+        // $suppliersComponent->installComponent();
+        // For Installing Suppliers Package
+        // $suppliersPackage = new SuppliersPackage();
+        // $suppliersPackage->installPackage(true);
+        // For Installing Storage
+        // $storagesComponent = new StoragesComponent();
+        // $storagesComponent->installComponent();
 
-        // $modules = $this->usePackage(ModulesPackage::class);
-        // var_dump($this->modules->menus->getMenusForApplication($this->application['id']));
-        // $this->view->disable();
-
-        //
-        // For Installing Businesses
-        // $businessesPackage = new BusinessesPackage();
-        // $businessesPackage->installPackage(true);
-
-        // For Installing Locations
-        // $locationsPackage = new LocationsPackage();
-        // $locationsPackage->installPackage(true);
-
-        // For Installing Channels
-        // $locationsPackage = new ChannelsPackage();
-        // $locationsPackage->installPackage(true);
-
+        // For Installing Brands
+        // $brandsComponent = new BrandsComponent();
+        // $brandsComponent->installComponent();
+        // For Installing Brands Package
+        // $brandsPackage = new BrandsPackage();
+        // $brandsPackage->installPackage(true);
         // $this->view->disable();
     }
 }

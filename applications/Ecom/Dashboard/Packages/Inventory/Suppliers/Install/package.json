@@ -1,0 +1,8 @@
+{
+    "name"          : "Suppliers",
+    "displayName"   : "Admin Suppliers Package",
+    "description"   : "Package for Suppliers component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/package-admin-suppliers",
+    "settings"      : { }
+}

@@ -3016,12 +3016,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 * @options                  :
 */
 (function (global, factory) {
-    'use strict';
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = global || self, factory(global.BazLibs = {}));
 }(this, function (exports) {
-    'use strict';
 
     var BazContentSectionWithForm = function ($) {
 
@@ -3214,15 +3212,31 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                             if ($(bazScanField).data('bazpostoncreate') === true ||
                                 $(bazScanField).data('bazpostonupdate') === true ||
                                 $(bazScanField).data('bazdevpost') === true) {
-                                if ($(thatV).data('multiple')) {
-                                    dataCollection[componentId][sectionId]['data'][extractComponentId] = [];
-                                    $($(bazScanField)[0].selectedOptions).each(function(i,v){
-                                        var thisSelectId = $(v)[0].value;
-                                        var thisSelectName = $(v)[0].text;
-                                        var thisSelectObject = { };
-                                        thisSelectObject[thisSelectId] = thisSelectName;
-                                        dataCollection[componentId][sectionId]['data'][extractComponentId].push(thisSelectObject);
+                                if ($(thatV)[0]['multiple']) {
+                                    dataCollection[componentId][sectionId]['data'][extractComponentId] = { };
+                                    dataCollection[componentId][sectionId]['data'][extractComponentId]['data'] = [];
+                                    var select2Data = $(bazScanField).select2('data');
+                                    var newTags = [];
+
+                                    $(select2Data).each(function(i,v){
+                                        if (v.newTag) {
+                                            newTags.push(v.text);
+                                        } else {
+                                            var thisSelectId = v.id;
+                                            var thisSelectName = v.text;
+
+                                            if ($(thatV)[0]['multiple-object']) {
+                                                var thisSelectObject = { };
+                                                thisSelectObject[thisSelectId] = thisSelectName;
+                                                dataCollection[componentId][sectionId]['data'][extractComponentId]['data'].push(thisSelectObject);
+                                            } else {
+                                                dataCollection[componentId][sectionId]['data'][extractComponentId]['data'].push(thisSelectId);
+                                            }
+                                        }
                                     });
+                                    if (newTags.length > 0) {
+                                        dataCollection[componentId][sectionId]['data'][extractComponentId]['newTags'] = newTags;
+                                    }
                                 } else {
                                     if ($(thatV).val() === '') {
                                         dataCollection[componentId][sectionId]['data'][extractComponentId] = 0;

@@ -39,12 +39,14 @@ class Dispatcher
         $this->dispatcher->setDefaultAction('view');
 
         if ($this->applicationsInfo) {
+            $component = $this->components->getIdComponent($this->applicationsInfo['errors_component']);
+
             if (isset($this->applicationsInfo['errors_component']) &&
                 $this->applicationsInfo['errors_component'] != 0
             ) {
-                $errorClassArr = explode('\\', $this->components->getById($this->applicationsInfo['errors_component'])['class']);
+                $errorClassArr = explode('\\', $component['class']);
                 unset($errorClassArr[Arr::lastKey($errorClassArr)]);
-                $errorComponent = ucfirst($this->components->getById($this->applicationsInfo['errors_component'])['route']);
+                $errorComponent = ucfirst($component['route']);
                 $namespace = implode('\\', $errorClassArr);
             } else {
                 $errorComponent = 'Errors';

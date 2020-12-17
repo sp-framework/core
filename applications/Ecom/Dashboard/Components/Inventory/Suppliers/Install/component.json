@@ -1,0 +1,36 @@
+{
+    "route"         : "suppliers",
+    "name"          : "Suppliers",
+    "description"   : "Manage dashboard suppliers via this component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-dashboard-suppliers",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Inventory\\Suppliers\\SuppliersComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "inventory"      : {
+            "title"     : "inventory",
+            "icon"      : "clipboard-list",
+            "childs"    : {
+                "suppliers"   : {
+                    "title"     : "Suppliers",
+                    "link"      : "inventory/suppliers"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

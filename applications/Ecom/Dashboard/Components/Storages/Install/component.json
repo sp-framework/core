@@ -1,0 +1,24 @@
+{
+    "route"         : "storages",
+    "name"          : "Storages",
+    "description"   : "List storages via this component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-dashboard-storages",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Storages\\StoragesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : false,
+    "settings"          : {
+    }
+}

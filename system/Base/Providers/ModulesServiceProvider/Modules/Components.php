@@ -25,6 +25,7 @@ class Components extends BasePackage
 			$this->model->filter(
 				function($component) use ($route, $applicationId) {
 					$component = $component->toArray();
+
 					$component['applications'] = Json::decode($component['applications'], true);
 
 					if (isset($component['applications'][$applicationId])) {

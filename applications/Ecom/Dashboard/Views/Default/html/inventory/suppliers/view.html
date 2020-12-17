@@ -1,0 +1,33 @@
+{% if supplier['id'] is defined %}
+    {% set supplierId = supplier['id'] %}
+{% else %}
+    {% set supplierId = '' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'handshake',
+        'cardTitle'                     : componentName,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'suppliers/types/' ~ supplierType ~ '/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : supplierId,
+            'addActionUrl'                  : 'inventory/suppliers/add',
+            'addSuccessRedirectUrl'         : 'inventory/suppliers',
+            'updateActionUrl'               : 'inventory/suppliers/update',
+            'updateSuccessRedirectUrl'      : 'inventory/suppliers',
+            'cancelActionUrl'               : 'inventory/suppliers',
+            'closeActionUrl'                : 'inventory/suppliers'
+        ]
+    ]
+)}}

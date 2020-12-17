@@ -1,0 +1,33 @@
+{% if brand['id'] is defined %}
+    {% set brandId = brand['id'] %}
+{% else %}
+    {% set brandId = '' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'dot-circle',
+        'cardTitle'                     : componentName,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'brands/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : brandId,
+            'addActionUrl'                  : 'inventory/brands/add',
+            'addSuccessRedirectUrl'         : 'inventory/brands',
+            'updateActionUrl'               : 'inventory/brands/update',
+            'updateSuccessRedirectUrl'      : 'inventory/brands',
+            'cancelActionUrl'               : 'inventory/brands',
+            'closeActionUrl'                : 'inventory/brands'
+        ]
+    ]
+)}}

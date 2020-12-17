@@ -148,7 +148,7 @@ class Setup
 		$this->db->createTable('storages_local', $dbName, (new StoragesLocal)->columns());
 	}
 
-	public function registerRepository()//Change this to SP
+	public function registerRepository()
 	{
 		(new RegisterRepository())->register($this->db);
 	}

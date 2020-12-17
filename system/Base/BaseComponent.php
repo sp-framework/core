@@ -51,6 +51,7 @@ abstract class BaseComponent extends Controller
 			$this->modules->components->getNamedComponentForApplication(
 				$this->componentName, $this->application['id']
 			);
+
 		if (!$this->component) {
 			$this->componentRoute =
 				str_replace('Component', '', $this->reflection->getShortName());
@@ -59,7 +60,11 @@ abstract class BaseComponent extends Controller
 				$this->modules->components->getRouteComponentForApplication(
 					strtolower($this->componentRoute), $this->application['id']
 				);
+		} else {
+			$this->componentRoute =
+				str_replace('Component', '', $this->reflection->getShortName());
 		}
+
 
 		if (!$this->isJson() || $this->request->isAjax()) {
 
@@ -112,7 +117,7 @@ abstract class BaseComponent extends Controller
 		$this->view->componentName = strtolower($this->componentName);
 
 		$this->view->componentId =
-			strtolower($this->view->applicationName) . '-' . strtolower($this->componentName);
+			strtolower($this->view->applicationRoute) . '-' . strtolower($this->componentRoute);
 
 		$reflection = Arr::sliceRight(explode('\\', $this->reflection->getName()), 3);
 
@@ -489,6 +494,29 @@ abstract class BaseComponent extends Controller
 				$this->view->render($componentName, $action)->getContent();
 
 			$this->view->setRenderLevel(View::LEVEL_MAIN_LAYOUT);
+		}
+	}
+
+	protected function getInstalledFiles($directory = null, $sub = true)
+	{
+		$installedFiles = [];
+		$installedFiles['dir'] = [];
+		$installedFiles['files'] = [];
+
+		if ($directory) {
+			$contents = $this->localContent->listContents($directory, $sub);
+
+			foreach ($contents as $contentKey => $content) {
+				if ($content['type'] === 'dir') {
+					array_push($installedFiles['dir'], $content['path']);
+				} else if ($content['type'] === 'file') {
+					array_push($installedFiles['files'], $content['path']);
+				}
+			}
+
+			return $installedFiles;
+		} else {
+			return null;
 		}
 	}
 }

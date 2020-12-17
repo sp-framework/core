@@ -1,0 +1,36 @@
+{
+    "route"         : "brands",
+    "name"          : "Brands",
+    "description"   : "Manage dashboard brands via this component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-dashboard-brands",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Inventory\\Brands\\BrandsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "inventory"      : {
+            "title"     : "inventory",
+            "icon"      : "clipboard-list",
+            "childs"    : {
+                "brands"   : {
+                    "title"     : "Brands",
+                    "link"      : "inventory/brands"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}
