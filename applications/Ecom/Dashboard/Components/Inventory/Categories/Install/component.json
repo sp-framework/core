@@ -1,0 +1,36 @@
+{
+    "route"         : "categories",
+    "name"          : "Categories",
+    "description"   : "Manage dashboard categories via this component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-dashboard-categories",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Inventory\\Categories\\CategoriesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "inventory"      : {
+            "title"     : "inventory",
+            "icon"      : "clipboard-list",
+            "childs"    : {
+                "categories"   : {
+                    "title"     : "Categories",
+                    "link"      : "inventory/categories"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

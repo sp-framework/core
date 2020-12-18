@@ -175,6 +175,14 @@ class Suppliers
                         'notNull' => true,
                     ]
                 ),
+                new Column(
+                    'notes',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 2048,
+                        'notNull' => true,
+                    ]
+                ),
             ]
         ];
     }

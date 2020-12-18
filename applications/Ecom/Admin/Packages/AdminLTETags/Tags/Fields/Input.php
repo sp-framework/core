@@ -82,7 +82,7 @@ class Input
         */
         $this->fieldParams['fieldInputTypeTextFilter'] =
             isset($this->params['fieldInputTypeTextFilter']) ?
-            'data-fieldinputfilter=' . $this->params['fieldInputTypeTextFilter'] . '"' :
+            'data-fieldinputfilter="' . $this->params['fieldInputTypeTextFilter'] . '"' :
             '';
 
         $this->fieldParams['fieldGroupPreAddonTextAdditionalClass'] =

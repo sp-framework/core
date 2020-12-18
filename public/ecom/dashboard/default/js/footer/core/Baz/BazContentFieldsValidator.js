@@ -69,7 +69,7 @@ var BazContentFieldsValidator = function() {
 
                 $.validator.setDefaults({
                     debug: false,
-                    ignore: ':submit, :reset, :image, :disabled, :hidden, input[type="file"]',
+                    ignore: ':submit, :reset, :image, :disabled, :hidden, .ignore, .cr-slider',
                     onkeyup: false,
                     onclick: false,
                     submitHandler: function() { },
@@ -78,10 +78,10 @@ var BazContentFieldsValidator = function() {
 
                 validateOptions = {
                     errorElement: 'div',
-                    errorPlacement: function ( error, element ) {
+                    errorPlacement: function (error,element) {
                         if (!formValid) {
-                            element.parents('.form-group').append(error);
-                            error.addClass('text-uppercase text-danger text-xs help-block');
+                            $(element).parents('.form-group').append(error);
+                            $(error).addClass('text-uppercase text-danger text-xs help-block');
                             $(element).closest('.form-group').addClass('has-feedback');
                         }
                     },

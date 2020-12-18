@@ -1,0 +1,541 @@
+{% if category['id'] is defined %}
+    {% set categoryId = category['id'] %}
+    {% set categoryType = category['type'] %}
+    {% set categoryImage = category['image'] %}
+    {% set categoryName = category['name'] %}
+    {% set categoryParent = category['parent'] %}
+    {% set categoryDescription = category['description'] %}
+    {% set categoryNeedAuth = category['need_auth'] %}
+    {% set categoryVisibleToRoleIds = category['visible_to_role_ids'] %}
+    {% set categoryVisibleOnChannelIds = category['visible_on_channel_ids'] %}
+    {% set categorySequence = category['sequence'] %}
+{% else %}
+    {% set categoryId = '' %}
+    {% set categoryType = 'local' %}
+    {% set categoryImage = '' %}
+    {% set categoryName = '' %}
+    {% set categoryParent = '' %}
+    {% set categoryDescription = '' %}
+    {% set categoryNeedAuth = 0 %}
+    {% set categoryVisibleToRoleIds = [] %}
+    {% set categoryVisibleOnChannelIds = [] %}
+    {% set categorySequence = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row vdivide">
+            <div class="col-md-4 col-sm-12">
+                <div class="row">
+                    <div class="col mb-2">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'image',
+                                'fieldLabel'                     : 'Category Image',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Category Image',
+                                'fieldRequired'                  : false,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldHidden'                    : true,
+                                'fieldDisabled'                  : true,
+                                'fieldValue'                     : categoryImage
+                            ]
+                        )}}
+                        {{adminltetags.useTag('buttons',
+                            {
+                                'componentId'            : componentId,
+                                'sectionId'              : sectionId,
+                                'buttonLabel'            : false,
+                                'buttonType'             : 'button',
+                                'buttons'                :
+                                {
+                                    'croppie-upload' :
+                                    {
+                                        'title'                 : false,
+                                        'position'              : 'left',
+                                        'icon'                  : 'upload',
+                                        'size'                  : 'sm',
+                                        'buttonAdditionalClass' : 'mr-1 ml-1 btn-file',
+                                        'content'               : '<input type="file" class="ignore" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*">'
+                                    },
+                                    'croppie-save' :
+                                    {
+                                        'title'                 : false,
+                                        'position'              : 'left',
+                                        'icon'                  : 'save',
+                                        'hidden'                : true,
+                                        'size'                  : 'sm',
+                                        'buttonAdditionalClass' : 'mr-1 ml-1'
+                                    },
+                                    'croppie-cancel' :
+                                    {
+                                        'title'                 : false,
+                                        'type'                  : 'secondary',
+                                        'position'              : 'left',
+                                        'icon'                  : 'times',
+                                        'hidden'                : true,
+                                        'size'                  : 'sm',
+                                        'buttonAdditionalClass' : 'mr-1 ml-1'
+                                    }
+                                }
+                            }
+                        )}}
+                        <span id="{{componentId}}-{{sectionId}}-save-warning" class="text-danger" hidden>Save/Cancel Image</span>
+                    </div>
+                </div>
+                <div class="text-center">
+                    {% if imageLink is defined %}
+                        <img alt="image" src="{{imageLink}}" class="user-image img-fluid img-thumbnail">
+                    {% else %}
+                        <img alt="image" src="/ecom/dashboard/default/images/general/image.png" class="user-image img-fluid img-thumbnail">
+                    {% endif %}
+                    <div id="{{componentId}}-{{sectionId}}-croppie" hidden></div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'id',
+                                'fieldLabel'                     : 'Category ID',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Category ID',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : false,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldHidden'                    : true,
+                                'fieldDisabled'                  : true,
+                                'fieldValue'                     : categoryId
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'type',
+                                'fieldLabel'                     : 'Category Type',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Category Type: Local/Remote',
+                                'fieldRequired'                  : true,
+                                'fieldHidden'                    : true,
+                                'fieldDisabled'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 100,
+                                'fieldValue'                     : categoryType
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'name',
+                                'fieldLabel'                     : 'Category Name',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Category Name Example: Phones',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 100,
+                                'fieldValue'                     : categoryName
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                            : component,
+                                'componentName'                        : componentName,
+                                'componentId'                          : componentId,
+                                'sectionId'                            : sectionId,
+                                'fieldId'                              : 'parent',
+                                'fieldLabel'                           : 'Select Parent Category',
+                                'fieldType'                            : 'select2',
+                                'fieldHelp'                            : true,
+                                'fieldHelpTooltipContent'              : 'Select a Parent Category',
+                                'fieldRequired'                        : false,
+                                'fieldBazScan'                         : true,
+                                'fieldBazPostOnCreate'                 : true,
+                                'fieldBazPostOnUpdate'                 : true,
+                                'fieldDataSelect2Options'              : categories,
+                                'fieldDataSelect2OptionsKey'           : 'id',
+                                'fieldDataSelect2OptionsValue'         : 'name',
+                                'fieldDataSelect2OptionsArray'         : true,
+                                'fieldDataSelect2OptionsSelected'      : categoryParent
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'description',
+                                'fieldLabel'                     : 'Description',
+                                'fieldType'                      : 'textarea',
+                                'fieldDataMaxLength'             : 1024,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Description',
+                                'fieldRequired'                  : false,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldTextareaRows'              : 2,
+                                'fieldValue'                     : categoryDescription
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {% if categoryNeedAuth is defined %}
+                    {% if categoryNeedAuth == 1 %}
+                        {% set categoryNeedAuthChecked = true %}
+                    {% else %}
+                        {% set categoryNeedAuthChecked = false %}
+                    {% endif %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'need_auth',
+                        'fieldLabel'                     : 'Category Needs Authentication?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Does category needs user to authenticate to view its content?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : categoryNeedAuthChecked,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'visible_to_role_ids',
+                        'fieldLabel'                     : 'Visible to role ids',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select roles that can view this category. Example: Customer Role, Guest Role. Note: Default is All Roles',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : false,
+                        'fieldDisabled'                  : false,
+                        'fieldDataSelect2Multiple'       : true,
+                        'fieldDataSelect2Options'        : roles,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': categoryVisibleToRoleIds
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'visible_on_channel_ids',
+                        'fieldLabel'                           : 'Visible On Channel(s)',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select channel(s). Note: Default is All Channels',
+                        'fieldRequired'                        : false,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Multiple'             : true,
+                        'fieldDataSelect2Options'              : localChannels,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : categoryVisibleOnChannelIds
+                    ]
+                )}}
+            </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'sequence',
+                                'fieldLabel'                            : 'Sequence',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Sequence. Default ordering is alphabetical. You can override it by giving it a sequence number.',
+                                'fieldRequired'                         : false,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 9999,
+                                'fieldValue'                            : categorySequence
+                            ]
+                        )}}
+                    </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals BazContentFieldsValidator PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-image'                   : {
+            afterInit: function() {
+                var uploadUUIDs = [];
+                var deleteUUIDs = [];
+                var imageCropper, imageBlob, newImage, oldImage, imageName;
+
+                function initCroppie() {
+                    imageCropper =
+                        $('#{{componentId}}-{{sectionId}}-croppie').croppie({
+                            viewport: {
+                                width: 200,
+                                height: 200,
+                            },
+                            boundary: {
+                                width: 250,
+                                height: 250
+                            }
+                        });
+
+                    $('#{{componentId}}-{{sectionId}}-croppie-upload-image').change(function () {
+                        readFile(this);
+                    });
+
+                    $('#{{componentId}}-{{sectionId}}-croppie-save').click(function (e) {
+                        e.preventDefault();
+
+                        if ($('#{{componentId}}-{{sectionId}}-image').val() &&
+                            $('#{{componentId}}-{{sectionId}}-image').val() !== ''
+                        ) {
+                            oldImage = true;
+                            deleteUUIDs.push($('#{{componentId}}-{{sectionId}}-image').val());
+                        } else {
+                            oldImage = false;
+                            deleteUUIDs = [];
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
+
+                        //To Canvas for show
+                        imageCropper.croppie('result', {
+                            type    : 'canvas',
+                            size    : 'viewport',
+                            format  : 'jpeg',
+                            circle  : false
+                        }).then(function (croppedImage) {
+                            imageBlob = croppedImage;
+                            $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
+                            $('.user-image').attr('src', croppedImage);
+                            $('.user-image').attr('hidden', false);
+                        });
+                        //To Blob for upload
+                        imageCropper.croppie('result', {
+                            type    : 'blob',
+                            size    : 'viewport',
+                            format  : 'jpeg',
+                            circle  : false
+                        }).then(function (croppedImage) {
+                            imageBlob = croppedImage;
+                            newImage = true;
+                            processDeleteUUIDs();
+                            uploadImage();
+                        });
+                    });
+
+                    $('#{{componentId}}-{{sectionId}}-croppie-cancel').click(function () {
+                        $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
+                        $('.user-image').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
+                        oldImage = false;
+                        deleteUUIDs = [];
+                    });
+                }
+
+                function readFile(input) {
+                    if (input.files && input.files[0]) {
+                        var reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            $('.user-image').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', false);
+                            $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', false);
+                            imageCropper.croppie('bind', {
+                                url: e.target.result
+                            }).then(function(){
+                                //
+                            });
+                        }
+
+                        imageName = input.files[0].name;
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                    else {
+                        PNotify.error("Sorry - you're browser doesn't support the FileReader API");
+                    }
+                }
+
+                function processDeleteUUIDs() {
+                    if (deleteUUIDs.length > 0) {
+
+                        var url = '{{links.url("storages/remove")}}';
+
+                        $(deleteUUIDs).each(function(index, uuid) {
+                            $.ajax({
+                                type    : 'POST',
+                                url     : url,
+                                data    :
+                                    {
+                                        "uuid"             : uuid
+                                    },
+                                dataType: 'json'
+                            }).done(function (data) {
+                                if (data && data.responseCode === 0) {
+                                    //
+                                }
+                            });
+                        });
+                    }
+                }
+
+                function uploadImage() {
+                    var formData = new FormData();
+
+                    formData.append('file', imageBlob);
+                    formData.append('directory', 'categories');
+                    formData.append('fileName', imageName);
+
+                    var url = '{{links.url("storages/add")}}';
+
+                    $.ajax(url, {
+                        method      : 'POST',
+                        data        : formData,
+                        dataType    : 'json',
+                        processData : false,
+                        contentType : false,
+                    }).done(function (data) {
+                        if (data) {
+                            uploadUUIDs.push(data.storageData.uuid);
+                            $('#{{componentId}}-{{sectionId}}-image').val(data.storageData.uuid);
+                        } else {
+                            PNotify.error('Image Upload Failed!');
+                        }
+                    });
+                }
+
+                initCroppie();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-description'             : { },
+        '{{componentId}}-{{sectionId}}-type'                    : { },
+        '{{componentId}}-{{sectionId}}-parent'                  : {
+            'placeholder' : 'SELECT PARENT CATEGORY'
+        },
+        '{{componentId}}-{{sectionId}}-need_auth'               : { },
+        '{{componentId}}-{{sectionId}}-visible_to_role_ids'     : {
+            'placeholder' : 'SELECT ROLES'
+        },
+        '{{componentId}}-{{sectionId}}-visible_on_channel_ids'  : {
+            'placeholder' : 'SELECT CHANNELS'
+        },
+        '{{componentId}}-{{sectionId}}-sequence'                : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                   : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name',
+            }
+        }
+    });
+</script>

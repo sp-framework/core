@@ -25,6 +25,8 @@ class Storages extends BasePackage
 
     public function addStorage(array $data)
     {
+        $data = $this->extractSelectData($data);
+
         $add = $this->add($data);
 
         if ($add) {
@@ -40,6 +42,8 @@ class Storages extends BasePackage
 
     public function updateStorage(array $data)
     {
+        $data = $this->extractSelectData($data);
+
         $update = $this->update($data);
 
         if ($update) {
@@ -52,6 +56,18 @@ class Storages extends BasePackage
             $this->packagesData->responseMessage = 'Error Updating Storage';
         }
         //
+    }
+
+    protected function extractSelectData(array $data)
+    {
+        $data['allowed_image_mime_types'] = Json::decode($data['allowed_image_mime_types'], true);
+        $data['allowed_image_mime_types'] = Json::encode($data['allowed_image_mime_types']['data']);
+        $data['allowed_image_sizes'] = Json::decode($data['allowed_image_sizes'], true);
+        $data['allowed_image_sizes'] = Json::encode($data['allowed_image_sizes']['data']);
+        $data['allowed_file_mime_types'] = Json::decode($data['allowed_file_mime_types'], true);
+        $data['allowed_file_mime_types'] = Json::encode($data['allowed_file_mime_types']['data']);
+
+        return $data;
     }
 
     public function removeStorage(array $data)

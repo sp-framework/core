@@ -56,7 +56,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
-                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
+                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -402,7 +402,6 @@
                         'fieldId'                        : 'can_login_role_ids',
                         'fieldLabel'                     : 'Allow Roles to login',
                         'fieldType'                      : 'select2',
-                        'fieldSelect2Multiple'           : true,
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select roles that can login into this app. Example: Customer Role, Sales Role.',
                         'fieldBazScan'                   : true,
@@ -410,6 +409,7 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldRequired'                  : false,
                         'fieldDisabled'                  : false,
+                        'fieldDataSelect2Multiple'       : true,
                         'fieldDataSelect2Options'        : roles,
                         'fieldDataSelect2OptionsKey'     : 'id',
                         'fieldDataSelect2OptionsValue'   : 'name',

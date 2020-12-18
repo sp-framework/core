@@ -60,13 +60,13 @@ class Select2
             $this->params['fieldSelect2Type'] :
             'primary';
 
-        $this->fieldParams['fieldSelect2Multiple'] =
-            isset($this->params['fieldSelect2Multiple']) && $this->params['fieldSelect2Multiple'] === true ?
+        $this->fieldParams['fieldDataSelect2Multiple'] =
+            isset($this->params['fieldDataSelect2Multiple']) && $this->params['fieldDataSelect2Multiple'] === true ?
             'multiple="multiple"' :
             '';
 
-        $this->fieldParams['fieldSelect2MultipleObject'] =
-            isset($this->params['fieldSelect2MultipleObject']) && $this->params['fieldSelect2MultipleObject'] === true ?
+        $this->fieldParams['fieldDataSelect2MultipleObject'] =
+            isset($this->params['fieldDataSelect2MultipleObject']) && $this->params['fieldDataSelect2MultipleObject'] === true ?
             'multiple-object="true"' :
             '';
 
@@ -86,7 +86,7 @@ class Select2
             '';
 
         $this->content .=
-            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:100%;" ' . $this->fieldParams['fieldSelect2Multiple'] . ' ' .$this->fieldParams['fieldSelect2MultipleObject'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldDataAttributes'] . '>
+            '<select ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="form-control select2 select2-' . $this->fieldParams['fieldSelect2Type'] . '" data-dropdown-css-class="select2-' . $this->fieldParams['fieldSelect2Type'] . '" ' . $this->fieldParams['fieldId'] . '" ' . $this->fieldParams['fieldName'] . '" style="width:100%;" ' . $this->fieldParams['fieldDataSelect2Multiple'] . ' ' .$this->fieldParams['fieldDataSelect2MultipleObject'] . ' ' . $this->fieldParams['fieldDisabled'] . ' ' . $this->fieldParams['fieldDataAttributes'] . '>
                 <option></option>';
 
         if ($this->fieldParams['fieldDataSelect2TreeData']) {

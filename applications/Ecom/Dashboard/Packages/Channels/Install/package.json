@@ -1,0 +1,8 @@
+{
+    "name"          : "Channels",
+    "displayName"   : "Dashboard Channels Package",
+    "description"   : "Package for Channels component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/package-dashboard-channels",
+    "settings"      : { }
+}
