@@ -26,8 +26,7 @@ class DynamicTable
 
     public function __construct($view, $tag, $links, $escaper, $params)
     {
-        $this->adminLTETags =
-            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
+        $this->adminLTETags = new AdminLTETags();
 
         $this->view = $view;
 

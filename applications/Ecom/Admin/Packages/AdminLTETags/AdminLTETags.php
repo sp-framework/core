@@ -2,26 +2,28 @@
 
 namespace Applications\Ecom\Admin\Packages\AdminLTETags;
 
-class AdminLTETags
+use System\Base\BasePackage;
+
+class AdminLTETags extends BasePackage
 {
-    protected $view;
+    // protected $view;
 
-    protected $tag;
+    // protected $tag;
 
-    protected $links;
+    // protected $links;
 
-    protected $escaper;
+    // protected $escaper;
 
-    public function __construct($view, $tag, $links, $escaper)
-    {
-        $this->view = $view;
+    // public function __construct($view, $tag, $links, $escaper)
+    // {
+    //     $this->view = $view;
 
-        $this->tag = $tag;
+    //     $this->tag = $tag;
 
-        $this->links = $links;
+    //     $this->links = $links;
 
-        $this->escaper = $escaper;
-    }
+    //     $this->escaper = $escaper;
+    // }
 
     public function useTag(string $tagName, array $params)
     {

@@ -414,10 +414,18 @@ class Filters extends AdminLTETags
                         'buttonSize'                        => 'sm',
                         'buttons'                           =>
                             [
-                                'save' => [
-                                    'title'                 => 'Save',
+                                'add' => [
+                                    'title'                 => 'Add',
                                     'disabled'              => true,
-                                    'icon'                  => 'save'
+                                    'icon'                  => 'save',
+                                    'url'                   => $this->links->url('filters/add')
+                                ],
+                                'update' => [
+                                    'title'                 => 'Update',
+                                    'disabled'              => true,
+                                    'hidden'                => true,
+                                    'icon'                  => 'save',
+                                    'url'                   => $this->links->url('filters/update')
                                 ],
                             ]
                     ]
@@ -438,63 +446,39 @@ class Filters extends AdminLTETags
                                         'componentId'                         => $this->params['componentId'],
                                         'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
                                         'fieldId'                             => 'gid',
-                                        'fieldLabel'                          => 'Group(s)',
+                                        'fieldLabel'                          => 'Role(s)',
                                         'fieldType'                           => 'select2',
                                         'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             => 'Select Groups to share filter with',
+                                        'fieldHelpTooltipContent'             => 'Select Roles to share filter with',
                                         'fieldBazScan'                        => true,
                                         'fieldRequired'                       => false,
-                                        'fieldDataSelect2Options'             =>
-                                            [
-                                                'group1'            =>
-                                                    [
-                                                        'id'            => 'group1',
-                                                        'name'          => 'Group1'
-                                                    ],
-                                                'group2'            =>
-                                                    [
-                                                        'id'            => 'group2',
-                                                        'name'          => 'Group2'
-                                                    ]
-                                            ],
-                                        'fieldDataSelect2OptionsKey'           => 'id',
-                                        'fieldDataSelect2OptionsValue'         => 'name',
-                                        'fieldDataSelect2OptionsArray'         => true,
-                                        'fieldSelect2Multiple'                 => true
+                                        'fieldDataSelect2Options'             => $this->roles->roles,
+                                        'fieldDataSelect2Multiple'            => true,
+                                        'fieldDataSelect2OptionsKey'          => 'id',
+                                        'fieldDataSelect2OptionsValue'        => 'name',
+                                        'fieldDataSelect2OptionsArray'        => true,
                                     ]
                                 ) .
                             '</div>
                         </div>
                         <div class="row">
-                            <div class="col">' .
+                            <div class="col">' . //This will be changed to user profiles
                                 $this->useTag('fields',
                                     [
                                         'componentId'                         => $this->params['componentId'],
                                         'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
                                         'fieldId'                             => 'uid',
-                                        'fieldLabel'                          => 'User(s)',
+                                        'fieldLabel'                          => 'Account(s)',
                                         'fieldType'                           => 'select2',
                                         'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             => 'Select Users to share filter with',
+                                        'fieldHelpTooltipContent'             => 'Select Accounts to share filter with',
                                         'fieldBazScan'                        => true,
                                         'fieldRequired'                       => false,
-                                        'fieldDataSelect2Options'             =>
-                                            [
-                                                'user1'            =>
-                                                    [
-                                                        'id'            => 'user1',
-                                                        'name'          => 'User1'
-                                                    ],
-                                                'user2'            =>
-                                                    [
-                                                        'id'            => 'user2',
-                                                        'name'          => 'User2'
-                                                    ]
-                                            ],
-                                        'fieldDataSelect2OptionsKey'           => 'id',
-                                        'fieldDataSelect2OptionsValue'         => 'name',
-                                        'fieldDataSelect2OptionsArray'         => true,
-                                        'fieldSelect2Multiple'                 => true
+                                        'fieldDataSelect2Options'             => [],
+                                        'fieldDataSelect2Multiple'            => true,
+                                        'fieldDataSelect2OptionsKey'          => 'id',
+                                        'fieldDataSelect2OptionsValue'        => 'name',
+                                        'fieldDataSelect2OptionsArray'        => true,
                                     ]
                                 ) .
                             '</div>
@@ -530,10 +514,10 @@ class Filters extends AdminLTETags
                         window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing"],
                         {
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-gid" : {
-                                placeholder: "Select Group(s)",
+                                placeholder: "Select Role(s)",
                             },
                             "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-uid" : {
-                                placeholder: "Select User(s)",
+                                placeholder: "Select Account(s)",
                             },
                         }
                     );

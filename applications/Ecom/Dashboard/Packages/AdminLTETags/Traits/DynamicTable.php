@@ -101,7 +101,7 @@ trait DynamicTable {
                 }
             }
 
-            $adminltetags = new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
+            $adminltetags = new AdminLTETags();
 
             $this->view->rows =
                 $adminltetags->useTag('content/listing/table',

@@ -32,8 +32,7 @@ class ButtonGroup
 
         $this->escaper = $escaper;
 
-        $this->adminLTETags =
-            new AdminLTETags($this->view, $this->tag, $this->links, $this->escaper);
+        $this->adminLTETags = new AdminLTETags();
 
         $this->params = $params;
 
