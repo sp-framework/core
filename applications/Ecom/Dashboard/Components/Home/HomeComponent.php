@@ -2,17 +2,18 @@
 
 namespace Applications\Ecom\Dashboard\Components\Home;
 
+use Applications\Ecom\Dashboard\Components\Channels\Install\Component as ChannelsComponent;
+use Applications\Ecom\Dashboard\Components\Filters\Install\Component as FiltersComponent;
 use Applications\Ecom\Dashboard\Components\Inventory\Brands\Install\Component as BrandsComponent;
-use Applications\Ecom\Dashboard\Components\Inventory\Specifications\Install\Component as SpecificationsComponent;
 use Applications\Ecom\Dashboard\Components\Inventory\Categories\Install\Component as CategoriesComponent;
+use Applications\Ecom\Dashboard\Components\Inventory\Specifications\Install\Component as SpecificationsComponent;
 use Applications\Ecom\Dashboard\Components\Inventory\Suppliers\Install\Component as SuppliersComponent;
 use Applications\Ecom\Dashboard\Components\Storages\Install\Component as StoragesComponent;
-use Applications\Ecom\Dashboard\Components\Channels\Install\Component as ChannelsComponent;
-use Applications\Ecom\Dashboard\Packages\Channels\Install\Package as ChannelsPackage;
 use Applications\Ecom\Dashboard\Packages\ABNLookup\Install\Package as ABNLookupPackage;
+use Applications\Ecom\Dashboard\Packages\Channels\Install\Package as ChannelsPackage;
 use Applications\Ecom\Dashboard\Packages\Inventory\Brands\Install\Package as BrandsPackage;
-use Applications\Ecom\Dashboard\Packages\Inventory\Specifications\Install\Package as SpecificationsPackage;
 use Applications\Ecom\Dashboard\Packages\Inventory\Categories\Install\Package as CategoriesPackage;
+use Applications\Ecom\Dashboard\Packages\Inventory\Specifications\Install\Package as SpecificationsPackage;
 use Applications\Ecom\Dashboard\Packages\Inventory\Suppliers\Install\Package as SuppliersPackage;
 use System\Base\BaseComponent;
 
@@ -23,6 +24,10 @@ class HomeComponent extends BaseComponent
      */
     public function viewAction()
     {
+        // For Installing Filters
+        // $filtersComponent = new FiltersComponent();
+        // $filtersComponent->installComponent();
+
         // For Installing ABNLookup
         // $abnLookupPackage = new ABNLookupPackage();
         // $abnLookupPackage->installPackage();
