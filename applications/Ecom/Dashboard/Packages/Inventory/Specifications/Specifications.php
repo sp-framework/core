@@ -72,7 +72,7 @@ class Specifications extends BasePackage
 
     public function removeSpecification(array $data)
     {
-        $specification = $this->getById($id);
+        $specification = $this->getById($data['id']);
 
         if ($specification['product_count'] && (int) $specification['product_count'] > 0) {
             $this->packagesData->responseCode = 1;
@@ -80,6 +80,26 @@ class Specifications extends BasePackage
             $this->packagesData->responseMessage = 'Specification is assigned to ' . $specification['product_count'] . ' products. Error removing specification.';
 
             return false;
+        }
+
+        if ($specification['is_group'] == 1) {
+            $childs = $this->getByParams(
+                [
+                    'conditions'    => 'group_id = :gid:',
+                    'bind'          =>
+                        [
+                            'gid'        => $specification['id']
+                        ]
+                ]
+            );
+
+            if (count($childs) > 0) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Specification is a group and other specifications are assigned to it. Error removing specification group.';
+
+                return false;
+            }
         }
 
         if ($this->remove($data['id'])) {
@@ -148,9 +168,10 @@ class Specifications extends BasePackage
     {
         $params =
             [
-                'conditions'    => 'is_group = :is_group: AND name = :name:',
+                'conditions'    => 'id != :id: AND is_group = :is_group: AND name = :name:',
                 'bind'          =>
                     [
+                        'id'          => $data['id'],
                         'is_group'    => '1',
                         'name'        => $data['name']
                     ]
@@ -169,9 +190,10 @@ class Specifications extends BasePackage
     {
         $params =
             [
-                'conditions'    => 'group_id = :group_id: AND name = :name:',
+                'conditions'    => 'id != :id: AND group_id = :group_id: AND name = :name:',
                 'bind'          =>
                     [
+                        'id'          => $data['id'],
                         'group_id'    => $data['group_id'],
                         'name'        => $data['name']
                     ]

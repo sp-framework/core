@@ -66,8 +66,12 @@
                 {% if specificationIsGroup is defined %}
                     {% if specificationIsGroup == 1 %}
                         {% set specificationIsGroupChecked = true %}
+                        {% set specificationGroupsDisabled = true %}
+                        {% set specificationGroupsHidden = true %}
                     {% else %}
                         {% set specificationIsGroupChecked = false %}
+                        {% set specificationGroupsDisabled = false %}
+                        {% set specificationGroupsHidden = false %}
                     {% endif %}
                 {% endif %}
                 {{adminltetags.useTag('fields',
@@ -105,6 +109,8 @@
                         'fieldHelp'                            : true,
                         'fieldHelpTooltipContent'              : 'Select a specificaion group',
                         'fieldRequired'                        : true,
+                        'fieldDisabled'                        : specificationGroupsDisabled,
+                        'fieldHidden'                          : specificationGroupsHidden,
                         'fieldBazScan'                         : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
