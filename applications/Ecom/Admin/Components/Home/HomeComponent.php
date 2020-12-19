@@ -3,6 +3,7 @@
 namespace Applications\Ecom\Admin\Components\Home;
 
 use Applications\Ecom\Admin\Packages\Businesses\Install\Package as BusinessesPackage;
+use Applications\Ecom\Admin\Packages\Channels\Install\Package as ChannelsPackage;
 use Applications\Ecom\Admin\Packages\Locations\Install\Package as LocationsPackage;
 use System\Base\BaseComponent;
 
@@ -27,6 +28,10 @@ class HomeComponent extends BaseComponent
 
         // For Installing Locations
         // $locationsPackage = new LocationsPackage();
+        // $locationsPackage->installPackage(true);
+
+        // For Installing Channels
+        // $locationsPackage = new ChannelsPackage();
         // $locationsPackage->installPackage(true);
 
         // $this->view->disable();
