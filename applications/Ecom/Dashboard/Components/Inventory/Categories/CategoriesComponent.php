@@ -5,6 +5,7 @@ namespace Applications\Ecom\Dashboard\Components\Inventory\Categories;
 use Applications\Ecom\Dashboard\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Ecom\Dashboard\Packages\Channels\Channels;
 use Applications\Ecom\Dashboard\Packages\Inventory\Categories\Categories;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
@@ -49,15 +50,23 @@ class CategoriesComponent extends BaseComponent
             }
 
             if ($this->getData()['id'] != 0) {
-                $this->view->category = $categories[$this->getData()['id']];
+                $category = $categories[$this->getData()['id']];
 
                 unset($categories[$this->getData()['id']]);
 
-                $storages = $this->usePackage(Storages::class);
+                $storages = $this->basepackages->storages;
 
-                $this->view->imageLink = $storages->getPublicLink($this->view->category['image'], 200);
+                if ($category['image'] !== '') {
+                    $this->view->imageLink = $storages->getPublicLink($category['image'], 200);
+                }
+
+                $category['visible_to_role_ids'] = Json::decode($category['visible_to_role_ids'], true);
+                $category['visible_on_channel_ids'] = Json::decode($category['visible_on_channel_ids'], true);
 
                 $this->view->categoryType = $category['type'];
+
+                $this->view->category = $category;
+
             } else {
 
                 $this->view->categoryType = $this->getData()['type'];

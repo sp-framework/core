@@ -41,7 +41,7 @@ class Categories
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 1024,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
