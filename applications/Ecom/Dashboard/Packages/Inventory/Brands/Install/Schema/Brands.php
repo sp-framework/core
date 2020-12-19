@@ -35,7 +35,22 @@ class Brands
                         'size'    => 100,
                         'notNull' => true,
                     ]
-                )
+                ),
+                new Column(
+                    'description',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 2048,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'product_count',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
             ]
         ];
     }

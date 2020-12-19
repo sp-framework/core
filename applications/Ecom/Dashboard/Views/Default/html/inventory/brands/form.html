@@ -2,10 +2,12 @@
     {% set brandId = brand['id'] %}
     {% set brandLogo = brand['logo'] %}
     {% set brandName = brand['name'] %}
+    {% set brandDescription = brand['description'] %}
 {% else %}
     {% set brandId = '' %}
     {% set brandLogo = '' %}
     {% set brandName = '' %}
+    {% set brandDescription = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -48,7 +50,7 @@
                                         'icon'                  : 'upload',
                                         'size'                  : 'sm',
                                         'buttonAdditionalClass' : 'mr-1 ml-1 btn-file',
-                                        'content'               : '<input type="file" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*"/>'
+                                        'content'               : '<input type="file" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*">'
                                     },
                                     'croppie-save' :
                                     {
@@ -130,6 +132,31 @@
                                 'fieldDataInputMinLength'        : 1,
                                 'fieldDataInputMaxLength'        : 100,
                                 'fieldValue'                     : brandName
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'description',
+                                'fieldLabel'                     : 'Brand Description',
+                                'fieldType'                      : 'textarea',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Brand Description',
+                                'fieldRequired'                  : false,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 2048,
+                                'fieldTextareaRows'              : 2,
+                                'fieldValue'                     : brandDescription
                             ]
                         )}}
                     </div>
@@ -320,6 +347,7 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-description'             : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                   : 'required'

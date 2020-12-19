@@ -11,4 +11,8 @@ class Brands extends BaseModel
     public $logo;
 
     public $name;
+
+    public $description;
+
+    public $product_count;
 }

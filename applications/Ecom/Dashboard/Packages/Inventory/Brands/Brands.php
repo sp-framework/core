@@ -42,7 +42,16 @@ class Brands extends BasePackage
 
     public function removeBrand(array $data)
     {
-        //Check relations before removing.
+        $brand = $this->getById($id);
+
+        if ($brand['product_count'] && (int) $brand['product_count'] > 0) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Brand is assigned to ' . $brand['product_count'] . ' products. Error removing brand.';
+
+            return false;
+        }
+
         if ($this->remove($data['id'])) {
             $this->packagesData->responseCode = 0;
 
@@ -52,5 +61,31 @@ class Brands extends BasePackage
 
             $this->packagesData->responseMessage = 'Error removing brand.';
         }
+    }
+
+    public function addProductCount(int $id)
+    {
+        $brand = $this->getById($id);
+
+        if ($brand['product_count'] && $brand['product_count'] != '') {
+            $brand['product_count'] = (int) $brand['product_count'] + 1;
+        } else {
+            $brand['product_count'] = 1;
+        }
+
+        $this->update($brand);
+    }
+
+    public function removeProductCount(int $id)
+    {
+        $brand = $this->getById($id);
+
+        if ($brand['product_count'] && $brand['product_count'] != '') {
+            $brand['product_count'] = (int) $brand['product_count'] - 1;
+        } else {
+            $brand['product_count'] = 0;
+        }
+
+        $this->update($brand);
     }
 }
