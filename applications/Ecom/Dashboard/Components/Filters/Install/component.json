@@ -1,0 +1,29 @@
+{
+    "route"         : "filters",
+    "name"          : "Filters",
+    "description"   : "Manage dashboard filters via this component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-dashboard-filters",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Filters\\FiltersComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      :
+        [{
+            "name"      : "Filters",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/package-dashboard-filters"
+        }],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : false,
+    "settings"          : {
+    }
+}
