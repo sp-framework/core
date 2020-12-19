@@ -46,5 +46,5 @@ class Suppliers extends BaseModel
 
     public $country_name;
 
-    public $notes;
+    public $internal_notes;
 }

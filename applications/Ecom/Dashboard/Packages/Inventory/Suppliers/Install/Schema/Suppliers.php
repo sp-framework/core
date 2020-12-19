@@ -176,11 +176,11 @@ class Suppliers
                     ]
                 ),
                 new Column(
-                    'notes',
+                    'internal_notes',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 2048,
-                        'notNull' => true,
+                        'size'    => 4096,
+                        'notNull' => false,
                     ]
                 ),
             ]
