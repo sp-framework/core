@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Ecom\Admin\Components\Channels;
+namespace Applications\Ecom\Dashboard\Components\Channels;
 
 use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Ecom\Admin\Packages\Channels\Channels;
