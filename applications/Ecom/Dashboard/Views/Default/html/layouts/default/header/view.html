@@ -1,3 +1,4 @@
+<input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <div class="container-fluid">
         <ul class="navbar-nav">
@@ -29,7 +30,11 @@ $('#logout').click(function(e) {
     e.preventDefault();
     var url = $(this).attr('href');
 
-    $.post(url, {}, function(data) {
+    var postData = { };
+    var tokenKey = $('.token').attr('name');
+    var token = $('.token').val();
+    postData[tokenKey] = token;
+    $.post(url, postData, function(data) {
         if (data.responseCode == '0') {
             window.location = '/';
         }

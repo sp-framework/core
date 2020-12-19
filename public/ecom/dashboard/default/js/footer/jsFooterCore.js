@@ -4789,6 +4789,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         'title'     : data.responseMessage
                                     });
                                 }
+                                if ($('#security-token').length === 1) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
                             },
                         'json'
                     );
@@ -4973,6 +4977,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                             'title'     : 'Cannot delete filter.'
                                         });
                                     }
+                                    if ($('#security-token').length === 1) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
                                 }, 'json');
                             }
                         }
@@ -5119,6 +5127,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                     $('#' + sectionId + '-filter-default')[0].checked = false;
                                 }
                             });
+                            if ($('#security-token').length === 1) {
+                                $('#security-token').attr('name', data.tokenKey);
+                                $('#security-token').val(data.token);
+                            }
                         }
                     }, 'json');
 
@@ -5227,6 +5239,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             PNotify.error({
                                 'title' : data.responseMessage
                             });
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
                         }
                     }, 'json');
 
@@ -5592,6 +5608,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#listing-primary-buttons').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
                     }
                 }).done(function() {
                     that._tableInit(reDraw);
@@ -5854,6 +5874,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         document.getElementById(rowSwitchInputId).checked = false;
                                     }
                                     pnotifySound.play();
+                                    if ($('#security-token').length === 1) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
                                 }
                             });
                         }
@@ -5971,6 +5995,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         $(currentCheckedLabel).addClass('focus active');
                                     }
                                     pnotifySound.play();
+                                    if ($('#security-token').length === 1) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
                                 }
                             });
                         }
@@ -5986,8 +6014,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).html();
                         var dataToSend = { };
                         //CSRF Token
-                        if ($('#' + sectionId + ' .token').length === 1) {
-                            dataToSend[$('#' + sectionId + ' .token').attr('name')] = $('#' + sectionId + ' .token').val();
+                        if ($('#security-token').length === 1) {
+                            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
                         }
                         dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
                         Swal.fire({
@@ -6043,6 +6071,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                             });
                                         }
                                         pnotifySound.play();
+                                        if ($('#security-token').length === 1) {
+                                            $('#security-token').attr('name', data.tokenKey);
+                                            $('#security-token').val(data.token);
+                                        }
                                     }
                                 });
                             }
@@ -8033,7 +8065,6 @@ exports.BazContentFields = BazContentFields;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-/* exported BazContentFieldsValidator */
 /* globals BazContentFields */
 /*
 * @title                    : BazContentFieldsValidator

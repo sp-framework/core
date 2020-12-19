@@ -17,7 +17,6 @@ BazCore.header({
             <div id="{{componentId}}-regular" hidden>
                 <p class="login-box-msg text-sm font-weight-bold">Login to start {{applicationName|lower}} session</p>
                 <div id="{{componentId}}-form">
-                    <input id="security-token" type="hidden" name="{{tokenKey}}" value="{{token}}" />
                     {{adminltetags.useTag('fields',
                         [
                             'componentId'                           : componentId,

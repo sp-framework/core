@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -12,7 +12,7 @@
         {{renderTitle()}}
         {{assets.outputCss('headLinks')}}
         {{assets.outputJs('headJs')}}
-        <script src="/Admin/Default/js/footer/plugins/vegas/2.4.4/vegas.min.js"></script>
+        <script src="/Dashboard/Default/js/footer/plugins/vegas/2.4.4/vegas.min.js"></script>
         {{assets.outputInlineCss()}}
     </head>
     <body id="body" class="login-page">
@@ -67,7 +67,7 @@ if (!window.dataCollection) {
         <script type="text/javascript" charset="utf-8">
             {{assets.get('body').getCodes()[1].getContent()}}
         </script>
+        <input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
         {{content()}}
     </body>
 </html>
-<!-- htmlmin:ignore -->

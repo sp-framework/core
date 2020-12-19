@@ -193,6 +193,10 @@
                                         'title'     : data.responseMessage
                                     });
                                 }
+                                if ($('#security-token').length === 1) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
                             },
                         'json'
                     );
@@ -377,6 +381,10 @@
                                             'title'     : 'Cannot delete filter.'
                                         });
                                     }
+                                    if ($('#security-token').length === 1) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
                                 }, 'json');
                             }
                         }
@@ -523,6 +531,10 @@
                                     $('#' + sectionId + '-filter-default')[0].checked = false;
                                 }
                             });
+                            if ($('#security-token').length === 1) {
+                                $('#security-token').attr('name', data.tokenKey);
+                                $('#security-token').val(data.token);
+                            }
                         }
                     }, 'json');
 
@@ -631,6 +643,10 @@
                             PNotify.error({
                                 'title' : data.responseMessage
                             });
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
                         }
                     }, 'json');
 
@@ -996,6 +1012,10 @@
                         $('#listing-primary-buttons').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
                     }
                 }).done(function() {
                     that._tableInit(reDraw);
@@ -1258,6 +1278,10 @@
                                         document.getElementById(rowSwitchInputId).checked = false;
                                     }
                                     pnotifySound.play();
+                                    if ($('#security-token').length === 1) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
                                 }
                             });
                         }
@@ -1375,6 +1399,10 @@
                                         $(currentCheckedLabel).addClass('focus active');
                                     }
                                     pnotifySound.play();
+                                    if ($('#security-token').length === 1) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
                                 }
                             });
                         }
@@ -1390,8 +1418,8 @@
                         var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).html();
                         var dataToSend = { };
                         //CSRF Token
-                        if ($('#' + sectionId + ' .token').length === 1) {
-                            dataToSend[$('#' + sectionId + ' .token').attr('name')] = $('#' + sectionId + ' .token').val();
+                        if ($('#security-token').length === 1) {
+                            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
                         }
                         dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
                         Swal.fire({
@@ -1447,6 +1475,10 @@
                                             });
                                         }
                                         pnotifySound.play();
+                                        if ($('#security-token').length === 1) {
+                                            $('#security-token').attr('name', data.tokenKey);
+                                            $('#security-token').val(data.token);
+                                        }
                                     }
                                 });
                             }

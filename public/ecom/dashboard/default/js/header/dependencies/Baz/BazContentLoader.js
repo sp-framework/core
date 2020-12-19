@@ -1,4 +1,3 @@
-/* exported BazContentLoader */
 /* global BazHelpers */
 /*
 * @title                    : BazContentLoader
@@ -8,9 +7,10 @@
 * @functions                :
 * @options                  :
 */
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+// eslint-disable-next-line no-unused-vars
 var BazContentLoader = function() {
-    'use strict';
     var BazContentLoader = void 0;
     var copyDataCollection, params;
 
@@ -194,6 +194,11 @@ var BazContentLoader = function() {
                     init(options);
                     dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
                     $('body').trigger('bazContentLoaderAjaxComplete');
+
+                    if ($('#security-token').length === 1) {
+                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                        $('#security-token').val(xhr.getResponseHeader('token'));
+                    }
                 }
             });
         }, options.ajaxLoadDelay);
@@ -259,6 +264,11 @@ var BazContentLoader = function() {
                     dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
                     // Trigger Modal Complete
                     $('body').trigger('bazContentLoaderModalComplete');
+
+                    if ($('#security-token').length === 1) {
+                        $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
+                        $('#security-token').val(xhr.getResponseHeader('token'));
+                    }
                 }
             });
         }, options.modalLoadDelay);

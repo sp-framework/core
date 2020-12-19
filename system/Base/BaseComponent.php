@@ -161,11 +161,11 @@ abstract class BaseComponent extends Controller
 
 	protected function afterExecuteRoute()
 	{
-		$this->view->tokenKey = $this->security->getTokenKey();
-
-		$this->view->token = $this->security->getToken();
-
 		if ($this->isJson()) {
+			$this->view->tokenKey = $this->security->getTokenKey();
+
+			$this->view->token = $this->security->getToken();
+
 			return $this->sendJson();
 		}
 
@@ -174,6 +174,9 @@ abstract class BaseComponent extends Controller
 				$this->view->menus =
 					$this->basepackages->menus->getMenusForApplication($this->application['id']);
 			}
+
+			$this->response->setHeader('tokenKey', $this->security->getTokenKey());
+			$this->response->setHeader('token', $this->security->getToken());
 		}
 	}
 

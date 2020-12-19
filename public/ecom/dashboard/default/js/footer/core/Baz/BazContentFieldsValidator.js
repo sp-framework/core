@@ -1,4 +1,3 @@
-/* exported BazContentFieldsValidator */
 /* globals BazContentFields */
 /*
 * @title                    : BazContentFieldsValidator
