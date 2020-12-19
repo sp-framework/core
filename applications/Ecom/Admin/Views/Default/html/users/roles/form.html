@@ -1,28 +1,18 @@
-{% if not canEmail %}
-    {% set emailCheck = true %}
+{% if role['id'] is defined %}
+    {% set roleId = role['id'] %}
+    {% set roleName = role['name'] %}
+    {% set roleDescription = role['description'] %}
 {% else %}
-    {% set emailCheck = false %}
+    {% set roleId = '' %}
+    {% set roleName = '' %}
+    {% set roleDescription = '' %}
 {% endif %}
-{% if user['id'] is defined %}
-    {% set userId = user['id'] %}
-    {% set userEmail = user['email'] %}
-    {% set userRole = user['role_id'] %}
-{% else %}
-    {% set userId = '' %}
-    {% set userEmail = '' %}
-    {% set userRole = 0 %}
-{% endif %}
-{% if user['override_role'] is defined and user['override_role'] == '1' %}
-    {% set override = true %}
-{% else %}
-    {% set override = false %}
-{% endif %}
-{% set userPermissions = user['permissions'] %}
+{% set rolePermissions = role['permissions'] %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
-                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
+                <input id="security-token" type="hidden" name="{{tokenKey}}" value="{{token}}">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -30,17 +20,17 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'id',
-                        'fieldLabel'                     : 'User ID',
+                        'fieldLabel'                     : 'Role ID',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'User ID',
+                        'fieldHelpTooltipContent'        : 'Role ID',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : false,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldHidden'                    : true,
                         'fieldDisabled'                  : true,
-                        'fieldValue'                     : userId
+                        'fieldValue'                     : roleId
                     ]
                 )}}
             </div>
@@ -53,71 +43,22 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'email',
-                        'fieldLabel'                     : 'Email',
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Role Name',
                         'fieldType'                      : 'input',
-                        'fieldInputType'                 : 'email',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'User Email Address',
+                        'fieldHelpTooltipContent'        : 'Name of the role. Example: Sales Manager',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : userEmail
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'role_id',
-                        'fieldLabel'                     : 'Select Role',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a role for this user.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDataSelect2Options'        : roles,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': userRole
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'override_role',
-                        'fieldLabel'                     : 'User Level Permissions',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select permissions for the user<br>NOTE: These permissions override role permissions',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'warning',
-                        'fieldCheckboxLabel'             : '',
-                        'fieldCheckboxChecked'           : override,
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : roleName
                     ]
                 )}}
             </div>
         </div>
-        <hr>
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -126,127 +67,24 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'can_login',
-                        'fieldLabel'                     : 'Can Login To Application?',
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Role Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
                         'fieldHelp'                      : true,
-                        'fieldAdditionalClass'           : 'mb-1',
-                        'fieldHelpTooltipContent'        : 'Select applications to which this user can login',
+                        'fieldHelpTooltipContent'        : 'Description of the role',
                         'fieldRequired'                  : false,
-                        'fieldType'                      : 'html',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-                {% for application in applications %}
-                    {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ application['route']] = application['route'] %}
-                    {% if user['can_login'][application['route']] is defined %}
-                        {% if user['can_login'][application['route']] == true %}
-                            {% set checked = true %}
-                        {% else %}
-                            {% set checked = false %}
-                        {% endif %}
-                    {% else %}
-                        {% set checked = false %}
-                    {% endif %}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'can_login-' ~ application['route'],
-                            'fieldLabel'                     : false,
-                            'fieldType'                      : 'checkbox',
-                            'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : application['name'],
-                            'fieldCheckboxChecked'           : checked,
-                            'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                            'fieldBazScan'                   : false
-                        ]
-                    )}}
-                {% endfor %}
-                {% set checkboxIds = json_encode(checkboxIds, 16) %}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'email_new_password',
-                        'fieldLabel'                     : 'Email New Password',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Email New Password to this user.<br>NOTE: Email Settings must be configured and attached to the domain for this option to work.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'info',
-                        'fieldCheckboxLabel'             : '',
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldDisabled'                  : emailCheck,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {% if user['force_pwreset'] is defined %}
-                    {% if user['force_pwreset'] == 1 %}
-                        {% set reset_checked = true %}
-                    {% else %}
-                        {% set reset_checked = false %}
-                    {% endif %}
-                {% else %}
-                    {% set reset_checked = false %}
-                {% endif %}
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'force_pwreset',
-                        'fieldLabel'                     : 'Force User Change Password',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Force use to change password at next login.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'info',
-                        'fieldCheckboxLabel'             : '',
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
                         'fieldBazScan'                   : true,
-                        'fieldCheckboxChecked'           : reset_checked
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'force_logout',
-                        'fieldLabel'                     : 'Force logout user',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Destroys all user sessions.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'danger',
-                        'fieldCheckboxLabel'             : '',
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : roleDescription
                     ]
                 )}}
             </div>
         </div>
-        <div class="row" id="user-permissions" hidden>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -258,7 +96,7 @@
                         'fieldLabel'                                  : 'Permissions',
                         'fieldType'                                   : 'jstree',
                         'fieldHelp'                                   : true,
-                        'fieldHelpTooltipContent'                     : 'Select permissions for the user<br>NOTE: These permissions override role permissions',
+                        'fieldHelpTooltipContent'                     : 'Select permissions for the role',
                         'fieldRequired'                               : false,
                         'fieldBazScan'                                : true,
                         'fieldBazPostOnCreate'                        : true,
@@ -372,68 +210,13 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 }
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                          : { },
-        '{{componentId}}-{{sectionId}}-email'                       : { },
-        '{{componentId}}-{{sectionId}}-email_new_password'          : { },
-        '{{componentId}}-{{sectionId}}-force_pwreset'               : { },
-        '{{componentId}}-{{sectionId}}-force_logout'                : { },
-        '{{componentId}}-{{sectionId}}-can_login'                   : {
-            'afterInit'     : function () {
-                'use strict';
-                //CanLogin
-                dataCollectionSection['data']['can_login'] = { };
-                var checkboxIds = JSON.parse('{{checkboxIds}}');
-                for (var checkbox in checkboxIds) {
-                    $('#' + checkbox).click(function() {
-                        var id = $(this)[0].id;
-                        extractCheckboxData(id, checkboxIds[checkbox])
-                    });
-                    extractCheckboxData(checkbox, checkboxIds[checkbox])
-                }
-                function extractCheckboxData(checkbox, application) {
-                    if ($('#' + checkbox)[0].checked === true) {
-                        dataCollectionSection['data']['can_login'][application] = true;
-                    } else {
-                        dataCollectionSection['data']['can_login'][application] = false;
-                    }
-                }
-            }
+        '{{componentId}}-{{sectionId}}-id'           : { },
+        '{{componentId}}-{{sectionId}}-name'         : { },
+        '{{componentId}}-{{sectionId}}-parent_id'    : {
+            'placeholder'   : 'SELECT PARENT ROLE'
         },
-        '{{componentId}}-{{sectionId}}-role_id'                     : {
-            'placeholder'   : 'SELECT ROLE'
-        },
-        '{{componentId}}-{{sectionId}}-override_role'   : {
-            'afterInit' : function () {
-                'use strict';
-
-                function fixGrid() {
-                    var gridCount = $('.jstree-grid-column').length - 1;
-                    var gridWidth = $('.jstree-grid-wrapper').width();
-                    var colWidth = (gridWidth - 300) / gridCount;
-                    $('.jstree-grid-column').each(function(index,grid) {
-                        if (index !== 0) {
-                            $(grid).css({
-                                width: colWidth
-                            });
-                        }
-                    });
-                }
-                function toggleGrid() {
-                    var checked = $('#' + '{{componentId}}-{{sectionId}}-override_role')[0].checked;
-                    if (checked) {
-                        $('#user-permissions').attr('hidden', false);
-                        fixGrid();
-                    } else if (!checked) {
-                        $('#user-permissions').attr('hidden', true);
-                    }
-                }
-                $('#' + '{{componentId}}-{{sectionId}}-override_role').click(function() {
-                    toggleGrid();
-                });
-                toggleGrid();
-            }
-        },
-        '{{componentId}}-{{sectionId}}-permissions'                 :
+        '{{componentId}}-{{sectionId}}-description'  : { },
+        '{{componentId}}-{{sectionId}}-permissions'  :
         $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-permissions'], {
             plugins: [
                         "search",
@@ -446,7 +229,6 @@ dataCollectionSection =
                 resizable   : true
             },
             afterInit : function(dataCollection) {
-                'use strict';
                 //Fix Grid Width
                 (function fixGrid() {
                     var gridCount = $('.jstree-grid-column').length - 1;
@@ -471,10 +253,10 @@ dataCollectionSection =
                 if (!dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data']) {
                     dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'] = { };
                 }
-
                 gridData = dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'];
 
-                permissions = JSON.parse('{{userPermissions}}');//Parse DB Data
+                permissions = JSON.parse('{{rolePermissions}}');//Parse DB Data
+
                 for (var application in permissions) {
                     for (var component in permissions[application]) {
                         if ($('#{{componentId}}-{{sectionId}}-permissions').find('[data-id="' + component + '"]').length > 0) {
@@ -514,6 +296,7 @@ dataCollectionSection =
                             .find('[data-jstreegrid="' + jstreeGridId + '"]')
                             .each(function(index, column) {
                                 var permission, spanClass, spanData;
+
                                 var spanClasses = $(this).children('span').attr("class").split(/\s+/);
                                 $(spanClasses).each(function(index, sclass) {
                                     if (sclass.search(/ACL-.*/) === 0) {
@@ -672,7 +455,6 @@ dataCollectionSection =
                                 }
                             }
                         }
-
                     }
                     extractData();
                 }
@@ -727,7 +509,9 @@ dataCollectionSection =
                             $('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')
                                 .children('span')
                                 .each(function(index,span) {
-                                    if (!$(span).hasClass('empty') && !$(span).hasClass('na')) {
+                                    if (!$(span).hasClass('empty') &&
+                                        !$(span).hasClass('na')) {
+
                                         var permission, spanClass, spanData;
                                         var spanClasses = $(span).attr("class").split(/\s+/);
                                         $(spanClasses).each(function(index, sclass) {
@@ -745,11 +529,11 @@ dataCollectionSection =
                                                 gridData[child.id]['permissions'][permission] = 0;
                                             }
                                         });
+
                                     }
                             });
                         }
                     });
-
                     extractData();
                 }
 
@@ -762,6 +546,7 @@ dataCollectionSection =
                     if (!dataCollectionSection['data']['permissions']) {
                         dataCollectionSection['data']['permissions'] = { };
                     }
+
                     var data = dataCollectionSection['data']['permissions'];
 
                     for (var nodeId in gridData) {
@@ -773,12 +558,12 @@ dataCollectionSection =
         //Validation
         '{{componentId}}-{{sectionId}}-form' : {
             rules: {
-                '{{componentId}}-{{sectionId}}-email'       : {'required' : true, 'email' : true},
-                '{{componentId}}-{{sectionId}}-role_id'     : 'required',
+                '{{componentId}}-{{sectionId}}-name'     : 'required',
+                '{{componentId}}-{{sectionId}}-parent_id': 'required',
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-email'       : 'Please enter correct email address',
-                '{{componentId}}-{{sectionId}}-role_id'     : 'Please select role',
+                '{{componentId}}-{{sectionId}}-name'     : 'Please enter role name',
+                '{{componentId}}-{{sectionId}}-parent_id': 'Please select parent role',
             }
         }
 });

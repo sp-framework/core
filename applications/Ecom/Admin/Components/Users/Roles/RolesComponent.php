@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Ecom\Admin\Components\Roles;
+namespace Applications\Ecom\Admin\Components\Users\Roles;
 
 use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
@@ -48,14 +48,14 @@ class RolesComponent extends BaseComponent
                 // 'disableActionsForIds'  => [1],
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'roles',
-                    'remove'    => 'roles/remove'
+                    'edit'      => 'users/roles',
+                    'remove'    => 'users/roles/remove'
                 ]
             ];
 
         $this->generateDTContent(
             $roles,
-            'roles/view',
+            'users/roles/view',
             null,
             ['name', 'description'],
             true,

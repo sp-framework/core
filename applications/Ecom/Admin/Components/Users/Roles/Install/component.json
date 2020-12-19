@@ -1,12 +1,12 @@
 {
-    "route"         : "accounts",
-    "name"          : "Accounts",
-    "description"   : "List accounts via this component",
+    "route"         : "roles",
+    "name"          : "Roles",
+    "description"   : "Manage admin roles via this component",
     "category"      : "ecom",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-admin-accounts",
-    "class"         : "Applications\\Ecom\\Admin\\Components\\Accounts\\AccountsComponent",
+    "repo"          : "https://github.com/h-w-f/component-admin-roles",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Users\\Roles\\RolesComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -24,9 +24,9 @@
             "title"     : "users",
             "icon"      : "users",
             "childs"    : {
-                "accounts"   : {
-                    "title"     : "Accounts",
-                    "link"      : "accounts"
+                "roles"   : {
+                    "title"     : "Roles",
+                    "link"      : "users/roles"
                 }
             }
         }

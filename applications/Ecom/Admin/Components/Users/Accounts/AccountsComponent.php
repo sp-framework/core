@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Ecom\Admin\Components\Accounts;
+namespace Applications\Ecom\Admin\Components\Users\Accounts;
 
 use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
@@ -63,14 +63,14 @@ class AccountsComponent extends BaseComponent
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'accounts',
-                    'remove'    => 'accounts/remove'
+                    'edit'      => 'users/accounts',
+                    'remove'    => 'users/accounts/remove'
                 ]
             ];
 
         $this->generateDTContent(
             $accounts,
-            'accounts/view',
+            'users/accounts/view',
             null,
             ['email', 'role_id'],
             true,

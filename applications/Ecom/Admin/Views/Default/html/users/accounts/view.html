@@ -1,7 +1,7 @@
-{% if user['id'] is defined %}
-    {% set userId = user['id'] %}
+{% if account['id'] is defined %}
+    {% set accountId = account['id'] %}
 {% else %}
-    {% set userId = '' %}
+    {% set accountId = '' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -14,19 +14,19 @@
         'cardHeader'                    : true,
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
-        'cardIcon'                      : 'user',
+        'cardIcon'                      : 'account',
         'cardTitle'                     : componentName,
         'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'users/form',
+        'cardBodyInclude'               : 'accounts/form',
         'formButtons'                   :
         [
-            'updateButtonId'                : userId,
-            'addActionUrl'                  : 'users/add',
-            'addSuccessRedirectUrl'         : 'users',
-            'updateActionUrl'               : 'users/update',
-            'updateSuccessRedirectUrl'      : 'users',
-            'cancelActionUrl'               : 'users',
-            'closeActionUrl'                : 'users'
+            'updateButtonId'                : accountId,
+            'addActionUrl'                  : 'users/accounts/add',
+            'addSuccessRedirectUrl'         : 'users/accounts',
+            'updateActionUrl'               : 'users/accounts/update',
+            'updateSuccessRedirectUrl'      : 'users/accounts',
+            'cancelActionUrl'               : 'users/accounts',
+            'closeActionUrl'                : 'users/accounts'
         ]
     ]
 )}}

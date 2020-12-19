@@ -8,7 +8,7 @@
         'contentType'           : 'sectionWithListing',
         'cardHeader'            : true,
         'cardType'              : 'primary',
-        'cardIcon'              : 'users',
+        'cardIcon'              : 'sitemap',
         'cardTitle'             : componentName,
         'cardAdditionalClass'   : 'rounded-0',
         'cardShowTools'         : ['maximize', 'collapse'],
@@ -16,17 +16,24 @@
         'dtFilters'             : table['filters'],
         'dtFilterColumns'       : table['filterColumns'],
         'dtFixedHeader'         : true,
-        'dtPrimaryButtons'      : {
-                                    'add-user' : {
-                                        'title'                   : 'Add New User',
-                                        'size'                    : 'sm',
-                                        'type'                    : 'primary',
-                                        'icon'                    : 'plus',
-                                        'buttonAdditionalClass'   : 'contentAjaxLink',
-                                        'position'                : 'right',
-                                        'url'                     : links.url('users/q/id/0')
-                                    }
-                                },
+        'dtPrimaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'add-business' : {
+                            'title'                   : 'Add New Role',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('users/roles/q/id/0')
+                        }
+                    }
+            },
         'dtTable'               : table,
         'dtColumns'             : table['columns'],
         'dtPostUrl'             : table['postUrl'],
@@ -37,6 +44,6 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No users data available. Add user by clicking the Add new user button.'
+        'dtZeroRecords'         : 'No roles data available. Add role by clicking the Add new role button.'
     ]
 )}}
