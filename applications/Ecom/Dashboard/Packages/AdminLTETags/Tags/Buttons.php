@@ -36,7 +36,7 @@ class Buttons extends AdminLTETags
         }
 
         try {
-            $button = 'Applications\\Ecom\\Admin\\Packages\\AdminLTETags\\Tags\\Buttons\\' . ucfirst($this->params['buttonType']);
+            $button = 'Applications\\Ecom\\Dashboard\\Packages\\AdminLTETags\\Tags\\Buttons\\' . ucfirst($this->params['buttonType']);
 
             $this->content .= (new $button($this->view, $this->tag, $this->links, $this->escaper, $this->params, $this->buttonParams))->getContent();
 

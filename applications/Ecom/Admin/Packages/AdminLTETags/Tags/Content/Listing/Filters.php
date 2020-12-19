@@ -414,13 +414,13 @@ class Filters extends AdminLTETags
                         'buttonSize'                        => 'sm',
                         'buttons'                           =>
                             [
-                                'add' => [
+                                'save-add' => [
                                     'title'                 => 'Add',
                                     'disabled'              => true,
                                     'icon'                  => 'save',
                                     'url'                   => $this->links->url('filters/add')
                                 ],
-                                'update' => [
+                                'save-update' => [
                                     'title'                 => 'Update',
                                     'disabled'              => true,
                                     'hidden'                => true,

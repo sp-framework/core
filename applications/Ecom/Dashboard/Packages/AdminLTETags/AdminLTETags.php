@@ -30,9 +30,9 @@ class AdminLTETags extends BasePackage
         $explodedTagName = explode('/', $tagName);
 
         if (count($explodedTagName) === 1) {
-            $tag = 'Applications\\Ecom\\Admin\\Packages\\AdminLTETags\\Tags\\' . ucfirst($explodedTagName[0]);
+            $tag = 'Applications\\Ecom\\Dashboard\\Packages\\AdminLTETags\\Tags\\' . ucfirst($explodedTagName[0]);
         } else {
-            $tag = 'Applications\\Ecom\\Admin\\Packages\\AdminLTETags\\Tags';
+            $tag = 'Applications\\Ecom\\Dashboard\\Packages\\AdminLTETags\\Tags';
 
             foreach ($explodedTagName as $name) {
                 $tag .= '\\' . ucfirst($name);

@@ -44,7 +44,7 @@ class Fields extends AdminLTETags
 
         if ($this->params['fieldType'] !== false) {
             try {
-                $field = 'Applications\\Ecom\\Admin\\Packages\\AdminLTETags\\Tags\\Fields\\' . ucfirst($this->params['fieldType']);
+                $field = 'Applications\\Ecom\\Dashboard\\Packages\\AdminLTETags\\Tags\\Fields\\' . ucfirst($this->params['fieldType']);
 
                 $this->content .=
                     (new $field($this->view, $this->tag, $this->links, $this->escaper, $this->params, $this->fieldParams))->getContent();
