@@ -27,7 +27,7 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
             <div class="col">
-                <input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
+                <input id="security-token" type="hidden" name="{{tokenKey}}" value="{{token}}" />
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -407,7 +407,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-port'                    : { },
         '{{componentId}}-{{sectionId}}-auth'                    : {
             afterInit: function() {
-                'use strict';
 
                 if ($('#{{componentId}}-{{sectionId}}-auth')[0].checked === true) {
                     $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password').attr('disabled', false);
@@ -430,7 +429,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-from_address'            : { },
         '{{componentId}}-{{sectionId}}-test'                    : {
             afterInit: function() {
-                'use strict';
 
                 $('#{{componentId}}-{{sectionId}}-test').click(function() {
                     if ($(this)[0].checked === true) {
@@ -447,14 +445,17 @@ dataCollectionSection =
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
                         $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'sectionToObj'});
+
                         $(this).attr('disabled', true);
                         $(this).children('i').attr('hidden', false);
+
                         var url = '{{links.url("emailservices/testemailservice")}}';
+
                         dataCollectionSection['data']['test_email_address'] = $('#{{componentId}}-{{sectionId}}-test_email_address').val();
+
                         var postData = dataCollectionSection['data'];
-                        var tokenKey = $('.token').attr('name');
-                        var token = $('.token').val();
-                        postData[tokenKey] = token;
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
                         $.post(url, postData, function(data) {
                             if (data.responseCode === 0) {
                                 if ($.isArray(data.responseMessage)) {
@@ -466,9 +467,9 @@ dataCollectionSection =
                                 } else {
                                     $('#{{componentId}}-{{sectionId}}-debug').empty().val(data.responseMessage);
                                 }
-                                if (data.newTokenKey && data.newToken) {
-                                    $('.token').attr('name', data.newTokenKey);
-                                    $('.token').val(data.newToken);
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
                                 }
                             } else {
                                 PNotify.error({

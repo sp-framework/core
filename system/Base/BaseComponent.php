@@ -161,6 +161,10 @@ abstract class BaseComponent extends Controller
 
 	protected function afterExecuteRoute()
 	{
+		$this->view->tokenKey = $this->security->getTokenKey();
+
+		$this->view->token = $this->security->getToken();
+
 		if ($this->isJson()) {
 			return $this->sendJson();
 		}

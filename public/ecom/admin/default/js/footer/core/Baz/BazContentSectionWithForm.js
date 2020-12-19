@@ -158,6 +158,11 @@
                                             PNotify.error({
                                                 title   : data.responseMessage
                                             });
+                                            dataCollection[componentId][sectionId]['dataToSubmit'] = { };
+                                            if ($('#security-token').length === 1) {
+                                                $('#security-token').attr('name', data.tokenKey);
+                                                $('#security-token').val(data.token);
+                                            }
                                         }
                                         $(thisButtonId).children('i').attr('hidden', true);
                                     }
@@ -335,9 +340,9 @@
                     });
                 }
                 //CSRF TOKEN
-                if ($('#' + sectionId + ' .token').length === 1) {
-                    dataCollection[componentId][sectionId]['dataToSubmit'][$('#' + sectionId + ' .token').attr('name')] =
-                        $('#' + sectionId + ' .token').val();
+                if ($('#security-token').length === 1) {
+                    dataCollection[componentId][sectionId]['dataToSubmit'][$('#security-token').attr('name')] =
+                        $('#security-token').val();
                 }
                 return dataCollection[componentId][sectionId]['dataToSubmit'];
             };

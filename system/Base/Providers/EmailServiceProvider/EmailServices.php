@@ -122,10 +122,6 @@ class EmailServices extends BasePackage
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = $this->email->getDebugOutput();
-
-            $this->packagesData->newTokenKey = $this->security->getTokenKey();
-
-            $this->packagesData->newToken = $this->security->getToken();
         }
     }
 }

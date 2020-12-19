@@ -24,12 +24,15 @@
 </nav>
 <script>
 $('#logout').click(function(e) {
-    'use strict';
-
     e.preventDefault();
     var url = $(this).attr('href');
 
-    $.post(url, {}, function(data) {
+    // var postData = { };
+    // var tokenKey = $('.token').attr('name');
+    // var token = $('.token').val();
+    // postData[tokenKey] = token;
+    // $.post(url, postData, function(data) {
+    $.post(url, function(data) {
         if (data.responseCode == '0') {
             window.location = '/';
         }

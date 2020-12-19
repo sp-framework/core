@@ -1,4 +1,4 @@
-<input class="token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
+<input id="security-token" type="hidden" name="{{tokenKey}}" value="{{token}}">
 <div class="row vdivide">
     <div id="filter" class="col">
         {% include 'modules/filter' with ['filters': filters] %}

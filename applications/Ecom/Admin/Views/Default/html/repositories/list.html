@@ -184,8 +184,8 @@ $('#repositories-options-delete').click(function() {
     }).then((result) => {
         if (result.isConfirmed) {
             var postData = { };
-            if ($('.token').length === 1) {
-                postData[$('.token').attr('name')] = $('.token').val();
+            if ($('#security-token').length === 1) {
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
             }
             postData['id'] = repoId;
             $.post('repositories/remove', postData,
@@ -197,6 +197,10 @@ $('#repositories-options-delete').click(function() {
                                 text        : data.responseMessage,
                                 textTrusted : true
                             });
+                        }
+                        if (data.tokenKey && data.token) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
                         }
                     },
                     'json'
