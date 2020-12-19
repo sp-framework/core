@@ -95,7 +95,7 @@ class AccountsComponent extends BaseComponent
                 return;
             }
 
-            $this->accounts->addUser($this->postData());
+            $this->accounts->addAccount($this->postData());
 
             $this->view->responseCode = $this->accounts->packagesData->responseCode;
 
@@ -119,7 +119,7 @@ class AccountsComponent extends BaseComponent
                 return;
             }
 
-            $this->accounts->updateUser($this->postData());
+            $this->accounts->updateAccount($this->postData());
 
             $this->view->responseCode = $this->accounts->packagesData->responseCode;
 
@@ -139,7 +139,7 @@ class AccountsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->accounts->removeUser($this->postData());
+            $this->accounts->removeAccount($this->postData());
 
             $this->view->responseCode = $this->accounts->packagesData->responseCode;
 

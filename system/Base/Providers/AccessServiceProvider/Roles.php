@@ -53,14 +53,16 @@ class Roles extends BasePackage
 
             $role = $this->getById($data['id']);
 
-            $accounts = Json::decode($role['accounts'], true);
+            if ($role['accounts']) {
+                $accounts = Json::decode($role['accounts'], true);
 
-            if (count($accounts) > 0) {
-                $this->packagesData->responseCode = 1;
+                if (count($accounts) > 0) {
+                    $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Role has accounts assigned to it. Cannot removes role.';
+                    $this->packagesData->responseMessage = 'Role has accounts assigned to it. Cannot removes role.';
 
-                return false;
+                    return false;
+                }
             }
 
             if ($this->remove($data['id'])) {

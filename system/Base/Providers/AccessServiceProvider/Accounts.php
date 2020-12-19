@@ -116,9 +116,13 @@ class Accounts extends BasePackage
 
     public function removeAccount(array $data)
     {
+        $account = $this->getById($data['id']);
+
+                $this->removeRoleAccount($account['role_id'], $account['id']);
         if (isset($data['id']) && $data['id'] != 1) {
 
             if ($this->remove($data['id'])) {
+
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = 'Removed account';
@@ -245,6 +249,25 @@ class Accounts extends BasePackage
         }
 
         array_push($role['accounts'], $id);
+
+        $role['accounts'] = Json::encode($role['accounts']);
+
+        $this->roles->update($role);
+    }
+
+    protected function removeRoleAccount(int $rid, int $id)
+    {
+        $role = $this->roles->getById($rid);
+
+        $role['accounts'] = Json::decode($role['accounts'], true);
+
+        $accountKey = array_keys($role['accounts'], $id);
+
+        if (count($accountKey) === 0) {
+            return;
+        }
+
+        unset($role['accounts'][$accountKey[0]]);
 
         $role['accounts'] = Json::encode($role['accounts']);
 
