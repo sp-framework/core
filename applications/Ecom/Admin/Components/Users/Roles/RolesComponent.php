@@ -41,8 +41,6 @@ class RolesComponent extends BaseComponent
             return;
         }
 
-        $roles = $this->roles->init();
-
         $controlActions =
             [
                 // 'disableActionsForIds'  => [1],
@@ -54,7 +52,7 @@ class RolesComponent extends BaseComponent
             ];
 
         $this->generateDTContent(
-            $roles,
+            $this->roles,
             'users/roles/view',
             null,
             ['name', 'description'],

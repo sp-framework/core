@@ -43,8 +43,6 @@ class AccountsComponent extends BaseComponent
             return;
         }
 
-        $accounts = $this->accounts->init();
-
         if ($this->request->isPost()) {
             $rolesIdToName = [];
             foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
@@ -69,7 +67,7 @@ class AccountsComponent extends BaseComponent
             ];
 
         $this->generateDTContent(
-            $accounts,
+            $this->accounts,
             'users/accounts/view',
             null,
             ['email', 'role_id'],
