@@ -33,13 +33,13 @@ class Filters extends AdminLTETags
                     $this->params['dtFilters'][$filterKey]['name'] . ' (Default)';
             }
 
-            if ($filter['permission'] === '0') {
+            if ($filter['type'] === '0') {
                 if (!$defaultFilter) {
                      $defaultFilter = $filterKey;
                 }
                 $this->params['dtFilters'][$filterKey]['name'] =
                     $this->params['dtFilters'][$filterKey]['name'] . ' (System)';
-            } else if ($filter['permission'] === '2') {
+            } else if ($filter['type'] === '2') {
                 $this->params['dtFilters'][$filterKey]['name'] =
                     $this->params['dtFilters'][$filterKey]['name'] . ' (Shared)';
             }
@@ -110,7 +110,8 @@ class Filters extends AdminLTETags
                                         'icon'                    => 'copy',
                                         'noMargin'                => true,
                                         'buttonAdditionalClass'   => 'rounded-0 text-white',
-                                        'position'                => 'right'
+                                        'position'                => 'right',
+                                        'url'                     => $this->links->url('filters/clone')
                                     ],
                                     'reset' => [
                                         'title'                   => false,

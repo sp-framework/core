@@ -57,8 +57,10 @@ trait DynamicTable {
                     $table['filters'][$filter['id']]['data']['id'] = $filter['id'];
                     $table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
                     $table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
-                    $table['filters'][$filter['id']]['data']['permission'] = $filter['permission'];
+                    $table['filters'][$filter['id']]['data']['type'] = $filter['type'];
+                    $table['filters'][$filter['id']]['data']['auto_generated'] = $filter['auto_generated'];
                     $table['filters'][$filter['id']]['data']['is_default'] = $filter['is_default'];
+                    $table['filters'][$filter['id']]['data']['account_id'] = $filter['account_id'];
                     $table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
 
                     if ($filter['is_default'] === '1') {

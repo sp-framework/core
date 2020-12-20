@@ -44,17 +44,32 @@ class Filters extends BasePackage
 
         $this->addFilter(
             [
-                'name'          => 'Show All ' . $component['name'],
-                'conditions'    => '',
-                'component_id'  => $componentId,
-                'permission'    => 0,//System
-                'is_default'    => 0
+                'name'              => 'Show All ' . $component['name'],
+                'conditions'        => '',
+                'component_id'      => $componentId,
+                'type'              => 0,//System
+                'is_default'        => 0,
+                'auto_generated'    => 1,
+                'account_id'        => 0
             ]
         );
     }
 
     public function addFilter(array $data)
     {
+        if (!isset($data['type'])) {
+            $data['type'] = 0;
+        }
+        if (!isset($data['is_default'])) {
+            $data['is_default'] = 0;
+        }
+        if (!isset($data['auto_generated'])) {
+            $data['auto_generated'] = 0;
+        }
+        if (!isset($data['account_id'])) {
+            $data['account_id'] = 0;
+        }
+
         if ($this->checkDefaultFilter($data)) {
             $add = $this->add($data);
 
@@ -111,8 +126,10 @@ class Filters extends BasePackage
 
                 $this->packagesData->responseMessage = 'Filter Removed';
 
-                $this->packagesData->filters =
-                    $filtersArr = $this->getFiltersForComponent($data['component_id']);
+                if (isset($data['component_id'])) {
+                    $this->packagesData->filters =
+                        $filtersArr = $this->getFiltersForComponent($data['component_id']);
+                }
 
                 return true;
         }
@@ -123,8 +140,12 @@ class Filters extends BasePackage
     public function cloneFilter(array $data)
     {
         $filter = $this->getById($data['id']);
-        $filter['permission'] = 1;
+        $filter['type'] = 1;
         $filter['is_default'] = 0;
+
+        if ($this->auth->account) {
+            $filter['account_id'] = $this->auth->account['id'];
+        }
 
         $clone = $this->clone($data['id'], 'name', $filter);
 
@@ -171,6 +192,10 @@ class Filters extends BasePackage
 
     protected function checkDefaultFilter(array $data)
     {
+        if (!isset($data['is_default']) || $data['is_default'] == 1 ) {
+            return true;
+        }
+
         $this->getDefaultFilter($data['component_id']);
 
         if ($this->defaultFilter) {
@@ -189,6 +214,7 @@ class Filters extends BasePackage
                 }
             } else {
                 $this->defaultFilter[0]['is_default'] = 0;
+
                 if (!$this->update($this->defaultFilter[0])) {
                     $this->packagesData->responseCode = 1;
 

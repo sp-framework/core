@@ -1,1 +1,32 @@
-DO NOT REMOVE THIS FILE. REQUIRED BY VIEW ACTION.
+{% if filter['id'] is defined %}
+    {% set filterId = filter['id'] %}
+{% else %}
+    {% set filterId = '' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'filter',
+        'cardTitle'                     : componentName,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'filters/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : filterId,
+            'addActionUrl'                  : 'filters/add',
+            'addSuccessRedirectUrl'         : 'filters',
+            'updateActionUrl'               : 'filters/update',
+            'updateSuccessRedirectUrl'      : 'filters',
+            'cancelActionUrl'               : 'filters',
+            'closeActionUrl'                : 'filters'
+        ]
+    ]
+)}}

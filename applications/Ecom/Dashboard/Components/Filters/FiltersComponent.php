@@ -41,6 +41,8 @@ class FiltersComponent extends BaseComponent
 
             $this->view->responseMessage = $this->filters->packagesData->responseMessage;
 
+            $this->view->filters = $this->filters->packagesData->filters;
+
         } else {
             $this->view->responseCode = 1;
 
@@ -65,6 +67,31 @@ class FiltersComponent extends BaseComponent
 
             $this->view->responseMessage = $this->filters->packagesData->responseMessage;
 
+            $this->view->filters = $this->filters->packagesData->filters;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function cloneAction()
+    {
+        if ($this->request->isPost()) {
+
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->filters->cloneFilter($this->postData());
+
+            $this->view->responseCode = $this->filters->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
+
+            $this->view->filters = $this->filters->packagesData->filters;
+
         } else {
             $this->view->responseCode = 1;
 
@@ -79,12 +106,36 @@ class FiltersComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
             $this->filters->removeFilter($this->postData());
 
             $this->view->responseCode = $this->filters->packagesData->responseCode;
 
             $this->view->responseMessage = $this->filters->packagesData->responseMessage;
 
+            $this->view->filters = $this->filters->packagesData->filters;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function getdefaultfilterAction()
+    {
+        if ($this->request->isPost()) {
+
+            if ($this->filters->getDefaultFilter($this->postData()['component_id'])) {
+                $this->view->defaultFilter = $this->filters->packagesData->defaultFilter;
+            }
+
+            $this->view->responseCode = $this->filters->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
         } else {
             $this->view->responseCode = 1;
 

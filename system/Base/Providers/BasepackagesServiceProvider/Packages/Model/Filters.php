@@ -10,13 +10,17 @@ class Filters extends BaseModel
 
     public $name;
 
-    public $conditions;
-
     public $component_id;
 
-    public $permission;
+    public $conditions;
+
+    public $type;
+
+    public $auto_generated;
 
     public $is_default;
+
+    public $account_id;
 
     public $shared_ids;
 }

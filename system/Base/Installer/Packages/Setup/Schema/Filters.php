@@ -29,18 +29,18 @@ class Filters
                     ]
                 ),
                 new Column(
-                    'conditions',
-                    [
-                        'type'    => Column::TYPE_TEXT,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
                     'component_id',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'size'    => 1,
                         'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'conditions',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -56,6 +56,21 @@ class Filters
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'size'    => 1,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'auto_generated',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'size'    => 1,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'account_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
                         'notNull' => true,
                     ]
                 ),

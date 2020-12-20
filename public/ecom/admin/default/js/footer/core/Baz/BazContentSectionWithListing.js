@@ -83,20 +83,15 @@
                 $(this._element).BazContentSectionWithFormToDatatable();
 
                 function toggleFilterButtons(sectionId) {
-                    if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 0 || //System
-                        $('#' + sectionId + '-filters option:selected').data()['permission'] === 2    //Shared
+                    if ($('#' + sectionId + '-filters option:selected').data()['type'] === 0 || //System
+                        $('#' + sectionId + '-filters option:selected').data()['type'] === 2    //Shared
                     ) {
-                        $('#' + sectionId + '-edit, ' +
-                          '#' + sectionId + '-delete, ' +
-                          '#' + sectionId + '-share'
-                        ).attr("disabled", true);
+                        $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
+                        $('#' + sectionId + '-delete').addClass('disabled');
 
-                    } else if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 1
-                    ) {
-                        $('#' + sectionId + '-edit, ' +
-                          '#' + sectionId + '-delete, ' +
-                          '#' + sectionId + '-share'
-                        ).attr("disabled", false);
+                    } else if ($('#' + sectionId + '-filters option:selected').data()['type'] === 1) {
+                        $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", false);
+                        $('#' + sectionId + '-delete').removeClass('disabled');
                     }
                 }
 
@@ -161,6 +156,9 @@
                 $('#' + sectionId + '-add').click(function(e) {
                     e.preventDefault();
 
+                    $('#' + sectionId + '-filter-save-add').attr('hidden', false);
+                    $('#' + sectionId + '-filter-save-update').attr('hidden', true);
+
                     clearStoredData();
 
                     $('#' + sectionId + '-filter-modal').modal('show');
@@ -176,9 +174,15 @@
                         PNotify.error({'title': 'Show All filter cannot be cloned'});
                         return;
                     }
-                    $.post('filter/clone',
-                           {'id' : selectedFilter.data()['id'], 'component_id' : selectedFilter.data()['component_id']},
-                           function(data) {
+
+                    var postData = { };
+                    postData['id'] = selectedFilter.data()['id'];
+                    postData['component_id'] = selectedFilter.data()['component_id'];
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    var url = $(this).attr('href');
+
+                    $.post(url, postData, function(data) {
                                 if (data.responseCode === 0) {
                                     PNotify.success({
                                         'title'     : data.responseMessage
@@ -207,6 +211,9 @@
                 //Edit / Open Modal
                 $('#' + sectionId + '-edit').click(function(e) {
                     e.preventDefault();
+
+                    $('#' + sectionId + '-filter-save-add').attr('hidden', true);
+                    $('#' + sectionId + '-filter-save-update').attr('hidden', false);
 
                     editFilter();
 
@@ -365,9 +372,14 @@
                                 });
                                 resetFilters();
                             } else {
-                                $.post('filter/remove',
-                                       {'id' : selectedFilter.data()['id'], 'component_id' : selectedFilter.data()['component_id']},
-                                       function(data) {
+                                var postData = { };
+                                postData['id'] = selectedFilter.data()['id'];
+                                postData['component_id'] = selectedFilter.data()['component_id'];
+                                postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                                var url = $(this).attr('href');
+
+                                $.post(url, postData, function(data) {
                                     if (data.responseCode === 0) {
                                         PNotify.success({
                                             'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
@@ -490,9 +502,12 @@
                 $('#' + sectionId + '-default').click(function() {
 
                     var postData = { };
-                        postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
+                    postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    $.post('filter/getdefaultfilter', postData, function(data) {
+                    var url = $(this).data('href');
+
+                    $.post(url, postData, function(data) {
                         if (data.responseCode === 0) {
                             Swal.fire({
                                 title                       : '<i class="fa fa-fw fa-question-circle text-danger mr-2" style="font-size: 1.25rem;position: relative;top: 3px;">' +
@@ -531,10 +546,10 @@
                                     $('#' + sectionId + '-filter-default')[0].checked = false;
                                 }
                             });
-                            if ($('#security-token').length === 1) {
-                                $('#security-token').attr('name', data.tokenKey);
-                                $('#security-token').val(data.token);
-                            }
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
                         }
                     }, 'json');
 
@@ -570,7 +585,7 @@
                 }
 
                 //Save
-                $('#' + sectionId + '-save').click(function(e) {
+                $('#' + sectionId + '-save-add, #' + sectionId + '-save-update').click(function(e) {
                     e.preventDefault();
 
                     query = '';
@@ -613,7 +628,8 @@
                     postData['name'] = filterName;
                     postData['conditions'] = query;
                     postData['component_id'] = $(selectedFilter).data()['component_id'];
-                    postData['permission'] = 1;
+                    postData['type'] = 1;
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
 
                     if ($('#' + sectionId + '-filter-default')[0].checked === true) {
                         postData['is_default'] = '1';
@@ -622,13 +638,13 @@
                         postData['is_default'] = '0';
                     }
 
-                    var url;
+                    var url = $(this).attr('href');
 
-                    if (postData['id'] !== '') {
-                        url = 'filter/update';
-                    } else {
-                        url = 'filter/add';
-                    }
+                    // if (postData['id'] !== '') {
+                    //     url = 'filter/update';
+                    // } else {
+                    //     url = 'filter/add';
+                    // }
 
                     //Update Filter
                     $.post(url, postData, function(data) {
@@ -676,9 +692,9 @@
                         if (filter['is_default'] == '1') {
                             filterName = filter['name'] + ' (Default)';
                         }
-                        if (filter['permission'] == '0') {
+                        if (filter['type'] == '0') {
                             filterName = filter['name'] + ' (System)';
-                        } else if (filter['permission'] == '2') {
+                        } else if (filter['type'] == '2') {
                             filterName = filter['name'] + ' (Shared)';
                         }
                         if (filter['shared_ids']) {
