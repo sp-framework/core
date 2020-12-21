@@ -167,7 +167,7 @@ class Applications extends BasePackage
 		$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
 
 		if ($data['middlewares']) {
-			$this->modules->middlewares->updateMiddlewares(Json::decode($data['middlewares'], true));
+			$this->modules->middlewares->updateMiddlewares($data);
 		}
 
 		if ($this->update($data)) {

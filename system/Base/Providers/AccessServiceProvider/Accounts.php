@@ -276,8 +276,8 @@ class Accounts extends BasePackage
 
     public function generateViewData(int $uid = null)
     {
-        if (isset($this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService']) &&
-            $this->basepackages->domains->getDomain()['settings']['applications'][$this->application['id']]['emailService'] !== ''
+        if (isset($this->basepackages->domains->getDomain()['applications'][$this->application['id']]['email_service']) &&
+            $this->basepackages->domains->getDomain()['applications'][$this->application['id']]['email_service'] !== ''
         ) {
             $this->packagesData->canEmail = true;
         } else {

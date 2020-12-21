@@ -148,22 +148,24 @@
                     {% else %}
                         {% set checked = false %}
                     {% endif %}
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                      : component,
-                            'componentName'                  : componentName,
-                            'componentId'                    : componentId,
-                            'sectionId'                      : sectionId,
-                            'fieldId'                        : 'can_login-' ~ application['route'],
-                            'fieldLabel'                     : false,
-                            'fieldType'                      : 'checkbox',
-                            'fieldCheckboxType'              : 'success',
-                            'fieldCheckboxLabel'             : application['name'],
-                            'fieldCheckboxChecked'           : checked,
-                            'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                            'fieldBazScan'                   : false
-                        ]
-                    )}}
+                    <div class="application" data-id="{{application['id']}}">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'can_login-' ~ application['route'],
+                                'fieldLabel'                     : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'success',
+                                'fieldCheckboxLabel'             : application['name'],
+                                'fieldCheckboxChecked'           : checked,
+                                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                                'fieldBazScan'                   : false
+                            ]
+                        )}}
+                    </div>
                 {% endfor %}
                 {% set checkboxIds = json_encode(checkboxIds, 16) %}
             </div>
@@ -384,9 +386,9 @@ dataCollectionSection =
                 for (var checkbox in checkboxIds) {
                     $('#' + checkbox).click(function() {
                         var id = $(this)[0].id;
-                        extractCheckboxData(id, checkboxIds[checkbox])
+                        extractCheckboxData(id, $('#' + id).parents('.application').data('id'))
                     });
-                    extractCheckboxData(checkbox, checkboxIds[checkbox])
+                    extractCheckboxData(checkbox, $('#' + checkbox).parents('.application').data('id'))
                 }
                 function extractCheckboxData(checkbox, application) {
                     if ($('#' + checkbox)[0].checked === true) {

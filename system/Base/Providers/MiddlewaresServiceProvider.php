@@ -20,7 +20,7 @@ class MiddlewaresServiceProvider extends Injectable
                 msort($this->modules->middlewares->getMiddlewaresForApplication($application['id']), 'sequence');
 
             foreach ($middlewares as $middleware) {
-                if ($middleware['enabled'] === '1') {
+                if ($middleware['enabled'] == true) {
                     $middlewareClass = $middleware['class'] . '\\' . $middleware['name'];
                     (new $middlewareClass())->process();
                 }

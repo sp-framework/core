@@ -447,7 +447,7 @@ class Auth
             return false;
         }
 
-        $this->account = $this->accounts->checkAccount($data['account']);
+        $this->account = $this->accounts->checkAccountByEmail($data['user']);
 
         if ($this->account) {
             $this->account['force_logout'] = '1';
