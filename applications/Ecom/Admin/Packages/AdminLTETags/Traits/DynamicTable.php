@@ -48,7 +48,14 @@ trait DynamicTable {
 
             if ($withFilter) {
                 $table['withFilter'] = $withFilter;
-                $filtersArr = $this->basepackages->filters->getFiltersForComponent($componentId);
+
+                $account = $this->auth->account();
+
+                if ($account) {
+                    $filtersArr = $this->basepackages->filters->getFiltersForAccountAndComponent($account['id'], $componentId);
+                } else {
+                    $filtersArr = $this->basepackages->filters->getFiltersForComponent($componentId);
+                }
 
                 $table['filterColumns'] = $package->getModelsColumnMap($columnsForFilter);
                 foreach ($filtersArr as $key => $filter) {

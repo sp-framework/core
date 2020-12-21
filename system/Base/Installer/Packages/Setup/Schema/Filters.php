@@ -44,15 +44,7 @@ class Filters
                     ]
                 ),
                 new Column(
-                    'permission',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'size'    => 1,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'is_default',
+                    'type',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'size'    => 1,
@@ -65,6 +57,14 @@ class Filters
                         'type'    => Column::TYPE_TINYINTEGER,
                         'size'    => 1,
                         'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'is_default',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'size'    => 1,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(

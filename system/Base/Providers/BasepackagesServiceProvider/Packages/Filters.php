@@ -15,10 +15,11 @@ class Filters extends BasePackage
 
     public function getFiltersForComponent(int $componentId)
     {
-        $filters = $this->getFilters($componentId);
+        $checkShowAllFilters = $this->checkShowAllFilters($componentId);
 
-        if ($filters) {
-            return $filters;
+        if ($checkShowAllFilters) {
+            return $this->getFilters($componentId);
+
         } else {
             $this->addShowAllFilter($componentId);
 
@@ -26,8 +27,49 @@ class Filters extends BasePackage
         }
     }
 
-    protected function getFilters(int $componentId)
+    public function getFiltersForAccountAndComponent(int $accountId, int $componentId)
     {
+        $checkShowAllFilters = $this->checkShowAllFilters($componentId);
+
+        if ($checkShowAllFilters) {
+            return $this->getFilters($componentId, $accountId);
+
+        } else {
+            $this->addShowAllFilter($componentId);
+
+            return $this->getFilters($componentId, $accountId);
+        }
+    }
+
+    protected function checkShowAllFilters(int $componentId)
+    {
+        return
+            $this->getByParams(
+                [
+                    'conditions'    => 'component_id = :cid: AND auto_generated = :ag:',
+                    'bind'          => [
+                        'cid'       => $componentId,
+                        'ag'        => 1
+                    ]
+                ]
+            );
+    }
+
+    protected function getFilters(int $componentId, int $accountId = null)
+    {
+        if ($accountId) {
+            return
+                $this->getByParams(
+                    [
+                        'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:)',
+                        'bind'          => [
+                            'cid'       => $componentId,
+                            'aid'       => $accountId,
+                            'aid0'       => 0
+                        ]
+                    ]
+                );
+        }
         return
             $this->getByParams(
                 [
@@ -38,6 +80,7 @@ class Filters extends BasePackage
                 ]
             );
     }
+
     protected function addShowAllFilter(int $componentId)
     {
         $component = $this->modules->components->getById($componentId);
@@ -67,7 +110,17 @@ class Filters extends BasePackage
             $data['auto_generated'] = 0;
         }
         if (!isset($data['account_id'])) {
-            $data['account_id'] = 0;
+            if ($data['type'] !== 0) {
+                $account = $this->auth->account();
+
+                if ($account) {
+                    $data['account_id'] = $account['id'];
+                } else {
+                    $data['account_id'] = 0;
+                }
+            } else {
+                $data['account_id'] = 0;
+            }
         }
 
         if ($this->checkDefaultFilter($data)) {

@@ -35,6 +35,8 @@ class Package extends BasePackage
                 $this->createTable('locations', '', (new $this->schemaToUse)->columns());
             }
 
+            // $this->registerPackage();
+
             return true;
         } catch (\PDOException $e) {
 
@@ -43,7 +45,6 @@ class Package extends BasePackage
             $this->packagesData->responseMessage = $e->getMessage();
         }
 
-        // $this->registerPackage();
     }
 
     protected function registerPackage()

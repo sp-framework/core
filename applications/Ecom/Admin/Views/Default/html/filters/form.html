@@ -3,17 +3,20 @@
     {% set filterName = filter['name'] %}
     {% set filterComponentId = filter['component_id'] %}
     {% set filterConditions = filter['conditions'] %}
+    {% if filter['auto_generated'] === '1' %}
+        {% set filterNameDisabled = true %}
+        {% set filterComponentIdDisabled = true %}
+        {% set filterConditionsDisabled = true %}
+    {% else %}
+        {% set filterNameDisabled = false %}
+        {% set filterComponentIdDisabled = false %}
+        {% set filterConditionsDisabled = false %}
+    {% endif %}
 {% else %}
     {% set filterId = '' %}
     {% set filterName = '' %}
     {% set filterComponentId = '' %}
     {% set filterConditions = '' %}
-{% endif %}
-{% if filter['auto_generated'] === '1' %}
-    {% set filterNameDisabled = true %}
-    {% set filterComponentIdDisabled = true %}
-    {% set filterConditionsDisabled = true %}
-{% else %}
     {% set filterNameDisabled = false %}
     {% set filterComponentIdDisabled = false %}
     {% set filterConditionsDisabled = false %}

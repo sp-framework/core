@@ -445,6 +445,31 @@ class Filters extends AdminLTETags
                                 $this->useTag('fields',
                                     [
                                         'componentId'                         => $this->params['componentId'],
+                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
+                                        'fieldId'                             => 'direct-url',
+                                        'fieldLabel'                          => 'Direct URL',
+                                        'fieldType'                           => 'input',
+                                        'fieldDisabled'                       => true,
+                                        'fieldGroupPostAddonButtons'          =>
+                                            [
+                                                'direct-url'   => [
+                                                    'title'                   => false,
+                                                    'type'                    => 'secondary',
+                                                    'icon'                    => 'copy',
+                                                    'noMargin'                => true,
+                                                    'buttonAdditionalClass'   => 'rounded-0',
+                                                    'position'                => 'right',
+                                                ]
+                                            ]
+                                    ]
+                                ) .
+                            '</div>
+                        </div>
+                        <div class="row">
+                            <div class="col">' .
+                                $this->useTag('fields',
+                                    [
+                                        'componentId'                         => $this->params['componentId'],
                                         'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
                                         'fieldId'                             => 'gid',
                                         'fieldLabel'                          => 'Role(s)',
@@ -463,7 +488,7 @@ class Filters extends AdminLTETags
                             '</div>
                         </div>
                         <div class="row">
-                            <div class="col">' . //This will be changed to user profiles
+                            <div class="col">' .
                                 $this->useTag('fields',
                                     [
                                         'componentId'                         => $this->params['componentId'],
@@ -514,10 +539,11 @@ class Filters extends AdminLTETags
                     $.extend(
                         window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing"],
                         {
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-gid" : {
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-direct-url" : { },
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-gid"        : {
                                 placeholder: "Select Role(s)",
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-uid" : {
+                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-uid"        : {
                                 placeholder: "Select Account(s)",
                             },
                         }

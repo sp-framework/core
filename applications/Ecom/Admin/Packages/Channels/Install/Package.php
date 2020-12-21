@@ -25,16 +25,14 @@ class Package extends BasePackage
         //     return;
         // }
 
-
-
-        // var_dump($dropTables);
-        // die();
         try {
             if ($dropTables) {
                 $this->createTable('channels', '', (new $this->schemaToUse)->columns(), $dropTables);
             } else {
                 $this->createTable('channels', '', (new $this->schemaToUse)->columns());
             }
+
+            // $this->registerPackage();
 
             return true;
         } catch (\PDOException $e) {
@@ -43,6 +41,26 @@ class Package extends BasePackage
 
             $this->packagesData->responseMessage = $e->getMessage();
         }
+    }
+
+    protected function registerPackage()
+    {
+        $packagePath = '/applications/Ecom/Admin/Packages/Channels/';
+
+        $jsonFile =
+            Json::decode($this->localContent->read($packagePath . '/Install/package.json'), true);
+
+        if (!$jsonFile) {
+            throw new \Exception('Problem reading package.json at location ' . $packagePath);
+        }
+
+        $jsonFile['display_name'] = $jsonFile['displayName'];
+        $jsonFile['settings'] = Json::encode($jsonFile['settings']);
+        $jsonFile['applications'] = Json::encode([$this->init()->application['id'] => ['installed' => true]]);
+        $jsonFile['files'] = Json::encode($this->getInstalledFiles($packagePath));
+
+        $this->modules->packages->add($jsonFile);
+        $this->logger->log->info('Package ' . $jsonFile['display_name'] . ' installed successfully on application ' . $this->application['name']);
     }
 
     public function updatePackage()

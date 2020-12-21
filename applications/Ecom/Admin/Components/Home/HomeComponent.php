@@ -23,16 +23,16 @@ class HomeComponent extends BaseComponent
 
         //
         // For Installing Businesses
-        // $businessesPackage = new BusinessesPackage();
-        // $businessesPackage->installPackage(true);
+        $businessesPackage = new BusinessesPackage();
+        $businessesPackage->installPackage(true);
 
         // For Installing Locations
-        // $locationsPackage = new LocationsPackage();
-        // $locationsPackage->installPackage(true);
+        $locationsPackage = new LocationsPackage();
+        $locationsPackage->installPackage(true);
 
         // For Installing Channels
-        // $locationsPackage = new ChannelsPackage();
-        // $locationsPackage->installPackage(true);
+        $locationsPackage = new ChannelsPackage();
+        $locationsPackage->installPackage(true);
 
         // $this->view->disable();
     }
