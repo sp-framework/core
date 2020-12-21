@@ -1,3 +1,4 @@
+/* exported BazContentLoader */
 /* global BazHelpers */
 /*
 * @title                    : BazContentLoader

@@ -1,42 +1,42 @@
 <div class="p-2">
-	<div class="row">
-		<div class="col">
-			<div class="form-group">
-				<label for="views-footer">Footer Parameters</label>
-				<div class="input-group">
-					<input type="text" name="views-footer" id="views-footer" class="form-control" value="{{viewsData.settings.footer.params}}" placeholder="Footer Parameters" disabled>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		{% set scripts = [] %}
-		{% for script in viewsData.settings.footer.script.src %}
-			{% set scripts = scripts|merge([script]) %}
-		{% endfor %}
-		<div class="col">
-			<div class="form-group">
-				<label for="footer-scripts">Scripts</label>
-				<div class="input-group">
-					<textarea name="footer-scripts" id="footer-scripts" class="form-control" placeholder="Scripts" disabled>
-						{{scripts|join('\n')}}
-					</textarea>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col">
-			<div class="form-group">
-				<label for="footer-jsscripts">Footer Js Scripts</label>
-				<div class="input-group">
-					<textarea name="footer-jsscripts" id="footer-jsscripts" class="form-control" placeholder="Scripts" disabled>
-						{% if viewsData.settings.footer.jsscript is defined %}
-							{{viewsData.settings.footer.jsscript|trim}}
-						{% endif %}
-					</textarea>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="views-footer">Footer Parameters</label>
+                <div class="input-group">
+                    <input type="text" name="views-footer" id="views-footer" class="form-control" value="{{viewsData.settings.footer.params}}" placeholder="Footer Parameters" disabled="disabled">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        {% set scripts = [] %}
+        {% for script in viewsData.settings.footer.script.src %}
+            {% set scripts = scripts|merge([script]) %}
+        {% endfor %}
+        <div class="col">
+            <div class="form-group">
+                <label for="footer-scripts">Scripts</label>
+                <div class="input-group">
+                    <textarea name="footer-scripts" id="footer-scripts" class="form-control" placeholder="Scripts" disabled="disabled">
+                        {{scripts|join('\n')}}
+                    </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <label for="footer-jsscripts">Footer Js Scripts</label>
+                <div class="input-group">
+                    <textarea name="footer-jsscripts" id="footer-jsscripts" class="form-control" placeholder="Scripts" disabled="disabled">
+                        {% if viewsData.settings.footer.jsscript is defined %}
+                            {{viewsData.settings.footer.jsscript|trim}}
+                        {% endif %}
+                    </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

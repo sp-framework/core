@@ -1,3 +1,4 @@
+
 {% if email['enabled'] === 'true' %}
     {% set enabledChecked = 'checked' %}
     {% set fieldsDisabled = '' %}
@@ -106,7 +107,7 @@
 </div>
 <script>
 (function emailJS() {
-    'use strict';
+
     var emailPostData;
     var emailTestUrl = "/{{route}}/module/settings/testemail";
 

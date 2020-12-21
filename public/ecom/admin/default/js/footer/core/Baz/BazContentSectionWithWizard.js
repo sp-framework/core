@@ -9,11 +9,10 @@
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSectionWithWizard = function() {
-    'use strict';
     var BazContentSectionWithWizard = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId , wizardOptions, originalTitle, steps, lastStep, review;
@@ -394,7 +393,6 @@ var BazContentSectionWithWizard = function() {
     return bazContentSectionWithWizard;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
-    'use strict';
     if ($('.sectionWithWizard').length > 0) {
         $('.sectionWithWizard').each(function() {
             BazContentSectionWithWizard.init({'wizardId' : $(this)});

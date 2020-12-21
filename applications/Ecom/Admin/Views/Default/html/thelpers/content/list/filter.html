@@ -209,7 +209,7 @@
 if (!window['bazDataCollection']['{{componentId}}']) {
     window['bazDataCollection']['{{componentId}}'] = { };
 }
-window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] = 
+window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
     $.extend(window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'], {
         '{{componentId}}-{{sectionId}}-columns' : {
             placeholder: "SELECT COLUMN TO FILTER",
@@ -222,7 +222,7 @@ window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] 
         },
         '{{componentId}}-{{sectionId}}-condition' : {
             placeholder: "FILTER CONDITION",
-        },        
+        },
         '{{componentId}}-{{sectionId}}-saved-filters' : {
             placeholder: "SELECT SAVED FILTERS AND APPLY",
         },
@@ -255,7 +255,6 @@ window['bazDataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] 
                 }
             },
             'postSuccess': function(datatable, extractedData) {
-                'use strict';
             }
         }
     }

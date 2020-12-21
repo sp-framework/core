@@ -10,7 +10,7 @@
                 <label class="input-group-text" for="view-barebone-application">Select Application</label>
             </div>
             <select class="custom-select" id="view-barebone-application">
-                <option value="0" selected>Select...</option>
+                <option value="0" selected="selected">Select...</option>
                 {% for application in applications %}
                     {% if application['name'] != 'Admin' %}
                         <option value="{{application['id']}}">{{application['name']}}</option>
@@ -51,7 +51,6 @@ var completeView = true;
 var customView = false;
 
 $('#view-barebone-application').change(function() {
-    'use strict';
     if ($('#view-barebone-application option:selected').val() !== '0') {
         $.post('/{{route}}/barebone/getselectedapplicationviewscomponents',
                {"application_id" : $('#view-barebone-application option:selected').val()},
@@ -98,7 +97,6 @@ $('#view-barebone-application').change(function() {
 });
 
 $('#view-barebone-view, #view-barebone-component').change(function() {
-    'use strict';
     $('#view-barebone-name').removeClass('is-invalid');
     if ($('#view-barebone-view option:selected').val() !== '0' ||
         $('#view-barebone-component option:selected').val() !== '0'
@@ -115,7 +113,6 @@ $('#view-barebone-view, #view-barebone-component').change(function() {
 });
 
 $('#view-install-barebone-button').click(function() {
-    'use strict';
 
     $('#alert').attr('hidden', true);
 
@@ -171,7 +168,6 @@ $('#view-install-barebone-button').click(function() {
 });
 
 function runPost(postData) {
-    'use strict';
     $.post('/{{route}}/barebone/install', postData, function(data) {
         if (data && data.responseCode === 0) {
             PNotify.success({

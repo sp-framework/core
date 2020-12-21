@@ -83,13 +83,13 @@
                 $(this._element).BazContentSectionWithFormToDatatable();
 
                 function toggleFilterButtons(sectionId) {
-                    if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 0 || //System
-                        $('#' + sectionId + '-filters option:selected').data()['permission'] === 2    //Shared
+                    if ($('#' + sectionId + '-filters option:selected').data()['type'] === 0 || //System
+                        $('#' + sectionId + '-filters option:selected').data()['type'] === 2    //Shared
                     ) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
                         $('#' + sectionId + '-delete').addClass('disabled');
 
-                    } else if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 1) {
+                    } else if ($('#' + sectionId + '-filters option:selected').data()['type'] === 1) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", false);
                         $('#' + sectionId + '-delete').removeClass('disabled');
                     }
@@ -628,7 +628,7 @@
                     postData['name'] = filterName;
                     postData['conditions'] = query;
                     postData['component_id'] = $(selectedFilter).data()['component_id'];
-                    postData['permission'] = 1;
+                    postData['type'] = 1;
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
                     if ($('#' + sectionId + '-filter-default')[0].checked === true) {
@@ -692,9 +692,9 @@
                         if (filter['is_default'] == '1') {
                             filterName = filter['name'] + ' (Default)';
                         }
-                        if (filter['permission'] == '0') {
+                        if (filter['type'] == '0') {
                             filterName = filter['name'] + ' (System)';
-                        } else if (filter['permission'] == '2') {
+                        } else if (filter['type'] == '2') {
                             filterName = filter['name'] + ' (Shared)';
                         }
                         if (filter['shared_ids']) {

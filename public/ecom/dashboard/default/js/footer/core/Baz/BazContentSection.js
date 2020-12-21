@@ -9,11 +9,10 @@
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSection = function() {
-    'use strict';
     var BazContentSection = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId;
@@ -58,7 +57,6 @@ var BazContentSection = function() {
     return bazContentSection;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
-    'use strict';
     if ($('.section').length > 0) {
         $('.section').each(function() {
             BazContentSection.init({'sectionId' : $(this)[0].id});

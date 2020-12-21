@@ -2,7 +2,7 @@
     <div class="col">
         <div class="btn-group btn-group-toggle float-right" data-toggle="buttons">
             <label class="btn btn-primary active">
-                <input type="radio" name="barebone-all-options" class="barebone-install-options" id="barebone-all-radio" checked>All
+                <input type="radio" name="barebone-all-options" class="barebone-install-options" id="barebone-all-radio" checked="checked">All
             </label>
             <label class="btn btn-secondary">
                 <input type="radio" name="barebone-component-options" class="barebone-install-options" id="barebone-component-radio">Component
@@ -49,7 +49,6 @@
 </small>
 <script>
 $('.barebone-install-options').each(function(index, option) {
-    'use strict';
     $($(option).parent()).click(function() {
 
         var selectedOptionId = $(this).children()[0].id;

@@ -2742,11 +2742,11 @@
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+// eslint-disable-next-line no-unused-vars
 var BazHelpers = function() {
-    'use strict';
     var BazHelpers = void 0;
 
     // Error
@@ -2949,11 +2949,10 @@ var BazHelpers = function() {
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSection = function() {
-    'use strict';
     var BazContentSection = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId;
@@ -2998,7 +2997,6 @@ var BazContentSection = function() {
     return bazContentSection;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
-    'use strict';
     if ($('.section').length > 0) {
         $('.section').each(function() {
             BazContentSection.init({'sectionId' : $(this)[0].id});
@@ -3413,12 +3411,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 * @options                  :
 */
 (function (global, factory) {
-    'use strict';
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = global || self, factory(global.BazLibs = {}));
 }(this, function (exports) {
-    'use strict';
 
     var BazContentSectionWithFormToDatatable = function ($) {
 
@@ -4679,13 +4675,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 $(this._element).BazContentSectionWithFormToDatatable();
 
                 function toggleFilterButtons(sectionId) {
-                    if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 0 || //System
-                        $('#' + sectionId + '-filters option:selected').data()['permission'] === 2    //Shared
+                    if ($('#' + sectionId + '-filters option:selected').data()['type'] === 0 || //System
+                        $('#' + sectionId + '-filters option:selected').data()['type'] === 2    //Shared
                     ) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
                         $('#' + sectionId + '-delete').addClass('disabled');
 
-                    } else if ($('#' + sectionId + '-filters option:selected').data()['permission'] === 1) {
+                    } else if ($('#' + sectionId + '-filters option:selected').data()['type'] === 1) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", false);
                         $('#' + sectionId + '-delete').removeClass('disabled');
                     }
@@ -5224,7 +5220,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     postData['name'] = filterName;
                     postData['conditions'] = query;
                     postData['component_id'] = $(selectedFilter).data()['component_id'];
-                    postData['permission'] = 1;
+                    postData['type'] = 1;
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
                     if ($('#' + sectionId + '-filter-default')[0].checked === true) {
@@ -5288,9 +5284,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         if (filter['is_default'] == '1') {
                             filterName = filter['name'] + ' (Default)';
                         }
-                        if (filter['permission'] == '0') {
+                        if (filter['type'] == '0') {
                             filterName = filter['name'] + ' (System)';
-                        } else if (filter['permission'] == '2') {
+                        } else if (filter['type'] == '2') {
                             filterName = filter['name'] + ' (Shared)';
                         }
                         if (filter['shared_ids']) {
@@ -6225,11 +6221,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSectionWithStorage = function() {
-    'use strict';
     var BazContentSectionWithStorage = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId, treeId, tableId, dropzoneId, fileId, modalId, thisOptions, datatableOptions, files;
@@ -6933,7 +6928,6 @@ var BazContentSectionWithStorage = function() {
     return bazContentSectionWithWizard;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
-    'use strict';
     if ($('.sectionWithStorage').length > 0) {
         $('.sectionWithStorage').each(function() {
             BazContentSectionWithStorage.init({'storageId' : $(this)});
@@ -6952,11 +6946,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSectionWithWizard = function() {
-    'use strict';
     var BazContentSectionWithWizard = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId , wizardOptions, originalTitle, steps, lastStep, review;
@@ -7337,7 +7330,6 @@ var BazContentSectionWithWizard = function() {
     return bazContentSectionWithWizard;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
-    'use strict';
     if ($('.sectionWithWizard').length > 0) {
         $('.sectionWithWizard').each(function() {
             BazContentSectionWithWizard.init({'wizardId' : $(this)});
@@ -7355,12 +7347,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
 * @options                  :
 */
 (function (global, factory) {
-    'use strict';
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = global || self, factory(global.BazLibs = {}));
 }(this, function (exports) {
-    'use strict';
 
     var BazContentFields = function ($) {
 
@@ -8081,6 +8071,7 @@ exports.BazContentFields = BazContentFields;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
+/* exported BazContentFieldsValidator */
 /* globals BazContentFields */
 /*
 * @title                    : BazContentFieldsValidator

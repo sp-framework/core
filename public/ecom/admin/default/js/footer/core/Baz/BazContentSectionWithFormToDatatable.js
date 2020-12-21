@@ -8,12 +8,10 @@
 * @options                  :
 */
 (function (global, factory) {
-    'use strict';
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = global || self, factory(global.BazLibs = {}));
 }(this, function (exports) {
-    'use strict';
 
     var BazContentSectionWithFormToDatatable = function ($) {
 

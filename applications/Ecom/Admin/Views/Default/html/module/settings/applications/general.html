@@ -6,7 +6,7 @@
                 <div class="form-group">
                     <label for="version">Version</label>
                     <div class="input-group">
-                        <input type="text" name="version" id="version" class="form-control" value="{{application['version']}}" placeholder="Version" disabled>
+                        <input type="text" name="version" id="version" class="form-control" value="{{application['version']}}" placeholder="Version" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                 <div class="form-group">
                     <label for="name">Application Name</label>
                     <div class="input-group">
-                        <input type="text" name="name" id="name" class="form-control" value="{{application['name']}}" placeholder="Application Name" disabled>
+                        <input type="text" name="name" id="name" class="form-control" value="{{application['name']}}" placeholder="Application Name" disabled="disabled">
                     </div>
                 </div>
             </div>
@@ -106,7 +106,7 @@
                         <option value="0">Select Domain</option>
                         {% for domain in domains %}
                             {% if domain['domain'] == settings['domain'] %}
-                                <option value="{{domain['domain']}}" selected>{{domain['domain']}}</option>
+                                <option value="{{domain['domain']}}" selected="selected">{{domain['domain']}}</option>
                             {% else %}
                                 <option value="{{domain['domain']}}">{{domain['domain']}}</option>
                             {% endif %}
@@ -126,7 +126,7 @@
                         <option value="0">Select Component</option>
                         {% for component in components %}
                             {% if component['name'] == settings['component'] %}
-                                <option value="{{component['name']}}" selected>{{component['display_name']}}</option>
+                                <option value="{{component['name']}}" selected="selected">{{component['display_name']}}</option>
                             {% else %}
                                 <option value="{{component['name']}}">{{component['display_name']}}</option>
                             {% endif %}
@@ -143,7 +143,7 @@
                         <option value="0">Select View</option>
                         {% for view in views %}
                             {% if view['name'] == settings['view'] %}
-                                <option value="{{view['name']}}" selected>{{view['display_name']}}</option>
+                                <option value="{{view['name']}}" selected="selected">{{view['display_name']}}</option>
                             {% else %}
                                 <option value="{{view['name']}}">{{view['display_name']}}</option>
                             {% endif %}
@@ -160,7 +160,7 @@
                         <option value="">Select Component</option>
                         {% for component in components %}
                             {% if component['name'] == settings['errorComponent'] %}
-                                <option value="{{component['name']}}" selected>{{component['display_name']}}</option>
+                                <option value="{{component['name']}}" selected="selected">{{component['display_name']}}</option>
                             {% else %}
                                 <option value="{{component['name']}}">{{component['display_name']}}</option>
                             {% endif %}

@@ -2742,11 +2742,11 @@
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
+// eslint-disable-next-line no-unused-vars
 var BazHelpers = function() {
-    'use strict';
     var BazHelpers = void 0;
 
     // Error
@@ -2949,11 +2949,10 @@ var BazHelpers = function() {
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSection = function() {
-    'use strict';
     var BazContentSection = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId;
@@ -2998,7 +2997,6 @@ var BazContentSection = function() {
     return bazContentSection;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
-    'use strict';
     if ($('.section').length > 0) {
         $('.section').each(function() {
             BazContentSection.init({'sectionId' : $(this)[0].id});
@@ -3413,12 +3411,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 * @options                  :
 */
 (function (global, factory) {
-    'use strict';
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = global || self, factory(global.BazLibs = {}));
 }(this, function (exports) {
-    'use strict';
 
     var BazContentSectionWithFormToDatatable = function ($) {
 
@@ -6225,11 +6221,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSectionWithStorage = function() {
-    'use strict';
     var BazContentSectionWithStorage = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId, treeId, tableId, dropzoneId, fileId, modalId, thisOptions, datatableOptions, files;
@@ -6933,7 +6928,6 @@ var BazContentSectionWithStorage = function() {
     return bazContentSectionWithWizard;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderModalComplete bazContentWizardAjaxComplete', function() {
-    'use strict';
     if ($('.sectionWithStorage').length > 0) {
         $('.sectionWithStorage').each(function() {
             BazContentSectionWithStorage.init({'storageId' : $(this)});
@@ -6952,11 +6946,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 * @options                  :
 */
 
-var _extends = Object.assign || function (target) { 'use strict'; for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 // var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var BazContentSectionWithWizard = function() {
-    'use strict';
     var BazContentSectionWithWizard = void 0;
     var dataCollection = window.dataCollection;
     var componentId, sectionId , wizardOptions, originalTitle, steps, lastStep, review;
@@ -7337,7 +7330,6 @@ var BazContentSectionWithWizard = function() {
     return bazContentSectionWithWizard;
 }();
 $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
-    'use strict';
     if ($('.sectionWithWizard').length > 0) {
         $('.sectionWithWizard').each(function() {
             BazContentSectionWithWizard.init({'wizardId' : $(this)});
@@ -7355,12 +7347,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
 * @options                  :
 */
 (function (global, factory) {
-    'use strict';
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
     typeof define === 'function' && define.amd ? define(['exports'], factory) :
     (global = global || self, factory(global.BazLibs = {}));
 }(this, function (exports) {
-    'use strict';
 
     var BazContentFields = function ($) {
 

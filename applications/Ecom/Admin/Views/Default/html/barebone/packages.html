@@ -7,7 +7,7 @@
                 <label class="input-group-text" for="package-barebone-application">Select Application</label>
             </div>
             <select class="custom-select" id="package-barebone-application">
-                <option value="0" selected>Select...</option>
+                <option value="0" selected="selected">Select...</option>
                 {% for application in applications %}
                     {% if application['name'] != 'Admin' %}
                         <option value="{{application['id']}}">{{application['name']}}</option>
@@ -27,7 +27,6 @@
 <script>
 /*global PNotify */
 $('#package-install-barebone-button').click(function() {
-    'use strict';
     $('#alert').attr('hidden', true);
     if ($('#package-barebone-application option:selected').val() === '0') {
         $('#package-barebone-application').addClass('is-invalid');

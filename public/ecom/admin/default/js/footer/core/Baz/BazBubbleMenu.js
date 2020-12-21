@@ -42,8 +42,6 @@
 			]
 */
 (function ($){
-	'use strict';
-
 	var DataKey = 'bb.bubblemenu';
 
 	var Default = {
