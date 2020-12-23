@@ -1,0 +1,36 @@
+{
+    "route"         : "employees",
+    "name"          : "Employees",
+    "description"   : "Manage employees via this component",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-employees",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Users\\Employees\\EmployeesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "users"      : {
+            "title"     : "users",
+            "icon"      : "users",
+            "childs"    : {
+                "employees"   : {
+                    "title"     : "Employees",
+                    "link"      : "users/employees"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

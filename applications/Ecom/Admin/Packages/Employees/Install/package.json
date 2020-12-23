@@ -1,0 +1,8 @@
+{
+    "name"          : "Employees",
+    "displayName"   : "Admin Employees Package",
+    "description"   : "Package for Employees component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/package-admin-employees",
+    "settings"      : { }
+}
