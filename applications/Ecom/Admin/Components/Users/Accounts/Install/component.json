@@ -1,5 +1,5 @@
 {
-    "route"         : "accounts",
+    "route"         : "users/accounts",
     "name"          : "Accounts",
     "description"   : "List accounts via this component",
     "category"      : "ecom",

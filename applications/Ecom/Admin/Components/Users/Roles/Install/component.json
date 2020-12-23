@@ -1,5 +1,5 @@
 {
-    "route"         : "roles",
+    "route"         : "users/roles",
     "name"          : "Roles",
     "description"   : "Manage admin roles via this component",
     "category"      : "ecom",
