@@ -12,14 +12,15 @@ use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\CountriesStatesCities;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
-use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Filter as RegisterFilter;
+use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
+use System\Base\Installer\Packages\Setup\Schema\Addressbook;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Components;
@@ -145,6 +146,7 @@ class Setup
 		$this->db->createTable('geo_countries', $dbName, (new Countries)->columns());
 		$this->db->createTable('geo_states', $dbName, (new States)->columns());
 		$this->db->createTable('geo_cities', $dbName, (new Cities)->columns());
+		$this->db->createTable('addressbook', $dbName, (new Addressbook)->columns());
 		$this->db->createTable('storages', $dbName, (new Storages)->columns());
 		$this->db->createTable('storages_local', $dbName, (new StoragesLocal)->columns());
 	}
