@@ -1,7 +1,9 @@
 {% if repository['id'] is defined %}
     {% set repositoryId = repository['id'] %}
+    {% set title = 'Repository (' ~ repository['name'] ~ ')' %}
 {% else %}
     {% set repositoryId = '' %}
+    {% set title = 'New Repository' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [

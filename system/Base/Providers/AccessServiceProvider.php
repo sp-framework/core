@@ -27,7 +27,6 @@ class AccessServiceProvider implements ServiceProviderInterface
             }
         );
 
-
         $container->setShared(
             'auth',
             function () use ($container) {

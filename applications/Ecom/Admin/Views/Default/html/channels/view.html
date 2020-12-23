@@ -1,7 +1,9 @@
 {% if channel['id'] is defined %}
     {% set channelId = channel['id'] %}
+    {% set title = channelType ~ ' Channel (' ~ channel['name'] ~ ')' %}
 {% else %}
     {% set channelId = '' %}
+    {% set title = 'New ' ~ channelType ~ ' Channel' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -16,7 +18,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'store',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'channels/types/' ~ channelType ~ '/form',
         'formButtons'                   :

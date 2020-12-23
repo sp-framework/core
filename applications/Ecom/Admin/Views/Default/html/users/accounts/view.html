@@ -1,7 +1,9 @@
 {% if account['id'] is defined %}
     {% set accountId = account['id'] %}
+    {% set title = 'Account (' ~ account['email'] ~ ')' %}
 {% else %}
     {% set accountId = '' %}
+    {% set title = 'New Account' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -14,8 +16,8 @@
         'cardHeader'                    : true,
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
-        'cardIcon'                      : 'account',
-        'cardTitle'                     : componentName,
+        'cardIcon'                      : 'user',
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'accounts/form',
         'formButtons'                   :

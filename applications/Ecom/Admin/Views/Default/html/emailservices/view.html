@@ -1,7 +1,9 @@
-{% if email['id'] is defined %}
+{% if emailservice['id'] is defined %}
     {% set emailserviceId = emailservice['id'] %}
+    {% set title = 'Email Service (' ~ emailservice['name'] ~ ')' %}
 {% else %}
     {% set emailserviceId = '' %}
+    {% set title = 'New Email Service' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -15,7 +17,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'envelope',
-        'cardTitle'                     : 'Email Service',
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'emailservices/form',
         'formButtons'                   :

@@ -1,7 +1,9 @@
 {% if application['id'] is defined %}
     {% set applicationId = application['id'] %}
+    {% set title = 'App (' ~ application['name'] ~ ')' %}
 {% else %}
     {% set applicationId = '' %}
+    {% set title = 'New App' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -15,7 +17,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'th-large',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'apps/form',
         'formButtons'                   :

@@ -1,7 +1,9 @@
 {% if business['id'] is defined %}
     {% set businessId = business['id'] %}
+    {% set title = 'Business (' ~ application['name'] ~ ')' %}
 {% else %}
     {% set businessId = '' %}
+    {% set title = 'New Business' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -15,7 +17,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'suitcase',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'businesses/form',
         'formButtons'                   :

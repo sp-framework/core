@@ -2,10 +2,12 @@
     {% set roleId = role['id'] %}
     {% set roleName = role['name'] %}
     {% set roleDescription = role['description'] %}
+    {% set title = 'Role (' ~ role['name'] ~ ')' %}
 {% else %}
     {% set roleId = '' %}
     {% set roleName = '' %}
     {% set roleDescription = '' %}
+    {% set title = 'New Role' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -19,7 +21,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'sitemap',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'roles/form',
         'formButtons'                   :

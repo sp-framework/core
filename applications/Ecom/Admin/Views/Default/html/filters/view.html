@@ -1,7 +1,9 @@
 {% if filter['id'] is defined %}
     {% set filterId = filter['id'] %}
+    {% set title = 'Filter (' ~ filter['name'] ~ ')' %}
 {% else %}
     {% set filterId = '' %}
+    {% set title = 'New Filter' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -15,7 +17,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'filter',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'filters/form',
         'formButtons'                   :
