@@ -102,7 +102,12 @@ class FiltersComponent extends BaseComponent
                 return;
             }
 
-            $this->filters->addFilter($this->postData());
+            //Adding close in add as cloning requires add permission so both add and clone can be performed in same action.
+            if (isset($this->postData()['clone']) && $this->postData()['clone']) {
+                $this->filters->cloneFilter($this->postData());
+            } else {
+                $this->filters->addFilter($this->postData());
+            }
 
             $this->view->responseCode = $this->filters->packagesData->responseCode;
 
@@ -168,6 +173,24 @@ class FiltersComponent extends BaseComponent
                 $this->view->filters = $this->filters->packagesData->filters;
             }
 
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function getdefaultfilterAction()
+    {
+        if ($this->request->isPost()) {
+
+            if ($this->filters->getDefaultFilter($this->postData()['component_id'])) {
+                $this->view->defaultFilter = $this->filters->packagesData->defaultFilter;
+            }
+
+            $this->view->responseCode = $this->filters->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->filters->packagesData->responseMessage;
         } else {
             $this->view->responseCode = 1;
 

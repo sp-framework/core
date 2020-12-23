@@ -2,6 +2,8 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
+use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Filters as FiltersModel;
 
@@ -27,17 +29,17 @@ class Filters extends BasePackage
         }
     }
 
-    public function getFiltersForAccountAndComponent(int $accountId, int $componentId)
+    public function getFiltersForAccountAndComponent(array $account, int $componentId)
     {
         $checkShowAllFilters = $this->checkShowAllFilters($componentId);
 
         if ($checkShowAllFilters) {
-            return $this->getFilters($componentId, $accountId);
+            return $this->getFilters($componentId, $account);
 
         } else {
             $this->addShowAllFilter($componentId);
 
-            return $this->getFilters($componentId, $accountId);
+            return $this->getFilters($componentId, $account);
         }
     }
 
@@ -55,20 +57,52 @@ class Filters extends BasePackage
             );
     }
 
-    protected function getFilters(int $componentId, int $accountId = null)
+    protected function getFilters(int $componentId, array $account = null)
     {
-        if ($accountId) {
-            return
+        if ($account['id']) {
+
+            $filtersArr =
                 $this->getByParams(
                     [
                         'conditions'    => 'component_id = :cid: AND (account_id = :aid: OR account_id = :aid0:)',
                         'bind'          => [
                             'cid'       => $componentId,
-                            'aid'       => $accountId,
+                            'aid'       => $account['id'],
                             'aid0'       => 0
                         ]
                     ]
                 );
+
+            foreach ($filtersArr as $filterKey => $filter) {
+                $filters[$filter['id']] = $filter;
+            }
+
+            $sharedFiltersArr =
+                $this->getByParams(
+                    [
+                        'conditions'    => 'shared_ids IS NOT NULL'
+                    ]
+                );
+
+            foreach ($sharedFiltersArr as $filterKey => $filter) {
+                $filter['shared_ids'] = Json::decode($filter['shared_ids'], true);
+
+                if (isset($filter['shared_ids']['rids'])) {
+                    if (Arr::has($filter['shared_ids']['rids'], $account['role_id'])) {
+                        $filter['account_name'] = $account['email'];
+                        $filter['shared_ids'] = Json::encode($filter['shared_ids']);
+                        $sharedFilters[$filter['id']] = $filter;
+                    }
+                } else if (isset($filter['shared_ids']['uids'])) {
+                    if (Arr::has($filter['shared_ids']['uids'], $account['id'])) {
+                        $filter['account_name'] = $account['email'];
+                        $filter['shared_ids'] = Json::encode($filter['shared_ids']);
+                        $sharedFilters[$filter['id']] = $filter;
+                    }
+                }
+            }
+
+            return array_merge($filters, $sharedFilters);
         }
         return
             $this->getByParams(
@@ -131,8 +165,7 @@ class Filters extends BasePackage
 
                 $this->packagesData->responseMessage = 'Filter Added';
 
-                $this->packagesData->filters =
-                    $filtersArr = $this->getFiltersForComponent($data['component_id']);
+                $this->setFilterUrl($data);
 
                 return true;
             }
@@ -148,7 +181,14 @@ class Filters extends BasePackage
 
     public function updateFilter(array $data)
     {
+        $component = $this->modules->components->getById($data['component_id']);
+
         if ($this->checkDefaultFilter($data)) {
+
+            if (isset($data['shared_ids']) && is_array($data['shared_ids'])) {
+                $data['shared_ids'] = Json::encode($data['shared_ids']);
+            }
+
             $update = $this->update($data);
 
             if ($update) {
@@ -156,8 +196,7 @@ class Filters extends BasePackage
 
                 $this->packagesData->responseMessage = 'Filter Updated';
 
-                $this->packagesData->filters =
-                    $filtersArr = $this->getFiltersForComponent($data['component_id']);
+                $this->setFilterUrl($data);
 
                 return true;
             }
@@ -175,17 +214,20 @@ class Filters extends BasePackage
         $remove = $this->remove($data['id']);
 
         if ($remove) {
-                $this->packagesData->responseCode = 0;
+            $this->packagesData->responseCode = 0;
 
-                $this->packagesData->responseMessage = 'Filter Removed';
+            $this->packagesData->responseMessage = 'Filter Removed';
 
-                if (isset($data['component_id'])) {
-                    $this->packagesData->filters =
-                        $filtersArr = $this->getFiltersForComponent($data['component_id']);
-                }
+            if (isset($data['component_id'])) {
+                $this->setFilterUrl($data);
+            }
 
-                return true;
+            return true;
         }
+
+        $this->packagesData->responseCode = 1;
+
+        $this->packagesData->responseMessage = 'Cannot remove filter.';
 
         return false;
     }
@@ -196,24 +238,41 @@ class Filters extends BasePackage
         $filter['type'] = 1;
         $filter['is_default'] = 0;
 
-        if ($this->auth->account) {
-            $filter['account_id'] = $this->auth->account['id'];
+        $account = $this->auth->account();
+
+        if ($account) {
+            $filter['account_id'] = $account['id'];
         }
 
         $clone = $this->clone($data['id'], 'name', $filter);
 
         if ($clone) {
-                $this->packagesData->responseCode = 0;
+            $this->packagesData->responseCode = 0;
 
-                $this->packagesData->responseMessage = 'Filter cloned successfully';
+            $this->packagesData->responseMessage = 'Filter cloned successfully';
 
-                $this->packagesData->filters =
-                    $filtersArr = $this->getFiltersForComponent($data['component_id']);
+            $this->setFilterUrl($data);
 
-                return true;
+            return true;
         }
 
         return false;
+    }
+
+    protected function setFilterUrl(array $data)
+    {
+        $component = $this->modules->components->getById($data['component_id']);
+
+        $filtersArr = $this->getFiltersForComponent($data['component_id']);
+
+        $filters = [];
+
+        foreach ($filtersArr as $key => $filter) {
+            $filters[$key] = $filter;
+            $filters[$key]['url'] = $this->links->url($component['route']) . '/q/filter/' . $filter['id'];
+        }
+
+        $this->packagesData->filters = $filters;
     }
 
     public function getDefaultFilter(int $componentId)
@@ -245,7 +304,7 @@ class Filters extends BasePackage
 
     protected function checkDefaultFilter(array $data)
     {
-        if (!isset($data['is_default']) || $data['is_default'] == 1 ) {
+        if (!isset($data['is_default']) || (isset($data['is_default']) && $data['is_default'] != 1)) {
             return true;
         }
 

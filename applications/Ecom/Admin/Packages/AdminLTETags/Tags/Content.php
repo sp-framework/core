@@ -8,11 +8,15 @@ class Content extends AdminLTETags
 {
     protected $params;
 
+    protected $compSecId;
+
     protected $content = '';
 
     public function getContent($params)
     {
         $this->params = $params;
+
+        $this->compSecId = $this->params['componentId'] . '-' . $this->params['sectionId'];
 
         $this->generateContent();
 
@@ -57,7 +61,7 @@ class Content extends AdminLTETags
     protected function getContentTypeSection()
     {
         return
-            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '" class="section">' .
+            '<section id="' . $this->compSecId . '" class="section">' .
                 $this->useTag('card', $this->params) .
             '</section>
             <script>
@@ -82,7 +86,7 @@ class Content extends AdminLTETags
             );
 
         $sectionForm .=
-            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '" class="sectionWithForm">' .
+            '<section id="' . $this->compSecId . '" class="sectionWithForm">' .
                 $this->useTag('card', $this->params) .
             '</section>';
 
@@ -98,7 +102,7 @@ class Content extends AdminLTETags
     protected function getContentTypeSectionWithFormToDatatable()
     {
         return
-            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '" class="sectionWithFormToDatatable">' .
+            '<section id="' . $this->compSecId . '" class="sectionWithFormToDatatable">' .
                 $this->useTag('card', $this->params) .
             '</section>
             <script>
@@ -106,6 +110,7 @@ class Content extends AdminLTETags
                 window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
             </script>';
     }
+
     protected function getContentTypeSectionWithWizard()
     {
         // <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithWizard">

@@ -112,7 +112,7 @@ class Filters extends AdminLTETags
                                         'noMargin'                => true,
                                         'buttonAdditionalClass'   => 'rounded-0 text-white',
                                         'position'                => 'right',
-                                        'url'                     => $this->links->url('filters/clone')
+                                        'url'                     => $this->links->url('filters/add')
                                     ],
                                     'reset' => [
                                         'title'                   => false,

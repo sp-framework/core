@@ -4693,6 +4693,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 $('#' + sectionId + '-filters').change(function() {
                     toggleFilterButtons(sectionId + '-filter');
 
+                    if ($('#' + sectionId + '-filter-alert').length === 1) {
+                        $('#' + sectionId + '-filter-alert').remove();
+                    }
+
                     query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
 
                     that._filterRunAjax(
@@ -4705,7 +4709,74 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 //Open Sharing Modal
                 $('#' + sectionId + '-share').click(function(e) {
                     e.preventDefault();
+
+                    var filterUrl = $('#' + sectionId + '-filter-filters option:selected').data()['url'];
+                    var sharedIds = $('#' + sectionId + '-filter-filters option:selected').data()['shared_ids'];
+                    //eslint-disable-next-line
+                    console.log(sharedIds);
+                    if (sharedIds.rids) {
+                        for (var rid in sharedIds.rids) {
+                            $('#' + sectionId + '-filter-sharing-rids').find('[data-value="' + rid + '"]').attr('selected', true);
+                        }
+                        $('#' + sectionId + '-filter-sharing-rids').trigger('change');
+                    }
+
+                    // if (sharedIds.uids) {
+                    //     for (var uid in sharedIds.uids) {
+                    //         //Dynamically add user ids.
+                    //     }
+                    //     $('#' + sectionId + '-filter-sharing-rids').trigger('change');
+                    // }
+
+                    $('#' + sectionId + '-filter-sharing-direct-url').val(filterUrl);
+
                     $('#' + sectionId + '-filter-sharing-modal').modal('show');
+                });
+
+                $('#' + sectionId + '-share-filter').click(function(e) {
+                    e.preventDefault();
+
+                    var rids = $('#' + sectionId + '-filter-sharing-rids').select2('data');
+                    var uids = $('#' + sectionId + '-filter-sharing-uids').select2('data');
+
+                    //Save To Db
+                    var postData = { };
+                    postData['id'] = $('#' + sectionId + '-filter-filters option:selected').data()['id'];
+                    postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
+                    postData['shared_ids'] = { };
+                    postData['shared_ids']['rids'] = { };
+                    $(rids).each(function(index, rid) {
+                        postData['shared_ids']['rids'][rid.id] = rid.text;
+                    });
+                    postData['shared_ids']['uids'] = [];
+                    $(uids).each(function(index, uid) {
+                        postData['shared_ids']['uids'].push(uid.id);
+                    });
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    var url = $(this).attr('href');
+
+                    //Update Filter
+                    $.post(url, postData, function(data) {
+                        if (data.responseCode === 0) {
+                            PNotify.success({
+                                'title' : data.responseMessage
+                            });
+                            if (data.filters) {
+                                redoFiltersOptions(query, sectionId, data);
+                            }
+                        } else {
+                            PNotify.error({
+                                'title' : data.responseMessage
+                            });
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
+                    }, 'json');
+
+                    $('#' + sectionId + '-filter-sharing-modal').modal('hide');
                 });
 
                 //Reset
@@ -4714,13 +4785,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     resetFilters();
                 });
-
                 function resetFilters() {
                     query = '';
                     var defaultFilter = null;
 
                     $('#' + sectionId + '-filter-filters').children().each(function(index, filter) {
-                        if ($(filter).data()['is_default'] == 1) {
+                        if ($(filter).data()['account_id'] != 0 &&
+                            $(filter).data()['is_default'] == 1
+                        ) {
                             query = $(filter).data()['conditions'];
                             defaultFilter = filter;
                             return false;
@@ -4737,10 +4809,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     if (defaultFilter) {
                         $('#' + sectionId + '-filter-filters').val($(defaultFilter).val());
-                        $('#' + sectionId + '-filter-edit, ' +
-                          '#' + sectionId + '-filter-delete, ' +
-                          '#' + sectionId + '-filter-share'
-                        ).attr("disabled", false);
+                        $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
+                        $('#' + sectionId + '-delete').addClass('disabled');
                     }
                 }
 
@@ -4770,6 +4840,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     var postData = { };
                     postData['id'] = selectedFilter.data()['id'];
                     postData['component_id'] = selectedFilter.data()['component_id'];
+                    postData['clone'] = true;
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
                     var url = $(this).attr('href');
@@ -4955,10 +5026,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         if (result.value) {
                             if ($(selectedFilter).data().ns === true) {
                                 $(selectedFilter).remove();
-                                $('#' + sectionId + '-filter-edit, ' +
-                                  '#' + sectionId + '-filter-delete, ' +
-                                  '#' + sectionId + '-filter-share'
-                                ).attr("disabled", true);
+                                $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
+                                $('#' + sectionId + '-delete').addClass('disabled');
+
                                 PNotify.success({
                                     'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
                                 });
@@ -5290,7 +5360,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             filterName = filter['name'] + ' (Shared)';
                         }
                         if (filter['shared_ids']) {
-                            filterName = filter['name'] + ' (Sharing)';
+                            filterName = filter['name'] + ' (Shared by ' + filter['account_name'] + ')';
                         }
 
                         if (filter['conditions'] === query) {

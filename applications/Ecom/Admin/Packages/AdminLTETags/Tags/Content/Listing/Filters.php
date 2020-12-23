@@ -13,9 +13,13 @@ class Filters extends AdminLTETags
 
     protected $fieldParams = [];
 
+    protected $compSecId;
+
     public function getContent($params)
     {
         $this->params = $params;
+
+        $this->compSecId = $this->params['componentId'] . '-' . $this->params['sectionId'];
 
         $this->generateContent();
 
@@ -26,31 +30,52 @@ class Filters extends AdminLTETags
     {
         $defaultFilter = null;
 
+        $account = $this->auth->account();
+
+        $filters = [];
+
+
         foreach ($this->params['dtFilters'] as $filterKey => $filter) {
-            if ($filter['is_default'] === '1') {
-                $defaultFilter = $filterKey;
-                $this->params['dtFilters'][$filterKey]['name'] =
-                    $this->params['dtFilters'][$filterKey]['name'] . ' (Default)';
+            $filters[$filterKey] = $filter;
+
+            if (isset($filter['data']['queryFilterId'])) {
+                if ($filter['data']['queryFilterId'] === $filter['id']) {
+                    $defaultFilter = $filterKey;
+                } else {
+                    $defaultFilter = 0;
+                }
+                $queryFilterId = $filter['data']['queryFilterId'];
+            } else if (($account && $account['id'] === $filter['account_id']) &&
+                $filter['is_default'] === '1'
+            ) {
+                if (!$defaultFilter) {
+                    $defaultFilter = $filterKey;
+                }
+
+                $filters[$filterKey]['name'] =
+                    $filters[$filterKey]['name'] . ' (Default)';
             }
 
             if ($filter['type'] === '0') {
-                if (!$defaultFilter) {
-                     $defaultFilter = $filterKey;
-                }
-                $this->params['dtFilters'][$filterKey]['name'] =
-                    $this->params['dtFilters'][$filterKey]['name'] . ' (System)';
+                $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (System)';
             } else if ($filter['type'] === '2') {
-                $this->params['dtFilters'][$filterKey]['name'] =
-                    $this->params['dtFilters'][$filterKey]['name'] . ' (Shared)';
+                $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared)';
             }
+
             if ($filter['shared_ids']) {
-                $this->params['dtFilters'][$filterKey]['name'] =
-                    $this->params['dtFilters'][$filterKey]['name'] . ' (Sharing)';
+                $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared by ' . $filter['account_name'] . ')';
             }
         }
+        if ($defaultFilter === null) {
+            $defaultFilter = Arr::firstKey($filters);
+        }
 
-        if (!$defaultFilter) {
-            $defaultFilter = Arr::firstKey($this->params['dtFilters']);
+        if ($defaultFilter === 0) {
+            $this->content .=
+                '</div><div id="' . $this->compSecId . '-filter-alert" class="alert alert-danger alert-dismissible animated fadeIn rounded-0 mb-3">
+                    <button id="admin-filters-main-alert-dismiss" type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                    <i class="icon fa fa-ban"></i>Filter with id ' . $queryFilterId . ' not found. Please select filter from list below.
+                </div><div class="row mb-2">';
         }
 
         $this->content .=
@@ -84,7 +109,8 @@ class Filters extends AdminLTETags
                                         'noMargin'                => true,
                                         'disabled'                => true,
                                         'buttonAdditionalClass'   => 'rounded-0',
-                                        'position'                => 'right'
+                                        'position'                => 'right',
+                                        'url'                     => $this->links->url('filters/remove')
                                     ],
                                     'share'   => [
                                         'title'                   => false,
@@ -111,7 +137,7 @@ class Filters extends AdminLTETags
                                         'noMargin'                => true,
                                         'buttonAdditionalClass'   => 'rounded-0 text-white',
                                         'position'                => 'right',
-                                        'url'                     => $this->links->url('filters/clone')
+                                        'url'                     => $this->links->url('filters/add')
                                     ],
                                     'reset' => [
                                         'title'                   => false,
@@ -124,7 +150,7 @@ class Filters extends AdminLTETags
                                 ],
                             'fieldInputType'                      => 'select',
                             'fieldHelp'                           => false,
-                            'fieldDataSelectOptions'              => $this->params['dtFilters'],
+                            'fieldDataSelectOptions'              => $filters,
                             'fieldDataSelectOptionsArray'         => true,
                             'fieldDataSelectOptionsKey'           => 'id',
                             'fieldDataSelectOptionsValue'         => 'name',
@@ -150,9 +176,9 @@ class Filters extends AdminLTETags
             $this->params['dtColumns'];
 
         $modalContent =
-            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter" class="sectionWithListingFilter">
-                <form autocomplete="off" class="mt-1" data-validateon="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-form">
-                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-fieldset">
+            '<section id="' . $this->compSecId . '-filter" class="sectionWithListingFilter">
+                <form autocomplete="off" class="mt-1" data-validateon="section" id="' . $this->compSecId . '-filter-form">
+                    <fieldset id="' . $this->compSecId . '-filter-fieldset">
                         <div class="row vdivide">
                             <div class="col">
                                 <div class="row">
@@ -334,12 +360,12 @@ class Filters extends AdminLTETags
                                 </div>
                             </div>
                             <div class="col-md-8">
-                                <div data-validateOn="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-table"></div>
+                                <div data-validateOn="section" id="' . $this->compSecId . '-filter-table"></div>
                             </div>
                         </div>
                     </fieldset>
                     <hr>
-                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-fieldset-save-apply">
+                    <fieldset id="' . $this->compSecId . '-filter-fieldset-save-apply">
                         <div class="row">
                             <div class="col">' .
                                 $this->useTag('fields',
@@ -385,6 +411,7 @@ class Filters extends AdminLTETags
                                         'fieldLabel'                            => 'Default?',
                                         'fieldType'                             => 'checkbox',
                                         'fieldCheckboxType'                     => 'info',
+                                        'fieldDataAttributes'                   => ['href' => $this->links->url('filters/getdefaultfilter')],
                                         'fieldHelp'                             => true,
                                         'fieldHelpTooltipContent'               => 'Make this filter as default filter<br>Note: Only saved filters can be made default.',
                                         'fieldBazScan'                          => true,
@@ -437,24 +464,24 @@ class Filters extends AdminLTETags
     protected function getShareModalContent()
     {
         $modalContent =
-            '<section id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing">
-                <form autocomplete="off" class="mt-1" data-validateon="section" id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-form">
-                    <fieldset id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-fieldset">
+            '<section id="' . $this->compSecId . '-filter-sharing">
+                <form autocomplete="off" class="mt-1" data-validateon="section" id="' . $this->compSecId . '-filter-sharing-form">
+                    <fieldset id="' . $this->compSecId . '-filter-sharing-fieldset">
                         <div class="row">
                             <div class="col">' .
                                 $this->useTag('fields',
                                     [
                                         'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter',
+                                        'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
                                         'fieldId'                             => 'direct-url',
                                         'fieldLabel'                          => 'Direct URL',
                                         'fieldType'                           => 'input',
-                                        'fieldDisabled'                       => true,
+                                        'fieldBazScan'                        => true,
                                         'fieldGroupPostAddonButtons'          =>
                                             [
-                                                'direct-url'   => [
+                                                'direct-url-copy'   => [
                                                     'title'                   => false,
-                                                    'type'                    => 'secondary',
+                                                    'type'                    => 'primary',
                                                     'icon'                    => 'copy',
                                                     'noMargin'                => true,
                                                     'buttonAdditionalClass'   => 'rounded-0',
@@ -471,7 +498,7 @@ class Filters extends AdminLTETags
                                     [
                                         'componentId'                         => $this->params['componentId'],
                                         'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
-                                        'fieldId'                             => 'gid',
+                                        'fieldId'                             => 'rids',
                                         'fieldLabel'                          => 'Role(s)',
                                         'fieldType'                           => 'select2',
                                         'fieldHelp'                           => true,
@@ -493,7 +520,7 @@ class Filters extends AdminLTETags
                                     [
                                         'componentId'                         => $this->params['componentId'],
                                         'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
-                                        'fieldId'                             => 'uid',
+                                        'fieldId'                             => 'uids',
                                         'fieldLabel'                          => 'Account(s)',
                                         'fieldType'                           => 'select2',
                                         'fieldHelp'                           => true,
@@ -523,7 +550,23 @@ class Filters extends AdminLTETags
                 'modalHeader'               => true,
                 'modalFooter'               => true,
                 'modalTitle'                => '<i class="fa fas fa-fw fa-share-alt"></i> ' . strtoupper($this->params['componentName'] . ' Filter share'),
-                'modalEscClose'             => 'true'
+                'modalEscClose'             => 'false',
+                'modalFooterButtons'        =>
+                    [
+                        'componentId'                       => $this->params['componentId'],
+                        'sectionId'                         => $this->params['sectionId'] . '-filter',
+                        'buttonType'                        => 'button',
+                        'buttonSize'                        => 'sm',
+                        'buttons'                           =>
+                            [
+                                'share-filter' => [
+                                    'title'                 => 'Share',
+                                    'disabled'              => true,
+                                    'icon'                  => 'share-alt',
+                                    'url'                   => $this->links->url('filters/update')
+                                ]
+                            ]
+                    ]
             ]
         );
     }
@@ -535,44 +578,57 @@ class Filters extends AdminLTETags
                 'if (!window["dataCollection"]["' . $this->params['componentId'] . '"]) {
                     window["dataCollection"]["' . $this->params['componentId'] . '"] = { };
                 }
-                window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing"] =
+                window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '-filter-sharing"] =
                     $.extend(
-                        window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing"],
+                        window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '-filter-sharing"],
                         {
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-direct-url" : { },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-gid"        : {
+                            "' . $this->compSecId . '-filter-sharing-direct-url" : {
+                                    afterInit: function() {
+                                        var copyText = document.getElementById("' . $this->compSecId . '-filter-sharing-direct-url");
+
+                                        $("#' . $this->compSecId . '-filter-sharing-direct-url-copy").click(function(e) {
+                                            e.preventDefault();
+
+                                            copyText.select();
+                                            copyText.setSelectionRange(0, 99999);
+                                            document.execCommand("copy");
+                                        });
+                                    }
+                                },
+                            "' . $this->compSecId . '-filter-sharing-rids"        : {
                                 placeholder: "Select Role(s)",
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-sharing-uid"        : {
+                            "' . $this->compSecId . '-filter-sharing-uids"        : {
                                 placeholder: "Select Account(s)",
+
                             },
                         }
                     );
-                window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter"] =
+                window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '-filter"] =
                     $.extend(
-                        window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter"],
+                        window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '-filter"],
                         {
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor" : {
+                            "' . $this->compSecId . '-filter-andor" : {
                                 placeholder: "SELECT AND/OR",
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : {
+                            "' . $this->compSecId . '-filter-field" : {
                                 placeholder: "SELECT FIELD TO FILTER",
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : {
+                            "' . $this->compSecId . '-filter-operator" : {
                                 placeholder: "SELECT FILTER OPERATOR",
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : {
+                            "' . $this->compSecId . '-filter-value" : {
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-id" : {
+                            "' . $this->compSecId . '-filter-id" : {
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-name" : {
+                            "' . $this->compSecId . '-filter-name" : {
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-default" : {
+                            "' . $this->compSecId . '-filter-default" : {
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-datatables" : [
-                                "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-table"
+                            "' . $this->compSecId . '-filter-datatables" : [
+                                "' . $this->compSecId . '-filter-table"
                             ],
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-table" : {
+                            "' . $this->compSecId . '-filter-table" : {
                                 "tableTitle"        : "Filters",
                                 "datatable"         : {
                                     "responsive"        : true,
@@ -587,7 +643,7 @@ class Filters extends AdminLTETags
                                         "canDelete"         : true,
                                     },
                                     "compareData"       : "rows",
-                                    "keepFieldsData"    : ["' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-andor"]
+                                    "keepFieldsData"    : ["' . $this->compSecId . '-filter-andor"]
                                 },
                                 "postExtraction": function(datatable, extractedData) {
                                     "use strict";
@@ -597,16 +653,16 @@ class Filters extends AdminLTETags
                                     extractedData[0][1]["extractedData"] = fieldData.replace(" (Numeric)", "");
                                 }
                             },
-                            "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-form" : {
+                            "' . $this->compSecId . '-filter-form" : {
                                 "rules"     : {
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "required",
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : "required",
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "required"
+                                    "' . $this->compSecId . '-filter-field" : "required",
+                                    "' . $this->compSecId . '-filter-operator" : "required",
+                                    "' . $this->compSecId . '-filter-value" : "required"
                                 },
                                 messages: {
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-field" : "Please select a field",
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-operator" : "Please select an operator",
-                                    "' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-filter-value" : "Please enter value. Numeric Fields only accept numbers or comma or decimal point"
+                                    "' . $this->compSecId . '-filter-field" : "Please select a field",
+                                    "' . $this->compSecId . '-filter-operator" : "Please select an operator",
+                                    "' . $this->compSecId . '-filter-value" : "Please enter value. Numeric Fields only accept numbers or comma or decimal point"
                                 }
                             }
                         }
