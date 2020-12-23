@@ -1,0 +1,36 @@
+{
+    "route"         : "customers",
+    "name"          : "Customers",
+    "description"   : "Manage customers via this component",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-customers",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Users\\Customers\\CustomersComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "users"      : {
+            "title"     : "users",
+            "icon"      : "users",
+            "childs"    : {
+                "customers"   : {
+                    "title"     : "Customers",
+                    "link"      : "users/customers"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}
