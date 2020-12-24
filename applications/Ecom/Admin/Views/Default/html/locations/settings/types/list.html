@@ -23,22 +23,14 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'location-types' : {
-                            'title'                   : 'Location Types',
-                            'size'                    : 'sm',
-                            'type'                    : 'secondary',
-                            'icon'                    : 'cog',
-                            'buttonAdditionalClass'   : 'contentAjaxLink',
-                            'url'                     : links.url('locations/settings/types')
-                        },
-                        'add-location' : {
-                            'title'                   : 'Add New Location',
+                        'add-location-type' : {
+                            'title'                   : 'Add New Location Type',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'plus',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('locations/q/id/0')
+                            'url'                     : links.url('locations/settings/types/q/id/0')
                         }
                     }
             },
@@ -52,6 +44,6 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No locations data available. Add location by clicking the Add new location button.'
+        'dtZeroRecords'         : 'No location types data available. Add location types by clicking the Add new location types button.'
     ]
 )}}

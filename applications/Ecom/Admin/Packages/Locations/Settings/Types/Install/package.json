@@ -1,0 +1,8 @@
+{
+    "name"          : "LocationsTypes",
+    "displayName"   : "Locations Types Package",
+    "description"   : "Package for Locations Types component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/package-dashboard-locations-types",
+    "settings"      : { }
+}

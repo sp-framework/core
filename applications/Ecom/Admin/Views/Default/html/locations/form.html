@@ -97,56 +97,24 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'type',
-                        'fieldLabel'                     : 'Location Type',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Location Type',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataSelect2Options'        :
-                            {
-                                '1'            :
-                                    {
-                                        'id'            : '1',
-                                        'name'          : 'Shop'
-                                    },
-                                '2'            :
-                                    {
-                                        'id'            : '2',
-                                        'name'          : 'Warehouse'
-                                    },
-                                '3'            :
-                                    {
-                                        'id'            : '3',
-                                        'name'          : 'Office'
-                                    },
-                                '4'            :
-                                    {
-                                        'id'            : '4',
-                                        'name'          : 'Home Office'
-                                    },
-                                '5'            :
-                                    {
-                                        'id'            : '5',
-                                        'name'          : 'Storage'
-                                    },
-                                '6'            :
-                                    {
-                                        'id'            : '6',
-                                        'name'          : 'Show Grounds'
-                                    }
-                            },
-                        'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'name',
-                        'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : locationType
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'type',
+                        'fieldLabel'                            : 'Location Type',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Location Type',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : locationsTypes,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : locationType
                     ]
                 )}}
             </div>
@@ -266,6 +234,7 @@
                 )}}
             </div>
         </div>
+        <hr>
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 {% include 'common/address/view' with

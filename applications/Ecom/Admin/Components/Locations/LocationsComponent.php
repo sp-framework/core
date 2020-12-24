@@ -4,6 +4,7 @@ namespace Applications\Ecom\Admin\Components\Locations;
 
 use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Ecom\Admin\Packages\Locations\Locations;
+use Applications\Ecom\Admin\Packages\Locations\Settings\Types\LocationsTypes;
 use System\Base\BaseComponent;
 
 class LocationsComponent extends BaseComponent
@@ -15,6 +16,7 @@ class LocationsComponent extends BaseComponent
     public function initialize()
     {
         $this->locations = $this->usePackage(Locations::class);
+        $this->locationsTypes = $this->usePackage(LocationsTypes::class);
     }
 
     /**
@@ -26,6 +28,8 @@ class LocationsComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $this->view->location = $this->locations->getById($this->getData()['id']);
             }
+
+            $this->view->locationsTypes = $this->locationsTypes->getAll()->locationstypes;
 
             $this->view->accounts = $this->accounts->getAll()->accounts;
 
