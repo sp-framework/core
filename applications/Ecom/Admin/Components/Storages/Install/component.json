@@ -19,7 +19,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 9,
+        "seq"           : 4,
         "storages" : {
             "icon"      : "boxes",
             "title"     : "storages",

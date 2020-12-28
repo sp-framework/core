@@ -19,7 +19,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 3,
+        "seq"           : 2,
         "apps" : {
             "icon"      : "th-large",
             "title"     : "apps",

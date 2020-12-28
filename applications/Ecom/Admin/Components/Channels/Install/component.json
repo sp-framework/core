@@ -19,7 +19,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 4,
+        "seq"           : 7,
         "channels" : {
             "icon"      : "store",
             "title"     : "channels",

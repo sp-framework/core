@@ -19,7 +19,7 @@
         "views"         : []
     },
     "menu"              : {
-        "seq"           : 4,
+        "seq"           : 8,
         "users"      : {
             "title"     : "users",
             "icon"      : "users",
