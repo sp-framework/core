@@ -2,9 +2,9 @@
 
 namespace Applications\Ecom\Admin\Components\Businesses;
 
-use Applications\Ecom\Admin\Packages\ABNLookup\ABNLookup;
-use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
-use Applications\Ecom\Admin\Packages\Businesses\Businesses;
+use Applications\Ecom\Common\Packages\ABNLookup\ABNLookup;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\Businesses\Businesses;
 use System\Base\BaseComponent;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 

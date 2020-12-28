@@ -1,0 +1,43 @@
+{
+    "route"         : "taxes",
+    "name"          : "Taxes",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "description"   : "List taxes via this component",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-taxes",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Taxes\\TaxesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "settings"      : {
+            "title"     : "settings",
+            "icon"      : "cogs",
+            "childs"    : {
+                "finance"       : {
+                    "title"     : "finance",
+                    "icon"      : "dollar-sign",
+                    "childs"    : {
+                        "taxes" : {
+                            "title"     : "taxes",
+                            "link"      : "taxes"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : true
+    }
+}

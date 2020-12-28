@@ -2,7 +2,7 @@
 
 namespace Applications\Ecom\Admin\Components\Filters;
 
-use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 
 class FiltersComponent extends BaseComponent

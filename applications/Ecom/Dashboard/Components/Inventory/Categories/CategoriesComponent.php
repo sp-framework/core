@@ -3,7 +3,7 @@
 namespace Applications\Ecom\Dashboard\Components\Inventory\Categories;
 
 use Applications\Ecom\Dashboard\Packages\AdminLTETags\Traits\DynamicTable;
-use Applications\Ecom\Dashboard\Packages\Channels\Channels;
+use Applications\Ecom\Common\Packages\Channels\Channels;
 use Applications\Ecom\Dashboard\Packages\Inventory\Categories\Categories;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;

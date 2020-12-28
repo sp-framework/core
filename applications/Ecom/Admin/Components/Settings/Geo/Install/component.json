@@ -1,0 +1,37 @@
+{
+    "route"         : "geo",
+    "name"          : "Geo",
+    "description"   : "Manage admin geo via this component",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-geo",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Geo\\GeoComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "settings"      : {
+            "title"     : "settings",
+            "icon"      : "cogs",
+            "childs"    : {
+                "geo"   : {
+                    "title"     : "Geo Locations",
+                    "link"      : "geo"
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : true
+    }
+}

@@ -2,9 +2,8 @@
 
 namespace Applications\Ecom\Admin\Components\Locations;
 
-use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
-use Applications\Ecom\Admin\Packages\Locations\Locations;
-use Applications\Ecom\Admin\Packages\Locations\Settings\Types\LocationsTypes;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\Locations\Locations;
 use System\Base\BaseComponent;
 
 class LocationsComponent extends BaseComponent

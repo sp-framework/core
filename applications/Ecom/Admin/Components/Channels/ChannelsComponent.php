@@ -2,9 +2,9 @@
 
 namespace Applications\Ecom\Admin\Components\Channels;
 
-use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
-use Applications\Ecom\Admin\Packages\Channels\Channels;
-use Applications\Ecom\Admin\Packages\Locations\Model\Locations;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\Channels\Channels;
+use Applications\Ecom\Common\Packages\Locations\Model\Locations;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 

@@ -1,8 +1,0 @@
-{
-    "name"          : "AdminLTETags",
-    "displayName"   : "Dashboard AdminLTETags Package",
-    "description"   : "Package for volt tags",
-    "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/package-dashboard-adminltetags",
-    "settings"      : { }
-}

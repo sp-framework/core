@@ -2,7 +2,7 @@
 
 namespace Applications\Ecom\Admin\Components\Domains;
 
-use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 
 class DomainsComponent extends BaseComponent
