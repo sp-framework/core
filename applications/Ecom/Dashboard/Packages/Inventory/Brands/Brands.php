@@ -42,7 +42,7 @@ class Brands extends BasePackage
 
     public function removeBrand(array $data)
     {
-        $brand = $this->getById($id);
+        $brand = $this->getById($data['id']);
 
         if ($brand['product_count'] && (int) $brand['product_count'] > 0) {
             $this->packagesData->responseCode = 1;

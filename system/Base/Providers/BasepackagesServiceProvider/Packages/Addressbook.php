@@ -15,25 +15,12 @@ class Addressbook extends BasePackage
 
     public $addressbook;
 
-    public function getAddressByReference(string $refId)
-    {
-        return
-            $this->getByParams(
-                [
-                    'conditions'    => 'ref_id = :refid:',
-                    'bind'          => [
-                        'refid'       => $refId
-                    ]
-                ]
-            );
-    }
-
     public function addAddress(array $data)
     {
         if ($this->add($data)) {
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Added ' . $data['ref_id'] . ' address';
+            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' address';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -46,7 +33,7 @@ class Addressbook extends BasePackage
         if ($this->update($data)) {
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['ref_id'] . ' address';
+            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' address';
         } else {
             $this->packagesData->responseCode = 1;
 

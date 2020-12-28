@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider;
 
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Addressbook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Domains;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
@@ -88,5 +89,12 @@ class Basepackages
 		$this->storages = (new Storages())->init();
 
 		return $this->storages;
+	}
+
+	protected function initAddressbook()
+	{
+		$this->addressbook = (new Addressbook())->init();
+
+		return $this->addressbook;
 	}
 }
