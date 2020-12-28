@@ -18,6 +18,10 @@
 			"timeout"		: 60,
 			"service"		: "streamCache"
 		},
+		"security"			: {
+			"passwordWorkFactor"	: "",
+			"cookiesWorkFactor"	    : ""
+		},
 		"logs"			: {
 			"enabled"			: "true",
 			"level"				: "DEBUG",

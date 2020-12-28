@@ -26,10 +26,14 @@ class SecTools
         return $this;
     }
 
-    public function hashPassword(string $password)
+    public function hashPassword(string $password, $workFactor = null)
     {
+        if ($workFactor) {
+            $this->security->setWorkFactor($workFactor);
+        }
+
         try {
-            return $this->security->hash($password);
+            return $this->security->hash($password, $this->security->getWorkFactor());
         } catch (\Exception $e) {
             throw $e;
         }

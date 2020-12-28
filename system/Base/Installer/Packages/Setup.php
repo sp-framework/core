@@ -72,8 +72,6 @@ class Setup
 
 		$this->security = $this->container->getShared('security');
 
-		$this->configs = new Configs();
-
 		if ($this->request->isPost()) {
 			$this->dbConfig =
 					[
@@ -219,10 +217,27 @@ class Setup
 					}
 				}
 			}
+
+			$commonPackages = $this->localContent->listContents('applications/Ecom/Common/Packages/', true);
+
+			foreach ($commonPackages as $commonPackageKey => $commonPackage) {
+				if ($commonPackage['basename'] === 'package.json') {
+					$jsonFile =
+						json_decode(
+							$this->localContent->read($commonPackage['path']),
+							true
+						);
+
+					if (!$jsonFile) {
+						throw new \Exception('Problem reading package.json at location ' . $commonPackage['path']);
+					}
+
+					$this->registerCommonPackage($jsonFile);
+				}
+			}
 		} else if ($type === 'middlewares') {
 
-			$adminMiddlewares =
-				$this->localContent->listContents('applications/Ecom/Admin/Middlewares/', true);
+			$adminMiddlewares = $this->localContent->listContents('applications/Ecom/Admin/Middlewares/', true);
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
@@ -237,6 +252,24 @@ class Setup
 					}
 
 					$this->registerAdminMiddleware($jsonFile);
+				}
+			}
+
+			$commonMiddlewares = $this->localContent->listContents('applications/Ecom/Common/Middlewares/', true);
+
+			foreach ($commonMiddlewares as $commonMiddlewareKey => $commonMiddleware) {
+				if ($commonMiddleware['basename'] === 'middleware.json') {
+					$jsonFile =
+						json_decode(
+							$this->localContent->read($commonMiddleware['path']),
+							true
+						);
+
+					if (!$jsonFile) {
+						throw new \Exception('Problem reading middleware.json at location ' . $commonMiddleware['path']);
+					}
+
+					$this->registerCommonMiddleware($jsonFile);
 				}
 			}
 		} else if ($type === 'views') {
@@ -290,9 +323,23 @@ class Setup
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
 
+	protected function registerCommonPackage(array $packageFile)
+	{
+		$installedFiles = $this->getInstalledFiles('applications/Ecom/Common/Packages/' . $packageFile['name']);
+
+		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
+	}
+
 	public function registerAdminMiddleware(array $middlewareFile)
 	{
 		$installedFiles = $this->getInstalledFiles('applications/Ecom/Admin/Middlewares/' . $middlewareFile['name']);
+
+		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
+	}
+
+	public function registerCommonMiddleware(array $middlewareFile)
+	{
+		$installedFiles = $this->getInstalledFiles('applications/Ecom/Common/Middlewares/' . $middlewareFile['name']);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
@@ -336,9 +383,9 @@ class Setup
 		return (new RegisterRootAdminRole())->register($this->db);
 	}
 
-	public function registerAdminAccount($adminRoleId)
+	public function registerAdminAccount($adminRoleId, $workFactor = 12)
 	{
-		$password = $this->security->hash($this->postData['pass']);
+		$password = $this->container['secTools']->hashPassword($this->postData['pass'], $workFactor);
 
 		return (new RegisterRootAdminAccount())->register($this->db, $this->postData['email'], $password, $adminRoleId);
 	}
@@ -378,12 +425,12 @@ class Setup
 
 	public function writeConfigs($coreJson)
 	{
-		return $this->configs->write($this->container, $this->postData, $coreJson);
+		return (new Configs($this->container, $this->postData, $coreJson))->write();
 	}
 
 	public function revertBaseConfig($coreJson)
 	{
-		$this->configs->revert($this->container, $this->postData, $coreJson);
+		return (new Configs($this->container, $this->postData, $coreJson))->revert();
 	}
 
 	public function removeInstaller()

@@ -13,6 +13,8 @@ class Auth
 
     protected $separator = '|';
 
+    protected $config;
+
     protected $session;
 
     protected $cookies;
@@ -33,8 +35,19 @@ class Auth
 
     public $packagesData;
 
-    public function __construct($session, $cookies, $accounts, $applications, $secTools, $validation, $logger, $links)
-    {
+    public function __construct(
+        $config,
+        $session,
+        $cookies,
+        $accounts,
+        $applications,
+        $secTools,
+        $validation,
+        $logger,
+        $links
+    ) {
+        $this->config = $config;
+
         $this->session = $session;
 
         $this->cookies = $cookies;
@@ -161,7 +174,7 @@ class Auth
 
         if ($this->secTools->passwordNeedsRehash($this->account['password'])) {
 
-            $this->account['password'] = $this->secTools->hashPassword($data['pass']);
+            $this->account['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
             $this->account['can_login'] = Json::encode($this->account['can_login']);
 
             $this->accounts->update($this->account);
@@ -270,14 +283,21 @@ class Auth
     {
         $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
 
-        $accountToken = Json::decode($this->account['remember_token'], true)[$cookieKey];
+        if ($this->account['remember_token']) {
+            $accountToken = Json::decode($this->account['remember_token'], true)[$cookieKey];
+        } else {
+            $accountToken = '';
+        }
 
-        list($identifier, $token) =
-            explode($this->separator, $this->cookies->get($cookieKey)->getValue());
+        if ($this->account['remember_identifier']) {
+            $accountIdentifier = Json::decode($this->account['remember_identifier'], true)[$cookieKey];
+        } else {
+            $accountIdentifier = '';
+        }
 
-        $identifierUser = $this->accounts->checkAccount($identifier);
+        list($identifier, $token) = explode($this->separator, $this->cookies->get($cookieKey)->getValue());
 
-        if ($this->account !== $identifierUser) {
+        if ($accountIdentifier !== $identifier) {
 
             $this->cookies->delete($cookieKey);
 
@@ -290,15 +310,23 @@ class Auth
 
             $this->cookies->delete($cookieKey);
 
-            $this->logger->log->debug('Cannot set account : ' . $this->account['email'] . ' via cookie for application: ' . $this->application['name']);
+            $this->logger->log->debug(
+                'Cannot set account : ' . $this->account['email'] . ' via cookie for application: ' . $this->application['name']
+            );
 
             throw new \Exception('Cannot set account from cookie');
         }
+
+        return true;
     }
 
     public function hasRecaller()
     {
-        return $this->cookies->has('remember' . $this->getKey());
+        if ($this->account) {
+            return $this->cookies->has('remember_' . $this->account['id'] . '_' . $this->getKey());
+        }
+
+        return false;
     }
 
     protected function setRememberToken()
@@ -334,7 +362,8 @@ class Auth
         } else {
             $this->account['remember_token'] = [];
         }
-        $this->account['remember_token'][$cookieKey] = $this->secTools->hashPassword($token);
+
+        $this->account['remember_token'][$cookieKey] = $this->secTools->hashPassword($token, $this->config->security->cookiesWorkFactor);
         $this->account['remember_token'] = Json::encode($this->account['remember_token']);
 
         $this->accounts->update($this->account);
@@ -482,7 +511,7 @@ class Auth
             return false;
         }
 
-        $this->account['password'] = $this->secTools->hashPassword($data['newpass']);
+        $this->account['password'] = $this->secTools->hashPassword($data['newpass'], $this->config->security->passwordWorkFactor);
         $this->account['force_pwreset'] = null;
         $this->setSessionAndToken($data);
         $this->accounts->updateAccount($this->account);

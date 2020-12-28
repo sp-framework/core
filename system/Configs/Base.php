@@ -18,6 +18,11 @@ return
 			"timeout"			=> 60, //Global Cache timeout in seconds
 			"service"			=> "streamCache"
 		],
+		"security"		=>
+		[
+			"passwordWorkFactor"=> 8,
+			"cookiesWorkFactor" => 4,
+		],
 		"logs"			=>
 		[
 			"enabled"			=> true,

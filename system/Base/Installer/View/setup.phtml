@@ -79,16 +79,6 @@
 													</div>
 												</div>
 											</div>
-<!-- 											<div class="col text-center">
-												<div class="btn-group btn-group-toggle" data-toggle="buttons">
-													<label class="btn btn-secondary">
-														<input type="radio" name="debug-options" class="debug-options" id="production">Production
-													</label>
-													<label class="btn btn-primary active">
-														<input type="radio" name="debug-options" class="debug-options" id="development" checked>Development
-													</label>
-												</div>
-											</div> -->
 										</div>
 									</div>
 									<div class="col-6 p-3">
@@ -105,6 +95,33 @@
 												<input type="password" name="pass" id="pass" class="form-control">
 											</div>
 										</div>
+										<hr>
+										<legend>Security</legend>
+										<div class="form-group">
+											<label for="pwf">Password Encryption Level *</label>
+											<div class="input-group">
+												<input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control" value="8" disabled>
+											</div>
+										</div>
+										<div class="form-group">
+											<label for="cwf">Cookies Encryption Level *</label>
+											<div class="input-group">
+												<input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control" value="8" disabled>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col">
+												<div class="form-group">
+													<div class="checkbox icheck-info">
+														<input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
+														<label for="auto-encrypt-level">
+															Calculate level as per system configuration
+														</label>
+													</div>
+												</div>
+											</div>
+										</div>
+										<small>Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
 										<hr>
 										<legend>Geo Location (Country of operation)</legend>
 										<div class="input-group mb-3">
@@ -146,10 +163,6 @@
 			</div>
 		</div>
 		<script type="text/javascript">
-			// $(document).ready(function() {
-				// $('.card-header').html('Bazaari Framework Core Setup');
-			// });
-
 			$('#submit').click(function() {
 				$(this).attr('disabled', true);
 				$('#submit-spinner').attr('hidden', false);
@@ -204,22 +217,38 @@
 					});
 					$('#submit-spinner').attr('hidden', true);
 					$('#submit').attr('disabled', false);
+				} else if ($('#pwf').val() === '') {
+					$('#pwf').addClass('is-invalid');
+					$('#pwf').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
+				} else if ($('#cwf').val() === '') {
+					$('#cwf').addClass('is-invalid');
+					$('#cwf').focus(function() {
+						$(this).removeClass('is-invalid');
+					});
+					$('#submit-spinner').attr('hidden', true);
+					$('#submit').attr('disabled', false);
 				} else {
 					$.ajax({
 						type    : 'POST',
 						url     : '/',
 						data    :
 							{
-								"host"          : $('#host').val(),
-								"port"          : $('#port').val(),
-								"database_name" : $('#database_name').val(),
-								"username"      : $('#username').val(),
-								"password"      : $('#password').val(),
-								"drop"          : $('#drop')[0].checked,
-								// "debug"         : $("input[name='debug-options']:checked")[0].id,
-								"email"      	: $('#email').val(),
-								"pass"      	: $('#pass').val(),
-								"country"      	: $('#country').val()
+								"host"          		: $('#host').val(),
+								"port"          		: $('#port').val(),
+								"database_name" 		: $('#database_name').val(),
+								"username"      		: $('#username').val(),
+								"password"      		: $('#password').val(),
+								"drop"          		: $('#drop')[0].checked,
+								"email"      			: $('#email').val(),
+								"pass"      			: $('#pass').val(),
+								"pwf"       			: $('#pwf').val(),
+								"cwf"       			: $('#cwf').val(),
+								"auto-encrypt-level"  	: $('#auto-encrypt-level')[0].checked,
+								"country"      			: $('#country').val()
 							},
 						dataType: 'json',
 						success: function (data) {
@@ -257,21 +286,29 @@
 				}
 			});
 
-			$('.debug-options').each(function(index, option) {
-				$($(option).parent()).click(function() {
-					var selectedOptionId = $(this).children()[0].id;
-
-					if (selectedOptionId === 'production') {
-						$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
-						$('#development').parent().removeClass('btn-primary').addClass('btn-secondary');
-					}
-
-					if (selectedOptionId === 'development') {
-						$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
-						$('#production').parent().removeClass('btn-primary').addClass('btn-secondary');
-					}
-				});
+			$('#auto-encrypt-level').click(function() {
+				if ($(this)[0].checked === true) {
+					$('#pwf, #cwf').attr('disabled', true);
+				} else if ($(this)[0].checked === false) {
+					$('#pwf, #cwf').attr('disabled', false);
+				}
 			});
+
+			// $('.debug-options').each(function(index, option) {
+			// 	$($(option).parent()).click(function() {
+			// 		var selectedOptionId = $(this).children()[0].id;
+
+			// 		if (selectedOptionId === 'production') {
+			// 			$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+			// 			$('#development').parent().removeClass('btn-primary').addClass('btn-secondary');
+			// 		}
+
+			// 		if (selectedOptionId === 'development') {
+			// 			$('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+			// 			$('#production').parent().removeClass('btn-primary').addClass('btn-secondary');
+			// 		}
+			// 	});
+			// });
 		</script>
 	</body>
 </html>
