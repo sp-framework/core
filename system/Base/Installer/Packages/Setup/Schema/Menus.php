@@ -20,18 +20,26 @@ class Menus
                             'primary'       => true,
                         ]
                     ),
-                    new Column(
-                        'application_id',
-                        [
-                            'type'    => Column::TYPE_TINYINTEGER,
-                            'notNull' => true,
-                        ]
-                    ),
+                    // new Column(
+                    //     'application_id',
+                    //     [
+                    //         'type'    => Column::TYPE_TINYINTEGER,
+                    //         'notNull' => true,
+                    //     ]
+                    // ),
                     new Column(
                         'menu',
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 4096,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
+                        'applications',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 2048,
                             'notNull' => true,
                         ]
                     ),

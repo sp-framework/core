@@ -8,9 +8,7 @@ class Menus extends BaseModel
 {
     public $id;
 
-    public $application_id;
-
     public $menu;
 
-    public $sequence;
+    public $applications;
 }

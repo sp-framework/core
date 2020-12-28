@@ -21,7 +21,7 @@ class Package
 					Json::encode($packageFile['settings']) :
 					null,
 				'applications'			=>
-					Json::encode(['1'=>['installed'=>true]]),
+					Json::encode(['1'=>['enabled'=>true]]),
 				'files'					=> Json::encode($installedFiles)
 			]
 		);

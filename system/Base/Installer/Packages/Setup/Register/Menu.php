@@ -11,9 +11,16 @@ class Menu
         $insertMenu = $db->insertAsDict(
             'menus',
             [
-                'application_id'    => 1,
-                'menu'              => Json::encode($menu),
-                'sequence'          => $sequence
+                'menu'                  => Json::encode($menu),
+                'applications'          =>
+                    Json::encode(
+                        ['1' =>
+                            ['enabled' => true,
+                             // 'sequence' => $sequence
+                            ]
+                        ]
+                    ),
+                'sequence'              => $sequence
             ]
         );
 

@@ -107,6 +107,20 @@ class Components
 						]
 					),
 					new Column(
+						'menu_id',
+						[
+							'type'    => Column::TYPE_SMALLINTEGER,
+							'notNull' => false,
+						]
+					),
+					new Column(
+						'installed',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'applications',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -137,6 +151,21 @@ class Components
 							'notNull' => false,
 						]
 					),
+					new Column(
+						'updated_by',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'updated_on',
+						[
+							'type'    => Column::TYPE_TIMESTAMP,
+							'notNull' => true,
+							'default' => 'CURRENT_TIMESTAMP',
+						]
+					)
 				]
 			];
 	}

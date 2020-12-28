@@ -27,5 +27,6 @@
         }
     },
     "settings"          : {
+        "mandatory"     : true
     }
 }

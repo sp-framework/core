@@ -223,8 +223,8 @@ class Views extends BasePackage
                 function($view) use ($applicationId, $name) {
                     $view = $view->toArray();
                     $view['applications'] = Json::decode($view['applications'], true);
-                    if ((isset($view['applications'][$applicationId]['installed']) &&
-                        $view['applications'][$applicationId]['installed'] === true) &&
+                    if ((isset($view['applications'][$applicationId]['enabled']) &&
+                        $view['applications'][$applicationId]['enabled'] === true) &&
                         $view['name'] === ucfirst($name)
                     ) {
                         return $view;
@@ -248,8 +248,8 @@ class Views extends BasePackage
                 function($view) use ($applicationId) {
                     $view = $view->toArray();
                     $view['applications'] = Json::decode($view['applications'], true);
-                    if (isset($view['applications'][$applicationId]['installed']) &&
-                        $view['applications'][$applicationId]['installed'] === true
+                    if (isset($view['applications'][$applicationId]['enabled']) &&
+                        $view['applications'][$applicationId]['enabled'] === true
                     ) {
                         return $view;
                     }
@@ -299,5 +299,46 @@ class Views extends BasePackage
         }
 
         return $views;
+    }
+
+    public function updateViews(array $data)
+    {
+        $views = Json::decode($data['views'], true);
+
+        foreach ($views as $viewId => $status) {
+            $view = $this->getById($viewId);
+
+            $view['applications'] = Json::decode($view['applications'], true);
+
+            if ($status === true) {
+                $view['applications'][$data['id']]['enabled'] = true;
+            } else if ($status === false) {
+                $view['applications'][$data['id']]['enabled'] = false;
+            }
+
+            $view['applications'] = Json::encode($view['applications']);
+
+            $view['settings'] = Json::decode($view['settings'], true);
+
+            if (isset($view['settings']['tags'])) {
+                $package = $this->modules->packages->getNamePackage($view['settings']['tags']);
+
+                if ($package) {
+                    $package['applications'] = Json::decode($package['applications'], true);
+
+                    $package['applications'][$data['id']]['enabled'] = true;
+
+                    $package['applications'] = Json::encode($package['applications']);
+
+                    $this->modules->packages->update($package);
+                }
+            }
+
+            $view['settings'] = Json::encode($view['settings']);
+
+            $this->update($view);
+        }
+
+        return true;
     }
 }

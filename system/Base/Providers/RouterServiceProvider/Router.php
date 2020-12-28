@@ -263,7 +263,6 @@ class Router
 	protected function validateDomain()
 	{
 		$this->domain = $this->domains->getDomain();
-
 		if (!$this->domain) {
 			$this->logger->log->alert(
 				'Domain ' . $this->request->getHttpHost() . ' is not registered with system!'
@@ -292,6 +291,7 @@ class Router
 		if (!isset($this->domain['applications'][$this->applicationInfo['id']])) {
 			return false;
 		}
+
 		$this->applicationDefaults['id'] = $this->applicationInfo['id'];
 		$this->applicationDefaults['application'] = $this->applicationInfo['route'];
 		$this->applicationDefaults['category'] = $this->applicationInfo['category'];

@@ -29,7 +29,7 @@ class Components extends BasePackage
 					$component['applications'] = Json::decode($component['applications'], true);
 
 					if (isset($component['applications'][$applicationId])) {
-						if ($component['applications'][$applicationId]['installed'] === true &&
+						if ($component['applications'][$applicationId]['enabled'] === true &&
 							$component['route'] === $route
 						) {
 							return $component;
@@ -56,7 +56,7 @@ class Components extends BasePackage
 					$component['applications'] = Json::decode($component['applications'], true);
 
 					if (isset($component['applications'][$applicationId])) {
-						if ($component['applications'][$applicationId]['installed'] === true &&
+						if ($component['applications'][$applicationId]['enabled'] === true &&
 							$component['name'] === ucfirst($name)
 						) {
 							return $component;
@@ -152,5 +152,66 @@ class Components extends BasePackage
 		}
 
 		return $components;
+	}
+
+	public function updateComponents(array $data)
+	{
+		$components = Json::decode($data['components'], true);
+
+		foreach ($components as $componentId => $status) {
+			$component = $this->getById($componentId);
+
+			$component['applications'] = Json::decode($component['applications'], true);
+
+			// if (isset($component['applications'][$data['id']])) {
+			// 	if ($status !== $component['applications'][$data['id']]['enabled']) {
+			// 		if ($status === true) {
+			// 			$component['applications'][$data['id']]['enabled'] = true;
+			// 		} else if ($status === false) {
+			// 			$component['applications'][$data['id']]['enabled'] = false;
+			// 		}
+			// 		$this->updateMenu($data, $component, $status);
+
+			// 		$component['applications'] = Json::encode($component['applications']);
+
+			// 		$this->update($component);
+			// 	}
+			// } else {
+				if ($status === true) {
+					$component['applications'][$data['id']]['enabled'] = true;
+				} else if ($status === false) {
+					$component['applications'][$data['id']]['enabled'] = false;
+				}
+
+				if ($component['menu_id']) {
+					$this->updateMenu($data, $component, $status);
+				}
+
+				$component['applications'] = Json::encode($component['applications']);
+
+				$this->update($component);
+			// }
+		}
+
+		return true;
+	}
+
+	protected function updateMenu($data, $component, $status)
+	{
+		$menu = $this->basepackages->menus->getById($component['menu_id']);
+
+		$menu['applications'] = Json::decode($menu['applications'], true);
+
+		if ($status === true) {
+			$menu['applications'][$data['id']]['enabled'] = true;
+		} else if ($status === false) {
+			$menu['applications'][$data['id']]['enabled'] = false;
+		}
+
+		$menu['applications'] = Json::encode($menu['applications']);
+
+		$this->basepackages->menus->update($menu);
+
+		$this->basepackages->menus->init(true);
 	}
 }

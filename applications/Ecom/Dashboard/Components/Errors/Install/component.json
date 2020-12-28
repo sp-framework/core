@@ -3,7 +3,7 @@
 	"name"			: "Errors",
 	"description"	: "Component to manage Errors on Dashboard Application",
 	"category"      : "ecom",
-	"sub_category"  : "admin",
+	"sub_category"  : "dashboard",
 	"version"		: "0.0.1",
 	"repo"			: "https://github.com/h-w-f/component-admin-errors",
 	"class"			: "Applications\\Ecom\\Dashboard\\Components\\Errors\\ErrorsComponent",

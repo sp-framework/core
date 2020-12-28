@@ -27,7 +27,9 @@ class ModulesComponent extends BaseComponent
 
 		foreach ($repositoriesArr as $key => $value) {
 			$repositories[$key] = $value;
-			$repositories[$key]['data']['url'] = $repositoriesArr[$key]['url'];
+			$repositories[$key]['data']['repo_url'] = $repositoriesArr[$key]['repo_url'];
+			$repositories[$key]['data']['site_url'] = $repositoriesArr[$key]['site_url'];
+			$repositories[$key]['data']['branch'] = $repositoriesArr[$key]['branch'];
 		}
 
 		$this->view->repositories = $repositories;
@@ -40,7 +42,7 @@ class ModulesComponent extends BaseComponent
 		$filters[] =
 			[
 				'id' => 'core',
-				'name' => 'core'
+				'name' => 'Core'
 			];
 		foreach ($applicationsArr as $key => $value) {
 			$filters[] =

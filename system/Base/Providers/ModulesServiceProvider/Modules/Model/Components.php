@@ -30,6 +30,10 @@ class Components extends BaseModel
 
     public $menu;
 
+    public $menu_id;
+
+    public $installed;
+
     public $applications;
 
     public $files;
@@ -37,4 +41,8 @@ class Components extends BaseModel
     public $update_available;
 
     public $update_version;
+
+    public $updated_by;
+
+    public $updated_on;
 }

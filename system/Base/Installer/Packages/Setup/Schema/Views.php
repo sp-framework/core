@@ -113,6 +113,21 @@ class Views
 							'notNull' => false,
 						]
 					),
+					new Column(
+						'updated_by',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'updated_on',
+						[
+							'type'    => Column::TYPE_TIMESTAMP,
+							'notNull' => true,
+							'default' => 'CURRENT_TIMESTAMP',
+						]
+					)
 				]
 			];
 	}

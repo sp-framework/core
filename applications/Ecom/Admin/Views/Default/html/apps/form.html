@@ -5,21 +5,7 @@
     {% set applicationRouteDisabled = true %}
     {% set applicationCategory = application['category'] %}
     {% set applicationSubCategory = application['sub_category'] %}
-    {% if applicationCategory === 'core' and applicationSubCategory === 'admin' %}
-        {% set applicationCategoryDisabled = true %}
-        {% set applicationSubCategoryDisabled = true %}
-    {% else %}
-        {% set applicationCategoryDisabled = false %}
-        {% set applicationSubCategoryDisabled = false %}
-    {% endif %}
     {% set applicationDescription = application['description'] %}
-    {% set applicationDefaultComponent = application['default_component'] %}
-    {% set applicationDefaultComponentDisabled = false %}
-    {% set applicationErrorsComponent = application['errors_component'] %}
-    {% set applicationErrorsComponentDisabled = false %}
-    {# {% set applicationDefaultView = application['default_view'] %}
-    {% set applicationDefaultViewDisabled = false %}
-    {% set applicationDefaultEmailService = application['default_email_service'] %} #}
     {% if application['registration_allowed'] == true %}
         {% set registrationAllowed = true %}
     {% else %}
@@ -35,18 +21,7 @@
     {% set applicationRouteDisabled = false %}
     {% set applicationCategory = '' %}
     {% set applicationSubCategory = '' %}
-    {% set applicationCategoryDisabled = false %}
-    {% set applicationSubCategoryDisabled = false %}
     {% set applicationDescription = '' %}
-    {% set applicationDefaultComponent = '' %}
-    {% set applicationDefaultComponentDisabled = true %}
-    {% set applicationErrorsComponent = '' %}
-    {% set applicationErrorsComponentDisabled = true %}
-    {# {% set applicationDefaultView = '' %}
-    {% set applicationDefaultViewDisabled = true %}
-    {% set applicationDefaultEmailService = '' %} #}
-    {% set components = [] %}
-    {# {% set views = [] %} #}
     {% set registrationAllowed = '' %}
     {% set applicationRegistrationRoleId = '' %}
     {% set applicationGuestRoleId = '' %}
@@ -124,6 +99,8 @@
                     ]
                 )}}
             </div>
+        </div>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -137,7 +114,6 @@
                         'fieldHelp'                            : true,
                         'fieldHelpTooltipContent'              : 'App Category suggests which components can be installed on this application.',
                         'fieldRequired'                        : true,
-                        'fieldDisabled'                        : applicationCategoryDisabled,
                         'fieldBazScan'                         : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
@@ -162,7 +138,6 @@
                         'fieldHelp'                            : true,
                         'fieldHelpTooltipContent'              : 'App Sub Category suggests which components can be installed on this application.',
                         'fieldRequired'                        : true,
-                        'fieldDisabled'                        : applicationSubCategoryDisabled,
                         'fieldBazScan'                         : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
@@ -199,108 +174,6 @@
                     ]
                 )}}
             </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'default_component',
-                        'fieldLabel'                     : 'Default Component',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a default component for this application.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : applicationDefaultComponentDisabled,
-                        'fieldDataSelect2Options'        : components,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': applicationDefaultComponent
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'errors_component',
-                        'fieldLabel'                     : 'Errors Component',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select an errors component for this application.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : false,
-                        'fieldDisabled'                  : applicationErrorsComponentDisabled,
-                        'fieldDataSelect2Options'        : components,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': applicationErrorsComponent
-                    ]
-                )}}
-            </div>
-{#             <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'default_view',
-                        'fieldLabel'                     : 'Default View (Template)',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a default view for this application.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDisabled'                  : applicationDefaultViewDisabled,
-                        'fieldDataSelect2Options'        : views,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': applicationDefaultView
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'default_email_service',
-                        'fieldLabel'                     : 'Default Email Service',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select email service for this application. Email will be sent out using these service.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : false,
-                        'fieldDataSelect2Options'        : emailservices,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'name',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': applicationDefaultEmailService
-                    ]
-                )}}
-            </div> #}
         </div>
         <hr>
         <div class="row">
@@ -418,83 +291,6 @@
                 )}}
             </div>
         </div>
-        <hr>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'middlewares',
-                        'fieldLabel'                     : 'Middlewares',
-                        'fieldHelp'                      : true,
-                        'fieldAdditionalClass'           : 'mb-1',
-                        'fieldHelpTooltipContent'        : 'Middlewares are piece of software that are run before the main content.<br> Example: Auth Middleware. It makes sure that users are authenticated before they can access the main content.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'html',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-                {% if middlewares|length > 0 %}
-                    {% for middleware in middlewares %}
-                        {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-middleware-' ~ middleware['name']] = middleware['name'] %}
-                        {% if middleware['enabled'] == 1 %}
-                            {% set middlewareChecked = true %}
-                        {% elseif middleware['enabled'] == 0 %}
-                            {% set middlewareChecked = false %}
-                        {% endif %}
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'middleware-' ~ middleware['name'],
-                                'fieldLabel'                     : false,
-                                'fieldType'                      : 'checkbox',
-                                'fieldCheckboxType'              : 'success',
-                                'fieldCheckboxLabel'             : middleware['display_name'],
-                                'fieldCheckboxChecked'           : middlewareChecked,
-                                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                                'fieldBazScan'                   : false,
-                                'fieldDataAttributes'            :
-                                [
-                                    'middleware'    : middleware['id']
-                                ]
-                            ]
-                        )}}
-                    {% endfor %}
-                    {% set checkboxIds = json_encode(checkboxIds, 16) %}
-                {% else %}
-                    <label>No middlewares installed for this application. Go to modules and install the middleware you need.</label>
-                    {% set checkboxIds = json_encode([]) %}
-                {% endif %}
-            </div>
-            <div class="col">
-                {% if middlewares|length > 0 %}
-                    <label>Middleware Sequence (Drag and drop to change sequence)</label>
-                    <ul class="list-group" id="{{componentId}}-{{sectionId}}-sortable-middlewares">
-                        {% for middleware in middlewares %}
-                            {% if middleware['enabled'] == 1 %}
-                                {% set disabled = '' %}
-                                {% set area = 'false' %}
-                            {% elseif middleware['enabled'] == 0 %}
-                                {% set disabled = 'disabled' %}
-                                {% set area = 'true' %}
-                            {% endif %}
-                            <li class="list-group-item list-group-item-secondary {{disabled}}" area-disabled="{{area}}" style="cursor: pointer" data-id="{{middleware['id']}}" data-middleware="{{componentId}}-{{sectionId}}-middleware-{{middleware['name']}}">
-                                <i class="fa fa-sort fa-fw handle"></i> {{middleware['display_name']}}
-                                <small class="form-text text-muted">{{middleware['description']}}</small>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            </div>
-        </div>
     </fieldset>
 </form>
 <script>
@@ -535,18 +331,6 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-route'                           : { },
         '{{componentId}}-{{sectionId}}-description'                     : { },
-        '{{componentId}}-{{sectionId}}-default_component'               : {
-            'placeholder'   : 'SELECT DEFAULT COMPONENT'
-        },
-        '{{componentId}}-{{sectionId}}-errors_component'                : {
-            'placeholder'   : 'SELECT ERRORS COMPONENT'
-        },
-        // '{{componentId}}-{{sectionId}}-default_view'                    : {
-        //     'placeholder'   : 'SELECT DEFAULT VIEW (TEMPLATE)'
-        // },
-        // '{{componentId}}-{{sectionId}}-default_email_service'           : {
-        //     'placeholder'   : 'SELECT DEFAULT EMAIL SERVICE'
-        // },
         '{{componentId}}-{{sectionId}}-registration_allowed'            : {
             afterInit: function() {
 
@@ -584,53 +368,12 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-can_login_role_ids'              : {
             'placeholder'   : 'SELECT ROLES'
         },
-        '{{componentId}}-{{sectionId}}-middlewares'                     : {
-            afterInit: function() {
-                var checkboxIds = JSON.parse('{{checkboxIds}}');
-
-                if (Object.keys(checkboxIds).length > 0) {
-                    var el = document.getElementById("{{componentId}}-{{sectionId}}-sortable-middlewares");
-                    var sortable = Sortable.create(el, {
-                        onEnd: function() {
-                            dataCollectionSection['data']['middlewares']['sequence'] = sortable.toArray();
-                        }
-                    });
-
-                    dataCollectionSection['data']['middlewares'] = { };
-                    dataCollectionSection['data']['middlewares']['middlewares'] = { };
-
-                    for (var checkbox in checkboxIds) {
-                        $('#' + checkbox).click(function() {
-                            var id = $(this)[0].id;
-                            extractCheckboxData(id, checkboxIds[checkbox])
-                        });
-                        extractCheckboxData(checkbox, checkboxIds[checkbox])
-                    }
-                }
-
-                function extractCheckboxData(checkbox, middleware) {
-                    dataCollectionSection['data']['middlewares']['sequence'] = sortable.toArray();
-
-                    if ($('#' + checkbox)[0].checked === true) {
-
-                        dataCollectionSection['data']['middlewares']['middlewares'][$('#' + checkbox).data('middleware')] = true;
-                        $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
-                            find('[data-middleware="' + checkbox + '"]').removeClass('disabled').attr('area-disabled', 'false');
-                    } else {
-                        dataCollectionSection['data']['middlewares']['middlewares'][$('#' + checkbox).data('middleware')] = false;
-                        $('#{{componentId}}-{{sectionId}}-sortable-middlewares').
-                            find('[data-middleware="' + checkbox + '"]').addClass('disabled').attr('area-disabled', 'true');
-                    }
-                }
-            }
-        },
         '{{componentId}}-{{sectionId}}-form'                            : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-route'                   : 'required',
                 '{{componentId}}-{{sectionId}}-category'                : 'required',
                 '{{componentId}}-{{sectionId}}-sub_category'            : 'required',
-                '{{componentId}}-{{sectionId}}-default_component'       : 'required',
                 '{{componentId}}-{{sectionId}}-registration_role_id'    : 'required',
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'required'
             },
@@ -639,7 +382,6 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-route'                   : 'Please enter app route',
                 '{{componentId}}-{{sectionId}}-category'                : 'Please select app category',
                 '{{componentId}}-{{sectionId}}-sub_category'            : 'Please select app sub category',
-                '{{componentId}}-{{sectionId}}-default_component'       : 'Please select app default component',
                 '{{componentId}}-{{sectionId}}-registration_role_id'    : 'Please select registration role',
                 '{{componentId}}-{{sectionId}}-guest_role_id'           : 'Please select guest role'
             }

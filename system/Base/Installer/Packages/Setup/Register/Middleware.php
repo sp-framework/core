@@ -14,6 +14,8 @@ class Middleware
 				'name' 					=> $middlewareFile['name'],
 				'display_name' 			=> $middlewareFile['displayName'],
 				'description' 			=> $middlewareFile['description'],
+				'category'  			=> $middlewareFile['category'],
+				'sub_category'  		=> $middlewareFile['sub_category'],
 				'version'				=> $middlewareFile['version'],
 				'repo'		 			=> $middlewareFile['repo'],
 				'class'					=> $middlewareFile['class'],
@@ -22,7 +24,7 @@ class Middleware
 					Json::encode($middlewareFile['settings']) :
 					null,
 				'applications'			=>
-					Json::encode(['1'=>['installed'=>true,'sequence'=>0,'enabled'=>false]]),
+					Json::encode(['1' => ['enabled' => false, 'sequence' => 0]]),
 				'files'					=> Json::encode($installedFiles)
 			]
 		);

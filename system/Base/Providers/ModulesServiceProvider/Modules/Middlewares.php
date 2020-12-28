@@ -50,8 +50,8 @@ class Middlewares extends BasePackage
 				function($middleware) use ($applicationId) {
 					$middleware = $middleware->toArray();
 					$middleware['applications'] = Json::decode($middleware['applications'], true);
-					if (isset($middleware['applications'][$applicationId]['installed']) &&
-						$middleware['applications'][$applicationId]['installed'] === true
+					if (isset($middleware['applications'][$applicationId]['enabled']) &&
+						$middleware['applications'][$applicationId]['enabled'] === true
 					) {
 						return $middleware;
 					}
@@ -64,6 +64,51 @@ class Middlewares extends BasePackage
 			$middlewares[$key] = $filter;
 			$middlewares[$key]['sequence'] = $filter['applications'][$applicationId]['sequence'];
 			$middlewares[$key]['enabled'] = $filter['applications'][$applicationId]['enabled'];
+		}
+
+		return $middlewares;
+	}
+
+	public function getMiddlewaresForCategoryAndSubcategory($category, $subCategory, $applicationId, $inclCommon = true)
+	{
+		$middlewares = [];
+
+		$filter =
+			$this->model->filter(
+				function($middleware) use ($category, $subCategory, $inclCommon) {
+					$middleware = $middleware->toArray();
+					$middleware['applications'] = Json::decode($middleware['applications'], true);
+					if ($inclCommon) {
+						if (($middleware['category'] === $category && $middleware['sub_category'] === $subCategory) ||
+							($middleware['category'] === $category && $middleware['sub_category'] === 'common')
+						) {
+							return $middleware;
+						}
+					} else {
+						if ($middleware['category'] === $category && $middleware['sub_category'] === $subCategory) {
+							return $middleware;
+						}
+					}
+				}
+			);
+
+		foreach ($filter as $key => $value) {
+			$middlewares[$key] = $value;
+			if (isset($filter[$key]['applications'][$applicationId])) {
+				if (isset($filter[$key]['applications'][$applicationId]['sequence'])) {
+					$middlewares[$key]['sequence'] = $filter[$key]['applications'][$applicationId]['sequence'];
+				} else {
+					$middlewares[$key]['sequence'] = 0;
+				}
+				if ($filter[$key]['applications'][$applicationId]['enabled']) {
+					$middlewares[$key]['enabled'] = $filter[$key]['applications'][$applicationId]['enabled'];
+				} else {
+					$middlewares[$key]['enabled'] = false;
+				}
+			} else {
+				$middlewares[$key]['sequence'] = 0;
+				$middlewares[$key]['enabled'] = false;
+			}
 		}
 
 		return $middlewares;

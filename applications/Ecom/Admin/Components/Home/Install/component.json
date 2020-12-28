@@ -26,6 +26,7 @@
             "link"      : "home"
         }
     },
-    "settings"      : {
+    "settings"          : {
+        "mandatory"     : true
     }
 }

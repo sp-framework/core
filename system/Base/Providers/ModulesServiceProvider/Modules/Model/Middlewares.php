@@ -14,6 +14,10 @@ class Middlewares extends BaseModel
 
     public $description;
 
+    public $category;
+
+    public $subcategory;
+
     public $version;
 
     public $repo;

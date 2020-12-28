@@ -45,6 +45,22 @@ class Middlewares
 						]
 					),
 					new Column(
+						'category',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'sub_category',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'version',
 						[
 							'type'    => Column::TYPE_VARCHAR,

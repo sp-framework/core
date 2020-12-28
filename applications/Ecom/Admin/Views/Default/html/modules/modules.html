@@ -38,6 +38,12 @@ $('#filter-options-filter').change(function() {
             $('#modules-loader').attr('hidden', true);
             $('#modules-data').html(data);
         });
+    } else if (filterVal == 0) {
+        $('#modules-data').empty().append(
+            '<h5 class="text-center">' +
+                'Select filter or sync with remote repository' +
+            '</h5>'
+        );
     }
     initModuleButtons();
 });

@@ -19,10 +19,6 @@ class Component
 				'version'				=> $componentFile['version'],
 				'class'					=> $componentFile['class'],
 				'repo'					=> $componentFile['repo'],
-				'settings'				=>
-					isset($componentFile['settings']) ?
-					Json::encode($componentFile['settings']) :
-					null,
 				'dependencies'		 	=>
 					isset($componentFile['dependencies']) ?
 					Json::encode($componentFile['dependencies']) :
@@ -31,9 +27,16 @@ class Component
 					isset($componentFile['menu']) ?
 					Json::encode($componentFile['menu']) :
 					false,
+				'menu_id'				=> $menuId,
+				'installed'				=> 0,
 				'applications'			=>
-					Json::encode(['1'=>['installed'=>true,'menu_id'=>$menuId]]),
-				'files'					=> Json::encode($installedFiles)
+					Json::encode(['1'=>['enabled'=>true]]),
+				'files'					=> Json::encode($installedFiles),
+				'settings'				=>
+					isset($componentFile['settings']) ?
+					Json::encode($componentFile['settings']) :
+					null,
+				'updated_by'			=> 0
 			]
 		);
 	}

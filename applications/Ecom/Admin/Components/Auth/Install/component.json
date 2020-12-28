@@ -19,6 +19,7 @@
         "views"         : []
     },
     "menu"              : false,
-    "settings"      : {
+    "settings"          : {
+        "mandatory"     : true
     }
 }

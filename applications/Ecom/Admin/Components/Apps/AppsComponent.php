@@ -14,12 +14,7 @@ class AppsComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $this->view->categories = $this->modules->applications->getAppCategories();
-
-        $this->view->subCategories = $this->modules->applications->getAppSubCategories();
-
-        if (isset($this->getData()['id'])) {
-
+        if (isset($this->getData()['modules']) && isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $application = $this->modules->applications->getById($this->getData()['id']);
 
@@ -27,19 +22,91 @@ class AppsComponent extends BaseComponent
 
                 $this->view->application = $application;
 
-                $this->view->components = $this->modules->components->getComponentsForApplication($this->getData()['id']);
+                $components = [];
+                $views = [];
+                $mandatoryComponents = [];
+                $mandatoryViews = [];
+
+                $componentsArr =
+                    $this->modules->components->getComponentsForCategoryAndSubcategory(
+                        $application['category'],
+                        $application['sub_category']
+                    );
+
+                foreach ($componentsArr as $key => &$componentValue) {
+                    if ($componentValue['applications']) {
+                        $componentValue['applications'] = Json::decode($componentValue['applications'], true);
+                    }
+
+                    if ($componentValue['settings']) {
+                        $componentValue['settings'] = Json::decode($componentValue['settings'], true);
+
+                        if (isset($componentValue['settings']['mandatory']) && $componentValue['settings']['mandatory'] == true) {
+                            array_push($mandatoryComponents, $componentValue['name']);
+                        }
+                    }
+
+                    $components[$key] = $componentValue;
+                }
+
+                $viewsArr =
+                    $this->modules->views->getViewsForCategoryAndSubcategory(
+                        $application['category'],
+                        $application['sub_category']
+                    );
+
+                foreach ($viewsArr as $key => &$viewValue) {
+                    if ($viewValue['applications']) {
+                        $viewValue['applications'] = Json::decode($viewValue['applications'], true);
+                    }
+
+                    if ($viewValue['settings']) {
+                        $viewValue['settings'] = Json::decode($viewValue['settings'], true);
+
+                        if (isset($viewValue['settings']['mandatory']) && $viewValue['settings']['mandatory'] == true) {
+                            array_push($mandatoryViews, $viewValue['name']);
+                        }
+                    }
+
+                    $views[$key] = $viewValue;
+                }
+
+                $this->view->components = msort($components, 'name');
+                $this->view->views = msort($views, 'name');
+                $this->view->mandatoryComponents = $mandatoryComponents;
+                $this->view->mandatoryViews = $mandatoryViews;
 
                 $this->view->middlewares =
-                    msort($this->modules->middlewares->getMiddlewaresForApplication($this->getData()['id']), 'sequence');
+                    msort(
+                        $this->modules->middlewares->getMiddlewaresForCategoryAndSubcategory(
+                            $application['category'],
+                            $application['sub_category'],
+                            $application['id']
+                        ), 'sequence');
+            }
 
-                $this->view->views = $this->modules->views->getViewsForApplication($this->getData()['id']);
-            } else {
-                $this->view->middlewares = [];
+            $this->view->modules = true;
+
+            $this->view->pick('apps/view');
+
+            return;
+        }
+
+        if (isset($this->getData()['id'])) {
+
+            $this->view->categories = $this->modules->applications->getAppCategories();
+
+            $this->view->subCategories = $this->modules->applications->getAppSubCategories();
+
+            if ($this->getData()['id'] != 0) {
+                $application = $this->modules->applications->getById($this->getData()['id']);
+
+                $application['can_login_role_ids'] = Json::decode($application['can_login_role_ids'], true);
+
+                $this->view->application = $application;
             }
 
             $this->view->roles = $this->roles->init()->roles;
-
-            $this->view->emailservices = $this->emailservices->init()->emailservices;
 
             $this->view->pick('apps/view');
 
@@ -57,10 +124,14 @@ class AppsComponent extends BaseComponent
 
         $dtAdditionControlButtons =
             [
-                'modules'    => [
-                    'title'     => 'modules',
-                    'icon'      => 'th',
-                    'link'      => 'modules'
+                'includeId'  => true,
+                // 'includeQ'   => true, //Only true when not adding /q/ in link below.
+                'buttons'    => [
+                    'modules'    => [
+                        'title'     => 'modules',
+                        'icon'      => 'th',
+                        'link'      => 'apps/q/modules/true'
+                    ]
                 ]
             ];
 
@@ -74,14 +145,13 @@ class AppsComponent extends BaseComponent
                 ],
                 'sub_category'  => ['html' =>
                     [
-                        'admin' => 'Admin',
+                        'admin' => 'Administration',
                         'dashboard' => 'Dashboard',
                         'eshop' => 'EShop',
                         'pos' => 'PoS'
                     ]
                 ]
             ];
-
 
         $this->generateDTContent(
             $this->modules->applications,

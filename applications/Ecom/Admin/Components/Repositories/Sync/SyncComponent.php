@@ -37,6 +37,8 @@ class SyncComponent extends BaseComponent
                 $this->view->thisApplication = $this->modules->manager->packagesData->applicationInfo;
 
                 $this->view->pick('../modules');
+
+                return;
             } else {
 
                 $this->view->responseCode = $modulesData->packagesData->responseCode;
@@ -46,12 +48,7 @@ class SyncComponent extends BaseComponent
                 return $this->sendJson();
             }
         }
-                // var_dump($this->view);
 
-        $this->view->disable();
-        // $this->view->repositories = $this->packages->use(Repositories::class)->getAllRepositories();
-
-        // $this->view->setup = isset($this->getData['setup']) ? $this->getData['setup'] : false;
-
+        return false;
     }
 }

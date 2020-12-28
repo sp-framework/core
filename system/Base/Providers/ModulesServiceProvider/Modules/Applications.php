@@ -147,6 +147,15 @@ class Applications extends BasePackage
 
 	public function addApplication(array $data)
 	{
+		if (strtolower($data['route']) === 'common') {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'App route "common" is reserved. Please use different route.';
+
+			return;
+		}
+		$data['default_component'] = 0;
+		$data['errors_component'] = 0;
 		$data['can_login_role_ids'] = Json::decode($data['can_login_role_ids'], true);
 		$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
 
@@ -163,11 +172,37 @@ class Applications extends BasePackage
 
 	public function updateApplication(array $data)
 	{
-		$data['can_login_role_ids'] = Json::decode($data['can_login_role_ids'], true);
-		$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
+		if (isset($data['modules']) && $data['modules'] == true) {
+			$app = $this->getById($data['id']);
 
-		if ($data['middlewares']) {
-			$this->modules->middlewares->updateMiddlewares($data);
+			$data = array_merge($app, $data);
+		}
+
+		if (strtolower($data['route']) === 'common') {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'App route "common" is reserved. Please use different route.';
+
+			return;
+		}
+
+		if (!isset($data['modules'])) {
+			$data['can_login_role_ids'] = Json::decode($data['can_login_role_ids'], true);
+			$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
+		}
+
+		if (isset($data['modules']) && $data['modules'] == true) {
+			if ($data['components']) {
+				$this->modules->components->updateComponents($data);
+			}
+
+			if ($data['views']) {
+				$this->modules->views->updateViews($data);
+			}
+
+			if ($data['middlewares']) {
+				$this->modules->middlewares->updateMiddlewares($data);
+			}
 		}
 
 		if ($this->update($data)) {
@@ -183,6 +218,14 @@ class Applications extends BasePackage
 
 	public function removeApplication(array $data)
 	{
+		if ($data['id'] == 1) {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'Cannot remove Admin App. Error removing application.';
+
+			return false;
+		}
+
 		$application = $this->getById($data['id']);
 
 		//Check relations before removing.

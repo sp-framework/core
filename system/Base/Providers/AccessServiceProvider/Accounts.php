@@ -160,27 +160,27 @@ class Accounts extends BasePackage
         }
     }
 
-    public function checkAccountByIdentifier(string $rememberIdentifier)
-    {
-        $account =
-            $this->getByParams(
-                    [
-                        'conditions'    => 'remember_identifier = :ri:',
-                        'bind'          =>
-                            [
-                                'ri'  => $rememberIdentifier
-                            ]
-                    ],
-                    false,
-                    false
-                );
+    // public function checkAccountByIdentifier(string $rememberIdentifier)
+    // {
+    //     $account =
+    //         $this->getByParams(
+    //                 [
+    //                     'conditions'    => 'remember_identifier = :ri:',
+    //                     'bind'          =>
+    //                         [
+    //                             'ri'  => $rememberIdentifier
+    //                         ]
+    //                 ],
+    //                 false,
+    //                 false
+    //             );
 
-        if ($account) {
-            return $account[0];
-        } else {
-            return false;
-        }
-    }
+    //     if ($account) {
+    //         return $account[0];
+    //     } else {
+    //         return false;
+    //     }
+    // }
 
     protected function validateData(array $data)
     {

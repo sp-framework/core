@@ -12,7 +12,11 @@ class Repositories extends BaseModel
 
     public $description;
 
-    public $url;
+    public $repo_url;
+
+    public $site_url;
+
+    public $branch;
 
     public $auth_token;
 

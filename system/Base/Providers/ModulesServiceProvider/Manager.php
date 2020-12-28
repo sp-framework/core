@@ -3,6 +3,7 @@
 namespace System\Base\Providers\ModulesServiceProvider;
 
 use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Manager extends BasePackage
@@ -37,7 +38,10 @@ class Manager extends BasePackage
         if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
 
             //generate localModules with updated Data
-            $this->getModulesData(null, true, true);
+            // $this->getModulesData(null, true, true);
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Synced successfully';
 
             return true;
         }
@@ -82,9 +86,16 @@ class Manager extends BasePackage
             foreach ($this->components as $componentKey => $component) {
                 $this->localModules['components'][$component['id']] = $component;
                 $this->localModules['components'][$component['id']]['settings']
-                    = json_decode($component['settings'], true);
+                    = Json::decode($component['settings'], true);
                 $this->localModules['components'][$component['id']]['dependencies']
-                    = json_decode($component['dependencies'], true);
+                    = Json::decode($component['dependencies'], true);
+
+                $updatedOnDate = new \DateTime($component['updated_on']);
+                $now = new \DateTime('now');
+                $diff = date_diff($updatedOnDate, $now);
+                if ($diff->h < 24) {
+                    $this->localModules['components'][$component['id']]['new'] = true;
+                }
             }
         } else {
             $this->localModules['components'] = [];
@@ -94,9 +105,16 @@ class Manager extends BasePackage
             foreach ($this->views as $viewKey => $view) {
                 $this->localModules['views'][$view['id']] = $view;
                 $this->localModules['views'][$view['id']]['settings']
-                    = json_decode($view['settings'], true);
+                    = Json::decode($view['settings'], true);
                 $this->localModules['views'][$view['id']]['dependencies']
-                    = json_decode($view['dependencies'], true);
+                    = Json::decode($view['dependencies'], true);
+
+                $updatedOnDate = new \DateTime($view['updated_on']);
+                $now = new \DateTime('now');
+                $diff = date_diff($updatedOnDate, $now);
+                if ($diff->h < 24) {
+                    $this->localModules['views'][$view['id']]['new'] = true;
+                }
             }
         } else {
             $this->localModules['views'] = [];
@@ -114,14 +132,18 @@ class Manager extends BasePackage
 
             if ($getFresh) {
                 $this->components =
-                    $this->modules->components->init(true)->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    $this->modules->components->init(true)
+                    ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
                 $this->views =
-                    $this->modules->views->init(true)->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    $this->modules->views->init(true)
+                    ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
             } else {
                 $this->components =
-                    $this->modules->components->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    $this->modules->components
+                    ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
                 $this->views =
-                    $this->modules->views->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    $this->modules->views
+                    ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
             }
         } else {
             $this->components = $this->modules->components->components;
@@ -131,7 +153,7 @@ class Manager extends BasePackage
 
     protected function getRemoteModules()
     {
-        $repoUrl = $this->repository['url'];
+        $repoUrl = $this->repository['repo_url'];
 
         if ($this->repository['repo_provider'] === '1') {//Gitea
             $headers =
@@ -141,8 +163,9 @@ class Manager extends BasePackage
                             'accept'    =>  'application/json'
                         ]
                 ];
-            $siteUrl = 'https://dev.bazaari.com.au/';
-            $branchUrl = '/raw/branch/master/';
+            $siteUrl = $this->repository['site_url'];
+
+            $branch = '/raw/branch/' . $this->repository['branch'] . '/';
         } else if ($this->repository['repo_provider'] === '2') {//Github
             $headers =
                 [
@@ -151,8 +174,9 @@ class Manager extends BasePackage
                             'accept'    =>  'application/vnd.github.mercy-preview+json'
                         ]
                 ];
-            $siteUrl = 'https://raw.githubusercontent.com/';
-            $branchUrl = '/master/';
+            $siteUrl = $this->repository['site_url'];//https://raw.githubusercontent.com/
+
+            $branch = '/' . $this->repository['branch'] . '/';
         }
 
         if ($this->repository['auth_token'] === '1') {//Auth
@@ -176,7 +200,7 @@ class Manager extends BasePackage
         $headers['verify'] = false;
 
         try {
-            $body = json_decode($this->remoteContent->get($repoUrl, $headers)->getBody()->getContents());
+            $body = Json::decode($this->remoteContent->get($repoUrl, $headers)->getBody()->getContents());
 
         } catch (ClientException $e) {
             $body = null;
@@ -200,40 +224,79 @@ class Manager extends BasePackage
 
             return false;
         }
-
         if ($body) {
             foreach ($body as $key => $value) {
+
                 $names = explode('-', $value->name);
 
                 if (count($names) > 0) {
                     if (count($names) === 1 && $names[0] === 'core') {
-                        $url = $siteUrl . $value->full_name . $branchUrl . 'core.json';
+                        $url = $siteUrl . $value->full_name . $branch . 'core.json';
 
-                        $this->remoteModules['core'][$value->name] =
-                            json_decode(
-                                $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                , true
-                            );
+                        try {
+                            $this->remoteModules['core'][$value->name] =
+                                Json::decode(
+                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    , true
+                                );
+                        } catch (\Exception $e) {
+                            $this->packagesData->responseCode = 1;
+
+                            $this->packagesData->responseMessage =
+                                'Syncing ' . $value->name . ' resulted in error ' .
+                                $e->getResponse()->getStatusCode() .
+                                '. Sync Halted! Please contact remote administrator or developer.';
+
+                            $this->logger->log->debug($e->getMessage());
+
+                            return false;
+                        }
 
                     } else if ($names[2] === 'component') {
                         $url =
-                            $siteUrl . $value->full_name . $branchUrl . ucfirst(Arr::last($names)) . '/Install/' . 'component.json';
+                            $siteUrl . $value->full_name . $branch . ucfirst(Arr::last($names)) . '/Install/' . 'component.json';
 
-                        $this->remoteModules['components'][$value->name] =
-                            json_decode(
-                                $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                , true
-                            );
+                        try {
+                            $this->remoteModules['components'][$value->name] =
+                                Json::decode(
+                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    , true
+                                );
 
+                        } catch (\Exception $e) {
+                            $this->packagesData->responseCode = 1;
+
+                            $this->packagesData->responseMessage =
+                                'Syncing component ' . $value->name . ' resulted in error ' .
+                                $e->getResponse()->getStatusCode() .
+                                '. Sync Halted! Please contact remote administrator or developer.';
+
+                            $this->logger->log->debug($e->getMessage());
+
+                            return false;
+                        }
                     } else if ($names[2] === 'view') {
                         $url =
-                            $siteUrl . $value->full_name . $branchUrl . ucfirst(Arr::last($names)) .'view.json';
+                            $siteUrl . $value->full_name . $branch . ucfirst(Arr::last($names)) .'/view.json';
 
-                        $this->remoteModules['views'][$value->name] =
-                            json_decode(
-                                $this->remoteContent->get($url, $headers)->getBody()->getContents()
-                                , true
-                            );
+                        try {
+                            $this->remoteModules['views'][$value->name] =
+                                Json::decode(
+                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    , true
+                                );
+                        } catch (\Exception $e) {
+                            $this->packagesData->responseCode = 1;
+
+                            $this->packagesData->responseMessage =
+                                'Syncing view ' . $value->name . ' resulted in error ' .
+                                $e->getResponse()->getStatusCode() .
+                                '. Sync Halted! Please contact remote administrator or developer.';
+
+                            $this->logger->log->debug($e->getMessage());
+
+                            return false;
+                        }
                     }
                 }
             }
@@ -269,20 +332,19 @@ class Manager extends BasePackage
                     $remoteComponents['update'] = [];
                     $remoteComponents['register'] = $remoteModules;
                 }
-                dump($remoteComponents);
-                die();
+
                 if (count($remoteComponents['update']) > 0) {
                     foreach ($remoteComponents['update'] as $updateRemoteComponentKey => $updateRemoteComponent) {
 
                         $updateRemoteComponent['settings'] =
                             isset($updateRemoteComponent['settings']) ?
-                            json_encode($updateRemoteComponent['settings']) :
-                            json_encode([]);
+                            Json::encode($updateRemoteComponent['settings']) :
+                            Json::encode([]);
 
                         $updateRemoteComponent['dependencies'] =
                             isset($updateRemoteComponent['dependencies']) ?
-                            json_encode($updateRemoteComponent['dependencies']) :
-                            json_encode([]);
+                            Json::encode($updateRemoteComponent['dependencies']) :
+                            Json::encode([]);
 
                         $this->modules->components->update($updateRemoteComponent);
 
@@ -292,15 +354,48 @@ class Manager extends BasePackage
 
                 if (count($remoteComponents['register']) > 0) {
                     foreach ($remoteComponents['register'] as $registerRemoteComponentKey => $registerRemoteComponent) {
-                        $registerRemoteComponent['settings'] =
-                            isset($registerRemoteComponent['settings']) ?
-                            json_encode($registerRemoteComponent['settings']) :
-                            json_encode([]);
-
                         $registerRemoteComponent['dependencies'] =
                             isset($registerRemoteComponent['dependencies']) ?
-                            json_encode($registerRemoteComponent['dependencies']) :
-                            json_encode([]);
+                            Json::encode($registerRemoteComponent['dependencies']) :
+                            Json::encode([]);
+
+                        if ($registerRemoteComponent['menu']) {
+                            if (isset($registerRemoteComponent['menu']['seq'])) {
+                                $sequence = $registerRemoteComponent['menu']['seq'];
+                                unset($registerRemoteComponent['menu']['seq']);
+                            } else {
+                                $sequence = 99;
+                            }
+                            $menu['menu'] = Json::encode($registerRemoteComponent['menu']);
+                            $menu['sequence'] = $sequence;
+                            $menu['applications'] = Json::encode([]);
+
+                            $this->basepackages->menus->add($menu);
+
+                            $registerRemoteComponent['menu_id'] = $this->basepackages->menus->packagesData->last['id'];
+
+                            $this->basepackages->menus->init(true);//Reset Cache
+
+                            $registerRemoteComponent['menu'] = Json::encode($registerRemoteComponent['menu']);
+                        } else {
+                            $registerRemoteComponent['menu'] = false;
+                        }
+
+                        $registerRemoteComponent['settings'] =
+                            isset($registerRemoteComponent['settings']) ?
+                            Json::encode($registerRemoteComponent['settings']) :
+                            Json::encode([]);
+
+                        $registerRemoteComponent['applications'] =
+                            Json::encode([]);
+
+                        $registerRemoteComponent['installed'] = 0;
+
+                        if ($this->auth->account()) {
+                            $registerRemoteComponent['updated_by'] = $this->auth->account()['id'];
+                        } else {
+                            $registerRemoteComponent['updated_by'] = 0;
+                        }
 
                         $this->modules->components->add($registerRemoteComponent);
 
@@ -318,7 +413,6 @@ class Manager extends BasePackage
                     $remoteViews['register'] = $remoteModules;
                 }
 
-
                 if (count($remoteViews['update']) > 0) {
                     foreach ($remoteViews['update'] as $updateRemoteViewKey => $updateRemoteView) {
                         $this->modules->views->update($updateRemoteView);
@@ -328,15 +422,26 @@ class Manager extends BasePackage
 
                 if (count($remoteViews['register']) > 0) {
                     foreach ($remoteViews['register'] as $registerRemoteViewKey => $registerRemoteView) {
-                        $registerRemoteView['settings'] =
-                            isset($registerRemoteView['settings']) ?
-                            json_encode($registerRemoteView['settings']) :
-                            json_encode([]);
-
                         $registerRemoteView['dependencies'] =
                             isset($registerRemoteView['dependencies']) ?
-                            json_encode($registerRemoteView['dependencies']) :
-                            json_encode([]);
+                            Json::encode($registerRemoteView['dependencies']) :
+                            Json::encode([]);
+
+                        $registerRemoteView['settings'] =
+                            isset($registerRemoteView['settings']) ?
+                            Json::encode($registerRemoteView['settings']) :
+                            Json::encode([]);
+
+                        $registerRemoteView['applications'] =
+                            Json::encode([]);
+
+                        $registerRemoteView['installed'] = 0;
+
+                        if ($this->auth->account()) {
+                            $registerRemoteView['updated_by'] = $this->auth->account()['id'];
+                        } else {
+                            $registerRemoteView['updated_by'] = 0;
+                        }
 
                         $this->modules->views->add($registerRemoteView);
 
@@ -374,13 +479,13 @@ class Manager extends BasePackage
                         // }
 
                         if (isset($localModule['settings'])) {
-                            $localModule['settings'] = json_encode($localModule['settings']);
+                            $localModule['settings'] = Json::encode($localModule['settings']);
                         } else {
                             $localModule['settings'] = null;
                         }
 
                         if (isset($localModule['dependencies'])) {
-                            $localModule['dependencies'] = json_encode($remoteModule['dependencies']);
+                            $localModule['dependencies'] = Json::encode($remoteModule['dependencies']);
                         } else {
                             $localModule['dependencies'] = null;
                         }

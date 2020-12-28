@@ -34,7 +34,6 @@ class SecurityServiceProvider implements ServiceProviderInterface
             }
         );
 
-
         $container->setShared(
             'secTools',
             function () use ($container) {

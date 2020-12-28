@@ -85,4 +85,51 @@ class RepositoriesComponent extends BaseComponent
             $this->view->responseMessage = 'Method Not Allowed';
         }
     }
+
+    public function syncAction()
+    {
+        if (isset($this->postData()['repoId'])) {
+
+            $synced = $this->modules->manager->syncRemoteWithLocal($this->postData()['repoId']);
+
+            if ($synced === true) {
+
+                $this->view->counter = $this->modules->manager->packagesData->counter;
+            }
+
+            $this->view->responseCode = $this->modules->manager->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->modules->manager->packagesData->responseMessage;
+
+            return $this->sendJson();
+
+            // if ($modulesData === true) {
+
+            //     $this->view->responseCode = $this->modules->manager->packagesData->responseCode;
+
+            //     $this->view->responseMessage = $this->modules->manager->packagesData->responseMessage;
+
+            //     // $this->view->modulesData = $this->modules->manager->packagesData->modulesData;
+
+            //     $this->view->counter = $this->modules->manager->packagesData->counter;
+
+            //     // $this->view->thisApplication = $this->modules->manager->packagesData->applicationInfo;
+
+            //     $this->setDefaultViewData();
+
+            //     // $this->view->pick('../modules/modulesdata');
+            // } else {
+
+            //     $this->view->responseCode = $modulesData->packagesData->responseCode;
+
+            //     $this->view->responseMessage = $modulesData->packagesData->responseMessage;
+
+            //     return $this->sendJson();
+            // }
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
 }

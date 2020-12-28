@@ -2,7 +2,9 @@
     {% set repositoryId = repository['id'] %}
     {% set repositoryName = repository['name'] %}
     {% set repositoryDescription = repository['description'] %}
-    {% set repositoryApiUrl = repository['url'] %}
+    {% set repositoryApiUrl = repository['repo_url'] %}
+    {% set repositorySiteUrl = repository['site_url'] %}
+    {% set repositoryBranch = repository['branch'] %}
     {% set repositoryRepoProvider = repository['repo_provider'] %}
     {% set repositoryAuthToken = repository['auth_token'] %}
     {% set repositoryUsername = repository['username'] %}
@@ -13,6 +15,8 @@
     {% set repositoryName = '' %}
     {% set repositoryDescription = '' %}
     {% set repositoryApiUrl = '' %}
+    {% set repositorySiteUrl = '' %}
+    {% set repositoryBranch = '' %}
     {% set repositoryRepoProvider = '1' %}
     {% set repositoryAuthToken = '0' %}
     {% set repositoryUsername = '' %}
@@ -105,30 +109,6 @@
             </div>
         </div>
         <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'url',
-                        'fieldLabel'                     : 'Repository API Url',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Repository API URL',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 200,
-                        'fieldValue'                     : repositoryApiUrl
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
             <div class="col-md-3">
                 {{adminltetags.useTag('fields',
                     [
@@ -164,7 +144,82 @@
                     ]
                 )}}
             </div>
-            <div class="col-md-3">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'repo_url',
+                                'fieldLabel'                     : 'Repository API Url',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Repository API URL',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldValue'                     : repositoryApiUrl
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'site_url',
+                                'fieldLabel'                     : 'Repository Site Url',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Repository Site URL',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldValue'                     : repositorySiteUrl
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'branch',
+                                'fieldLabel'                     : 'Repository Branch',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Repository Branch. Master/Beta/Alpha etc.',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 100,
+                                'fieldValue'                     : repositoryBranch
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -311,7 +366,9 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                              : { },
         '{{componentId}}-{{sectionId}}-name'                            : { },
         '{{componentId}}-{{sectionId}}-description'                     : { },
-        '{{componentId}}-{{sectionId}}-url'                             : { },
+        '{{componentId}}-{{sectionId}}-repo_url'                        : { },
+        '{{componentId}}-{{sectionId}}-site_url'                        : { },
+        '{{componentId}}-{{sectionId}}-branch'                          : { },
         '{{componentId}}-{{sectionId}}-repo_provider'                   : { },
         '{{componentId}}-{{sectionId}}-auth_token'                      : {
             afterInit : function() {

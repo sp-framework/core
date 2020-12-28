@@ -26,8 +26,9 @@ class View
 					Json::encode($viewFile['dependencies']) :
 					null,
 				'applications'			=>
-					Json::encode(['1'=>['installed'=>true]]),
-				'files'					=> Json::encode($installedFiles)
+					Json::encode(['1'=>['enabled'=>true]]),
+				'files'					=> Json::encode($installedFiles),
+				'updated_by'			=> 0
 			]
 		);
 	}

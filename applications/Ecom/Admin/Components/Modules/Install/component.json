@@ -13,23 +13,8 @@
 			"version"	: "0.0.1",
 			"repo"		: "https://github.com/h-w-f/core"
 		},
-		"components"	:
-		[{
-			"name"		: "Repositories",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/component-admin-repositories"
-		}],
-		"packages"		:
-		[{
-			"name"		: "Modules",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/package-admin-modules"
-		},
-		{
-			"name"		: "Repositories",
-			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/package-admin-repositories"
-		}],
+		"components"	: [],
+		"packages"		: [],
 		"middlewares"	: [],
 		"views"			: []
 	},
@@ -41,6 +26,7 @@
 			"link"		: "modules"
 		}
 	},
-	"settings"		: {
+	"settings"          : {
+		"mandatory"     : true
 	}
 }

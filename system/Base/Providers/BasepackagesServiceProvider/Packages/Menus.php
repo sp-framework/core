@@ -40,7 +40,7 @@ class Menus extends BasePackage
             }
         }
 
-        $this->cacheTools->setCache('menus', $buildMenu);
+        $this->cacheTools->setCache('menus_' . $applicationId, $buildMenu);
 
         return $buildMenu;
     }
@@ -52,14 +52,22 @@ class Menus extends BasePackage
         $filter =
             $this->model->filter(
                 function($menu) use ($applicationId) {
-                    if ($menu->application_id === $applicationId) {
-                        return $menu;
+                    $menu = $menu->toArray();
+                    // var_dump($menu);
+                    $menu['applications'] = Json::decode($menu['applications'], true);
+                    if (count($menu['applications']) > 0) {
+                        if (isset($menu['applications'][$applicationId]) &&
+                            $menu['applications'][$applicationId]['enabled'] === true
+                        ) {
+                            // $menu['sequence'] = $menu['applications'][$applicationId]['sequence'];
+                            return $menu;
+                        }
                     }
                 }
             );
 
         foreach ($filter as $key => $value) {
-            $menus[$key] = $value->toArray();
+            $menus[$key] = $value;
         }
 
         return $menus;

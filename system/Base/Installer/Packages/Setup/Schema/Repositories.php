@@ -37,11 +37,27 @@ class Repositories
 						]
 					),
 					new Column(
-						'url',
+						'repo_url',
 						[
 							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 2048,
-							'notNull' => false,
+							'size'    => 1024,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'site_url',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 1024,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'branch',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 100,
+							'notNull' => true,
 						]
 					),
 					new Column(

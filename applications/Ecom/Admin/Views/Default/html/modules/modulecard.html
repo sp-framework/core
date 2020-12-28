@@ -1,3 +1,10 @@
+{% if module['new'] is defined and module['new'] === true %}
+<div class="ribbon-wrapper ribbon-sm">
+    <div class="ribbon bg-success">
+        New
+    </div>
+</div>
+{% endif %}
 <div class="row">
     <div class="col-md-4">
         <p class="card-text">Name:</p>

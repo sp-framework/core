@@ -17,6 +17,7 @@
         "views"         : []
     },
     "settings"      : {
+        "mandatory" : true,
         "cache"     : false,
         "layout"    : "default",
         "tags"      : "AdminLTETags",

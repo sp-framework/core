@@ -28,7 +28,7 @@
                     'icon'                    : 'edit',
                     'noMargin'                : true,
                     'disabled'                : true,
-                    'url'                     : 'repositories/q/id/0',
+                    'url'                     : links.url('repositories/q/id/0'),
                     'buttonAdditionalClass'   : 'rounded-0 text-white contentAjaxLink disabled',
                     'position'                : 'right'
                 ],
@@ -46,7 +46,7 @@
                     'type'                    : 'success',
                     'icon'                    : 'plus',
                     'noMargin'                : true,
-                    'url'                     : 'repositories/q/id/0',
+                    'url'                     : links.url('repositories/q/id/0'),
                     'buttonAdditionalClass'   : 'rounded-0 contentAjaxLink',
                     'position'                : 'right'
                 ]
@@ -67,17 +67,20 @@
 initSync();
 
 function changeRepoButtons(val = '0') {
+    var url = "{{links.url('repositories/q/id/')}}" + val;
+
     if (val == '1') {
         $('#repositories-options-sync').attr('disabled', false);
         $('#repositories-options-delete').attr('disabled', true);
         $('#repositories-options-edit').removeClass('disabled');
-        $('#repositories-options-edit').attr('href', 'repositories/q/id/' + val);
+        $('#repositories-options-edit').attr('href', url);
     } else if (val == '0') {
         $('#repositories-options-sync, #repositories-options-delete').attr('disabled', true);
         $('#repositories-options-edit').addClass('disabled');
     } else if (val != '1') {
         $('#repositories-options-sync, #repositories-options-delete').attr('disabled', false);
         $('#repositories-options-edit').removeClass('disabled');
+        $('#repositories-options-edit').attr('href', url);
     }
 }
 
@@ -92,20 +95,23 @@ function initSync(val) {
         $('#modules-loader').attr('hidden', false);
         $('#modules-data').attr('hidden', true);
 
-        $.get(
-            'repositories/sync/q/' +
-            'repoId/' + $('#repositories-options-repositories option:selected').val(),
+        var repoId = $('#repositories-options-repositories option:selected').val();
+        var filterId = $('#filter-options-filter option:selected').val();
+        $.post(
+            'repositories/sync',
+            {'repoId' : repoId},
             function(data) {
-                if (typeof data === 'string') {
-                    $('#modules-data').empty().html(data);
+                if (data.responseCode === 0) {
+                    $('#modules-data').empty().load("{{links.url('modules/q/filter/')}}" + filterId);
+
                     $('#modules-data').attr('hidden', false);
                     $('#modules-loader').attr('hidden', true);
                     $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
 
                     var text, registerCounter, updateCounter;
 
-                    registerCounter = Number($('#register-counter').val());
-                    updateCounter = Number($('#update-counter').val());
+                    registerCounter = data.counter.register;
+                    updateCounter = data.counter.update;
 
                     if (registerCounter > 0 || updateCounter > 0) {
                         if (registerCounter !== 0 && updateCounter === 0) {
@@ -118,16 +124,14 @@ function initSync(val) {
                             text =
                                 'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
                         }
-                        PNotify.info({
-                            text        : text,
-                            textTrusted : true
-                        });
                     } else {
-                        PNotify.info({
-                            text        : 'Sync Complete.<br>No new modules or updates available.',
-                            textTrusted : true
-                        });
+                        text = 'Sync Complete.<br>No new modules or updates available.';
                     }
+                    PNotify.info({
+                        text        : text,
+                        textTrusted : true
+                    });
+
                     initModuleButtons();
                 } else {
                     PNotify.error({
