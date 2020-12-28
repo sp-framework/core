@@ -1,0 +1,36 @@
+{
+    "route"         : "users/employees",
+    "name"          : "Employees",
+    "description"   : "Manage employees via this component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://github.com/h-w-f/component-admin-users-employees",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Users\\Employees\\EmployeesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://github.com/h-w-f/core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "hrms"      : {
+            "title"     : "hrms",
+            "icon"      : "user-cog",
+            "childs"    : {
+                "employees"   : {
+                    "title"     : "Employees",
+                    "link"      : "hrms/employees"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}
