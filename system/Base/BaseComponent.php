@@ -9,6 +9,7 @@ use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
+use Phalcon\Mvc\Dispatcher;
 use Phalcon\Mvc\View;
 use Phalcon\Tag;
 
@@ -33,7 +34,6 @@ abstract class BaseComponent extends Controller
 	protected function onConstruct()
 	{
 		$this->application = $this->modules->applications->getApplicationInfo();
-
 		if (!$this->application) {
 			return;
 		}
@@ -53,18 +53,11 @@ abstract class BaseComponent extends Controller
 			);
 
 		if (!$this->component) {
-			$this->componentRoute =
-				str_replace('Component', '', $this->reflection->getShortName());
-
 			$this->component =
 				$this->modules->components->getRouteComponentForApplication(
-					strtolower($this->componentRoute), $this->application['id']
+					strtolower($this->componentName), $this->application['id']
 				);
-		} else {
-			$this->componentRoute =
-				str_replace('Component', '', $this->reflection->getShortName());
 		}
-
 
 		if (!$this->isJson() || $this->request->isAjax()) {
 
@@ -79,6 +72,36 @@ abstract class BaseComponent extends Controller
 
 				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 			}
+		}
+	}
+
+	public function beforeExecuteRoute(Dispatcher $dispatcher)
+	{
+		if (!$this->component) {
+			$component = $this->modules->components->getIdComponent($this->application['errors_component']);
+
+			if (isset($this->application['errors_component']) &&
+				$this->application['errors_component'] != 0
+			) {
+				$errorClassArr = explode('\\', $component['class']);
+				unset($errorClassArr[Arr::lastKey($errorClassArr)]);
+				$errorComponent = ucfirst($component['route']);
+				$namespace = implode('\\', $errorClassArr);
+				$this->view->setViewsDir($this->modules->views->getPhalconViewPath());
+			} else {
+				$errorComponent = 'Errors';
+				$namespace = 'System\Base\Providers\ErrorServiceProvider';
+			}
+
+			$dispatcher->forward(
+				[
+					'controller' => $errorComponent,
+					'action'     => 'controllerNotFound',
+					'namespace'  => $namespace
+				]
+			);
+
+			return false;
 		}
 	}
 
@@ -117,7 +140,7 @@ abstract class BaseComponent extends Controller
 		$this->view->componentName = strtolower($this->componentName);
 
 		$this->view->componentId =
-			strtolower($this->view->applicationRoute) . '-' . strtolower($this->componentRoute);
+			strtolower($this->view->applicationRoute) . '-' . strtolower($this->componentName);
 
 		$reflection = Arr::sliceRight(explode('\\', $this->reflection->getName()), 3);
 
