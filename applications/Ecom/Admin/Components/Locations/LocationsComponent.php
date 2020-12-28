@@ -15,7 +15,6 @@ class LocationsComponent extends BaseComponent
     public function initialize()
     {
         $this->locations = $this->usePackage(Locations::class);
-        $this->locationsTypes = $this->usePackage(LocationsTypes::class);
     }
 
     /**
@@ -25,12 +24,14 @@ class LocationsComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $this->view->location = $this->locations->getById($this->getData()['id']);
+                $location = $this->locations->getById($this->getData()['id']);
+
+                $address = $this->basepackages->addressbook->getById($location['address_id']);
+
+                $location = array_merge($location, $address);
+
+                $this->view->location = $location;
             }
-
-            $this->view->locationsTypes = $this->locationsTypes->getAll()->locationstypes;
-
-            $this->view->accounts = $this->accounts->getAll()->accounts;
 
             $this->view->responseCode = $this->locations->packagesData->responseCode;
 
@@ -46,14 +47,22 @@ class LocationsComponent extends BaseComponent
         if ($this->request->isPost()) {
             $replaceColumns =
                 [
-                    'type'   => ['html'  =>
+                    'inbound_shipping'   => ['html'  =>
                         [
-                            '1' => 'Shop',
-                            '2' => 'Warehouse',
-                            '3' => 'Office',
-                            '4' => 'Home Office',
-                            '5' => 'Storage',
-                            '6' => 'Show Grounds'
+                            '0' => 'No',
+                            '1' => 'Yes'
+                        ]
+                    ],
+                    'outbound_shipping'   => ['html'  =>
+                        [
+                            '0' => 'No',
+                            '1' => 'Yes'
+                        ]
+                    ],
+                    'can_stock'   => ['html'  =>
+                        [
+                            '0' => 'No',
+                            '1' => 'Yes'
                         ]
                     ]
                 ];
@@ -74,9 +83,9 @@ class LocationsComponent extends BaseComponent
             $locations,
             'locations/view',
             null,
-            ['name', 'type'],
+            ['name', 'inbound_shipping', 'outbound_shipping', 'can_stock'],
             true,
-            ['name', 'type'],
+            ['name', 'inbound_shipping', 'outbound_shipping', 'can_stock'],
             $controlActions,
             null,
             $replaceColumns,

@@ -1,12 +1,10 @@
 {% if location['id'] is defined %}
     {% set locationId = location['id'] %}
     {% set locationName = location['name'] %}
-    {% set locationType = location['type'] %}
-    {% set locationDescription = location['description'] %}
-    {% set locationPrimaryContact = location['primary_contact'] %}
-    {% set locationSecondaryContact = location['secondary_contact'] %}
     {% set locationInboundShipping = location['inbound_shipping'] %}
     {% set locationOutboundShipping = location['outbound_shipping'] %}
+    {% set locationCanStock = location['can_stock'] %}
+    {% set locationAddressId = location['address_id'] %}
     {% set locationStreetAddress = location['street_address'] %}
     {% set locationStreetAddress2 = location['street_address_2'] %}
     {% set locationCityId = location['city_id'] %}
@@ -16,15 +14,14 @@
     {% set locationState = location['state_name'] %}
     {% set locationCountryId = location['country_id'] %}
     {% set locationCountry = location['country_name'] %}
+    {% set locationNotes = location['notes'] %}
 {% else %}
     {% set locationId = '' %}
     {% set locationName = '' %}
-    {% set locationType = '' %}
-    {% set locationDescription = '' %}
-    {% set locationPrimaryContact = '' %}
-    {% set locationSecondaryContact = '' %}
     {% set locationInboundShipping = '' %}
     {% set locationOutboundShipping = '' %}
+    {% set locationCanStock = '' %}
+    {% set locationAddressId = '' %}
     {% set locationStreetAddress = '' %}
     {% set locationStreetAddress2 = '' %}
     {% set locationCityId = '' %}
@@ -34,6 +31,7 @@
     {% set locationState = '' %}
     {% set locationCountryId = '' %}
     {% set locationCountry = '' %}
+    {% set locationNotes = '' %}
 {% endif %}
 {% if locationInboundShipping == '1' %}
     {% set locationInboundShippingChecked = true %}
@@ -44,6 +42,11 @@
     {% set locationOutboundShippingChecked = true %}
 {% else %}
     {% set locationOutboundShippingChecked = false %}
+{% endif %}
+{% if locationCanStock == '1' %}
+    {% set locationCanStockChecked = true %}
+{% else %}
+    {% set locationCanStockChecked = false %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -94,105 +97,6 @@
                     ]
                 )}}
             </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'type',
-                        'fieldLabel'                            : 'Location Type',
-                        'fieldType'                             : 'select2',
-                        'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Location Type',
-                        'fieldRequired'                         : true,
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : true,
-                        'fieldBazPostOnUpdate'                  : true,
-                        'fieldDataSelect2Options'               : locationsTypes,
-                        'fieldDataSelect2OptionsKey'            : 'id',
-                        'fieldDataSelect2OptionsValue'          : 'name',
-                        'fieldDataSelect2OptionsArray'          : true,
-                        'fieldDataSelect2OptionsSelected'       : locationType
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'primary_contact',
-                        'fieldLabel'                     : 'Primary Contact',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a primary contact for this location.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : true,
-                        'fieldDataSelect2Options'        : accounts,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'email',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': locationPrimaryContact
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'secondary_contact',
-                        'fieldLabel'                     : 'Secondary Contact',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Select a secondary contact for this location.',
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldRequired'                  : false,
-                        'fieldDataSelect2Options'        : accounts,
-                        'fieldDataSelect2OptionsKey'     : 'id',
-                        'fieldDataSelect2OptionsValue'   : 'email',
-                        'fieldDataSelect2OptionsArray'   : true,
-                        'fieldDataSelect2OptionsSelected': locationSecondaryContact
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'description',
-                        'fieldLabel'                     : 'Location Description',
-                        'fieldType'                      : 'textarea',
-                        'fieldDataMaxLength'             : 1024,
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Description of the location',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMaxLength'        : 1024,
-                        'fieldTextareaRows'              : 2,
-                        'fieldValue'                     : locationDescription
-                    ]
-                )}}
-            </div>
         </div>
         <div class="row">
             <div class="col">
@@ -203,17 +107,20 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'inbound_shipping',
-                        'fieldLabel'                     : 'Shipping',
+                        'fieldLabel'                     : 'Inbound Shipping?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Does location accepts returns or shipment from suppliers?',
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'success',
                         'fieldCheckboxChecked'           : locationInboundShippingChecked,
-                        'fieldCheckboxLabel'             : 'Inbound Shipping?',
                         'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true
                     ]
                 )}}
+            </div>
+            <div class="col">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -221,11 +128,33 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'outbound_shipping',
-                        'fieldLabel'                     : false,
+                        'fieldLabel'                     : 'Outbound Shipping?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Does location ship products to customer?',
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'success',
                         'fieldCheckboxChecked'           : locationOutboundShippingChecked,
-                        'fieldCheckboxLabel'             : 'Outbound Shipping?',
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'can_stock',
+                        'fieldLabel'                     : 'Can Stock?',
+                        'fieldType'                      : 'checkbox',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Does location stock items/products? In case of warehouse or shop location.',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldCheckboxChecked'           : locationCanStockChecked,
                         'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
@@ -236,7 +165,7 @@
         </div>
         <hr>
         <div class="row">
-            <div class="col-md-12 col-sm-12">
+            <div class="col">
                 {% include 'common/address/view' with
                     [
                         'component'                                   : component,
@@ -268,6 +197,52 @@
                         'countryFieldBazPostOnUpdate'                 : true
                     ]
                 %}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'address_id',
+                        'fieldLabel'                     : 'Location Address ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Location Address ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : locationAddressId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'notes',
+                        'fieldLabel'                     : 'Location Notes',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Notes of the location',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : locationNotes
+                    ]
+                )}}
             </div>
         </div>
     </fieldset>
@@ -302,23 +277,14 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-name'                    : { },
-        '{{componentId}}-{{sectionId}}-type'                    : {
-            'placeholder' : 'SELECT LOCATION TYPE',
-        },
-        '{{componentId}}-{{sectionId}}-description'             : { },
-        '{{componentId}}-{{sectionId}}-primary_contact'         : {
-            'placeholder' : 'SELECT PRIMARY CONTACT',
-        },
-        '{{componentId}}-{{sectionId}}-secondary_contact'       : {
-            'placeholder' : 'SELECT SECONDARY CONTACT',
-        },
         '{{componentId}}-{{sectionId}}-inbound_shipping'        : { },
         '{{componentId}}-{{sectionId}}-outbound_shipping'       : { },
+        '{{componentId}}-{{sectionId}}-can_stock'               : { },
+        '{{componentId}}-{{sectionId}}-address_id'              : { },
+        '{{componentId}}-{{sectionId}}-notes'                   : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                   : 'required',
-                '{{componentId}}-{{sectionId}}-type'                   : 'required',
-                '{{componentId}}-{{sectionId}}-primary_contact'        : 'required',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'required',
                 '{{componentId}}-{{sectionId}}-city'                   : 'required',
                 '{{componentId}}-{{sectionId}}-post_code'              : 'required',
@@ -327,8 +293,6 @@ dataCollectionSection =
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                   : 'Please enter location name',
-                '{{componentId}}-{{sectionId}}-type'                   : 'Please select location type',
-                '{{componentId}}-{{sectionId}}-primary_contact'        : 'Please select location primary contact',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'Please enter street address',
                 '{{componentId}}-{{sectionId}}-city'                   : 'Please enter city',
                 '{{componentId}}-{{sectionId}}-post_code'              : 'Please enter post code',
