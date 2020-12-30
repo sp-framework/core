@@ -13,7 +13,18 @@
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row vdivide">
             <div class="col-md-4 col-sm-12">
-                <div class="row">
+                {% include '../common/images/croppie' with
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'logo',
+                        'fieldValue'                     : brandLogo,
+                        'imageType'                      : 'logo'
+                    ]
+                %}
+{#                 <div class="row">
                     <div class="col mb-2">
                         {{adminltetags.useTag('fields',
                             [
@@ -50,7 +61,7 @@
                                         'icon'                  : 'upload',
                                         'size'                  : 'sm',
                                         'buttonAdditionalClass' : 'mr-1 ml-1 btn-file',
-                                        'content'               : '<input type="file" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*">'
+                                        'content'               : '<input type="file" class="ignore" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*"/>'
                                     },
                                     'croppie-save' :
                                     {
@@ -84,12 +95,11 @@
                         <img alt="logo" src="/ecom/admin/default/images/general/logo.png" class="user-image img-fluid img-thumbnail">
                     {% endif %}
                     <div id="{{componentId}}-{{sectionId}}-croppie" hidden></div>
-                </div>
+                </div> #}
             </div>
             <div class="col">
                 <div class="row">
                     <div class="col">
-                        <input class="token" type="hidden" name="{{tokenKey}}" value="{{token}}">
                         {{adminltetags.useTag('fields',
                             [
                                 'component'                      : component,
@@ -194,158 +204,166 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
-        '{{componentId}}-{{sectionId}}-logo'                    : {
-            afterInit: function() {
-                var uploadUUIDs = [];
-                var deleteUUIDs = [];
-                var imageCropper, imageBlob, newImage, oldImage, imageName;
+        // '{{componentId}}-{{sectionId}}-logo'                    : {
+        //     afterInit: function() {
+        //         var uploadUUIDs = [];
+        //         var deleteUUIDs = [];
+        //         var imageCropper, imageBlob, newImage, oldImage, imageName;
 
-                function initCroppie() {
-                    imageCropper =
-                        $('#{{componentId}}-{{sectionId}}-croppie').croppie({
-                            viewport: {
-                                width: 200,
-                                height: 200,
-                            },
-                            boundary: {
-                                width: 250,
-                                height: 250
-                            }
-                        });
+        //         function initCroppie() {
+        //             imageCropper =
+        //                 $('#{{componentId}}-{{sectionId}}-croppie').croppie({
+        //                     viewport: {
+        //                         width: 200,
+        //                         height: 200,
+        //                     },
+        //                     boundary: {
+        //                         width: 250,
+        //                         height: 250
+        //                     }
+        //                 });
 
-                    $('#{{componentId}}-{{sectionId}}-croppie-upload-image').change(function () {
-                        readFile(this);
-                    });
+        //             $('#{{componentId}}-{{sectionId}}-croppie-upload-image').change(function () {
+        //                 readFile(this);
+        //             });
 
-                    $('#{{componentId}}-{{sectionId}}-croppie-save').click(function (e) {
-                        e.preventDefault();
+        //             $('#{{componentId}}-{{sectionId}}-croppie-save').click(function (e) {
+        //                 e.preventDefault();
 
-                        if ($('#{{componentId}}-{{sectionId}}-logo').val() &&
-                            $('#{{componentId}}-{{sectionId}}-logo').val() !== ''
-                        ) {
-                            oldImage = true;
-                            deleteUUIDs.push($('#{{componentId}}-{{sectionId}}-logo').val());
-                        } else {
-                            oldImage = false;
-                            deleteUUIDs = [];
-                        }
+        //                 if ($('#{{componentId}}-{{sectionId}}-logo').val() &&
+        //                     $('#{{componentId}}-{{sectionId}}-logo').val() !== ''
+        //                 ) {
+        //                     oldImage = true;
+        //                     deleteUUIDs.push($('#{{componentId}}-{{sectionId}}-logo').val());
+        //                 } else {
+        //                     oldImage = false;
+        //                     deleteUUIDs = [];
+        //                 }
 
-                        $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
+        //                 $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
 
-                        //To Canvas for show
-                        imageCropper.croppie('result', {
-                            type    : 'canvas',
-                            size    : 'viewport',
-                            format  : 'jpeg',
-                            circle  : false
-                        }).then(function (croppedImage) {
-                            imageBlob = croppedImage;
-                            $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
-                            $('.user-image').attr('src', croppedImage);
-                            $('.user-image').attr('hidden', false);
-                        });
-                        //To Blob for upload
-                        imageCropper.croppie('result', {
-                            type    : 'blob',
-                            size    : 'viewport',
-                            format  : 'jpeg',
-                            circle  : false
-                        }).then(function (croppedImage) {
-                            imageBlob = croppedImage;
-                            newImage = true;
-                            processDeleteUUIDs();
-                            uploadImage();
-                        });
-                    });
+        //                 //To Canvas for show
+        //                 imageCropper.croppie('result', {
+        //                     type    : 'canvas',
+        //                     size    : 'viewport',
+        //                     format  : 'jpeg',
+        //                     circle  : false
+        //                 }).then(function (croppedImage) {
+        //                     imageBlob = croppedImage;
+        //                     $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
+        //                     $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
+        //                     $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
+        //                     $('.user-image').attr('src', croppedImage);
+        //                     $('.user-image').attr('hidden', false);
+        //                 });
+        //                 //To Blob for upload
+        //                 imageCropper.croppie('result', {
+        //                     type    : 'blob',
+        //                     size    : 'viewport',
+        //                     format  : 'jpeg',
+        //                     circle  : false
+        //                 }).then(function (croppedImage) {
+        //                     imageBlob = croppedImage;
+        //                     newImage = true;
+        //                     processDeleteUUIDs();
+        //                     uploadImage();
+        //                 });
+        //             });
 
-                    $('#{{componentId}}-{{sectionId}}-croppie-cancel').click(function () {
-                        $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
-                        $('.user-image').attr('hidden', false);
-                        $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
-                        oldImage = false;
-                        deleteUUIDs = [];
-                    });
-                }
+        //             $('#{{componentId}}-{{sectionId}}-croppie-cancel').click(function () {
+        //                 $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
+        //                 $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
+        //                 $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
+        //                 $('.user-image').attr('hidden', false);
+        //                 $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
+        //                 oldImage = false;
+        //                 deleteUUIDs = [];
+        //             });
+        //         }
 
-                function readFile(input) {
-                    if (input.files && input.files[0]) {
-                        var reader = new FileReader();
+        //         function readFile(input) {
+        //             if (input.files && input.files[0]) {
+        //                 var reader = new FileReader();
 
-                        reader.onload = function (e) {
-                            $('.user-image').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', false);
-                            $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', false);
-                            $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', false);
-                            imageCropper.croppie('bind', {
-                                url: e.target.result
-                            }).then(function(){
-                                //
-                            });
-                        }
+        //                 reader.onload = function (e) {
+        //                     $('.user-image').attr('hidden', true);
+        //                     $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', false);
+        //                     $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', false);
+        //                     $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', false);
+        //                     imageCropper.croppie('bind', {
+        //                         url: e.target.result
+        //                     }).then(function(){
+        //                         //
+        //                     });
+        //                 }
 
-                        imageName = input.files[0].name;
-                        reader.readAsDataURL(input.files[0]);
-                    }
-                    else {
-                        PNotify.error("Sorry - you're browser doesn't support the FileReader API");
-                    }
-                }
+        //                 imageName = input.files[0].name;
+        //                 reader.readAsDataURL(input.files[0]);
+        //             }
+        //             else {
+        //                 PNotify.error("Sorry - you're browser doesn't support the FileReader API");
+        //             }
+        //         }
 
-                function processDeleteUUIDs() {
-                    if (deleteUUIDs.length > 0) {
+        //         function processDeleteUUIDs() {
+        //             if (deleteUUIDs.length > 0) {
 
-                        var url = '{{links.url("storages/remove")}}';
+        //                 var url = '{{links.url("storages/remove")}}';
 
-                        $(deleteUUIDs).each(function(index, uuid) {
-                            $.ajax({
-                                type    : 'POST',
-                                url     : url,
-                                data    :
-                                    {
-                                        "uuid"             : uuid
-                                    },
-                                dataType: 'json'
-                            }).done(function (data) {
-                                if (data && data.responseCode === 0) {
-                                    //
-                                }
-                            });
-                        });
-                    }
-                }
+        //                 $(deleteUUIDs).each(function(index, uuid) {
+        //                     $.ajax({
+        //                         type    : 'POST',
+        //                         url     : url,
+        //                         data    :
+        //                             {
+        //                                 "uuid"             : uuid
+        //                             },
+        //                         dataType: 'json'
+        //                     }).done(function (data) {
+        //                         if (data.tokenKey && data.token) {
+        //                             $('#security-token').attr('name', data.tokenKey);
+        //                             $('#security-token').val(data.token);
+        //                         }
+        //                         if (data && data.responseCode === 0) {
+        //                             //
+        //                         }
+        //                     });
+        //                 });
+        //             }
+        //         }
 
-                function uploadImage() {
-                    var formData = new FormData();
+        //         function uploadImage() {
+        //             var formData = new FormData();
 
-                    formData.append('file', imageBlob);
-                    formData.append('directory', 'brands');
-                    formData.append('fileName', imageName);
+        //             formData.append('file', imageBlob);
+        //             formData.append('directory', 'brands');
+        //             formData.append('fileName', imageName);
 
-                    var url = '{{links.url("storages/add")}}';
+        //             var url = '{{links.url("storages/add")}}';
 
-                    $.ajax(url, {
-                        method      : 'POST',
-                        data        : formData,
-                        dataType    : 'json',
-                        processData : false,
-                        contentType : false,
-                    }).done(function (data) {
-                        if (data) {
-                            uploadUUIDs.push(data.storageData.uuid);
-                            $('#{{componentId}}-{{sectionId}}-logo').val(data.storageData.uuid);
-                        } else {
-                            PNotify.error('Image Upload Failed!');
-                        }
-                    });
-                }
+        //             $.ajax(url, {
+        //                 method      : 'POST',
+        //                 data        : formData,
+        //                 dataType    : 'json',
+        //                 processData : false,
+        //                 contentType : false,
+        //             }).done(function (data) {
+        //                 if (data) {
+        //                     if (data.tokenKey && data.token) {
+        //                         $('#security-token').attr('name', data.tokenKey);
+        //                         $('#security-token').val(data.token);
+        //                     }
+        //                     uploadUUIDs.push(data.storageData.uuid);
+        //                     $('#{{componentId}}-{{sectionId}}-logo').val(data.storageData.uuid);
+        //                 } else {
+        //                     PNotify.error('Image Upload Failed!');
+        //                 }
+        //             });
+        //         }
 
-                initCroppie();
-            }
-        },
+        //         initCroppie();
+        //     }
+        // },
         '{{componentId}}-{{sectionId}}-name'                    : { },
         '{{componentId}}-{{sectionId}}-description'             : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
