@@ -5,7 +5,7 @@
     "version"       : "0.0.1",
     "category"      : "ecom",
     "sub_category"  : "common",
-    "repo"          : "https://github.com/h-w-f/middleware-admin-auth",
+    "repo"          : "https://.../ecom-common-middleware-auth",
     "class"         : "Applications\\Ecom\\Common\\Middlewares\\Auth",
     "settings"      : { }
 }

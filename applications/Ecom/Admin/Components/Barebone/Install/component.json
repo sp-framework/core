@@ -5,20 +5,20 @@
 	"category"      : "ecom",
 	"sub_category"  : "admin",
 	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/component-admin-barebone",
+	"repo"			: "https://.../ecom-admin-component-barebone",
 	"class"			: "Applications\\Ecom\\Admin\\Components\\Barebone\\BareboneComponent",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/core"
+			"repo"		: "https://.../core"
 		},
 		"components"	: [],
 		"packages"		:
 		[{
 			"name"		: "Barebone",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/package-admin-barebone"
+			"repo"		: "https://.../package-admin-barebone"
 		}],
 		"middlewares"	: [],
 		"views"			: []

@@ -5,18 +5,30 @@
     "category"      : "ecom",
     "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-dashboard-categories",
+    "repo"          : "https://.../ecom-dashboard-component-inventory-categories",
     "class"         : "Applications\\Ecom\\Dashboard\\Components\\Inventory\\Categories\\CategoriesComponent",
     "dependencies"  : {
-        "core"          : {
-            "name"      : "Core",
-            "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/core"
+        "core": {
+            "name": "Core",
+            "version": "0.0.1",
+            "repo": "https://.../core"
         },
-        "components"    : [],
-        "packages"      : [],
-        "middlewares"   : [],
-        "views"         : []
+        "components": [],
+        "packages":
+        [
+            {
+                "name": "Categories",
+                "version": "0.0.1",
+                "repo": "https://.../ecom-dashboard-package-inventory-categories"
+            },
+            {
+                "name": "Channels",
+                "version": "0.0.1",
+                "repo": "https://.../ecom-common-package-channels"
+            }
+        ],
+        "middlewares": [],
+        "views": []
     },
     "menu"              : {
         "seq"           : 3,

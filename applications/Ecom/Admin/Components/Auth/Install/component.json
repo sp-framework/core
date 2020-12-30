@@ -5,13 +5,13 @@
     "category"      : "ecom",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-admin-auth",
+    "repo"          : "https://.../ecom-admin-component-auth",
     "class"         : "Applications\\Ecom\\Admin\\Components\\Auth\\AuthComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
             "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/core"
+            "repo"      : "https://.../core"
         },
         "components"    : [],
         "packages"      : [],

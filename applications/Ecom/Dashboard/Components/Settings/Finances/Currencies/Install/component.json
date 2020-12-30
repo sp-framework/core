@@ -5,7 +5,7 @@
     "category"      : "ecom",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
-    "repo"          : "https://.../ecom-admin-component-settings-finances-currencies",
+    "repo"          : "https://.../ecom-admin-component-currencies",
     "class"         : "Applications\\Ecom\\Admin\\Components\\Settings\\Finances\\Currencies\\CurrenciesComponent",
     "dependencies"  : {
         "core"          : {

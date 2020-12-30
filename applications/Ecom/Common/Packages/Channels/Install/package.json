@@ -1,8 +1,10 @@
 {
-	"name"			: "Channels",
-	"displayName" 	: "Admin Channels Package",
-	"description"	: "Package for Channels component",
-	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/package-admin-channels",
-	"settings"		: {	}
+    "name"          : "Channels",
+    "displayName"   : "Admin Channels Package",
+    "description"   : "Package for Channels component",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../ecom-common-package-channels",
+    "category"      : "ecom",
+    "sub_category"  : "common",
+    "settings"      : { }
 }

@@ -1,8 +1,10 @@
 {
-	"name"			: "Currencies",
-	"displayName" 	: "Admin Currencies Package",
-	"description"	: "Package for Currencies component",
-	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/package-admin-currencies",
-	"settings"		: {	}
+    "name"          : "Currencies",
+    "displayName"   : "Admin Currencies Package",
+    "description"   : "Package for Currencies component",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../ecom-common-package-currencies",
+    "category"      : "ecom",
+    "sub_category"  : "common",
+    "settings"      : { }
 }

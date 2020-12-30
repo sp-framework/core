@@ -2,7 +2,9 @@
     "name"          : "Specifications",
     "displayName"   : "Admin Specifications Package",
     "description"   : "Package for Specifications component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/package-admin-specifications",
+    "repo"          : "https://.../ecom-dashboard-package-inventory-specifications",
     "settings"      : { }
 }

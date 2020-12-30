@@ -4,7 +4,7 @@
 	"displayName" 	: "Component Home (Barebone)",
 	"description"	: "Component Home (Barebone)",
 	"version"		: "0.0.1",
-	"repo"			: "https://",
+	"repo"			: "https://.../category-subcategory-type-name",
 	"path"			: "/",
 	"class"			: "Applications\\Barebone\\Components\\Home\\HomeComponent",
 	"type"			: "forms",
@@ -12,20 +12,10 @@
 		"core"			: {
 			"name"		: "Core",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/core"
-		},
-		"application" : {
-			"name"		: "Barebone",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
+			"repo"		: "https://.../core"
 		},
 		"components"	: [],
-		"packages"		:
-		[{
-			"name"		: "Barebone",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		}],
+		"packages"		: [],
 		"middlewares"	: [],
 		"views"			: []
 	},

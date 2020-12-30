@@ -1,12 +1,12 @@
 {
-    "route"         : "storages",
-    "name"          : "Storages",
-    "description"   : "List storages via this component",
+    "route"         : "settings/geo",
+    "name"          : "Geo",
+    "description"   : "Manage dashboard geo via this component",
     "category"      : "ecom",
     "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://.../ecom-dashboard-component-storages",
-    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Storages\\StoragesComponent",
+    "repo"          : "https://.../ecom-dashboard-component-settings-geo",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Settings\\Geo\\GeoComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -20,5 +20,6 @@
     },
     "menu"              : false,
     "settings"          : {
+        "mandatory"     : true
     }
 }

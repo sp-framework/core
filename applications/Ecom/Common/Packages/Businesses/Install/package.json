@@ -3,6 +3,8 @@
     "displayName"   : "Admin Businesses Package",
     "description"   : "Package for Businesses component",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/package-admin-businesses",
+    "repo"          : "https://.../ecom-common-package-businesses",
+    "category"      : "ecom",
+    "sub_category"  : "common",
     "settings"      : { }
 }

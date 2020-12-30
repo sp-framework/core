@@ -1,8 +1,10 @@
 {
-	"name"			: "Barebone",
-	"displayName" 	: "Admin Barebone Package",
-	"description"	: "Package for Barebone component",
-	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/package-admin-barebone",
-	"settings"		: {	}
+    "name"          : "Barebone",
+    "displayName"   : "Admin Barebone Package",
+    "description"   : "Package for Barebone component",
+    "version"       : "0.0.1",
+    "category"      : "ecom",
+    "sub_category"  : "admin",
+    "repo"          : "https://.../ecom-admin-package-barebone",
+    "settings"      : { }
 }

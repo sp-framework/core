@@ -1,8 +1,10 @@
 {
-	"name"			: "Taxes",
-	"displayName" 	: "Admin Taxes Package",
-	"description"	: "Package for Taxes component",
-	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/package-admin-taxes",
-	"settings"		: {	}
+    "name"          : "Taxes",
+    "displayName"   : "Admin Taxes Package",
+    "description"   : "Package for Taxes component",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../ecom-common-package-taxes",
+    "category"      : "ecom",
+    "sub_category"  : "common",
+    "settings"      : { }
 }

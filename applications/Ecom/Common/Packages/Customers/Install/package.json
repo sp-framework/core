@@ -3,6 +3,8 @@
     "displayName"   : "Admin Customers Package",
     "description"   : "Package for Customers component",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/package-admin-customers",
+    "repo"          : "https://.../ecom-common-package-customers",
+    "category"      : "ecom",
+    "sub_category"  : "common",
     "settings"      : { }
 }

@@ -3,17 +3,17 @@
 	"displayName"   : "Barebone Application View (Default)",
 	"description"   : "Default Barebone View",
 	"version"       : "0.0.1",
-	"repo"          : "https://github.com/h-w-f/view-admin-default",
+	"repo"          : "https://.../view-admin-default",
 	"dependencies"  : {
 		"core"          : {
 			"name"      : "Core",
 			"version"   : "0.0.1",
-			"repo"      : "https://github.com/h-w-f/core"
+			"repo"      : "https://.../core"
 		},
 		"application"  	: {
 			"name"      : "Barebone",
 			"version"   : "0.0.1",
-			"repo"      : "https://github.com/h-w-f/application-admin"
+			"repo"      : "https://.../application-admin"
 		},
 		"components"    : [],
 		"packages"      : [],

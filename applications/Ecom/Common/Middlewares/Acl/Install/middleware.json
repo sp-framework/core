@@ -5,7 +5,7 @@
     "category"      : "ecom",
     "sub_category"  : "common",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/middleware-admin-acl",
+    "repo"          : "https://.../ecom-common-middleware-acl",
     "class"         : "Applications\\Ecom\\Common\\Middlewares\\Acl",
     "settings"      : { }
 }

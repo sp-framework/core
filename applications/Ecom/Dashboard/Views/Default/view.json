@@ -4,12 +4,12 @@
     "category"      : "ecom",
     "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/view-dashboard-default",
+    "repo"          : "https://.../ecom-dashboard-view-default",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
             "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/core"
+            "repo"      : "https://.../core"
         },
         "components"    : [],
         "packages"      : [],

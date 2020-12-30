@@ -3,25 +3,15 @@
 	"displayName" 	: "Home Package (Barebone)",
 	"description"	: "Home Package (Barebone)",
 	"version"		: "0.0.1",
-	"repo"			: "https://",
+	"repo"			: "https://.../category-subcategory-type-name",
 	"path"			: "/",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/core"
+			"repo"		: "https://.../core"
 		},
-		"application" : {
-			"name"		: "Barebone",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		},
-		"components"	:
-		[{
-			"name"		: "Barebone",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		}],
+		"components"	: [],
 		"packages"		: [],
 		"middlewares"	: [],
 		"views"			: []

@@ -1,8 +1,10 @@
 {
-	"name"			: "Locations",
-	"displayName" 	: "Locations Package",
-	"description"	: "Package for Locations component",
-	"version"		: "0.0.1",
-	"repo"			: "https://github.com/h-w-f/package-dashboard-locations",
-	"settings"		: {	}
+    "name"          : "Locations",
+    "displayName"   : "Locations Package",
+    "description"   : "Package for Locations component",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../ecom-common-package-locations",
+    "category"      : "ecom",
+    "sub_category"  : "common",
+    "settings"      : { }
 }

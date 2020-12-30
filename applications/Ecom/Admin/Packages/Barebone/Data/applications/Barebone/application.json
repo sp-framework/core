@@ -4,37 +4,17 @@
 	"displayName" 	: "Barebone Application",
 	"description" 	: "Barebone Application",
 	"version"		: "0.0.1",
-	"repo"			: "https://",
+	"repo"			: "https://.../category-subcategory-type-name",
 	"dependencies"	: {
 		"core"			: {
 		"name"		: "Core",
 		"version"	: "0.0.1",
-		"repo"		: "https://github.com/h-w-f/core"
+		"repo"		: "https://.../core"
 		},
-		"components"	:
-		[{
-			"name"		: "Home",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		}],
-		"packages"		:
-		[{
-			"name"		: "Home",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		}],
-		"middlewares"	:
-		[{
-			"name"		: "Home",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		}],
-		"views"			:
-		[{
-			"name"		: "Default",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
-		}]
+		"components"	: [],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
 	},
 	"settings"		: {
 		"domain"			: "",

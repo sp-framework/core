@@ -3,19 +3,14 @@
 	"displayName" 	: "Home Middleware (Barebone)",
 	"description"	: "Home Middleware (Barebone)",
 	"version"		: "0.0.1",
-	"repo"			: "https://",
+	"repo"			: "https://../category-subcategory-type-name",
 	"path"			: "/",
 	"class"			: "Applications\\Barebone\\Middlewares\\Home",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
 			"version"	: "0.0.1",
-			"repo"		: "https://github.com/h-w-f/core"
-		},
-		"application" : {
-			"name"		: "Barebone",
-			"version"	: "0.0.1",
-			"repo"		: "https://"
+			"repo"		: "https://.../core"
 		},
 		"components"	: [],
 		"packages"		: [],

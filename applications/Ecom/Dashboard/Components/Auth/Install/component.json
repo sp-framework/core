@@ -1,12 +1,12 @@
 {
-    "route"         : "storages",
-    "name"          : "Storages",
-    "description"   : "List storages via this component",
+    "route"         : "auth",
+    "name"          : "Auth",
+    "description"   : "Manage dashboard auth via this component",
     "category"      : "ecom",
     "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://.../ecom-dashboard-component-storages",
-    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Storages\\StoragesComponent",
+    "repo"          : "https://.../ecom-dashboard-component-auth",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Auth\\AuthComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -20,5 +20,6 @@
     },
     "menu"              : false,
     "settings"          : {
+        "mandatory"     : true
     }
 }

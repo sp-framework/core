@@ -5,13 +5,13 @@
     "category"      : "ecom",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-admin-apps",
+    "repo"          : "https://.../ecom-admin-component-apps",
     "class"         : "Applications\\Ecom\\Admin\\Components\\Apps\\AppsComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
             "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/core"
+            "repo"      : "https://.../core"
         },
         "components"    : [],
         "packages"      : [],

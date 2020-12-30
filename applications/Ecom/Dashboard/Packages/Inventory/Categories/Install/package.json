@@ -2,7 +2,9 @@
     "name"          : "Categories",
     "displayName"   : "Admin Categories Package",
     "description"   : "Package for Categories component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/package-admin-brands",
+    "repo"          : "https://.../ecom-dashboard-package-inventory-categories",
     "settings"      : { }
 }

@@ -1,12 +1,12 @@
 {
-    "route"         : "settings/geo",
-    "name"          : "Geo",
-    "description"   : "Manage admin geo via this component",
+    "route"         : "settings/finances/taxes",
+    "name"          : "Taxes",
     "category"      : "ecom",
     "sub_category"  : "admin",
+    "description"   : "List taxes via this component",
     "version"       : "0.0.1",
-    "repo"          : "https://.../ecom-admin-component-settings-geo",
-    "class"         : "Applications\\Ecom\\Admin\\Components\\Settings\\Geo\\GeoComponent",
+    "repo"          : "https://.../ecom-admin-component-taxes",
+    "class"         : "Applications\\Ecom\\Admin\\Components\\Settings\\Finances\\Taxes\\TaxesComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -24,9 +24,15 @@
             "title"     : "settings",
             "icon"      : "cogs",
             "childs"    : {
-                "geo"   : {
-                    "title"     : "Geo Locations",
-                    "link"      : "geo"
+                "finance"       : {
+                    "title"     : "finance",
+                    "icon"      : "dollar-sign",
+                    "childs"    : {
+                        "taxes" : {
+                            "title"     : "taxes",
+                            "link"      : "taxes"
+                        }
+                    }
                 }
             }
         }

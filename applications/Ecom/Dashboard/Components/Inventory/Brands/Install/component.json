@@ -5,16 +5,23 @@
     "category"      : "ecom",
     "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-dashboard-brands",
+    "repo"          : "https://.../ecom-dashboard-component-inventory-brands",
     "class"         : "Applications\\Ecom\\Dashboard\\Components\\Inventory\\Brands\\BrandsComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
             "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/core"
+            "repo"      : "https://.../core"
         },
         "components"    : [],
-        "packages"      : [],
+        "packages":
+        [
+            {
+                "name"      : "Brands",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../ecom-dashboard-package-inventory-brands"
+            }
+        ],
         "middlewares"   : [],
         "views"         : []
     },

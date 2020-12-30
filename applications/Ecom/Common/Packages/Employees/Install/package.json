@@ -3,6 +3,8 @@
     "displayName"   : "Employees Package",
     "description"   : "Package for Employees component",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/package-common-employees",
+    "repo"          : "https://.../ecom-common-package-employees",
+    "category"      : "ecom",
+    "sub_category"  : "common",
     "settings"      : { }
 }

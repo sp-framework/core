@@ -5,16 +5,28 @@
     "category"      : "ecom",
     "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://github.com/h-w-f/component-dashboard-suppliers",
+    "repo"          : "https://.../ecom-dashboard-component-inventory-suppliers",
     "class"         : "Applications\\Ecom\\Dashboard\\Components\\Inventory\\Suppliers\\SuppliersComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
             "version"   : "0.0.1",
-            "repo"      : "https://github.com/h-w-f/core"
+            "repo"      : "https://.../core"
         },
         "components"    : [],
-        "packages"      : [],
+        "packages":
+        [
+            {
+                "name"      : "Specifications",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../ecom-dashboard-package-inventory-specifications"
+            },
+            {
+                "name"      : "Brands",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../ecom-dashboard-package-inventory-brands"
+            }
+        ],
         "middlewares"   : [],
         "views"         : []
     },
