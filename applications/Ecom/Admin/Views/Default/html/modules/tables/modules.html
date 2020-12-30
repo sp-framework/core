@@ -1,0 +1,53 @@
+<table class="table table-sm table-hover">
+    <thead>
+        <tr>
+            <th class="text-uppercase">Name</th>
+            <th class="text-uppercase">Description</th>
+            <th class="text-uppercase">Category</th>
+            <th class="text-uppercase">Sub Category</th>
+            <th class="text-uppercase">Menu</th>
+            <th class="text-uppercase">Version</th>
+            <th class="text-uppercase">Update Available</th>
+            <th class="text-uppercase">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for moduleKey, module in modules %}
+            <tr>
+                <td>
+                    {{module['name']}}
+                    {% if module['new'] is defined and module['new'] %}
+                        <span class="badge badge-success">New</span>
+                    {% endif %}
+                </td>
+                <td class="text-truncate" style="max-width: 20rem;">{{module['description']}}</td>
+                <td>{{module['category']}}</td>
+                <td>{{module['sub_category']}}</td>
+                <td>
+                {% if module['menu_id'] is defined and module['menu_id'] %}
+                    YES
+                {% else %}
+                    -
+                {% endif %}
+                </td>
+                <td>{{module['version']}}</td>
+                <td>
+                    {% if module['update_available'] and module['update_available'] == 1 %}
+                        Yes
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                <button type="button" class="btn btn-info btn-xs"><i class="fa fa-fw fa-info-circle"></i></button>
+                {% if module['installed'] == 0 %}
+                    <button type="button" class="btn btn-primary btn-xs"><i class="fa fa-fw fa-download"></i></button>
+                {% endif %}
+                {% if module['update_available'] and module['update_available'] == 1 %}
+                    <button type="button" class="btn btn-primary btn-xs">Update ({{module['update_version']}})</button>
+                {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
