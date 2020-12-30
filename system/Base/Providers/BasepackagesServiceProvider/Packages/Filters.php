@@ -59,7 +59,7 @@ class Filters extends BasePackage
 
     protected function getFilters(int $componentId, array $account = null)
     {
-        if ($account['id']) {
+        if ($account && isset($account['id'])) {
 
             $filtersArr =
                 $this->getByParams(
@@ -84,25 +84,29 @@ class Filters extends BasePackage
                     ]
                 );
 
-            foreach ($sharedFiltersArr as $filterKey => $filter) {
-                $filter['shared_ids'] = Json::decode($filter['shared_ids'], true);
+            if ($sharedFiltersArr) {
+                foreach ($sharedFiltersArr as $filterKey => $filter) {
+                    $filter['shared_ids'] = Json::decode($filter['shared_ids'], true);
 
-                if (isset($filter['shared_ids']['rids'])) {
-                    if (Arr::has($filter['shared_ids']['rids'], $account['role_id'])) {
-                        $filter['account_name'] = $account['email'];
-                        $filter['shared_ids'] = Json::encode($filter['shared_ids']);
-                        $sharedFilters[$filter['id']] = $filter;
-                    }
-                } else if (isset($filter['shared_ids']['uids'])) {
-                    if (Arr::has($filter['shared_ids']['uids'], $account['id'])) {
-                        $filter['account_name'] = $account['email'];
-                        $filter['shared_ids'] = Json::encode($filter['shared_ids']);
-                        $sharedFilters[$filter['id']] = $filter;
+                    if (isset($filter['shared_ids']['rids'])) {
+                        if (Arr::has($filter['shared_ids']['rids'], $account['role_id'])) {
+                            $filter['account_name'] = $account['email'];
+                            $filter['shared_ids'] = Json::encode($filter['shared_ids']);
+                            $sharedFilters[$filter['id']] = $filter;
+                        }
+                    } else if (isset($filter['shared_ids']['uids'])) {
+                        if (Arr::has($filter['shared_ids']['uids'], $account['id'])) {
+                            $filter['account_name'] = $account['email'];
+                            $filter['shared_ids'] = Json::encode($filter['shared_ids']);
+                            $sharedFilters[$filter['id']] = $filter;
+                        }
                     }
                 }
+
+                return array_merge($filters, $sharedFilters);
             }
 
-            return array_merge($filters, $sharedFilters);
+            return $filters;
         }
         return
             $this->getByParams(
