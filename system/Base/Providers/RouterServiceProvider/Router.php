@@ -5,6 +5,7 @@ namespace System\Base\Providers\RouterServiceProvider;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Router as PhalconRouter;
+use System\Base\Providers\RouterServiceProvider\Exceptions\ApplicationNotAllowedException;
 use System\Base\Providers\RouterServiceProvider\Exceptions\DomainNotRegisteredException;
 
 class Router
@@ -285,7 +286,8 @@ class Router
 				' on domain ' . $this->request->getHttpHost()
 			);
 
-			return false;
+			throw new ApplicationNotAllowedException('Trying to access application ' . $this->applicationInfo['name'] .
+				' on domain ' . $this->request->getHttpHost());
 		}
 
 		if (!isset($this->domain['applications'][$this->applicationInfo['id']])) {

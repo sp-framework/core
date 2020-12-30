@@ -19,4 +19,11 @@ class ErrorsComponent extends BaseComponent
 
         $this->view->pick('common/errors/notfound');
     }
+
+    public function routeNotFoundAction()
+    {
+        $this->view->setViewsDir($this->modules->views->getPhalconViewPath());
+
+        $this->view->pick('common/errors/notfound');
+    }
 }

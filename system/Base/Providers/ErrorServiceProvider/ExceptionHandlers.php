@@ -26,9 +26,25 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/Error/'));
+		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/View/errors/'));
 
-		return $this->view->partial('permissiondenied');
+		return $this->view->partial('permissionDenied');
+	}
+
+	public function handleApplicationNotAllowedException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
+
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = 'Not Found!';
+
+			return $this->sendJson();
+		}
+
+		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/View/errors/'));
+
+		return $this->view->partial('notFound');
 	}
 
 	public function handleValidationException()

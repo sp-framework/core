@@ -77,7 +77,7 @@ abstract class BaseComponent extends Controller
 
 	public function beforeExecuteRoute(Dispatcher $dispatcher)
 	{
-		if (!$this->component) {
+		if (!$this->component && $this->application) {
 			$component = $this->modules->components->getIdComponent($this->application['errors_component']);
 
 			if (isset($this->application['errors_component']) &&
@@ -101,7 +101,7 @@ abstract class BaseComponent extends Controller
 				]
 			);
 
-			return false;
+			return;
 		}
 	}
 
