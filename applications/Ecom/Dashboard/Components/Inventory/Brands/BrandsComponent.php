@@ -2,11 +2,9 @@
 
 namespace Applications\Ecom\Dashboard\Components\Inventory\Brands;
 
-use Applications\Ecom\Dashboard\Packages\ABNLookup\ABNLookup;
-use Applications\Ecom\Dashboard\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Ecom\Dashboard\Packages\Inventory\Brands\Brands;
 use System\Base\BaseComponent;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 class BrandsComponent extends BaseComponent
 {

@@ -6,7 +6,6 @@ use Applications\Ecom\Common\Packages\ABNLookup\ABNLookup;
 use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Ecom\Common\Packages\Businesses\Businesses;
 use System\Base\BaseComponent;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 class BusinessesComponent extends BaseComponent
 {
@@ -53,7 +52,7 @@ class BusinessesComponent extends BaseComponent
 
                 unset($businesses[$this->getData()['id']]);
 
-                $storages = $this->usePackage(Storages::class);
+                $storages = $this->basepackages->storages;
 
                 $this->view->logoLink = $storages->getPublicLink($this->view->business['logo'], 200);
             }

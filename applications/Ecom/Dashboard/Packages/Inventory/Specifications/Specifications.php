@@ -30,6 +30,8 @@ class Specifications extends BasePackage
                 return false;
             }
 
+            $data['product_count'] = 0;
+
             if ($this->add($data)) {
                 $this->packagesData->responseCode = 0;
 
@@ -93,7 +95,7 @@ class Specifications extends BasePackage
                 ]
             );
 
-            if (count($childs) > 0) {
+            if ($childs && count($childs) > 0) {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Specification is a group and other specifications are assigned to it. Error removing specification group.';

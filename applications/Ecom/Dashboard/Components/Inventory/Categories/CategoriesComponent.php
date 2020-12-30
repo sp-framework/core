@@ -2,12 +2,11 @@
 
 namespace Applications\Ecom\Dashboard\Components\Inventory\Categories;
 
-use Applications\Ecom\Dashboard\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Ecom\Common\Packages\Channels\Channels;
 use Applications\Ecom\Dashboard\Packages\Inventory\Categories\Categories;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 class CategoriesComponent extends BaseComponent
 {

@@ -30,6 +30,8 @@ class Categories extends BasePackage
 
             $data = $this->buildCategory($data);
 
+            $data['product_count'] = 0;
+
             if ($this->add($data)) {
                 $this->packagesData->responseCode = 0;
 

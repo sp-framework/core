@@ -2,13 +2,12 @@
 
 namespace Applications\Ecom\Dashboard\Components\Inventory\Suppliers;
 
-use Applications\Ecom\Dashboard\Packages\ABNLookup\ABNLookup;
-use Applications\Ecom\Dashboard\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\ABNLookup\ABNLookup;
 use Applications\Ecom\Dashboard\Packages\Inventory\Brands\Brands;
 use Applications\Ecom\Dashboard\Packages\Inventory\Suppliers\Suppliers;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 class SuppliersComponent extends BaseComponent
 {
@@ -29,7 +28,7 @@ class SuppliersComponent extends BaseComponent
             $findDetails = $abn->lookupABN($this->postData()['abn']);
 
             if ($findDetails) {
-                $this->view->supplierDetails = $abn->packagesData->supplierDetails;
+                $this->view->supplierDetails = $abn->packagesData->businessDetails;
             }
             $this->view->responseCode = $abn->packagesData->responseCode;
 

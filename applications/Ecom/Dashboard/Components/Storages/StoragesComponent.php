@@ -2,7 +2,7 @@
 
 namespace Applications\Ecom\Dashboard\Components\Storages;
 
-use Applications\Ecom\Admin\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 

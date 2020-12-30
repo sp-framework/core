@@ -2,11 +2,9 @@
 
 namespace Applications\Ecom\Dashboard\Components\Inventory\Specifications;
 
-use Applications\Ecom\Dashboard\Packages\ABNLookup\ABNLookup;
-use Applications\Ecom\Dashboard\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Ecom\Dashboard\Packages\Inventory\Specifications\Specifications;
 use System\Base\BaseComponent;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 class SpecificationsComponent extends BaseComponent
 {
@@ -72,18 +70,21 @@ class SpecificationsComponent extends BaseComponent
                     if ($specificationValue['group_id'] != '0') {
                         $group = $this->specifications->getById($specificationValue['group_id']);
                         $groupToName[$specificationValue['group_id']] = $group['name'];
-                    } else {
                     }
                 }
 
                 $replaceColumns =
                     [
-                        'is_group' => ['html' => ['0' => 'No', '1' => 'Yes']],
-                        'group_id' => ['html'  => $groupToName]
+                        'is_group'          => ['html' => ['0' => 'No', '1' => 'Yes']],
+                        'group_id'          => ['html' => $groupToName]
                     ];
 
             } else {
-                $replaceColumns = null;
+                $replaceColumns =
+                    [
+                        'is_group'          => ['html' => ['0' => 'No', '1' => 'Yes']],
+                        'group_id'          => ['html' => ['0' => '-']]
+                    ];
             }
         } else {
             $replaceColumns = null;
