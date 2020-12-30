@@ -46,6 +46,30 @@ class Packages extends BasePackage
 		}
 	}
 
+	public function getNamedPackageForRepo($name, $repo)
+	{
+		$filter =
+			$this->model->filter(
+				function($package) use ($name, $repo) {
+					$package = $package->toArray();
+
+					if ($package['name'] === ucfirst($name) &&
+						$package['repo'] === $repo
+					) {
+						return $package;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate package name found for package ' . $name);
+		} else if (count($filter) === 1) {
+			return $filter[0];
+		} else {
+			return false;
+		}
+	}
+
 	public function getIdPackage($id)
 	{
 		$filter =
@@ -86,6 +110,34 @@ class Packages extends BasePackage
 		} else {
 			return false;
 		}
+	}
+
+	public function getPackagesForCategoryAndSubcategory($category, $subCategory, $inclCommon = true)
+	{
+		$packages = [];
+
+		$filter =
+			$this->model->filter(
+				function($package) use ($category, $subCategory, $inclCommon) {
+					$package = $package->toArray();
+					if ($inclCommon) {
+						if (($package['category'] === $category && $package['sub_category'] === $subCategory) ||
+							($package['category'] === $category && $package['sub_category'] === 'common')
+						) {
+							return $package;
+						}
+					} else {
+						if ($package['category'] === $category && $package['sub_category'] === $subCategory) {
+							return $package;
+						}
+					}
+				}
+			);
+
+		foreach ($filter as $key => $value) {
+			$packages[$key] = $value;
+		}
+		return $packages;
 	}
 
 	public function addPackage(array $data)

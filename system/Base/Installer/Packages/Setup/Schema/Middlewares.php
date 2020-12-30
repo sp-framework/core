@@ -100,6 +100,13 @@ class Middlewares
 						]
 					),
 					new Column(
+						'installed',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'files',
 						[
 							'type'    => Column::TYPE_TEXT,
@@ -122,6 +129,21 @@ class Middlewares
 							'notNull' => false,
 						]
 					),
+					new Column(
+						'updated_by',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'updated_on',
+						[
+							'type'    => Column::TYPE_TIMESTAMP,
+							'notNull' => true,
+							'default' => 'CURRENT_TIMESTAMP',
+						]
+					)
 				]
 			];
 	}

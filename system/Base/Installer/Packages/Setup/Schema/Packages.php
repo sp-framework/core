@@ -45,6 +45,22 @@ class Packages
 						]
 					),
 					new Column(
+						'category',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'sub_category',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'version',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -76,6 +92,13 @@ class Packages
 						]
 					),
 					new Column(
+						'installed',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'files',
 						[
 							'type'    => Column::TYPE_TEXT,
@@ -98,6 +121,21 @@ class Packages
 							'notNull' => false,
 						]
 					),
+					new Column(
+						'updated_by',
+						[
+							'type'    => Column::TYPE_INTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'updated_on',
+						[
+							'type'    => Column::TYPE_TIMESTAMP,
+							'notNull' => true,
+							'default' => 'CURRENT_TIMESTAMP',
+						]
+					)
 				]
 			];
 	}

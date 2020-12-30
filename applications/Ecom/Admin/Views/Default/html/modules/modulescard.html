@@ -1,6 +1,18 @@
 {% if modules|length != 0 %}
     <div class="row">
-        {% for moduleKey, module in modules %}
+        {% if modules|length === 1 and modules[modules|keys[0]]['name'] === 'Core' %}
+            {% include 'modules/tables/core' with ['module':modules[modules|keys[0]]] %}
+        {% else %}
+            {% include 'modules/tables/modules' with
+                [
+                    'modules'               : modules,
+                    'component'             : component,
+                    'componentId'           : componentId,
+                    'parent'                : parent
+                ]
+            %}
+        {% endif %}
+{#         {% for moduleKey, module in modules %}
             {% if modulesKey == 'core' %}
                 {% set colSize = '12' %}
             {% else %}
@@ -35,7 +47,7 @@
                     ]
                 )}}
             </div>
-        {% endfor %}
+        {% endfor %} #}
     </div>
 {% elseif modules|length == 0 %}
     <div class="row">

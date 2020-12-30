@@ -28,7 +28,7 @@ class Component
 					Json::encode($componentFile['menu']) :
 					false,
 				'menu_id'				=> $menuId,
-				'installed'				=> 0,
+				'installed'				=> 1,
 				'applications'			=>
 					Json::encode(['1'=>['enabled'=>true]]),
 				'files'					=> Json::encode($installedFiles),

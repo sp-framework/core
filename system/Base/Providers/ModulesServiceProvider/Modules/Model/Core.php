@@ -25,4 +25,8 @@ class Core extends BaseModel
     public $update_available;
 
     public $update_version;
+
+    public $updated_by;
+
+    public $updated_on;
 }

@@ -30,10 +30,6 @@ class Modules
 
 	protected $repositories;
 
-	protected $domains;
-
-	protected $menus;
-
 	protected $manager;
 
 	protected $installer;
@@ -100,20 +96,6 @@ class Modules
 		$this->repositories = (new Repositories())->init();
 
 		return $this->repositories;
-	}
-
-	protected function initDomains()
-	{
-		$this->domains = (new Domains())->init();
-
-		return $this->domains;
-	}
-
-	protected function initMenus()
-	{
-		$this->menus = (new Menus())->init();
-
-		return $this->menus;
 	}
 
 	protected function initManager()

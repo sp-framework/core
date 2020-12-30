@@ -81,8 +81,8 @@ class Components extends BasePackage
 				function($component) use ($applicationId) {
 					$component = $component->toArray();
 					$component['applications'] = Json::decode($component['applications'], true);
-					if (isset($component['applications'][$applicationId]['installed']) &&
-						$component['applications'][$applicationId]['installed'] === true
+					if (isset($component['applications'][$applicationId]['enabled']) &&
+						$component['applications'][$applicationId]['enabled'] === true
 					) {
 						return $component;
 					}
@@ -132,25 +132,31 @@ class Components extends BasePackage
 		}
 	}
 
-	public function getComponentsForCategoryAndSubcategory($category, $subCategory)
+	public function getComponentsForCategoryAndSubcategory($category, $subCategory, $inclCommon = true)
 	{
 		$components = [];
 
 		$filter =
 			$this->model->filter(
-				function($component) use ($category, $subCategory) {
-					if ($component->category === $category &&
-						$component->sub_category === $subCategory
-					) {
-						return $component;
+				function($component) use ($category, $subCategory, $inclCommon) {
+					$component = $component->toArray();
+					if ($inclCommon) {
+						if (($component['category'] === $category && $component['sub_category'] === $subCategory) ||
+							($component['category'] === $category && $component['sub_category'] === 'common')
+						) {
+							return $component;
+						}
+					} else {
+						if ($component['category'] === $category && $component['sub_category'] === $subCategory) {
+							return $component;
+						}
 					}
 				}
 			);
 
 		foreach ($filter as $key => $value) {
-			$components[$key] = $value->toArray();
+			$components[$key] = $value;
 		}
-
 		return $components;
 	}
 
@@ -163,34 +169,42 @@ class Components extends BasePackage
 
 			$component['applications'] = Json::decode($component['applications'], true);
 
-			// if (isset($component['applications'][$data['id']])) {
-			// 	if ($status !== $component['applications'][$data['id']]['enabled']) {
-			// 		if ($status === true) {
-			// 			$component['applications'][$data['id']]['enabled'] = true;
-			// 		} else if ($status === false) {
-			// 			$component['applications'][$data['id']]['enabled'] = false;
-			// 		}
-			// 		$this->updateMenu($data, $component, $status);
+			if ($status === true) {
+				$component['applications'][$data['id']]['enabled'] = true;
 
-			// 		$component['applications'] = Json::encode($component['applications']);
+				$component['dependencies'] = Json::decode($component['dependencies'], true);
 
-			// 		$this->update($component);
-			// 	}
-			// } else {
-				if ($status === true) {
-					$component['applications'][$data['id']]['enabled'] = true;
-				} else if ($status === false) {
-					$component['applications'][$data['id']]['enabled'] = false;
+				if (isset($component['dependencies']['packages']) && count($component['dependencies']['packages']) > 0) {
+
+					foreach ($component['dependencies']['packages'] as $key => $dependencyPackage) {
+
+						$package = $this->modules->packages->getNamedPackageForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
+
+						if ($package) {
+							$package['applications'] = Json::decode($package['applications'], true);
+
+							$package['applications'][$data['id']]['enabled'] = true;
+
+							$package['applications'] = Json::encode($package['applications']);
+
+							$this->modules->packages->update($package);
+						}
+					}
 				}
 
-				if ($component['menu_id']) {
-					$this->updateMenu($data, $component, $status);
-				}
+				$component['dependencies'] = Json::encode($component['dependencies']);
 
-				$component['applications'] = Json::encode($component['applications']);
+			} else if ($status === false) {
+				$component['applications'][$data['id']]['enabled'] = false;
+			}
 
-				$this->update($component);
-			// }
+			if ($component['menu_id']) {
+				$this->updateMenu($data, $component, $status);
+			}
+
+			$component['applications'] = Json::encode($component['applications']);
+
+			$this->update($component);
 		}
 
 		return true;

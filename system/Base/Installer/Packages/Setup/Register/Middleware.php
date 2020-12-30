@@ -25,7 +25,9 @@ class Middleware
 					null,
 				'applications'			=>
 					Json::encode(['1' => ['enabled' => false, 'sequence' => 0]]),
-				'files'					=> Json::encode($installedFiles)
+				'installed'				=> 1,
+				'files'					=> Json::encode($installedFiles),
+				'updated_by'			=> 0
 			]
 		);
 	}

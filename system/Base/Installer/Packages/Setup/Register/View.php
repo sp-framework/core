@@ -27,6 +27,7 @@ class View
 					null,
 				'applications'			=>
 					Json::encode(['1'=>['enabled'=>true]]),
+				'installed'				=> 1,
 				'files'					=> Json::encode($installedFiles),
 				'updated_by'			=> 0
 			]

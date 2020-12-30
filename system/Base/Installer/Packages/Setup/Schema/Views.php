@@ -91,6 +91,13 @@ class Views
 						]
 					),
 					new Column(
+						'installed',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'files',
 						[
 							'type'    => Column::TYPE_MEDIUMTEXT,

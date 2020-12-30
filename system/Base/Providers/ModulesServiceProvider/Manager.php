@@ -90,15 +90,55 @@ class Manager extends BasePackage
                 $this->localModules['components'][$component['id']]['dependencies']
                     = Json::decode($component['dependencies'], true);
 
-                $updatedOnDate = new \DateTime($component['updated_on']);
-                $now = new \DateTime('now');
-                $diff = date_diff($updatedOnDate, $now);
-                if ($diff->h < 24) {
-                    $this->localModules['components'][$component['id']]['new'] = true;
+                if ($component['installed'] == 0) {
+                    $updatedOnDate = new \DateTime($component['updated_on']);
+                    $now = new \DateTime('now');
+                    $diff = date_diff($updatedOnDate, $now);
+                    if ($diff->h < 24) {
+                        $this->localModules['components'][$component['id']]['new'] = true;
+                    }
                 }
             }
         } else {
             $this->localModules['components'] = [];
+        }
+
+        if (count($this->packages) > 0) {
+            foreach ($this->packages as $packagesKey => $packages) {
+                $this->localModules['packages'][$packages['id']] = $packages;
+                $this->localModules['packages'][$packages['id']]['settings']
+                    = Json::decode($packages['settings'], true);
+
+                if ($packages['installed'] == 0) {
+                    $updatedOnDate = new \DateTime($packages['updated_on']);
+                    $now = new \DateTime('now');
+                    $diff = date_diff($updatedOnDate, $now);
+                    if ($diff->h < 24) {
+                        $this->localModules['packages'][$packages['id']]['new'] = true;
+                    }
+                }
+            }
+        } else {
+            $this->localModules['packages'] = [];
+        }
+
+        if (count($this->middlewares) > 0) {
+            foreach ($this->middlewares as $middlewareKey => $middleware) {
+                $this->localModules['middlewares'][$middleware['id']] = $middleware;
+                $this->localModules['middlewares'][$middleware['id']]['settings']
+                    = Json::decode($middleware['settings'], true);
+
+                if ($middleware['installed'] == 0) {
+                    $updatedOnDate = new \DateTime($middleware['updated_on']);
+                    $now = new \DateTime('now');
+                    $diff = date_diff($updatedOnDate, $now);
+                    if ($diff->h < 24) {
+                        $this->localModules['middlewares'][$middleware['id']]['new'] = true;
+                    }
+                }
+            }
+        } else {
+            $this->localModules['middlewares'] = [];
         }
 
         if (count($this->views) > 0) {
@@ -109,11 +149,13 @@ class Manager extends BasePackage
                 $this->localModules['views'][$view['id']]['dependencies']
                     = Json::decode($view['dependencies'], true);
 
-                $updatedOnDate = new \DateTime($view['updated_on']);
-                $now = new \DateTime('now');
-                $diff = date_diff($updatedOnDate, $now);
-                if ($diff->h < 24) {
-                    $this->localModules['views'][$view['id']]['new'] = true;
+                if ($middleware['installed'] == 0) {
+                    $updatedOnDate = new \DateTime($view['updated_on']);
+                    $now = new \DateTime('now');
+                    $diff = date_diff($updatedOnDate, $now);
+                    if ($diff->h < 24) {
+                        $this->localModules['views'][$view['id']]['new'] = true;
+                    }
                 }
             }
         } else {
@@ -134,6 +176,15 @@ class Manager extends BasePackage
                 $this->components =
                     $this->modules->components->init(true)
                     ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+
+                $this->packages =
+                    $this->modules->packages->init(true)
+                    ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
+
+                $this->middlewares =
+                    $this->modules->middlewares->init(true)
+                    ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
+
                 $this->views =
                     $this->modules->views->init(true)
                     ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
@@ -141,12 +192,26 @@ class Manager extends BasePackage
                 $this->components =
                     $this->modules->components
                     ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+
+                $this->packages =
+                    $this->modules->packages
+                    ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
+
+                $this->middlewares =
+                    $this->modules->middlewares
+                    ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
+
                 $this->views =
                     $this->modules->views
                     ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
             }
         } else {
             $this->components = $this->modules->components->components;
+
+            $this->packages = $this->modules->packages->packages;
+
+            $this->middlewares = $this->modules->middlewares->middlewares;
+
             $this->views = $this->modules->views->views;
         }
     }
@@ -253,8 +318,11 @@ class Manager extends BasePackage
                         }
 
                     } else if ($names[2] === 'component') {
+
+                        $path = $this->getNamesPathString($names);
+
                         $url =
-                            $siteUrl . $value->full_name . $branch . ucfirst(Arr::last($names)) . '/Install/' . 'component.json';
+                            $siteUrl . $value->full_name . $branch . $path . 'Install/' . 'component.json';
 
                         try {
                             $this->remoteModules['components'][$value->name] =
@@ -275,9 +343,67 @@ class Manager extends BasePackage
 
                             return false;
                         }
-                    } else if ($names[2] === 'view') {
+
+                    } else if ($names[2] === 'package') {
+
+                        $path = $this->getNamesPathString($names);
+
                         $url =
-                            $siteUrl . $value->full_name . $branch . ucfirst(Arr::last($names)) .'/view.json';
+                            $siteUrl . $value->full_name . $branch . $path . 'Install/' . 'package.json';
+
+                        try {
+                            $this->remoteModules['packages'][$value->name] =
+                                Json::decode(
+                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    , true
+                                );
+
+                        } catch (\Exception $e) {
+                            $this->packagesData->responseCode = 1;
+
+                            $this->packagesData->responseMessage =
+                                'Syncing package ' . $value->name . ' resulted in error ' .
+                                $e->getResponse()->getStatusCode() .
+                                '. Sync Halted! Please contact remote administrator or developer.';
+
+                            $this->logger->log->debug($e->getMessage());
+
+                            return false;
+                        }
+
+                    } else if ($names[2] === 'middleware') {
+
+                        $path = $this->getNamesPathString($names);
+
+                        $url =
+                            $siteUrl . $value->full_name . $branch . $path . 'Install/' . 'middleware.json';
+
+                        try {
+                            $this->remoteModules['middlewares'][$value->name] =
+                                Json::decode(
+                                    $this->remoteContent->get($url, $headers)->getBody()->getContents()
+                                    , true
+                                );
+
+                        } catch (\Exception $e) {
+                            $this->packagesData->responseCode = 1;
+
+                            $this->packagesData->responseMessage =
+                                'Syncing middleware ' . $value->name . ' resulted in error ' .
+                                $e->getResponse()->getStatusCode() .
+                                '. Sync Halted! Please contact remote administrator or developer.';
+
+                            $this->logger->log->debug($e->getMessage());
+
+                            return false;
+                        }
+
+                    } else if ($names[2] === 'view') {
+
+                        $path = $this->getNamesPathString($names);
+
+                        $url =
+                            $siteUrl . $value->full_name . $branch . $path .'view.json';
 
                         try {
                             $this->remoteModules['views'][$value->name] =
@@ -303,6 +429,21 @@ class Manager extends BasePackage
         }
 
         return true;
+    }
+
+    protected function getNamesPathString($names)
+    {
+        unset($names[0]);
+        unset($names[1]);
+        unset($names[2]);
+
+        $path = '';
+
+        foreach ($names as $name) {
+            $path .= ucfirst($name) . '/';
+        }
+
+        return $path;
     }
 
     protected function updateRemoteModulesToDB()
@@ -398,6 +539,102 @@ class Manager extends BasePackage
                         }
 
                         $this->modules->components->add($registerRemoteComponent);
+
+                        $counter['register'] = $counter['register'] + 1;
+                    }
+                }
+            }
+
+            if ($remoteModulesType === 'packages') {
+
+                if (count($this->localModules[$remoteModulesType]) > 0) {
+                    $remotePackages = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
+                } else {
+                    $remotePackages['update'] = [];
+                    $remotePackages['register'] = $remoteModules;
+                }
+
+                if (count($remotePackages['update']) > 0) {
+                    foreach ($remotePackages['update'] as $updateRemotePackageKey => $updateRemotePackage) {
+
+                        $updateRemotePackage['settings'] =
+                            isset($updateRemotePackage['settings']) ?
+                            Json::encode($updateRemotePackage['settings']) :
+                            Json::encode([]);
+
+                        $this->modules->packages->update($updateRemotePackage);
+
+                        $counter['update'] = $counter['update'] + 1;
+                    }
+                }
+
+                if (count($remotePackages['register']) > 0) {
+                    foreach ($remotePackages['register'] as $registerRemotePackageKey => $registerRemotePackage) {
+
+                        $registerRemotePackage['settings'] =
+                            isset($registerRemotePackage['settings']) ?
+                            Json::encode($registerRemotePackage['settings']) :
+                            Json::encode([]);
+
+                        $registerRemotePackage['applications'] = Json::encode([]);
+
+                        $registerRemotePackage['installed'] = 0;
+
+                        if ($this->auth->account()) {
+                            $registerRemotePackage['updated_by'] = $this->auth->account()['id'];
+                        } else {
+                            $registerRemotePackage['updated_by'] = 0;
+                        }
+
+                        $this->modules->packages->add($registerRemotePackage);
+
+                        $counter['register'] = $counter['register'] + 1;
+                    }
+                }
+            }
+
+            if ($remoteModulesType === 'middlewares') {
+
+                if (count($this->localModules[$remoteModulesType]) > 0) {
+                    $remoteMiddlewares = $this->findRemoteInLocal($remoteModules, $this->localModules[$remoteModulesType]);
+                } else {
+                    $remoteMiddlewares['update'] = [];
+                    $remoteMiddlewares['register'] = $remoteModules;
+                }
+
+                if (count($remoteMiddlewares['update']) > 0) {
+                    foreach ($remoteMiddlewares['update'] as $updateRemoteMiddlewareKey => $updateRemoteMiddleware) {
+
+                        $updateRemoteMiddleware['settings'] =
+                            isset($updateRemoteMiddleware['settings']) ?
+                            Json::encode($updateRemoteMiddleware['settings']) :
+                            Json::encode([]);
+
+                        $this->modules->middlewares->update($updateRemoteMiddleware);
+
+                        $counter['update'] = $counter['update'] + 1;
+                    }
+                }
+
+                if (count($remoteMiddlewares['register']) > 0) {
+                    foreach ($remoteMiddlewares['register'] as $registerRemoteMiddlewareKey => $registerRemoteMiddleware) {
+
+                        $registerRemoteMiddleware['settings'] =
+                            isset($registerRemoteMiddleware['settings']) ?
+                            Json::encode($registerRemoteMiddleware['settings']) :
+                            Json::encode([]);
+
+                        $registerRemoteMiddleware['applications'] = Json::encode([]);
+
+                        $registerRemoteMiddleware['installed'] = 0;
+
+                        if ($this->auth->account()) {
+                            $registerRemoteMiddleware['updated_by'] = $this->auth->account()['id'];
+                        } else {
+                            $registerRemoteMiddleware['updated_by'] = 0;
+                        }
+
+                        $this->modules->middlewares->add($registerRemoteMiddleware);
 
                         $counter['register'] = $counter['register'] + 1;
                     }

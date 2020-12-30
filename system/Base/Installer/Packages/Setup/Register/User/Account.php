@@ -8,12 +8,7 @@ class Account
 {
     public function register($db, $email, $password, $adminRoleId)
     {
-        $permissions =
-            Json::encode(
-                [
-                    'permissions'   => []
-                ]
-            );
+        $permissions = Json::encode([]);
 
         $insertAdmin = $db->insertAsDict(
             'accounts',

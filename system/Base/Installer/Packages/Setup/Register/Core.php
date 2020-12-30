@@ -29,7 +29,8 @@ class Core
 					isset($baseConfig['settings']) ?
 					json_encode($baseConfig['settings']) :
 					null,
-				'files'					=> json_encode($installedFiles)
+				'files'					=> json_encode($installedFiles),
+				'updated_by'			=> 0
 			]
 		);
 	}

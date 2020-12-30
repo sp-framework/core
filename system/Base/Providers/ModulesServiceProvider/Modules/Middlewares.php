@@ -69,7 +69,7 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
-	public function getMiddlewaresForCategoryAndSubcategory($category, $subCategory, $applicationId, $inclCommon = true)
+	public function getMiddlewaresForCategoryAndSubcategory($category, $subCategory, $applicationId = null, $inclCommon = true)
 	{
 		$middlewares = [];
 
@@ -94,20 +94,23 @@ class Middlewares extends BasePackage
 
 		foreach ($filter as $key => $value) {
 			$middlewares[$key] = $value;
-			if (isset($filter[$key]['applications'][$applicationId])) {
-				if (isset($filter[$key]['applications'][$applicationId]['sequence'])) {
-					$middlewares[$key]['sequence'] = $filter[$key]['applications'][$applicationId]['sequence'];
+
+			if ($applicationId) {
+				if (isset($filter[$key]['applications'][$applicationId])) {
+					if (isset($filter[$key]['applications'][$applicationId]['sequence'])) {
+						$middlewares[$key]['sequence'] = $filter[$key]['applications'][$applicationId]['sequence'];
+					} else {
+						$middlewares[$key]['sequence'] = 0;
+					}
+					if ($filter[$key]['applications'][$applicationId]['enabled']) {
+						$middlewares[$key]['enabled'] = $filter[$key]['applications'][$applicationId]['enabled'];
+					} else {
+						$middlewares[$key]['enabled'] = false;
+					}
 				} else {
 					$middlewares[$key]['sequence'] = 0;
-				}
-				if ($filter[$key]['applications'][$applicationId]['enabled']) {
-					$middlewares[$key]['enabled'] = $filter[$key]['applications'][$applicationId]['enabled'];
-				} else {
 					$middlewares[$key]['enabled'] = false;
 				}
-			} else {
-				$middlewares[$key]['sequence'] = 0;
-				$middlewares[$key]['enabled'] = false;
 			}
 		}
 

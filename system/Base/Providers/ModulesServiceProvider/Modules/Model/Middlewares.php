@@ -28,9 +28,15 @@ class Middlewares extends BaseModel
 
     public $applications;
 
+    public $installed;
+
     public $files;
 
     public $update_available;
 
     public $update_version;
+
+    public $updated_by;
+
+    public $updated_on;
 }
