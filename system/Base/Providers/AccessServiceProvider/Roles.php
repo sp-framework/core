@@ -86,7 +86,6 @@ class Roles extends BasePackage
     {
         $acls = [];
         $applicationsArr = $this->modules->applications->applications;
-
         foreach ($applicationsArr as $applicationKey => $application) {
             $componentsArr = $this->modules->components->getComponentsForApplication($application['id']);
             $components[strtolower($application['name'])] = ['title' => strtoupper($application['name'])];

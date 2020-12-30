@@ -22,6 +22,10 @@ class Acl extends BaseMiddleware
 
     protected $role;
 
+    protected $accountPermissions;
+
+    protected $rolePermissions;
+
     public function process()
     {
         $appRoute = strtolower($this->application['route']);
@@ -42,7 +46,6 @@ class Acl extends BaseMiddleware
         if (!$this->auth->hasUserInSession()) {//Not Authenticated
             return $this->response->redirect('/' . $appRoute . '/auth');
         }
-
         $rolesArr = $this->roles->getAll()->roles;
         $roles = [];
         foreach ($rolesArr as $key => $value) {
@@ -55,7 +58,8 @@ class Acl extends BaseMiddleware
             $this->checkAuthAclMiddlewareSequence();
         }
 
-        if ($this->account['role_id'] === '1') {//Systems Administrators
+        $this->accountPermissions = Json::decode($this->account['permissions'], true);
+        if ($this->account['role_id'] === '1' && count($this->accountPermissions) === 0) {//Systems Administrators
             return;
         }
 
@@ -66,8 +70,7 @@ class Acl extends BaseMiddleware
             $this->application['sub_category'] . '/' .
             $this->application['route'] . '/acls/';
 
-        $this->controller = $this->dispatcher->getControllerName();
-        $this->action = str_replace('Action', '', $this->dispatcher->getActiveMethod());
+        $this->setControllerAndAction();
 
         if ($this->account && $this->account['override_role'] === '1') {
             $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
@@ -75,17 +78,16 @@ class Acl extends BaseMiddleware
             if ($this->localContent->has($aclFileDir . $this->accountEmail . $this->account['id'])) {
 
                 $this->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
-
             } else {
 
                 $this->acl->addRole(
                     new Role($this->accountEmail, 'User Override Role')
                 );
-                $permissions = Json::decode($this->account['permissions'], true);
+                // $permissions = Json::decode($this->account['permissions'], true);
 
                 $this->generateComponentsArr();
 
-                foreach ($permissions as $componentKey => $permission) {
+                foreach ($this->accountPermissions as $componentKey => $permission) {
                     $this->buildAndTestAcl($this->accountEmail, $componentKey, $permission);
                 }
 
@@ -113,9 +115,9 @@ class Acl extends BaseMiddleware
                     new Role($this->roleName, $this->role['description'])
                 );
 
-                $permissions = Json::decode($this->role['permissions'], true);
+                $this->rolePermissions = Json::decode($this->role['permissions'], true);
 
-                foreach ($permissions as $componentKey => $permission) {
+                foreach ($this->rolePermissions as $componentKey => $permission) {
                     if ($this->components[$componentKey]['name'] === $this->controller) {
                         $this->buildAndTestAcl($this->roleName, $componentKey, $permission);
                         break;
@@ -133,6 +135,20 @@ class Acl extends BaseMiddleware
         }
     }
 
+    protected function setControllerAndAction()
+    {
+        $controllerName = $this->dispatcher->getControllerName();
+
+        $component =
+            $this->modules->components->getNamedComponentForApplication(
+                $controllerName,
+                $this->application['id']
+            );
+        $this->controller = $component['id'] . $controllerName;
+
+        $this->action = str_replace('Action', '', $this->dispatcher->getActiveMethod());
+    }
+
     protected function buildAndTestAcl($name, $componentKey, $permission, $fullAccess = null)
     {
         $componentName = $this->components[$componentKey]['name'];
@@ -140,12 +156,12 @@ class Acl extends BaseMiddleware
         $componentAcls = $this->components[$componentKey]['acls'];
         // var_dump($this->components[$componentKey]);
         $this->acl->addComponent(
-            new Component($componentName, $componentDescription), $componentAcls
+            new Component($componentKey . $componentName, $componentDescription), $componentAcls
         );
 
         // var_dump($permission[$this->action]);
         if ($permission[$this->action] === 1) {
-            $this->acl->allow($name, $componentName, $this->action);
+            $this->acl->allow($name, $componentKey . $componentName, $this->action);
             $this->logger->log->debug('User ' . $this->accountEmail . ' granted access to component ' . $componentName . ' for action ' . $this->action);
         } else {
             $this->logger->log->debug('User ' . $this->accountEmail . ' denied access to component ' . $componentName . ' for action ' . $this->action);
@@ -183,8 +199,6 @@ class Acl extends BaseMiddleware
     protected function generateComponentsArr()
     {
         $componentsArr = $this->modules->components->components;
-
-        // $components = [];
 
         foreach ($componentsArr as $component) {
             if ($component['class'] && $component['class'] !== '') {

@@ -79,6 +79,10 @@ class Accounts extends BasePackage
             return false;
         }
 
+        if ($data['override_role'] == 0) {
+            $data['permissions'] = Json::encode([]);
+        }
+
         $data['email'] = strtolower($data['email']);
 
         if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
