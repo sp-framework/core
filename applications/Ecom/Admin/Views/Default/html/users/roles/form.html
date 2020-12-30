@@ -7,6 +7,17 @@
     {% set roleName = '' %}
     {% set roleDescription = '' %}
 {% endif %}
+{% if roleId === '1' %}
+    {% set nameDisabled = true %}
+    {% set descriptionDisabled = true %}
+    {% set permissionshidden = 'hidden' %}
+    {% set permissionsinfohidden = '' %}
+{% else %}
+    {% set nameDisabled = false %}
+    {% set descriptionDisabled = false %}
+    {% set permissionshidden = '' %}
+    {% set permissionsinfohidden = 'hidden' %}
+{% endif %}
 {% set rolePermissions = role['permissions'] %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -48,6 +59,7 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Name of the role. Example: Sales Manager',
                         'fieldRequired'                  : true,
+                        'fieldDisabled'                  : nameDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
@@ -73,6 +85,7 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Description of the role',
                         'fieldRequired'                  : false,
+                        'fieldDisabled'                  : descriptionDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
@@ -83,7 +96,7 @@
                 )}}
             </div>
         </div>
-        <div class="row">
+        <div class="row" {{permissionshidden}}>
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -127,6 +140,14 @@
                             ]
                     ]
                 )}}
+            </div>
+        </div>
+        <div class="row" {{permissionsinfohidden}}>
+            <div class="col">
+                <div class="callout callout-info">
+                    <h5><i class="icon fa fa-fw fa-info-circle"></i> INFO</h5>
+                    <p>System Administrators role have full access to all apps. To configure permissions for a System Administrator user, you need to configure Account level permissions for that user. Account level permissions override System Administrators role permissions.</p>
+                </div>
             </div>
         </div>
     </fieldset>
