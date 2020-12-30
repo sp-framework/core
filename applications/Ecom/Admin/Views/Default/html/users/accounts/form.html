@@ -148,7 +148,7 @@
                     {% else %}
                         {% set checked = false %}
                     {% endif %}
-                    <div class="application" data-id="{{application['id']}}">
+                    <div class="application" data-id="{{application['id']}}" data-route="{{application['route']}}">
                         {{adminltetags.useTag('fields',
                             [
                                 'component'                      : component,
@@ -386,9 +386,9 @@ dataCollectionSection =
                 for (var checkbox in checkboxIds) {
                     $('#' + checkbox).click(function() {
                         var id = $(this)[0].id;
-                        extractCheckboxData(id, $('#' + id).parents('.application').data('id'))
+                        extractCheckboxData(id, $('#' + id).parents('.application').data('route'))
                     });
-                    extractCheckboxData(checkbox, $('#' + checkbox).parents('.application').data('id'))
+                    extractCheckboxData(checkbox, $('#' + checkbox).parents('.application').data('route'))
                 }
                 function extractCheckboxData(checkbox, application) {
                     if ($('#' + checkbox)[0].checked === true) {

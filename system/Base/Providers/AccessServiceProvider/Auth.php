@@ -154,7 +154,6 @@ class Auth
 
             return false;
         }
-
         if (!$this->checkAccount($data)) {
             return false;
         }
@@ -175,7 +174,9 @@ class Auth
         if ($this->secTools->passwordNeedsRehash($this->account['password'])) {
 
             $this->account['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
-            $this->account['can_login'] = Json::encode($this->account['can_login']);
+            if (is_array($this->account['can_login'])) {
+                $this->account['can_login'] = Json::encode($this->account['can_login']);
+            }
 
             $this->accounts->update($this->account);
         }
@@ -194,41 +195,11 @@ class Auth
         if ($this->account) {
             if ($this->account['can_login']) {
                 $this->account['can_login'] = Json::decode($this->account['can_login'], true);
+            }
 
-                if (!isset($this->account['can_login'][$this->application['route']])) {//New Application OR New account via rego
-
-                    if ($this->application['can_login_role_ids']) {
-
-                        $this->application['can_login_role_ids'] = Json::decode($this->application['can_login_role_ids'], true);
-
-                        if (in_array($this->account['role_id'], $this->application['can_login_role_ids'])) {
-
-                            $this->account['can_login'][$this->application['route']] = true;
-
-                            $this->account['can_login'] = Json::encode($this->account['can_login']);
-
-                            $this->accounts->update($this->account);
-
-                        } else {
-                            $this->packagesData->responseCode = 1;
-
-                            $this->packagesData->responseMessage = 'Error: Contact System Administrator';
-
-                            $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
-
-                            return false;
-                        }
-                    }
-                } else if (isset($this->account['can_login'][$this->application['route']]) && !$this->account['can_login'][$this->application['route']]) {//Not allowed for application
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error: Contact System Administrator';
-
-                    $this->logger->log->debug($this->account['email'] . ' is not allowed to login to application ' . $this->application['name']);
-
-                    return false;
-                }
-            } else {
+            if (isset($this->account['can_login'][$this->application['route']]) &&
+                !$this->account['can_login'][$this->application['route']]
+            ) {//Not allowed for application
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Error: Contact System Administrator';
@@ -236,6 +207,32 @@ class Auth
                 $this->logger->log->debug($this->account['email'] . ' is not allowed to login to application ' . $this->application['name']);
 
                 return false;
+            }
+
+            if (!isset($this->account['can_login'][$this->application['route']])) {//New Application OR New account via rego
+
+                if ($this->application['can_login_role_ids']) {
+
+                    $this->application['can_login_role_ids'] = Json::decode($this->application['can_login_role_ids'], true);
+
+                    if (in_array($this->account['role_id'], $this->application['can_login_role_ids'])) {
+
+                        $this->account['can_login'][$this->application['route']] = true;
+
+                        $this->account['can_login'] = Json::encode($this->account['can_login']);
+
+                        $this->accounts->update($this->account);
+
+                    } else {
+                        $this->packagesData->responseCode = 1;
+
+                        $this->packagesData->responseMessage = 'Error: Contact System Administrator';
+
+                        $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
+
+                        return false;
+                    }
+                }
             }
 
             if (!$this->secTools->checkPassword($data['pass'], $this->account['password'])) {//Password Fail
