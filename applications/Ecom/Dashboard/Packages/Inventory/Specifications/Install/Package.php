@@ -19,7 +19,7 @@ class Package extends BasePackage
     {
         $this->init();
 
-        if ($this->checkPackage($this->packageToUse)) {
+        if (!$dropTables && $this->checkPackage($this->packageToUse)) {
 
             $this->packagesData->responseCode = 1;
 
@@ -35,7 +35,7 @@ class Package extends BasePackage
                 $this->createTable('specifications', '', (new $this->schemaToUse)->columns());
             }
 
-            $this->registerPackage();
+            // $this->registerPackage();
 
             return true;
         } catch (\PDOException $e) {
@@ -60,11 +60,11 @@ class Package extends BasePackage
 
         $jsonFile['display_name'] = $jsonFile['displayName'];
         $jsonFile['settings'] = Json::encode($jsonFile['settings']);
-        $jsonFile['applications'] = Json::encode([$this->init()->application['id'] => ['installed' => true]]);
+        $jsonFile['applications'] = Json::encode([$this->init()->application['id'] => ['enabled' => true]]);
         $jsonFile['files'] = Json::encode($this->getInstalledFiles($packagePath));
 
         $this->modules->packages->add($jsonFile);
-        $this->logger->log->info('Package ' . $jsonFile['display_name'] . ' installed successfully on application ' . $this->application['name']);
+        $this->logger->log->info('Package ' . $jsonFile['display_name'] . ' enabled successfully on application ' . $this->application['name']);
     }
 
     public function updatePackage()
