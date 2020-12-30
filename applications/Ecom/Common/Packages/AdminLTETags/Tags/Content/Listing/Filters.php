@@ -34,6 +34,11 @@ class Filters extends AdminLTETags
 
         $filters = [];
 
+        if (!$this->auth->account()) {
+            $sharedHidden = true;
+        } else {
+            $sharedHidden = false;
+        }
 
         foreach ($this->params['dtFilters'] as $filterKey => $filter) {
             $filters[$filterKey] = $filter;
@@ -119,6 +124,7 @@ class Filters extends AdminLTETags
                                         'icon'                    => 'share-alt',
                                         'noMargin'                => true,
                                         'disabled'                => true,
+                                        'hidden'                  => $sharedHidden,
                                         'buttonAdditionalClass'   => 'rounded-0',
                                         'position'                => 'right'
                                     ],

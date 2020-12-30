@@ -20,5 +20,6 @@
     },
     "menu"              : false,
     "settings"          : {
+        "mandatory"     : true
     }
 }

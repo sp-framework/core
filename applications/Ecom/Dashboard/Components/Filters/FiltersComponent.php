@@ -2,13 +2,10 @@
 
 namespace Applications\Ecom\Dashboard\Components\Filters;
 
-use Applications\Ecom\Dashboard\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
 
 class FiltersComponent extends BaseComponent
 {
-    use DynamicTable;
-
     protected $filters;
 
     public function initialize()
