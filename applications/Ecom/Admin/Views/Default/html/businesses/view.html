@@ -1,6 +1,6 @@
 {% if business['id'] is defined %}
     {% set businessId = business['id'] %}
-    {% set title = 'Business (' ~ application['name'] ~ ')' %}
+    {% set title = 'Business (' ~ business['name'] ~ ')' %}
 {% else %}
     {% set businessId = '' %}
     {% set title = 'New Business' %}

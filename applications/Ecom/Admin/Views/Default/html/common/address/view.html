@@ -230,7 +230,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     new autoComplete({
                         data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                             src: async() => {
-                                const url = '{{links.url("geo/searchCity")}}';
+                                const url = '{{links.url("settings/geo/searchCity")}}';
 
                                 var myHeaders = new Headers();
                                 myHeaders.append("accept", "application/json");
@@ -249,11 +249,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
 
                                 const data = await response.json();
 
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
                                 if (data.cities) {
-                                    if (data.tokenKey && data.token) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
-                                    }
                                     return data.cities;
                                 } else {
                                     return [];
@@ -368,7 +368,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     new autoComplete({
                         data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                             src: async() => {
-                                const url = '{{links.url("geo/searchState")}}';
+                                const url = '{{links.url("settings/geo/searchState")}}';
 
                                 var myHeaders = new Headers();
                                 myHeaders.append("accept", "application/json");
@@ -387,11 +387,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
 
                                 const data = await response.json();
 
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
                                 if (data.states) {
-                                    if (data.tokenKey && data.token) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
-                                    }
                                     return data.states;
                                 } else {
                                     return [];
@@ -466,7 +466,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     new autoComplete({
                         data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                             src: async() => {
-                                const url = '{{links.url("geo/searchCountry")}}';
+                                const url = '{{links.url("settings/geo/searchCountry")}}';
 
                                 var myHeaders = new Headers();
                                 myHeaders.append("accept", "application/json");
@@ -485,11 +485,12 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
 
                                 const data = await response.json();
 
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+
                                 if (data.countries) {
-                                    if (data.tokenKey && data.token) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
-                                    }
                                     return data.countries;
                                 } else {
                                     return [];
@@ -665,7 +666,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     new autoComplete({
                         data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                             src: async() => {
-                                const url = '{{links.url("geo/searchState")}}';
+                                const url = '{{links.url("settings/geo/searchState")}}';
 
                                 var myHeaders = new Headers();
                                 myHeaders.append("accept", "application/json");
@@ -684,11 +685,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
 
                                 const data = await response.json();
 
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
                                 if (data.states) {
-                                    if (data.tokenKey && data.token) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
-                                    }
                                     return data.states;
                                 } else {
                                     return [];
@@ -763,7 +764,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     new autoComplete({
                         data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                             src: async() => {
-                                const url = '{{links.url("geo/searchCountry")}}';
+                                const url = '{{links.url("settings/geo/searchCountry")}}';
 
                                 var myHeaders = new Headers();
                                 myHeaders.append("accept", "application/json");
@@ -782,11 +783,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
 
                                 const data = await response.json();
 
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
                                 if (data.countries) {
-                                    if (data.tokenKey && data.token) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
-                                    }
                                     return data.countries;
                                 } else {
                                     return [];
@@ -923,7 +924,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     new autoComplete({
                         data: {                              // Data src [Array, Function, Async] | (REQUIRED)
                             src: async() => {
-                                const url = '{{links.url("geo/searchCountry")}}';
+                                const url = '{{links.url("settings/geo/searchCountry")}}';
 
                                 var myHeaders = new Headers();
                                 myHeaders.append("accept", "application/json");
@@ -942,11 +943,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
 
                                 const data = await response.json();
 
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
                                 if (data.countries) {
-                                    if (data.tokenKey && data.token) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
-                                    }
                                     return data.countries;
                                 } else {
                                     return [];
