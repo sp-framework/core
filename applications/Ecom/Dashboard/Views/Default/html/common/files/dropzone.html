@@ -1,0 +1,321 @@
+{% if tableMaxHeight is defined %}
+    {% set maxheight = 'style="max-height: ' ~ tableMaxHeight ~ 'px;overflow-y: scroll;overflow-x: hidden"' %}
+{% else %}
+    {% set maxheight = 'style="max-height: 300px;overflow-y: scroll;overflow-x: hidden"' %}
+{% endif %}
+
+{% if thumbnailSize is not defined %}
+    {% set thumbnailSize = 80 %}
+{% endif %}
+{% if spotlightSize is not defined %}
+    {% set spotlightSize = 1200 %}
+{% endif %}
+
+{% if maxAttachments is not defined %}
+    {% set maxAttachments = 5 %}
+{% endif %}
+
+<div {{maxheight}}>
+    <div class="row">
+        <div class="col mb-2">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : fieldId,
+                    'fieldLabel'                     : fieldLabel,
+                    'fieldType'                      : 'html',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : fieldHelpTooltipContent,
+                    'fieldAdditionalClass'           : 'mb-0',
+                    'fieldRequired'                  : false,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true
+                ]
+            )}}
+            {{adminltetags.useTag('buttons',
+                {
+                    'componentId'            : componentId,
+                    'sectionId'              : sectionId,
+                    'buttonLabel'            : false,
+                    'buttonType'             : 'button',
+                    'buttons'                :
+                    {
+                        'dropzone-upload' :
+                        {
+                            'title'                 : false,
+                            'position'              : 'left',
+                            'icon'                  : 'upload',
+                            'size'                  : 'xs',
+                            'buttonAdditionalClass' : 'mr-1 ml-1 btn-file'
+                        },
+                        'dropzone-save' :
+                        {
+                            'title'                 : false,
+                            'position'              : 'left',
+                            'icon'                  : 'save',
+                            'hidden'                : true,
+                            'size'                  : 'xs',
+                            'buttonAdditionalClass' : 'mr-1 ml-1'
+                        },
+                        'dropzone-cancel' :
+                        {
+                            'title'                 : false,
+                            'type'                  : 'secondary',
+                            'position'              : 'left',
+                            'icon'                  : 'times',
+                            'hidden'                : true,
+                            'size'                  : 'xs',
+                            'buttonAdditionalClass' : 'mr-1 ml-1'
+                        }
+                    }
+                }
+            )}}
+            <span id="{{componentId}}-{{sectionId}}-dropzone-save-warning" class="text-danger" hidden>Save/Cancel Files</span>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="{{componentId}}-{{sectionId}}-attachments-table" class="table table-sm border-bottom">
+            <tbody>
+                {% for attachment in attachments %}
+                    <tr>
+                    {% if attachment['type'] === 'application/pdf' %}
+                        <td>
+                            <i class="fa fa-fw fa-file-pdf-o fa-5x"></i>
+                        </td>
+                    {% else %}
+                        <td>
+                            <a class="spotlight" href="/files/get/{{attachment.uuid}}?w=1200">
+                                <img alt="" src="/files/get/{{attachment.uuid}}?w=80" class="img-fluid img-thumbnail">
+                            </a>
+                        </td>
+                    {% endif %}
+                        <td>
+                            <span class="employee-details-list-table-name">{{attachment['org_file_name']}}</span>
+                        </td>
+                        <td>
+                            <a data-tab="details" data-uuid="{{attachment['uuid']}}" class="uploads-delete btn btn-danger btn-sm p-1" href="#">
+                                <i class="fa fa-fw fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="row p-2">
+        <div class="col">
+            <div id="employee-details-upload-previews">
+                <div id="employee-details-upload-template" class="row">
+                    <div class="col-sm-2 p-1 text-center">
+                        <span class="preview">
+                            <img alt="" data-dz-thumbnail />
+                        </span>
+                    </div>
+                    <div class="col-sm-8 p-1">
+                        <div class="progress" style="position: relative;top: 13px;" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                            <div class="progress progress-bar progress-bar-striped bg-success" style="width:0%;" data-dz-uploadprogress></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2 p-1 text-center">
+                        <button data-dz-remove style="position: relative;top: 4px;" class="btn btn-danger delete p-1">
+                            <i class="fa fa-fw fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+/* globals Dropzone PNotify Swal */
+if (!window['dataCollection']['{{componentId}}']) {
+    window['dataCollection']['{{componentId}}'] = { };
+}
+window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
+    $.extend(window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'], {
+        '{{componentId}}-{{sectionId}}-{{fieldId}}'                    : {
+            afterInit: function() {
+                var uploadUUIDs = [];
+                var deleteUUIDs = [];
+                var filesLimit = "{{maxAttachments}}";
+                var totalUploadFiles = 0;
+                var problemWithUpload = false;
+
+            // function initDropzone() {
+            //     uploadDropzone();
+            //     var thisUUIDs = $('.uploads-delete');
+            //     if (thisUUIDs.length > 0) {
+            //         totalUploadFiles = thisUUIDs.length;
+            //         fileLimit = 5 - totalUploadFiles;
+            //         $(thisUUIDs).each(function(index, uuid) {
+            //             uploadUUIDs.push($(uuid).data('uuid'));
+            //         });
+            //     }
+            // }
+            //     function redoUploadDelete() {
+            //         $('.uploads-delete').off();
+
+            //         $('.uploads-delete').each(function (index,button) {
+            //             $(button).click(function() {
+            //                 Swal.fire({
+            //                     title: 'Are you sure?',
+            //                     icon: 'warning',
+            //                     showCancelButton: true,
+            //                     confirmButtonText: 'Yes, delete it!'
+            //                 }).then((result) => {
+            //                     if (result.value) {
+            //                         // Remove from Table
+            //                         $(button).parents('tr').remove();
+            //                         // Reset Counters for totals
+            //                         totalUploadFiles = totalUploadFiles - 1;
+            //                         fileLimit = fileLimit + 1;
+            //                         //Change upload_data
+            //                         const index = uploadUUIDs.indexOf($(button).data('uuid'));
+            //                         if (index > -1) {
+            //                           uploadUUIDs.splice(index, 1);
+            //                         }
+            //                         deleteUUIDs.push($(button).data('uuid'));
+            //                     }
+            //                 });
+            //             });
+            //         });
+            //     }
+
+            //     function uploadDropzone() {
+            //     var previewNode = document.querySelector("#employee-details-upload-template");
+            //     previewNode.id = "";
+            //     var previewTemplate = previewNode.parentNode.innerHTML;
+            //     previewNode.parentNode.removeChild(previewNode);
+
+            //     window.baggacarriers.uploadDropzone = new Dropzone('#employee-details', {
+            //         url                 : "/files/store/",
+            //         params              : //Token,
+            //         timeout             : 60000,
+            //         resizeWidth         : 1200,
+            //         thumbnailWidth      : 40,
+            //         thumbnailHeight     : 40,
+            //         parallelUploads     : 5,
+            //         maxFiles            : fileLimit,
+            //         previewTemplate     : previewTemplate,
+            //         autoQueue           : false,
+            //         previewsContainer   : "#employee-details-upload-previews",
+            //         clickable           : "#employee-details-upload-button"
+            //     });
+
+            //     window.baggacarriers.uploadDropzone.on("addedfile", function(file) {
+            //         if (file.type === 'image/jpeg' ||
+            //             file.type === 'image/png' ||
+            //             file.type === 'application/pdf'
+            //             ) {
+            //             if (file.type === 'application/pdf') {
+            //                 $(file.previewElement).children().first().find("[data-dz-thumbnail]").attr("src", "/assets/images/pdf.png");
+            //             }
+            //             totalUploadFiles = totalUploadFiles + 1;
+            //             fileLimit = fileLimit - 1
+            //             if (fileLimit < 0) {
+            //                 window.baggacarriers.uploadDropzone.removeFile(file);
+            //                 PNotify.error({
+            //                     title: file.name + ' was not added!',
+            //                     text: 'Max file limit reached'
+            //                 });
+            //             }
+            //         } else {
+            //             window.baggacarriers.uploadDropzone.removeFile(file);
+            //             PNotify.error({
+            //                 title: file.name,
+            //                 text: 'Extension not allowed! File not added.'
+            //             });
+            //         }
+            //     });
+
+            //     window.baggacarriers.uploadDropzone.on("removedfile", function(file) {
+            //         totalUploadFiles = totalUploadFiles - 1;
+            //         fileLimit = fileLimit + 1
+
+            //         problemWithUpload = false;
+            //     });
+
+            //     window.baggacarriers.uploadDropzone.on("success", function(file, response) {
+            //         if (file.accepted && file.status === 'success') {
+            //             if (response.error === 1) {
+            //                 problemWithUpload = true;
+            //                 PNotify.error({
+            //                     title: file.name,
+            //                     text: 'Error ' + response.errorMsg
+            //                 });
+            //             } else {
+            //                 $(file.previewTemplate).remove();
+            //             }
+            //         }
+            //         uploadUUIDs.push(response.uuid);
+            //     });
+
+            //     window.baggacarriers.uploadDropzone.on("error", function(file, response) {
+            //         if (file.accepted === false) {
+            //             //
+            //         }
+            //     });
+
+            //     window.baggacarriers.uploadDropzone.on("queuecomplete", function(response) {
+            //         if (!problemWithUpload) {
+            //             uploadPostData['uploads_data'] = uploadUUIDs;
+            //             processDeleteUUIDs();
+            //             performSave();
+            //         }
+            //     });
+            //     }
+            // }
+
+            // function performUploads() {
+            //     if (window.baggacarriers.uploadDropzone.files.length > 0) {
+            //         $('#modal-save-spinner').attr('hidden', false);
+            //         $('#employee-details-save-spinner').attr('hidden', false);
+            //         //Used for dropzone later
+            //         window.baggacarriers.uploadDropzone.options.params = {
+            //             TOKEN,
+            //             "directory"      : '/employees' +
+            //                                '/' + employeeId +
+            //                                '/' + task +
+            //                                '/'
+            //         };
+            //         window.baggacarriers.uploadDropzone.enqueueFiles(
+            //             window.baggacarriers.uploadDropzone.getFilesWithStatus(Dropzone.ADDED)
+            //         );
+            //     } else {
+            //         uploadPostData['uploads_data'] = uploadUUIDs;
+            //         if (deleteUUIDs.length > 0) {
+            //             processDeleteUUIDs();
+            //         }
+            //         performSave();
+            //     }
+            // }
+            // function processDeleteUUIDs() {
+            //     if (deleteUUIDs.length > 0) {
+            //         $(deleteUUIDs).each(function(index, uuid) {
+            //             $.ajax({
+            //                 type    : 'POST',
+            //                 url     : '/files/delete/' + uuid,
+            //                 data    :
+            //                     {
+            //                         TOKEN,
+            //                         "force"             : true
+            //                     },
+            //                 dataType: 'json'
+            //             }).done(function (data) {
+            //                 if (data && data.error === 0) {
+            //                     //
+            //                     // PNotify.success({
+            //                     //  title: 'Removed File!',
+            //                     // });
+            //                 }
+            //             });
+            //         });
+            //     }
+            }
+        }
+    });
+</script>
