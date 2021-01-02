@@ -39,15 +39,14 @@ class Html
         $this->fieldParams = $fieldParams;
 
         $this->fieldParams['fieldHtmlContent'] =
-        isset($this->params['fieldHtmlContent']) ?
-        $this->params['fieldHtmlContent'] :
-        '';
+            isset($this->params['fieldHtmlContent']) ?
+            $this->params['fieldHtmlContent'] :
+            '';
 
         $this->fieldParams['fieldHtmlAdditionalClass'] =
-        isset($this->params['fieldHtmlAdditionalClass']) ?
-        $this->params['fieldHtmlAdditionalClass'] :
-        '';
-
+            isset($this->params['fieldHtmlAdditionalClass']) ?
+            $this->params['fieldHtmlAdditionalClass'] :
+            '';
 
         $this->generateContent();
     }
