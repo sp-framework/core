@@ -52,7 +52,11 @@ class DynamicTable
 
     protected function generateTableContent()
     {
-        if (isset($this->params['dtPrimaryButtons']) || isset($this->params['dtFilter'])) {
+
+        if (isset($this->params['dtPrimaryButtons']) ||
+            isset($this->params['dtSecondaryButtons']) ||
+            isset($this->params['dtFilter'])
+        ) {
             $this->content .=
                 '<div class="row mb-2">';
 
@@ -60,11 +64,10 @@ class DynamicTable
                 $this->content .=
                     (new Filters($this->view, $this->tag, $this->links, $this->escaper))->getContent($this->params);
             }
-
+            $this->content .= '<div class="col"><div class="row">';
             if (isset($this->params['dtPrimaryButtons'])) {
                 $this->content .=
                     '<div class="col" id="listing-primary-buttons" hidden>';
-
 
                 $this->content .=
                     $this->adminLTETags->useTag(
@@ -73,9 +76,23 @@ class DynamicTable
                         );
 
                 $this->content .= '</div>';
+
             }
 
-            $this->content .= '</div>';
+            if (isset($this->params['dtSecondaryButtons'])) {
+                $this->content .=
+                    '<div class="col" id="listing-secondary-buttons" hidden>';
+
+                $this->content .=
+                    $this->adminLTETags->useTag(
+                            'buttons',
+                            $this->params['dtSecondaryButtons']
+                        );
+
+                $this->content .= '</div>';
+            }
+
+            $this->content .= '</div></div></div>';
         }
 
         $this->dtParams['dtStriped'] =

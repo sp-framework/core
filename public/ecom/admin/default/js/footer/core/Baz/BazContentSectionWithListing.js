@@ -1080,6 +1080,7 @@
                     }
                     $('#listing-data-loader').hide();
                     $('#listing-primary-buttons').attr('hidden', false);
+                    $('#listing-secondary-buttons').attr('hidden', false);
                     $('#listing-filters').attr('hidden', false);
                     that._tableInit(false);
                     that._registerEvents();
@@ -1096,6 +1097,7 @@
                     success     : function(data) {
                         $('#listing-data-loader').hide();
                         $('#listing-primary-buttons').attr('hidden', false);
+                        $('#listing-secondary-buttons').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
                         if ($('#security-token').length === 1) {
