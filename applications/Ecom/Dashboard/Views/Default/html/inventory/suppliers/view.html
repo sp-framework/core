@@ -1,7 +1,9 @@
 {% if supplier['id'] is defined %}
     {% set supplierId = supplier['id'] %}
+    {% set title = 'Supplier (' ~ supplier['name'] ~ ')' %}
 {% else %}
     {% set supplierId = '' %}
+    {% set title = 'New Supplier' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -16,7 +18,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'handshake',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'suppliers/types/' ~ supplierType ~ '/form',
         'formButtons'                   :

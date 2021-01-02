@@ -1,7 +1,9 @@
 {% if specification['id'] is defined %}
     {% set specificationId = specification['id'] %}
+    {% set title = 'Specification (' ~ specification['name'] ~ ')' %}
 {% else %}
     {% set specificationId = '' %}
+    {% set title = 'New Specification' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -16,7 +18,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'dot-circle',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'specifications/form',
         'formButtons'                   :

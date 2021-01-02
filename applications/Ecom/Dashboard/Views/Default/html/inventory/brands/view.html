@@ -1,7 +1,9 @@
 {% if brand['id'] is defined %}
     {% set brandId = brand['id'] %}
+    {% set title = 'Brand (' ~ brand['name'] ~ ')' %}
 {% else %}
     {% set brandId = '' %}
+    {% set title = 'New Brand' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -16,7 +18,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'dot-circle',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'brands/form',
         'formButtons'                   :

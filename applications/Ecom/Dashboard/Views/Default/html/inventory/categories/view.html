@@ -1,7 +1,9 @@
 {% if category['id'] is defined %}
     {% set categoryId = category['id'] %}
+    {% set title = 'Category (' ~ category['name'] ~ ')' %}
 {% else %}
     {% set categoryId = '' %}
+    {% set title = 'New Category' %}
 {% endif %}
 {{adminltetags.useTag('content',
     [
@@ -15,7 +17,7 @@
         'cardFooter'                    : true,
         'cardType'                      : 'primary',
         'cardIcon'                      : 'sitemap',
-        'cardTitle'                     : componentName,
+        'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
         'cardBodyInclude'               : 'categories/types/' ~ categoryType ~ '/form',
         'formButtons'                   :
