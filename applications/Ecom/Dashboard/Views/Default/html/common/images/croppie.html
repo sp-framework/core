@@ -1,84 +1,84 @@
-                <div class="row">
-                    <div class="col mb-2">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : fieldId,
-                                'fieldLabel'                     : componentName ~ ' ' ~ fieldId,
-                                'fieldType'                      : 'input',
-                                'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : componentName ~ ' ' ~ fieldId,
-                                'fieldRequired'                  : true,
-                                'fieldBazScan'                   : true,
-                                'fieldBazPostOnCreate'           : true,
-                                'fieldBazPostOnUpdate'           : true,
-                                'fieldHidden'                    : true,
-                                'fieldDisabled'                  : true,
-                                'fieldValue'                     : fieldValue
-                            ]
-                        )}}
-                        {{adminltetags.useTag('buttons',
-                            {
-                                'componentId'            : componentId,
-                                'sectionId'              : sectionId,
-                                'buttonLabel'            : false,
-                                'buttonType'             : 'button',
-                                'buttons'                :
-                                {
-                                    'croppie-upload' :
-                                    {
-                                        'title'                 : false,
-                                        'position'              : 'left',
-                                        'icon'                  : 'upload',
-                                        'size'                  : 'sm',
-                                        'buttonAdditionalClass' : 'mr-1 ml-1 btn-file',
-                                        'content'               : '<input type="file" class="ignore" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*">'
-                                    },
-                                    'croppie-save' :
-                                    {
-                                        'title'                 : false,
-                                        'position'              : 'left',
-                                        'icon'                  : 'save',
-                                        'hidden'                : true,
-                                        'size'                  : 'sm',
-                                        'buttonAdditionalClass' : 'mr-1 ml-1'
-                                    },
-                                    'croppie-cancel' :
-                                    {
-                                        'title'                 : false,
-                                        'type'                  : 'secondary',
-                                        'position'              : 'left',
-                                        'icon'                  : 'times',
-                                        'hidden'                : true,
-                                        'size'                  : 'sm',
-                                        'buttonAdditionalClass' : 'mr-1 ml-1'
-                                    }
-                                }
-                            }
-                        )}}
-                        <span id="{{componentId}}-{{sectionId}}-croppie-save-warning" class="text-danger" hidden>Save/Cancel Image</span>
-                    </div>
-                </div>
-                <div class="text-center">
-                    {% if imageType === 'logo' %}
-                        {% if logoLink is defined %}
-                            <img alt="logo" src="{{logoLink}}" class="user-image img-fluid img-thumbnail">
-                        {% else %}
-                            <img alt="logo" src="{{links.images('general/logo.png')}}" class="user-image img-fluid img-thumbnail">
-                        {% endif %}
-                    {% elseif imageType === 'image' %}
-                        {% if imageLink is defined %}
-                            <img alt="image" src="{{imageLink}}" class="user-image img-fluid img-thumbnail">
-                        {% else %}
-                            <img alt="image" src="{{links.images('general/image.png')}}" class="user-image img-fluid img-thumbnail">
-                        {% endif %}
-                    {% endif %}
-                    <div id="{{componentId}}-{{sectionId}}-croppie" hidden></div>
-                </div>
-                <script>
+<div class="row">
+    <div class="col mb-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : fieldId,
+                'fieldLabel'                     : componentName ~ ' ' ~ fieldId,
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : componentName ~ ' ' ~ fieldId,
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : fieldValue
+            ]
+        )}}
+        {{adminltetags.useTag('buttons',
+            {
+                'componentId'            : componentId,
+                'sectionId'              : sectionId,
+                'buttonLabel'            : false,
+                'buttonType'             : 'button',
+                'buttons'                :
+                {
+                    'croppie-upload' :
+                    {
+                        'title'                 : false,
+                        'position'              : 'left',
+                        'icon'                  : 'upload',
+                        'size'                  : 'xs',
+                        'buttonAdditionalClass' : 'mr-1 ml-1 btn-file',
+                        'content'               : '<input type="file" class="ignore" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*"/>'
+                    },
+                    'croppie-save' :
+                    {
+                        'title'                 : false,
+                        'position'              : 'left',
+                        'icon'                  : 'save',
+                        'hidden'                : true,
+                        'size'                  : 'xs',
+                        'buttonAdditionalClass' : 'mr-1 ml-1'
+                    },
+                    'croppie-cancel' :
+                    {
+                        'title'                 : false,
+                        'type'                  : 'secondary',
+                        'position'              : 'left',
+                        'icon'                  : 'times',
+                        'hidden'                : true,
+                        'size'                  : 'xs',
+                        'buttonAdditionalClass' : 'mr-1 ml-1'
+                    }
+                }
+            }
+        )}}
+        <span id="{{componentId}}-{{sectionId}}-croppie-save-warning" class="text-danger" hidden>Save/Cancel Image</span>
+    </div>
+</div>
+<div class="text-center">
+    {% if imageType === 'logo' %}
+        {% if logoLink is defined %}
+            <img alt="logo" src="{{logoLink}}" class="user-image img-fluid img-thumbnail">
+        {% else %}
+            <img alt="logo" src="{{links.images('general/logo.png')}}" class="user-image img-fluid img-thumbnail">
+        {% endif %}
+    {% elseif imageType === 'image' %}
+        {% if imageLink is defined %}
+            <img alt="image" src="{{imageLink}}" class="user-image img-fluid img-thumbnail">
+        {% else %}
+            <img alt="image" src="{{links.images('general/image.png')}}" class="user-image img-fluid img-thumbnail">
+        {% endif %}
+    {% endif %}
+    <div id="{{componentId}}-{{sectionId}}-croppie" hidden></div>
+</div>
+<script>
 /* globals PNotify */
 if (!window['dataCollection']['{{componentId}}']) {
     window['dataCollection']['{{componentId}}'] = { };
@@ -218,7 +218,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     var formData = new FormData();
 
                     formData.append('file', imageBlob);
-                    formData.append('directory', 'businesses');
+                    formData.append('directory', "{{componentName|lower}}");
                     formData.append('fileName', imageName);
 
                     var url = '{{links.url("storages/add")}}';

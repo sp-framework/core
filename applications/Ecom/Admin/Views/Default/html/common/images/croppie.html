@@ -218,7 +218,7 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     var formData = new FormData();
 
                     formData.append('file', imageBlob);
-                    formData.append('directory', 'businesses');
+                    formData.append('directory', "{{componentName|lower}}");
                     formData.append('fileName', imageName);
 
                     var url = '{{links.url("storages/add")}}';

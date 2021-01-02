@@ -24,90 +24,21 @@
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row vdivide">
-            <div class="col-md-4 col-sm-12">
-                {% include '../common/images/croppie' with
+            <div class="col-md-3 col-sm-12">
+                {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'image',
+                        'fieldLabel'                     : false,
+                        'fieldType'                      : 'files/croppie',
                         'fieldValue'                     : categoryImage,
-                        'imageType'                      : 'image'
+                        'imageType'                      : 'image',
+                        'imageLink'                      : imageLink
                     ]
-                %}
-{#                 <div class="row">
-                    <div class="col mb-2">
-                        {{adminltetags.useTag('fields',
-                            [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'image',
-                                'fieldLabel'                     : 'Category Image',
-                                'fieldType'                      : 'input',
-                                'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Category Image',
-                                'fieldRequired'                  : false,
-                                'fieldBazScan'                   : true,
-                                'fieldBazPostOnCreate'           : true,
-                                'fieldBazPostOnUpdate'           : true,
-                                'fieldHidden'                    : true,
-                                'fieldDisabled'                  : true,
-                                'fieldValue'                     : categoryImage
-                            ]
-                        )}}
-                        {{adminltetags.useTag('buttons',
-                            {
-                                'componentId'            : componentId,
-                                'sectionId'              : sectionId,
-                                'buttonLabel'            : false,
-                                'buttonType'             : 'button',
-                                'buttons'                :
-                                {
-                                    'croppie-upload' :
-                                    {
-                                        'title'                 : false,
-                                        'position'              : 'left',
-                                        'icon'                  : 'upload',
-                                        'size'                  : 'sm',
-                                        'buttonAdditionalClass' : 'mr-1 ml-1 btn-file',
-                                        'content'               : '<input type="file" class="ignore" style="cursor: pointer;opacity: 0;font-size: 0;" id="' ~ componentId ~ '-' ~ sectionId ~ '-croppie-upload-image" value="Choose a file" accept="image/*"/>'
-                                    },
-                                    'croppie-save' :
-                                    {
-                                        'title'                 : false,
-                                        'position'              : 'left',
-                                        'icon'                  : 'save',
-                                        'hidden'                : true,
-                                        'size'                  : 'sm',
-                                        'buttonAdditionalClass' : 'mr-1 ml-1'
-                                    },
-                                    'croppie-cancel' :
-                                    {
-                                        'title'                 : false,
-                                        'type'                  : 'secondary',
-                                        'position'              : 'left',
-                                        'icon'                  : 'times',
-                                        'hidden'                : true,
-                                        'size'                  : 'sm',
-                                        'buttonAdditionalClass' : 'mr-1 ml-1'
-                                    }
-                                }
-                            }
-                        )}}
-                        <span id="{{componentId}}-{{sectionId}}-save-warning" class="text-danger" hidden>Save/Cancel Image</span>
-                    </div>
-                </div>
-                <div class="text-center">
-                    {% if imageLink is defined %}
-                        <img alt="image" src="{{imageLink}}" class="user-image img-fluid img-thumbnail">
-                    {% else %}
-                        <img alt="image" src="/ecom/dashboard/default/images/general/image.png" class="user-image img-fluid img-thumbnail">
-                    {% endif %}
-                    <div id="{{componentId}}-{{sectionId}}-croppie" hidden></div>
-                </div> #}
+                )}}
             </div>
             <div class="col">
                 <div class="row">
@@ -373,167 +304,6 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
-        // '{{componentId}}-{{sectionId}}-image'                   : {
-        //     afterInit: function() {
-        //         var uploadUUIDs = [];
-        //         var deleteUUIDs = [];
-        //         var imageCropper, imageBlob, newImage, oldImage, imageName;
-
-        //         function initCroppie() {
-        //             imageCropper =
-        //                 $('#{{componentId}}-{{sectionId}}-croppie').croppie({
-        //                     viewport: {
-        //                         width: 200,
-        //                         height: 200,
-        //                     },
-        //                     boundary: {
-        //                         width: 250,
-        //                         height: 250
-        //                     }
-        //                 });
-
-        //             $('#{{componentId}}-{{sectionId}}-croppie-upload-image').change(function () {
-        //                 readFile(this);
-        //             });
-
-        //             $('#{{componentId}}-{{sectionId}}-croppie-save').click(function (e) {
-        //                 e.preventDefault();
-
-        //                 if ($('#{{componentId}}-{{sectionId}}-image').val() &&
-        //                     $('#{{componentId}}-{{sectionId}}-image').val() !== ''
-        //                 ) {
-        //                     oldImage = true;
-        //                     deleteUUIDs.push($('#{{componentId}}-{{sectionId}}-image').val());
-        //                 } else {
-        //                     oldImage = false;
-        //                     deleteUUIDs = [];
-        //                 }
-
-        //                 $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
-
-        //                 //To Canvas for show
-        //                 imageCropper.croppie('result', {
-        //                     type    : 'canvas',
-        //                     size    : 'viewport',
-        //                     format  : 'jpeg',
-        //                     circle  : false
-        //                 }).then(function (croppedImage) {
-        //                     imageBlob = croppedImage;
-        //                     $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
-        //                     $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
-        //                     $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
-        //                     $('.user-image').attr('src', croppedImage);
-        //                     $('.user-image').attr('hidden', false);
-        //                 });
-        //                 //To Blob for upload
-        //                 imageCropper.croppie('result', {
-        //                     type    : 'blob',
-        //                     size    : 'viewport',
-        //                     format  : 'jpeg',
-        //                     circle  : false
-        //                 }).then(function (croppedImage) {
-        //                     imageBlob = croppedImage;
-        //                     newImage = true;
-        //                     processDeleteUUIDs();
-        //                     uploadImage();
-        //                 });
-        //             });
-
-        //             $('#{{componentId}}-{{sectionId}}-croppie-cancel').click(function () {
-        //                 $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', true);
-        //                 $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', true);
-        //                 $('#{{componentId}}-{{sectionId}}-save-warning').attr('hidden', true);
-        //                 $('.user-image').attr('hidden', false);
-        //                 $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', true);
-        //                 oldImage = false;
-        //                 deleteUUIDs = [];
-        //             });
-        //         }
-
-        //         function readFile(input) {
-        //             if (input.files && input.files[0]) {
-        //                 var reader = new FileReader();
-
-        //                 reader.onload = function (e) {
-        //                     $('.user-image').attr('hidden', true);
-        //                     $('#{{componentId}}-{{sectionId}}-croppie').attr('hidden', false);
-        //                     $('#{{componentId}}-{{sectionId}}-croppie-save').attr('hidden', false);
-        //                     $('#{{componentId}}-{{sectionId}}-croppie-cancel').attr('hidden', false);
-        //                     imageCropper.croppie('bind', {
-        //                         url: e.target.result
-        //                     }).then(function(){
-        //                         //
-        //                     });
-        //                 }
-
-        //                 imageName = input.files[0].name;
-        //                 reader.readAsDataURL(input.files[0]);
-        //             }
-        //             else {
-        //                 PNotify.error("Sorry - you're browser doesn't support the FileReader API");
-        //             }
-        //         }
-
-        //         function processDeleteUUIDs() {
-        //             if (deleteUUIDs.length > 0) {
-
-        //                 var url = '{{links.url("storages/remove")}}';
-
-        //                 $(deleteUUIDs).each(function(index, uuid) {
-        //                     $.ajax({
-        //                         type    : 'POST',
-        //                         url     : url,
-        //                         data    :
-        //                             {
-        //                                 "uuid"             : uuid
-        //                             },
-        //                         dataType: 'json'
-        //                     }).done(function (data) {
-        //                         if (data.tokenKey && data.token) {
-        //                             $('#security-token').attr('name', data.tokenKey);
-        //                             $('#security-token').val(data.token);
-        //                         }
-        //                         if (data && data.responseCode === 0) {
-
-        //                             //
-        //                         }
-        //                     });
-        //                 });
-        //             }
-        //         }
-
-        //         function uploadImage() {
-        //             var formData = new FormData();
-
-        //             formData.append('file', imageBlob);
-        //             formData.append('directory', 'categories');
-        //             formData.append('fileName', imageName);
-
-        //             var url = '{{links.url("storages/add")}}';
-
-        //             $.ajax(url, {
-        //                 method      : 'POST',
-        //                 data        : formData,
-        //                 dataType    : 'json',
-        //                 processData : false,
-        //                 contentType : false,
-        //             }).done(function (data) {
-        //                 if (data) {
-        //                     if (data.tokenKey && data.token) {
-        //                         $('#security-token').attr('name', data.tokenKey);
-        //                         $('#security-token').val(data.token);
-        //                     }
-        //                     uploadUUIDs.push(data.storageData.uuid);
-        //                     $('#{{componentId}}-{{sectionId}}-image').val(data.storageData.uuid);
-        //                 } else {
-        //                     PNotify.error('Image Upload Failed!');
-        //                 }
-        //             });
-        //         }
-
-        //         initCroppie();
-        //     }
-        // },
         '{{componentId}}-{{sectionId}}-name'                    : { },
         '{{componentId}}-{{sectionId}}-description'             : { },
         '{{componentId}}-{{sectionId}}-type'                    : { },
