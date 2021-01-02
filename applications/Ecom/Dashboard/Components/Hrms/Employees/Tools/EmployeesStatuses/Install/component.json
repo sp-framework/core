@@ -1,0 +1,31 @@
+{
+    "route"         : "hrms/employees/tools/employeesstatuses",
+    "name"          : "Employees Statuses",
+    "description"   : "Manage employees statuses via this component",
+    "category"      : "ecom",
+    "sub_category"  : "dashboard",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../ecom-dashboard-component-hrms-employees-tools-employeesstatuses",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Hrms\\Employees\\Tools\\EmployeesStatusesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Employees",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../ecom-common-package-hrms-employees-tools-employeesstatuses"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         : []
+    },
+    "menu"              : false,
+    "settings"          : {
+    }
+}

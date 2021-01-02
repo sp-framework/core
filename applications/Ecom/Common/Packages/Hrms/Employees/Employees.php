@@ -1,8 +1,8 @@
 <?php
 
-namespace Applications\Ecom\Common\Packages\Employees;
+namespace Applications\Ecom\Common\Packages\Hrms\Employees;
 
-use Applications\Ecom\Common\Packages\Employees\Model\Employees as EmployeesModel;
+use Applications\Ecom\Common\Packages\Hrms\Employees\Model\Employees as EmployeesModel;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 

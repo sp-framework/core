@@ -1,12 +1,12 @@
 {
-    "route"         : "users/employees",
+    "route"         : "hrms/employees",
     "name"          : "Employees",
     "description"   : "Manage employees via this component",
     "category"      : "ecom",
     "sub_category"  : "dashboard",
     "version"       : "0.0.1",
-    "repo"          : "https://.../ecom-dashboard-component-users-employees",
-    "class"         : "Applications\\Ecom\\Admin\\Components\\Users\\Employees\\EmployeesComponent",
+    "repo"          : "https://.../ecom-dashboard-component-hrms-employees",
+    "class"         : "Applications\\Ecom\\Dashboard\\Components\\Hrms\\Employees\\EmployeesComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -14,7 +14,14 @@
             "repo"      : "https://.../core"
         },
         "components"    : [],
-        "packages"      : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Employees",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../ecom-common-package-hrms-employees"
+            }
+        ],
         "middlewares"   : [],
         "views"         : []
     },

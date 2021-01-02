@@ -1,13 +1,13 @@
 <?php
 
-namespace Applications\Ecom\Dashboard\Components\Hrms\Employees;
+namespace Applications\Ecom\Dashboard\Components\Hrms\Employees\Tools\EmployeesStatuses;
 
 use Applications\Ecom\Common\Packages\Hrms\Employees\Employees;
 use Applications\Ecom\Common\Packages\AdminLTETags\Traits\DynamicTable;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
-class EmployeesComponent extends BaseComponent
+class EmployeesStatusesComponent extends BaseComponent
 {
     use DynamicTable;
 

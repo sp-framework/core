@@ -1,9 +1,9 @@
 <?php
 
-namespace Applications\Ecom\Common\Packages\Employees\Install;
+namespace Applications\Ecom\Common\Packages\Hrms\Employees\Install;
 
-use Applications\Ecom\Common\Packages\Employees\Employees;
-use Applications\Ecom\Common\Packages\Employees\Install\Schema\Employees as EmployeesSchema;
+use Applications\Ecom\Common\Packages\Hrms\Employees\Employees;
+use Applications\Ecom\Common\Packages\Hrms\Employees\Install\Schema\Employees as EmployeesSchema;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -19,7 +19,7 @@ class Package extends BasePackage
     {
         $this->init();
 
-        if ($this->checkPackage($this->packageToUse)) {
+        if (!$dropTables && $this->checkPackage($this->packageToUse)) {
 
             $this->packagesData->responseCode = 1;
 
@@ -30,9 +30,9 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
-                $this->createTable('employees', '', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('hrms_employees', '', (new $this->schemaToUse)->columns(), $dropTables);
             } else {
-                $this->createTable('employees', '', (new $this->schemaToUse)->columns());
+                $this->createTable('hrms_employees', '', (new $this->schemaToUse)->columns());
             }
 
             // $this->registerPackage();
@@ -49,7 +49,7 @@ class Package extends BasePackage
 
     protected function registerPackage()
     {
-        $packagePath = '/applications/Ecom/Common/Packages/Employees/';
+        $packagePath = '/applications/Ecom/Common/Packages/Hrms/Employees/';
 
         $jsonFile =
             Json::decode($this->localContent->read($packagePath . '/Install/package.json'), true);
