@@ -2,7 +2,7 @@
 
 namespace Applications\Ecom\Dashboard\Components\Home;
 
-use Applications\Ecom\Common\Packages\Employees\Install\Package as EmployeesPackage;
+use Applications\Ecom\Common\Packages\Hrms\Employees\Install\Package as EmployeesPackage;
 use Applications\Ecom\Common\Packages\Channels\Install\Package as ChannelsPackage;
 use Applications\Ecom\Dashboard\Components\Filters\Install\Component as FiltersComponent;
 use Applications\Ecom\Dashboard\Components\Inventory\Brands\Install\Component as BrandsComponent;
@@ -35,8 +35,8 @@ class HomeComponent extends BaseComponent
         // $suppliersComponent = new SuppliersComponent();
         // $suppliersComponent->installComponent();
         // For Installing Suppliers Package
-        // $suppliersPackage = new SuppliersPackage();
-        // $suppliersPackage->installPackage(true);
+        $suppliersPackage = new SuppliersPackage();
+        $suppliersPackage->installPackage(true);
         // For Installing Storage
         // $storagesComponent = new StoragesComponent();
         // $storagesComponent->installComponent();
@@ -57,19 +57,20 @@ class HomeComponent extends BaseComponent
         // $categoriesComponent = new CategoriesComponent();
         // $categoriesComponent->installComponent();
         // For Installing Categories Package
-        // $categoriesPackage = new CategoriesPackage();
-        // $categoriesPackage->installPackage(true);
+        $categoriesPackage = new CategoriesPackage();
+        $categoriesPackage->installPackage(true);
 
         // For Installing Specifications
         // $specificationComponent = new SpecificationsComponent();
         // $specificationComponent->installComponent();
         // For Installing Specifications Package
-        // $specificationPackage = new SpecificationsPackage();
-        // $specificationPackage->installPackage(true);
+        $specificationPackage = new SpecificationsPackage();
+        $specificationPackage->installPackage(true);
 
         // For Installing Employees Types
         $employeesTypesPackage = new EmployeesPackage();
         $employeesTypesPackage->installPackage(true);
+
         // $this->view->disable();
     }
 }
