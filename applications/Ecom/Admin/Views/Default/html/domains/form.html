@@ -136,18 +136,21 @@
                             {% set checked = true %}
                             {% set viewDisabled = false %}
                             {% set emailServiceDisabled = false %}
-                            {% set storageServiceDisabled = false %}
+                            {% set publicStorageServiceDisabled = false %}
+                            {% set privateStorageServiceDisabled = false %}
                         {% else %}
                             {% set checked = false %}
                             {% set viewDisabled = true %}
                             {% set emailServiceDisabled = true %}
-                            {% set storageServiceDisabled = true %}
+                            {% set publicStorageServiceDisabled = true %}
+                            {% set privateStorageServiceDisabled = true %}
                         {% endif %}
                     {% else %}
                         {% set checked = false %}
                         {% set viewDisabled = true %}
                         {% set emailServiceDisabled = true %}
-                        {% set storageServiceDisabled = true %}
+                        {% set publicStorageServiceDisabled = true %}
+                        {% set privateStorageServiceDisabled = true %}
                     {% endif %}
                     <hr>
                     <div class="application" data-id="{{application['id']}}">
@@ -252,10 +255,10 @@
                                 )}}
                             </div>
                             <div class="col">
-                                {% if domain['applications'][application['id']]['storage'] is defined %}
-                                    {% set storage = domain['applications'][application['id']]['storage'] %}
+                                {% if domain['applications'][application['id']]['publicStorage'] is defined %}
+                                    {% set publicStorage = domain['applications'][application['id']]['publicStorage'] %}
                                 {% else %}
-                                    {% set storage = 0 %}
+                                    {% set publicStorage = 0 %}
                                 {% endif %}
                                 {{adminltetags.useTag('fields',
                                     [
@@ -263,23 +266,55 @@
                                         'componentName'                  : componentName,
                                         'componentId'                    : componentId,
                                         'sectionId'                      : sectionId,
-                                        'fieldId'                        : application['id'] ~ '-storage',
-                                        'fieldLabel'                     : 'Use Storage',
+                                        'fieldId'                        : application['id'] ~ '-public-storage',
+                                        'fieldLabel'                     : 'Use Public Storage',
                                         'fieldType'                      : 'select2',
                                         'fieldHelp'                      : true,
-                                        'fieldHelpTooltipContent'        : 'Select storage for this domain and application.',
+                                        'fieldHelpTooltipContent'        : 'Select public storage for this domain and application.',
                                         'fieldBazScan'                   : true,
                                         'fieldRequired'                  : false,
-                                        'fieldDisabled'                  : storageServiceDisabled,
+                                        'fieldDisabled'                  : publicStorageServiceDisabled,
                                         'fieldDataAttributes'            :
                                             [
-                                                'type' : 'storage'
+                                                'type' : 'publicStorage'
                                             ],
-                                        'fieldDataSelect2Options'        : storages,
+                                        'fieldDataSelect2Options'        : publicStorages,
                                         'fieldDataSelect2OptionsKey'     : 'id',
                                         'fieldDataSelect2OptionsValue'   : 'name',
                                         'fieldDataSelect2OptionsArray'   : true,
-                                        'fieldDataSelect2OptionsSelected': storage
+                                        'fieldDataSelect2OptionsSelected': publicStorage
+                                    ]
+                                )}}
+                            </div>
+                            <div class="col">
+                                {% if domain['applications'][application['id']]['privateStorage'] is defined %}
+                                    {% set privateStorage = domain['applications'][application['id']]['privateStorage'] %}
+                                {% else %}
+                                    {% set privateStorage = 0 %}
+                                {% endif %}
+                                {{adminltetags.useTag('fields',
+                                    [
+                                        'component'                      : component,
+                                        'componentName'                  : componentName,
+                                        'componentId'                    : componentId,
+                                        'sectionId'                      : sectionId,
+                                        'fieldId'                        : application['id'] ~ '-private-storage',
+                                        'fieldLabel'                     : 'Use Private Storage',
+                                        'fieldType'                      : 'select2',
+                                        'fieldHelp'                      : true,
+                                        'fieldHelpTooltipContent'        : 'Select private storage for this domain and application.',
+                                        'fieldBazScan'                   : true,
+                                        'fieldRequired'                  : false,
+                                        'fieldDisabled'                  : privateStorageServiceDisabled,
+                                        'fieldDataAttributes'            :
+                                            [
+                                                'type' : 'privateStorage'
+                                            ],
+                                        'fieldDataSelect2Options'        : privateStorages,
+                                        'fieldDataSelect2OptionsKey'     : 'id',
+                                        'fieldDataSelect2OptionsValue'   : 'name',
+                                        'fieldDataSelect2OptionsArray'   : true,
+                                        'fieldDataSelect2OptionsSelected': privateStorage
                                     ]
                                 )}}
                             </div>
@@ -350,12 +385,14 @@ dataCollectionSection =
                             dataCollectionSection['data']['applications'][applicationId]['allowed'] = true;
                             $('#{{componentId}}-{{sectionId}}-' + applicationId + '-view').attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-' + applicationId + '-email-service').attr('disabled', false);
-                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-storage').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-public-storage').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-private-storage').attr('disabled', false);
                         } else {
                             dataCollectionSection['data']['applications'][applicationId]['allowed'] = false;
                             $('#{{componentId}}-{{sectionId}}-' + applicationId + '-view').attr('disabled', true);
                             $('#{{componentId}}-{{sectionId}}-' + applicationId + '-email-service').attr('disabled', true);
-                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-storage').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-public-storage').attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-' + applicationId + '-private-storage').attr('disabled', true);
                         }
                     } else if (select2 && select2Type) {
                         dataCollectionSection['data']['applications'][applicationId][select2Type] =
@@ -391,8 +428,10 @@ for (var id in applicationIds) {
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-view'] = {"placeholder": "SELECT VIEW (TEMPLATE)"};
     dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = { };
     dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-email-service'] = {"placeholder": "SELECT EMAIL SERVICE"};
-    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-storage'] = { };
-    dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-storage'] = {"placeholder": "SELECT STORAGE"};
+    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-public-storage'] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-public-storage'] = {"placeholder": "SELECT PUBLIC STORAGE"};
+    dynamicFields['select2']['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = { };
+    dataCollectionSection['{{componentId}}-{{sectionId}}-' + id + '-private-storage'] = {"placeholder": "SELECT PRIVATE STORAGE"};
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['rules']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "required";
     dataCollectionSection['{{componentId}}-{{sectionId}}-form']['messages']['{{componentId}}-{{sectionId}}-' + id + '-view'] = "please select a view (template)";
 }

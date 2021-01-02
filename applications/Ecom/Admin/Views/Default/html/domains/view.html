@@ -1,12 +1,8 @@
 {% if domain['id'] is defined %}
     {% set domainId = domain['id'] %}
-    {% set domainName = domain['name'] %}
-    {% set domainDescription = domain['description'] %}
     {% set title = 'Domain (' ~ domain['name'] ~ ')' %}
 {% else %}
     {% set domainId = '' %}
-    {% set domainName = '' %}
-    {% set domainDescription = '' %}
     {% set title = 'New Domain' %}
 {% endif %}
 {{adminltetags.useTag('content',

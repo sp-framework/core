@@ -55,7 +55,6 @@ class Storages extends BasePackage
 
             $this->packagesData->responseMessage = 'Error Updating Storage';
         }
-        //
     }
 
     protected function extractSelectData(array $data)
@@ -87,12 +86,22 @@ class Storages extends BasePackage
 
     public function getFile(array $getData)
     {
-        return $this->initStorage()->get($getData);
+        if ($getData['storagetype'] === 'public') {
+            $public = true;
+        } else if ($getData['storagetype'] === 'private') {
+            $public = false;
+        }
+        return $this->initStorage($public)->get($getData);
     }
 
     public function storeFile()
     {
-        $storage = $this->initStorage();
+        if ($this->request->getPost()['storagetype'] === 'public') {
+            $public = true;
+        } else if ($this->request->getPost()['storagetype'] === 'private') {
+            $public = false;
+        }
+        $storage = $this->initStorage($public);
 
         if ($storage->store()) {
             $this->packagesData->storageData = $storage->packagesData->storageData;
@@ -113,7 +122,12 @@ class Storages extends BasePackage
 
     public function removeFile(string $uuid)
     {
-        $storage = $this->initStorage();
+        if ($this->request->getPost()['storagetype'] === 'public') {
+            $public = true;
+        } else if ($this->request->getPost()['storagetype'] === 'private') {
+            $public = false;
+        }
+        $storage = $this->initStorage($public);
 
         if ($storage->removeFile($uuid)) {
             $this->packagesData->responseCode = $storage->packagesData->responseCode;
@@ -130,7 +144,7 @@ class Storages extends BasePackage
         }
     }
 
-    protected function initStorage()
+    protected function initStorage($public = true)
     {
         if (isset($this->request->getPost()['channel']) && $this->request->getPost()['channel'] !== '') {
             $channels = $this->usePackage(Channels::class);
@@ -149,12 +163,16 @@ class Storages extends BasePackage
 
             $application = $this->modules->applications->getApplicationInfo();
         }
-
-        if (isset($domain['applications'][$application['id']]['storage']) &&
-            $domain['applications'][$application['id']]['storage'] !== ''
+        if ((isset($domain['applications'][$application['id']]['publicStorage']) &&
+            $domain['applications'][$application['id']]['publicStorage'] !== '') &&
+            (isset($domain['applications'][$application['id']]['privateStorage']) &&
+            $domain['applications'][$application['id']]['privateStorage'] !== '')
         ) {
-            $storage =
-                $this->getById($domain['applications'][$application['id']]['storage']);
+            if ($public) {
+                $storage = $this->getById($domain['applications'][$application['id']]['publicStorage']);
+            } else {
+                $storage = $this->getById($domain['applications'][$application['id']]['privateStorage']);
+            }
         } else {
             return false;
         }
@@ -168,6 +186,7 @@ class Storages extends BasePackage
 
     public function getPublicLink($uuid, $width = null)
     {
+        var_dump($this->initStorage());
         return $this->initStorage()->getPublicLink($uuid, $width);
     }
 }

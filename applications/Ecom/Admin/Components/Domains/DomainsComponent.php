@@ -24,7 +24,21 @@ class DomainsComponent extends BaseComponent
             }
             $this->view->emailservices = $this->basepackages->domains->packagesData->emailservices;
 
-            $this->view->storages = $this->basepackages->domains->packagesData->storages;
+            $storages = $this->basepackages->domains->packagesData->storages;
+            $publicStorages = [];
+            $privateStorages = [];
+
+            foreach ($storages as $key => $storage) {
+                if ($storage['permission'] === 'public') {
+                    $publicStorages[$key] = $storage;
+                } else if ($storage['permission'] === 'private') {
+                    $privateStorages[$key] = $storage;
+                }
+            }
+
+            $this->view->publicStorages = $publicStorages;
+
+            $this->view->privateStorages = $privateStorages;
 
             $this->view->applications = $this->basepackages->domains->packagesData->applications;
 

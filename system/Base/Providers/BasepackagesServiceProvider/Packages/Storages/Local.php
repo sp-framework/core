@@ -119,7 +119,6 @@ class Local extends BasePackage
 
         $this->directory = $this->request->getPost()['directory'] ?? null;
 
-
         $storageData = [];
 
         foreach ($this->request->getUploadedFiles() as $key => $file) {
