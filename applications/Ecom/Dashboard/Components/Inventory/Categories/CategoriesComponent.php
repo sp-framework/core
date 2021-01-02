@@ -69,7 +69,10 @@ class CategoriesComponent extends BaseComponent
             } else {
 
                 $this->view->categoryType = $this->getData()['type'];
+
+                $this->view->imageLink = '';
             }
+
             $this->view->categories = $categories;
 
             $this->view->roles = $this->roles->init()->roles;

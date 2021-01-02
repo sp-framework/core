@@ -63,8 +63,9 @@ class SuppliersComponent extends BaseComponent
                 $this->view->supplier = $supplier;
             } else {
                 $this->view->supplierType = $this->getData()['type'];
-            }
 
+                $this->view->logoLink = '';
+            }
 
             $this->view->pick('suppliers/view');
 

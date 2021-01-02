@@ -88,4 +88,31 @@ class Brands extends BasePackage
 
         $this->update($brand);
     }
+
+    public function searchBrands(string $brandQueryString)
+    {
+        $searchBrands =
+            $this->getByParams(
+                [
+                    'conditions'    => 'name LIKE :bName:',
+                    'bind'          => [
+                        'bName'     => '%' . $brandQueryString . '%'
+                    ]
+                ]
+            );
+
+        if ($searchBrands) {
+            $brands = [];
+
+            foreach ($searchBrands as $brandKey => $brandValue) {
+                $brands[$brandKey] = $brandValue;
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->brands = $brands;
+
+            return true;
+        }
+    }
 }

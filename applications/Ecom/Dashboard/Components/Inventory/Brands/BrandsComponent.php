@@ -32,6 +32,8 @@ class BrandsComponent extends BaseComponent
                 if ($this->view->brand['logo'] && $this->view->brand['logo'] !== '') {
                     $this->view->logoLink = $storages->getPublicLink($this->view->brand['logo'], 200);
                 }
+            } else {
+                $this->view->logoLink = '';
             }
 
             $this->view->brands = [];
@@ -131,6 +133,31 @@ class BrandsComponent extends BaseComponent
             $this->view->responseCode = 1;
 
             $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function searchBrandAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 2) {
+                    return;
+                }
+
+                $searchBrands = $this->brands->searchBrands($searchQuery);
+
+                if ($searchBrands) {
+                    $this->view->responseCode = $this->brands->packagesData->responseCode;
+
+                    $this->view->brands = $this->brands->packagesData->brands;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
         }
     }
 }
