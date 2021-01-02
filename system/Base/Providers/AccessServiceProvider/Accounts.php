@@ -20,6 +20,8 @@ class Accounts extends BasePackage
     {
         $data['email'] = strtolower($data['email']);
 
+        $data['domain'] = explode('@', $data['email'])[1];
+
         if ($this->checkAccountByEmail($data['email'])) {
             $this->packagesData->responseCode = 1;
 
@@ -31,7 +33,6 @@ class Accounts extends BasePackage
         if ($this->validateData($data)) {
 
             $password = $this->generateNewPassword();
-
 
             $data['password'] = $this->secTools->hashPassword($password);
 
@@ -84,6 +85,8 @@ class Accounts extends BasePackage
         }
 
         $data['email'] = strtolower($data['email']);
+
+        $data['domain'] = explode('@', $data['email'])[1];
 
         if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
 
@@ -139,6 +142,43 @@ class Accounts extends BasePackage
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'Cannot remove default account.';
+        }
+    }
+
+    public function searchAccountInternal(string $emailQueryString)
+    {
+        // Only search accounts with email domain that are registered with the system
+        $domains = [];
+
+        foreach ($this->basepackages->domains->domains as $key => $domain) {
+            $domains[$key] = $domain['name'];
+        }
+
+        $searchAccounts =
+            $this->getByParams(
+                [
+                    'conditions'    => 'email LIKE :aEmail:',
+                    'bind'          => [
+                        'aEmail'     => '%' . $emailQueryString . '%'
+                    ]
+                ]
+            );
+
+        if (count($searchAccounts) > 0) {
+            $accounts = [];
+
+            foreach ($searchAccounts as $accountKey => $accountValue) {
+                if (in_array($accountValue['domain'], $domains)) {
+                    $accounts[$accountKey]['id'] = $accountValue['id'];
+                    $accounts[$accountKey]['email'] = $accountValue['email'];
+                }
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->accounts = $accounts;
+
+            return true;
         }
     }
 

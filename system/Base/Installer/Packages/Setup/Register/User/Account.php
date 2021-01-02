@@ -14,6 +14,7 @@ class Account
             'accounts',
             [
                 'email'                 => $email,
+                'domain'                => explode('@', $email)[1],
                 'password'              => $password,
                 'role_id'               => $adminRoleId,
                 'override_role'         => 0,

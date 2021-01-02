@@ -30,6 +30,14 @@ class Accounts
                         ]
                     ),
                     new Column(
+                        'domain',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 50,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'password',
                         [
                             'type'    => Column::TYPE_VARCHAR,
