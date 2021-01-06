@@ -4,6 +4,7 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
+use System\Base\Providers\ModulesServiceProvider\Modules\ApplicationTypes;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Applications as ApplicationsModel;
 
 class Applications extends BasePackage
@@ -14,10 +15,15 @@ class Applications extends BasePackage
 
 	public $applications;
 
+	public $applicationTypes;
+
 	protected $applicationInfo = null;
 
 	public function init(bool $resetCache = false)
 	{
+		$this->applicationTypes =
+			(new ApplicationTypes)->init($resetCache)->applicationTypes;
+
 		$this->getAll($resetCache);
 
 		return $this;
@@ -41,12 +47,19 @@ class Applications extends BasePackage
 
 		$uri = explode('/q/', $uri);
 
+		$domain = $this->basepackages->domains->getDomain();
+
 		if ($uri[0] === '/') {
-			if ($this->basepackages->domains->getDomain()) {
-				return $this->getIdApplication($this->basepackages->domains->getDomain()['default_application_id'])['route'];
+			if ($domain) {
+				return $this->getIdApplication($domain['default_application_id'])['route'];
 			}
 			return null;
 		} else {
+			if (isset($domain['exclusive_to_default_application']) &&
+				$domain['exclusive_to_default_application'] == 1
+			) {
+				return $this->getIdApplication($domain['default_application_id'])['route'];
+			}
 			return explode('/', $uri[0])[1];
 		}
 	}
@@ -147,13 +160,18 @@ class Applications extends BasePackage
 
 	public function addApplication(array $data)
 	{
-		if (strtolower($data['route']) === 'common') {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'App route "common" is reserved. Please use different route.';
-
+		if (!$this->checkType($data)) {
 			return;
 		}
+
+		if ($this->getRouteApplication($data['route'])) {
+			$this->packagesData->responseCode = 1;
+
+			$this->packagesData->responseMessage = 'App route ' . strtolower($data['route']) . ' is used by another app. Please use different route.';
+
+			return false;
+		}
+
 		$data['default_component'] = 0;
 		$data['errors_component'] = 0;
 		$data['can_login_role_ids'] = Json::decode($data['can_login_role_ids'], true);
@@ -178,11 +196,7 @@ class Applications extends BasePackage
 			$data = array_merge($app, $data);
 		}
 
-		if (strtolower($data['route']) === 'common') {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'App route "common" is reserved. Please use different route.';
-
+		if (!$this->checkType($data)) {
 			return;
 		}
 
@@ -216,6 +230,23 @@ class Applications extends BasePackage
 		}
 	}
 
+	protected function checkType($data)
+	{
+		$typesArr = $this->modules->applications->applicationTypes;
+
+		foreach ($typesArr as $key => $type) {
+			if (strtolower($data['route']) === $type['app_type']) {
+				$this->packagesData->responseCode = 1;
+
+				$this->packagesData->responseMessage = 'App route ' . strtolower($data['route']) . ' is reserved. Please use different route.';
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public function removeApplication(array $data)
 	{
 		if ($data['id'] == 1) {
@@ -240,51 +271,51 @@ class Applications extends BasePackage
 		}
 	}
 
-	public function getAppCategories()
-	{
-		return
-			[
-				'1'   =>
-					[
-						'id'   => 'ecom',
-						'name' => 'E-Commerce Management System'
-					],
-				'2'    =>
-					[
-						'id'   => 'tms',
-						'name' => 'Transport Management System'
-					]
-			];
-	}
+	// public function getAppCategories()
+	// {
+	// 	return
+	// 		[
+	// 			'1'   =>
+	// 				[
+	// 					'id'   => 'ecom',
+	// 					'name' => 'E-Commerce Management System'
+	// 				],
+	// 			'2'    =>
+	// 				[
+	// 					'id'   => 'tms',
+	// 					'name' => 'Transport Management System'
+	// 				]
+	// 		];
+	// }
 
-	public function getAppSubCategories()
-	{
-		return
-			[
-				'1'	  =>
-					[
-						'id'  		=> 'admin',
-						'parent'	=> 'ecom',
-						'name' 		=> 'Admin'
-					],
-				'2'   =>
-					[
-						'id'  		=> 'dashboard',
-						'parent'	=> 'ecom',
-						'name' 		=> 'Dashboard'
-					],
-				'3'   =>
-					[
-						'id'  		=> 'eshop',
-						'parent'	=> 'ecom',
-						'name' 		=> 'EShop'
-					],
-				'4'   =>
-					[
-						'id'  		=> 'pos',
-						'parent'	=> 'ecom',
-						'name' 		=> 'PoS'
-					]
-			];
-	}
+	// public function getAppSubCategories()
+	// {
+	// 	return
+	// 		[
+	// 			'1'	  =>
+	// 				[
+	// 					'id'  		=> 'admin',
+	// 					'parent'	=> 'ecom',
+	// 					'name' 		=> 'Admin'
+	// 				],
+	// 			'2'   =>
+	// 				[
+	// 					'id'  		=> 'dashboard',
+	// 					'parent'	=> 'ecom',
+	// 					'name' 		=> 'Dashboard'
+	// 				],
+	// 			'3'   =>
+	// 				[
+	// 					'id'  		=> 'eshop',
+	// 					'parent'	=> 'ecom',
+	// 					'name' 		=> 'EShop'
+	// 				],
+	// 			'4'   =>
+	// 				[
+	// 					'id'  		=> 'pos',
+	// 					'parent'	=> 'ecom',
+	// 					'name' 		=> 'PoS'
+	// 				]
+	// 		];
+	// }
 }

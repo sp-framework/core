@@ -12,15 +12,19 @@ class Links
 
 	protected $view;
 
+	protected $domain;
+
 	protected $url;
 
-	public function __construct($request, $application, $view)
+	public function __construct($request, $application, $view, $domain)
 	{
 		$this->request = $request;
 
 		$this->application = $application;
 
 		$this->view = $view;
+
+		$this->domain = $domain;
 
 		$this->init();
 	}
@@ -41,6 +45,11 @@ class Links
 	public function url($link = null)
 	{
 		if ($link) {
+			if (isset($this->domain['exclusive_to_default_application']) &&
+				$this->domain['exclusive_to_default_application'] == 1
+			) {
+				return $this->url->getStatic('/' . $link);
+			}
 			return $this->url->getStatic(
 				strtolower($this->application['route']) . '/' . $link
 			);
@@ -52,40 +61,40 @@ class Links
 	public function images($link)
 	{
 		return $this->url->getStatic(
-			$this->application['category'] . '/' .
-			$this->application['sub_category'] . '/' .
+			$this->application['app_type'] . '/' .
+			// $this->application['sub_category'] . '/' .
 			strtolower($this->view['name']) . '/images/' . $link);
 	}
 
 	public function css($link)
 	{
 		return $this->url->getStatic(
-			$this->application['category'] . '/' .
-			$this->application['sub_category'] . '/' .
+			$this->application['app_type'] . '/' .
+			// $this->application['sub_category'] . '/' .
 			strtolower($this->view['name']) . '/css/' . $link);
 	}
 
 	public function js($link)
 	{
 		return $this->url->getStatic(
-			$this->application['category'] . '/' .
-			$this->application['sub_category'] . '/' .
+			$this->application['app_type'] . '/' .
+			// $this->application['sub_category'] . '/' .
 			strtolower($this->view['name']) . '/js/' . $link);
 	}
 
 	public function fonts($link)
 	{
 		return $this->url->getStatic(
-			$this->application['category'] . '/' .
-			$this->application['sub_category'] . '/' .
+			$this->application['app_type'] . '/' .
+			// $this->application['sub_category'] . '/' .
 			strtolower($this->view['name']) . '/fonts/' . $link);
 	}
 
 	public function sounds($link)
 	{
 		return $this->url->getStatic(
-			$this->application['category'] . '/' .
-			$this->application['sub_category'] . '/' .
+			$this->application['app_type'] . '/' .
+			// $this->application['sub_category'] . '/' .
 			strtolower($this->view['name']) . '/sounds/' . $link);
 	}
 }

@@ -14,6 +14,7 @@ class Middleware
 				'name' 					=> $middlewareFile['name'],
 				'display_name' 			=> $middlewareFile['displayName'],
 				'description' 			=> $middlewareFile['description'],
+				'app_type' 				=> $middlewareFile['app_type'],
 				'category'  			=> $middlewareFile['category'],
 				'sub_category'  		=> $middlewareFile['sub_category'],
 				'version'				=> $middlewareFile['version'],

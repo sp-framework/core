@@ -63,8 +63,8 @@ class Views extends BasePackage
             if ($this->application && $this->view) {
                 $this->voltCompiledPath =
                     base_path('applications/' .
-                              ucfirst($this->application['category']) . '/' .
-                              ucfirst($this->application['sub_category']) .
+                              ucfirst($this->application['app_type']) . '/' .
+                              // ucfirst($this->application['sub_category']) .
                               '/Views/Html_compiled/' . ucfirst($this->application['route']) . '/' . $this->view['name'] . '/'
                           );
             } else {
@@ -92,7 +92,9 @@ class Views extends BasePackage
         if (!isset($this->phalconViewPath)) {
             if ($this->application && $this->view) {
                 $this->phalconViewPath =
-                    base_path('applications/' . ucfirst($this->application['category']) . '/' . ucfirst($this->application['sub_category']) .
+                    base_path('applications/' .
+                              ucfirst($this->application['app_type']) . '/' .
+                              // ucfirst($this->application['sub_category']) .
                               '/Views/' . $this->view['name'] .
                               '/html/');
             } else {
@@ -112,7 +114,9 @@ class Views extends BasePackage
         if (!isset($this->phalconViewLayoutPath)) {
             if ($this->application && $this->view) {
                 $this->phalconViewLayoutPath =
-                    base_path('applications/' . ucfirst($this->application['category']) . '/' . ucfirst($this->application['sub_category']) .
+                    base_path('applications/' .
+                              ucfirst($this->application['app_type']) . '/' .
+                              // ucfirst($this->application['sub_category']) .
                               '/Views/' . $this->view['name'] .
                               '/html/layouts/');
             } else {
@@ -279,26 +283,85 @@ class Views extends BasePackage
         }
     }
 
+    public function getNameViews($name)
+    {
+        $filter =
+            $this->model->filter(
+                function($view) use ($name) {
+                    if ($view->name == $name) {
+                        return $view;
+                    }
+                }
+            );
+
+        if (count($filter) > 1) {
+            throw new \Exception('Duplicate view Id found for name ' . $name);
+        } else if (count($filter) === 1) {
+            return $filter[0]->toArray();
+        } else {
+            return false;
+        }
+    }
+
     public function getViewsForCategoryAndSubcategory($category, $subCategory)
     {
         $views = [];
 
         $filter =
             $this->model->filter(
-                function($views) use ($category, $subCategory) {
-                    if ($views->category === $category &&
-                        $views->sub_category === $subCategory
+                function($view) use ($category, $subCategory) {
+                    $view = $view->toArray();
+                    if ($view['category'] === $category &&
+                        $view['sub_category'] === $subCategory
                     ) {
-                        return $views;
+                        return $view;
                     }
                 }
             );
 
         foreach ($filter as $key => $value) {
-            $views[$key] = $value->toArray();
+            $views[$key] = $value;
         }
 
         return $views;
+    }
+
+    public function getViewsForAppType(string $type)
+    {
+        $views = [];
+
+        $filter =
+            $this->model->filter(
+                function($view) use ($type) {
+                    $view = $view->toArray();
+                    if ($view['app_type'] === $type) {
+                        return $view;
+                    }
+                }
+            );
+
+        foreach ($filter as $key => $value) {
+            $views[$key] = $value;
+        }
+
+        return $views;
+    }
+
+    public function getDefaultViewForAppType(string $type)
+    {
+        $filter =
+            $this->model->filter(
+                function($view) use ($type) {
+                    $view = $view->toArray();
+                    if ($view['app_type'] === $type &&
+                        $view['name'] === 'Default'
+                    ) {
+                        return $view;
+                    }
+                }
+            );
+
+        return $filter[0];
     }
 
     public function updateViews(array $data)

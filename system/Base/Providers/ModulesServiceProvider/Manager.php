@@ -175,35 +175,43 @@ class Manager extends BasePackage
             if ($getFresh) {
                 $this->components =
                     $this->modules->components->init(true)
-                    ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getComponentsForAppType($application['app_type']);
 
                 $this->packages =
                     $this->modules->packages->init(true)
-                    ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getPackagesForAppType($application['app_type']);
 
                 $this->middlewares =
                     $this->modules->middlewares->init(true)
-                    ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getMiddlewaresForAppType($application['app_type']);
 
                 $this->views =
                     $this->modules->views->init(true)
-                    ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getViewsForAppType($application['app_type']);
             } else {
                 $this->components =
                     $this->modules->components
-                    ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getComponentsForAppType($application['app_type']);
 
                 $this->packages =
                     $this->modules->packages
-                    ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getPackagesForAppType($application['app_type']);
 
                 $this->middlewares =
                     $this->modules->middlewares
-                    ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getMiddlewaresForAppType($application['app_type']);
 
                 $this->views =
                     $this->modules->views
-                    ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    // ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
+                    ->getViewsForAppType($application['app_type']);
             }
         } else {
             $this->components = $this->modules->components->components;

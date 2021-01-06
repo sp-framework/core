@@ -40,14 +40,14 @@ class HttpServiceProvider implements ServiceProviderInterface
             }
         );
 
-
         $container->setShared(
             'links',
             function () use ($container) {
                 $request = $container->getShared('request');
                 $application = $container->getShared('modules')->applications->getApplicationInfo();
                 $view = $container->getShared('modules')->views->getViewInfo();
-                return new Links($request, $application, $view);
+                $domain = $container->getShared('basepackages')->domains->getDomain();
+                return new Links($request, $application, $view, $domain);
             }
         );
     }

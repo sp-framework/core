@@ -14,6 +14,7 @@ class Package
 				'name' 					=> $packageFile['name'],
 				'display_name'			=> $packageFile['displayName'],
 				'description' 			=> $packageFile['description'],
+				'app_type'		 		=> $packageFile['app_type'],
 				'category'				=> $packageFile['category'],
 				'sub_category'			=> $packageFile['sub_category'],
 				'version'				=> $packageFile['version'],

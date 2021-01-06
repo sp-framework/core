@@ -13,6 +13,7 @@ class View
 			[
 				'name' 					=> $viewFile['name'],
 				'description' 			=> $viewFile['description'],
+				'app_type' 				=> $viewFile['app_type'],
 				'category'  			=> $viewFile['category'],
 				'sub_category'  		=> $viewFile['sub_category'],
 				'version'				=> $viewFile['version'],

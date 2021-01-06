@@ -14,6 +14,12 @@ class Packages extends BaseModel
 
     public $description;
 
+    public $app_type;
+
+    public $category;
+
+    public $subcategory;
+
     public $version;
 
     public $repo;

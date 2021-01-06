@@ -19,6 +19,28 @@ class Components extends BasePackage
 		return $this;
 	}
 
+	public function getComponentByName($name)
+	{
+		$filter =
+			$this->model->filter(
+				function($component) use ($name) {
+					$component = $component->toArray();
+
+					if ($component['name'] === $name) {
+						return $component;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate component route found for component ' . $route);
+		} else if (count($filter) === 1) {
+			return $filter[0];
+		} else {
+			return false;
+		}
+	}
+
 	public function getRouteComponentForApplication($route, $applicationId)
 	{
 		$filter =
@@ -150,6 +172,26 @@ class Components extends BasePackage
 						if ($component['category'] === $category && $component['sub_category'] === $subCategory) {
 							return $component;
 						}
+					}
+				}
+			);
+
+		foreach ($filter as $key => $value) {
+			$components[$key] = $value;
+		}
+		return $components;
+	}
+
+	public function getComponentsForAppType(string $type)
+	{
+		$components = [];
+
+		$filter =
+			$this->model->filter(
+				function($component) use ($type) {
+					$component = $component->toArray();
+					if ($component['app_type'] === $type) {
+						return $component;
 					}
 				}
 			);

@@ -14,9 +14,7 @@ class Applications extends BaseModel
 
     public $description;
 
-    public $category;
-
-    public $sub_category;
+    public $app_type;
 
     public $default_component;
 

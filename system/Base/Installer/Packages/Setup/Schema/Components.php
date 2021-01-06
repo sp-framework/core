@@ -21,14 +21,6 @@ class Components
 						]
 					),
 					new Column(
-						'route',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 50,
-							'notNull' => true,
-						]
-					),
-					new Column(
 						'name',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -37,11 +29,35 @@ class Components
 						]
 					),
 					new Column(
+						'route',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
+						'alias',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 50,
+							'notNull' => false,
+						]
+					),
+					new Column(
 						'description',
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 2048,
 							'notNull' => false,
+						]
+					),
+					new Column(
+						'app_type',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'	  => 50,
+							'notNull' => true,
 						]
 					),
 					new Column(

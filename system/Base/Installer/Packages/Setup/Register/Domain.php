@@ -24,11 +24,12 @@ class Domain
 		$db->insertAsDict(
 			'domains',
 			[
-				'name'   					=> $request->getHttpHost(),
-				'description' 				=> '',
-				"default_application_id"	=> 1,
-				"applications"			    => Json::encode($applications),
-				'settings'			 		=> Json::encode([])
+				'name'   							=> $request->getHttpHost(),
+				'description' 						=> '',
+				"default_application_id"			=> 1,
+				"exclusive_to_default_application"	=> 0,
+				"applications"			    		=> Json::encode($applications),
+				'settings'			 				=> Json::encode([])
 			]
 		);
 	}

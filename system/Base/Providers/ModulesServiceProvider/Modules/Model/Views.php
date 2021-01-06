@@ -12,6 +12,8 @@ class Views extends BaseModel
 
     public $description;
 
+    public $app_type;
+
     public $category;
 
     public $sub_category;

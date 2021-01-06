@@ -117,6 +117,47 @@ class Middlewares extends BasePackage
 		return $middlewares;
 	}
 
+	public function getMiddlewaresForAppType(string $type, $applicationId = null)
+	{
+		$middlewares = [];
+
+		$filter =
+			$this->model->filter(
+				function($middleware) use ($type) {
+					$middleware = $middleware->toArray();
+					$middleware['applications'] = Json::decode($middleware['applications'], true);
+
+					if ($middleware['app_type'] === $type) {
+						return $middleware;
+					}
+				}
+			);
+
+		foreach ($filter as $key => $value) {
+			$middlewares[$key] = $value;
+
+			if ($applicationId) {
+				if (isset($filter[$key]['applications'][$applicationId])) {
+					if (isset($filter[$key]['applications'][$applicationId]['sequence'])) {
+						$middlewares[$key]['sequence'] = $filter[$key]['applications'][$applicationId]['sequence'];
+					} else {
+						$middlewares[$key]['sequence'] = 0;
+					}
+					if ($filter[$key]['applications'][$applicationId]['enabled']) {
+						$middlewares[$key]['enabled'] = $filter[$key]['applications'][$applicationId]['enabled'];
+					} else {
+						$middlewares[$key]['enabled'] = false;
+					}
+				} else {
+					$middlewares[$key]['sequence'] = 0;
+					$middlewares[$key]['enabled'] = false;
+				}
+			}
+		}
+
+		return $middlewares;
+	}
+
 	public function updateMiddlewares(array $data)
 	{
 		$middlewares = Json::decode($data['middlewares'], true);

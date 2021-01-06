@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Domains
 {
@@ -44,6 +45,13 @@ class Domains
 						]
 					),
 					new Column(
+						'exclusive_to_default_application',
+						[
+							'type'    => Column::TYPE_TINYINTEGER,
+							'notNull' => false,
+						]
+					),
+					new Column(
 						'applications',
 						[
 							'type'    => Column::TYPE_VARCHAR,
@@ -57,6 +65,15 @@ class Domains
 							'type'    => Column::TYPE_TEXT,
 							'notNull' => false,
 						]
+					)
+				],
+				'indexes' => [
+					new Index(
+						'column_UNIQUE',
+						[
+							'name'
+						],
+						'UNIQUE'
 					)
 				]
 			];

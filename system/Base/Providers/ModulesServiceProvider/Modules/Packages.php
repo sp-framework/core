@@ -140,6 +140,26 @@ class Packages extends BasePackage
 		return $packages;
 	}
 
+	public function getPackagesForAppType(string $type)
+	{
+		$packages = [];
+
+		$filter =
+			$this->model->filter(
+				function($package) use ($type) {
+					$package = $package->toArray();
+					if ($package['app_type'] === $type) {
+						return $package;
+					}
+				}
+			);
+
+		foreach ($filter as $key => $value) {
+			$packages[$key] = $value;
+		}
+		return $packages;
+	}
+
 	public function addPackage(array $data)
 	{
 		if ($this->add($data)) {

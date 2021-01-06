@@ -62,18 +62,25 @@ class ViewServiceProvider implements ServiceProviderInterface
 			$application = $container->getShared('modules')->applications->getApplicationInfo();
 			$tagsName = strtolower($tags['name']);
 
-			$appPackage = 'Applications\\' . ucfirst($application['category']) . '\\' . ucfirst($application['sub_category']) . '\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
+			$appPackage =
+				'Applications\\' .
+				ucfirst($application['app_type']) . '\\' .
+				// ucfirst($application['sub_category']) . '\\' .
+				'Packages\\' . $tags['name'] . '\\' . $tags['name'];
 
-			$commonPackage = 'Applications\\' . ucfirst($application['category']) . '\\Common\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
+			// $commonPackage =
+			// 	'Applications\\' .
+			// 	ucfirst($application['app_type']) .
+			// 	'\\Common\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
 
 			try {
 				$reflection = new \ReflectionClass($appPackage);
 				$package = $appPackage;
-			} catch (\Exception $e) {
-				if ($e->getCode()) {
-					$reflection = new \ReflectionClass($commonPackage);
-					$package = $commonPackage;
-				}
+			// } catch (\Exception $e) {
+			// 	if ($e->getCode()) {
+			// 		$reflection = new \ReflectionClass($commonPackage);
+			// 		$package = $commonPackage;
+			// 	}
 			} catch (\Exception $e) {
 				throw $e;
 			}

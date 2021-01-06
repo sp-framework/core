@@ -14,6 +14,8 @@ class Domains extends BaseModel
 
     public $default_application_id;
 
+    public $exclusive_to_default_application;
+
     public $applications;
 
     public $settings;

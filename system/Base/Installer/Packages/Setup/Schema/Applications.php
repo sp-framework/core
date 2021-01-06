@@ -46,15 +46,7 @@ class Applications
 					]
 				),
 				new Column(
-					'category',
-					[
-						'type'    => Column::TYPE_VARCHAR,
-						'size'	  => 50,
-						'notNull' => true,
-					]
-				),
-				new Column(
-					'sub_category',
+					'app_type',
 					[
 						'type'    => Column::TYPE_VARCHAR,
 						'size'	  => 50,
@@ -117,7 +109,7 @@ class Applications
 				new Index(
 					'column_UNIQUE',
 					[
-						'name'
+						'route'
 					],
 					'UNIQUE'
 				)

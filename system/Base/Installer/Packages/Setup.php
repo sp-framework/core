@@ -8,6 +8,7 @@ use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplication;
+use System\Base\Installer\Packages\Setup\Register\ApplicationTypes as RegisterApplicationTypes;
 use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\CountriesStatesCities;
@@ -21,6 +22,7 @@ use System\Base\Installer\Packages\Setup\Register\User\Account as RegisterRootAd
 use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Addressbook;
+use System\Base\Installer\Packages\Setup\Schema\ApplicationTypes;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Components;
@@ -127,7 +129,8 @@ class Setup
 		$dbName = $this->dbConfig['db']['dbname'];
 
 		$this->db->createTable('core', $dbName, (new Core)->columns());
-		$this->db->createTable('applications', $dbName, (new Applications)->columns(),);
+		$this->db->createTable('applications', $dbName, (new Applications)->columns());
+		$this->db->createTable('application_types', $dbName, (new ApplicationTypes)->columns());
 		$this->db->createTable('components', $dbName, (new Components)->columns());
 		$this->db->createTable('packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('middlewares', $dbName, (new Middlewares)->columns());
@@ -167,11 +170,13 @@ class Setup
 	{
 		if ($type === 'applications') {
 
+			$this->registerApplicationTypes();
+
 			return $this->registerAdminApplication();
 
 		} else if ($type === 'components') {
 
-			$adminComponents = $this->localContent->listContents('applications/Ecom/Admin/Components/', true);
+			$adminComponents = $this->localContent->listContents('applications/Dash/Components/', true);
 
 			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
 				if ($adminComponent['basename'] === 'component.json') {
@@ -196,12 +201,12 @@ class Setup
 			}
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->localContent->listContents('applications/Ecom/Admin/Packages/', true);
+			$adminPackages = $this->localContent->listContents('applications/Dash/Packages/', true);
 
 			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
 				if ($adminPackage['basename'] === 'package.json') {
 					if ($adminPackage['path'] !==
-						'applications/Ecom/Admin/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
+						'applications/Dash/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
 					) {
 						$jsonFile =
 							json_decode(
@@ -237,7 +242,7 @@ class Setup
 			}
 		} else if ($type === 'middlewares') {
 
-			$adminMiddlewares = $this->localContent->listContents('applications/Ecom/Admin/Middlewares/', true);
+			$adminMiddlewares = $this->localContent->listContents('applications/Dash/Middlewares/', true);
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
@@ -275,7 +280,7 @@ class Setup
 		} else if ($type === 'views') {
 			$jsonFile =
 				json_decode(
-					$this->localContent->read('applications/Ecom/Admin/Views/Default/view.json'),
+					$this->localContent->read('applications/Dash/Views/Default/view.json'),
 					true
 				);
 
@@ -287,21 +292,26 @@ class Setup
 		}
 	}
 
+	protected function registerApplicationTypes()
+	{
+		return (new RegisterApplicationTypes())->register($this->db);
+	}
+
 	protected function registerAdminApplication()
 	{
 		return (new RegisterApplication())->register($this->db);
 	}
 
+	protected function registerAdminComponent(array $componentFile, $menuId)
+	{
+		$installedFiles = $this->getInstalledFiles('applications/Dash/Components/' . $componentFile['name']);
+
+		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
+	}
+
 	public function updateAdminApplicationComponents()
 	{
 		return (new RegisterApplication())->update($this->db);
-	}
-
-	protected function registerAdminComponent(array $componentFile, $menuId)
-	{
-		$installedFiles = $this->getInstalledFiles('applications/Ecom/Admin/Components/' . $componentFile['name']);
-
-		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
 	}
 
 	protected function registerAdminMenu(array $menu)
@@ -318,7 +328,7 @@ class Setup
 
 	protected function registerAdminPackage(array $packageFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Ecom/Admin/Packages/' . $packageFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Dash/Packages/' . $packageFile['name']);
 
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
@@ -332,7 +342,7 @@ class Setup
 
 	public function registerAdminMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Ecom/Admin/Middlewares/' . $middlewareFile['name']);
+		$installedFiles = $this->getInstalledFiles('applications/Dash/Middlewares/' . $middlewareFile['name']);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
@@ -346,8 +356,8 @@ class Setup
 
 	protected function registerAdminView(array $viewFile)
 	{
-		$applicationInstalledFiles = $this->getInstalledFiles('applications/Ecom/Admin/Views/');
-		$publicInstalledFiles = $this->getInstalledFiles('public/Admin/');
+		$applicationInstalledFiles = $this->getInstalledFiles('applications/Dash/Views/');
+		$publicInstalledFiles = $this->getInstalledFiles('public/dash/');
 
 		$installedFiles = array_merge($applicationInstalledFiles, $publicInstalledFiles);
 

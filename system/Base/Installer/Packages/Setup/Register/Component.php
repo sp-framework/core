@@ -14,6 +14,7 @@ class Component
 				'name' 					=> $componentFile['name'],
 				'route'					=> $componentFile['route'],
 				'description' 			=> $componentFile['description'],
+				'app_type' 				=> $componentFile['app_type'],
 				'category'  			=> $componentFile['category'],
 				'sub_category'  		=> $componentFile['sub_category'],
 				'version'				=> $componentFile['version'],

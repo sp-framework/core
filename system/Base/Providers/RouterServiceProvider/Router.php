@@ -14,6 +14,8 @@ class Router
 
 	protected $domain;
 
+	protected $domainAppExclusive = false;
+
 	protected $domainDefaults;
 
 	protected $applications;
@@ -109,9 +111,9 @@ class Router
 		if ($home) {
 			$this->defaultNamespace =
 				'Applications\\' .
-				ucfirst($this->applicationDefaults['category']) .
-				'\\' .
-				ucfirst($this->applicationDefaults['sub_category']) .
+				ucfirst($this->applicationDefaults['app_type']) .
+				// '\\' .
+				// ucfirst($this->applicationDefaults['sub_category']) .
 				'\\Components\\' .
 				ucfirst($this->applicationDefaults['component'])
 				;
@@ -119,9 +121,9 @@ class Router
 			if ($this->givenRouteClass !== '') {
 				$this->defaultNamespace =
 					'Applications\\' .
-					ucfirst($this->applicationDefaults['category']) .
-					'\\' .
-					ucfirst($this->applicationDefaults['sub_category']) .
+					ucfirst($this->applicationDefaults['app_type']) .
+					// '\\' .
+					// ucfirst($this->applicationDefaults['sub_category']) .
 					'\\Components' .
 					$this->givenRouteClass . '\\' .
 					ucfirst($this->controller)
@@ -129,9 +131,9 @@ class Router
 			} else {
 				$this->defaultNamespace =
 					'Applications\\' .
-					ucfirst($this->applicationDefaults['category']) .
-					'\\' .
-					ucfirst($this->applicationDefaults['sub_category']) .
+					ucfirst($this->applicationDefaults['app_type']) .
+					// '\\' .
+					// ucfirst($this->applicationDefaults['sub_category']) .
 					'\\Components\\' .
 					$this->givenRouteClass .
 					ucfirst($this->controller)
@@ -198,7 +200,10 @@ class Router
 
 	protected function getGivenRouteClass(array $routeArray)
 	{
-		unset($routeArray[0]); //Remove application name
+		// var_dump($routeArray);
+		if (!$this->domainAppExclusive) {
+			unset($routeArray[0]); //Remove application name
+		}
 
 		if ($this->request->isGet()) {
 			$this->controller = Arr::last($routeArray);
@@ -272,32 +277,38 @@ class Router
 			throw new DomainNotRegisteredException('Domain ' . $this->request->getHttpHost() . ' is not registered with system!');
 		}
 
-		$this->applicationInfo = $this->applications->getApplicationInfo();
-
-		if (!$this->applicationInfo) {
-			return false;
-		}
-
-		if (isset($this->domain['applications'][$this->applicationInfo['id']]['allowed']) &&
-			!$this->domain['applications'][$this->applicationInfo['id']]['allowed']
+		if (isset($this->domain['exclusive_to_default_application']) &&
+			$this->domain['exclusive_to_default_application'] == 1
 		) {
-			$this->logger->log->alert(
-				'Trying to access application ' . $this->applicationInfo['name'] .
-				' on domain ' . $this->request->getHttpHost()
-			);
+			$this->applicationInfo = $this->applications->getIdApplication($this->domain['default_application_id']);
 
-			throw new ApplicationNotAllowedException('Trying to access application ' . $this->applicationInfo['name'] .
-				' on domain ' . $this->request->getHttpHost());
-		}
+			$this->domainAppExclusive = true;
 
-		if (!isset($this->domain['applications'][$this->applicationInfo['id']])) {
-			return false;
+		} else  {
+			$this->applicationInfo = $this->applications->getApplicationInfo();
+
+			if (!$this->applicationInfo) {
+				return false;
+			}
+
+			if ((isset($this->domain['applications'][$this->applicationInfo['id']]['allowed']) &&
+				!$this->domain['applications'][$this->applicationInfo['id']]['allowed']) ||
+				!isset($this->domain['applications'][$this->applicationInfo['id']])
+			) {
+				$this->logger->log->alert(
+					'Trying to access application ' . $this->applicationInfo['name'] .
+					' on domain ' . $this->request->getHttpHost()
+				);
+				throw new ApplicationNotAllowedException('Trying to access application ' . $this->applicationInfo['name'] .
+					' on domain ' . $this->request->getHttpHost());
+			}
 		}
 
 		$this->applicationDefaults['id'] = $this->applicationInfo['id'];
 		$this->applicationDefaults['application'] = $this->applicationInfo['route'];
-		$this->applicationDefaults['category'] = $this->applicationInfo['category'];
-		$this->applicationDefaults['sub_category'] = $this->applicationInfo['sub_category'];
+		$this->applicationDefaults['app_type'] = $this->applicationInfo['app_type'];
+		// $this->applicationDefaults['category'] = $this->applicationInfo['category'];
+		// $this->applicationDefaults['sub_category'] = $this->applicationInfo['sub_category'];
 		$this->applicationDefaults['component'] =
 			$this->components->getIdComponent($this->applicationInfo['default_component'])['route'];
 		$this->applicationDefaults['errorComponent'] =
