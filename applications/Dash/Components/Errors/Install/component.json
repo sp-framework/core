@@ -1,0 +1,33 @@
+{
+	"route"			: "errors",
+	"name"			: "Errors",
+	"description"	: "Component to manage Errors on Dash Application",
+	"app_type"		: "dash",
+	"category"      : "system",
+	"sub_category"  : "tools",
+	"version"		: "0.0.1",
+	"repo"			: "https://.../dash-component-system-tools-errors",
+	"class"			: "Applications\\Dash\\Components\\Errors\\ErrorsComponent",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://.../core"
+		},
+		"components"	: [],
+		"packages"      : [],
+		"middlewares"   : [],
+		"views"         :
+		[
+			{
+				"name"      : "Default",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../dash-view-default"
+			}
+		]
+	},
+	"menu"				: false,
+	"settings"		: {
+		"mandatory"     : true
+	}
+}

@@ -1,0 +1,15 @@
+{# {% set component =  %} #}
+<div id="baz-errors" class="component container-fluid" hidden>
+    <div id="baz-errors-content">
+        {% include('common/errors/networkerror') %} {# ErrorCode = 0 #}
+        {% include('common/errors/ratelimit') %} {# ErrorCode = 114 #}
+        {% include('common/errors/forbidden') %} {# ErrorCode = 403 #}
+        {% include('common/errors/notfound') %} {# ErrorCode = 404 #}
+        {% include('common/errors/servererror') %} {# ErrorCode = 500 #}
+        {% include('common/errors/badgateway') %} {# ErrorCode = 502 #}
+        {% include('common/errors/serviceunavailable') %} {# ErrorCode = 503 #}
+        {% include('common/errors/gatewaytimeout') %} {# ErrorCode = 504 #}
+        {% include('common/errors/templateerror') %}  {# ErrorCode = templateError #}
+        {% include('common/errors/maintenance') %}  {# ErrorCode = maintenance #}
+    </div>
+</div>

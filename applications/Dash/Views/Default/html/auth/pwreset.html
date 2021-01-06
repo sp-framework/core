@@ -1,0 +1,246 @@
+<script>
+/*global BazCore */
+BazCore.header({
+    loadHeaderAt : 'login'
+});
+</script>
+<div id="{{componentId}}" class="login-box">
+    <div class="card m-0">
+        <div class="card-body login-card-body">
+            <div class="login-logo">
+                <img src="{{links.images('/baz/logo/fulllogo168x30.png')}}" data-rjs="3" alt="Bazaari Logo">
+            </div>
+            <div id="{{componentId}}-regular" hidden>
+                <p class="login-box-msg text-sm font-weight-bold">Password Reset</p>
+                <div id="{{componentId}}-form">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'user',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'text',
+                            'fieldPlaceholder'                      : 'Username',
+                            'fieldBazScan'                          : true,
+                            'fieldGroupPostAddonIcon'               : 'user'
+                        ]
+                    )}}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'pass',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'password',
+                            'fieldPlaceholder'                      : 'Current Password',
+                            'fieldBazScan'                          : true,
+                            'fieldGroupPostAddonIcon'               : 'lock'
+                        ]
+                    )}}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'newpass',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'password',
+                            'fieldPlaceholder'                      : 'New Password',
+                            'fieldBazScan'                          : true,
+                            'fieldGroupPostAddonIcon'               : 'lock'
+                        ]
+                    )}}
+                    {{adminltetags.useTag('fields',
+                        [
+                            'componentId'                           : componentId,
+                            'sectionId'                             : 'form',
+                            'fieldId'                               : 'confirmnewpass',
+                            'fieldLabel'                            : false,
+                            'fieldType'                             : 'input',
+                            'fieldInputType'                        : 'password',
+                            'fieldPlaceholder'                      : 'Confirm New Password',
+                            'fieldBazScan'                          : true,
+                            'fieldGroupPostAddonIcon'               : 'lock'
+                        ]
+                    )}}
+                    <div class="row mt-2">
+                        <div class="col">
+                            <button id="{{componentId}}-form-reset" type="button" class="btn btn-info float-right">
+                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                <span class="sr-only">Loading...</span>
+                                <span class="text-uppercase">Reset</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-footer text-sm text-center">
+                    <b>
+                        <a class="text-teal" href="https://www.bazaari.com.au">Bazaari E Trade Pty. Ltd.</a>
+                    </b>
+                    <br>
+                    Copyright © 2014-{{date("Y")}}. All rights reserved.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+/*global BazCore */
+$(document).ready(function(){
+    $('#{{componentId}}-regular').attr('hidden', false).addClass('animated fadeIn');
+    $('#{{componentId}}-form-user').focus();
+
+    BazCore.footer({
+        loadFooterAt : 'auth'
+    });
+
+    // Slideshow
+    $('body').vegas({
+        delay: 300000,
+        timer: false,
+        shuffle: true,
+        slides: [
+        { src: '{{links.images("/vegas/2.4.4/images/wp1.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp2.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp3.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp4.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp5.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp6.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp7.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp8.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp9.jpg")}}' },
+        { src: '{{links.images("/vegas/2.4.4/images/wp10.jpg")}}' }
+        ],
+        overlay: '{{links.images("/vegas/2.4.4/overlays/01.png")}}'
+    });
+
+    var url, data;
+    function getAjaxUrlData() {
+        $('#{{componentId}}-form-auth, #{{componentId}}-form-forgot, #{{componentId}}-form-reset').attr('disabled', true);
+        $('.login-spinner').attr('hidden', false);
+
+        if ($('#{{componentId}}-form-auth').length > 0) {
+            url = '{{links.url("auth/login")}}';
+            data = {
+                'user'      : $('#{{componentId}}-form-user').val().trim(),
+                'pass'      : $('#{{componentId}}-form-pass').val().trim(),
+                'remember'  : $('#{{componentId}}-form-remember')[0].checked
+            };
+        } else if ($('#{{componentId}}-form-forgot').length > 0) {
+            url = '{{links.url("auth/forgot")}}';
+            data = {
+                'user'      : $('#{{componentId}}-form-user').val().trim()
+            };
+        } else if ($('#{{componentId}}-form-reset').length > 0) {
+            url = '{{links.url("auth/pwreset")}}';
+            data = {
+                'user'              : $('#{{componentId}}-form-user').val().trim(),
+                'pass'              : $('#{{componentId}}-form-pass').val().trim(),
+                'newpass'           : $('#{{componentId}}-form-newpass').val().trim(),
+                'confirmnewpass'    : $('#{{componentId}}-form-confirmnewpass').val().trim()
+            }
+        }
+        data[$('#security-token').attr('name')] = $('#security-token').val();
+    }
+
+    $('#{{componentId}}-form-auth, #{{componentId}}-form-forgot, #{{componentId}}-form-reset').click(function(e) {
+        e.preventDefault();
+        getAjaxUrlData();
+        runAjax();
+    });
+
+    $('body').keyup(function(e) {
+        if (e.keyCode === 13) {
+            e.preventDefault();
+            getAjaxUrlData();
+            runAjax();
+        }
+    });
+
+    function runAjax() {
+        $.ajax({
+            url             : url,
+            data            : data,
+            method          : 'post',
+            dataType        : 'json',
+            beforeSend      : function() {
+                                    $("#{{componentId}}-form :input").prop("disabled", true);
+                                },
+            error           : function() {
+                                    $('.login-box-msg').text('Error! Please contact administrator.');
+                                    failed();
+                                },
+            success         : function(data) {
+                                if (data.responseCode == '0') {
+                                    $('.login-box-msg').text(data.responseMessage);
+                                    if (data.redirectUrl) {
+                                        success(data.redirectUrl);
+                                    } else {
+                                        success();
+                                    }
+                                } else if (data.responseCode == '1') {
+                                    $('.login-box-msg').text(data.responseMessage);
+                                    if (data.tokenKey && data.token) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
+                                    failed();
+                                } else if (data.responseCode == '2') {
+                                    $('.login-spinner').attr('hidden', true);
+                                    $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+                                    $('.login-box-msg').text(data.responseMessage);
+                                    if (data.tokenKey && data.token) {
+                                        $('#security-token').attr('name', data.tokenKey);
+                                        $('#security-token').val(data.token);
+                                    }
+                                    window.location = '/{{applicationRoute}}/';
+                                }
+                            }
+        });
+    }
+
+    function failed() {
+        $('.login-spinner').attr('hidden', true);
+        $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
+        $('#{{componentId}}-form :input').prop('disabled', false);
+        $('#{{componentId}}-form :input').not('.token').val('');
+        $('#{{componentId}}-form-user').focus();
+        $('#{{componentId}}-form-auth').attr('disabled', false);
+        setTimeout(function () {
+            $('.login-box-msg').removeClass('text-danger text-success animated fadeIn');
+
+            if ($('#{{componentId}}-form-auth').length > 0) {
+                $('.login-box-msg').text('Login to start {{applicationRoute}} session');
+            } else if ($('#{{componentId}}-form-forgot').length > 0) {
+                $('.login-box-msg').text('Forgot Password');
+            } else if ($('#{{componentId}}-form-reset').length > 0) {
+                $('.login-box-msg').text('Reset Password');
+            }
+
+            $('.login-box-msg').addClass('animated fadeIn');
+        }, 5000);
+    }
+
+    function success(redirectUrl = null) {
+        $('.login-spinner').attr('hidden', true);
+        $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
+        if ($('#{{componentId}}-form-auth').length > 0) {
+            if (redirectUrl) {
+                window.location = redirectUrl;
+            } else {
+                window.location = '/{{applicationRoute}}/';
+            }
+        } else if ($('#{{componentId}}-form-forgot').length > 0) {
+            //
+        } else if ($('#{{componentId}}-form-reset').length > 0) {
+            if (redirectUrl) {
+                window.location = redirectUrl;
+            } else {
+                window.location = '/{{applicationRoute}}/';
+            }
+        }
+    }
+});
+</script>

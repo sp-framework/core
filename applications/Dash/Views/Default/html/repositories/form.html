@@ -1,0 +1,409 @@
+{% if repository['id'] is defined %}
+    {% set repositoryId = repository['id'] %}
+    {% set repositoryName = repository['name'] %}
+    {% set repositoryDescription = repository['description'] %}
+    {% set repositoryApiUrl = repository['repo_url'] %}
+    {% set repositorySiteUrl = repository['site_url'] %}
+    {% set repositoryBranch = repository['branch'] %}
+    {% set repositoryRepoProvider = repository['repo_provider'] %}
+    {% set repositoryAuthToken = repository['auth_token'] %}
+    {% set repositoryUsername = repository['username'] %}
+    {% set repositoryPassword = repository['password'] %}
+    {% set repositoryToken = repository['token'] %}
+{% else %}
+    {% set repositoryId = '' %}
+    {% set repositoryName = '' %}
+    {% set repositoryDescription = '' %}
+    {% set repositoryApiUrl = '' %}
+    {% set repositorySiteUrl = '' %}
+    {% set repositoryBranch = '' %}
+    {% set repositoryRepoProvider = '1' %}
+    {% set repositoryAuthToken = '0' %}
+    {% set repositoryUsername = '' %}
+    {% set repositoryPassword = '' %}
+    {% set repositoryToken = '' %}
+{% endif %}
+{% if repositoryAuthToken == '0' %}
+    {% set authDisabled = true %}
+    {% set tokenDisabled = true %}
+{% elseif repositoryAuthToken == '1' %}
+    {% set authDisabled = false %}
+    {% set tokenDisabled = true %}
+{% elseif repositoryAuthToken == '2' %}
+    {% set authDisabled = true %}
+    {% set tokenDisabled = false %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Repository ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Repository ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : repositoryId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Repository Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Repository Name Example: Bazaari',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : repositoryName
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Repository Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description of the repository',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : repositoryDescription
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'repo_provider',
+                        'fieldLabel'                     : 'Repository Provider?',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select repository provider.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'gittea' :
+                                    [
+                                        'title'                           : 'Gitea',
+                                        'type'                            : 'info',
+                                        'dataValue'                       : '1'
+                                    ],
+                                'github' :
+                                    [
+                                        'title'                           : 'Github',
+                                        'type'                            : 'info',
+                                        'dataValue'                       : '2'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : repositoryRepoProvider
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'repo_url',
+                                'fieldLabel'                     : 'Repository API Url',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Repository API URL',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldValue'                     : repositoryApiUrl
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'site_url',
+                                'fieldLabel'                     : 'Repository Site Url',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Repository Site URL',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 1024,
+                                'fieldValue'                     : repositorySiteUrl
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'branch',
+                                'fieldLabel'                     : 'Repository Branch',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Repository Branch. Master/Beta/Alpha etc.',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 100,
+                                'fieldValue'                     : repositoryBranch
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'auth_token',
+                        'fieldLabel'                     : 'Auth/Token?',
+                        'fieldType'                      : 'radio',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select either basic user authentication is used or user token is used.',
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldRadioButtons'              :
+                            [
+                                'none' :
+                                    [
+                                        'title'                           : 'None',
+                                        'type'                            : 'secondary',
+                                        'dataValue'                       : '0'
+                                    ],
+                                'auth' :
+                                    [
+                                        'title'                           : 'Auth',
+                                        'type'                            : 'success',
+                                        'dataValue'                       : '1'
+                                    ],
+                                'token' :
+                                    [
+                                        'title'                           : 'Token',
+                                        'type'                            : 'success',
+                                        'dataValue'                       : '2'
+                                    ]
+                            ],
+                        'fieldRadioChecked'              : repositoryAuthToken
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'username',
+                                'fieldLabel'                     : 'Username',
+                                'fieldType'                      : 'input',
+                                'fieldRequired'                  : true,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Username',
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 50,
+                                'fieldDisabled'                  : authDisabled,
+                                'fieldValue'                     : repositoryUsername
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'password',
+                                'fieldLabel'                     : 'Password',
+                                'fieldType'                      : 'input',
+                                'fieldInputType'                 : 'password',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Password',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDisabled'                  : authDisabled,
+                                'fieldValue'                     : repositoryPassword
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'token',
+                                'fieldLabel'                     : 'Token',
+                                'fieldType'                      : 'input',
+                                'fieldInputType'                 : 'password',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Token',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDisabled'                  : tokenDisabled,
+                                'fieldValue'                     : repositoryToken
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-name'                            : { },
+        '{{componentId}}-{{sectionId}}-description'                     : { },
+        '{{componentId}}-{{sectionId}}-repo_url'                        : { },
+        '{{componentId}}-{{sectionId}}-site_url'                        : { },
+        '{{componentId}}-{{sectionId}}-branch'                          : { },
+        '{{componentId}}-{{sectionId}}-repo_provider'                   : { },
+        '{{componentId}}-{{sectionId}}-auth_token'                      : {
+            afterInit : function() {
+                $('#{{componentId}}-{{sectionId}}-auth_token').click(function() {
+                    if ($(this).find('input[type=radio]:checked').data('value') == 0) {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-token').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 1) {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-token').attr('disabled', true);
+                    } else if ($(this).find('input[type=radio]:checked').data('value') == 2) {
+                        $('#{{componentId}}-{{sectionId}}-username, #{{componentId}}-{{sectionId}}-password').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-token').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-username'                        : { },
+        '{{componentId}}-{{sectionId}}-password'                        : { },
+        '{{componentId}}-{{sectionId}}-token'                           : { },
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-url'                     : 'required',
+                '{{componentId}}-{{sectionId}}-username'                : 'required',
+                '{{componentId}}-{{sectionId}}-password'                : 'required',
+                '{{componentId}}-{{sectionId}}-token'                   : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter repository name',
+                '{{componentId}}-{{sectionId}}-url'                     : 'Please enter repository url',
+                '{{componentId}}-{{sectionId}}-username'                : 'Please select repository username',
+                '{{componentId}}-{{sectionId}}-password'                : 'Please select repository password',
+                '{{componentId}}-{{sectionId}}-token'                   : 'Please select registration token'
+            }
+        }
+    });
+</script>

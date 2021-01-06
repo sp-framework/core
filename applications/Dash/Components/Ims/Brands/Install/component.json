@@ -1,0 +1,51 @@
+{
+    "route"         : "brands",
+    "name"          : "Brands",
+    "description"   : "Manage dash brands via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-ims-brands",
+    "class"         : "Applications\\Dash\\Components\\Ims\\Brands\\BrandsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages":
+        [
+            {
+                "name"      : "Brands",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-ims-brands"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "ims"           : {
+            "title"     : "Inventory",
+            "icon"      : "clipboard-list",
+            "childs"    : {
+                "brands"   : {
+                    "title"     : "Brands",
+                    "link"      : "ims/brands"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

@@ -1,0 +1,34 @@
+{% if business['id'] is defined %}
+    {% set businessId = business['id'] %}
+    {% set title = 'Business (' ~ business['name'] ~ ')' %}
+{% else %}
+    {% set businessId = '' %}
+    {% set title = 'New Business' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'suitcase',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'businesses/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : businessId,
+            'addActionUrl'                  : 'businesses/add',
+            'addSuccessRedirectUrl'         : 'businesses',
+            'updateActionUrl'               : 'businesses/update',
+            'updateSuccessRedirectUrl'      : 'businesses',
+            'cancelActionUrl'               : 'businesses',
+            'closeActionUrl'                : 'businesses'
+        ]
+    ]
+)}}

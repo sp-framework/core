@@ -1,0 +1,21 @@
+{
+	"name"			: "Home",
+	"displayName" 	: "Home Package (Barebone)",
+	"description"	: "Home Package (Barebone)",
+	"version"		: "0.0.1",
+	"repo"			: "https://.../category-subcategory-type-name",
+	"path"			: "/",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://.../core"
+		},
+		"components"	: [],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

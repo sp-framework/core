@@ -1,0 +1,45 @@
+{
+    "route"         : "auth",
+    "name"          : "Auth",
+    "description"   : "Manage dash auth via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-tools-auth",
+    "class"         : "Applications\\Dash\\Components\\Auth\\AuthComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   :
+        [
+            {
+                "name"      : "Auth",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-middleware-system-tools-auth"
+            },
+            {
+                "name"      : "Acl",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-middleware-system-tools-acl"
+            }
+        ],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : false,
+    "settings"          : {
+        "mandatory"     : true
+    }
+}

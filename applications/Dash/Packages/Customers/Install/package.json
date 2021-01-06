@@ -1,0 +1,11 @@
+{
+    "name"          : "Customers",
+    "displayName"   : "Admin Customers Package",
+    "description"   : "Package for Customers component",
+    "app_type"      : "dash",
+    "category"      : "ecom",
+    "sub_category"  : "common",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../ecom-common-package-customers",
+    "settings"      : { }
+}

@@ -1,0 +1,11 @@
+{
+    "name"          : "Barebone",
+    "displayName"   : "Admin Barebone Package",
+    "description"   : "Package for Barebone component",
+    "version"       : "0.0.1",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "devtools",
+    "repo"          : "https://.../dash-package-system-devtools-barebone",
+    "settings"      : { }
+}

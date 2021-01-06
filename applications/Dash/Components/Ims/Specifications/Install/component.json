@@ -1,0 +1,51 @@
+{
+    "route"         : "specifications",
+    "name"          : "Specifications",
+    "description"   : "Manage dash specifications via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-ims-specifications",
+    "class"         : "Applications\\Dash\\Components\\Ims\\Specifications\\SpecificationsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages":
+        [
+            {
+                "name"      : "Specifications",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-ims-specifications"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "ims"           : {
+            "title"     : "Inventory",
+            "icon"      : "clipboard-list",
+            "childs"    : {
+                "specifications"   : {
+                    "title"     : "Specifications",
+                    "link"      : "ims/specifications"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

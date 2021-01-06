@@ -1,0 +1,35 @@
+{% if employee['id'] is defined %}
+    {% set employeeId = employee['id'] %}
+    {% set title = 'Employee (' ~ employee['name'] ~ ')' %}
+{% else %}
+    {% set employeeId = '' %}
+    {% set title = 'New Employee' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'users',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'employees/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : employeeId,
+            'addActionUrl'                  : 'hrms/employees/add',
+            'addSuccessRedirectUrl'         : 'hrms/employees',
+            'updateActionUrl'               : 'hrms/employees/update',
+            'updateSuccessRedirectUrl'      : 'hrms/employees',
+            'cancelActionUrl'               : 'hrms/employees',
+            'closeActionUrl'                : 'hrms/employees'
+        ]
+    ]
+)}}

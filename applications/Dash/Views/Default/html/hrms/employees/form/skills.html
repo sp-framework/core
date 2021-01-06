@@ -1,0 +1,27 @@
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'skills',
+                'fieldLabel'                     : 'Skills',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Add Employee Skills keywords.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 15,
+                'fieldValue'                     : employeeSkills
+            ]
+        )}}
+    </div>
+    <div class="col">
+        SKILLS CERTIFICATES ATTACHMENTS
+    </div>
+</div>

@@ -1,0 +1,42 @@
+{
+    "route"         : "domains",
+    "name"          : "Domains",
+    "description"   : "Manage admin domains via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-domains",
+    "class"         : "Applications\\Dash\\Components\\Domains\\DomainsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 5,
+        "domains"       : {
+            "title"     : "domains",
+            "icon"      : "globe-asia",
+            "link"      : "domains"
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

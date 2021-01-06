@@ -1,0 +1,11 @@
+{
+    "name"          : "Taxes",
+    "displayName"   : "Admin Taxes Package",
+    "description"   : "Package for Taxes component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-admin-taxes",
+    "settings"      : { }
+}

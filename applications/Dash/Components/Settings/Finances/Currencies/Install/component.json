@@ -1,0 +1,60 @@
+{
+    "route"         : "settings/finances/currencies",
+    "name"          : "Currencies",
+    "description"   : "List currencies via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-currencies",
+    "class"         : "Applications\\Dash\\Components\\Settings\\Finances\\Currencies\\CurrenciesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Currencies",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-currencies"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "settings"      : {
+            "title"     : "settings",
+            "icon"      : "cogs",
+            "childs"    : {
+                "finance"       : {
+                    "title"     : "finance",
+                    "icon"      : "dollar-sign",
+                    "childs"    : {
+                        "currencies" : {
+                            "title"     : "currencies",
+                            "link"      : "currencies"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

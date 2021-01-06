@@ -1,0 +1,77 @@
+{% if modules is defined and modules === true %}
+    {% set applicationId = application['id'] %}
+    {% set title = 'Modules for App (' ~ application['name'] ~ ')' %}
+    {% if components|length === 0 %}
+        {% set formButtonsArr =
+            [
+                'closeActionUrl'                : 'apps'
+            ]
+        %}
+    {% else %}
+        {% set formButtonsArr =
+            [
+                'updateButtonId'                : applicationId,
+                'addActionUrl'                  : 'apps/add',
+                'addSuccessRedirectUrl'         : 'apps',
+                'updateActionUrl'               : 'apps/update',
+                'updateSuccessRedirectUrl'      : 'apps',
+                'cancelActionUrl'               : 'apps',
+                'closeActionUrl'                : 'apps'
+            ]
+        %}
+    {% endif %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'th',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'apps/modules',
+            'formButtons'                   : formButtonsArr
+
+        ]
+    )}}
+{% else %}
+    {% if application['id'] is defined %}
+        {% set applicationId = application['id'] %}
+        {% set title = 'App (' ~ application['name'] ~ ')' %}
+    {% else %}
+        {% set applicationId = '' %}
+        {% set title = 'New App' %}
+    {% endif %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'th-large',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'apps/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : applicationId,
+                'addActionUrl'                  : 'apps/add',
+                'addSuccessRedirectUrl'         : 'apps',
+                'updateActionUrl'               : 'apps/update',
+                'updateSuccessRedirectUrl'      : 'apps',
+                'cancelActionUrl'               : 'apps',
+                'closeActionUrl'                : 'apps'
+            ]
+        ]
+    )}}
+{% endif %}

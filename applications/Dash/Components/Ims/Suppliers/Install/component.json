@@ -1,0 +1,61 @@
+{
+    "route"         : "suppliers",
+    "name"          : "Suppliers",
+    "description"   : "Manage dash suppliers via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-ims-suppliers",
+    "class"         : "Applications\\Dash\\Components\\Ims\\Suppliers\\SuppliersComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages":
+        [
+            {
+                "name"      : "Suppliers",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-ims-suppliers"
+            },
+            {
+                "name"      : "Brands",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-ims-brands"
+            },
+            {
+                "name"      : "ABNLookup",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-tools-abnlookup"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "ims"           : {
+            "title"     : "Inventory",
+            "icon"      : "clipboard-list",
+            "childs"    : {
+                "suppliers"   : {
+                    "title"     : "Suppliers",
+                    "link"      : "ims/suppliers"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

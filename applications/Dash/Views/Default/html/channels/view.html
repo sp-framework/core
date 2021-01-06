@@ -1,0 +1,35 @@
+{% if channel['id'] is defined %}
+    {% set channelId = channel['id'] %}
+    {% set title = channelType ~ ' Channel (' ~ channel['name'] ~ ')' %}
+{% else %}
+    {% set channelId = '' %}
+    {% set title = 'New ' ~ channelType ~ ' Channel' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'store',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'channels/types/' ~ channelType ~ '/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : channelId,
+            'addActionUrl'                  : 'channels/add',
+            'addSuccessRedirectUrl'         : 'channels',
+            'updateActionUrl'               : 'channels/update',
+            'updateSuccessRedirectUrl'      : 'channels',
+            'cancelActionUrl'               : 'channels',
+            'closeActionUrl'                : 'channels'
+        ]
+    ]
+)}}

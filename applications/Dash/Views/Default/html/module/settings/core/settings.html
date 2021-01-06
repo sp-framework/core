@@ -1,0 +1,36 @@
+<div class="p-2">
+    <ul class="nav nav-tabs" id="coreSettingsTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="settings-debug-tab" data-toggle="tab" href="#settings-debug" role="tab" aria-controls="settings-debug" aria-selected="true">Debug</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="settings-cache-tab" data-toggle="tab" href="#settings-cache" role="tab" aria-controls="settings-cache" aria-selected="false">Cache</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="settings-db-tab" data-toggle="tab" href="#settings-db" role="tab" aria-controls="settings-db" aria-selected="false">Database</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="settings-logs-tab" data-toggle="tab" href="#settings-logs" role="tab" aria-controls="settings-logs" aria-selected="false">Logs</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="settings-email-tab" data-toggle="tab" href="#settings-email" role="tab" aria-controls="settings-email" aria-selected="false">Email</a>
+        </li>
+    </ul>
+    <div class="tab-content" id="viewSettingsTabContent">
+        <div class="tab-pane fade show active" id="settings-debug" role="tabpanel" aria-labelledby="settings-debug-tab">
+            {% include 'settings/core/settings/debug.html' %}
+        </div>
+        <div class="tab-pane fade" id="settings-cache" role="tabpanel" aria-labelledby="settings-cache-tab">
+            {% include 'settings/core/settings/cache.html' %}
+        </div>
+        <div class="tab-pane fade" id="settings-db" role="tabpanel" aria-labelledby="settings-db-tab">
+            {% include 'settings/core/settings/db.html' %}
+        </div>
+        <div class="tab-pane fade" id="settings-logs" role="tabpanel" aria-labelledby="settings-logs-tab">
+            {% include 'settings/core/settings/logs.html' %}
+        </div>
+        <div class="tab-pane fade" id="settings-email" role="tabpanel" aria-labelledby="settings-email-tab">
+            {% include 'settings/core/settings/email.html' %}
+        </div>
+    </div>
+</div>

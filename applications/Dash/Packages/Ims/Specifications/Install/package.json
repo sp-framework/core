@@ -1,0 +1,11 @@
+{
+    "name"          : "Specifications",
+    "displayName"   : "Admin Specifications Package",
+    "description"   : "Package for Specifications component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-ims-specifications",
+    "settings"      : { }
+}

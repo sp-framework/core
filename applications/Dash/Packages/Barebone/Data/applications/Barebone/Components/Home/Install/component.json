@@ -1,0 +1,24 @@
+{
+	"route"			: "home",
+	"name"			: "Home",
+	"displayName" 	: "Component Home (Barebone)",
+	"description"	: "Component Home (Barebone)",
+	"version"		: "0.0.1",
+	"repo"			: "https://.../category-subcategory-type-name",
+	"path"			: "/",
+	"class"			: "Applications\\Barebone\\Components\\Home\\HomeComponent",
+	"type"			: "forms",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://.../core"
+		},
+		"components"	: [],
+		"packages"		: [],
+		"middlewares"	: [],
+		"views"			: []
+	},
+	"settings"		: {
+	}
+}

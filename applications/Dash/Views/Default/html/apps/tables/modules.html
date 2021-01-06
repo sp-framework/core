@@ -1,0 +1,91 @@
+<table class="table table-sm table-hover">
+    <thead>
+        <tr>
+            <th></th>
+            <th class="text-uppercase">Name</th>
+            <th class="text-uppercase">Description</th>
+            <th class="text-uppercase">Category</th>
+            <th class="text-uppercase">Sub Category</th>
+            <th class="text-uppercase">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for moduleKey, module in modules %}
+            <tr>
+                {% if moduleType === 'component' %}
+                    {% set componentIds[componentId ~ '-' ~ sectionId ~ '-component-' ~ module['id']] = module['id'] %}
+                    {% if module['name'] === 'Home' %}
+                        {% if application['default_component'] is defined and application['default_component'] == 0 %}
+                            {% set applicationDefaultComponent = module['id'] %}
+                        {% endif %}
+                    {% endif %}
+
+                    {% if module['name'] === 'Errors' %}
+                        {% if application['errors_component'] is defined and application['errors_component'] == 0 %}
+                            {% set applicationErrorsComponent = module['id'] %}
+                        {% endif %}
+                    {% endif %}
+                    {% if module['applications'][application['id']] is defined and module['applications'][application['id']]['enabled'] === true %}
+                        {% set checked = true %}
+                    {% else %}
+                        {% set checked = false %}
+                    {% endif %}
+                {% elseif moduleType === 'view' %}
+                    {% set viewIds[componentId ~ '-' ~ sectionId ~ '-view-' ~ module['id']] = module['id'] %}
+                    {% if module['applications'][application['id']] is defined and module['applications'][application['id']]['enabled'] === true %}
+                        {% set checked = true %}
+                    {% else %}
+                        {% set checked = false %}
+                    {% endif %}
+                {% endif %}
+                {% if module['name'] in mandatoryModules %}
+                    {% set disabled = true %}
+                    {% set checked = true %}
+                {% else %}
+                    {% set disabled = false %}
+                {% endif %}
+                <td>
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : moduleType ~ '-' ~ module['id'],
+                            'fieldLabel'                     : false,
+                            'fieldHelp'                      : false,
+                            'fieldHelpTooltipContent'        : '',
+                            'fieldDisabled'                  : disabled,
+                            'fieldAdditionalClass'           : 'mb-0',
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'success',
+                            'fieldCheckboxChecked'           : checked,
+                            'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase m-0',
+                            'fieldBazScan'                   : false,
+                            'fieldDataAttributes'            :
+                            [
+                                'id'                        : module['id'],
+                                'type'                      : moduleType
+                            ]
+                        ]
+                    )}}
+                </td>
+                <td>
+                    {{module['name']}}
+                </td>
+                <td class="text-truncate" style="max-width: 20rem;">
+                    {{module['description']}}
+                </td>
+                <td>
+                    {{module['category']|capitalize}}
+                </td>
+                <td>
+                    {{module['sub_category']|capitalize}}
+                </td>
+                <td>
+                    <button type="button" class="btn btn-info btn-xs"><i class="fa fa-fw fa-info-circle"></i></button>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

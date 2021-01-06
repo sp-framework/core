@@ -1,0 +1,11 @@
+{
+    "name"          : "Brands",
+    "displayName"   : "Admin Brands Package",
+    "description"   : "Package for Brands component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-ims-brands",
+    "settings"      : { }
+}

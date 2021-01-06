@@ -1,0 +1,29 @@
+{% if modulesKey != 'core' %}
+    {% set datacategory = 'data-category="' ~ module['category'] ~ '"' %}
+{% else %}
+    {% set datacategory = '' %}
+{% endif %}
+{# {% if module['enabled'] == true %}
+    <a href="module/settings/q/id/{{module['id']}}" data-type="{{modulesKey}}" {{datacategory}} data-name="{{module['name']}}" data-process="settings" data-id="{{module['id']}}" class="btn-settings btn btn-sm btn-primary contentAjaxLink">
+        Settings
+    </a>
+{% endif %}
+{% if modulesKey != 'core' and module['enabled'] == true %}
+    {% if module['application_id'] is defined and module['application_id'] != 1 and module['name'] != 'Admin' %}
+    <a href="#" data-type="{{modulesKey}}" {{datacategory}} data-name="{{module['name']}}" data-process="uninstall" data-id="{{module['id']}}" class="btn-uninstall btn btn-sm btn-danger float-right">
+        <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Uninstall
+    </a>
+    {% endif %}
+{% else %}
+    {% if modulesKey != 'core' %}
+        <a href="#" data-type="{{modulesKey}}" {{datacategory}} data-name="{{module['name']}}" data-process="delete" data-id="{{module['id']}}" class="btn-delete btn btn-sm btn-danger">
+            <i class="fas fa-fw fa-cog fa-spin" hidden=""></i> Delete
+        </a>
+        <a href="module" data-type="{{modulesKey}}" {{datacategory}} data-name="{{module['name']}}" data-process="view" data-subprocess="install" data-id="{{module['id']}}" class="btn-view btn btn-sm btn-info float-right contentAjaxLink">Install
+        </a>
+    {% endif %}
+{% endif %} #}
+{% if module['update_available'] == true %}
+    <a href="module" data-type="{{modulesKey}}" {{datacategory}} data-name="{{module['name']}}" data-process="view" data-subprocess="update" data-id="{{module['id']}}" class="btn-update btn btn-sm btn-info float-right mr-2 contentAjaxLink">Update
+    </a>
+{% endif %}

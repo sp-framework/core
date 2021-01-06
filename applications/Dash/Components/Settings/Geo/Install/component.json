@@ -1,0 +1,47 @@
+{
+    "route"         : "settings/geo",
+    "name"          : "Geo",
+    "description"   : "Manage dash geo via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-geo",
+    "class"         : "Applications\\Dash\\Components\\Settings\\Geo\\GeoComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "settings"      : {
+            "title"     : "settings",
+            "icon"      : "cogs",
+            "childs"    : {
+                "geo" : {
+                    "title"     : "Geo Locations",
+                    "link"      : "settings/geo"
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

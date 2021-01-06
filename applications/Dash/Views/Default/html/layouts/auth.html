@@ -1,0 +1,69 @@
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+{{get_doctype()}}
+<html lang="en">
+    <head>
+        {% for meta in assets.get('meta').getCodes() %}
+            {% if meta.getType() === 'charset' %}
+                <meta charset="{{meta.getContent()}}">
+            {% else %}
+                <meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
+            {% endif %}
+        {% endfor %}
+        {{renderTitle()}}
+        {{assets.outputCss('headLinks')}}
+        {{assets.outputJs('headJs')}}
+        <script src="/dash/default/js/footer/plugins/vegas/2.4.4/vegas.min.js"></script>
+        {{assets.outputInlineCss()}}
+    </head>
+    <body id="body" class="login-page">
+        <script>
+/* globals dataCollection */
+if (!window.dataCollection) {
+    //For all data collection. Section Data collection, has list of fields, whole section HTML, section fields data
+    window.dataCollection = { };
+    dataCollection = window.dataCollection;
+    dataCollection.env = { };
+    //Paths
+    dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
+    // dataCollection.env.rootPath = window.location.origin + dataCollection.env.rootPath.match(/.*\//g);
+    dataCollection.env.jsPath =
+        dataCollection.env.rootPath +
+        "{{modules.applications.getApplicationInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'js/';
+    dataCollection.env.cssPath =
+        dataCollection.env.rootPath +
+        "{{modules.applications.getApplicationInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'css/';
+    dataCollection.env.imagesPath =
+        dataCollection.env.rootPath +
+        "{{modules.applications.getApplicationInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'images/';
+    dataCollection.env.soundPath =
+        dataCollection.env.rootPath +
+        "{{modules.applications.getApplicationInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'sounds/';
+    dataCollection.env.sounds = { };
+    dataCollection.env.sounds.pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3');
+    dataCollection.env.sounds.swalSound = new Audio(dataCollection.env.soundPath + 'swal.mp3');
+    dataCollection.env.fontsPath =
+        dataCollection.env.rootPath +
+        "{{modules.applications.getApplicationInfo()['app_type']}}" + '/' +
+        "{{strtolower(modules.views.getViewInfo()['name'])}}" + '/' + 'fonts/';
+    dataCollection.env.libsLoaded = false;
+    //Parameters
+    // params = new URLSearchParams(window.location.search.substring(1));
+    // dataCollection.env.currentRoute = params.get("route");
+    // dataCollection.env.currentId = params.get("id");
+    var uri = window.location.href.replace(dataCollection.env.rootPath, '');
+    var splitUri = uri.split('/q/');
+    dataCollection.env.currentRoute = splitUri[0];
+}
+</script>
+        <script type="text/javascript" charset="utf-8">
+            {{assets.get('body').getCodes()[1].getContent()}}
+        </script>
+        <input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
+        {{content()}}
+    </body>
+</html>
+<!-- htmlmin:ignore -->

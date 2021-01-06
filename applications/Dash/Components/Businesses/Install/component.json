@@ -1,0 +1,51 @@
+{
+    "route"         : "businesses",
+    "name"          : "Businesses",
+    "description"   : "List businesses via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-businesses",
+    "class"         : "Applications\\Dash\\Components\\Businesses\\BusinessesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Businesses",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-businesses"
+            },
+            {
+                "name"      : "ABNLookup",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-tools-abnlookup"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "businesses" : {
+            "icon"      : "suitcase",
+            "title"     : "businesses",
+            "link"      : "businesses"
+        }
+    },
+    "settings"          : {
+    }
+}

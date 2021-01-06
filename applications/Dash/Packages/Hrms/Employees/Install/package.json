@@ -1,0 +1,11 @@
+{
+    "name"          : "Employees",
+    "displayName"   : "Employees Package",
+    "description"   : "Package for Employees component",
+    "app_type"      : "dash",
+    "category"      : "ecom",
+    "sub_category"  : "common",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-employees",
+    "settings"      : { }
+}

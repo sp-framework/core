@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		{% for meta in assets.get('meta').getCodes() %}
+			{% if meta.getType() === 'charset' %}
+				<meta charset="{{meta.getContent()}}">
+			{% else %}
+				<meta name="{{meta.getType()}}" content="{{meta.getContent()}}">
+			{% endif %}
+		{% endfor %}
+		<title>Soaring Phalcon Framework</title>
+		{{assets.outputCss('headLinks')}}
+		{{assets.outputJs('headJs')}}
+		{{assets.outputInlineCss()}}
+	</head>
+	<body {{assets.get('body').getCodes()[0].getContent()}}>
+		<script type="text/javascript" charset="utf-8">
+			{{assets.get('body').getCodes()[1].getContent()}}
+		</script>
+		<div class="main-content">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col">
+						<div id="alert" class="alert mt-2 mb-2" hidden></div>
+					</div>
+				</div>
+				{{content()}}
+			</div>
+		</div>
+		<footer {{assets.get('footer').getCodes()[0].getContent()}}>
+			{{assets.outputJs('footerJs')}}
+			{{assets.outputInlineJs()}}
+		</footer>
+	</body>
+</html>

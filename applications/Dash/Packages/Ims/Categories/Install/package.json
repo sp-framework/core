@@ -1,0 +1,11 @@
+{
+    "name"          : "Categories",
+    "displayName"   : "Admin Categories Package",
+    "description"   : "Package for Categories component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-ims-categories",
+    "settings"      : { }
+}

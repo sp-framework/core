@@ -1,0 +1,11 @@
+{
+    "name"          : "AdminLTETags",
+    "displayName"   : "Admin AdminLTETags Package",
+    "description"   : "Package for volt tags",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-system-tools-adminltetags",
+    "settings"      : { }
+}
