@@ -26,7 +26,14 @@
             }
         ]
     },
-    "menu"              : false,
+    "menu"              : {
+        "seq"           : 98,
+        "filters"       : {
+            "title"     : "filters",
+            "icon"      : "filter",
+            "link"      : "filters"
+        }
+    },
     "settings"          : {
         "mandatory"     : {
             "admin"     : true

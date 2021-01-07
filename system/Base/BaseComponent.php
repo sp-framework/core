@@ -195,7 +195,7 @@ abstract class BaseComponent extends Controller
 		if (!$this->isJson() || $this->request->isAjax()) {
 			if ($this->application) {
 				$this->view->menus =
-					$this->basepackages->menus->getMenusForApplication($this->application['id']);
+					$this->basepackages->menus->buildMenusForApplication($this->application['id']);
 			}
 
 			$this->response->setHeader('tokenKey', $this->security->getTokenKey());

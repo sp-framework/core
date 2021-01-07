@@ -210,6 +210,10 @@ class Applications extends BasePackage
 				$this->modules->components->updateComponents($data);
 			}
 
+			if ($data['menus']) {
+				$this->basepackages->menus->updateMenus($data);
+			}
+
 			if ($data['views']) {
 				$this->modules->views->updateViews($data);
 			}

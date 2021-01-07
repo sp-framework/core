@@ -83,6 +83,7 @@
             {% endif %}
 
             {% set componentIds = [] %}
+            {% set menuIds = [] %}
             <div class="row">
                 <div class="col">
                     {% include 'apps/tables/modules' with
@@ -98,7 +99,8 @@
                     %}
                     {% for component in components %}
                         {% set componentIds[componentId ~ '-' ~ sectionId ~ '-component-' ~ component['id']] = component['id'] %}
-                        {% if component['name'] === 'Home' %}
+                        {% set menuIds[componentId ~ '-' ~ sectionId ~ '-component-menu-' ~ component['id']] = component['menu_id'] %}
+{#                         {% if component['name'] === 'Home' %}
                             {% if application['default_component'] is defined and application['default_component'] == 0 %}
                                 {% set applicationDefaultComponent = component['id'] %}
                             {% endif %}
@@ -109,6 +111,7 @@
                                 {% set applicationErrorsComponent = component['id'] %}
                             {% endif %}
                         {% endif %}
+
                         {% if component['applications'][application['id']] is defined and component['applications'][application['id']]['enabled'] === true %}
                             {% set checked = true %}
                         {% else %}
@@ -124,9 +127,10 @@
                             {% set checked = true %}
                         {% else %}
                             {% set disabled = false %}
-                        {% endif %}
+                        {% endif %} #}
                     {% endfor %}
                     {% set componentIds = json_encode(componentIds, 16) %}
+                    {% set menuIds = json_encode(menuIds, 16) %}
                 </div>
             </div>
             <div class="row">
@@ -182,6 +186,7 @@
         {% else %}
             <label>No components available for this app type. Go to <a href="{{links.url('modules')}}" class="contentAjaxLink">modules</a> and download components.</label>
             {% set componentIds = json_encode([]) %}
+            {% set menuIds = json_encode([]) %}
         {% endif %}
         <hr>
         <div class="row">
@@ -222,7 +227,7 @@
                 %}
                 {% for view in views %}
                     {% set viewIds[componentId ~ '-' ~ sectionId ~ '-view-' ~ view['id']] = view['id'] %}
-                    {% if view['applications'][application['id']] is defined and view['applications'][application['id']]['enabled'] === true %}
+{#                     {% if view['applications'][application['id']] is defined and view['applications'][application['id']]['enabled'] === true %}
                         {% set checked = true %}
                     {% else %}
                         {% set checked = false %}
@@ -232,7 +237,7 @@
                         {% set checked = true %}
                     {% else %}
                         {% set disabled = false %}
-                    {% endif %}
+                    {% endif %} #}
                 {% endfor %}
                 {% set viewIds = json_encode(viewIds, 16) %}
             </div>
@@ -366,23 +371,39 @@ dataCollectionSection =
                     for (var componentCheckbox in componentIds) {
                         $('#' + componentCheckbox).click(function() {
                             var id = $(this)[0].id;
-                            extractComponentCheckboxData(id, componentIds[componentCheckbox]);
+                            extractComponentCheckboxData(id, componentIds[componentCheckbox], true);
                         });
                         extractComponentCheckboxData(componentCheckbox, componentIds[componentCheckbox]);
                     }
                 }
 
-                function extractComponentCheckboxData(componentCheckbox, component) {
+                function extractComponentCheckboxData(componentCheckbox, component, switchMenu = false) {
                     var componentId = $('#' + componentCheckbox).data('id');
+                    var menuId = $('#' + componentCheckbox).data('menu');
+                    var applicationId = $('#' + componentCheckbox).data('application_id');
 
                     if ($('#' + componentCheckbox)[0].checked === true) {
                         dataCollectionSection['data']['components'][$('#' + componentCheckbox).data('id')] = true;
+                        if (switchMenu &&
+                            Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))).length > 0
+                        ) {
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id')).attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))[0].checked = true;
+                            dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = true;
+                        }
                         $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
                         $('#{{componentId}}-{{sectionId}}-errors_component').find('[value="' + componentId + '"]').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-errors_component').trigger('change');
                     } else {
                         dataCollectionSection['data']['components'][$('#' + componentCheckbox).data('id')] = false;
+                        if (switchMenu &&
+                            Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))).length > 0
+                        ) {
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id')).attr('disabled', true);
+                            $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))[0].checked = false;
+                            dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = false;
+                        }
                         $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
                         $('#{{componentId}}-{{sectionId}}-errors_component').find('[value="' + componentId + '"]').attr('disabled', true);
@@ -391,7 +412,40 @@ dataCollectionSection =
                 }
             }
         },
-        '{{componentId}}-{{sectionId}}-views'                      : {
+        '{{componentId}}-{{sectionId}}-menus'                           : {
+            afterInit: function() {
+                var menuIds = JSON.parse('{{menuIds}}');
+
+                if (Object.keys(menuIds).length > 0) {
+                    dataCollectionSection['data']['menus'] = { };
+
+                    for (var menuCheckbox in menuIds) {
+                        $('#' + menuCheckbox).click(function() {
+                            var id = $(this)[0].id;
+                            extractMenuCheckboxData(id, menuIds[menuCheckbox]);
+                        });
+                        extractMenuCheckboxData(menuCheckbox, menuIds[menuCheckbox]);
+                    }
+                }
+
+                function extractMenuCheckboxData(menuCheckbox, menu) {
+                    var applicationId = $('#' + menuCheckbox).data('application_id');
+                    var menuId = $('#' + menuCheckbox).data('menu');
+
+                    if (applicationId && menuId) {
+                        dataCollectionSection['data']['menus'][menuId] = { };
+                        dataCollectionSection['data']['menus'][menuId][applicationId] = { };
+
+                        if ($('#' + menuCheckbox)[0].checked === true) {
+                            dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = true;
+                        } else {
+                            dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = false;
+                        }
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-views'                           : {
             afterInit: function() {
                 var viewIds = JSON.parse('{{viewIds}}');
 

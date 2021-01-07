@@ -37,7 +37,7 @@ class Fields extends AdminLTETags
 
         if ($this->fieldParams['fieldLabel']) {
             $this->content .=
-                '<label>' . strtoupper($this->fieldParams['fieldLabel']) . '</label> ' .
+                '<label ' .  $this->fieldParams['fieldLabelClass'] . '>' . strtoupper($this->fieldParams['fieldLabel']) . '</label> ' .
                 $this->fieldParams['fieldHelp'] . ' ' .
                 $this->fieldParams['fieldRequired'];
         }
@@ -105,6 +105,11 @@ class Fields extends AdminLTETags
         } else {
             $this->fieldParams['fieldLabel'] = '<label>missing_fieldLabel</label>';
         }
+
+        $this->fieldParams['fieldLabelClass'] =
+            isset($this->params['fieldLabelClass']) ?
+            'class="'. $this->params['fieldLabelClass'] . '"' :
+            '';
 
         // fieldPlaceholder - field placeholder, if false, then field label is used.
         if (isset($this->params['fieldPlaceholder'])) {

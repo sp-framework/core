@@ -21,9 +21,9 @@ class Menus extends BasePackage
         return $this;
     }
 
-    public function getMenusForApplication($applicationId)
+    public function buildMenusForApplication($applicationId)
     {
-        $menus = $this->filterMenu($applicationId);
+        $menus = $this->getMenusForApplication($applicationId);
 
         $cachedMenu = $this->cacheTools->getCache('menus');
 
@@ -45,7 +45,7 @@ class Menus extends BasePackage
         return $buildMenu;
     }
 
-    protected function filterMenu($applicationId)
+    public function getMenusForApplication($applicationId)
     {
         $menus = [];
 
@@ -53,13 +53,13 @@ class Menus extends BasePackage
             $this->model->filter(
                 function($menu) use ($applicationId) {
                     $menu = $menu->toArray();
-                    // var_dump($menu);
+
                     $menu['applications'] = Json::decode($menu['applications'], true);
                     if (count($menu['applications']) > 0) {
                         if (isset($menu['applications'][$applicationId]) &&
                             $menu['applications'][$applicationId]['enabled'] === true
                         ) {
-                            // $menu['sequence'] = $menu['applications'][$applicationId]['sequence'];
+
                             return $menu;
                         }
                     }
@@ -67,9 +67,31 @@ class Menus extends BasePackage
             );
 
         foreach ($filter as $key => $value) {
-            $menus[$key] = $value;
+            $menus[$value['id']] = $value;
         }
 
         return $menus;
+    }
+
+
+    public function updateMenus($data)
+    {
+        $menus = Json::decode($data['menus'], true);
+
+        if (count($menus) > 0) {
+            foreach ($menus as $menuId => $value) {
+                $menu = $this->getById($menuId);
+
+                $menu['applications'] = Json::decode($menu['applications'], true);
+
+                $menu['applications'] = array_replace($menu['applications'], $value);
+
+                $menu['applications'] = Json::encode($menu['applications']);
+
+                $this->update($menu);
+            }
+        }
+
+        $this->basepackages->menus->init(true);
     }
 }

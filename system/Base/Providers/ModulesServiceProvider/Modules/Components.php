@@ -240,9 +240,9 @@ class Components extends BasePackage
 				$component['applications'][$data['id']]['enabled'] = false;
 			}
 
-			if ($component['menu_id']) {
-				$this->updateMenu($data, $component, $status);
-			}
+			// if ($component['menu_id']) {
+			// 	$this->updateMenu($data, $component, $status);
+			// }
 
 			$component['applications'] = Json::encode($component['applications']);
 
@@ -252,22 +252,22 @@ class Components extends BasePackage
 		return true;
 	}
 
-	protected function updateMenu($data, $component, $status)
-	{
-		$menu = $this->basepackages->menus->getById($component['menu_id']);
+	// protected function updateMenu($data, $component, $status)
+	// {
+	// 	$menu = $this->basepackages->menus->getById($component['menu_id']);
 
-		$menu['applications'] = Json::decode($menu['applications'], true);
+	// 	$menu['applications'] = Json::decode($menu['applications'], true);
 
-		if ($status === true) {
-			$menu['applications'][$data['id']]['enabled'] = true;
-		} else if ($status === false) {
-			$menu['applications'][$data['id']]['enabled'] = false;
-		}
+	// 	if ($status === true) {
+	// 		$menu['applications'][$data['id']]['enabled'] = true;
+	// 	} else if ($status === false) {
+	// 		$menu['applications'][$data['id']]['enabled'] = false;
+	// 	}
 
-		$menu['applications'] = Json::encode($menu['applications']);
+	// 	$menu['applications'] = Json::encode($menu['applications']);
 
-		$this->basepackages->menus->update($menu);
+	// 	$this->basepackages->menus->update($menu);
 
-		$this->basepackages->menus->init(true);
-	}
+	// 	$this->basepackages->menus->init(true);
+	// }
 }

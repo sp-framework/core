@@ -31,6 +31,8 @@ class AppsComponent extends BaseComponent
                 $mandatoryComponents = [];
                 $mandatoryViews = [];
 
+                $this->view->modulesMenus = $this->basepackages->menus->getMenusForApplication($application['id']);
+
                 $componentsArr =
                     $this->modules->components->getComponentsForAppType(
                         $application['app_type'],

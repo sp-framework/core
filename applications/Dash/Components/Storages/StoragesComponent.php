@@ -26,7 +26,7 @@ class StoragesComponent extends BaseComponent
             return $this->storages->getFile($this->getData());
         }
 
-        if ($this->application['id'] === 1) {
+        if ($this->application['id'] == 1) {
             if (isset($this->getData()['id'])) {
                 if ($this->getData()['id'] != 0) {
                     $storage = $this->storages->getById($this->getData()['id']);
@@ -51,6 +51,8 @@ class StoragesComponent extends BaseComponent
                 return;
             }
 
+            $this->view->storageType = '';
+
             $controlActions =
                 [
                     'actionsToEnable'       =>
@@ -74,7 +76,11 @@ class StoragesComponent extends BaseComponent
             );
 
             $this->view->pick('storages/list');
+
+            return;
         }
+
+        return false;
     }
 
     /**
