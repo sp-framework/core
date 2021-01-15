@@ -358,7 +358,7 @@ abstract class BasePackage extends Controller
 			}
 
 			if (!$returnArray) {
-				$this->model;
+				return $this->model;
 			} else {
 				return $this->model->toArray();
 			}
