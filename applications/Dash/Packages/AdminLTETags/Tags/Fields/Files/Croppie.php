@@ -150,7 +150,15 @@ class Croppie
                     '<img alt="image" src="' . $this->params['imageLink'] . '" class="user-image img-fluid img-thumbnail">';
             } else {
                 $this->content .=
-                    '<img alt="image" src="' . $this->links->images('general/image.png') . '" class="user-image img-fluid img-thumbnail">';
+                    '<img alt="image" src="' . $this->links->images('general/img.png') . '" class="user-image img-fluid img-thumbnail">';
+            }
+        } else if ($this->params['imageType'] === 'portrait') {
+            if (isset($this->params['portraitLink']) && $this->params['portraitLink'] !== '') {
+                $this->content .=
+                    '<img alt="portrait" src="' . $this->params['portraitLink'] . '" class="user-portrait img-fluid img-thumbnail">';
+            } else {
+                $this->content .=
+                    '<img alt="portrait" src="' . $this->links->images('general/portrait.png') . '" class="user-image img-fluid img-thumbnail">';
             }
         }
 
