@@ -48,7 +48,7 @@
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'hire_date',
                         'fieldLabel'                     : 'Hiring Date',
-                        'fieldType'                      : 'input',
+                        'fieldType'                      : 'flatpickr',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Hiring date of the employee',
                         'fieldRequired'                  : true,
@@ -70,7 +70,8 @@
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'terminate_date',
                         'fieldLabel'                     : 'Terminate Date',
-                        'fieldType'                      : 'input',
+                        'fieldType'                      : 'flatpickr',
+                        'fieldFlatpickrClearButton'      : true,
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Terminate date of the employee',
                         'fieldRequired'                  : false,
@@ -88,44 +89,78 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'hire_manager_id',
-                        'fieldLabel'                     : 'Hiring Manager',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Hiring Manager',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : employeeHireManagerId
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'hire_manager_id',
+                        'fieldLabel'                            : 'Manager ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : employeeHireManagerId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'hire_manager_full_name',
+                        'fieldLabel'                            : 'Hiring Manager',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Search Manager',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Search Manager',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : false,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : employeeHireManager
                     ]
                 )}}
             </div>
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'hire_referrer_id',
-                        'fieldLabel'                     : 'Hiring Referrer',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Employee Referred by?',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : employeeHireReferrerId
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'hire_referrer_id',
+                        'fieldLabel'                            : 'Referrer ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : employeeHireReferrerId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'hire_referrer_full_name',
+                        'fieldLabel'                            : 'Referred By',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Search Employee',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Search Employee',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : false,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : employeeHireReferrer
                     ]
                 )}}
             </div>
@@ -140,10 +175,11 @@
                 'componentId'                   : componentId,
                 'sectionId'                     : sectionId,
                 'fieldId'                       : 'employment_attachments',
-                'fieldLabel'                    : 'Attachments',
+                'fieldLabel'                    : 'Employment Documents',
                 'fieldHelpTooltipContent'       : 'Max: 5. You can attach employee resume or any other documents',
                 'attachments'                   : employeeEmploymentAttachments,
-                'maxAttachments'                : 5
+                'maxAttachments'                : 5,
+                'storage'                       : storage
             ]
         %}
     </div>

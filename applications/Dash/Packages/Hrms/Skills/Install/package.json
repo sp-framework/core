@@ -1,0 +1,11 @@
+{
+    "name"          : "Skills",
+    "displayName"   : "Admin Skills Package",
+    "description"   : "Package for Skills component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "hrms",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-hrms-skills",
+    "settings"      : { }
+}

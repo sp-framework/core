@@ -8,11 +8,11 @@
         'contentType'           : 'sectionWithListing',
         'cardHeader'            : true,
         'cardType'              : 'primary',
-        'cardIcon'              : 'id-card',
+        'cardIcon'              : 'circle',
         'cardTitle'             : componentName,
         'cardAdditionalClass'   : 'rounded-0',
         'cardShowTools'         : ['maximize', 'collapse'],
-        'dtFilter'              : true,
+        'dtFilter'              : false,
         'dtFilters'             : table['filters'],
         'dtFilterColumns'       : table['filterColumns'],
         'dtFixedHeader'         : true,
@@ -24,34 +24,13 @@
                 'buttons'               :
                     {
                         'add-business' : {
-                            'title'                   : 'Add New Employee',
+                            'title'                   : 'Add New Status',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'plus',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('hrms/employees/q/id/0')
-                        }
-                    }
-            },
-        'dtSecondaryButtons'      :
-            {
-                'componentId'                       : componentId,
-                'sectionId'                         : 'listing',
-                'buttonType'                        : 'DropdownSplitButtons',
-                'dropdownButtonId'                  : 'main',
-                'dropdownButtonTitle'               : 'Settings',
-                'dropdownButtonIcon'                : 'cog',
-                'dropdownButtonType'                : 'secondary',
-                'dropdownButtonAdditionalClass'     : 'text-uppercase',
-                'buttonPosition'                    : 'right',
-                'dropdownAlign'                     : 'right',
-                'buttons'                           :
-                    {
-                        'statuses' : {
-                            'title'                   : 'Statuses',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('hrms/employees/settings/statuses/hrmsemployeesstatuses')
+                            'url'                     : links.url('hrms/employees/settings/statuses/q/id/0')
                         }
                     }
             },
@@ -65,6 +44,6 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No employees data available. Add employee by clicking the Add new employee button.'
+        'dtZeroRecords'         : 'No statuses data available. Add status by clicking the Add new status button.'
     ]
 )}}

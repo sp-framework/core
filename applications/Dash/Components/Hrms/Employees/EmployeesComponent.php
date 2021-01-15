@@ -2,8 +2,10 @@
 
 namespace Applications\Dash\Components\Hrms\Employees;
 
-use Applications\Dash\Packages\Hrms\Employees\Employees;
 use Applications\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Dash\Packages\Hrms\Employees\Employees;
+use Applications\Dash\Packages\Hrms\Employees\Settings\Statuses\EmployeesStatuses;
+use Applications\Dash\Packages\Locations\Locations;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -16,6 +18,8 @@ class EmployeesComponent extends BaseComponent
     public function initialize()
     {
         $this->employees = $this->usePackage(Employees::class);
+        $this->statuses = $this->usePackage(EmployeesStatuses::class);
+        $this->locations = $this->usePackage(Locations::class);
     }
 
     /**
@@ -28,6 +32,12 @@ class EmployeesComponent extends BaseComponent
                 $this->view->employee = $this->employees->getById($this->getData()['id']);
             }
 
+            $this->view->statuses = $this->statuses->getAll()->employeesStatuses;
+
+            $this->view->locations = $this->locations->getAll()->locations;
+
+            $this->view->storage = $this->basepackages->storages->getAppStorages()['private'];
+
             $this->view->pick('employees/view');
 
             return;
@@ -37,7 +47,8 @@ class EmployeesComponent extends BaseComponent
             [
                 'actionsToEnable'       =>
                 [
-                    'view'      => 'hrms/employees'
+                    'edit'      => 'hrms/employees',
+                    'remove'    => 'hrms/employees/remove',
                 ]
             ];
 
@@ -55,11 +66,6 @@ class EmployeesComponent extends BaseComponent
         );
 
         $this->view->pick('employees/list');
-    }
-
-    public function getAllEmployeesAction()
-    {
-        $this->view->employees = $this->employees->getAll()->employees;
     }
 
     /**
@@ -146,6 +152,31 @@ class EmployeesComponent extends BaseComponent
                     $this->view->responseCode = $this->accounts->packagesData->responseCode;
 
                     $this->view->accounts = $this->accounts->packagesData->accounts;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
+        }
+    }
+
+    public function searchEmployeeAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 3) {
+                    return;
+                }
+
+                $searchEmployees = $this->employees->searchByFullName($searchQuery);
+
+                if ($searchEmployees) {
+                    $this->view->responseCode = $this->employees->packagesData->responseCode;
+
+                    $this->view->employees = $this->employees->packagesData->employees;
                 }
             } else {
                 $this->view->responseCode = 1;

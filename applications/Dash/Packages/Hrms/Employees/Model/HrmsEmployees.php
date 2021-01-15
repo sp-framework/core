@@ -4,11 +4,11 @@ namespace Applications\Dash\Packages\Hrms\Employees\Model;
 
 use System\Base\BaseModel;
 
-class Employees extends BaseModel
+class HrmsEmployees extends BaseModel
 {
     public $id;
 
-    public $image;
+    public $portrait;
 
     public $account_id;
 
@@ -61,11 +61,4 @@ class Employees extends BaseModel
     public $skills_attachments;
 
     public $additional_notes;
-
-    public function initialize()
-    {
-        $this->setSource('hrms_employees');
-
-        $this->useDynamicUpdate(true);
-    }
 }

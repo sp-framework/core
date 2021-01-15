@@ -1,13 +1,13 @@
 {
-    "route"         : "hrms/employees/tools/employeesstatuses",
+    "route"         : "hrms/employees/settings/statuses",
     "name"          : "Employees Statuses",
     "description"   : "Manage employees statuses via this component",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "hrms",
     "version"       : "0.0.1",
-    "repo"          : "https://.../dash-component-business-hrms-employeesstatuses",
-    "class"         : "Applications\\Dash\\Components\\Hrms\\Employees\\Tools\\EmployeesStatusesComponent",
+    "repo"          : "https://.../dash-component-business-hrms-employees-statuses",
+    "class"         : "Applications\\Dash\\Components\\Hrms\\Employees\\Settings\\Statuses\\StatusesComponent",
     "dependencies"  : {
         "core"          : {
             "name"      : "Core",
@@ -18,9 +18,9 @@
         "packages"      :
         [
             {
-                "name"      : "Employees",
+                "name"      : "EmployeesStatuses",
                 "version"   : "0.0.1",
-                "repo"      : "https://.../dashbaord-package-business-hrms-employeesstatuses"
+                "repo"      : "https://.../dash-package-business-hrms-employees-statuses"
             }
         ],
         "middlewares"   : [],

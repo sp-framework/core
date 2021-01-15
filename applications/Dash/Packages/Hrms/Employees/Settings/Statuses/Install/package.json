@@ -1,0 +1,11 @@
+{
+    "name"          : "EmployeesStatuses",
+    "displayName"   : "Employees Statuses Package",
+    "description"   : "Package for Employees Statuses component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "hrms",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-hrms-employees-statuses",
+    "settings"      : { }
+}

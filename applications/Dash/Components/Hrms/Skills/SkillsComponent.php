@@ -1,21 +1,21 @@
 <?php
 
-namespace Applications\Dash\Components\Hrms\Employees\Tools\EmployeesStatuses;
+namespace Applications\Dash\Components\Hrms\Skills;
 
-use Applications\Dash\Packages\Hrms\Employees\Employees;
 use Applications\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Dash\Packages\Hrms\Skills\Skills;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
-class EmployeesStatusesComponent extends BaseComponent
+class SkillsComponent extends BaseComponent
 {
     use DynamicTable;
 
-    protected $employees;
+    protected $skills;
 
     public function initialize()
     {
-        $this->employees = $this->usePackage(Employees::class);
+        $this->skills = $this->usePackage(Skills::class);
     }
 
     /**
@@ -25,41 +25,37 @@ class EmployeesStatusesComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $this->view->employee = $this->employees->getById($this->getData()['id']);
+                $this->view->skill = $this->skills->getById($this->getData()['id']);
             }
 
-            $this->view->pick('employees/view');
+            $this->view->pick('skills/view');
 
             return;
         }
-        // $this->links->url('storages/q/uuid/' . $employee['image'] . '/w/200');
+
         $controlActions =
             [
                 'actionsToEnable'       =>
                 [
-                    'view'      => 'hrms/employees'
+                    'edit'      => 'hrms/skills',
+                    'remove'    => 'hrms/skills/remove',
                 ]
             ];
 
         $this->generateDTContent(
-            $this->employees,
-            'hrms/employees/view',
+            $this->skills,
+            'hrms/skills/view',
             null,
-            ['full_name', 'designation'],
+            ['name'],
             true,
-            ['full_name', 'designation'],
+            ['name'],
             $controlActions,
             [],
             null,
-            'first_name'
+            'name'
         );
 
-        $this->view->pick('employees/list');
-    }
-
-    public function getAllEmployeesAction()
-    {
-        $this->view->employees = $this->employees->getAll()->employees;
+        $this->view->pick('skills/list');
     }
 
     /**
@@ -73,11 +69,11 @@ class EmployeesStatusesComponent extends BaseComponent
                 return;
             }
 
-            $this->employees->addEmployees($this->postData());
+            $this->skills->addSkills($this->postData());
 
-            $this->view->responseCode = $this->employees->packagesData->responseCode;
+            $this->view->responseCode = $this->skills->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->employees->packagesData->responseMessage;
+            $this->view->responseMessage = $this->skills->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -97,11 +93,11 @@ class EmployeesStatusesComponent extends BaseComponent
                 return;
             }
 
-            $this->employees->updateEmployees($this->postData());
+            $this->skills->updateSkills($this->postData());
 
-            $this->view->responseCode = $this->employees->packagesData->responseCode;
+            $this->view->responseCode = $this->skills->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->employees->packagesData->responseMessage;
+            $this->view->responseMessage = $this->skills->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -117,11 +113,11 @@ class EmployeesStatusesComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->employees->removeEmployees($this->postData());
+            $this->skills->removeSkills($this->postData());
 
-            $this->view->responseCode = $this->employees->packagesData->responseCode;
+            $this->view->responseCode = $this->skills->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->employees->packagesData->responseMessage;
+            $this->view->responseMessage = $this->skills->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -130,28 +126,32 @@ class EmployeesStatusesComponent extends BaseComponent
         }
     }
 
-    public function searchAccountAction()
+    public function searchSkillAction()
     {
         if ($this->request->isPost()) {
             if ($this->postData()['search']) {
                 $searchQuery = $this->postData()['search'];
 
-                if (strlen($searchQuery) < 3) {
+                if (strlen($searchQuery) < 2) {
                     return;
                 }
 
-                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
+                $searchSkill = $this->skills->searchSkills($searchQuery);
 
-                if ($searchAccounts) {
-                    $this->view->responseCode = $this->accounts->packagesData->responseCode;
+                if ($searchSkill) {
+                    $this->view->responseCode = $this->skills->packagesData->responseCode;
 
-                    $this->view->accounts = $this->accounts->packagesData->accounts;
+                    $this->view->skills = $this->skills->packagesData->skills;
                 }
             } else {
                 $this->view->responseCode = 1;
 
                 $this->view->responseMessage = 'search query missing';
             }
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
         }
     }
 }

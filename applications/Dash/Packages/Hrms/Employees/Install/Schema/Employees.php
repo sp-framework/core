@@ -21,7 +21,7 @@ class Employees
                     ]
                 ),
                 new Column(
-                    'image',
+                    'portrait',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 1024,
@@ -32,14 +32,6 @@ class Employees
                     'account_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'account_email',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
                         'notNull' => true,
                     ]
                 ),

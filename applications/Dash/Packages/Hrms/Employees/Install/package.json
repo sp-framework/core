@@ -1,11 +1,11 @@
 {
     "name"          : "Employees",
-    "displayName"   : "Employees Package",
-    "description"   : "Package for Employees component",
+    "displayName"   : "Hrms Employees Package",
+    "description"   : "Package for Hrms Employees component",
     "app_type"      : "dash",
-    "category"      : "ecom",
-    "sub_category"  : "common",
+    "category"      : "business",
+    "sub_category"  : "hrms",
     "version"       : "0.0.1",
-    "repo"          : "https://.../dash-package-employees",
+    "repo"          : "https://.../dash-package-business-hrms-employees",
     "settings"      : { }
 }

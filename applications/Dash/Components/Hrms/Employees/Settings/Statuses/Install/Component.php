@@ -1,8 +1,8 @@
 <?php
 
-namespace Applications\Dash\Components\Hrms\Employees\Install;
+namespace Applications\Dash\Components\Hrms\Employees\Settings\Statuses\Install;
 
-use Applications\Dash\Components\Hrms\Employees\EmployeesComponent;
+use Applications\Dash\Components\Hrms\Employees\Settings\Statuses\StatusesComponent;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -10,7 +10,7 @@ class Component extends BaseComponent
 {
     public function installComponent()
     {
-        if ($this->checkComponent(EmployeesComponent::class)) {
+        if ($this->checkComponent(StatusesComponent::class)) {
 
             $this->view->responseCode = 1;
 
@@ -24,7 +24,7 @@ class Component extends BaseComponent
 
     protected function registerComponent()
     {
-        $componentPath = '/applications/Dash/Components/Hrms/Employees/';
+        $componentPath = '/applications/Dash/Components/Hrms/Employees/Settings/Statuses';
 
         $jsonFile =
             Json::decode($this->localContent->read($componentPath . '/Install/component.json'), true);
