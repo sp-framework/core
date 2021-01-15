@@ -228,11 +228,9 @@ class Local extends BasePackage
                 'uuid_location'         => $this->directory . '/',
                 'org_file_name'         => $this->fileName,
                 'type'                  => $this->mimeType,
-                'status'                => 0,
+                'orphan'                => 1,
                 'created_by'            => $this->auth->account()['id'] ?? 0,
-                'updated_by'            => $this->auth->account()['id'] ?? 0,
-                'created'               => new \DateTime('now'),
-                'updated'               => new \DateTime('now'),
+                'updated_by'            => $this->auth->account()['id'] ?? 0
             ];
 
         $this->add($data);
@@ -252,11 +250,17 @@ class Local extends BasePackage
             if (isset($this->getData['w']) && in_array($this->getData['w'], $this->allowedImageSizes)) {
                 $sizedImage = $this->getSizedImage($file[0], $this->getData['w']);
 
-                $this->response->setContentType($file[0]['type']);
-                $this->response->setContent($this->localContent->read($sizedImage));
+                if ($sizedImage) {
+                    $this->response->setContentType($file[0]['type']);
+
+                    $this->response->setContent($this->localContent->read($sizedImage));
+                }
+
                 return $this->response->send();
             } else {
-                return $this->response->setStatusCode(404, 'Not Found');
+                $this->response->setStatusCode(404, 'Not Found');
+
+                return $this->response->send();
             }
         } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
             $dataFile =
@@ -275,7 +279,9 @@ class Local extends BasePackage
             return $this->response->setContent($this->localContent->read($dataFile));
 
         } else {
-            return $this->response->setStatusCode(404, 'Not Found');
+            $this->response->setStatusCode(404, 'Not Found');
+
+            return $this->response->send();
         }
     }
 
@@ -295,11 +301,13 @@ class Local extends BasePackage
     {
         $imageFile = '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsImagesPath . '/' . $file['uuid_location'] . $file['uuid'];
 
-        if (!$this->localContent->has($imageFile)
-        ) {
+        if (!$this->localContent->has($imageFile)) {
+
             $this->logger->log->info('File with UUID is in database, but not at location ' . $imageFile);
 
-            return $this->response->setStatusCode(404, 'Not Found');
+            $this->response->setStatusCode(404, 'Not Found');
+
+            return false;
         }
 
         $image = new Gd(base_path($imageFile));
@@ -319,16 +327,20 @@ class Local extends BasePackage
 
             //Put empty content that will be overridden on image save
             $this->localContent->put($sizedImage, '');
+
             if (isset($this->getData['quality'])) {
                 $this->settingsDefaultImageQuality = $this->getData['quality'];
             }
             $image->save($this->cachePath . $file['uuid_location'] . $file['uuid'] . '/' . $width, $this->settingsDefaultImageQuality);
 
-            $this->updateFileLink(
-                $file,
-                $width,
-                '/' . $this->local['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $width
-            );
+            //Only update links for public as users cannot access private folder.
+            if ($this->local['permission'] === 'public') {
+                $this->updateFileLink(
+                    $file,
+                    $width,
+                    '/' . $this->local['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $width
+                );
+            }
 
             return $sizedImage;
         }

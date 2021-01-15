@@ -48,7 +48,7 @@ class StoragesLocal
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 4096,
-                            'notNull' => true,
+                            'notNull' => false,
                         ]
                     ),
                     new Column(
@@ -68,7 +68,7 @@ class StoragesLocal
                         ]
                     ),
                     new Column(
-                        'status',
+                        'orphan',
                         [
                             'type'    => Column::TYPE_TINYINTEGER,
                             'notNull' => true,
@@ -86,6 +86,22 @@ class StoragesLocal
                         [
                             'type'    => Column::TYPE_INTEGER,
                             'notNull' => false,
+                        ]
+                    ),
+                    new Column(
+                        'created',
+                        [
+                            'type'    => Column::TYPE_TIMESTAMP,
+                            'notNull' => true,
+                            'default' => 'CURRENT_TIMESTAMP',
+                        ]
+                    ),
+                    new Column(
+                        'updated',
+                        [
+                            'type'    => Column::TYPE_TIMESTAMP,
+                            'notNull' => true,
+                            'default' => 'CURRENT_TIMESTAMP',
                         ]
                     )
                 ]

@@ -84,37 +84,68 @@ class Storages extends BasePackage
         }
     }
 
+    public function getAppStorages()
+    {
+        foreach ($this->storages as $key => $storage) {
+            if ($storage['allowed_image_mime_types']) {
+                $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
+            }
+            if ($storage['allowed_image_sizes']) {
+                $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
+            }
+            if ($storage['allowed_file_mime_types']) {
+                $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
+            }
+            $storages[$storage['permission']] = $storage;
+        }
+
+        return $storages;
+    }
+
     public function getFile(array $getData)
     {
-        if ($getData['storagetype'] === 'public') {
-            $public = true;
-        } else if ($getData['storagetype'] === 'private') {
-            $public = false;
-        }
-        return $this->initStorage($public)->get($getData);
+        // if ($getData['storagetype'] === 'public') {
+        //     $public = true;
+        // } else if ($getData['storagetype'] === 'private') {
+        //     $public = false;
+        // }
+        return $this->initStorage(false)->get($getData);
     }
 
     public function storeFile()
     {
-        if ($this->request->getPost()['storagetype'] === 'public') {
+        if (isset($this->request->getPost()['storagetype'])) {
+            if ($this->request->getPost()['storagetype'] === 'public') {
+                $public = true;
+            } else if ($this->request->getPost()['storagetype'] === 'private') {
+                $public = false;
+            }
+        } else {
             $public = true;
-        } else if ($this->request->getPost()['storagetype'] === 'private') {
-            $public = false;
         }
+
         $storage = $this->initStorage($public);
 
-        if ($storage->store()) {
-            $this->packagesData->storageData = $storage->packagesData->storageData;
+        if ($storage) {
+            if ($storage->store()) {
+                $this->packagesData->storageData = $storage->packagesData->storageData;
 
-            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+                $this->packagesData->responseCode = $storage->packagesData->responseCode;
 
-            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+                $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
 
-            return true;
+                return true;
+            } else {
+                $this->packagesData->responseCode = $storage->packagesData->responseCode;
+
+                $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+
+                return false;
+            }
         } else {
-            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+            $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+            $this->packagesData->responseMessage = 'Storage not configured, contact administrator';
 
             return false;
         }
@@ -122,11 +153,16 @@ class Storages extends BasePackage
 
     public function removeFile(string $uuid)
     {
-        if ($this->request->getPost()['storagetype'] === 'public') {
+        if (isset($this->request->getPost()['storagetype'])) {
+            if ($this->request->getPost()['storagetype'] === 'public') {
+                $public = true;
+            } else if ($this->request->getPost()['storagetype'] === 'private') {
+                $public = false;
+            }
+        } else {
             $public = true;
-        } else if ($this->request->getPost()['storagetype'] === 'private') {
-            $public = false;
         }
+
         $storage = $this->initStorage($public);
 
         if ($storage->removeFile($uuid)) {
@@ -163,6 +199,7 @@ class Storages extends BasePackage
 
             $application = $this->modules->applications->getApplicationInfo();
         }
+
         if ((isset($domain['applications'][$application['id']]['publicStorage']) &&
             $domain['applications'][$application['id']]['publicStorage'] !== '') &&
             (isset($domain['applications'][$application['id']]['privateStorage']) &&
@@ -186,7 +223,6 @@ class Storages extends BasePackage
 
     public function getPublicLink($uuid, $width = null)
     {
-        var_dump($this->initStorage());
         return $this->initStorage()->getPublicLink($uuid, $width);
     }
 }
