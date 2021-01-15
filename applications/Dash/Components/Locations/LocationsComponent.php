@@ -162,4 +162,24 @@ class LocationsComponent extends BaseComponent
             $this->view->responseMessage = 'Method Not Allowed';
         }
     }
+
+    public function getLocationByIdAction()
+    {
+        if ($this->request->isPost()) {
+
+            $this->locations->getLocationById($this->postData());
+
+            $this->view->locationAddress = $this->locations->packagesData->locationAddress;
+
+            $this->view->responseCode = $this->locations->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->locations->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+
+    }
 }

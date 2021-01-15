@@ -86,4 +86,14 @@ class Locations extends BasePackage
     {
         //
     }
+
+    public function getLocationById($data)
+    {
+        $location = $this->getById($data['id']);
+
+        $this->packagesData->locationAddress =
+            $this->basepackages->addressbook->getById($location['address_id']);
+
+        return true;
+    }
 }
