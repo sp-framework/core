@@ -10,20 +10,20 @@ class ErrorsComponent extends BaseComponent
     {
         $this->view->setViewsDir($this->modules->views->getPhalconViewPath());
 
-        $this->view->pick('common/errors/notfound');
+        $this->view->pick('common/errors/controllernotfound');
     }
 
     public function actionNotFoundAction()
     {
         $this->view->setViewsDir($this->modules->views->getPhalconViewPath());
 
-        $this->view->pick('common/errors/notfound');
+        $this->view->pick('common/errors/actionnotfound');
     }
 
     public function routeNotFoundAction()
     {
         $this->view->setViewsDir($this->modules->views->getPhalconViewPath());
 
-        $this->view->pick('common/errors/notfound');
+        $this->view->pick('common/errors/routenotfound');
     }
 }
