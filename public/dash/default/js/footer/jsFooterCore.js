@@ -7409,7 +7409,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
     }
 });
 
-/* globals define exports PNotify */
+/* globals define exports PNotify flatpickr */
 /*
 * @title                    : BazContentFields
 * @description              : Baz Lib for Content (Sections With Form)
@@ -7767,29 +7767,22 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
                     if (options.beforeInit) {
                         options.beforeInit();
                     }
-                    thisFieldId = fieldId;
-                    fieldId = $('#' + fieldId).parent();
+                    // thisFieldId = fieldId;
+                    // fieldId = $('#' + fieldId).parent();
                     options = $.extend({
-                        wrap            : true,
-                        enableTime      : true,
-                        dateFormat      : 'd/m/Y h:i K',
-                        minuteIncrement : 1
+                        mode            : 'single',
+                        enableTime      : false,
+                        altInput        : true,
+                        altFormat       : "d-m-Y",
+                        dateFormat      : "d-m-Y",
                     }, options);
-                    if ($(fieldId).data('flatpickr-mode') === 'multiple') {
-                        options = $.extend({
-                            mode : 'multiple'
-                        }, options);
-                    }
-                    if ($(fieldId).data('flatpickr-mode') === 'range') {
-                        options = $.extend({
-                            mode : 'range'
-                        }, options);
-                    }
-                    dataCollection[componentId][sectionId][thisFieldId]['flatpickr'] = $(fieldId).flatpickr(options);
-                    if ($(fieldId).find('#' + thisFieldId + '-clear').length > 0) {
-                        $('#' + thisFieldId + '-clear').click(function() {
-                            dataCollection[componentId][sectionId][thisFieldId]['flatpickr'].clear();
-                            dataCollection[componentId][sectionId][thisFieldId]['flatpickr'].close();
+
+                    dataCollection[componentId][sectionId][fieldId]['flatpickr'] = flatpickr('#' + fieldId, options);
+
+                    if ($('#' + fieldId + '-clear').length > 0) {
+                        $('#' + fieldId + '-clear').click(function() {
+                            dataCollection[componentId][sectionId][fieldId]['flatpickr'].clear();
+                            dataCollection[componentId][sectionId][fieldId]['flatpickr'].close();
                         });
                     }
                     if (options.afterInit) {
