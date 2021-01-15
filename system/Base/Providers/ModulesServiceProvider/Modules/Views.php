@@ -63,7 +63,7 @@ class Views extends BasePackage
             if ($this->application && $this->view) {
                 $this->voltCompiledPath =
                     base_path('applications/' .
-                              ucfirst($this->application['app_type']) . '/' .
+                              ucfirst($this->application['app_type']) .
                               // ucfirst($this->application['sub_category']) .
                               '/Views/Html_compiled/' . ucfirst($this->application['route']) . '/' . $this->view['name'] . '/'
                           );
@@ -93,7 +93,7 @@ class Views extends BasePackage
             if ($this->application && $this->view) {
                 $this->phalconViewPath =
                     base_path('applications/' .
-                              ucfirst($this->application['app_type']) . '/' .
+                              ucfirst($this->application['app_type']) .
                               // ucfirst($this->application['sub_category']) .
                               '/Views/' . $this->view['name'] .
                               '/html/');
@@ -115,7 +115,7 @@ class Views extends BasePackage
             if ($this->application && $this->view) {
                 $this->phalconViewLayoutPath =
                     base_path('applications/' .
-                              ucfirst($this->application['app_type']) . '/' .
+                              ucfirst($this->application['app_type']) .
                               // ucfirst($this->application['sub_category']) .
                               '/Views/' . $this->view['name'] .
                               '/html/layouts/');
