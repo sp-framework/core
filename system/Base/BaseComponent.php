@@ -19,6 +19,8 @@ abstract class BaseComponent extends Controller
 
 	protected $componentName;
 
+	protected $componentRoute;
+
 	protected $application;
 
 	protected $component;
@@ -52,10 +54,18 @@ abstract class BaseComponent extends Controller
 				$this->componentName, $this->application['id']
 			);
 
+		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+
+		if ($this->request->isPost()) {
+			unset($url[Arr::lastKey($url)]);
+		}
+
+		$this->componentRoute = implode('/', $url);
+
 		if (!$this->component) {
 			$this->component =
 				$this->modules->components->getRouteComponentForApplication(
-					strtolower($this->componentName), $this->application['id']
+					strtolower($this->componentRoute), $this->application['id']
 				);
 		}
 
