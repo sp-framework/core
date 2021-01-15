@@ -83,11 +83,15 @@ trait DynamicTable {
                         $table['postUrlParams'] = ['conditions' => $filter['conditions']];
                     }
                 }
+            } else {
+                $table['filters'] = [];
+                $table['filterColumns'] = [];
             }
 
             $this->view->table = $table;
 
         } else if ($this->request->isPost()) {
+
             $pagedData =
                 $package->getPaged(
                     [

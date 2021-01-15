@@ -21,20 +21,21 @@ class FiltersComponent extends BaseComponent
      */
     public function viewAction()
     {
-        if ($this->application['id'] === 1) {
+        if ($this->application['id'] == 1) {
+            $components = $this->modules->components->components;
+
+            foreach ($components as $key => $component) {
+                $components[$key]['name'] = $component['name'] . ' (' . $component['category'] . '/' . $component['sub_category'] . ')';
+            }
+
+            $this->view->components = $components;
+
             if (isset($this->getData()['id'])) {
                 if ($this->getData()['id'] != 0) {
                     $filter = $this->filters->getById($this->getData()['id']);
 
                     $this->view->filter = $filter;
                 }
-
-                $components = $this->modules->components->components;
-
-                foreach ($components as $key => $component) {
-                    $components[$key]['name'] = $component['name'] . ' (' . $component['category'] . '/' . $component['sub_category'] . ')';
-                }
-                $this->view->components = $components;
 
                 $this->view->pick('filters/view');
 
