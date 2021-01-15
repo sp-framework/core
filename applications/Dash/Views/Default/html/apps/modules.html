@@ -390,6 +390,13 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id')).attr('disabled', false);
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))[0].checked = true;
                             dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = true;
+                        } else {
+                            //matched during onload extractComponentCheckboxData
+                            if (Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))).length > 0) {
+                                $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id')).attr('disabled', false);
+                                // $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))[0].checked = true;
+                                // dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = true;
+                            }
                         }
                         $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
@@ -402,7 +409,7 @@ dataCollectionSection =
                         ) {
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id')).attr('disabled', true);
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))[0].checked = false;
-                            dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = false;
+                            // dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = false;
                         }
                         $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');
