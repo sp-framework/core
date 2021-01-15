@@ -22,6 +22,8 @@ class Dropzone
 
     protected $adminLTETags;
 
+    protected $compSecId;
+
     public function __construct($view, $tag, $links, $escaper, $params, $fieldParams)
     {
         $this->adminLTETags = new AdminLTETags();
@@ -38,16 +40,7 @@ class Dropzone
 
         $this->fieldParams = $fieldParams;
 
-        $this->fieldParams['fieldHtmlContent'] =
-        isset($this->params['fieldHtmlContent']) ?
-        $this->params['fieldHtmlContent'] :
-        '';
-
-        $this->fieldParams['fieldHtmlAdditionalClass'] =
-        isset($this->params['fieldHtmlAdditionalClass']) ?
-        $this->params['fieldHtmlAdditionalClass'] :
-        '';
-
+        $this->compSecId = $this->params['componentId'] . '-' . $this->params['sectionId'];
 
         $this->generateContent();
     }
@@ -59,9 +52,9 @@ class Dropzone
 
     protected function generateContent()
     {
-        $this->content .=
-            '<div ' . $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' class="' . $this->fieldParams['fieldHtmlAdditionalClass'] . '" ' . $this->fieldParams['fieldId'] . '">' .
-                $this->fieldParams['fieldHtmlContent'] .
-            '</div>';
+        if (!isset($this->params['storageType'])) {
+            $this->params['storageType'] = 'public';
+        }
+        //
     }
 }
