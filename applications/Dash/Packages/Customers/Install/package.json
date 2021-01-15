@@ -3,9 +3,9 @@
     "displayName"   : "Admin Customers Package",
     "description"   : "Package for Customers component",
     "app_type"      : "dash",
-    "category"      : "ecom",
-    "sub_category"  : "common",
+    "category"      : "business",
+    "sub_category"  : "crms",
     "version"       : "0.0.1",
-    "repo"          : "https://.../ecom-common-package-customers",
+    "repo"          : "https://.../dash-package-business-crms-customers",
     "settings"      : { }
 }

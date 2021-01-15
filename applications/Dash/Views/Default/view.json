@@ -1,6 +1,6 @@
 {
     "name"          : "Default",
-    "description"   : "Default Ecom Dashboard View",
+    "description"   : "Default Dashboard View",
     "app_type"      : "dash",
     "category"      : "system",
     "sub_category"  : "tools",
@@ -23,7 +23,7 @@
         "layout"    : "default",
         "tags"      : "AdminLTETags",
         "head"      : {
-            "title" : "Ecom Dashboard",
+            "title" : "Dashboard",
             "meta"  : {
                 "charset"       : "UTF-8",
                 "viewport"      : "width=device-width, initial-scale=1, shrink-to-fit=no",

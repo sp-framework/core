@@ -72,6 +72,7 @@ class Router
 	public function init()
 	{
 		if ($this->validateDomain()) {
+
 			$this->getURI();
 
 			if ($this->applicationInfo && $this->applicationDefaults) {
@@ -200,7 +201,6 @@ class Router
 
 	protected function getGivenRouteClass(array $routeArray)
 	{
-		// var_dump($routeArray);
 		if (!$this->domainAppExclusive) {
 			unset($routeArray[0]); //Remove application name
 		}
@@ -209,11 +209,9 @@ class Router
 			$this->controller = Arr::last($routeArray);
 			$this->action = 'view';
 			unset($routeArray[Arr::lastKey($routeArray)]);
-
 			foreach ($routeArray as $route) {
 				$this->givenRouteClass .= '\\' . ucfirst($route);
 			}
-
 		} elseif ($this->request->isPost()) {
 			$this->action = Arr::last($routeArray);
 			unset($routeArray[Arr::lastKey($routeArray)]);
