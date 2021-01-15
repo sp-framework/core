@@ -1,0 +1,35 @@
+{% if specification['id'] is defined %}
+    {% set specificationId = specification['id'] %}
+    {% set title = 'Specification (' ~ specification['name'] ~ ')' %}
+{% else %}
+    {% set specificationId = '' %}
+    {% set title = 'New Specification' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'dot-circle',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'specifications/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : specificationId,
+            'addActionUrl'                  : 'inventory/specifications/add',
+            'addSuccessRedirectUrl'         : 'inventory/specifications',
+            'updateActionUrl'               : 'inventory/specifications/update',
+            'updateSuccessRedirectUrl'      : 'inventory/specifications',
+            'cancelActionUrl'               : 'inventory/specifications',
+            'closeActionUrl'                : 'inventory/specifications'
+        ]
+    ]
+)}}

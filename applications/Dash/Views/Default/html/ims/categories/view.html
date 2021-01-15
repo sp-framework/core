@@ -1,0 +1,34 @@
+{% if category['id'] is defined %}
+    {% set categoryId = category['id'] %}
+    {% set title = 'Category (' ~ category['name'] ~ ')' %}
+{% else %}
+    {% set categoryId = '' %}
+    {% set title = 'New Category' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'sitemap',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'categories/types/' ~ categoryType ~ '/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : categoryId,
+            'addActionUrl'                  : 'inventory/categories/add',
+            'addSuccessRedirectUrl'         : 'inventory/categories',
+            'updateActionUrl'               : 'inventory/categories/update',
+            'updateSuccessRedirectUrl'      : 'inventory/categories',
+            'cancelActionUrl'               : 'inventory/categories',
+            'closeActionUrl'                : 'inventory/categories'
+        ]
+    ]
+)}}
