@@ -210,8 +210,16 @@ abstract class BaseComponent extends Controller
 		$firstKey = Arr::firstKey($url);
 		$lastKey = Arr::lastKey($url);
 
-		unset($url[$firstKey]);
-		unset($url[$lastKey]);
+		$this->domain = $this->basepackages->domains->getDomain();
+
+		if (isset($this->domain['exclusive_to_default_application']) &&
+			$this->domain['exclusive_to_default_application'] == 1
+		) {
+			unset($url[$lastKey]);
+		} else {
+			unset($url[$firstKey]);
+			unset($url[$lastKey]);
+		}
 
 		return implode('/', $url);
 	}
@@ -352,12 +360,12 @@ abstract class BaseComponent extends Controller
 
 		if (isset($this->viewSettings['head']['title'])) {
 			Tag::setTitle($this->viewSettings['head']['title']);
-
-			if (isset($this->componentName)) {
-				Tag::appendTitle(' - ' . $this->componentName);
-			}
 		} else {
-			Tag::setTitle('Title Missing In Application Configuration');
+			Tag::setTitle(ucfirst($this->application['name']));
+		}
+
+		if (isset($this->componentName)) {
+			Tag::appendTitle(' - ' . $this->componentName);
 		}
 	}
 
