@@ -142,15 +142,29 @@ class Employees
                     ]
                 ),
                 new Column(
-                    'contact_work',
+                    'contact_location_id',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
+                        'type'    => Column::TYPE_SMALLINTEGER,
                         'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'contact_work_ext',
+                    'contact_address_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'contact_phone',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 15,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'contact_phone_ext',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 10,
@@ -162,7 +176,7 @@ class Employees
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 15,
-                        'notNull' => false,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
@@ -189,36 +203,22 @@ class Employees
                         'notNull' => false,
                     ]
                 ),
-                new Column(
-                    'contact_location_id',
-                    [
-                        'type'    => Column::TYPE_SMALLINTEGER,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'contact_address_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'skills',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'skills_attachments',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 2048,
-                        'notNull' => false,
-                    ]
-                ),
+                // new Column(
+                //     'skills',
+                //     [
+                //         'type'    => Column::TYPE_VARCHAR,
+                //         'size'    => 4096,
+                //         'notNull' => false,
+                //     ]
+                // ),
+                // new Column(
+                //     'skills_attachments',
+                //     [
+                //         'type'    => Column::TYPE_VARCHAR,
+                //         'size'    => 2048,
+                //         'notNull' => false,
+                //     ]
+                // ),
                 new Column(
                     'additional_notes',
                     [
@@ -227,6 +227,9 @@ class Employees
                         'notNull' => false,
                     ]
                 )
+            ],
+            'options' => [
+                'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
             ]
         ];
     }

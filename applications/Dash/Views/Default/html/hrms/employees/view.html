@@ -1,6 +1,6 @@
 {% if employee['id'] is defined %}
     {% set employeeId = employee['id'] %}
-    {% set title = 'Employee (' ~ employee['name'] ~ ')' %}
+    {% set title = 'Employee (' ~ employee['full_name'] ~ ')' %}
 {% else %}
     {% set employeeId = '' %}
     {% set title = 'New Employee' %}
@@ -20,6 +20,7 @@
         'cardIcon'                      : 'id-card',
         'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
+        'cardShowTools'                 : ['maximize', 'collapse'],
         'cardBodyInclude'               : 'employees/form',
         'formButtons'                   :
         [
@@ -30,6 +31,24 @@
             'updateSuccessRedirectUrl'      : 'hrms/employees',
             'cancelActionUrl'               : 'hrms/employees',
             'closeActionUrl'                : 'hrms/employees'
+        ],
+        'dataDependencies'     :
+        [
+            [
+                'componentName'      : 'Statuses',
+                'componentVar'       : statuses,
+                'componentRoute'     : 'hrms/employees/settings/statuses'
+            ],
+            [
+                'componentName'      : 'Desginations',
+                'componentVar'       : designations,
+                'componentRoute'     : 'hrms/employees/settings/designations'
+            ],
+            [
+                'componentName'      : 'Locations',
+                'componentVar'       : locations,
+                'componentRoute'     : false
+            ]
         ]
     ]
 )}}

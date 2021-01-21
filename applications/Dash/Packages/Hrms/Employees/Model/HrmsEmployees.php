@@ -40,6 +40,13 @@ class HrmsEmployees extends BaseModel
 
     public $employment_notes;
 
+    public $contact_location_id;
+
+    public $contact_address_id;
+
+    // public $skills;
+
+    // public $skills_attachments;
     public $contact_work;
 
     public $contact_work_ext;
@@ -51,14 +58,6 @@ class HrmsEmployees extends BaseModel
     public $contact_other;
 
     public $contact_notes;
-
-    public $contact_location_id;
-
-    public $contact_address_id;
-
-    public $skills;
-
-    public $skills_attachments;
 
     public $additional_notes;
 }

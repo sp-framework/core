@@ -11,7 +11,8 @@
                 'fieldType'                      : 'files/croppie',
                 'fieldValue'                     : employeePortrait,
                 'imageType'                      : 'portrait',
-                'storageType'                    : 'private'
+                'storageType'                    : 'private',
+                'portraitLink'                   : portraitLink
             ]
         )}}
     </div>
@@ -71,6 +72,7 @@
                         'fieldHelp'                             : true,
                         'fieldHelpTooltipContent'               : 'Search Account ID (Email)',
                         'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : false,
                         'fieldBazPostOnUpdate'                  : false,
                         'fieldRequired'                         : true,
@@ -94,6 +96,7 @@
                         'fieldHelpTooltipContent'              : 'Status',
                         'fieldRequired'                        : true,
                         'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
                         'fieldDataSelect2Options'              : statuses,
@@ -120,6 +123,7 @@
                         'fieldHelpTooltipContent'        : 'First Name',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
@@ -142,6 +146,7 @@
                         'fieldHelpTooltipContent'        : 'Last Name',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
@@ -155,22 +160,25 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'designation',
-                        'fieldLabel'                     : 'Designation',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Designation',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : employeeDesignation
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'designation',
+                        'fieldLabel'                           : 'Designation',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Employee Designation',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : designations,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeDesignation
                     ]
                 )}}
             </div>
@@ -204,6 +212,7 @@
                         'fieldHelp'                             : true,
                         'fieldHelpTooltipContent'               : 'Search Manager. If Employee is top level manager who doesnt report to anyone, enter field value - <strong>self</strong>',
                         'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : false,
                         'fieldBazPostOnUpdate'                  : false,
                         'fieldRequired'                         : true,

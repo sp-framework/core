@@ -4,6 +4,7 @@ namespace Applications\Dash\Components\Hrms\Employees;
 
 use Applications\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Dash\Packages\Hrms\Employees\Employees;
+use Applications\Dash\Packages\Hrms\Employees\Settings\Designations\EmployeesDesignations;
 use Applications\Dash\Packages\Hrms\Employees\Settings\Statuses\EmployeesStatuses;
 use Applications\Dash\Packages\Locations\Locations;
 use Phalcon\Helper\Json;
@@ -15,10 +16,17 @@ class EmployeesComponent extends BaseComponent
 
     protected $employees;
 
+    protected $statuses;
+
+    protected $designations;
+
+    protected $locations;
+
     public function initialize()
     {
         $this->employees = $this->usePackage(Employees::class);
         $this->statuses = $this->usePackage(EmployeesStatuses::class);
+        $this->designations = $this->usePackage(EmployeesDesignations::class);
         $this->locations = $this->usePackage(Locations::class);
     }
 
@@ -27,14 +35,80 @@ class EmployeesComponent extends BaseComponent
      */
     public function viewAction()
     {
+        $statuses = $this->statuses->getAll()->employeesStatuses;
+
+        $designations = $this->designations->getAll()->employeesDesignations;
+
+        $locations = $this->locations->getAll()->locations;
+
         if (isset($this->getData()['id'])) {
+            $this->view->portraitLink = '';
             if ($this->getData()['id'] != 0) {
-                $this->view->employee = $this->employees->getById($this->getData()['id']);
+                $employee = $this->employees->getById($this->getData()['id']);
+
+                if ($employee['portrait'] && $employee['portrait'] !== '') {
+                    $this->view->portraitLink = $this->links->url('storages/q/uuid/' . $employee['portrait'] . '/w/200');
+                }
+
+                $employee['account_email'] = $this->accounts->getById($employee['account_id'])['email'];
+
+                if ($employee['manager_id'] == 0) {
+                    $employee['manager_full_name'] = $employee['full_name'];
+                } else {
+                    $employee['manager_full_name'] = $this->employees->getById($employee['manager_id'])['full_name'];
+                }
+                if ($employee['hire_manager_id'] == 0) {
+                    $employee['hire_manager_full_name'] = '';
+                } else {
+                    $employee['hire_manager_full_name'] = $this->employees->getById($employee['hire_manager_id'])['full_name'];
+                }
+                if ($employee['hire_referrer_id'] == 0) {
+                    $employee['hire_referrer_full_name'] = '';
+                } else {
+                    $employee['hire_referrer_full_name'] = $this->employees->getById($employee['hire_referrer_id'])['full_name'];
+                }
+
+                if ($employee['contact_address_id']) {
+                    $address = $this->basepackages->addressbook->getById($employee['contact_address_id']);
+
+                    unset($address['id']);
+
+                    $employee = array_merge($employee, $address);
+                } else {
+                    $employee['street_address'] = '';
+                    $employee['street_address_2'] = '';
+                    $employee['city_id'] = '';
+                    $employee['city_name'] = '';
+                    $employee['post_code'] = '';
+                    $employee['state_id'] = '';
+                    $employee['state_name'] = '';
+                    $employee['country_id'] = '';
+                    $employee['country_name'] = '';
+                }
+
+                if ($employee['employment_attachments']) {
+                    $attachments = [];
+
+                    $attachmentsArr = Json::decode($employee['employment_attachments'], true);
+
+                    foreach ($attachmentsArr as $key => $attachment) {
+                        $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
+                        if ($attachmentInfo) {
+                            $attachments[$key] = $attachmentInfo;
+                        }
+                    }
+
+                    $employee['employment_attachments'] = $attachments;
+                }
+
+                $this->view->employee = $employee;
             }
 
-            $this->view->statuses = $this->statuses->getAll()->employeesStatuses;
+            $this->view->statuses = $statuses;
 
-            $this->view->locations = $this->locations->getAll()->locations;
+            $this->view->designations = $designations;
+
+            $this->view->locations = $locations;
 
             $this->view->storage = $this->basepackages->storages->getAppStorages()['private'];
 
@@ -42,7 +116,39 @@ class EmployeesComponent extends BaseComponent
 
             return;
         }
-        // $this->links->url('storages/q/uuid/' . $employee['image'] . '/w/200');
+
+        if ($this->request->isPost()) {
+            $statusesToName = [];
+            $designationToName = [];
+
+            foreach ($statuses as $statusesKey => $statusesValue) {
+                $statusesToName[$statusesValue['id']] = $statusesValue['name'];
+            }
+            foreach ($designations as $designationKey => $designationValue) {
+                $designationToName[$designationValue['id']] = $designationValue['name'];
+            }
+
+            $replaceColumns =
+                [
+                    'status' => ['html'  => $statusesToName],
+                    'designation' => ['html'  => $designationToName],
+                    'type_id'   => ['html'  =>
+                        [
+                            '1' => 'Employee',
+                            '2' => 'Contractor'
+                        ]
+                    ],
+                    'work_type_id'   => ['html'  =>
+                        [
+                            '1' => 'Traditional',
+                            '2' => 'Remote'
+                        ]
+                    ]
+                ];
+        } else {
+            $replaceColumns = null;
+        }
+
         $controlActions =
             [
                 'actionsToEnable'       =>
@@ -56,12 +162,12 @@ class EmployeesComponent extends BaseComponent
             $this->employees,
             'hrms/employees/view',
             null,
-            ['full_name', 'designation'],
+            ['first_name', 'last_name', 'designation', 'status', 'type_id', 'work_type_id'],
             true,
-            ['full_name', 'designation'],
+            ['first_name', 'last_name', 'designation', 'status', 'type_id', 'work_type_id'],
             $controlActions,
-            [],
-            null,
+            ['type_id' => 'Type', 'work_type_id' => 'Work Type'],
+            $replaceColumns,
             'first_name'
         );
 
@@ -79,7 +185,7 @@ class EmployeesComponent extends BaseComponent
                 return;
             }
 
-            $this->employees->addEmployees($this->postData());
+            $this->employees->addEmployee($this->postData());
 
             $this->view->responseCode = $this->employees->packagesData->responseCode;
 
@@ -103,7 +209,7 @@ class EmployeesComponent extends BaseComponent
                 return;
             }
 
-            $this->employees->updateEmployees($this->postData());
+            $this->employees->updateEmployee($this->postData());
 
             $this->view->responseCode = $this->employees->packagesData->responseCode;
 
@@ -123,7 +229,7 @@ class EmployeesComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->employees->removeEmployees($this->postData());
+            $this->employees->removeEmployee($this->postData());
 
             $this->view->responseCode = $this->employees->packagesData->responseCode;
 
@@ -139,6 +245,10 @@ class EmployeesComponent extends BaseComponent
     public function searchAccountAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
             if ($this->postData()['search']) {
                 $searchQuery = $this->postData()['search'];
 

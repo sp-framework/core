@@ -1,7 +1,7 @@
 {
     "name"          : "Employees",
-    "displayName"   : "Hrms Employees Package",
-    "description"   : "Package for Hrms Employees component",
+    "displayName"   : "Hrms Employees",
+    "description"   : "Human Resource Management System (HRMS) Package for managing employees via employees component",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "hrms",

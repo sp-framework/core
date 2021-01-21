@@ -16,10 +16,26 @@ class Employees extends BasePackage
 
     public function addEmployee(array $data)
     {
+        $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+
+        if ($data['work_type_id'] == 2) {
+            $address = $data;
+
+            $address['name'] = $data['full_name'];
+
+            $address['package_name'] = $this->packageName;
+
+            $address['id'] = '';
+
+            $this->basepackages->addressbook->addAddress($address);
+
+            $data['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
+        }
+
         if ($this->add($data)) {
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' employee';
+            $this->packagesData->responseMessage = 'Added ' . $data['full_name'] . ' employee';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -29,10 +45,45 @@ class Employees extends BasePackage
 
     public function updateEmployee(array $data)
     {
+        $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+
+        if ($data['work_type_id'] == 2 &&
+            ($data['contact_address_id'] &&
+             $data['contact_address_id'] != 0 &&
+             $data['contact_address_id'] !== '')
+        ) {
+            $address = $data;
+
+            $address['package_name'] = $this->packageName;
+
+            $address['name'] = $data['full_name'];
+
+            $address['address_id'] = $data['contact_address_id'];
+
+            $this->basepackages->addressbook->mergeAndUpdate($address);
+
+        } else if ($data['work_type_id'] == 2 &&
+                   (!$data['contact_address_id'] ||
+                    $data['contact_address_id'] == 0 ||
+                    $data['contact_address_id'] === '')
+        ) {
+            $address = $data;
+
+            $address['package_name'] = $this->packageName;
+
+            $address['name'] = $data['full_name'];
+
+            $address['id'] = '';
+
+            $this->basepackages->addressbook->addAddress($address);
+
+            $data['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
+        }
+
         if ($this->update($data)) {
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' employee';
+            $this->packagesData->responseMessage = 'Updated ' . $data['full_name'] . ' employee';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -88,6 +139,23 @@ class Employees extends BasePackage
             $this->packagesData->employees = $employees;
 
             return true;
+        }
+    }
+
+    public function searchByAccountId($accountId)
+    {
+        $searchEmployee =
+            $this->getByParams(
+                [
+                    'conditions'    => 'account_id = :accountId:',
+                    'bind'          => [
+                        'accountId' => $accountId
+                    ]
+                ]
+            );
+
+        if (count($searchEmployee) === 1) {
+            return $searchEmployee[0];
         }
     }
 }

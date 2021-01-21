@@ -13,6 +13,7 @@
                 'fieldHelpTooltipContent'        : 'Work Type. Traditional workers travel to office to work.',
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataSelect2Options'        :
@@ -38,7 +39,7 @@
 </div>
 <div class="row vdivide">
     <div class="col">
-        <div class="row contact-location-id" hidden>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -52,14 +53,16 @@
                         'fieldHelp'                            : true,
                         'fieldHelpTooltipContent'              : "Location of the employee's work",
                         'fieldRequired'                        : true,
+                        'fieldHidden'                          : true,
                         'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
                         'fieldDataSelect2Options'              : locations,
                         'fieldDataSelect2OptionsKey'           : 'id',
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : employeeContactLocation
+                        'fieldDataSelect2OptionsSelected'      : employeeContactLocationId
                     ]
                 )}}
             </div>
@@ -100,8 +103,28 @@
                 )}}
             </div>
         </div>
-        <div class="row remote-address" hidden>
+        <div class="row">
             <div class="col-md-12 col-sm-12">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_address_id',
+                        'fieldLabel'                     : 'Employee Contact Address ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Employee Contact Address ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : employeeContactAddressId
+                    ]
+                )}}
                 {% include '../common/address/view' with
                     [
                         'component'                                   : component,
@@ -111,31 +134,37 @@
                         'includeStreet'                               : true,
                         'searchType'                                  : 'city',
                         'streetAddress'                               : employeeContactStreetAddress,
-                        'streetFieldRequired'                         : false,
+                        'streetAddressFieldRequired'                  : false,
                         'streetAddressFieldBazPostOnCreate'           : true,
                         'streetAddressFieldBazPostOnUpdate'           : true,
+                        'streetAddressFieldHidden'                    : true,
                         'streetAddress2'                              : employeeContactStreetAddress2,
                         'streetAddress2FieldBazPostOnCreate'          : true,
                         'streetAddress2FieldBazPostOnUpdate'          : true,
+                        'streetAddress2FieldHidden'                   : true,
                         'cityId'                                      : employeeContactCityId,
                         'cityName'                                    : employeeContactCity,
                         'cityFieldRequired'                           : false,
                         'cityFieldBazPostOnCreate'                    : true,
                         'cityFieldBazPostOnUpdate'                    : true,
+                        'cityFieldHidden'                             : true,
                         'postCode'                                    : employeeContactPostCode,
                         'postCodeFieldRequired'                       : false,
                         'postCodeFieldBazPostOnCreate'                : true,
                         'postCodeFieldBazPostOnUpdate'                : true,
+                        'postCodeFieldHidden'                         : true,
                         'stateId'                                     : employeeContactStateId,
                         'stateName'                                   : employeeContactState,
                         'stateFieldRequired'                          : false,
                         'stateFieldBazPostOnCreate'                   : true,
                         'stateFieldBazPostOnUpdate'                   : true,
+                        'stateFieldHidden'                            : true,
                         'countryId'                                   : employeeContactCountryId,
                         'countryName'                                 : employeeContactCountry,
                         'countryFieldRequired'                        : false,
                         'countryFieldBazPostOnCreate'                 : true,
-                        'countryFieldBazPostOnUpdate'                 : true
+                        'countryFieldBazPostOnUpdate'                 : true,
+                        'countryFieldHidden'                          : true
                     ]
                 %}
             </div>
@@ -157,6 +186,7 @@
                         'fieldHelpTooltipContent'        : 'Phone number of the employee',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
@@ -179,6 +209,7 @@
                         'fieldHelpTooltipContent'        : 'Phone number extension of the employee',
                         'fieldRequired'                  : false,
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
@@ -203,6 +234,7 @@
                         'fieldHelpTooltipContent'        : 'Mobile phone number of the employee',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
@@ -227,6 +259,7 @@
                         'fieldHelpTooltipContent'        : 'Fax number of the employee',
                         'fieldRequired'                  : false,
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
@@ -249,6 +282,7 @@
                         'fieldHelpTooltipContent'        : 'Any other contact # of the employee',
                         'fieldRequired'                  : false,
                         'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
@@ -276,6 +310,7 @@
                 'fieldHelpTooltipContent'        : 'Contact Notes',
                 'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
