@@ -45,6 +45,10 @@ class Links
 	public function url($link = null)
 	{
 		if ($link) {
+			if ($link === '/') {
+				return '/';
+			}
+
 			if (isset($this->domain['exclusive_to_default_application']) &&
 				$this->domain['exclusive_to_default_application'] == 1
 			) {
