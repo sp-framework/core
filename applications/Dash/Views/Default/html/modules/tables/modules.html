@@ -7,20 +7,24 @@
             <th class="text-uppercase">Sub Category</th>
             <th class="text-uppercase">Menu</th>
             <th class="text-uppercase">Version</th>
-            <th class="text-uppercase">Update Available</th>
+            <th class="text-uppercase">Update</th>
             <th class="text-uppercase">Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for moduleKey, module in modules %}
             <tr>
-                <td>
-                    {{module['name']}}
+                <td class="text-truncate" style="min-width: 10rem;max-width: 10rem;">
+                    {% if module['display_name'] is defined %}
+                        {{module['display_name']}}
+                    {% else %}
+                        {{module['name']}}
+                    {% endif %}
                     {% if module['new'] is defined and module['new'] %}
                         <span class="badge badge-success">New</span>
                     {% endif %}
                 </td>
-                <td class="text-truncate" style="max-width: 20rem;">{{module['description']}}</td>
+                <td class="text-truncate" style="min-width: 20rem;max-width: 20rem;">{{module['description']}}</td>
                 <td>{{module['category']}}</td>
                 <td>{{module['sub_category']}}</td>
                 <td>
