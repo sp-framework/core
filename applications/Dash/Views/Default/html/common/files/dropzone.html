@@ -88,7 +88,7 @@
             <span id="{{componentId}}-{{sectionId}}-{{fieldId}}-dropzone-save-warning" class="text-danger" hidden>Save/Cancel Files</span>
         </div>
     </div>
-    <div class="row">
+    <div class="row pb-2">
         <div class="col">
             <ul class="list-group" id="{{componentId}}-{{sectionId}}-{{fieldId}}-upload-previews">
                 <li class="list-group-item list-group-item-secondary {{componentId}}-{{sectionId}}-{{fieldId}}-upload-template" area-disabled="false">
@@ -113,71 +113,72 @@
             </ul>
         </div>
     </div>
-    <hr>
-    <div class="row" id="{{componentId}}-{{sectionId}}-{{fieldId}}-attachment">
+    <div class="row border-top pt-2" id="{{componentId}}-{{sectionId}}-{{fieldId}}-attachment">
         <div class="col">
             <ul class="list-group" id="{{componentId}}-{{sectionId}}-{{fieldId}}-sortable-attachments">
-                {% for attachment in attachments %}
-                    {% if attachment['type'] === 'application/pdf' %}
-                        {% set src = links.images('/general/pdf.png') %}
-                        {% set alt = 'pdf' %}
-                    {% elseif attachment['type'] === 'text/plain' %}
-                        {% set src = links.images('/general/file.png') %}
-                        {% set alt = 'file' %}
-                    {% elseif attachment['type'] === 'application/msword' or attachment['type'] === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' %}
-                        {% set src = links.images('/general/file.png') %}
-                        {% set alt = 'file' %}
-                    {% elseif attachment['type'] === 'application/vnd.ms-excel' or attachment['type'] === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' %}
-                        {% set src = links.images('/general/excel.png') %}
-                        {% set alt = 'excel' %}
-                    {% elseif attachment['type'] === 'application/vnd.ms-powerpoint' or attachment['type'] === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' %}
-                        {% set src = links.images('/general/powerpoint.png') %}
-                        {% set alt = 'powerpoint' %}
-                    {% elseif attachment['type'] === 'application/zip' %}
-                        {% set src = links.images('/general/zip.png') %}
-                        {% set alt = 'zip' %}
-                    {% elseif attachment['type'] === 'text/csv' %}
-                        {% set src = links.images('/general/csv.png') %}
-                        {% set alt = 'csv' %}
-                    {% else %}
-                        {% set src = links.images('/general/file-unknown.png') %}
-                        {% set alt = 'Unknwon File Type' %}
-                    {% endif %}
-
-                    <li class="list-group-item list-group-item-secondary" area-disabled="false" style="cursor: pointer" data-uuid="{{attachment['uuid']}}">
-                        {% if sortable is defined and sortable === true %}
-                            <i class="fa fa-sort fa-fw handle"></i>
+                {% if attachments|length > 0 %}
+                    {% for attachment in attachments %}
+                        {% if attachment['type'] === 'application/pdf' %}
+                            {% set src = links.images('/general/pdf.png') %}
+                            {% set alt = 'pdf' %}
+                        {% elseif attachment['type'] === 'text/plain' %}
+                            {% set src = links.images('/general/file.png') %}
+                            {% set alt = 'file' %}
+                        {% elseif attachment['type'] === 'application/msword' or attachment['type'] === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' %}
+                            {% set src = links.images('/general/file.png') %}
+                            {% set alt = 'file' %}
+                        {% elseif attachment['type'] === 'application/vnd.ms-excel' or attachment['type'] === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' %}
+                            {% set src = links.images('/general/excel.png') %}
+                            {% set alt = 'excel' %}
+                        {% elseif attachment['type'] === 'application/vnd.ms-powerpoint' or attachment['type'] === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' %}
+                            {% set src = links.images('/general/powerpoint.png') %}
+                            {% set alt = 'powerpoint' %}
+                        {% elseif attachment['type'] === 'application/zip' %}
+                            {% set src = links.images('/general/zip.png') %}
+                            {% set alt = 'zip' %}
+                        {% elseif attachment['type'] === 'text/csv' %}
+                            {% set src = links.images('/general/csv.png') %}
+                            {% set alt = 'csv' %}
+                        {% else %}
+                            {% set src = links.images('/general/file-unknown.png') %}
+                            {% set alt = 'Unknwon File Type' %}
                         {% endif %}
-                        {{attachment['org_file_name']}}
-                        <div class="row mt-2">
-                            <div class="col">
-                                {% if attachment['type'] in storage['allowed_file_mime_types'] %}
-                                    <img alt="{{alt}}" src="{{src}}" class="img-fluid img-thumbnail">
-                                    {% set download = true %}
-                                {% elseif attachment['type'] in storage['allowed_image_mime_types'] %}
-                                    {% set download = false %}
-                                    <a class="spotlight" href="/storages/q/uuid/{{attachment['uuid']}}/w/{{spotlightSize}}">
-                                        <img alt="{{attachment['org_file_name']}}" src="/storages/q/uuid/{{attachment['uuid']}}/w/{{thumbnailSize}}" class="img-fluid img-thumbnail">
+
+                        <li class="list-group-item list-group-item-secondary" area-disabled="false" style="cursor: pointer" data-uuid="{{attachment['uuid']}}">
+                            {% if sortable is defined and sortable === true %}
+                                <i class="fa fa-sort fa-fw handle"></i>
+                            {% endif %}
+                            {{attachment['org_file_name']}}
+                            <div class="row mt-2">
+                                <div class="col">
+                                    {% if attachment['type'] in storage['allowed_file_mime_types'] %}
+                                        <img alt="{{alt}}" src="{{src}}" class="img-fluid img-thumbnail">
+                                        {% set download = true %}
+                                    {% elseif attachment['type'] in storage['allowed_image_mime_types'] %}
+                                        {% set download = false %}
+                                        <a class="spotlight" href="/storages/q/uuid/{{attachment['uuid']}}/w/{{spotlightSize}}">
+                                            <img alt="{{attachment['org_file_name']}}" src="/storages/q/uuid/{{attachment['uuid']}}/w/{{thumbnailSize}}" class="img-fluid img-thumbnail">
+                                        </a>
+                                    {% else %}
+                                        {% set download = true %}
+                                        <img alt="{{alt}}" src="{{src}}" class="img-fluid img-thumbnail">
+                                    {% endif %}
+                                </div>
+                                <div class="col">
+                                    <a data-uuid="{{attachment['uuid']}}" class="uploads-delete btn btn-danger btn-xs float-right" href="#">
+                                        <i class="fa fa-fw fa-trash"></i>
                                     </a>
-                                {% else %}
-                                    {% set download = true %}
-                                    <img alt="{{alt}}" src="{{src}}" class="img-fluid img-thumbnail">
-                                {% endif %}
+                                    {% if download is defined and download === true %}
+                                        {% set fileLink = links.url('storages/q/uuid/' ~ attachment["uuid"]) %}
+                                        <a data-uuid="{{attachment['uuid']}}" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="{{fileLink}}" target="_blank">
+                                            <i class="fa fa-fw fa-download"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="col">
-                                <a data-uuid="{{attachment['uuid']}}" class="uploads-delete btn btn-danger btn-xs float-right" href="#">
-                                    <i class="fa fa-fw fa-trash"></i>
-                                </a>
-                                {% if download is defined and download === true %}
-                                    {% set fileLink = links.url('storages/q/uuid/' ~ attachment["uuid"]) %}
-                                    <a data-uuid="{{attachment['uuid']}}" class="uploads-download btn btn-primary btn-xs float-right mr-2" href="{{fileLink}}" target="_blank">
-                                        <i class="fa fa-fw fa-download"></i>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </li>
-                {% endfor %}
+                        </li>
+                    {% endfor %}
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -236,6 +237,19 @@ $.extend(window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionI
                 collectData();
             }
 
+            function renewToken() {
+                var tokenName = $('#security-token').attr('name');
+                var token = $('#security-token').val();
+                var postData = { };
+                postData[tokenName] = token;
+                $.ajaxSetup({'async': true});
+                $.post('{{links.url("storages/getnewtoken")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $("#security-token").attr("name", response.tokenKey);
+                        $("#security-token").val(response.token);
+                    }
+                }, 'json');
+            }
             function initEvents() {
                 fieldId['dropzone'].on("addedfile", function(file) {
                     registerSaveCancel();
@@ -311,6 +325,7 @@ $.extend(window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionI
                     } else {
                         initDropzone();
                     }
+                    renewToken();
                 });
 
                 fieldId['dropzone'].on("success", function(file, response) {
@@ -323,7 +338,7 @@ $.extend(window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionI
                     }
 
                     if (file.accepted && file.status === 'success') {
-                        if (response.responseCode == 1) {
+                        if (response.responseCode != 0) {
                             problemWithUpload = true;
                             PNotify.error({
                                 title: file.name,
@@ -511,38 +526,40 @@ $.extend(window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionI
             }
 
             function processDeleteUUIDs() {
-                var tokenName = $('#security-token').attr('name');
-                var token = $('#security-token').val();
-
                 if (deleteUUIDs.length > 0) {
                     $(deleteUUIDs).each(function(index, uuid) {
-
-                        var postData = { };
-                        postData['uuid'] = uuid;
-                        postData[tokenName] = token;
-                        postData['storagetype']  = '{{storage["permission"]}}';
-
-                        $.post('{{links.url("storages/remove")}}', postData, function(response) {
-                            if (response.tokenKey && response.token) {
-                                $("#security-token").attr("name", response.tokenKey);
-                                $("#security-token").val(response.token);
-                            }
-                            if (response.responseCode != 0) {
-                                PNotify.error({
-                                    title: 'Error:',
-                                    text: response.responseMessage
-                                });
-                            } else {
-                                $('#{{componentId}}-{{sectionId}}-{{fieldId}}-sortable-attachments').find('[data-uuid="' + uuid + '"]')[0].remove();
-                            }
-                        }, 'json');
+                        deleteFile(uuid);
                     });
-
-                    $('#{{componentId}}-{{sectionId}}-{{fieldId}}-dropzone-save').attr('hidden', true);
-                    $('#{{componentId}}-{{sectionId}}-{{fieldId}}-dropzone-cancel').attr('hidden', true);
-                    deleteUUIDs = [];
-                    initDropzone();
                 }
+                $('#{{componentId}}-{{sectionId}}-{{fieldId}}-dropzone-save').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-{{fieldId}}-dropzone-cancel').attr('hidden', true);
+                deleteUUIDs = [];
+                initDropzone();
+            }
+
+            function deleteFile(uuid) {
+                var tokenName = $('#security-token').attr('name');
+                var token = $('#security-token').val();
+                var postData = { };
+                postData['uuid'] = uuid;
+                postData[tokenName] = token;
+                postData['storagetype']  = '{{storage["permission"]}}';
+
+                $.post('{{links.url("storages/remove")}}', postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $("#security-token").attr("name", response.tokenKey);
+                        $("#security-token").val(response.token);
+                    }
+                    if (response.responseCode != 0) {
+                        PNotify.error({
+                            title: 'Error:',
+                            text: response.responseMessage
+                        });
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-{{fieldId}}-sortable-attachments').find('[data-uuid="' + uuid + '"]')[0].remove();
+                    }
+                    collectData();
+                }, 'json');
             }
 
             function collectData() {
@@ -568,6 +585,7 @@ $.extend(window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionI
                 } else {
                     fieldId['uuidData'] = [];
                     $('#{{componentId}}-{{sectionId}}-{{fieldId}}-sortable-attachments li').each(function(index,li) {
+
                         fieldId['uuidData'].push($(li).data('uuid'));
                     });
 
