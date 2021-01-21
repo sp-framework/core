@@ -8,8 +8,16 @@ class AuthComponent extends BaseComponent
 {
     public function viewAction()
     {
+        $domain = $this->basepackages->domains->getDomain();
+
         if ($this->auth->check()) {
-            return $this->response->redirect('/' . strtolower($this->application['route']));
+            if (isset($domain['exclusive_to_default_application']) &&
+                $domain['exclusive_to_default_application'] == 1
+            ) {
+                return $this->response->redirect('/');
+            } else {
+                return $this->response->redirect('/' . strtolower($this->application['route']));
+            }
         }
 
         $this->view->setLayout('auth');
