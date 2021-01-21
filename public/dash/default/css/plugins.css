@@ -975,7 +975,7 @@ body.vegas-container {
 .jstree-default .jstree-icon,
 #jstree-dnd.jstree-default .jstree-ok,
 #jstree-dnd.jstree-default .jstree-er {
-  background-image: url("/Admin/Default/images/jstree/3.3.8/32px.png");
+  background-image: url("/dash/default/images/jstree/3.3.8/32px.png");
 }
 .jstree-default .jstree-node {
   background-position: -292px -4px;
@@ -1080,7 +1080,7 @@ body.vegas-container {
   background-position: 0 0;
 }
 .jstree-default > .jstree-container-ul .jstree-loading > .jstree-ocl {
-  background: url("/Admin/Default/images/jstree/3.3.8/throbber.gif") center center no-repeat;
+  background: url("/dash/default/images/jstree/3.3.8/throbber.gif") center center no-repeat;
 }
 .jstree-default .jstree-file {
   background-position: -100px -68px;

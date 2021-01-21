@@ -10,7 +10,7 @@ class Addressbook extends BaseModel
 
     public $name;
 
-    public $type;
+    public $package_name;
 
     public $street_address;
 

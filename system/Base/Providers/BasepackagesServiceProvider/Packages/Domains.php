@@ -87,7 +87,7 @@ class Domains extends BasePackage
 		if ($add) {
 			$this->packagesData->responseCode = 0;
 
-			$this->packagesData->responseMessage = 'Domain Added';
+			$this->packagesData->responseMessage = 'Domain ' . $data['name'] . ' Added';
 		} else {
 			$this->packagesData->responseCode = 1;
 
@@ -102,7 +102,7 @@ class Domains extends BasePackage
 		if ($update) {
 			$this->packagesData->responseCode = 0;
 
-			$this->packagesData->responseMessage = 'Domain Updated';
+			$this->packagesData->responseMessage = 'Domain ' . $data['name'] . ' Updated';
 		} else {
 			$this->packagesData->responseCode = 1;
 
@@ -118,7 +118,7 @@ class Domains extends BasePackage
 		if ($remove) {
 			$this->packagesData->responseCode = 0;
 
-			$this->packagesData->responseMessage = 'Domain Removed';
+			$this->packagesData->responseMessage = 'Domain ' . $data['name'] . ' Removed';
 		} else {
 			$this->packagesData->responseCode = 1;
 

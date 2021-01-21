@@ -134,7 +134,7 @@ class Components extends BasePackage
 		return $components;
 	}
 
-	public function getIdComponent($id)
+	public function getComponentById($id)
 	{
 		$filter =
 			$this->model->filter(

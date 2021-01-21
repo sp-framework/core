@@ -308,10 +308,10 @@ class Router
 		// $this->applicationDefaults['category'] = $this->applicationInfo['category'];
 		// $this->applicationDefaults['sub_category'] = $this->applicationInfo['sub_category'];
 		$this->applicationDefaults['component'] =
-			$this->components->getIdComponent($this->applicationInfo['default_component'])['route'];
+			$this->components->getComponentById($this->applicationInfo['default_component'])['route'];
 		$this->applicationDefaults['errorComponent'] =
 			isset($this->applicationInfo['errors_component']) && $this->applicationInfo['errors_component'] != 0 ?
-			$this->components->getIdComponent($this->applicationInfo['errors_component'])['route'] :
+			$this->components->getComponentById($this->applicationInfo['errors_component'])['route'] :
 			null;
 		$this->applicationDefaults['view'] =
 			$this->views->getIdViews($this->domain['applications'][$this->applicationInfo['id']]['view'])['name'];

@@ -39,7 +39,7 @@ class Dispatcher
         $this->dispatcher->setDefaultAction('view');
 
         if ($this->applicationsInfo) {
-            $component = $this->components->getIdComponent($this->applicationsInfo['errors_component']);
+            $component = $this->components->getComponentById($this->applicationsInfo['errors_component']);
 
             if (isset($this->applicationsInfo['errors_component']) &&
                 $this->applicationsInfo['errors_component'] != 0
