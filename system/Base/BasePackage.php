@@ -410,6 +410,14 @@ abstract class BasePackage extends Controller
 		if ($data) {
 			${$this->packageName} = $this->modelToUse::findFirstById($data['id']);
 
+			if (!${$this->packageName}) {
+				$this->packagesData->responseCode = 1;
+
+				$this->packagesData->responseMessage = $data['id'] . " not found!";
+
+				return;
+			}
+
 			${$this->packageName}->assign($data);
 
 			$update = ${$this->packageName}->update();
@@ -556,7 +564,8 @@ abstract class BasePackage extends Controller
 		$key = [];
 
 		foreach ($class as $value) {
-			array_push($key, substr($value, 0, 3));
+			// array_push($key, substr($value, 0, 4));
+			array_push($key, $value);
 		}
 
 		return strtolower(join($key));
@@ -609,15 +618,15 @@ abstract class BasePackage extends Controller
 		return $this->packagesData->getAllData();
 	}
 
-	protected function paramsWithCache(array $parameters)
+	protected function paramsWithCache(array $params)
 	{
 		if ($this->cacheKey) {
-			$parameters = $this->cacheTools->addModelCacheParameters($parameters, $this->getCacheKey());
+			$params = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
 		}
 
-		$this->cacheKey = $parameters['cache']['key'];
+		$this->cacheKey = $params['cache']['key'];
 
-		return $parameters;
+		return $params;
 	}
 
 	//Very broad at the moment, we need to narrow down search and delete caching
