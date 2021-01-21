@@ -27,8 +27,8 @@ class CacheTools
 		$this->cache = $caches[$this->cacheService];
 	}
 
-	public function addModelCacheParameters($parameters = null, $cacheName = null) {
-
+	public function addModelCacheParameters($parameters = null, $cacheName = null)
+	{
 		if ($parameters && $cacheName) {
 			$cacheKey[0] = $cacheName;
 			$cacheKey[] = $parameters;

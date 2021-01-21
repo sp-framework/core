@@ -1,6 +1,6 @@
 <?php
 
-namespace Applications\Dash\Components\Users\Customers;
+namespace Applications\Dash\Components\Crms\Customers;
 
 use Applications\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Dash\Packages\Customers\Customers;

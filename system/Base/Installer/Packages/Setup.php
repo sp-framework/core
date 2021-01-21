@@ -8,7 +8,7 @@ use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplication;
-use System\Base\Installer\Packages\Setup\Register\ApplicationTypes as RegisterApplicationTypes;
+use System\Base\Installer\Packages\Setup\Register\Application\Type as RegisterApplicationType;
 use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\CountriesStatesCities;
@@ -22,7 +22,7 @@ use System\Base\Installer\Packages\Setup\Register\User\Account as RegisterRootAd
 use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Addressbook;
-use System\Base\Installer\Packages\Setup\Schema\ApplicationTypes;
+use System\Base\Installer\Packages\Setup\Schema\Applications\Types as ApplicationsTypes;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Components;
@@ -130,7 +130,7 @@ class Setup
 
 		$this->db->createTable('core', $dbName, (new Core)->columns());
 		$this->db->createTable('applications', $dbName, (new Applications)->columns());
-		$this->db->createTable('application_types', $dbName, (new ApplicationTypes)->columns());
+		$this->db->createTable('application_types', $dbName, (new ApplicationsTypes)->columns());
 		$this->db->createTable('components', $dbName, (new Components)->columns());
 		$this->db->createTable('packages', $dbName, (new Packages)->columns());
 		$this->db->createTable('middlewares', $dbName, (new Middlewares)->columns());
@@ -294,7 +294,7 @@ class Setup
 
 	protected function registerApplicationTypes()
 	{
-		return (new RegisterApplicationTypes())->register($this->db);
+		return (new RegisterApplicationType())->register($this->db);
 	}
 
 	protected function registerAdminApplication()

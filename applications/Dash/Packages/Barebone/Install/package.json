@@ -1,6 +1,6 @@
 {
     "name"          : "Barebone",
-    "displayName"   : "Admin Barebone Package",
+    "displayName"   : "Barebone",
     "description"   : "Package for Barebone component",
     "version"       : "0.0.1",
     "app_type"      : "dash",

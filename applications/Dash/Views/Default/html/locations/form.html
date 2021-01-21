@@ -4,7 +4,6 @@
     {% set locationInboundShipping = location['inbound_shipping'] %}
     {% set locationOutboundShipping = location['outbound_shipping'] %}
     {% set locationCanStock = location['can_stock'] %}
-    {% set locationAddressId = location['address_id'] %}
     {% set locationStreetAddress = location['street_address'] %}
     {% set locationStreetAddress2 = location['street_address_2'] %}
     {% set locationCityId = location['city_id'] %}
@@ -14,6 +13,7 @@
     {% set locationState = location['state_name'] %}
     {% set locationCountryId = location['country_id'] %}
     {% set locationCountry = location['country_name'] %}
+    {% set locationAddressId = location['address_id'] %}
     {% set locationNotes = location['notes'] %}
 {% else %}
     {% set locationId = '' %}
@@ -21,7 +21,6 @@
     {% set locationInboundShipping = '' %}
     {% set locationOutboundShipping = '' %}
     {% set locationCanStock = '' %}
-    {% set locationAddressId = '' %}
     {% set locationStreetAddress = '' %}
     {% set locationStreetAddress2 = '' %}
     {% set locationCityId = '' %}
@@ -31,6 +30,7 @@
     {% set locationState = '' %}
     {% set locationCountryId = '' %}
     {% set locationCountry = '' %}
+    {% set locationAddressId = '' %}
     {% set locationNotes = '' %}
 {% endif %}
 {% if locationInboundShipping == '1' %}
