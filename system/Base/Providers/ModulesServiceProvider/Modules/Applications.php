@@ -4,7 +4,7 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\ApplicationTypes;
+use System\Base\Providers\ModulesServiceProvider\Modules\Applications\Types as ApplicationsTypes;
 use System\Base\Providers\ModulesServiceProvider\Modules\Model\Applications as ApplicationsModel;
 
 class Applications extends BasePackage
@@ -15,14 +15,14 @@ class Applications extends BasePackage
 
 	public $applications;
 
-	public $applicationTypes;
+	public $applicationsTypes;
 
 	protected $applicationInfo = null;
 
 	public function init(bool $resetCache = false)
 	{
-		$this->applicationTypes =
-			(new ApplicationTypes)->init($resetCache)->applicationTypes;
+		$this->applicationsTypes =
+			(new ApplicationsTypes)->init($resetCache)->applicationsTypes;
 
 		$this->getAll($resetCache);
 
@@ -82,7 +82,8 @@ class Applications extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($application) use ($id) {
-					if ($application->id == $id) {
+					$application = $application->toArray();
+					if ($application['id'] == $id) {
 						return $application;
 					}
 				}
@@ -91,7 +92,7 @@ class Applications extends BasePackage
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate application Id found for id ' . $id);
 		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
+			return $filter[0];
 		} else {
 			return false;
 		}
@@ -102,7 +103,8 @@ class Applications extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($application) use ($name) {
-					if ($application->name === ucfirst($name)) {
+					$application = $application->toArray();
+					if ($application['name'] === ucfirst($name)) {
 						return $application;
 					}
 				}
@@ -111,7 +113,7 @@ class Applications extends BasePackage
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate application name found for application ' . $name);
 		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
+			return $filter[0];
 		} else {
 			return false;
 		}
@@ -122,7 +124,8 @@ class Applications extends BasePackage
 		$filter =
 			$this->model->filter(
 				function($application) use ($route) {
-					if ($application->route === ($route)) {
+					$application = $application->toArray();
+					if ($application['route'] === ($route)) {
 						return $application;
 					}
 				}
@@ -131,7 +134,7 @@ class Applications extends BasePackage
 		if (count($filter) > 1) {
 			throw new \Exception('Duplicate application route found for route ' . $route);
 		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
+			return $filter[0];
 		} else {
 			return false;
 		}
@@ -236,7 +239,7 @@ class Applications extends BasePackage
 
 	protected function checkType($data)
 	{
-		$typesArr = $this->modules->applications->applicationTypes;
+		$typesArr = $this->modules->applications->applicationsTypes;
 
 		foreach ($typesArr as $key => $type) {
 			if (strtolower($data['route']) === $type['app_type']) {

@@ -9,12 +9,13 @@ use System\Base\BaseComponent;
 class AppsComponent extends BaseComponent
 {
     use DynamicTable;
+
     /**
      * @acl(name=view)
      */
     public function viewAction()
     {
-        $typesArr = $this->modules->applications->applicationTypes;
+        $typesArr = $this->modules->applications->applicationsTypes;
 
         $this->view->types = $typesArr;
 
