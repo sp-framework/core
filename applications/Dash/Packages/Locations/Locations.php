@@ -15,7 +15,7 @@ class Locations extends BasePackage
 
     public function addLocation(array $data)
     {
-        $data['type'] = 'locations';
+        $data['package_name'] = $this->packageName;
 
         $this->basepackages->addressbook->addAddress($data);
 
@@ -35,13 +35,9 @@ class Locations extends BasePackage
 
     public function updateLocation(array $data)
     {
-        $data['type'] = 'locations';
+        $data['package_name'] = $this->packageName;
 
-        $address = $this->basepackages->addressbook->getById($data['address_id']);
-
-        $address = array_merge($address, $data);
-
-        $this->basepackages->addressbook->updateAddress($data);
+        $this->basepackages->addressbook->mergeAndUpdate($data);
 
         if ($this->update($data)) {
             $this->packagesData->responseCode = 0;

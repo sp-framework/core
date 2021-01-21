@@ -125,7 +125,6 @@ class StoragesComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
-
             if (!$this->checkCSRF()) {
                 return;
             }
@@ -148,10 +147,6 @@ class StoragesComponent extends BaseComponent
      */
     public function removeAction()
     {
-        if (!$this->checkCSRF()) {
-            return;
-        }
-
         if ($this->request->isPost() && isset($this->postData()['uuid'])) {
 
             $this->storages->removeFile($this->postData()['uuid']);
@@ -165,6 +160,9 @@ class StoragesComponent extends BaseComponent
 
         if ($this->application['id'] === 1) {
             if ($this->request->isPost()) {
+                if (!$this->checkCSRF()) {
+                    return;
+                }
 
                 $this->storages->removeStorage($this->postData());
 
