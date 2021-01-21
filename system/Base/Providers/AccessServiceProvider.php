@@ -32,6 +32,7 @@ class AccessServiceProvider implements ServiceProviderInterface
             function () use ($container) {
                 $config = $container->getShared('config');
                 $session = $container->getShared('session');
+                $sessionTools = $container->getShared('sessionTools');
                 $cookies = $container->getShared('cookies');
                 $accounts = $container->getShared('accounts');
                 $applications = $container->getShared('modules')->applications;
@@ -44,6 +45,7 @@ class AccessServiceProvider implements ServiceProviderInterface
                     new Auth(
                         $config,
                         $session,
+                        $sessionTools,
                         $cookies,
                         $accounts,
                         $applications,

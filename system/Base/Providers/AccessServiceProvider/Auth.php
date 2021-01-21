@@ -17,6 +17,8 @@ class Auth
 
     protected $session;
 
+    protected $sessionTools;
+
     protected $cookies;
 
     protected $accounts;
@@ -38,6 +40,7 @@ class Auth
     public function __construct(
         $config,
         $session,
+        $sessionTools,
         $cookies,
         $accounts,
         $applications,
@@ -49,6 +52,8 @@ class Auth
         $this->config = $config;
 
         $this->session = $session;
+
+        $this->sessionTools = $sessionTools;
 
         $this->cookies = $cookies;
 
@@ -81,6 +86,7 @@ class Auth
         $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
 
         if ($this->account) {
+            $this->clearAccountSessionId();
             $this->clearAccountRememberToken($cookieKey);
         }
 
@@ -101,12 +107,32 @@ class Auth
         return true;
     }
 
-    protected function clearAccountRememberToken($cookieKey)
+    protected function clearAccountSessionId()
     {
-        if ($this->account['session_id']) {
-            $this->account['session_id'] = null;
+        if ($this->account['session_ids']) {
+            if (!is_array($this->account['session_ids'])) {
+                $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
+            }
+        }
+        $sessionIdKey = array_search($this->session->getId(), $this->account['session_ids']);
+
+        if ($sessionIdKey !== false) {
+            if (count($this->account['session_ids']) === 1) {
+                $this->account['session_ids'] = null;
+            } else {
+                unset($this->account['session_ids'][$sessionIdKey]);
+
+                $this->account['session_ids'] = Json::encode($this->account['session_ids']);
+            }
         }
 
+        $this->sessionTools->clearSession($this->session->getId());
+
+        $this->accounts->update($this->account);
+    }
+
+    protected function clearAccountRememberToken($cookieKey)
+    {
         if ($this->account['remember_identifier']) {
             $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
             unset($this->account['remember_identifier'][$cookieKey]);
@@ -262,7 +288,15 @@ class Auth
     protected function setSessionAndToken(array $data)
     {
         if ($this->setUserSession()) {
-            $this->account['session_id'] = $this->session->getId();
+            if ($this->account['session_ids']) {
+                $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
+                array_push($this->account['session_ids'], $this->session->getId());
+            } else {
+                $this->account['session_ids'] = [];
+                array_push($this->account['session_ids'], $this->session->getId());
+            }
+
+            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
 
             if (is_array($this->account['can_login'])) {
                 $this->account['can_login'] = Json::encode($this->account['can_login']);
@@ -408,10 +442,20 @@ class Auth
             return false;
         }
 
-        if (!$this->account['session_id']) {
+        if (!$this->account['session_ids']) {
             $this->logger->log->debug($this->account['email'] . ' session null, perhaps was forced logged out by Administrator.');
 
             throw new \Exception('User session deleted in DB by administrator via force logout.');
+        } else if ($this->account['session_ids']) {
+            $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
+
+            if (!in_array($this->session->getId(), $this->account['session_ids'])) {
+                $this->logger->log->debug($this->account['email'] . ' session id ' . $this->session->getId() . ' not present in DB.');
+
+                $this->sessionTools->clearSession($this->session->getId());
+
+                throw new \Exception('User session deleted in DB by administrator via force logout.');
+            }
         }
 
         if (!$this->account) {
