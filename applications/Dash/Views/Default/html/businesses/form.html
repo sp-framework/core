@@ -5,6 +5,7 @@
     {% set businessAbn = business['abn'] %}
     {% set businessType = business['type'] %}
     {% set businessParentId = business['parent'] %}
+    {% set businessAddressId = business['address_id'] %}
     {% set businessStreetAddress = business['street_address'] %}
     {% set businessStreetAddress2 = business['street_address_2'] %}
     {% set businessCityId = business['city_id'] %}
@@ -21,6 +22,7 @@
     {% set businessAbn = '' %}
     {% set businessType = '1' %}
     {% set businessParentId = '' %}
+    {% set businessAddressId = '' %}
     {% set businessStreetAddress = '' %}
     {% set businessStreetAddress2 = '' %}
     {% set businessCityId = '' %}
@@ -54,7 +56,8 @@
                         'fieldType'                      : 'files/croppie',
                         'fieldValue'                     : businessLogo,
                         'imageType'                      : 'logo',
-                        'storageType'                    : 'public'
+                        'storageType'                    : 'public',
+                        'logoLink'                       : logoLink
                     ]
                 )}}
             </div>
@@ -227,6 +230,26 @@
         <hr>
         <div class="row">
             <div class="col-md-12 col-sm-12">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'address_id',
+                        'fieldLabel'                     : 'Business Address ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Business Address ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : businessAddressId
+                    ]
+                )}}
                 {% include 'common/address/view' with
                     [
                         'component'                                   : component,
@@ -429,6 +452,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-parent'                  : {
             'placeholder' : 'SELECT PARENT BUSINESS'
         },
+        '{{componentId}}-{{sectionId}}-address_id'              : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-abn'                    : 'required',

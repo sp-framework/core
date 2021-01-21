@@ -40,6 +40,8 @@ class BusinessesComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
+            $this->view->logoLink = '';
+
             $businessesArr = $this->businesses->getAll()->businesses;
             $businesses = [];
 

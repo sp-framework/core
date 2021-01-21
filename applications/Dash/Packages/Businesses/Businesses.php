@@ -15,6 +15,12 @@ class Businesses extends BasePackage
 
     public function addBusiness(array $data)
     {
+        $data['package_name'] = $this->packageName;
+
+        $this->basepackages->addressbook->addAddress($data);
+
+        $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
+
         if ($this->add($data)) {
             $this->packagesData->responseCode = 0;
 
@@ -28,6 +34,10 @@ class Businesses extends BasePackage
 
     public function updateBusiness(array $data)
     {
+        $data['package_name'] = $this->packageName;
+
+        $this->basepackages->addressbook->mergeAndUpdate($data);
+
         if ($this->update($data)) {
             $this->packagesData->responseCode = 0;
 
@@ -42,6 +52,7 @@ class Businesses extends BasePackage
     public function removeBusiness(array $data)
     {
         //Check relations before removing.
+        //Remove Address
         if ($this->remove($data['id'])) {
             $this->packagesData->responseCode = 0;
 
