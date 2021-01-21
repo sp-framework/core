@@ -1,5 +1,5 @@
 /* exported BazContentSection */
-/* globals */
+/* globals BazContentFields */
 /*
 * @title                    : BazContentSection
 * @description              : Baz Core Lib
@@ -33,7 +33,10 @@ var BazContentSection = function() {
         if (!dataCollection[componentId][sectionId]) {
             dataCollection[componentId][sectionId] = { };
         }
-        $('#' + sectionId).BazContentFields();
+        BazContentFields.init({
+            'componentId'   : componentId,
+            'sectionId'     : sectionId
+        });
     }
 
     function bazContentSection() {

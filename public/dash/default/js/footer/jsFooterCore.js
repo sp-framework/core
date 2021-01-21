@@ -2939,7 +2939,7 @@ var BazHelpers = function() {
     return bazHelpersConstructor;
 }();
 /* exported BazContentSection */
-/* globals */
+/* globals BazContentFields */
 /*
 * @title                    : BazContentSection
 * @description              : Baz Core Lib
@@ -2973,7 +2973,10 @@ var BazContentSection = function() {
         if (!dataCollection[componentId][sectionId]) {
             dataCollection[componentId][sectionId] = { };
         }
-        $('#' + sectionId).BazContentFields();
+        BazContentFields.init({
+            'componentId'   : componentId,
+            'sectionId'     : sectionId
+        });
     }
 
     function bazContentSection() {
@@ -3004,7 +3007,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
     }
 });
 
-/* globals define exports BazContentFieldsValidator PNotify Pace BazCore BazContentLoader */
+/* globals define exports BazContentFieldsValidator BazContentFields PNotify Pace BazCore BazContentLoader */
 /*
 * @title                    : BazContentSectionWithForm
 * @description              : Baz Lib for Content (Sections With Form)
@@ -3039,7 +3042,11 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
             sectionId,
             extractComponentId,
             that,
-            thatV;
+            thatV,
+            formJsTreeSelector;
+        var types = { };
+        var tabIds = [];
+        var validationObject = { };
 
         var BazContentSectionWithForm = function () {
             function BazContentSectionWithForm(element, settings) {
@@ -3074,12 +3081,22 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     dataCollection[componentId][sectionId]['dataToSubmit'] = { };
                 }
 
-                $(this._element).BazContentFields();
-
-                BazContentFieldsValidator.initValidator({
+                validationObject = {
                     'componentId'   : componentId,
                     'sectionId'     : sectionId,
                     'on'            : 'section'
+                }
+
+                if ($('#' + sectionId + '-form-fields').length > 0) {
+                    this._buildFormJsTree();
+                    validationObject['formJsTreeSelector'] = formJsTreeSelector;
+                }
+
+                BazContentFieldsValidator.initValidator(validationObject);
+
+                BazContentFields.init({
+                    'componentId'   : componentId,
+                    'sectionId'     : sectionId
                 });
 
                 if (options.task === 'validateForm') {
@@ -3092,19 +3109,145 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
             };
 
             _proto._validateForm = function _validateForm() {
-                var validated = BazContentFieldsValidator.validateForm({
+                validationObject = {
                     'componentId'     : componentId,
                     'sectionId'       : sectionId,
                     'onSuccess'       : false,
                     'type'            : 'section',
                     'preValidated'    : false,
-                    'formId'          : null
-                });
+                    'formId'          : null,
+                    'on'              : 'section'
+                }
+                if ($('#' + sectionId + '-form-fields').length > 0) {
+                    validationObject['formJsTreeSelector'] = formJsTreeSelector;
+                }
+                var validated = BazContentFieldsValidator.validateForm(validationObject);
+
                 return validated;
             };
 
-            _proto._initSectionButtonsAndActions = function _initSectionButtonsAndActions() {
+            _proto._redoFormJsTree = function _redoFormJsTree() {
+                $(formJsTreeSelector).jstree('destroy');
+                that._buildFormJsTree();
+                BazContentFields.init({'fieldId':formJsTreeSelector[0].id});
 
+                validationObject = {
+                    'on'              : 'section',
+                    'type'            : 'section',
+                    'formLocation'    : sectionId
+                }
+                if ($('#' + sectionId + '-form-fields').length > 0) {
+                    validationObject['formJsTreeSelector'] = formJsTreeSelector;
+                }
+                BazContentFieldsValidator.cancelValidatingForm(validationObject);//cancel any form validation as jstree has changed
+            }
+
+            _proto._buildFormJsTree = function _buildFormJsTree() {
+                formJsTreeSelector = $('#' + sectionId + '-form-fields');
+
+                $(formJsTreeSelector).empty();
+
+                // Create Tree
+                $(formJsTreeSelector).append('<ul></ul>');
+
+                // Grab Icons from Controller
+                types.item = {"icon" : "fas fa-fw fa-angle-right"};
+
+                // Grab Fields from Tabs Note: attr "jstree-search" is used to populate tree
+                $('#' + sectionId + '-form .nav-tabs li a').each(function() {
+                    var tabId = $(this).attr('href').replace('#', '');
+                    tabIds.push(tabId);
+                    var tabName = $(this).html().toUpperCase();
+
+                    types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
+
+                    $(formJsTreeSelector).
+                        find('ul').
+                        first().
+                        append(
+                            '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                            '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                            '</li>'
+                        );
+
+                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').first().append('<ul></ul>');
+
+                    $('#' + tabId).find("[jstree-search]").each(function() {
+                        var fieldId = this.id.replace('-jstreesearch', '');
+
+                        if ($(this).attr('jstree-search') !== '') {
+                            if (!$('#' + fieldId).parents('.form-group').hasClass('d-none') &&
+                                $('#' + fieldId).attr('disabled') !== 'disabled'
+                            ) {
+                                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').
+                                    // find('ul').
+                                    // first().
+                                    $('[data-tabid="' + tabId + '-ul"]').append(
+                                        '<li data-tabid="' + tabId +
+                                            '" data-jstreeid="' + $(this)[0].id +
+                                            '" data-jstree=' + '{"type":' + '"item"}>' +
+                                            $(this).attr('jstree-search') +
+                                        '</li>'
+                                );
+                            }
+                        }
+                    });
+                });
+
+                dataCollection[componentId][sectionId][sectionId + '-form-fields'] =
+                    $.extend(dataCollection[componentId][sectionId][sectionId + '-form-fields'], {
+                        "types" : types,
+                        "plugins": ["search","types"],
+                        "search": {
+                            'show_only_matches': true,
+                            'search_callback'  : function(str, node) {
+                                var word, words = [];
+                                var searchFor = str.toUpperCase().replace(/^\s+/g, '').replace(/\s+$/g, '');
+                                if (searchFor.indexOf(',') >= 0) {
+                                    words = searchFor.split(',');
+                                } else {
+                                    words = [searchFor];
+                                }
+                                for (var i = 0; i < words.length; i++) {
+                                    word = words[i];
+                                    if ((node.text || "").indexOf(word) >= 0) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        }
+                    });
+
+                // Init jstree selection process
+                $(formJsTreeSelector).on('select_node.jstree', function() {
+                    var selfId = $(this).jstree('get_selected',true)[0];
+                    if (selfId.parent === '#') {
+                        $(formJsTreeSelector).jstree('open_node', selfId);
+                    } else {
+                        $(tabIds).each(function(index,tabId) {
+                            var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
+
+                            $(tab).removeClass('active');
+                            $(tab).attr('area-selected', false);
+                            $('#' + tabId).removeClass('active show');
+                        })
+
+                        var activateTab = $('#' + sectionId + '-form').find('[href="#' + selfId.data.tabid + '"]');
+                        $(activateTab).addClass('active');
+                        $(activateTab).attr('area-selected', true);
+
+                        $('#' + selfId.data.tabid).addClass('active show');
+
+                        $('#' + selfId.data.jstreeid).parent().addClass('bg-info disabled animated fadeIn');
+                        setTimeout(function() {
+                            $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
+                        }, 2000);
+                    }
+                });
+            }
+
+            _proto._initSectionButtonsAndActions = function _initSectionButtonsAndActions() {
                 if ($('#' + sectionId + '-id').val() === '') {
                     $('#' + sectionId + ' .card-footer button.addData').attr('hidden', false);
                     $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
@@ -3401,7 +3544,7 @@ exports.BazContentSectionWithForm = BazContentSectionWithForm;
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-/* globals define exports BazContentFieldsValidator BazContentFieldsValidator PNotify */
+/* globals define exports BazContentFieldsValidator BazContentFields PNotify */
 /*
 * @title                    : BazContentSectionWithFormToDatatable
 * @description              : Baz Lib for Content (Sections With Form)
@@ -3479,14 +3622,16 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 if (options.task === 'tableDataToObj') {
                     this._tableDataToObj();
                 } else {
-                    $(this._element).BazContentFields();
+                    BazContentFields.init({
+                        'componentId'   : componentId,
+                        'sectionId'     : sectionId
+                    });
 
                     BazContentFieldsValidator.initValidator({
                         'componentId'   : componentId,
                         'sectionId'     : sectionId,
                         'on'            : 'section'
                     });
-
                     this._fieldsToDatatable(sectionId);
                 }
 
@@ -3503,7 +3648,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     'onSuccess'       : onSuccess,
                     'type'            : type,
                     'preValidated'    : preValidated,
-                    'formId'          : formId
+                    'formId'          : formId,
+                    'on'              : 'section'
                 });
 
                 return validated;
@@ -4590,7 +4736,7 @@ exports.BazContentSectionWithFormToDatatable = BazContentSectionWithFormToDatata
 Object.defineProperty(exports, '__esModule', { value: true });
 
 }));
-/* globals define exports BazContentLoader Swal PNotify */
+/* globals define exports BazContentLoader BazContentFields Swal PNotify */
 /*
 * @title                    : BazContentSectionWithListing
 * @description              : Baz Lib for Content (Sections With Form)
@@ -4671,21 +4817,26 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
             //Build listing filters
             _proto._buildListingFilters = function() {
-                $('#' + sectionId + '-sharing').BazContentFields();
+                BazContentFields.init({
+                    'componentId'   : componentId,
+                    'sectionId'     : sectionId
+                });
                 $(this._element).BazContentSectionWithFormToDatatable();
 
                 function toggleFilterButtons(sectionId) {
-                    if ($('#' + sectionId + '-filters option:selected').data()['type'] === 0 || //System
-                        $('#' + sectionId + '-filters option:selected').data()['type'] === 2    //Shared
-                    ) {
+                    if ($('#' + sectionId + '-filters option:selected').data()['filter_type'] == 0) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
                         $('#' + sectionId + '-delete').addClass('disabled');
-
-                    } else if ($('#' + sectionId + '-filters option:selected').data()['type'] === 1) {
+                    } else if ($('#' + sectionId + '-filters option:selected').data()['filter_type'] == 1) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", false);
                         $('#' + sectionId + '-delete').removeClass('disabled');
                     }
+                    if ($('#' + sectionId + '-filters option:selected').data()['shared'] == 1) {
+                        $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
+                        $('#' + sectionId + '-delete').addClass('disabled');
+                    }
                 }
+                        // $('#' + sectionId + '-filters option:selected').data()['filter_type'] === 1    //User
 
                 toggleFilterButtons(sectionId);
 
@@ -4712,71 +4863,114 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     var filterUrl = $('#' + sectionId + '-filter-filters option:selected').data()['url'];
                     var sharedIds = $('#' + sectionId + '-filter-filters option:selected').data()['shared_ids'];
-                    //eslint-disable-next-line
-                    console.log(sharedIds);
-                    if (sharedIds.rids) {
+
+                    if (sharedIds && sharedIds.rids) {
                         for (var rid in sharedIds.rids) {
-                            $('#' + sectionId + '-filter-sharing-rids').find('[data-value="' + rid + '"]').attr('selected', true);
+                            $('#' + sectionId + '-filter-sharing-rids').append(
+                                '<option value="' + sharedIds.rids[rid]['id'] + '" selected>' + sharedIds.rids[rid]['name'] + '</option>'
+                            );
                         }
-                        $('#' + sectionId + '-filter-sharing-rids').trigger('change');
+                        $('#' + sectionId + '-filter-sharing-rids').trigger('select2:change');
                     }
 
-                    // if (sharedIds.uids) {
-                    //     for (var uid in sharedIds.uids) {
-                    //         //Dynamically add user ids.
-                    //     }
-                    //     $('#' + sectionId + '-filter-sharing-rids').trigger('change');
-                    // }
+                    if (sharedIds && sharedIds.eids) {
+                        for (var eid in sharedIds.eids) {
+                            $('#' + sectionId + '-filter-sharing-eids').append(
+                                '<option value="' + sharedIds.eids[eid]['id'] + '" selected>' + sharedIds.eids[eid]['name'] + '</option>'
+                            );
+                        }
+                        $('#' + sectionId + '-filter-sharing-eids').trigger('select2:change');
+                    }
+
+                    if (sharedIds && sharedIds.aids) {
+                        for (var aid in sharedIds.aids) {
+                            $('#' + sectionId + '-filter-sharing-aids').append(
+                                '<option value="' + sharedIds.aids[aid]['id'] + '" selected>' + sharedIds.aids[aid]['name'] + '</option>'
+                            );
+                        }
+                        $('#' + sectionId + '-filter-sharing-aids').trigger('select2:change');
+                    }
 
                     $('#' + sectionId + '-filter-sharing-direct-url').val(filterUrl);
 
                     $('#' + sectionId + '-filter-sharing-modal').modal('show');
-                });
 
-                $('#' + sectionId + '-share-filter').click(function(e) {
-                    e.preventDefault();
-
-                    var rids = $('#' + sectionId + '-filter-sharing-rids').select2('data');
-                    var uids = $('#' + sectionId + '-filter-sharing-uids').select2('data');
-
-                    //Save To Db
-                    var postData = { };
-                    postData['id'] = $('#' + sectionId + '-filter-filters option:selected').data()['id'];
-                    postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
-                    postData['shared_ids'] = { };
-                    postData['shared_ids']['rids'] = { };
-                    $(rids).each(function(index, rid) {
-                        postData['shared_ids']['rids'][rid.id] = rid.text;
+                    //Share Buttons
+                    $('#' + sectionId + '-filter-share-filter, #' + sectionId + '-filter-sharing-modal-button-close').off();
+                    $('#' + sectionId + '-filter-sharing-modal-button-close').click(function() {
+                        $('#' + sectionId + '-filter-sharing-rids').empty().trigger('select2:change');
+                        $('#' + sectionId + '-filter-sharing-eids').empty().trigger('select2:change');
+                        $('#' + sectionId + '-filter-sharing-aids').empty().trigger('select2:change');
                     });
-                    postData['shared_ids']['uids'] = [];
-                    $(uids).each(function(index, uid) {
-                        postData['shared_ids']['uids'].push(uid.id);
-                    });
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    $('#' + sectionId + '-filter-share-filter').click(function(e) {
+                        e.preventDefault();
 
-                    var url = $(this).attr('href');
+                        var rids = $('#' + sectionId + '-filter-sharing-rids').select2('data');
+                        var uids;
+                        if ($('#' + sectionId + '-filter-sharing-eids').length > 0) {
+                            uids = $('#' + sectionId + '-filter-sharing-eids').select2('data');
+                        } else if ($('#' + sectionId + '-filter-sharing-aids').length > 0) {
+                            uids = $('#' + sectionId + '-filter-sharing-aids').select2('data');
+                        }
 
-                    //Update Filter
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
-                            PNotify.success({
-                                'title' : data.responseMessage
+                        //Save To Db
+                        var postData = { };
+                        postData['id'] = $('#' + sectionId + '-filter-filters option:selected').data()['id'];
+                        postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
+                        postData['filter_type'] = '1';
+                        postData['shared_ids'] = { };
+                        postData['shared_ids']['rids'] = [];
+                        if (rids.length > 0) {
+                            $(rids).each(function(index, rid) {
+                                postData['shared_ids']['rids'].push(rid.id);
                             });
-                            if (data.filters) {
-                                redoFiltersOptions(query, sectionId, data);
+                        }
+                        if ($('#' + sectionId + '-filter-sharing-eids').length > 0) {
+                            postData['shared_ids']['eids'] = [];
+                            if (uids.length > 0) {
+                                $(uids).each(function(index, eid) {
+                                    postData['shared_ids']['eids'].push(eid.id);
+                                });
                             }
-                        } else {
-                            PNotify.error({
-                                'title' : data.responseMessage
-                            });
+                        } else if ($('#' + sectionId + '-filter-sharing-aids').length > 0) {
+                            postData['shared_ids']['aids'] = [];
+                            if (uids.length > 0) {
+                                $(uids).each(function(index, aid) {
+                                    postData['shared_ids']['aids'].push(aid.id);
+                                });
+                            }
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
-                        }
-                    }, 'json');
+                        postData['shared_ids'] = JSON.stringify(postData['shared_ids']);
 
-                    $('#' + sectionId + '-filter-sharing-modal').modal('hide');
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                        var url = $(this).attr('href');
+
+                        // //Update Filter
+                        $.post(url, postData, function(data) {
+                            if (data.responseCode === 0) {
+                                PNotify.success({
+                                    'title' : data.responseMessage
+                                });
+                                if (data.filters) {
+                                    redoFiltersOptions(query, sectionId, data);
+                                }
+                            } else {
+                                PNotify.error({
+                                    'title' : data.responseMessage
+                                });
+                            }
+                            if ($('#security-token').length === 1) {
+                                $('#security-token').attr('name', data.tokenKey);
+                                $('#security-token').val(data.token);
+                            }
+                            $('#' + sectionId + '-filter-sharing-rids').empty().trigger('select2:change');
+                            $('#' + sectionId + '-filter-sharing-eids').empty().trigger('select2:change');
+                            $('#' + sectionId + '-filter-sharing-aids').empty().trigger('select2:change');
+                        }, 'json');
+
+                        $('#' + sectionId + '-filter-sharing-modal').modal('hide');
+                    });
                 });
 
                 //Reset
@@ -4846,27 +5040,25 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     var url = $(this).attr('href');
 
                     $.post(url, postData, function(data) {
-                                if (data.responseCode === 0) {
-                                    PNotify.success({
-                                        'title'     : data.responseMessage
-                                    });
-                                    if (data.filters) {
-                                        redoFiltersOptions('', sectionId, data);
-                                    }
-                                    resetFilters();
-                                    toggleFilterButtons(sectionId + '-filter');
-                                } else {
-                                    PNotify.error({
-                                        'title'     : data.responseMessage
-                                    });
-                                }
-                                if ($('#security-token').length === 1) {
-                                    $('#security-token').attr('name', data.tokenKey);
-                                    $('#security-token').val(data.token);
-                                }
-                            },
-                        'json'
-                    );
+                        if (data.responseCode === 0) {
+                            PNotify.success({
+                                'title'     : data.responseMessage
+                            });
+                            if (data.filters) {
+                                redoFiltersOptions('', sectionId, data);
+                            }
+                            resetFilters();
+                            toggleFilterButtons(sectionId + '-filter');
+                        } else {
+                            PNotify.error({
+                                'title'     : data.responseMessage
+                            });
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
+                    }, 'json');
 
                     toggleFilterButtons(sectionId + '-filter');
                 });
@@ -5290,7 +5482,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     postData['name'] = filterName;
                     postData['conditions'] = query;
                     postData['component_id'] = $(selectedFilter).data()['component_id'];
-                    postData['type'] = 1;
+                    postData['filter_type'] = '1';
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
                     if ($('#' + sectionId + '-filter-default')[0].checked === true) {
@@ -5341,6 +5533,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 function redoFiltersOptions(query, sectionId, data) {
                     var filtersOptions = '';
+
                     $.each(data.filters, function(index, filter) {
                         filtersOptions += '<option ';
                         var filterName = filter['name'];
@@ -5354,13 +5547,17 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         if (filter['is_default'] == '1') {
                             filterName = filter['name'] + ' (Default)';
                         }
-                        if (filter['type'] == '0') {
+                        if (filter['filter_type'] == '0') {
                             filterName = filter['name'] + ' (System)';
-                        } else if (filter['type'] == '2') {
-                            filterName = filter['name'] + ' (Shared)';
+                        // } else if (filter['filter_type'] == '2') {
+                        //     filterName = filter['name'] + ' (Shared)';
                         }
                         if (filter['shared_ids']) {
-                            filterName = filter['name'] + ' (Shared by ' + filter['account_name'] + ')';
+                            if (filter['employee_full_name']) {
+                                filterName = filter['name'] + ' (Shared by ' + filter['employee_full_name'] + ')';
+                            } else if (filter['account_email']) {
+                                filterName = filter['name'] + ' (Shared by ' + filter['account_email'] + ')';
+                            }
                         }
 
                         if (filter['conditions'] === query) {
@@ -7409,7 +7606,8 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
     }
 });
 
-/* globals define exports PNotify flatpickr */
+/* exported BazContentFields */
+/* globals PNotify flatpickr */
 /*
 * @title                    : BazContentFields
 * @description              : Baz Lib for Content (Sections With Form)
@@ -7418,726 +7616,788 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete', function() {
 * @functions                :
 * @options                  :
 */
-(function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = global || self, factory(global.BazLibs = {}));
-}(this, function (exports) {
+// (function (global, factory) {
+//     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+//     typeof define === 'function' && define.amd ? define(['exports'], factory) :
+//     (global = global || self, factory(global.BazLibs = {}));
+// }(this, function (exports) {
 
-    var BazContentFields = function ($) {
+//     var BazContentFields = function ($) {
 
-        var NAME                    = 'BazContentFields';
-        var DATA_KEY                = 'baz.contentfields';
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+// var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+// eslint-disable-next-line no-unused-vars
+var BazContentFields = function() {
+    var BazContentFields = void 0;
+        // var NAME                    = 'BazContentFields';
+        // var DATA_KEY                = 'baz.contentfields';
         // var EVENT_KEY               = "." + DATA_KEY;
-        var JQUERY_NO_CONFLICT      = $.fn[NAME];
+        // var JQUERY_NO_CONFLICT      = $.fn[NAME];
         // var Event = {
         // };
         // var ClassName = {
         // };
         // var Selector = {
         // };
-        var Default = {
-        };
-        var componentId,
-            pnotifySound,
-            dataCollection,
-            sectionId,
-            that;
+        // var Default = {
+        // };
+    var componentId,
+        sectionId,
+        pnotifySound,
+        dataCollection;
 
-        var BazContentFields = function () {
-            function BazContentFields(element, settings) {
-                that = this;
-                this._element = element;
-                this._settings = $.extend({}, Default, settings);
+    var minValText, maxValText, minLengthText, maxLengthText, thisFieldId;
 
-                if ($('body').find('.flatpickr-calendar').length > 0) {
-                    $('body').find('.flatpickr-calendar').remove();
-                }
-                if ($('body').find('.dz-hidden-input').length > 0) {
-                    $('body').find('.dz-hidden-input').remove();
-                }
+    // Error
+    function error(errorMsg) {
+        throw new Error(errorMsg);
+    }
 
-                this._init(this._settings);
-                this._bazInitFields(this._settings);
-            }
+    //Init
+    function init(options) {
+        componentId = options.componentId;
+        sectionId = options.sectionId;
+        dataCollection = window['dataCollection'];
+        pnotifySound = dataCollection.env.sounds.pnotifySound;
 
-            var _proto = BazContentFields.prototype;
+        if ($('body').find('.flatpickr-calendar').length > 0) {
+            $('body').find('.flatpickr-calendar').remove();
+        }
+        if ($('body').find('.dz-hidden-input').length > 0) {
+            $('body').find('.dz-hidden-input').remove();
+        }
+    }
 
-            _proto._error = function(message) {
-                throw new Error(message);
-            };
+        // var BazContentFields = function () {
+        //     function BazContentFields(element, settings) {
+        //         that = this;
+        //         this._element = element;
+        //         this._settings = $.extend({}, Default, settings);
 
-            _proto._init = function _init() {
-                componentId = $(this._element).parents('.component')[0].id;
-                sectionId = $(this._element)[0].id;
-                dataCollection = window['dataCollection'];
-                pnotifySound = dataCollection.env.sounds.pnotifySound
+        //         if ($('body').find('.flatpickr-calendar').length > 0) {
+        //             $('body').find('.flatpickr-calendar').remove();
+        //         }
+        //         if ($('body').find('.dz-hidden-input').length > 0) {
+        //             $('body').find('.dz-hidden-input').remove();
+        //         }
 
-                // Grab Components HTML Code (future use)
-                // if (!dataCollection[componentId].html){
-                //     dataCollection[componentId].html = $('#' + componentId).parents('.container-fluid').html();
-                // }
-                // dataCollection[componentId][sectionId].html = $('#' + sectionId).html();
+        //         this._init();
+        //         if (this._settings.fieldId) {
+        //             this._bazInitField();
+        //         } else {
+        //             this._bazInitFields();
+        //         }
+        //     }
 
-                // TODO Decide what to do with section without any fields.
-                // I can only think of tabs being made available via section, which needs to be initialized.
-                // ALSO TABS CAN HAVE OPTION TO ENABLE A PARTICULAR TABID or FIRST TAB ID
-            };
+        //     var _proto = BazContentFields.prototype;
 
-            _proto._bazInitFields = function _bazInitFields() {
+        //     _proto._error = function(message) {
+        //         throw new Error(message);
+        //     };
+
+        //     _proto._init = function _init() {
+        //         componentId = $(this._element).parents('.component')[0].id;
+        //         sectionId = $(this._element)[0].id;
+        //         dataCollection = window['dataCollection'];
+        //         pnotifySound = dataCollection.env.sounds.pnotifySound
+
+        //         // Grab Components HTML Code (future use)
+        //         // if (!dataCollection[componentId].html){
+        //         //     dataCollection[componentId].html = $('#' + componentId).parents('.container-fluid').html();
+        //         // }
+        //         // dataCollection[componentId][sectionId].html = $('#' + sectionId).html();
+
+        //         // TODO Decide what to do with section without any fields.
+        //         // I can only think of tabs being made available via section, which needs to be initialized.
+        //         // ALSO TABS CAN HAVE OPTION TO ENABLE A PARTICULAR TABID or FIRST TAB ID
+        //     };
+
+        //     _proto._bazInitField = function _bazInitField() {
+        //     };
+
+            // _proto._bazInitFields = function _bazInitFields() {
                 // tableData[sectionId] = { };//building object used during save
-                var minValText, maxValText, minLengthText, maxLengthText, thisFieldId;
+    function initFields(options = null) {
+        var fields;
+        if (options && options.fieldId) {
+            fields = $('#' + sectionId).find('#' + options.fieldId);
+        } else {
+            fields = $('#' + sectionId).find('[data-bazscantype]');
+        }
 
-                // Iterate through the component
-                $('#' + sectionId).find('[data-bazscantype]').each(function(index,bazScanField) {
-                    // if (bazScanField.tagName !== 'FIELDSET' && $(bazScanField).parents('fieldset').data('bazscantype') !== 'datatable') {
-                        if (dataCollection[componentId][sectionId][bazScanField.id]) {
-                            dataCollection[componentId][sectionId][bazScanField.id].bazScanType = bazScanField.dataset.bazscantype;
-                            if (bazScanField.dataset.bazscantype === 'input') {
-                                initInput(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'select2') {
-                                initSelect2(bazScanField.id, sectionId, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'checkbox') {
-                                initCheckbox(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'radio' || bazScanField.dataset.bazscantype === 'radio-button-group') {
-                                initRadio(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'flatpickr') {
-                                initFlatpickr(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'textarea') {
-                                initTextarea(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'trumbowyg') {
-                                initTrumbowyg(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'counters') {
-                                initCounters(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'jstree') {
-                                initJstree(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'html') {
-                                initHTML(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'dropzone') {
-                                initDropzone(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            } else if (bazScanField.dataset.bazscantype === 'datatable') {
-                                initDatatable(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
-                            }
+        // Iterate through the component
+        $(fields).each(function(index,bazScanField) {
+            // if (bazScanField.tagName !== 'FIELDSET' && $(bazScanField).parents('fieldset').data('bazscantype') !== 'datatable') {
+                if (dataCollection[componentId][sectionId][bazScanField.id]) {
+                    dataCollection[componentId][sectionId][bazScanField.id].bazScanType = bazScanField.dataset.bazscantype;
+                    if (bazScanField.dataset.bazscantype === 'input') {
+                        initInput(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'select2') {
+                        initSelect2(bazScanField.id, sectionId, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'checkbox') {
+                        initCheckbox(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'radio' || bazScanField.dataset.bazscantype === 'radio-button-group') {
+                        initRadio(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'flatpickr') {
+                        initFlatpickr(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'textarea') {
+                        initTextarea(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'trumbowyg') {
+                        initTrumbowyg(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'counters') {
+                        initCounters(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'jstree') {
+                        initJstree(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'html') {
+                        initHTML(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'dropzone') {
+                        initDropzone(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'datatable') {
+                        initDatatable(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    }
+                } else {
+                    error('Individual sections parameters missing for ' + bazScanField.id);
+                }
+            // }
+        });
+        dataCollection[componentId][sectionId]['initFields'] = true;
+    }
+
+    function maxLength(fieldId, options) {
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        if (fieldId.hasAttribute('minlength') ||
+            fieldId.hasAttribute('maxlength') ||
+            fieldId.hasAttribute('max')) {
+            if (fieldId.hasAttribute('maxlength')) {
+                maxLengthText = ' UsedChar: %charsTyped% MaxChar: %charsTotal%';
+            } else {
+                maxLengthText = '';
+            }
+            if (fieldId.hasAttribute('minlength')) {
+                minLengthText = 'MinChar: ' + fieldId.attributes.minlength.value + ' ';
+            } else {
+                minLengthText = '';
+            }
+            if (fieldId.hasAttribute('min')) {
+                minValText = 'MinVal: ' + fieldId.attributes.min.value + ' ';
+                options.customMaxAttribute = 'min';
+            } else {
+                minValText = '';
+            }
+            if (fieldId.hasAttribute('max')) {
+                maxValText = 'MaxVal: ' + fieldId.attributes.max.value + ' ';
+                options.customMaxAttribute = 'max';
+            } else {
+                maxValText = '';
+            }
+            options = $.extend({
+                currentInput            : $(fieldId),
+                alwaysShow              : true,
+                allowOverMax            : false,
+                thresholdAmount         : 5,
+                thresholdPercent        : 20,
+                message                 : minValText + maxValText + minLengthText + maxLengthText,
+                placement               : 'top-right-inside'
+            }, options);
+            dataCollection[componentId][sectionId][thisFieldId]['maxlength'] = $(fieldId).maxlength(options);
+        }
+    }
+
+    // Restricts input for each element in the set of matched elements to the given fieldInputTypeTextFilter.
+    function applyInputFilter(field, filter) {
+        if (!$.fn.inputFilter) {
+            (function($) {
+                $.fn.inputFilter = function(inputFilter) {
+                    return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
+                        if (inputFilter(this.value)) {
+                            this.oldValue = this.value;
+                            this.oldSelectionStart = this.selectionStart;
+                            this.oldSelectionEnd = this.selectionEnd;
+                        } else if (this.hasOwnProperty("oldValue")) {
+                            this.value = this.oldValue;
+                            this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
                         } else {
-                            that._error('Individual sections parameters missing for ' + bazScanField.id);
+                            this.value = "";
                         }
-                    // }
+                    });
+                };
+            }(jQuery));
+        }
+
+        if (filter === 'int') {
+            $(field).inputFilter(function(value) {
+              return /^-?\d*$/.test(value);
+            });
+        } else if (filter === 'positiveInt') {
+            $(field).inputFilter(function(value) {
+              return /^\d*$/.test(value);
+            });
+        } else if (filter === 'positiveIntMax') {
+            $(field).inputFilter(function(value) {
+              return /^\d*$/.test(value) && (value === "" || parseInt(value) <= $(field).attr('max'));
+            });
+        } else if (filter === 'float') {
+            $(field).inputFilter(function(value) {
+              return /^-?\d*[.]?\d*$/.test(value);
+            });
+        } else if (filter === 'positiveFloat') {
+            $(field).inputFilter(function(value) {
+              return /^\d*[.]?\d*$/.test(value);
+            });
+        } else if (filter === 'positiveFloatMax') {
+            $(field).inputFilter(function(value) {
+              return /^\d*[.]?\d*$/.test(value) && (value === "" || parseFloat(value) <= $(field).attr('max'));
+            });
+        } else if (filter === 'percent') {
+            $(field).inputFilter(function(value) {
+              return /^-?\d*[.]?\d{0,2}$/.test(value);
+            });
+        } else if (filter === 'positivePercent') {
+            $(field).inputFilter(function(value) {
+              return /^\d*[.]?\d{0,2}$/.test(value);
+            });
+        } else if (filter === 'positivePercentMax') {
+            $(field).inputFilter(function(value) {
+              return /^\d*[.]?\d{0,2}$/.test(value) && (value === "" || parseFloat(value) <= $(field).attr('max'));
+            });
+        } else if (filter === 'currency') {
+            $(field).inputFilter(function(value) {
+              return /^-?\d*[.,]?\d{0,2}$/.test(value);
+            });
+        } else if (filter === 'positiveCurrency') {
+            $(field).inputFilter(function(value) {
+              return /^\d*[.,]?\d{0,2}$/.test(value);
+            });
+        } else if (filter === 'positiveCurrencyMax') {
+            $(field).inputFilter(function(value) {
+              return /^\d*[.,]?\d{0,2}$/.test(value) && (value === "" || parseFloat(value) <= $(field).attr('max'));
+            });
+        } else if (filter === 'char') {
+            $(field).inputFilter(function(value) {
+              return /^[a-z]*$/i.test(value);
+            });
+        } else if (filter === 'hex') {
+            $(field).inputFilter(function(value) {
+              return /^[0-9a-f]*$/i.test(value);
+            });
+        }
+    }
+
+    function initInput(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        var buttonId, button, buttonArr;
+
+        if (fieldId.previousElementSibling && fieldId.previousElementSibling.children[0]) {
+            if (fieldId.previousElementSibling.children[0].classList.contains('dropdown-toggle')) {
+                buttonArr = fieldId.previousElementSibling.children[1].querySelectorAll('a');
+                for (button = buttonArr.length - 1; button >= 0; button--) {
+                    buttonId = buttonArr[button].id;
+                    if (options[buttonId]) {
+                        buttonArr[button].addEventListener('click', function(buttonId) {
+                            options[buttonId.target.id]();//call function
+                        }, false);
+                    }
+                }
+            } else if (!fieldId.previousElementSibling.children[0].classList.contains('dropdown-toggle')) {
+                if (fieldId.previousElementSibling.children[0].tagName === 'BUTTON') {
+                    buttonId = fieldId.previousElementSibling.children[0].id;
+                    if (options[buttonId]) {
+                        buttonId.addEventListener('click', function(buttonId) {
+                            options[buttonId]();//call function
+                        }, false);
+                    }
+                }
+            }
+        }
+        if (fieldId.nextElementSibling && fieldId.nextElementSibling.children[0]) {
+            if (fieldId.nextElementSibling.children[0].classList.contains('dropdown-toggle')) {
+                buttonArr = fieldId.nextElementSibling.children[1].querySelectorAll('a');
+                for (button = buttonArr.length - 1; button >= 0; button--) {
+                    buttonId = buttonArr[button].id;
+                    if (options[buttonId]) {
+                        buttonArr[button].addEventListener('click', function(buttonId) {
+                            options[buttonId.target.id]();//call function
+                        }, false);
+                    }
+                }
+            } else if (!fieldId.nextElementSibling.children[0].classList.contains('dropdown-toggle')) {
+                if (fieldId.nextElementSibling.children[0].tagName === 'BUTTON') {
+                    buttonId = fieldId.nextElementSibling.children[0].id;
+                    if (options[buttonId]) {
+                        buttonId.addEventListener('click', function(buttonId) {
+                            options[buttonId]();//call function
+                        }, false);
+                    }
+                }
+            }
+        }
+        if ($(fieldId).attr('type') === 'text' && $(fieldId).data('fieldinputfilter')) {
+            applyInputFilter($(fieldId), $(fieldId).data('fieldinputfilter'));
+        }
+        maxLength(thisFieldId, options);
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initSelect2(fieldId, sectionId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        options = $.extend({
+            placeholder: 'MISSING PLACEHOLDER'
+        }, options);
+        dataCollection[componentId][sectionId][thisFieldId]['select2'] = $(fieldId).select2(options);
+        // validation
+        if (dataCollection[componentId][sectionId][sectionId + '-form'] &&
+            dataCollection[componentId][sectionId][sectionId + '-form'].rules[thisFieldId] === 'required') {
+            $(fieldId).on('change.select2', function() {
+                $(this).valid();
+            });
+        }
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initCheckbox(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initRadio(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        // Remove checked radio bg on toggle
+        if ($(fieldId).find('label.btn').length > 0) {
+            $(fieldId).find('label.btn').each(function() {
+                $(this).click(function() {
+                    $(this).siblings('label.btn').each(function() {
+                        $(this).removeClass(function(index, css) {
+                            return (css.match(/\bbg-\S+/g) || []).join(' ');
+                        });
+                    });
                 });
-                dataCollection[componentId][sectionId]['initFields'] = true;
+            });
+        }
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
 
-                function maxLength(fieldId, options) {
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    if (fieldId.hasAttribute('minlength') ||
-                        fieldId.hasAttribute('maxlength') ||
-                        fieldId.hasAttribute('max')) {
-                        if (fieldId.hasAttribute('maxlength')) {
-                            maxLengthText = ' UsedChar: %charsTyped% MaxChar: %charsTotal%';
-                        } else {
-                            maxLengthText = '';
-                        }
-                        if (fieldId.hasAttribute('minlength')) {
-                            minLengthText = 'MinChar: ' + fieldId.attributes.minlength.value + ' ';
-                        } else {
-                            minLengthText = '';
-                        }
-                        if (fieldId.hasAttribute('min')) {
-                            minValText = 'MinVal: ' + fieldId.attributes.min.value + ' ';
-                            options.customMaxAttribute = 'min';
-                        } else {
-                            minValText = '';
-                        }
-                        if (fieldId.hasAttribute('max')) {
-                            maxValText = 'MaxVal: ' + fieldId.attributes.max.value + ' ';
-                            options.customMaxAttribute = 'max';
-                        } else {
-                            maxValText = '';
-                        }
-                        options = $.extend({
-                            currentInput            : $(fieldId),
-                            alwaysShow              : true,
-                            allowOverMax            : false,
-                            thresholdAmount         : 5,
-                            thresholdPercent        : 20,
-                            message                 : minValText + maxValText + minLengthText + maxLengthText,
-                            placement               : 'top-right-inside'
-                        }, options);
-                        dataCollection[componentId][sectionId][thisFieldId]['maxlength'] = $(fieldId).maxlength(options);
-                    }
+    function initFlatpickr(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit();
+        }
+        // thisFieldId = fieldId;
+        // fieldId = $('#' + fieldId).parent();
+        options = $.extend({
+            mode            : 'single',
+            enableTime      : false,
+            altInput        : true,
+            altFormat       : "d-m-Y",
+            dateFormat      : "d-m-Y",
+        }, options);
+
+        dataCollection[componentId][sectionId][fieldId]['flatpickr'] = flatpickr('#' + fieldId, options);
+
+        if ($('#' + fieldId + '-clear').length > 0) {
+            $('#' + fieldId + '-clear').click(function() {
+                dataCollection[componentId][sectionId][fieldId]['flatpickr'].clear();
+                dataCollection[componentId][sectionId][fieldId]['flatpickr'].close();
+            });
+        }
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initTextarea(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        maxLength(thisFieldId, options);
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initTrumbowyg(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        options = $.extend({
+            imageWidthModalEdit: true,
+            urlProtocol: true,
+            tagsToRemove: ['script', 'link'],
+            btnsDef: {
+                image: {
+                    dropdown: ['insertImage', 'base64', 'upload', 'noembed'],
+                    ico: 'insertImage'
                 }
-
-                // Restricts input for each element in the set of matched elements to the given fieldInputTypeTextFilter.
-                function applyInputFilter(field, filter) {
-                    if (!$.fn.inputFilter) {
-                        (function($) {
-                            $.fn.inputFilter = function(inputFilter) {
-                                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
-                                    if (inputFilter(this.value)) {
-                                        this.oldValue = this.value;
-                                        this.oldSelectionStart = this.selectionStart;
-                                        this.oldSelectionEnd = this.selectionEnd;
-                                    } else if (this.hasOwnProperty("oldValue")) {
-                                        this.value = this.oldValue;
-                                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-                                    } else {
-                                        this.value = "";
-                                    }
-                                });
-                            };
-                        }(jQuery));
-                    }
-
-                    if (filter === 'int') {
-                        $(field).inputFilter(function(value) {
-                          return /^-?\d*$/.test(value);
-                        });
-                    } else if (filter === 'positiveInt') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*$/.test(value);
-                        });
-                    } else if (filter === 'positiveIntMax') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*$/.test(value) && (value === "" || parseInt(value) <= $(field).attr('max'));
-                        });
-                    } else if (filter === 'float') {
-                        $(field).inputFilter(function(value) {
-                          return /^-?\d*[.]?\d*$/.test(value);
-                        });
-                    } else if (filter === 'positiveFloat') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*[.]?\d*$/.test(value);
-                        });
-                    } else if (filter === 'positiveFloatMax') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*[.]?\d*$/.test(value) && (value === "" || parseFloat(value) <= $(field).attr('max'));
-                        });
-                    } else if (filter === 'percent') {
-                        $(field).inputFilter(function(value) {
-                          return /^-?\d*[.]?\d{0,2}$/.test(value);
-                        });
-                    } else if (filter === 'positivePercent') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*[.]?\d{0,2}$/.test(value);
-                        });
-                    } else if (filter === 'positivePercentMax') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*[.]?\d{0,2}$/.test(value) && (value === "" || parseFloat(value) <= $(field).attr('max'));
-                        });
-                    } else if (filter === 'currency') {
-                        $(field).inputFilter(function(value) {
-                          return /^-?\d*[.,]?\d{0,2}$/.test(value);
-                        });
-                    } else if (filter === 'positiveCurrency') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*[.,]?\d{0,2}$/.test(value);
-                        });
-                    } else if (filter === 'positiveCurrencyMax') {
-                        $(field).inputFilter(function(value) {
-                          return /^\d*[.,]?\d{0,2}$/.test(value) && (value === "" || parseFloat(value) <= $(field).attr('max'));
-                        });
-                    } else if (filter === 'char') {
-                        $(field).inputFilter(function(value) {
-                          return /^[a-z]*$/i.test(value);
-                        });
-                    } else if (filter === 'hex') {
-                        $(field).inputFilter(function(value) {
-                          return /^[0-9a-f]*$/i.test(value);
-                        });
-                    }
+            },
+            btns: [
+                ['viewHTML', 'formatting', 'historyUndo', 'historyRedo'],
+                ['fontfamily', 'fontsize', 'superscript', 'subscript'],
+                ['strong', 'em', 'del', 'lineheight', 'preformatted', 'specialChars'],
+                ['foreColor', 'backColor', 'link', 'image'],
+                ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+                ['unorderedList', 'orderedList', 'table', 'horizontalRule'],
+                ['removeformat', 'fullscreen']
+            ],
+            plugins: {
+                table: {
+                    rows: 4,
+                    columns: 4
                 }
+            }
+        }, options);
+        dataCollection[componentId][sectionId][thisFieldId]['trumbowyg'] =
+            $(fieldId).trumbowyg(options);
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
 
-                function initInput(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    var buttonId, button, buttonArr;
+    function initCounters(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
 
-                    if (fieldId.previousElementSibling && fieldId.previousElementSibling.children[0]) {
-                        if (fieldId.previousElementSibling.children[0].classList.contains('dropdown-toggle')) {
-                            buttonArr = fieldId.previousElementSibling.children[1].querySelectorAll('a');
-                            for (button = buttonArr.length - 1; button >= 0; button--) {
-                                buttonId = buttonArr[button].id;
-                                if (options[buttonId]) {
-                                    buttonArr[button].addEventListener('click', function(buttonId) {
-                                        options[buttonId.target.id]();//call function
-                                    }, false);
-                                }
-                            }
-                        } else if (!fieldId.previousElementSibling.children[0].classList.contains('dropdown-toggle')) {
-                            if (fieldId.previousElementSibling.children[0].tagName === 'BUTTON') {
-                                buttonId = fieldId.previousElementSibling.children[0].id;
-                                if (options[buttonId]) {
-                                    buttonId.addEventListener('click', function(buttonId) {
-                                        options[buttonId]();//call function
-                                    }, false);
-                                }
-                            }
-                        }
-                    }
-                    if (fieldId.nextElementSibling && fieldId.nextElementSibling.children[0]) {
-                        if (fieldId.nextElementSibling.children[0].classList.contains('dropdown-toggle')) {
-                            buttonArr = fieldId.nextElementSibling.children[1].querySelectorAll('a');
-                            for (button = buttonArr.length - 1; button >= 0; button--) {
-                                buttonId = buttonArr[button].id;
-                                if (options[buttonId]) {
-                                    buttonArr[button].addEventListener('click', function(buttonId) {
-                                        options[buttonId.target.id]();//call function
-                                    }, false);
-                                }
-                            }
-                        } else if (!fieldId.nextElementSibling.children[0].classList.contains('dropdown-toggle')) {
-                            if (fieldId.nextElementSibling.children[0].tagName === 'BUTTON') {
-                                buttonId = fieldId.nextElementSibling.children[0].id;
-                                if (options[buttonId]) {
-                                    buttonId.addEventListener('click', function(buttonId) {
-                                        options[buttonId]();//call function
-                                    }, false);
-                                }
-                            }
-                        }
-                    }
-                    if ($(fieldId).attr('type') === 'text' && $(fieldId).data('fieldinputfilter')) {
-                        applyInputFilter($(fieldId), $(fieldId).data('fieldinputfilter'));
-                    }
-                    maxLength(thisFieldId, options);
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initSelect2(fieldId, sectionId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    options = $.extend({
-                        placeholder: 'MISSING PLACEHOLDER'
-                    }, options);
-                    dataCollection[componentId][sectionId][thisFieldId]['select2'] = $(fieldId).select2(options);
-                    // validation
-                    if (dataCollection[componentId][sectionId][sectionId + '-form'] &&
-                        dataCollection[componentId][sectionId][sectionId + '-form'].rules[thisFieldId] === 'required') {
-                        $(fieldId).on('change.select2', function() {
-                            $(this).valid();
-                        });
-                    }
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initCheckbox(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initRadio(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    // Remove checked radio bg on toggle
-                    if ($(fieldId).find('label.btn').length > 0) {
-                        $(fieldId).find('label.btn').each(function() {
-                            $(this).click(function() {
-                                $(this).siblings('label.btn').each(function() {
-                                    $(this).removeClass(function(index, css) {
-                                        return (css.match(/\bbg-\S+/g) || []).join(' ');
-                                    });
-                                });
-                            });
-                        });
-                    }
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initFlatpickr(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit();
-                    }
-                    // thisFieldId = fieldId;
-                    // fieldId = $('#' + fieldId).parent();
-                    options = $.extend({
-                        mode            : 'single',
-                        enableTime      : false,
-                        altInput        : true,
-                        altFormat       : "d-m-Y",
-                        dateFormat      : "d-m-Y",
-                    }, options);
-
-                    dataCollection[componentId][sectionId][fieldId]['flatpickr'] = flatpickr('#' + fieldId, options);
-
-                    if ($('#' + fieldId + '-clear').length > 0) {
-                        $('#' + fieldId + '-clear').click(function() {
-                            dataCollection[componentId][sectionId][fieldId]['flatpickr'].clear();
-                            dataCollection[componentId][sectionId][fieldId]['flatpickr'].close();
-                        });
-                    }
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initTextarea(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    maxLength(thisFieldId, options);
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initTrumbowyg(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    options = $.extend({
-                        imageWidthModalEdit: true,
-                        urlProtocol: true,
-                        tagsToRemove: ['script', 'link'],
-                        btnsDef: {
-                            image: {
-                                dropdown: ['insertImage', 'base64', 'upload', 'noembed'],
-                                ico: 'insertImage'
-                            }
-                        },
-                        btns: [
-                            ['viewHTML', 'formatting', 'historyUndo', 'historyRedo'],
-                            ['fontfamily', 'fontsize', 'superscript', 'subscript'],
-                            ['strong', 'em', 'del', 'lineheight', 'preformatted', 'specialChars'],
-                            ['foreColor', 'backColor', 'link', 'image'],
-                            ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                            ['unorderedList', 'orderedList', 'table', 'horizontalRule'],
-                            ['removeformat', 'fullscreen']
-                        ],
-                        plugins: {
-                            table: {
-                                rows: 4,
-                                columns: 4
-                            }
-                        }
-                    }, options);
-                    dataCollection[componentId][sectionId][thisFieldId]['trumbowyg'] =
-                        $(fieldId).trumbowyg(options);
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initCounters(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
-                }
-
-                function initJstree(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit();
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    options = $.extend({ }, options);
-                    // Init
-                    dataCollection[componentId][sectionId][thisFieldId]['jstree'] = $(fieldId).jstree(options);
-                    // Search
-                    if (options.bazJstreeOptions.search == null || options.bazJstreeOptions.search) {
+    function initJstree(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit();
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        options = $.extend({ }, options);
+        // Init
+        dataCollection[componentId][sectionId][thisFieldId]['jstree'] = $(fieldId).jstree(options);
+        // Search
+        if (options.bazJstreeOptions.search == null || options.bazJstreeOptions.search) {
+            $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
+            $('#' + thisFieldId + '-tree-search-input').on('keyup', function() {
+                $(fieldId).jstree(true).search($(this).val());
+            });
+        }
+        var selectedNode;
+        // Add New Node
+        if (options.bazJstreeOptions.add == null || options.bazJstreeOptions.add) {
+            $('#' + thisFieldId + '-tools-add').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-add').click(function(e) {
+                e.preventDefault();
+                selectedNode = $(fieldId).jstree('get_selected', true);
+                // Check if node are selected and only 1 is selected
+                if ($(selectedNode).length !== 1) {
+                    PNotify.removeAll();
+                    PNotify.notice({
+                        title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
+                        text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to create a new node under it'
+                    });
+                    pnotifySound.play();
+                    return false;
+                } else {
+                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', true);
+                    $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
+                    $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', false);
+                    $('#' + thisFieldId + '-tree-add-input').focus();
+                    $('#' + thisFieldId + '-tree-add-input-cancel').click(function() {
+                        $('#' + thisFieldId + '-tree-add-input').val(null);
                         $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                        $('#' + thisFieldId + '-tree-search-input').on('keyup', function() {
-                            $(fieldId).jstree(true).search($(this).val());
-                        });
-                    }
-                    var selectedNode;
-                    // Add New Node
-                    if (options.bazJstreeOptions.add == null || options.bazJstreeOptions.add) {
-                        $('#' + thisFieldId + '-tools-add').attr('hidden', false);
-                        $('#' + thisFieldId + '-tools-add').click(function(e) {
-                            e.preventDefault();
-                            selectedNode = $(fieldId).jstree('get_selected', true);
-                            // Check if node are selected and only 1 is selected
-                            if ($(selectedNode).length !== 1) {
-                                PNotify.removeAll();
-                                PNotify.notice({
-                                    title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
-                                    text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to create a new node under it'
-                                });
-                                pnotifySound.play();
-                                return false;
-                            } else {
-                                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', true);
-                                $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
-                                $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', false);
-                                $('#' + thisFieldId + '-tree-add-input').focus();
-                                $('#' + thisFieldId + '-tree-add-input-cancel').click(function() {
-                                    $('#' + thisFieldId + '-tree-add-input').val(null);
-                                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                                    $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', true);
-                                    $('#' + thisFieldId + '-tree-add-input-success').off();
-                                });
-                                $('#' + thisFieldId + '-tree-add-input-success').click(function() {
-                                    modifyJsTree($(fieldId), thisFieldId, 'addNode', this, $('#' + thisFieldId + '-tree-add-input'), selectedNode, options.bazJstreeOptions.addFunction);
-                                });
-                                $('#' + thisFieldId + '-tree-add-input').keypress(function() {
-                                    var keycode = (event.keyCode ? event.keyCode : event.which);
-                                    if(keycode == '13'){
-                                        modifyJsTree($(fieldId), thisFieldId, 'addNode', this, $('#' + thisFieldId + '-tree-add-input-success'), selectedNode, options.bazJstreeOptions.addFunction);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    // Edit Selected Node
-                    if (options.bazJstreeOptions.edit == null || options.bazJstreeOptions.edit) {
-                        $('#' + thisFieldId + '-tools-edit').attr('hidden', false);
-                        $('#' + thisFieldId + '-tools-edit').click(function() {
-                        selectedNode = $(fieldId).jstree('get_selected', true);
-                        // Check if node are selected and only 1 is selected
-                            if ($(selectedNode).length !== 1) {
-                                PNotify.removeAll();
-                                PNotify.notice({
-                                    title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
-                                    text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to rename',
-                                });
-                                pnotifySound.play();
-                                return false;
-                            } else {
-                                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', true);
-                                $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', false);
-                                $('#' + thisFieldId + '-tree-edit-input').val(selectedNode[0].text).focus();
-                                $('#' + thisFieldId + '-tree-edit-input-cancel').click(function() {
-                                    $('#' + thisFieldId + '-tree-edit-input').val(null);
-                                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                                    $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
-                                    $('#' + thisFieldId + '-tree-edit-input-success').off();
-                                });
-                                $('#' + thisFieldId + '-tree-edit-input-success').click(function() {
-                                    modifyJsTree($(fieldId), thisFieldId, 'editNode', this, $('#' + thisFieldId + '-tree-edit-input'), selectedNode, options.bazJstreeOptions.editFunction);
-                                });
-                                $('#' + thisFieldId + '-tree-edit-input').keypress(function() {
-                                    var keycode = (event.keyCode ? event.keyCode : event.which);
-                                    if(keycode == '13'){
-                                        modifyJsTree($(fieldId), thisFieldId, 'editNode', this, $('#' + thisFieldId + '-tree-edit--input-success'), selectedNode, options.bazJstreeOptions.editFunction);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    // Collapse all Nodes
-                    if (options.bazJstreeOptions.collapse == null || options.bazJstreeOptions.collapse) {
-                        $('#' + thisFieldId + '-tools-collapse').attr('hidden', false);
-                        $('#' + thisFieldId + '-tools-collapse').click(function(e) {
-                            e.preventDefault();
-                            $(fieldId).jstree('deselect_all');
-                            $(fieldId).jstree('close_all');
-                        });
-                    }
-                    // Expand all Nodes
-                    if (options.bazJstreeOptions.expand == null || options.bazJstreeOptions.expand) {
-                        $('#' + thisFieldId + '-tools-expand').attr('hidden', false);
-                        $('#' + thisFieldId + '-tools-expand').click(function(e) {
-                            e.preventDefault();
-                            $(fieldId).jstree('deselect_all');
-                            $(fieldId).jstree('open_all');
-                        });
-                    }
-                    // First Open
-                    if (options.bazJstreeOptions.firstOpen == null || options.bazJstreeOptions.firstOpen) {
-                        var firstId = $(fieldId)[0].children[0].children[0].id;
-                        $(fieldId).jstree('open_node', firstId);
-                    }
-                    //All Open
-                    if (options.bazJstreeOptions.allOpen == null || options.bazJstreeOptions.allOpen) {
-                        $(fieldId).jstree('open_all');
-                    }
-                    // Show all children if root is clicked
-                    if (options.bazJstreeOptions.toggleAllChildren == null || options.bazJstreeOptions.toggleAllChildren) {
-                        $(fieldId).on('select_node.jstree', function(e, data) {
-                            if (data.node.children.length > 0) {
-                                $(fieldId).jstree('open_all', data.node.id);
-                            }
-                        });
-                        $(fieldId).on('close_node.jstree', function(e, data) {
-                            $(fieldId).jstree('deselect_node', data.node.id);
-                        });
-                    }
-                    // Select only EndNode to perform actions
-                    if (options.bazJstreeOptions.selectEndNodeOnly == null || options.bazJstreeOptions.selectEndNodeOnly) {
-                        $(fieldId).on('select_node.jstree', function (e,data) {
-                            if (data.node.children.length > 0) {
-                                $(fieldId).jstree('deselect_node', data.node.id);
-                            }
-                        });
-                    }
-                    //HideAll Jstree default icons (only works if fieldJstreeDoubleClickToggle is set to true)
-                    if (options.bazJstreeOptions.hideJstreeIcon == null || options.bazJstreeOptions.hideJstreeIcon) {
-                        $(fieldId).find('.jstree-ocl').hide();
-                        $(fieldId).on('open_node.jstree close_node.jstree', function() {
-                            $(fieldId).find('.jstree-ocl').hide();
-                        });
-                    }
-                    if ($(fieldId).parents('form').length !== 0) {
-                        if (options[$(fieldId).parents('form')[0].id] && options[$(fieldId).parents('form')[0].id].rules[$(fieldId)[0].id + '-validate'] === 'required') {
-                            $(fieldId).on('select_node.jstree', function() {
-                                $('#' + $(this)[0].id + '-validate').val(null);
-                                if ($(fieldId).jstree('get_selected', true).length > 0 ) {
-                                    $('#' + $(this)[0].id + '-validate').val('selected');
-                                    $('#' + $(this)[0].id + '-validate').valid();
-                                    $(fieldId).removeClass('border-danger').addClass('border-default');
-                                    $(fieldId).siblings('#' + $(this)[0].id + '-tree-search').find('.border-danger').removeClass('border-danger').addClass('border-default');
-                                    $(fieldId).siblings('#' + $(this)[0].id + '-tree-search').find('.bg-danger').removeClass('bg-danger').addClass('bg-default');
-                                }
-                            });
+                        $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', true);
+                        $('#' + thisFieldId + '-tree-add-input-success').off();
+                    });
+                    $('#' + thisFieldId + '-tree-add-input-success').click(function() {
+                        modifyJsTree($(fieldId), thisFieldId, 'addNode', this, $('#' + thisFieldId + '-tree-add-input'), selectedNode, options.bazJstreeOptions.addFunction);
+                    });
+                    $('#' + thisFieldId + '-tree-add-input').keypress(function() {
+                        var keycode = (event.keyCode ? event.keyCode : event.which);
+                        if(keycode == '13'){
+                            modifyJsTree($(fieldId), thisFieldId, 'addNode', this, $('#' + thisFieldId + '-tree-add-input-success'), selectedNode, options.bazJstreeOptions.addFunction);
                         }
-                    }
-                    // ModifyJsTree
-                    function modifyJsTree(tree, optionsId, task, elthis, elthat, selectedNode, runFunction) {
-                        if (task === 'addNode') {
-                            tree.jstree('create_node',
-                                $('#' + selectedNode[0].id),
-                                $('#' + optionsId + '-tree-add-input').val(),
-                                'last',
-                                function() {
-                                    tree.jstree('open_node', $('#' + selectedNode[0].id));
-                                }
-                            );
-                            $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                            $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', true);
-                            $('#' + optionsId + '-tree-add-input').val(null);
-                            $(elthis).off();
-                            $(elthat).off();
-                            runFunction();
-                        } else if (task === 'editNode') {
-                            tree.jstree('rename_node',
-                                $('#' + selectedNode[0].id),
-                                $('#' + optionsId + '-tree-edit-input').val()
-                            );
-                            $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
-                            $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
-                            $('#' + optionsId + '-tree-edit-input').val(null);
-                            $(elthis).off();
-                            $(elthat).off();
-                            runFunction();
+                    });
+                }
+            });
+        }
+        // Edit Selected Node
+        if (options.bazJstreeOptions.edit == null || options.bazJstreeOptions.edit) {
+            $('#' + thisFieldId + '-tools-edit').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-edit').click(function() {
+            selectedNode = $(fieldId).jstree('get_selected', true);
+            // Check if node are selected and only 1 is selected
+                if ($(selectedNode).length !== 1) {
+                    PNotify.removeAll();
+                    PNotify.notice({
+                        title: 'None or Multiple ' + options.bazJstreeOptions.treeName + ' selected!',
+                        text: 'Please select only 1 ' + options.bazJstreeOptions.treeName + ' to rename',
+                    });
+                    pnotifySound.play();
+                    return false;
+                } else {
+                    $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', true);
+                    $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', false);
+                    $('#' + thisFieldId + '-tree-edit-input').val(selectedNode[0].text).focus();
+                    $('#' + thisFieldId + '-tree-edit-input-cancel').click(function() {
+                        $('#' + thisFieldId + '-tree-edit-input').val(null);
+                        $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
+                        $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
+                        $('#' + thisFieldId + '-tree-edit-input-success').off();
+                    });
+                    $('#' + thisFieldId + '-tree-edit-input-success').click(function() {
+                        modifyJsTree($(fieldId), thisFieldId, 'editNode', this, $('#' + thisFieldId + '-tree-edit-input'), selectedNode, options.bazJstreeOptions.editFunction);
+                    });
+                    $('#' + thisFieldId + '-tree-edit-input').keypress(function() {
+                        var keycode = (event.keyCode ? event.keyCode : event.which);
+                        if(keycode == '13'){
+                            modifyJsTree($(fieldId), thisFieldId, 'editNode', this, $('#' + thisFieldId + '-tree-edit--input-success'), selectedNode, options.bazJstreeOptions.editFunction);
                         }
-                    }
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
+                    });
                 }
-
-                function initHTML(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit(dataCollection);
-                    }
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
+            });
+        }
+        // Collapse all Nodes
+        if (options.bazJstreeOptions.collapse == null || options.bazJstreeOptions.collapse) {
+            $('#' + thisFieldId + '-tools-collapse').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-collapse').click(function(e) {
+                e.preventDefault();
+                $(fieldId).jstree('deselect_all');
+                $(fieldId).jstree('close_all');
+            });
+        }
+        // Expand all Nodes
+        if (options.bazJstreeOptions.expand == null || options.bazJstreeOptions.expand) {
+            $('#' + thisFieldId + '-tools-expand').attr('hidden', false);
+            $('#' + thisFieldId + '-tools-expand').click(function(e) {
+                e.preventDefault();
+                $(fieldId).jstree('deselect_all');
+                $(fieldId).jstree('open_all');
+            });
+        }
+        // First Open
+        if (options.bazJstreeOptions.firstOpen == null || options.bazJstreeOptions.firstOpen) {
+            var firstId = $(fieldId)[0].children[0].children[0].id;
+            $(fieldId).jstree('open_node', firstId);
+        }
+        //All Open
+        if (options.bazJstreeOptions.allOpen == null || options.bazJstreeOptions.allOpen) {
+            $(fieldId).jstree('open_all');
+        }
+        // Show all children if root is clicked
+        if (options.bazJstreeOptions.toggleAllChildren == null || options.bazJstreeOptions.toggleAllChildren) {
+            $(fieldId).on('select_node.jstree', function(e, data) {
+                if (data.node.children.length > 0) {
+                    $(fieldId).jstree('open_all', data.node.id);
                 }
-
-                function initDropzone(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit();
-                    }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    dataCollection[componentId][sectionId][thisFieldId]['dropzone'] = $(fieldId).dropzone(options);
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
+            });
+            $(fieldId).on('close_node.jstree', function(e, data) {
+                $(fieldId).jstree('deselect_node', data.node.id);
+            });
+        }
+        // Select only EndNode to perform actions
+        if (options.bazJstreeOptions.selectEndNodeOnly == null || options.bazJstreeOptions.selectEndNodeOnly) {
+            $(fieldId).on('select_node.jstree', function (e,data) {
+                if (data.node.children.length > 0) {
+                    $(fieldId).jstree('deselect_node', data.node.id);
                 }
-
-                function initDatatable(fieldId, options) {
-                    if (options.beforeInit) {
-                        options.beforeInit();
+            });
+        }
+        //HideAll Jstree default icons (only works if fieldJstreeDoubleClickToggle is set to true)
+        if (options.bazJstreeOptions.hideJstreeIcon == null || options.bazJstreeOptions.hideJstreeIcon) {
+            $(fieldId).find('.jstree-ocl').hide();
+            $(fieldId).on('open_node.jstree close_node.jstree', function() {
+                $(fieldId).find('.jstree-ocl').hide();
+            });
+        }
+        if ($(fieldId).parents('form').length !== 0) {
+            if (options[$(fieldId).parents('form')[0].id] && options[$(fieldId).parents('form')[0].id].rules[$(fieldId)[0].id + '-validate'] === 'required') {
+                $(fieldId).on('select_node.jstree', function() {
+                    $('#' + $(this)[0].id + '-validate').val(null);
+                    if ($(fieldId).jstree('get_selected', true).length > 0 ) {
+                        $('#' + $(this)[0].id + '-validate').val('selected');
+                        $('#' + $(this)[0].id + '-validate').valid();
+                        $(fieldId).removeClass('border-danger').addClass('border-default');
+                        $(fieldId).siblings('#' + $(this)[0].id + '-tree-search').find('.border-danger').removeClass('border-danger').addClass('border-default');
+                        $(fieldId).siblings('#' + $(this)[0].id + '-tree-search').find('.bg-danger').removeClass('bg-danger').addClass('bg-default');
                     }
-                    thisFieldId = fieldId;
-                    fieldId = document.getElementById(fieldId);
-                    if (options.dataTables) {
-                        for (var datatable in options.dataTables) {
-                            var datatableTable = options.dataTables[datatable];
-                            var datatableConfig = dataCollection[componentId][sectionId][datatableTable];
-                            if (datatableConfig) {
-                                if (datatableConfig.bazdatatable && datatableConfig.bazdatatable.compareData) {
-                                    if (datatableConfig.bazdatatable.compareData.inclIds) {
-                                        var datatableIncludes = datatableConfig.bazdatatable.compareData.inclIds;
-                                        for (var datatableInclude in datatableIncludes) {
-                                            var toolTipTitle = $('#' + datatableInclude).parents('.form-group').find('label').siblings('i').attr('title');
-                                            toolTipTitle += '<br><span>NOTE: Field should be unique</span>';
-                                            if (datatableIncludes[datatableInclude].length > 0) {
-                                                toolTipTitle += '<br><span>UNIQUE KEYWORDS: ' + datatableIncludes[datatableInclude].toString() + '</span>';
-                                            }
-                                            $('#' + datatableInclude).parents('.form-group').find('label').siblings('i').attr('title', toolTipTitle).addClass('text-warning');
-                                        }
-                                    }
-                                    // NOTE: exclude is very difficult to narrow. Avoid using excludes and use twig template {{fieldUnique}}
+                });
+            }
+        }
+        // ModifyJsTree
+        function modifyJsTree(tree, optionsId, task, elthis, elthat, selectedNode, runFunction) {
+            if (task === 'addNode') {
+                tree.jstree('create_node',
+                    $('#' + selectedNode[0].id),
+                    $('#' + optionsId + '-tree-add-input').val(),
+                    'last',
+                    function() {
+                        tree.jstree('open_node', $('#' + selectedNode[0].id));
+                    }
+                );
+                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
+                $('#' + thisFieldId + '-tree-add-input').parents('.form-group').first().attr('hidden', true);
+                $('#' + optionsId + '-tree-add-input').val(null);
+                $(elthis).off();
+                $(elthat).off();
+                runFunction();
+            } else if (task === 'editNode') {
+                tree.jstree('rename_node',
+                    $('#' + selectedNode[0].id),
+                    $('#' + optionsId + '-tree-edit-input').val()
+                );
+                $('#' + thisFieldId + '-tree-search-input').parents('.form-group').first().attr('hidden', false);
+                $('#' + thisFieldId + '-tree-edit-input').parents('.form-group').first().attr('hidden', true);
+                $('#' + optionsId + '-tree-edit-input').val(null);
+                $(elthis).off();
+                $(elthat).off();
+                runFunction();
+            }
+        }
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initHTML(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit(dataCollection);
+        }
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initDropzone(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit();
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        dataCollection[componentId][sectionId][thisFieldId]['dropzone'] = $(fieldId).dropzone(options);
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initDatatable(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit();
+        }
+        thisFieldId = fieldId;
+        fieldId = document.getElementById(fieldId);
+        if (options.dataTables) {
+            for (var datatable in options.dataTables) {
+                var datatableTable = options.dataTables[datatable];
+                var datatableConfig = dataCollection[componentId][sectionId][datatableTable];
+                if (datatableConfig) {
+                    if (datatableConfig.bazdatatable && datatableConfig.bazdatatable.compareData) {
+                        if (datatableConfig.bazdatatable.compareData.inclIds) {
+                            var datatableIncludes = datatableConfig.bazdatatable.compareData.inclIds;
+                            for (var datatableInclude in datatableIncludes) {
+                                var toolTipTitle = $('#' + datatableInclude).parents('.form-group').find('label').siblings('i').attr('title');
+                                toolTipTitle += '<br><span>NOTE: Field should be unique</span>';
+                                if (datatableIncludes[datatableInclude].length > 0) {
+                                    toolTipTitle += '<br><span>UNIQUE KEYWORDS: ' + datatableIncludes[datatableInclude].toString() + '</span>';
                                 }
-                            } else {
-                                that._error('Datatable ' + datatableTable + ' is defined, but no configuration assigned to it!')
+                                $('#' + datatableInclude).parents('.form-group').find('label').siblings('i').attr('title', toolTipTitle).addClass('text-warning');
                             }
                         }
-                        // this._fieldsToDatatable(fieldId);
-                    } else {
-                        that._error('Tables not assigned to ' + thisFieldId + '. They need to be assigned in an array, please see documentation');
+                        // NOTE: exclude is very difficult to narrow. Avoid using excludes and use twig template {{fieldUnique}}
                     }
-                    if (options.afterInit) {
-                        options.afterInit(dataCollection);
-                    }
+                } else {
+                    error('Datatable ' + datatableTable + ' is defined, but no configuration assigned to it!')
                 }
-            };
+            }
+            // this._fieldsToDatatable(fieldId);
+        } else {
+            error('Tables not assigned to ' + thisFieldId + '. They need to be assigned in an array, please see documentation');
+        }
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
 
-            BazContentFields._jQueryInterface = function _jQueryInterface(options) {
-                var data = $(this).data(DATA_KEY);
+            // BazContentFields._jQueryInterface = function _jQueryInterface(options) {
+            //     var data = $(this).data(DATA_KEY);
+            //     var _options = $.extend({}, Default, options);
 
-                var _options = $.extend({}, Default, options);
+            //     if (!data) {
+            //         data = new BazContentFields($(this), _options);
+            //         $(this).data(DATA_KEY, typeof _options === 'string' ? data : _options);
+            //     }
+            // };
+    // }
+    function bazContentFieldsConstructor() {
+        // if something needs to be constructed
+        return null;
+    }
 
-                if (!data) {
-                    data = new BazContentFields($(this), _options);
-                    $(this).data(DATA_KEY, typeof _options === 'string' ? data : _options);
-                }
-            };
+    function setup(BazContentFieldsConstructor) {
+        BazContentFields = BazContentFieldsConstructor;
+        BazContentFields.defaults = { };
+        BazContentFields.init = function(options) {
+            if (options.fieldId) {
+                initFields(options);
+            } else {
+                init(_extends(BazContentFields.defaults, options));
+                initFields();
+            }
+        }
+    }
 
-        return BazContentFields;
+    setup(bazContentFieldsConstructor);
 
-        }();
+    return bazContentFieldsConstructor;
 
-    $.fn[NAME] = BazContentFields._jQueryInterface;
-    $.fn[NAME].Constructor = BazContentFields;
+}();
+//         return BazContentFields;
 
-    $.fn[NAME].noConflict = function () {
-        $.fn[NAME] = JQUERY_NO_CONFLICT;
-        return BazContentFields._jQueryInterface;
-    };
+//         }();
 
-    return BazContentFields;
-}(jQuery);
+//     $.fn[NAME] = BazContentFields._jQueryInterface;
+//     $.fn[NAME].Constructor = BazContentFields;
 
-exports.BazContentFields = BazContentFields;
+//     $.fn[NAME].noConflict = function () {
+//         $.fn[NAME] = JQUERY_NO_CONFLICT;
+//         return BazContentFields._jQueryInterface;
+//     };
 
-Object.defineProperty(exports, '__esModule', { value: true });
+//     return BazContentFields;
+// }(jQuery);
 
-}));
+// exports.BazContentFields = BazContentFields;
+
+// Object.defineProperty(exports, '__esModule', { value: true });
+
+// }));
 /* exported BazContentFieldsValidator */
-/* globals BazContentFields */
+/* globals */
 /*
 * @title                    : BazContentFieldsValidator
 * @description              : Baz Content Fields Validator Lib
@@ -8163,7 +8423,7 @@ var BazContentFieldsValidator = function() {
         validateDatatableOnSections, //Validation of datatable on section submit
         validateFormsOnDatatable, //Validate datatable form on datable submit
         dataCollection,
-        sectionsJsTreeSelector;
+        formJsTreeSelector = null;
     var formValid = false;
     var hasError = []; //Validation, list of fields that has errors
     // var tableData = { }; //Datatable Data
@@ -8179,6 +8439,12 @@ var BazContentFieldsValidator = function() {
         sectionId = options.sectionId;
         dataCollection = window['dataCollection'];
         errorSound = dataCollection.env.sounds.swalSound //Error Sound for Swal
+
+        formJsTreeSelector = null;
+        if (options.formJsTreeSelector) {
+            formJsTreeSelector = options.formJsTreeSelector;
+        }
+
         if (options.on === 'section') {
             on = sectionId;
         } else if (options.on === 'component'){
@@ -8274,12 +8540,10 @@ var BazContentFieldsValidator = function() {
 
     //Validate Sections on Submit
     function validateForm(componentId, sectionId, onSuccess, type, preValidated, formId) {
-        //eslint-disable-next-line
-        // console.log(componentId, sectionId, onSuccess, type, preValidated, formId);
         if (!preValidated) {
             formValid = false;
-            if (type === 'component') {
-                formLocation = componentId;
+            if (type === 'section') {
+                // formLocation = componentId;
                 // for (var component in validateForms[componentId]) {
                 //     $.each(validateForms[componentId][sectionId], function(index, form) {
                 //         $('#' + form).submit();
@@ -8303,7 +8567,7 @@ var BazContentFieldsValidator = function() {
                 //         }
                 //     }
                 // }
-            } else if (type === 'section') {
+            // } else if (type === 'section') {
                 formLocation = sectionId;
                 $.each(validateForms[componentId][sectionId], function(index, form) {
                     $('#' + form).submit();
@@ -8319,6 +8583,7 @@ var BazContentFieldsValidator = function() {
                 hasError.push(id.toUpperCase());
             });
             hasErrorCount = hasError.length;
+
             if (!preValidated && hasErrorCount > 0) {
                 $('#' + formLocation + '-alert').remove();
                 $('#' + formLocation).before(
@@ -8329,10 +8594,10 @@ var BazContentFieldsValidator = function() {
                 '<div>'
                 );
                 errorSound.play();
-                if (type === 'component') {
-                    if (sectionsJsTreeSelector) {
+                if (type === 'section') {
+                    if (formJsTreeSelector) {
                         // BazContentFields.fixHeight('fixedHeight');
-                        $(sectionsJsTreeSelector).jstree(true).settings.search.search_callback = function(str, node) {
+                        $(formJsTreeSelector).jstree(true).settings.search.search_callback = function(str, node) {
                             var word, words = [];
                             var searchFor = str.toUpperCase().replace(/^\s+/g, '').replace(/\s+$/g, '');
                             if (searchFor.indexOf(',') >= 0) {
@@ -8350,39 +8615,39 @@ var BazContentFieldsValidator = function() {
                             }
                             return false;
                         }
-                        $(sectionsJsTreeSelector).jstree(true).refresh();
-                        $('#' + formLocation + '-sections-tree').children('.card').removeClass('box-primary').addClass('box-danger');
-                        $('#' + formLocation + '-sections-tree').find('.card-header').children('strong').html(' Errors');
-                        $('#' + formLocation + '-sections-tree').find('.card-tools').addClass('hidden');
-                        $('#' + formLocation + '-sections-tree').find('.widget-icon').children('i').removeClass('fa-bars').addClass('fa-ban');
-                        $(sectionsJsTreeSelector).jstree(true).search(hasError.toString());
-                        $('#' + formLocation + '-sections-jstree').find('.jstree-anchor').addClass('text-danger').css("text-transform", 'uppercase');
-                        $('#' + formLocation + '-sections-fields-search').val(hasError.toString());
-                        $('#' + formLocation + '-sections-fields-search').siblings('.input-group-addon').addClass('hidden');
-                        $('#' + formLocation + '-sections-fields-search').siblings('.input-group-btn').removeClass('hidden');
-                        $('#' + formLocation + '-sections-fields-search').attr('disabled', true);
-                        $('#' + formLocation + '-sections-fields-search-cancel').click(function() {
-                            cancelValidatingForm(type, formLocation, false, formId);
-                        });
+                        $(formJsTreeSelector).jstree(true).refresh();
+                        // $('#' + formLocation + '-sections-tree').children('.card').removeClass('box-primary').addClass('box-danger');
+                        // $('#' + formLocation + '-sections-tree').find('.card-header').children('strong').html(' Errors');
+                        // $('#' + formLocation + '-sections-tree').find('.card-tools').addClass('hidden');
+                        // $('#' + formLocation + '-sections-tree').find('.widget-icon').children('i').removeClass('fa-bars').addClass('fa-ban');
+                        $(formJsTreeSelector).jstree(true).search(hasError.toString());
+                        $('#' + formLocation + '-form-fields').find('.jstree-anchor').addClass('text-danger').css("text-transform", 'uppercase');
+                        // $('#' + formLocation + '-form-fields-search-input').val(hasError.toString());
+                        // $('#' + formLocation + '-form-fields-search-input').siblings('.input-group-addon').addClass('hidden');
+                        // $('#' + formLocation + '-form-fields-search-input').siblings('.input-group-btn').removeClass('hidden');
+                        // $('#' + formLocation + '-form-fields-search-input').attr('disabled', true);
+                        // $('#' + formLocation + '-form-fields-search-cancel').click(function() {
+                        //     cancelValidatingForm(type, formLocation);
+                        // });
                     }
                     $('#' + formLocation + '-alert-dismiss').click(function() {
-                        cancelValidatingForm(type, formLocation, false, formId);
+                        cancelValidatingForm(type, formLocation);
                     });
                     return false;
-                } else if (type === 'section') {
-                    $('#' + formLocation + '-alert-dismiss').click(function() {
-                        if ($(this).parents('.sectionWithForm').length > 0) {
-                            formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
-                        } else if ($(this).parents('.sectionWithFormToDatatable').length > 0) {
-                            formLocation = $(this).parent().siblings('.sectionWithFormToDatatable')[0].id;
-                        }
-                        cancelValidatingForm(type, formLocation, false, formId);
-                    });
-                    return false;
+                // } else if (type === 'section') {
+                //     $('#' + formLocation + '-alert-dismiss').click(function() {
+                //         if ($(this).parents('.sectionWithForm').length > 0) {
+                //             formLocation = $(this).parent().siblings('.sectionWithForm')[0].id;
+                //         } else if ($(this).parents('.sectionWithFormToDatatable').length > 0) {
+                //             formLocation = $(this).parent().siblings('.sectionWithFormToDatatable')[0].id;
+                //         }
+                //         cancelValidatingForm(type, formLocation);
+                //     });
+                //     return false;
                 } else if (type === 'datatable') {
                     $('#' + formLocation + '-alert-dismiss').click(function() {
                         formLocation = $(this).parent().siblings('.sectionWithFormToDatatable')[0].id;
-                        cancelValidatingForm(type, formLocation, false, formId);
+                        cancelValidatingForm(type, formLocation);
                     });
                     return false;
                 }
@@ -8394,55 +8659,57 @@ var BazContentFieldsValidator = function() {
                 return true;
             }
         } else {
-            if (type === 'component') {
-                hasErrorCount = $('#' + formLocation).find('.has-error').length;
+            if (type === 'section') {
+
                 hasError = [];
                 $('#' + formLocation).find('.has-error').each(function(index,errorId) {
-                    var id = $(errorId).children('label').html();
+                    var id = $(errorId).find('label').html();
                     hasError.push(id.toUpperCase());
                 });
+                hasErrorCount = hasError.length;
+
                 if (hasErrorCount > 0) {
                     $('#' + formLocation + '-alert').find('strong').html(hasErrorCount);
-                    if (sectionsJsTreeSelector) {
-                        $(sectionsJsTreeSelector).jstree(true).search(hasError.toString());
-                        $('#' + formLocation + '-sections-fields-search').val(hasError.toString());
-                        $('#' + formLocation + '-sections-jstree').find('.jstree-anchor').addClass('text-danger').css("text-transform", 'uppercase');
+                    if (formJsTreeSelector) {
+                        $(formJsTreeSelector).jstree(true).search(hasError.toString());
+                        $('#' + formLocation + '-form-fields-tree-search-input').val(hasError.toString());
+                        $('#' + formLocation + '-form-fields').find('.jstree-anchor').addClass('text-danger').css("text-transform", 'uppercase');
                     }
                     return false;
                 } else {
                     if (!onSuccess) {
-                        cancelValidatingForm(type, formLocation, false, formId);
+                        cancelValidatingForm(type, formLocation);
                     } else {
-                        cancelValidatingForm(type, formLocation, true, formId);
+                        cancelValidatingForm(type, formLocation);
                     }
                     return true;
                 }
-            } else if (type === 'section') {
-                hasErrorCount = $('#' + sectionId).find('.has-error').length;
-                hasError = [];
+            // } else if (type === 'section') {
+            //     hasErrorCount = $('#' + sectionId).find('.has-error').length;
+            //     hasError = [];
 
-                $('#' + sectionId).find('.has-error').each(function(index,errorId) {
-                    var id = $(errorId).children('label').html();
-                    hasError.push(id.toUpperCase());
-                });
+            //     $('#' + sectionId).find('.has-error').each(function(index,errorId) {
+            //         var id = $(errorId).children('label').html();
+            //         hasError.push(id.toUpperCase());
+            //     });
 
-                if (hasErrorCount > 0) {
-                    $('#' + sectionId + '-alert').find('strong').html(hasErrorCount);
-                    return false;
-                } else {
-                    if (!onSuccess) {
-                        cancelValidatingForm(type, sectionId, false, formId);
-                    } else {
-                        cancelValidatingForm(type, sectionId, true, formId);
-                    }
-                    return true;
-                }
+            //     if (hasErrorCount > 0) {
+            //         $('#' + sectionId + '-alert').find('strong').html(hasErrorCount);
+            //         return false;
+            //     } else {
+            //         if (!onSuccess) {
+            //             cancelValidatingForm(type, sectionId);
+            //         } else {
+            //             cancelValidatingForm(type, sectionId);
+            //         }
+            //         return true;
+            //     }
             } else if (type === 'datatable') {
                 if (hasErrorCount > 0) {
                     $('#' + formLocation + '-alert').find('strong').html(hasErrorCount);
                     return false;
                 } else {
-                    cancelValidatingForm(type, formLocation, false, formId);
+                    cancelValidatingForm(type, formLocation);
                     return true;
                 }
             }
@@ -8450,24 +8717,23 @@ var BazContentFieldsValidator = function() {
     }
 
     //Cancel validating form
-    function cancelValidatingForm(type, formLocation, jstreeRefresh, formId) {
-
+    function cancelValidatingForm(type, formLocation) {
         $('#' + formLocation + '-alert').remove();
 
-        if (type === 'component') {
-            if (sectionsJsTreeSelector) {
+        if (type === 'section') {
+            if (formJsTreeSelector) {
                 // BazContentFields.fixHeight('fixedHeight');
-                $('#' + formLocation + '-sections-tree').children('.card').removeClass('box-danger').addClass('box-primary');
-                $('#' + formLocation + '-sections-tree').find('.card-header').children('strong').html(' Sections');
-                $('#' + formLocation + '-sections-tree').find('.card-tools').removeClass('hidden');
-                $('#' + formLocation + '-sections-tree').find('.widget-icon').children('i').removeClass('fa-ban').addClass('fa-bars');
-                $('#' + formLocation + '-sections-jstree').find('.jstree-anchor').css("text-transform", 'uppercase');
-                $('#' + formLocation + '-sections-fields-search').val('');
-                $(sectionsJsTreeSelector).jstree(true).search('');
-                $('#' + formLocation + '-sections-fields-search').attr('disabled', false);
-                $('#' + formLocation + '-sections-fields-search').siblings('.input-group-addon').removeClass('hidden');
-                $('#' + formLocation + '-sections-fields-search').siblings('.input-group-btn').addClass('hidden');
-                $(sectionsJsTreeSelector).jstree(true).settings.search.search_callback = function(str, node) {
+                // $('#' + formLocation + '-sections-tree').children('.card').removeClass('box-danger').addClass('box-primary');
+                // $('#' + formLocation + '-sections-tree').find('.card-header').children('strong').html(' Sections');
+                // $('#' + formLocation + '-sections-tree').find('.card-tools').removeClass('hidden');
+                // $('#' + formLocation + '-sections-tree').find('.widget-icon').children('i').removeClass('fa-ban').addClass('fa-bars');
+                // $('#' + formLocation + '-sections-jstree').find('.jstree-anchor').css("text-transform", 'uppercase');
+                $('#' + formLocation + '-form-fields-tree-search-input').val('');
+                $(formJsTreeSelector).jstree(true).search('');
+                // $('#' + formLocation + '-sections-fields-search').attr('disabled', false);
+                // $('#' + formLocation + '-sections-fields-search').siblings('.input-group-addon').removeClass('hidden');
+                // $('#' + formLocation + '-sections-fields-search').siblings('.input-group-btn').addClass('hidden');
+                $(formJsTreeSelector).jstree(true).settings.search.search_callback = function(str, node) {
                     var word, words = [];
                     var searchFor = str.toUpperCase().replace(/^\s+/g, '').replace(/\s+$/g, '');
                     if (searchFor.indexOf(',') >= 0) {
@@ -8482,9 +8748,6 @@ var BazContentFieldsValidator = function() {
                         }
                     }
                     return false;
-                }
-                if (!jstreeRefresh && formId !== null) {
-                    BazContentFields.redoSectionsJsTree();
                 }
             }
         } else if (type === 'datatable') {
@@ -8520,23 +8783,23 @@ var BazContentFieldsValidator = function() {
 
     function setup(BazContentFieldsValidatorConstructor) {
         BazContentFieldsValidator = BazContentFieldsValidatorConstructor;
-        BazContentFieldsValidator.defaults = { };
         BazContentFieldsValidator.initValidator = function(options) {
+            BazContentFieldsValidator.defaults = { };
             init(_extends(BazContentFieldsValidator.defaults, options));
             initValidator();
         }
         BazContentFieldsValidator.validateForm = function(options) {
+            BazContentFieldsValidator.defaults = { };
             init(_extends(BazContentFieldsValidator.defaults, options));
             var validate =
                 validateForm(options.componentId, options.sectionId, options.onSuccess, options.type, options.preValidated, options.formId);
             return validate;
         }
         BazContentFieldsValidator.cancelValidatingForm = function(options) {
+            BazContentFieldsValidator.defaults = { };
             init(_extends(BazContentFieldsValidator.defaults, options));
-            cancelValidatingForm(options.type, options.formLocation, options.jstreeRefresh, options.formId);
+            cancelValidatingForm(options.type, options.formLocation);
         }
-
-
     }
 
     setup(bazContentFieldsValidatorConstructor);

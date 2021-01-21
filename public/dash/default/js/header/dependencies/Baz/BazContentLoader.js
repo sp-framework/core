@@ -182,6 +182,7 @@ var BazContentLoader = function() {
                             $(options.ajaxContainer).empty();
                             options.ajaxError.call('templateError');
                         }
+                        dataCollection.env.breadcrumb = xhr.getResponseHeader('breadcrumb');
                         if (element) {
                             options.ajaxFinished.call(element); //call the 'finished' callback
                         } else {
@@ -194,6 +195,7 @@ var BazContentLoader = function() {
                     // Reset counter after page load complete to accommodate new links (if any)
                     init(options);
                     dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
+
                     $('body').trigger('bazContentLoaderAjaxComplete');
 
                     if ($('#security-token').length === 1) {
@@ -249,6 +251,7 @@ var BazContentLoader = function() {
                             $(options.modalContainer).removeClass('p-0');
                             options.modalError.call('templateError');
                         }
+                        dataCollection.env.breadcrumb = xhr.getResponseHeader('breadcrumb');
                         if (element) {
                             options.modalFinished.call(element); //call the 'finished' callback
                         } else {

@@ -1,4 +1,4 @@
-/* globals define exports BazContentFieldsValidator PNotify Pace BazCore BazContentLoader */
+/* globals define exports BazContentFieldsValidator BazContentFields PNotify Pace BazCore BazContentLoader */
 /*
 * @title                    : BazContentSectionWithForm
 * @description              : Baz Lib for Content (Sections With Form)
@@ -33,7 +33,11 @@
             sectionId,
             extractComponentId,
             that,
-            thatV;
+            thatV,
+            formJsTreeSelector;
+        var types = { };
+        var tabIds = [];
+        var validationObject = { };
 
         var BazContentSectionWithForm = function () {
             function BazContentSectionWithForm(element, settings) {
@@ -68,12 +72,22 @@
                     dataCollection[componentId][sectionId]['dataToSubmit'] = { };
                 }
 
-                $(this._element).BazContentFields();
-
-                BazContentFieldsValidator.initValidator({
+                validationObject = {
                     'componentId'   : componentId,
                     'sectionId'     : sectionId,
                     'on'            : 'section'
+                }
+
+                if ($('#' + sectionId + '-form-fields').length > 0) {
+                    this._buildFormJsTree();
+                    validationObject['formJsTreeSelector'] = formJsTreeSelector;
+                }
+
+                BazContentFieldsValidator.initValidator(validationObject);
+
+                BazContentFields.init({
+                    'componentId'   : componentId,
+                    'sectionId'     : sectionId
                 });
 
                 if (options.task === 'validateForm') {
@@ -86,19 +100,145 @@
             };
 
             _proto._validateForm = function _validateForm() {
-                var validated = BazContentFieldsValidator.validateForm({
+                validationObject = {
                     'componentId'     : componentId,
                     'sectionId'       : sectionId,
                     'onSuccess'       : false,
                     'type'            : 'section',
                     'preValidated'    : false,
-                    'formId'          : null
-                });
+                    'formId'          : null,
+                    'on'              : 'section'
+                }
+                if ($('#' + sectionId + '-form-fields').length > 0) {
+                    validationObject['formJsTreeSelector'] = formJsTreeSelector;
+                }
+                var validated = BazContentFieldsValidator.validateForm(validationObject);
+
                 return validated;
             };
 
-            _proto._initSectionButtonsAndActions = function _initSectionButtonsAndActions() {
+            _proto._redoFormJsTree = function _redoFormJsTree() {
+                $(formJsTreeSelector).jstree('destroy');
+                that._buildFormJsTree();
+                BazContentFields.init({'fieldId':formJsTreeSelector[0].id});
 
+                validationObject = {
+                    'on'              : 'section',
+                    'type'            : 'section',
+                    'formLocation'    : sectionId
+                }
+                if ($('#' + sectionId + '-form-fields').length > 0) {
+                    validationObject['formJsTreeSelector'] = formJsTreeSelector;
+                }
+                BazContentFieldsValidator.cancelValidatingForm(validationObject);//cancel any form validation as jstree has changed
+            }
+
+            _proto._buildFormJsTree = function _buildFormJsTree() {
+                formJsTreeSelector = $('#' + sectionId + '-form-fields');
+
+                $(formJsTreeSelector).empty();
+
+                // Create Tree
+                $(formJsTreeSelector).append('<ul></ul>');
+
+                // Grab Icons from Controller
+                types.item = {"icon" : "fas fa-fw fa-angle-right"};
+
+                // Grab Fields from Tabs Note: attr "jstree-search" is used to populate tree
+                $('#' + sectionId + '-form .nav-tabs li a').each(function() {
+                    var tabId = $(this).attr('href').replace('#', '');
+                    tabIds.push(tabId);
+                    var tabName = $(this).html().toUpperCase();
+
+                    types[tabId] = {"icon" : "fas fa-fw fa-chevron-right"};
+
+                    $(formJsTreeSelector).
+                        find('ul').
+                        first().
+                        append(
+                            '<li data-tabid="' + tabId + '" data-jstree=' + '{"type":"' + tabId + '"} class="text-uppercase">' + tabName +
+                            '<ul data-tabid="' + tabId + '-ul"></ul>' +
+                            '</li>'
+                        );
+
+                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').first().append('<ul></ul>');
+
+                    $('#' + tabId).find("[jstree-search]").each(function() {
+                        var fieldId = this.id.replace('-jstreesearch', '');
+
+                        if ($(this).attr('jstree-search') !== '') {
+                            if (!$('#' + fieldId).parents('.form-group').hasClass('d-none') &&
+                                $('#' + fieldId).attr('disabled') !== 'disabled'
+                            ) {
+                                    // $('#' + sectionId + '-form-fields li:contains("' + tabName + '")').
+                                    // find('ul').
+                                    // first().
+                                    $('[data-tabid="' + tabId + '-ul"]').append(
+                                        '<li data-tabid="' + tabId +
+                                            '" data-jstreeid="' + $(this)[0].id +
+                                            '" data-jstree=' + '{"type":' + '"item"}>' +
+                                            $(this).attr('jstree-search') +
+                                        '</li>'
+                                );
+                            }
+                        }
+                    });
+                });
+
+                dataCollection[componentId][sectionId][sectionId + '-form-fields'] =
+                    $.extend(dataCollection[componentId][sectionId][sectionId + '-form-fields'], {
+                        "types" : types,
+                        "plugins": ["search","types"],
+                        "search": {
+                            'show_only_matches': true,
+                            'search_callback'  : function(str, node) {
+                                var word, words = [];
+                                var searchFor = str.toUpperCase().replace(/^\s+/g, '').replace(/\s+$/g, '');
+                                if (searchFor.indexOf(',') >= 0) {
+                                    words = searchFor.split(',');
+                                } else {
+                                    words = [searchFor];
+                                }
+                                for (var i = 0; i < words.length; i++) {
+                                    word = words[i];
+                                    if ((node.text || "").indexOf(word) >= 0) {
+                                        return true;
+                                    }
+                                }
+                                return false;
+                            }
+                        }
+                    });
+
+                // Init jstree selection process
+                $(formJsTreeSelector).on('select_node.jstree', function() {
+                    var selfId = $(this).jstree('get_selected',true)[0];
+                    if (selfId.parent === '#') {
+                        $(formJsTreeSelector).jstree('open_node', selfId);
+                    } else {
+                        $(tabIds).each(function(index,tabId) {
+                            var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
+
+                            $(tab).removeClass('active');
+                            $(tab).attr('area-selected', false);
+                            $('#' + tabId).removeClass('active show');
+                        })
+
+                        var activateTab = $('#' + sectionId + '-form').find('[href="#' + selfId.data.tabid + '"]');
+                        $(activateTab).addClass('active');
+                        $(activateTab).attr('area-selected', true);
+
+                        $('#' + selfId.data.tabid).addClass('active show');
+
+                        $('#' + selfId.data.jstreeid).parent().addClass('bg-info disabled animated fadeIn');
+                        setTimeout(function() {
+                            $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
+                        }, 2000);
+                    }
+                });
+            }
+
+            _proto._initSectionButtonsAndActions = function _initSectionButtonsAndActions() {
                 if ($('#' + sectionId + '-id').val() === '') {
                     $('#' + sectionId + ' .card-footer button.addData').attr('hidden', false);
                     $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);

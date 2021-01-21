@@ -1,4 +1,4 @@
-/* globals define exports BazContentFieldsValidator BazContentFieldsValidator PNotify */
+/* globals define exports BazContentFieldsValidator BazContentFields PNotify */
 /*
 * @title                    : BazContentSectionWithFormToDatatable
 * @description              : Baz Lib for Content (Sections With Form)
@@ -76,14 +76,16 @@
                 if (options.task === 'tableDataToObj') {
                     this._tableDataToObj();
                 } else {
-                    $(this._element).BazContentFields();
+                    BazContentFields.init({
+                        'componentId'   : componentId,
+                        'sectionId'     : sectionId
+                    });
 
                     BazContentFieldsValidator.initValidator({
                         'componentId'   : componentId,
                         'sectionId'     : sectionId,
                         'on'            : 'section'
                     });
-
                     this._fieldsToDatatable(sectionId);
                 }
 
@@ -100,7 +102,8 @@
                     'onSuccess'       : onSuccess,
                     'type'            : type,
                     'preValidated'    : preValidated,
-                    'formId'          : formId
+                    'formId'          : formId,
+                    'on'              : 'section'
                 });
 
                 return validated;
