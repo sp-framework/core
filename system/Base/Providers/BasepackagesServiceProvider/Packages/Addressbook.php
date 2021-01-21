@@ -17,6 +17,13 @@ class Addressbook extends BasePackage
 
     public function addAddress(array $data)
     {
+        if ($data['city_id'] == 0 ||
+            $data['state_id'] == 0 ||
+            $data['country_id'] == 0
+        ) {
+            $data = $this->addNewGeoLocation($data);
+        }
+
         if ($this->add($data)) {
             $this->packagesData->responseCode = 0;
 
@@ -52,5 +59,37 @@ class Addressbook extends BasePackage
 
             $this->packagesData->responseMessage = 'Error removing address.';
         }
+    }
+
+    public function mergeAndUpdate(array $data)
+    {
+        $address = $this->getById($data['address_id']);
+
+        unset($data['id']);
+
+        $address = array_merge($address, $data);
+
+        $this->updateAddress($address);
+
+        return true;
+    }
+
+    protected function addNewGeoLocation($data)
+    {
+        //If Cities/States/Countries Id is received as 0, we create a new one and then assign proper ids.
+        //New Id's can start from a large number to avoid any conflict.
+        // if ($data['city_id'] == 0) {
+        //     if ($data['country_id'] == 0) {
+        //         $newCountry = [];//New Country
+        //     }
+
+        //     if ($data['state_id'] == 0) {
+        //         $newState = [];//New state
+        //     }
+
+        //     $newCity = [];//New City
+        // }
+
+        return $data;
     }
 }

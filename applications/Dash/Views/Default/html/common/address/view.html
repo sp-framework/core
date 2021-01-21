@@ -1,8 +1,8 @@
-{% if streetFieldLabel is not defined %}
-    {% set streetFieldLabel = 'Street Address' %}
+{% if streetAddressFieldLabel is not defined %}
+    {% set streetAddressFieldLabel = 'Street Address' %}
 {% endif %}
-{% if street2FieldLabel is not defined %}
-    {% set street2FieldLabel = 'Street Address 2' %}
+{% if streetAddress2FieldLabel is not defined %}
+    {% set streetAddress2FieldLabel = 'Street Address 2' %}
 {% endif %}
 {% if cityFieldLabel is not defined %}
     {% set cityFieldLabel = 'City' %}
@@ -17,13 +17,75 @@
     {% set countryFieldLabel = 'Country' %}
 {% endif %}
 
-{% if streetFieldRequired is defined and streetFieldRequired === false %}
-    {% set streetFieldRequired = false %}
+{% if streetAddressFieldHidden is defined and streetAddressFieldHidden === true %}
+    {% set streetAddressFieldHidden = true %}
 {% else %}
-    {% set streetFieldRequired = true %}
+    {% set streetAddressFieldHidden = false %}
 {% endif %}
-{% if street2FieldRequired is not defined %}
-    {% set street2FieldRequired = false %}
+{% if streetAddress2FieldHidden is defined and streetAddress2FieldHidden === true %}
+    {% set streetAddress2FieldHidden = true %}
+{% else %}
+    {% set streetAddress2FieldHidden = false %}
+{% endif %}
+{% if cityFieldHidden is defined and cityFieldHidden === true %}
+    {% set cityFieldHidden = true %}
+{% else %}
+    {% set cityFieldHidden = false %}
+{% endif %}
+{% if postCodeFieldHidden is defined and postCodeFieldHidden === true %}
+    {% set postCodeFieldHidden = true %}
+{% else %}
+    {% set postCodeFieldHidden = false %}
+{% endif %}
+{% if stateFieldHidden is defined and stateFieldHidden === true %}
+    {% set stateFieldHidden = true %}
+{% else %}
+    {% set stateFieldHidden = false %}
+{% endif %}
+{% if countryFieldHidden is defined and countryFieldHidden === true %}
+    {% set countryFieldHidden = true %}
+{% else %}
+    {% set countryFieldHidden = false %}
+{% endif %}
+
+{% if streetAddressFieldDisabled is defined and streetAddressFieldDisabled === true %}
+    {% set streetAddressFieldDisabled = true %}
+{% else %}
+    {% set streetAddressFieldDisabled = false %}
+{% endif %}
+{% if streetAddress2FieldDisabled is defined and streetAddress2FieldDisabled === true %}
+    {% set streetAddress2FieldDisabled = true %}
+{% else %}
+    {% set streetAddress2FieldDisabled = false %}
+{% endif %}
+{% if cityFieldDisabled is defined and cityFieldDisabled === true %}
+    {% set cityFieldDisabled = true %}
+{% else %}
+    {% set cityFieldDisabled = false %}
+{% endif %}
+{% if postCodeFieldDisabled is defined and postCodeFieldDisabled === true %}
+    {% set postCodeFieldDisabled = true %}
+{% else %}
+    {% set postCodeFieldDisabled = false %}
+{% endif %}
+{% if stateFieldDisabled is defined and stateFieldDisabled === true %}
+    {% set stateFieldDisabled = true %}
+{% else %}
+    {% set stateFieldDisabled = false %}
+{% endif %}
+{% if countryFieldDisabled is defined and countryFieldDisabled === true %}
+    {% set countryFieldDisabled = true %}
+{% else %}
+    {% set countryFieldDisabled = false %}
+{% endif %}
+
+{% if streetAddressFieldRequired is defined and streetAddressFieldRequired === false %}
+    {% set streetAddressFieldRequired = false %}
+{% else %}
+    {% set streetAddressFieldRequired = true %}
+{% endif %}
+{% if streetAddress2FieldRequired is not defined %}
+    {% set streetAddress2FieldRequired = false %}
 {% endif %}
 {% if cityFieldRequired is defined and cityFieldRequired === false %}
     {% set cityFieldRequired = false %}
@@ -56,12 +118,15 @@
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
                     'fieldId'                               : 'street_address',
-                    'fieldLabel'                            : streetFieldLabel,
+                    'fieldLabel'                            : streetAddressFieldLabel,
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : streetFieldLabel,
-                    'fieldRequired'                         : streetFieldRequired,
+                    'fieldHelpTooltipContent'               : streetAddressFieldLabel,
+                    'fieldHidden'                           : streetAddressFieldHidden,
+                    'fieldDisabled'                         : streetAddressFieldDisabled,
+                    'fieldRequired'                         : streetAddressFieldRequired,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : streetAddressFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : streetAddressFieldBazPostOnUpdate,
                     'fieldDataInputMinLength'               : 1,
@@ -78,12 +143,15 @@
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
                     'fieldId'                               : 'street_address_2',
-                    'fieldLabel'                            : street2FieldLabel,
+                    'fieldLabel'                            : streetAddress2FieldLabel,
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : street2FieldLabel,
-                    'fieldRequired'                         : street2FieldRequired,
+                    'fieldHelpTooltipContent'               : streetAddress2FieldLabel,
+                    'fieldHidden'                           : streetAddress2FieldHidden,
+                    'fieldDisabled'                         : streetAddress2FieldDisabled,
+                    'fieldRequired'                         : streetAddress2FieldRequired,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : streetAddress2FieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : streetAddress2FieldBazPostOnUpdate,
                     'fieldDataInputMinLength'               : 1,
@@ -127,8 +195,11 @@
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : 'Search ' ~ cityFieldLabel ~ '. If there are no search results, try fixing the spelling or use full form for the name, ex: use Saint instead of St.',
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : cityFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : cityFieldBazPostOnUpdate,
+                    'fieldHidden'                           : cityFieldHidden,
+                    'fieldDisabled'                         : cityFieldDisabled,
                     'fieldRequired'                         : cityFieldRequired,
                     'fieldDataInputMinLength'               : 1,
                     'fieldDataInputMaxLength'               : 100,
@@ -148,8 +219,11 @@
                     'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : postCodeFieldLabel ~ ' of the address.',
+                    'fieldHidden'                           : postCodeFieldHidden,
+                    'fieldDisabled'                         : postCodeFieldDisabled,
                     'fieldRequired'                         : postCodeFieldRequired,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : postCodeFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : postCodeFieldBazPostOnUpdate,
                     'fieldDataInputMinLength'               : 1,
@@ -190,8 +264,11 @@
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : 'Enter ' ~ stateFieldLabel,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : stateFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : stateFieldBazPostOnUpdate,
+                    'fieldHidden'                           : stateFieldHidden,
+                    'fieldDisabled'                         : stateFieldDisabled,
                     'fieldRequired'                         : stateFieldRequired,
                     'fieldDataInputMinLength'               : 1,
                     'fieldDataInputMaxLength'               : 100,
@@ -229,8 +306,11 @@
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : 'Enter ' ~ countryFieldLabel,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : countryFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : countryFieldBazPostOnUpdate,
+                    'fieldHidden'                           : countryFieldHidden,
+                    'fieldDisabled'                         : countryFieldDisabled,
                     'fieldRequired'                         : countryFieldRequired,
                     'fieldDataInputMinLength'               : 1,
                     'fieldDataInputMaxLength'               : 100,
@@ -628,8 +708,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : 'Enter ' ~ stateFieldLabel,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : stateFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : stateFieldBazPostOnUpdate,
+                    'fieldHidden'                           : stateFieldHidden,
+                    'fieldDisabled'                         : stateFieldDisabled,
                     'fieldRequired'                         : stateFieldRequired,
                     'fieldDataInputMinLength'               : 1,
                     'fieldDataInputMaxLength'               : 100,
@@ -667,8 +750,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : 'Enter ' ~ countryFieldLabel,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : countryFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : countryFieldBazPostOnUpdate,
+                    'fieldHidden'                           : countryFieldHidden,
+                    'fieldDisabled'                         : countryFieldDisabled,
                     'fieldRequired'                         : countryFieldRequired,
                     'fieldDataInputMinLength'               : 1,
                     'fieldDataInputMaxLength'               : 100,
@@ -925,8 +1011,11 @@ window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}'] =
                     'fieldHelp'                             : true,
                     'fieldHelpTooltipContent'               : 'Enter ' ~ countryFieldLabel,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : countryFieldBazPostOnCreate,
                     'fieldBazPostOnUpdate'                  : countryFieldBazPostOnUpdate,
+                    'fieldHidden'                           : countryFieldHidden,
+                    'fieldDisabled'                         : countryFieldDisabled,
                     'fieldRequired'                         : countryFieldRequired,
                     'fieldDataInputMinLength'               : 1,
                     'fieldDataInputMaxLength'               : 100,

@@ -25,15 +25,15 @@ class Addressbook
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
-                        'notNull' => false,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'type',
+                    'package_name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
-                        'notNull' => false,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
@@ -41,7 +41,7 @@ class Addressbook
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -56,7 +56,7 @@ class Addressbook
                     'city_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -64,7 +64,7 @@ class Addressbook
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 255,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -72,14 +72,14 @@ class Addressbook
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'size'    => 20,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
                     'state_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -87,14 +87,14 @@ class Addressbook
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 255,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
                     'country_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -102,9 +102,12 @@ class Addressbook
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 255,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
+            ],
+            'options' => [
+                'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
             ]
         ];
     }
