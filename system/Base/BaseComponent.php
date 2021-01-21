@@ -21,6 +21,8 @@ abstract class BaseComponent extends Controller
 
 	protected $componentRoute;
 
+	protected $domain;
+
 	protected $application;
 
 	protected $component;
@@ -35,6 +37,8 @@ abstract class BaseComponent extends Controller
 
 	protected function onConstruct()
 	{
+		$this->domain = $this->basepackages->domains->getDomain();
+
 		$this->application = $this->modules->applications->getApplicationInfo();
 		if (!$this->application) {
 			return;
@@ -44,30 +48,7 @@ abstract class BaseComponent extends Controller
 
 		$this->views = $this->modules->views->getViewInfo();
 
-		$this->reflection = new \ReflectionClass($this);
-
-		$this->componentName =
-			str_replace('Component', '', $this->reflection->getShortName());
-
-		$this->component =
-			$this->modules->components->getNamedComponentForApplication(
-				$this->componentName, $this->application['id']
-			);
-
-		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
-
-		if ($this->request->isPost()) {
-			unset($url[Arr::lastKey($url)]);
-		}
-
-		$this->componentRoute = implode('/', $url);
-
-		if (!$this->component) {
-			$this->component =
-				$this->modules->components->getRouteComponentForApplication(
-					strtolower($this->componentRoute), $this->application['id']
-				);
-		}
+		$this->setComponent();
 
 		if (!$this->isJson() || $this->request->isAjax()) {
 
@@ -85,10 +66,42 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	protected function setComponent()
+	{
+		$this->reflection = new \ReflectionClass($this);
+
+		$this->componentName =
+			str_replace('Component', '', $this->reflection->getShortName());
+
+		$this->component =
+			$this->modules->components->getNamedComponentForApplication(
+				$this->componentName, $this->application['id']
+			);
+
+		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
+
+		if ($this->request->isPost()) {
+			unset($url[Arr::lastKey($url)]);
+		}
+
+		if ($url[0] === $this->application['route']) {
+			unset($url[0]);
+		}
+
+		$this->componentRoute = implode('/', $url);
+
+		if (!$this->component) {
+			$this->component =
+				$this->modules->components->getRouteComponentForApplication(
+					strtolower($this->componentRoute), $this->application['id']
+				);
+		}
+	}
+
 	public function beforeExecuteRoute(Dispatcher $dispatcher)
 	{
 		if (!$this->component && $this->application) {
-			$component = $this->modules->components->getIdComponent($this->application['errors_component']);
+			$component = $this->modules->components->getComponentById($this->application['errors_component']);
 
 			if (isset($this->application['errors_component']) &&
 				$this->application['errors_component'] != 0
@@ -169,6 +182,10 @@ abstract class BaseComponent extends Controller
 		}
 
 		$this->view->viewName = $this->views['name'];
+
+		if ($this->application && $this->componentRoute) {
+			$this->view->breadcrumb = $this->componentRoute;
+		}
 	}
 
 	protected function setDefaultViewResponse()
@@ -176,6 +193,8 @@ abstract class BaseComponent extends Controller
 		$this->view->responseCode = '0';
 
 		$this->view->responseMessage = 'Default Response Message';
+
+		$this->view->breadcrumb = '';
 	}
 
 	protected function sendJson()
@@ -194,10 +213,13 @@ abstract class BaseComponent extends Controller
 
 	protected function afterExecuteRoute()
 	{
+		$this->buildHeaderBreadcrumb();
+
 		if ($this->isJson()) {
 			$this->view->tokenKey = $this->security->getTokenKey();
 
 			$this->view->token = $this->security->getToken();
+
 
 			return $this->sendJson();
 		}
@@ -213,14 +235,33 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	protected function buildHeaderBreadcrumb()
+	{
+		if ($this->application && $this->componentRoute) {
+			$this->response->setHeader(
+				'breadcrumb',
+				$this->componentRoute
+			);
+		}
+	}
+
+	public function getNewTokenAction()
+	{
+		if ($this->request->isPost() && $this->isJson()) {
+			$this->view->tokenKey = $this->security->getTokenKey();
+
+			$this->view->token = $this->security->getToken();
+
+			return $this->sendJson();
+		}
+	}
+
 	protected function getURI()
 	{
 		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
 
 		$firstKey = Arr::firstKey($url);
 		$lastKey = Arr::lastKey($url);
-
-		$this->domain = $this->basepackages->domains->getDomain();
 
 		if (isset($this->domain['exclusive_to_default_application']) &&
 			$this->domain['exclusive_to_default_application'] == 1

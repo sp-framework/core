@@ -26,6 +26,7 @@ if (!window.dataCollection) {
     window.dataCollection = { };
     dataCollection = window.dataCollection;
     dataCollection.env = { };
+    dataCollection.env.breadcrumb = '{{breadcrumb}}';
     //Paths
     dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
     // dataCollection.env.rootPath = window.location.origin + dataCollection.env.rootPath.match(/.*\//g);

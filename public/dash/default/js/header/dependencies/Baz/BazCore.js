@@ -112,22 +112,27 @@ var BazCore = function() {
 
     //Breadcrumb
     function bazUpdateBreadcrumb() {
-        if (window.dataCollection.env['currentComponentId']) {
-            var mainBreadcrumb, titleComponentArr;
-            var componentArr = window.dataCollection.env['currentComponentId'].split('-');
+        if (dataCollection.env.breadcrumb) {
+            var mainBreadcrumb, titleBreadcrumbArr;
+            var breadcrumbArr = dataCollection.env.breadcrumb.split('/');
 
-            if (componentArr.length > 1) {
-                var titleText = componentArr.pop();
+            if (breadcrumbArr.length > 1) {
+                var titleText = breadcrumbArr.pop();
                 $('#content-header-breadcrumb ol.breadcrumb').empty();
-                titleComponentArr = [];
-                $.each(componentArr, function(index,component) {
-                    titleComponentArr.push('<li class="breadcrumb-item text-uppercase">' + component + '</li>');
+                titleBreadcrumbArr = [];
+                $.each(breadcrumbArr, function(index,path) {
+                    titleBreadcrumbArr.push('<li class="breadcrumb-item text-uppercase">' + path + '</li>');
                 });
-                mainBreadcrumb = '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' + titleComponentArr.join('');
+                mainBreadcrumb =
+                    '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' +
+                    titleBreadcrumbArr.join('');
                 $('#content-header-breadcrumb ol.breadcrumb').append(mainBreadcrumb);
                 $('#content-header-breadcrumb ol.breadcrumb').append('<li class="breadcrumb-item text-uppercase font-weight-bolder">' + titleText + '</li>');
             } else {
-                $('#content-header-breadcrumb ol.breadcrumb').empty().append('<li class="breadcrumb-item"><i class="fas fa-fw fa-home"></i></li>');
+                $('#content-header-breadcrumb ol.breadcrumb').empty().append(
+                    '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' +
+                    '<li class="breadcrumb-item text-uppercase">Home</li>'
+                );
             }
         } else {
             $('#content-header-breadcrumb ol.breadcrumb').empty().append(
@@ -165,7 +170,7 @@ var BazCore = function() {
             'ajaxLinkClass'                 : '.contentAjaxLink',
             'ajaxContainer'                 : $("#baz-content"),
             'ajaxBefore'                    : function () {
-                                                window.dataCollection.env['currentComponentId'] = null;
+                                                dataCollection.env['currentComponentId'] = null;
                                                 $('#baz-error').attr('hidden', true);
                                                 $('#baz-error-content').children().attr('hidden', true);
                                                 Pace.restart();
