@@ -282,7 +282,7 @@
                         'fieldJstreeSearchShowOnlyMatches'            : false,
                         'fieldJstreeSearchShowOnlyMatchesChildren'    : false,
                         'fieldJstreeHideJstreeIcons'                  : false,
-                        'dataSrcArr' :
+                        'fieldJstreeDataSrcArr'                       :
                             [
                                 'components'   :
                                     [
@@ -459,7 +459,7 @@ dataCollectionSection =
                     });
                 })();
 
-                var allIds, gridData, permissions, parents, children;
+                var allIds, gridData, permissions, parents, children, jstreeId;
 
                 allIds =
                     $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
@@ -473,16 +473,21 @@ dataCollectionSection =
                 gridData = dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'];
 
                 permissions = JSON.parse('{{accountPermissions}}');//Parse DB Data
+
                 for (var application in permissions) {
                     for (var component in permissions[application]) {
-                        if ($('#{{componentId}}-{{sectionId}}-permissions').find('[data-id="' + component + '"]').length > 0) {
-                            var jstreeId =
-                                $('#{{componentId}}-{{sectionId}}-permissions').find('[data-id="' + component + '"]')[0].id;
-                            gridData[jstreeId] = { };
-                            gridData[jstreeId]['component_id'] = component;
-                            gridData[jstreeId]['permissions'] = permissions[application][component];
-                            gridData[jstreeId]['parents'] = [];
-                            gridData[jstreeId]['children'] = [];
+                        jstreeId =
+                            $($('#{{componentId}}-{{sectionId}}-permissions ul.jstree-children')
+                                .find('[data-id="' + application + '"]'))
+                            .find('[data-id="' + component + '"]');
+
+                        if (jstreeId.length > 0) {
+                            gridData[jstreeId[0].id] = { };
+                            gridData[jstreeId[0].id]['application_id'] = application;
+                            gridData[jstreeId[0].id]['component_id'] = component;
+                            gridData[jstreeId[0].id]['permissions'] = permissions[application][component];
+                            gridData[jstreeId[0].id]['parents'] = [];
+                            gridData[jstreeId[0].id]['children'] = [];
                         }
                     }
                 }
@@ -762,8 +767,13 @@ dataCollectionSection =
                     }
                     var data = dataCollectionSection['data']['permissions'];
 
+                    for (var application in permissions) {
+                        data[application] = { };
+                    }
+
                     for (var nodeId in gridData) {
-                        data[gridData[nodeId]['component_id']] = gridData[nodeId]['permissions'];
+                        data[gridData[nodeId]['application_id']][gridData[nodeId]['component_id']] =
+                            gridData[nodeId]['permissions'];
                     }
                 }
             }

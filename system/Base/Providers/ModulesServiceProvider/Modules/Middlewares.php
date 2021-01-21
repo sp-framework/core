@@ -26,7 +26,7 @@ class Middlewares extends BasePackage
 				function($middleware) use ($name, $applicationId) {
 					$middleware = $middleware->toArray();
 					$middleware['applications'] = Json::decode($middleware['applications'], true);
-					if ($middleware['applications'][$applicationId]['installed'] === true &&
+					if ($middleware['applications'][$applicationId]['enabled'] === true &&
 						$middleware['name'] === ucfirst($name)
 					) {
 						return $middleware;

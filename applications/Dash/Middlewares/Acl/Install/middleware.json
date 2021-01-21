@@ -1,6 +1,6 @@
 {
     "name"          : "Acl",
-    "displayName"   : "Access Control List Middleware",
+    "displayName"   : "Access Control List",
     "description"   : "This middleware is used by user roles. It checks the role configuration and allows/blocks user's connection to a particular resource.",
     "app_type"      : "dash",
     "category"      : "system",

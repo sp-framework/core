@@ -329,21 +329,29 @@ class Accounts extends BasePackage
         }
 
         $acls = [];
+
         $applicationsArr = $this->modules->applications->applications;
 
         foreach ($applicationsArr as $applicationKey => $application) {
             $componentsArr = $this->modules->components->getComponentsForApplication($application['id']);
-            $components[strtolower($application['name'])] = ['title' => strtoupper($application['name'])];
-            // foreach ($componentsArr as $key => $component) {
-            //     $components[strtolower($application['name'])]['childs'][$component['type']] = ['title' => strtoupper($component['type'])];
-            // }
-            foreach ($componentsArr as $key => $component) {
-                $reflector = $this->annotations->get($component['class']);
-                $methods = $reflector->getMethodsAnnotations();
 
-                if ($methods) {
-                    $components[strtolower($application['name'])]['childs'][$key]['id'] = $component['id'];
-                    $components[strtolower($application['name'])]['childs'][$key]['title'] = $component['name'];
+            if (count($componentsArr) > 0) {
+                $components[strtolower($application['id'])] =
+                    [
+                        'title' => strtoupper($application['name']),
+                        'id' => strtoupper($application['id'])
+                    ];
+                // foreach ($componentsArr as $key => $component) {
+                //     $components[strtolower($application['name'])]['childs'] = ['title' => strtoupper($component['type'])];
+                // }
+                foreach ($componentsArr as $key => $component) {
+                    $reflector = $this->annotations->get($component['class']);
+                    $methods = $reflector->getMethodsAnnotations();
+
+                    if ($methods) {
+                        $components[strtolower($application['id'])]['childs'][$key]['id'] = $component['id'];
+                        $components[strtolower($application['id'])]['childs'][$key]['title'] = $component['name'];
+                    }
                 }
             }
         }
@@ -389,8 +397,8 @@ class Accounts extends BasePackage
                                 foreach ($methods as $annotation) {
                                     $action = $annotation->getAll('acl')[0]->getArguments();
                                     $acls[$action['name']] = $action['name'];
-                                    if (isset($permissionsArr[$component['id']])) {
-                                        $permissions[$application['id']][$component['id']] = $permissionsArr[$component['id']];
+                                    if (isset($permissionsArr[$application['id']][$component['id']])) {
+                                        $permissions[$application['id']][$component['id']] = $permissionsArr[$application['id']][$component['id']];
                                     } else {
                                         $permissions[$application['id']][$component['id']][$action['name']] = 0;
                                     }

@@ -60,6 +60,9 @@ class Roles
                         ],
                         'UNIQUE'
                     )
+                ],
+                'options' => [
+                    'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
                 ]
             ];
     }

@@ -83,10 +83,10 @@ class Accounts
                         ]
                     ),
                     new Column(
-                        'session_id',
+                        'session_ids',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 1024,
+                            'size'    => 4096,
                             'notNull' => false,
                         ]
                     ),

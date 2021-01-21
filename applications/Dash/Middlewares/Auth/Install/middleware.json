@@ -1,6 +1,6 @@
 {
     "name"          : "Auth",
-    "displayName"   : "Authentication Middleware",
+    "displayName"   : "Authentication",
     "description"   : "This middleware is used by authentication package. Once enabled, user need to authentication to this application to access any resource.",
     "version"       : "0.0.1",
     "app_type"      : "dash",

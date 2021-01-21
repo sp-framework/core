@@ -404,12 +404,13 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-errors_component').trigger('change');
                     } else {
                         dataCollectionSection['data']['components'][$('#' + componentCheckbox).data('id')] = false;
+                        $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id')).attr('disabled', true);
                         if (switchMenu &&
                             Object.keys($('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))).length > 0
                         ) {
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id')).attr('disabled', true);
                             $('#{{componentId}}-{{sectionId}}-component-menu-' + $('#' + componentCheckbox).data('id'))[0].checked = false;
-                            // dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = false;
+                            dataCollectionSection['data']['menus'][menuId][applicationId]['enabled'] = false;
                         }
                         $('#{{componentId}}-{{sectionId}}-default_component').find('[value="' + componentId + '"]').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-default_component').trigger('change');

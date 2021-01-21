@@ -22,7 +22,18 @@ class MiddlewaresServiceProvider extends Injectable
             foreach ($middlewares as $middleware) {
                 if ($middleware['enabled'] == true) {
                     $middlewareClass = $middleware['class'] . '\\' . $middleware['name'];
-                    (new $middlewareClass())->process();
+                    $mw = (new $middlewareClass())->process();
+
+                    //If there is a redirect or null returned from process
+                    if ($mw && $mw instanceof \Phalcon\Http\Response) {
+                        if ($mw->getHeaders()->toArray()['Status'] === '302 Found') {
+                            break;
+                        }
+                    }
+
+                    if ($mw === false) {
+                        break;
+                    }
                 }
             }
         }

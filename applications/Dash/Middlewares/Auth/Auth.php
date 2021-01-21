@@ -8,16 +8,25 @@ class Auth extends BaseMiddleware
 {
     public function process()
     {
-        $appRoute = strtolower($this->application['route']);
+        $domain = $this->basepackages->domains->getDomain();
+
+        if (isset($domain['exclusive_to_default_application']) &&
+            $domain['exclusive_to_default_application'] == 1
+        ) {
+            $appRoute = '';
+        } else {
+            $appRoute = '/' . strtolower($this->application['route']);
+        }
+
         $givenRoute = rtrim(explode('/q/', $this->request->getUri())[0], '/');
 
         $guestAccess =
         [
-            '/' . $appRoute . '/auth',
-            '/' . $appRoute . '/auth/login',
-            '/' . $appRoute . '/auth/logout',
-            '/' . $appRoute . '/auth/forgot',
-            '/' . $appRoute . '/auth/pwreset'
+            $appRoute . '/auth',
+            $appRoute . '/auth/login',
+            $appRoute . '/auth/logout',
+            $appRoute . '/auth/forgot',
+            $appRoute . '/auth/pwreset'
         ];
 
         if (!in_array($givenRoute, $guestAccess)) {
@@ -43,8 +52,11 @@ class Auth extends BaseMiddleware
 
             //Authenticated
             if (!$this->auth->check()) {
-                return $this->response->redirect('/' . $appRoute . '/auth');
+                return $this->response->redirect($appRoute . '/auth');
             }
+
+            return true;
         }
+        return false;
     }
 }

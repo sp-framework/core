@@ -10,33 +10,28 @@ class Accounts extends BaseModel
 
     public $email;
 
+    public $domain;
+
     public $password;
+
+    public $role_id;
+
+    public $override_role;
 
     public $permissions;
 
     public $can_login;
 
-    public $version;
+    public $force_pwreset;
+
+    public $session_ids;
+
+    public $remember_identifier;
 
     public $remember_token;
 
-    public $remember_identifier;
-    // public $id;
-    // public $customer_name;
-    // public $contact_last_name;
-    // public $contact_first_name;
-    // public $phone;
-    // public $address_line_1;
-    // public $address_line_2;
-    // public $city;
-    // public $state;
-    // public $post_code;
-    // public $country;
-    // public $sales_rep_employee_number;
-    // public $credit_limit;
-
     public function initialize()
     {
-        // $this->setSource('customers');
+        //
     }
 }
