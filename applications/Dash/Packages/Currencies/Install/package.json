@@ -1,7 +1,7 @@
 {
     "name"          : "Currencies",
-    "displayName"   : "Admin Currencies Package",
-    "description"   : "Package for Currencies component",
+    "displayName"   : "Currencies",
+    "description"   : "Package to register currencies via currencies component",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "admin",

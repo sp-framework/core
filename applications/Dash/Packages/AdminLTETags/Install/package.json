@@ -1,7 +1,7 @@
 {
     "name"          : "AdminLTETags",
-    "displayName"   : "Admin AdminLTETags Package",
-    "description"   : "Package for volt tags",
+    "displayName"   : "AdminLTE HTML Helper Tags",
+    "description"   : "Package to generate AdminLTE framework html tags",
     "app_type"      : "dash",
     "category"      : "system",
     "sub_category"  : "tools",

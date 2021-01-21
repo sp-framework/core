@@ -1,7 +1,7 @@
 {
     "name"          : "Businesses",
-    "displayName"   : "Admin Businesses Package",
-    "description"   : "Package for Businesses component",
+    "displayName"   : "Businesses",
+    "description"   : "Package to register business information via businesses component",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "admin",

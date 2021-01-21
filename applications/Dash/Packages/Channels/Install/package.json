@@ -1,7 +1,7 @@
 {
     "name"          : "Channels",
-    "displayName"   : "Admin Channels Package",
-    "description"   : "Package for Channels component",
+    "displayName"   : "Channels",
+    "description"   : "Package to register different selling channels via channels component",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "admin",

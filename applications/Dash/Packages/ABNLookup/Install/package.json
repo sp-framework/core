@@ -1,7 +1,7 @@
 {
     "name"          : "ABNLookup",
-    "displayName"   : "Admin ABN Lookup Package",
-    "description"   : "Package for making ABN Search via Businesses component",
+    "displayName"   : "Australian Business Number Lookup",
+    "description"   : "Package to make ABN Search via components and packages",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "tools",

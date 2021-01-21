@@ -1,7 +1,7 @@
 {
     "name"          : "Customers",
-    "displayName"   : "Admin Customers Package",
-    "description"   : "Package for Customers component",
+    "displayName"   : "CRMS Customers",
+    "description"   : "Customer Relationship Management System (CRMS) Package for managing customers via customers component",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "crms",
