@@ -40,6 +40,12 @@ class Filters extends AdminLTETags
             $sharedHidden = false;
         }
 
+        $employeesPackage = $this->init()->checkPackage('Applications\Dash\Packages\Hrms\Employees\Employees');
+
+        if ($employeesPackage) {
+            $employeesPackage = new \Applications\Dash\Packages\Hrms\Employees\Employees;
+        }
+
         foreach ($this->params['dtFilters'] as $filterKey => $filter) {
             $filters[$filterKey] = $filter;
 
@@ -50,7 +56,7 @@ class Filters extends AdminLTETags
                     $defaultFilter = 0;
                 }
                 $queryFilterId = $filter['data']['queryFilterId'];
-            } else if (($account && $account['id'] === $filter['account_id']) &&
+            } else if (($account && ($account['id'] === $filter['account_id'])) &&
                 $filter['is_default'] === '1'
             ) {
                 if (!$defaultFilter) {
@@ -61,14 +67,20 @@ class Filters extends AdminLTETags
                     $filters[$filterKey]['name'] . ' (Default)';
             }
 
-            if ($filter['type'] === '0') {
+            if ($filter['filter_type'] === '0') {
                 $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (System)';
-            } else if ($filter['type'] === '2') {
-                $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared)';
-            }
+            // } else if ($filter['filter_type'] === '1') {
+            //     $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared)';
+            } else if ($filter['shared'] == '1' && $filter['shared_ids']) {
+                if ($this->auth->account()['id'] != $filter['account_id']) {
+                    if ($employeesPackage) {
+                        $employee = $employeesPackage->searchByAccountId($filter['account_id']);
 
-            if ($filter['shared_ids']) {
-                $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared by ' . $filter['account_name'] . ')';
+                        $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared by ' . $employee['full_name'] . ')';
+                    } else {
+                        $filters[$filterKey]['name'] = $filters[$filterKey]['name'] . ' (Shared by ' . $filter['account_email'] . ')';
+                    }
+                }
             }
         }
         if ($defaultFilter === null) {
@@ -470,7 +482,7 @@ class Filters extends AdminLTETags
     protected function getShareModalContent()
     {
         $modalContent =
-            '<section id="' . $this->compSecId . '-filter-sharing">
+            '<section id="' . $this->compSecId . '-filter-sharing" class="sectionWithForm">
                 <form autocomplete="off" class="mt-1" data-validateon="section" id="' . $this->compSecId . '-filter-sharing-form">
                     <fieldset id="' . $this->compSecId . '-filter-sharing-fieldset">
                         <div class="row">
@@ -511,38 +523,68 @@ class Filters extends AdminLTETags
                                         'fieldHelpTooltipContent'             => 'Select Roles to share filter with',
                                         'fieldBazScan'                        => true,
                                         'fieldRequired'                       => false,
-                                        'fieldDataSelect2Options'             => $this->roles->roles,
-                                        'fieldDataSelect2Multiple'            => true,
-                                        'fieldDataSelect2OptionsKey'          => 'id',
-                                        'fieldDataSelect2OptionsValue'        => 'name',
-                                        'fieldDataSelect2OptionsArray'        => true,
-                                    ]
-                                ) .
-                            '</div>
-                        </div>
-                        <div class="row">
-                            <div class="col">' .
-                                $this->useTag('fields',
-                                    [
-                                        'componentId'                         => $this->params['componentId'],
-                                        'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
-                                        'fieldId'                             => 'uids',
-                                        'fieldLabel'                          => 'Account(s)',
-                                        'fieldType'                           => 'select2',
-                                        'fieldHelp'                           => true,
-                                        'fieldHelpTooltipContent'             => 'Select Accounts to share filter with',
-                                        'fieldBazScan'                        => true,
-                                        'fieldRequired'                       => false,
                                         'fieldDataSelect2Options'             => [],
                                         'fieldDataSelect2Multiple'            => true,
                                         'fieldDataSelect2OptionsKey'          => 'id',
                                         'fieldDataSelect2OptionsValue'        => 'name',
-                                        'fieldDataSelect2OptionsArray'        => true,
+                                        'fieldDataSelect2OptionsArray'        => true
                                     ]
                                 ) .
                             '</div>
-                        </div>
-                    </fieldset>
+                        </div>';
+                        //Check if employees package exists we show employees. We can extract the Account Ids from them.
+                        $employeesPackage = $this->init()->checkPackage('Applications\Dash\Packages\Hrms\Employees\Employees');
+
+                        if ($employeesPackage) {
+                            $modalContent .= '<div class="row">
+                                <div class="col">' .
+                                    $this->useTag('fields',
+                                        [
+                                            'componentId'                         => $this->params['componentId'],
+                                            'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
+                                            'fieldId'                             => 'eids',
+                                            'fieldLabel'                          => 'Employee(s)',
+                                            'fieldType'                           => 'select2',
+                                            'fieldHelp'                           => true,
+                                            'fieldHelpTooltipContent'             => 'Select Employees to share filter with',
+                                            'fieldBazScan'                        => true,
+                                            'fieldRequired'                       => false,
+                                            'fieldDataSelect2Options'             => [],
+                                            'fieldDataSelect2Multiple'            => true,
+                                            'fieldDataSelect2OptionsKey'          => 'id',
+                                            'fieldDataSelect2OptionsValue'        => 'name',
+                                            'fieldDataSelect2OptionsArray'        => true
+                                        ]
+                                    ) .
+                                '</div>
+                            </div>';
+                        } else {
+                            $modalContent .= '<div class="row">
+                                <div class="col">' .
+                                    $this->useTag('fields',
+                                        [
+                                            'componentId'                         => $this->params['componentId'],
+                                            'sectionId'                           => $this->params['sectionId'] . '-filter-sharing',
+                                            'fieldId'                             => 'aids',
+                                            'fieldLabel'                          => 'Account(s)',
+                                            'fieldType'                           => 'select2',
+                                            'fieldHelp'                           => true,
+                                            'fieldHelpTooltipContent'             => 'Select Accounts to share filter with',
+                                            'fieldBazScan'                        => true,
+                                            'fieldRequired'                       => false,
+                                            'fieldDataSelect2Options'             => [],
+                                            'fieldDataSelect2Multiple'            => true,
+                                            'fieldDataSelect2OptionsKey'          => 'id',
+                                            'fieldDataSelect2OptionsValue'        => 'name',
+                                            'fieldDataSelect2OptionsArray'        => true
+                                        ]
+                                    ) .
+                                '</div>
+                            </div>';
+                        }
+
+                    $modalContent .=
+                    '</fieldset>
                 </form>
             </section>';
 
@@ -602,11 +644,118 @@ class Filters extends AdminLTETags
                                     }
                                 },
                             "' . $this->compSecId . '-filter-sharing-rids"        : {
-                                placeholder: "Select Role(s)",
-                            },
-                            "' . $this->compSecId . '-filter-sharing-uids"        : {
-                                placeholder: "Select Account(s)",
+                                placeholder: "SELECT ROLE(S)",
+                                "ajax"          : {
+                                    url         : "' . $this->links->url('filters/searchRole') . '",
+                                    dataType    : "json",
+                                    method      : "post",
+                                    data: function(params) {
+                                        return {
+                                            search: params.term
+                                        }
+                                    },
+                                    processResults: function(data) {
+                                        if (data.tokenKey && data.token) {
+                                            $("#security-token").attr("name", data.tokenKey);
+                                            $("#security-token").val(data.token);
+                                        }
+                                        if (data.roles) {
+                                            var rolesData = [];
+                                            for (var item of data.roles) {
+                                                rolesData.push({
+                                                    "id"    : item["id"],
+                                                    "text"  : item["name"]
+                                                });
+                                            }
 
+                                            return {
+                                                results: rolesData
+                                            }
+                                        } else {
+                                            return {
+                                                results : []
+                                            }
+                                        }
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength : 2
+                            },
+                            "' . $this->compSecId . '-filter-sharing-eids"        : {
+                                placeholder: "SELECT EMPLOYEE(S)",
+                                "ajax"          : {
+                                    url         : "' . $this->links->url('filters/searchEmployee') . '",
+                                    dataType    : "json",
+                                    method      : "post",
+                                    data: function(params) {
+                                        return {
+                                            search: params.term
+                                        }
+                                    },
+                                    processResults: function(data) {
+                                        if (data.tokenKey && data.token) {
+                                            $("#security-token").attr("name", data.tokenKey);
+                                            $("#security-token").val(data.token);
+                                        }
+                                        if (data.employees) {
+                                            var employeesData = [];
+                                            for (var item of data.employees) {
+                                                employeesData.push({
+                                                    "id"    : item["id"],
+                                                    "text"  : item["full_name"]
+                                                });
+                                            }
+
+                                            return {
+                                                results: employeesData
+                                            }
+                                        } else {
+                                            return {
+                                                results : []
+                                            }
+                                        }
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength : 2
+                            },
+                            "' . $this->compSecId . '-filter-sharing-aids"        : {
+                                placeholder: "SELECT ACCOUNT(S)",
+                                "ajax"          : {
+                                    url         : "' . $this->links->url('filters/searchAccount') . '",
+                                    dataType    : "json",
+                                    method      : "post",
+                                    data: function(params) {
+                                        return {
+                                            search: params.term
+                                        }
+                                    },
+                                    processResults: function(data) {
+                                        if (data.tokenKey && data.token) {
+                                            $("#security-token").attr("name", data.tokenKey);
+                                            $("#security-token").val(data.token);
+                                        }
+                                        if (data.accounts) {
+                                            var accountsData = [];
+                                            for (var item of data.accounts) {
+                                                accountsData.push({
+                                                    "id"    : item["id"],
+                                                    "text"  : item["email"]
+                                                });
+                                            }
+
+                                            return {
+                                                results: accountsData
+                                            }
+                                        } else {
+                                            return {
+                                                results : []
+                                            }
+                                        }
+                                    },
+                                    cache: true
+                                },
+                                minimumInputLength : 2
                             },
                         }
                     );

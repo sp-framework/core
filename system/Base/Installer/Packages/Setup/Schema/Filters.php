@@ -44,7 +44,7 @@ class Filters
                     ]
                 ),
                 new Column(
-                    'type',
+                    'filter_type',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'size'    => 1,

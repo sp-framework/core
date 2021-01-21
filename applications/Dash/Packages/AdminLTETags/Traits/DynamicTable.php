@@ -3,6 +3,7 @@
 namespace Applications\Dash\Packages\AdminLTETags\Traits;
 
 use Applications\Dash\Packages\AdminLTETags\AdminLTETags;
+use Phalcon\Helper\Json;
 
 trait DynamicTable {
     public function generateDTContent(
@@ -64,12 +65,13 @@ trait DynamicTable {
                     $table['filters'][$filter['id']]['data']['id'] = $filter['id'];
                     $table['filters'][$filter['id']]['data']['component_id'] = $filter['component_id'];
                     $table['filters'][$filter['id']]['data']['conditions'] = $filter['conditions'];
-                    $table['filters'][$filter['id']]['data']['type'] = $filter['type'];
+                    $table['filters'][$filter['id']]['data']['filter_type'] = $filter['filter_type'];
                     $table['filters'][$filter['id']]['data']['auto_generated'] = $filter['auto_generated'];
                     $table['filters'][$filter['id']]['data']['is_default'] = $filter['is_default'];
                     $table['filters'][$filter['id']]['data']['account_id'] = $filter['account_id'];
-                    $table['filters'][$filter['id']]['data']['shared_ids'] = $this->escaper->escapeHtml($filter['shared_ids']);
-                    $table['filters'][$filter['id']]['data']['url'] = $this->links->url($this->component['route']) . '/q/filter/' . $filter['id'];
+                    $table['filters'][$filter['id']]['data']['shared'] = $filter['shared'];
+                    $table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
+                    $table['filters'][$filter['id']]['data']['url'] = $filter['url'];
 
                     if (isset($this->getData()['filter'])) {
                         if ($this->getData()['filter'] === $filter['id']) {
@@ -79,7 +81,9 @@ trait DynamicTable {
                             $table['filters'][$filter['id']]['data']['queryFilterId'] = $this->getData()['filter'];
                             $table['postUrlParams'] = ['conditions' => '-:id:equals:0&'];
                         }
-                    } else if ($filter['is_default'] === '1') {
+                    } else if (($account && ($account['id'] === $filter['account_id'])) &&
+                                $filter['is_default'] === '1'
+                    ) {
                         $table['postUrlParams'] = ['conditions' => $filter['conditions']];
                     }
                 }

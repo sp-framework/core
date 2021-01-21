@@ -3,6 +3,7 @@
 namespace Applications\Dash\Components\Filters;
 
 use Applications\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Applications\Dash\Packages\Hrms\Employees\Employees;
 use System\Base\BaseComponent;
 
 class FiltersComponent extends BaseComponent
@@ -45,7 +46,7 @@ class FiltersComponent extends BaseComponent
             if ($this->request->isPost()) {
                 $replaceColumns =
                     [
-                        'type' => ['html'  =>
+                        'filter_type' => ['html'  =>
                             [
                                 '0' =>  'System',
                                 '1' =>  'User',
@@ -82,9 +83,9 @@ class FiltersComponent extends BaseComponent
                 $this->basepackages->filters,
                 'filters/view',
                 null,
-                ['name', 'type', 'auto_generated', 'is_default'],
+                ['name', 'filter_type', 'auto_generated', 'is_default'],
                 true,
-                ['name', 'type', 'auto_generated', 'is_default'],
+                ['name', 'filter_type', 'auto_generated', 'is_default'],
                 $controlActions,
                 null,
                 $replaceColumns,
@@ -150,7 +151,7 @@ class FiltersComponent extends BaseComponent
 
             $this->view->responseMessage = $this->filters->packagesData->responseMessage;
 
-            if ($this->application['id'] === 1) {
+            if ($this->application['id'] == 1) {
                 $this->view->filters = $this->filters->packagesData->filters;
             } else {
                 if (isset($this->postData()['component_id'])) {
@@ -165,7 +166,7 @@ class FiltersComponent extends BaseComponent
         }
     }
 
-    public function cloneAction()
+    protected function cloneAction()
     {
         if ($this->request->isPost()) {
 
@@ -199,20 +200,21 @@ class FiltersComponent extends BaseComponent
                 return;
             }
 
-            $this->filters->removeFilter($this->postData());
+            $removeFilter = $this->filters->removeFilter($this->postData());
 
             $this->view->responseCode = $this->filters->packagesData->responseCode;
 
             $this->view->responseMessage = $this->filters->packagesData->responseMessage;
 
-            if ($this->application['id'] === 1) {
-                $this->view->filters = $this->filters->packagesData->filters;
-            } else {
-                if (isset($this->postData()['component_id'])) {
+            if ($removeFilter) {
+                if ($this->application['id'] === 1) {
                     $this->view->filters = $this->filters->packagesData->filters;
+                } else {
+                    if (isset($this->postData()['component_id'])) {
+                        $this->view->filters = $this->filters->packagesData->filters;
+                    }
                 }
             }
-
         } else {
             $this->view->responseCode = 1;
 
@@ -235,6 +237,123 @@ class FiltersComponent extends BaseComponent
             $this->view->responseCode = 1;
 
             $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function searchRoleAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 3) {
+                    return;
+                }
+
+                $searchRoles = $this->roles->searchRole($searchQuery);
+
+                if ($searchRoles) {
+                    $this->view->responseCode = $this->roles->packagesData->responseCode;
+
+                    $this->view->roles = $this->roles->packagesData->roles;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
+        }
+    }
+
+    public function searchAccountAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 3) {
+                    return;
+                }
+
+                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
+
+                if ($searchAccounts) {
+                    $currentAccount = $this->auth->account();
+
+                    if ($currentAccount) {
+                        $accounts = $this->accounts->packagesData->accounts;
+
+                        foreach ($accounts as $accountKey => $account) {
+                            if ($account['id'] == $currentAccount['id']) {
+                                unset($accounts[$accountKey]);
+                            }
+                        }
+
+                        $accounts = array_values($accounts);
+
+                        $this->view->responseCode = $this->accounts->packagesData->responseCode;
+
+                        $this->view->accounts = $accounts;
+                    } else {
+                        $this->view->responseCode = $this->accounts->packagesData->responseCode;
+
+                        $this->view->accounts = $this->accounts->packagesData->accounts;
+                    }
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
+        }
+    }
+
+    public function searchEmployeeAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 3) {
+                    return;
+                }
+
+                $employees = $this->usePackage(Employees::class);
+
+                $searchEmployees = $employees->searchByFullName($searchQuery);
+
+                if ($searchEmployees) {
+                    $currentAccount = $this->auth->account();
+
+                    if ($currentAccount) {
+                        $employeesArr = $employees->packagesData->employees;
+
+                        foreach ($employeesArr as $employeeKey => $employee) {
+                            if ($employee['id'] == $currentAccount['id']) {
+                                unset($employeesArr[$employeeKey]);
+                            }
+                        }
+
+                        $employeesArr = array_values($employeesArr);
+
+                        $this->view->responseCode = $employees->packagesData->responseCode;
+
+                        $this->view->employees = $employeesArr;
+                    } else {
+                        $this->view->responseCode = $employees->packagesData->responseCode;
+
+                        $this->view->employees = $employees->packagesData->employees;
+                    }
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
         }
     }
 }

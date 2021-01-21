@@ -1,4 +1,4 @@
-/* globals define exports BazContentLoader Swal PNotify */
+/* globals define exports BazContentLoader BazContentFields Swal PNotify */
 /*
 * @title                    : BazContentSectionWithListing
 * @description              : Baz Lib for Content (Sections With Form)
@@ -79,21 +79,26 @@
 
             //Build listing filters
             _proto._buildListingFilters = function() {
-                $('#' + sectionId + '-sharing').BazContentFields();
+                BazContentFields.init({
+                    'componentId'   : componentId,
+                    'sectionId'     : sectionId
+                });
                 $(this._element).BazContentSectionWithFormToDatatable();
 
                 function toggleFilterButtons(sectionId) {
-                    if ($('#' + sectionId + '-filters option:selected').data()['type'] === 0 || //System
-                        $('#' + sectionId + '-filters option:selected').data()['type'] === 2    //Shared
-                    ) {
+                    if ($('#' + sectionId + '-filters option:selected').data()['filter_type'] == 0) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
                         $('#' + sectionId + '-delete').addClass('disabled');
-
-                    } else if ($('#' + sectionId + '-filters option:selected').data()['type'] === 1) {
+                    } else if ($('#' + sectionId + '-filters option:selected').data()['filter_type'] == 1) {
                         $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", false);
                         $('#' + sectionId + '-delete').removeClass('disabled');
                     }
+                    if ($('#' + sectionId + '-filters option:selected').data()['shared'] == 1) {
+                        $('#' + sectionId + '-edit, #' + sectionId + '-share').attr("disabled", true);
+                        $('#' + sectionId + '-delete').addClass('disabled');
+                    }
                 }
+                        // $('#' + sectionId + '-filters option:selected').data()['filter_type'] === 1    //User
 
                 toggleFilterButtons(sectionId);
 
@@ -120,71 +125,114 @@
 
                     var filterUrl = $('#' + sectionId + '-filter-filters option:selected').data()['url'];
                     var sharedIds = $('#' + sectionId + '-filter-filters option:selected').data()['shared_ids'];
-                    //eslint-disable-next-line
-                    console.log(sharedIds);
-                    if (sharedIds.rids) {
+
+                    if (sharedIds && sharedIds.rids) {
                         for (var rid in sharedIds.rids) {
-                            $('#' + sectionId + '-filter-sharing-rids').find('[data-value="' + rid + '"]').attr('selected', true);
+                            $('#' + sectionId + '-filter-sharing-rids').append(
+                                '<option value="' + sharedIds.rids[rid]['id'] + '" selected>' + sharedIds.rids[rid]['name'] + '</option>'
+                            );
                         }
-                        $('#' + sectionId + '-filter-sharing-rids').trigger('change');
+                        $('#' + sectionId + '-filter-sharing-rids').trigger('select2:change');
                     }
 
-                    // if (sharedIds.uids) {
-                    //     for (var uid in sharedIds.uids) {
-                    //         //Dynamically add user ids.
-                    //     }
-                    //     $('#' + sectionId + '-filter-sharing-rids').trigger('change');
-                    // }
+                    if (sharedIds && sharedIds.eids) {
+                        for (var eid in sharedIds.eids) {
+                            $('#' + sectionId + '-filter-sharing-eids').append(
+                                '<option value="' + sharedIds.eids[eid]['id'] + '" selected>' + sharedIds.eids[eid]['name'] + '</option>'
+                            );
+                        }
+                        $('#' + sectionId + '-filter-sharing-eids').trigger('select2:change');
+                    }
+
+                    if (sharedIds && sharedIds.aids) {
+                        for (var aid in sharedIds.aids) {
+                            $('#' + sectionId + '-filter-sharing-aids').append(
+                                '<option value="' + sharedIds.aids[aid]['id'] + '" selected>' + sharedIds.aids[aid]['name'] + '</option>'
+                            );
+                        }
+                        $('#' + sectionId + '-filter-sharing-aids').trigger('select2:change');
+                    }
 
                     $('#' + sectionId + '-filter-sharing-direct-url').val(filterUrl);
 
                     $('#' + sectionId + '-filter-sharing-modal').modal('show');
-                });
 
-                $('#' + sectionId + '-share-filter').click(function(e) {
-                    e.preventDefault();
-
-                    var rids = $('#' + sectionId + '-filter-sharing-rids').select2('data');
-                    var uids = $('#' + sectionId + '-filter-sharing-uids').select2('data');
-
-                    //Save To Db
-                    var postData = { };
-                    postData['id'] = $('#' + sectionId + '-filter-filters option:selected').data()['id'];
-                    postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
-                    postData['shared_ids'] = { };
-                    postData['shared_ids']['rids'] = { };
-                    $(rids).each(function(index, rid) {
-                        postData['shared_ids']['rids'][rid.id] = rid.text;
+                    //Share Buttons
+                    $('#' + sectionId + '-filter-share-filter, #' + sectionId + '-filter-sharing-modal-button-close').off();
+                    $('#' + sectionId + '-filter-sharing-modal-button-close').click(function() {
+                        $('#' + sectionId + '-filter-sharing-rids').empty().trigger('select2:change');
+                        $('#' + sectionId + '-filter-sharing-eids').empty().trigger('select2:change');
+                        $('#' + sectionId + '-filter-sharing-aids').empty().trigger('select2:change');
                     });
-                    postData['shared_ids']['uids'] = [];
-                    $(uids).each(function(index, uid) {
-                        postData['shared_ids']['uids'].push(uid.id);
-                    });
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    $('#' + sectionId + '-filter-share-filter').click(function(e) {
+                        e.preventDefault();
 
-                    var url = $(this).attr('href');
+                        var rids = $('#' + sectionId + '-filter-sharing-rids').select2('data');
+                        var uids;
+                        if ($('#' + sectionId + '-filter-sharing-eids').length > 0) {
+                            uids = $('#' + sectionId + '-filter-sharing-eids').select2('data');
+                        } else if ($('#' + sectionId + '-filter-sharing-aids').length > 0) {
+                            uids = $('#' + sectionId + '-filter-sharing-aids').select2('data');
+                        }
 
-                    //Update Filter
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
-                            PNotify.success({
-                                'title' : data.responseMessage
+                        //Save To Db
+                        var postData = { };
+                        postData['id'] = $('#' + sectionId + '-filter-filters option:selected').data()['id'];
+                        postData['component_id'] = $('#' + sectionId + '-filter-filters option:selected').data()['component_id'];
+                        postData['filter_type'] = '1';
+                        postData['shared_ids'] = { };
+                        postData['shared_ids']['rids'] = [];
+                        if (rids.length > 0) {
+                            $(rids).each(function(index, rid) {
+                                postData['shared_ids']['rids'].push(rid.id);
                             });
-                            if (data.filters) {
-                                redoFiltersOptions(query, sectionId, data);
+                        }
+                        if ($('#' + sectionId + '-filter-sharing-eids').length > 0) {
+                            postData['shared_ids']['eids'] = [];
+                            if (uids.length > 0) {
+                                $(uids).each(function(index, eid) {
+                                    postData['shared_ids']['eids'].push(eid.id);
+                                });
                             }
-                        } else {
-                            PNotify.error({
-                                'title' : data.responseMessage
-                            });
+                        } else if ($('#' + sectionId + '-filter-sharing-aids').length > 0) {
+                            postData['shared_ids']['aids'] = [];
+                            if (uids.length > 0) {
+                                $(uids).each(function(index, aid) {
+                                    postData['shared_ids']['aids'].push(aid.id);
+                                });
+                            }
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
-                        }
-                    }, 'json');
+                        postData['shared_ids'] = JSON.stringify(postData['shared_ids']);
 
-                    $('#' + sectionId + '-filter-sharing-modal').modal('hide');
+                        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                        var url = $(this).attr('href');
+
+                        // //Update Filter
+                        $.post(url, postData, function(data) {
+                            if (data.responseCode === 0) {
+                                PNotify.success({
+                                    'title' : data.responseMessage
+                                });
+                                if (data.filters) {
+                                    redoFiltersOptions(query, sectionId, data);
+                                }
+                            } else {
+                                PNotify.error({
+                                    'title' : data.responseMessage
+                                });
+                            }
+                            if ($('#security-token').length === 1) {
+                                $('#security-token').attr('name', data.tokenKey);
+                                $('#security-token').val(data.token);
+                            }
+                            $('#' + sectionId + '-filter-sharing-rids').empty().trigger('select2:change');
+                            $('#' + sectionId + '-filter-sharing-eids').empty().trigger('select2:change');
+                            $('#' + sectionId + '-filter-sharing-aids').empty().trigger('select2:change');
+                        }, 'json');
+
+                        $('#' + sectionId + '-filter-sharing-modal').modal('hide');
+                    });
                 });
 
                 //Reset
@@ -254,27 +302,25 @@
                     var url = $(this).attr('href');
 
                     $.post(url, postData, function(data) {
-                                if (data.responseCode === 0) {
-                                    PNotify.success({
-                                        'title'     : data.responseMessage
-                                    });
-                                    if (data.filters) {
-                                        redoFiltersOptions('', sectionId, data);
-                                    }
-                                    resetFilters();
-                                    toggleFilterButtons(sectionId + '-filter');
-                                } else {
-                                    PNotify.error({
-                                        'title'     : data.responseMessage
-                                    });
-                                }
-                                if ($('#security-token').length === 1) {
-                                    $('#security-token').attr('name', data.tokenKey);
-                                    $('#security-token').val(data.token);
-                                }
-                            },
-                        'json'
-                    );
+                        if (data.responseCode === 0) {
+                            PNotify.success({
+                                'title'     : data.responseMessage
+                            });
+                            if (data.filters) {
+                                redoFiltersOptions('', sectionId, data);
+                            }
+                            resetFilters();
+                            toggleFilterButtons(sectionId + '-filter');
+                        } else {
+                            PNotify.error({
+                                'title'     : data.responseMessage
+                            });
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
+                    }, 'json');
 
                     toggleFilterButtons(sectionId + '-filter');
                 });
@@ -698,7 +744,7 @@
                     postData['name'] = filterName;
                     postData['conditions'] = query;
                     postData['component_id'] = $(selectedFilter).data()['component_id'];
-                    postData['type'] = 1;
+                    postData['filter_type'] = '1';
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
                     if ($('#' + sectionId + '-filter-default')[0].checked === true) {
@@ -749,6 +795,7 @@
 
                 function redoFiltersOptions(query, sectionId, data) {
                     var filtersOptions = '';
+
                     $.each(data.filters, function(index, filter) {
                         filtersOptions += '<option ';
                         var filterName = filter['name'];
@@ -762,13 +809,17 @@
                         if (filter['is_default'] == '1') {
                             filterName = filter['name'] + ' (Default)';
                         }
-                        if (filter['type'] == '0') {
+                        if (filter['filter_type'] == '0') {
                             filterName = filter['name'] + ' (System)';
-                        } else if (filter['type'] == '2') {
-                            filterName = filter['name'] + ' (Shared)';
+                        // } else if (filter['filter_type'] == '2') {
+                        //     filterName = filter['name'] + ' (Shared)';
                         }
                         if (filter['shared_ids']) {
-                            filterName = filter['name'] + ' (Shared by ' + filter['account_name'] + ')';
+                            if (filter['employee_full_name']) {
+                                filterName = filter['name'] + ' (Shared by ' + filter['employee_full_name'] + ')';
+                            } else if (filter['account_email']) {
+                                filterName = filter['name'] + ' (Shared by ' + filter['account_email'] + ')';
+                            }
                         }
 
                         if (filter['conditions'] === query) {
