@@ -112,6 +112,16 @@ class Storages extends BasePackage
         return $this->initStorage(false)->get($getData);
     }
 
+    public function getFileInfo($uuid)
+    {
+        $fileInfo = $this->initStorage(false)->getFileInfo($uuid);
+
+        if ($fileInfo) {
+            return $fileInfo[0];
+        }
+        return false;
+    }
+
     public function storeFile()
     {
         if (isset($this->request->getPost()['storagetype'])) {

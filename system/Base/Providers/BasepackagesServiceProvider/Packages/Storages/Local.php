@@ -285,7 +285,7 @@ class Local extends BasePackage
         }
     }
 
-    protected function getFileInfo($uuid)
+    public function getFileInfo($uuid)
     {
         return $this->getByParams(
             [
