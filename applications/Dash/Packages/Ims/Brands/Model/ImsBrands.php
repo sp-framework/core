@@ -4,7 +4,7 @@ namespace Applications\Dash\Packages\Ims\Brands\Model;
 
 use System\Base\BaseModel;
 
-class Brands extends BaseModel
+class ImsBrands extends BaseModel
 {
     public $id;
 

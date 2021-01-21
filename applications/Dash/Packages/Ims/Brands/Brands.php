@@ -2,13 +2,13 @@
 
 namespace Applications\Dash\Packages\Ims\Brands;
 
-use Applications\Dash\Packages\Ims\Brands\Model\Brands as BrandsModel;
+use Applications\Dash\Packages\Ims\Brands\Model\ImsBrands;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Brands extends BasePackage
 {
-    protected $modelToUse = BrandsModel::class;
+    protected $modelToUse = ImsBrands::class;
 
     protected $packageName = 'brands';
 

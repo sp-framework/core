@@ -44,9 +44,17 @@ class SuppliersComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             $this->view->brands = $this->usePackage(Brands::class)->getAll()->brands;
 
+            $this->view->logoLink = '';
+
             if ($this->getData()['id'] != 0) {
 
                 $supplier = $this->suppliers->getById($this->getData()['id']);
+
+                $address = $this->basepackages->addressbook->getById($supplier['address_id']);
+
+                unset($address['id']);
+
+                $supplier = array_merge($supplier, $address);
 
                 $storages = $this->basepackages->storages;
 
@@ -63,8 +71,6 @@ class SuppliersComponent extends BaseComponent
                 $this->view->supplier = $supplier;
             } else {
                 $this->view->supplierType = $this->getData()['type'];
-
-                $this->view->logoLink = '';
             }
 
             $this->view->pick('suppliers/view');

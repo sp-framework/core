@@ -30,9 +30,9 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
-                $this->createTable('specifications', '', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('ims_specifications', '', (new $this->schemaToUse)->columns(), $dropTables);
             } else {
-                $this->createTable('specifications', '', (new $this->schemaToUse)->columns());
+                $this->createTable('ims_specifications', '', (new $this->schemaToUse)->columns());
             }
 
             // $this->registerPackage();

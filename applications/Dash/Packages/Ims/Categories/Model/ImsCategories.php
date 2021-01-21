@@ -4,7 +4,7 @@ namespace Applications\Dash\Packages\Ims\Categories\Model;
 
 use System\Base\BaseModel;
 
-class Categories extends BaseModel
+class ImsCategories extends BaseModel
 {
     public $id;
 

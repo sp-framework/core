@@ -2,13 +2,13 @@
 
 namespace Applications\Dash\Packages\Ims\Specifications;
 
-use Applications\Dash\Packages\Ims\Specifications\Model\Specifications as SpecificationsModel;
+use Applications\Dash\Packages\Ims\Specifications\Model\ImsSpecifications;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Specifications extends BasePackage
 {
-    protected $modelToUse = SpecificationsModel::class;
+    protected $modelToUse = ImsSpecifications::class;
 
     protected $packageName = 'specifications';
 

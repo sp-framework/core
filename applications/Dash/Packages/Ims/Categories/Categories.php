@@ -2,14 +2,14 @@
 
 namespace Applications\Dash\Packages\Ims\Categories;
 
-use Applications\Dash\Packages\Ims\Categories\Model\Categories as CategoriesModel;
+use Applications\Dash\Packages\Ims\Categories\Model\ImsCategories;
 use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
 use System\Base\BasePackage;
 
 class Categories extends BasePackage
 {
-    protected $modelToUse = CategoriesModel::class;
+    protected $modelToUse = ImsCategories::class;
 
     protected $packageName = 'categories';
 

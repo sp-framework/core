@@ -3,13 +3,13 @@
 namespace Applications\Dash\Packages\Ims\Suppliers;
 
 use Applications\Dash\Packages\Ims\Brands\Brands;
-use Applications\Dash\Packages\Ims\Suppliers\Model\Suppliers as SuppliersModel;
+use Applications\Dash\Packages\Ims\Suppliers\Model\ImsSuppliers;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Suppliers extends BasePackage
 {
-    protected $modelToUse = SuppliersModel::class;
+    protected $modelToUse = ImsSuppliers::class;
 
     protected $packageName = 'suppliers';
 
@@ -18,6 +18,12 @@ class Suppliers extends BasePackage
     public function addSupplier(array $data)
     {
         $data = $this->addBrands($data);
+
+        $data['package_name'] = $this->packageName;
+
+        $this->basepackages->addressbook->addAddress($data);
+
+        $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
 
         if ($this->add($data)) {
             $this->packagesData->responseCode = 0;
@@ -34,6 +40,10 @@ class Suppliers extends BasePackage
     {
         $data = $this->addBrands($data);
 
+        $data['package_name'] = $this->packageName;
+
+        $this->basepackages->addressbook->mergeAndUpdate($data);
+
         if ($this->update($data)) {
             $this->packagesData->responseCode = 0;
 
@@ -48,6 +58,7 @@ class Suppliers extends BasePackage
     public function removeSupplier(array $data)
     {
         //Check relations before removing.
+        //Remove Address
         if ($this->remove($data['id'])) {
             $this->packagesData->responseCode = 0;
 

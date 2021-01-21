@@ -23,6 +23,8 @@ class BrandsComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
+            $this->view->logoLink = '';
+
             if ($this->getData()['id'] != 0) {
 
                 $this->view->brand = $this->brands->getById($this->getData()['id']);
@@ -32,8 +34,6 @@ class BrandsComponent extends BaseComponent
                 if ($this->view->brand['logo'] && $this->view->brand['logo'] !== '') {
                     $this->view->logoLink = $storages->getPublicLink($this->view->brand['logo'], 200);
                 }
-            } else {
-                $this->view->logoLink = '';
             }
 
             $this->view->brands = [];

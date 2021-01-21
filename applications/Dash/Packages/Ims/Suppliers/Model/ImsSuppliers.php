@@ -4,7 +4,7 @@ namespace Applications\Dash\Packages\Ims\Suppliers\Model;
 
 use System\Base\BaseModel;
 
-class Suppliers extends BaseModel
+class ImsSuppliers extends BaseModel
 {
     public $id;
 
@@ -28,23 +28,24 @@ class Suppliers extends BaseModel
 
     public $contact_email;
 
-    public $street_address;
+    public $address_id;
+    // public $street_address;
 
-    public $street_address_2;
+    // public $street_address_2;
 
-    public $city_id;
+    // public $city_id;
 
-    public $city_name;
+    // public $city_name;
 
-    public $pin_code;
+    // public $pin_code;
 
-    public $state_id;
+    // public $state_id;
 
-    public $state_name;
+    // public $state_name;
 
-    public $country_id;
+    // public $country_id;
 
-    public $country_name;
+    // public $country_name;
 
     public $internal_notes;
 }

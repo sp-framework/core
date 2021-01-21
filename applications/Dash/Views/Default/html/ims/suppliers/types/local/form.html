@@ -20,6 +20,7 @@
     {% set supplierState = supplier['state_name'] %}
     {% set supplierCountryId = supplier['country_id'] %}
     {% set supplierCountry = supplier['country_name'] %}
+    {% set supplierAddressId = supplier['address_id'] %}
     {% set supplierInternalNotes = supplier['internal_notes'] %}
 {% else %}
     {% set supplierId = '' %}
@@ -43,6 +44,7 @@
     {% set supplierState = '' %}
     {% set supplierCountryId = '' %}
     {% set supplierCountry = '' %}
+    {% set supplierAddressId = '' %}
     {% set supplierInternalNotes = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
@@ -408,6 +410,26 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
+                        'fieldId'                        : 'address_id',
+                        'fieldLabel'                     : 'Supplier Address ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Supplier Address ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : supplierAddressId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
                         'fieldId'                        : 'internal_notes',
                         'fieldLabel'                     : 'Internal Notes',
                         'fieldType'                      : 'textarea',
@@ -490,7 +512,7 @@ dataCollectionSection =
                     var postData = { };
                     postData['abn'] = $('#{{componentId}}-{{sectionId}}-abn').val();
 
-                    $.post('{{links.url("inventory/suppliers/searchABN")}}', postData, function(data) {
+                    $.post('{{links.url("ims/suppliers/searchABN")}}', postData, function(data) {
                         $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-abn-search').children('i').attr('hidden', true);
 
@@ -603,6 +625,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-contact_last_name'       : { },
         '{{componentId}}-{{sectionId}}-contact_phone'           : { },
         '{{componentId}}-{{sectionId}}-contact_email'           : { },
+        '{{componentId}}-{{sectionId}}-address_id'              : { },
         '{{componentId}}-{{sectionId}}-internal_notes'          : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {

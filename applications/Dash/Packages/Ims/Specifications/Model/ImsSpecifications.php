@@ -4,7 +4,7 @@ namespace Applications\Dash\Packages\Ims\Specifications\Model;
 
 use System\Base\BaseModel;
 
-class Specifications extends BaseModel
+class ImsSpecifications extends BaseModel
 {
     public $id;
 
