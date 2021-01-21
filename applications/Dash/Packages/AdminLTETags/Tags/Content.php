@@ -34,7 +34,13 @@ class Content extends AdminLTETags
                 if ($this->params['contentType'] === 'section') {
                     $this->content .= $this->getContentTypeSection();
                 } else if ($this->params['contentType'] === 'sectionWithForm') {
-                    $this->content .= $this->getContentTypeSectionWithForm();
+                    if (isset($this->params['dataDependencies']) &&
+                        count($this->params['dataDependencies']) > 0
+                    ) {
+                        $this->content .= $this->checkDataDependency();
+                    } else {
+                        $this->content .= $this->getContentTypeSectionWithForm();
+                    }
                 } else if ($this->params['contentType'] === 'sectionWithFormToDatatable') {
                     $this->content .= $this->getContentTypeSectionWithFormToDatatable();
                 } else if ($this->params['contentType'] === 'sectionWithWizard') {
@@ -68,6 +74,59 @@ class Content extends AdminLTETags
                 window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
                 window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
             </script>';
+    }
+
+    protected function checkDataDependency()
+    {
+        $hasError = false;
+
+        $cardContent = '';
+
+        foreach ($this->params['dataDependencies'] as $errorKey => $error) {
+            if (count($error['componentVar']) === 0) {
+                $hasError = true;
+                $cardContent .=
+                    '<div class="callout callout-danger">
+                        <h5>No ' . $error['componentName'] . ' data found!</h5>
+                        <p>Component ' . $this->params['component']['name'] . ' needs data from component ' . $error['componentName'] . '. ';
+
+                if ($error['componentRoute']) {
+                    $cardContent .=
+                        'Please <a href="' . $this->links->url($error['componentRoute']) . '" class="contentAjaxLink text-primary">click here</a> to add new ' . $error['componentName'] . ' or contact systems administrator for further instructions.</p>
+                    </div>';
+                } else {
+                    $cardContent .=
+                        'Please contact systems administrator for further instructions.</p>
+                    </div>';
+                }
+            }
+        }
+
+        $cardParams =
+            [
+                'componentId'                   => $this->params['componentId'],
+                'sectionId'                     => $this->params['sectionId'],
+                'cardHeader'                    => true,
+                'cardType'                      => 'danger',
+                'cardIcon'                      => 'ban',
+                'cardTitle'                     => 'Data Dependency Error',
+                'cardAdditionalClass'           => 'rounded-0',
+                'cardShowTools'                 => [],
+                'cardBodyContent'               => $cardContent
+            ];
+
+        if ($hasError) {
+            return
+                '<section id="' . $this->compSecId . '" class="section">' .
+                    $this->useTag('card', $cardParams) .
+                '</section>
+                <script>
+                    window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
+                    window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
+                </script>';
+        } else {
+            return $this->getContentTypeSectionWithForm();
+        }
     }
 
     protected function getContentTypeSectionWithForm()
