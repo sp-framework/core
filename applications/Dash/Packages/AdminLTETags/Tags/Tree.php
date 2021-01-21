@@ -327,18 +327,25 @@ class Tree extends AdminLTETags
                 //     $numeric = '';
                 // }
                 // var_dump($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']);
+
                 if (is_array($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) &&
                     count($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) > 0
                 ) {
-                    foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'] as $selectArrKey => $selectArrValue) {
-                        if ($key == $selectArrValue) {
-                            $this->content .=
-                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
+                    if (in_array($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'])) {
+                        $this->content .=
+                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
+                    } else {
+                        $this->content .=
+                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
+                    }
+
+                    // foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'] as $selectArrKey => $selectArrValue) {
+                    //     if ($key == $selectArrValue) {
                         // } else {
                         //     $this->content .=
                         //         '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
-                        }
-                    }
+                    //     }
+                    // }
                 } else {
                     if ($key == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
                         $this->content .=

@@ -48,6 +48,10 @@ class Jstree
 
     protected function generateContent()
     {
+        if (!isset($this->params['fieldJstreeDataSrcArr']) || !is_array($this->params['fieldJstreeDataSrcArr'])) {
+            throw new \Exception('fieldJstreeDataSrcArr for jstree not set. Example: "fieldJstreeDataSrcArr":["permissions":["srcArr":components]]');
+        }
+
         $this->content .=
             '<input type="text" class="form-control form-control-sm jstreevalidate rounded-0" ' . $this->fieldParams['fieldId'] . '-validate" ' . $this->fieldParams['fieldName'] . '-tree-validate" placeholder="' . strtoupper($this->fieldParams['fieldPlaceholder']) . '" hidden />
             <div ' . $this->fieldParams['fieldId'] . '-tree-tools" class="mb-2 float-right">
@@ -65,7 +69,7 @@ class Jstree
                 </a>
             </div>';
 
-            if ($this->params['fieldJstreeSearch']) {
+            if (isset($this->params['fieldJstreeSearch']) && $this->params['fieldJstreeSearch'] === true) {
                 $this->content .=
                     $this->adminLTETags->useTag(
                         'fields',
@@ -82,7 +86,7 @@ class Jstree
                             'fieldRequired'                           => false,
                             'fieldBazScan'                            => false,
                             'fieldHidden'                             => false,
-                            'fieldPlaceholder'                        => 'Search ' . $this->params['fieldId'] . '...',
+                            'fieldPlaceholder'                        => 'Search ' . $this->params['fieldLabel'] . '...',
                             'fieldGroupPostAddonIcon'                 => 'search'
                         ]
                     );
@@ -141,7 +145,7 @@ class Jstree
                 );
 
             $this->content .=
-                '<div class="height-control-200 p-1 border mt-1" ' . $this->fieldParams['fieldId'] . '-tree-div">
+                '<div class="height-control-200 p-1 border mt-1 text-uppercase" ' . $this->fieldParams['fieldId'] . '-tree-div" style="overflow-x: scroll;font-size: 0.75rem !important;">
                     <div '. $this->fieldParams['fieldBazPostOnCreate'] . ' ' . $this->fieldParams['fieldBazPostOnUpdate'] . ' ' . $this->fieldParams['fieldBazScan'] . ' ' . $this->fieldParams['fieldId'] . '">';
 
                         $this->fieldParams['fieldJstreeRootIcon'] =
@@ -156,7 +160,7 @@ class Jstree
                         }
 
                         $counter = 0;
-                        foreach ($this->params['dataSrcArr'] as $dataArrKey => $dataArr) {
+                        foreach ($this->params['fieldJstreeDataSrcArr'] as $dataArrKey => $dataArr) {
                             if (is_array($dataArr)) {
                                 if (isset($this->params['fieldJstreeIncludeRootInPath']) &&
                                     $this->params['fieldJstreeIncludeRootInPath'] === true
@@ -173,7 +177,7 @@ class Jstree
                                 if (isset($dataArr['srcArr'])) {
                                     $treeData = $dataArr['srcArr'];
                                 } else {
-                                    throw new \Exception('srcArr for jstree not set. Example: "dataSrcArr":["permissions":["srcArr":components]]');
+                                    throw new \Exception('srcArr for jstree not set. Example: "fieldJstreeDataSrcArr":["permissions":["srcArr":components]]');
                                 }
 
                                 $groupIcon =

@@ -32,6 +32,13 @@ class Fields extends AdminLTETags
 
         $this->buildFieldParamsArr();
 
+        if (isset($this->params['fieldBazJstreeSearch']) &&
+            $this->params['fieldBazJstreeSearch'] === true
+        ) {
+            $this->content .=
+                '<div ' . $this->fieldParams['jstreeSearchId'] . ' jstree-search="' . strtoupper($this->fieldParams['fieldLabel']) . '">';
+        }
+
         $this->content .=
             '<div class="form-group ' . $this->fieldParams['fieldAdditionalClass'] . ' ' . $this->fieldParams['fieldHidden'] . '">';
 
@@ -55,6 +62,12 @@ class Fields extends AdminLTETags
         }
 
         $this->content .= '</div>';
+
+        if (isset($this->params['fieldBazJstreeSearch']) &&
+            $this->params['fieldBazJstreeSearch'] === true
+        ) {
+            $this->content .= '</div>';
+        }
     }
 
     protected function getFieldType()
@@ -92,8 +105,8 @@ class Fields extends AdminLTETags
         $this->fieldParams['fieldId'] = 'id="' . $this->fieldParams['idChain'] . '-' . $this->params['fieldId'];
         $this->fieldParams['forId'] = 'for="' . $this->fieldParams['idChain'] . '-' . $this->params['fieldId'];
         $this->fieldParams['fieldName'] = 'name="' . $this->fieldParams['idChain'] . '-' . $this->params['fieldId'];
+        $this->fieldParams['jstreeSearchId'] = 'id=' . $this->fieldParams['idChain'] . '-' . $this->params['fieldId'] . '-jstreesearch';
 
-        // $jstreeSearchId = 'id=' ~ idChain ~ fieldId ~ '-jstreesearch';
 
         // fieldLabel - field label fall between <label></label> and other places
         if (isset($this->params['fieldLabel'])) {
@@ -226,12 +239,12 @@ class Fields extends AdminLTETags
 
         // fieldBazPost: This is if you want BazContentFields.js to grab fields information and act on them. See BazContentFields.js documentation for more information as to what happens with certain field type.
         $this->fieldParams['fieldBazPostOnCreate'] =
-            isset($this->params['fieldBazPostOnCreate']) ?
+            isset($this->params['fieldBazPostOnCreate']) && $this->params['fieldBazPostOnCreate'] === true ?
             'data-bazPostOnCreate="true"' :
             '';
 
         $this->fieldParams['fieldBazPostOnUpdate'] =
-            isset($this->params['fieldBazPostOnUpdate']) ?
+            isset($this->params['fieldBazPostOnUpdate']) && $this->params['fieldBazPostOnUpdate'] === true ?
             'data-bazPostOnUpdate="true"' :
             '';
         //
