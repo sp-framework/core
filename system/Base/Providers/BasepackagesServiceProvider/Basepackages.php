@@ -8,6 +8,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
@@ -20,6 +21,8 @@ class Basepackages
 	protected $menus;
 
 	protected $geoCountries;
+
+	protected $geoTimezones;
 
 	protected $geoStates;
 
@@ -68,6 +71,13 @@ class Basepackages
 		$this->geoCountries = (new GeoCountries())->init();
 
 		return $this->geoCountries;
+	}
+
+	protected function initGeoTimezones()
+	{
+		$this->geoTimezones = (new GeoTimezones())->init();
+
+		return $this->geoTimezones;
 	}
 
 	protected function initGeoStates()
