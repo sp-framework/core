@@ -38,7 +38,7 @@
             datatableOptions,
             swalSound;
         var listColumns = { };
-        var query = '';
+        var query;
 
         var BazContentSectionWithListing = function () {
             function BazContentSectionWithListing(element, settings) {
@@ -56,6 +56,7 @@
             _proto._init = function _init(options) {
                 componentId = $(this._element).parents('.component')[0].id;
                 sectionId = $(this._element)[0].id;
+                query = '';
 
                 dataCollection = window['dataCollection'];
                 pnotifySound = dataCollection.env.sounds.pnotifySound
@@ -687,16 +688,19 @@
                     });
                     $('#' + sectionId + '-filter-andor').val('and').trigger('change');
                     $('#' + sectionId + '-filter-andor').attr('disabled', false);
-
+                    //eslint-disable-next-line
+                    // console.log(e.rowsCount);
                     if (e.rowsCount === 1) {
                         $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
                     }
                     if (e.rowsCount < 1) {
                         $('#' + sectionId + '-filter-name').attr('disabled', true);
-                        $('#' + sectionId + '-filter-save').attr('disabled', true);
+                        $('#' + sectionId + '-filter-save-add').addClass('disabled');
+                        $('#' + sectionId + '-filter-save-update').addClass('disabled');
                     } else {
                         $('#' + sectionId + '-filter-name').attr('disabled', false);
-                        $('#' + sectionId + '-filter-save').attr('disabled', false);
+                        $('#' + sectionId + '-filter-save-add').removeClass('disabled');
+                        $('#' + sectionId + '-filter-save-update').removeClass('disabled');
                     }
                 }
 
