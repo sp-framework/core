@@ -20,6 +20,10 @@ class GeoCountries extends BaseModel
 
     public $currency;
 
+    public $currency_symbol;
+
+    public $currency_enabled;
+
     public $native;
 
     public $region;

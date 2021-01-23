@@ -47,6 +47,7 @@ class Countries
                     'capital'           => $country['capital'],
                     'currency'          => $country['currency'],
                     'currency_symbol'   => $country['currency_symbol'],
+                    'currency_enabled'  => 0,
                     'native'            => $country['native'],
                     'region'            => $country['region'],
                     'subregion'         => $country['subregion'],

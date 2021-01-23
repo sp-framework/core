@@ -45,7 +45,7 @@
                     "childs"    : {
                         "currencies" : {
                             "title"     : "currencies",
-                            "link"      : "currencies"
+                            "link"      : "settings/finances/currencies"
                         }
                     }
                 }

@@ -77,6 +77,13 @@ class Countries
                     ]
                 ),
                 new Column(
+                    'currency_enabled',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'native',
                     [
                         'type'      => Column::TYPE_VARCHAR,

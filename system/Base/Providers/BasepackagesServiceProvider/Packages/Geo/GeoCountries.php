@@ -60,7 +60,11 @@ class GeoCountries extends BasePackage
 
     public function updateCountry(array $data)
     {
-        if ($this->update($data)) {
+        $country = $this->getById($data['id']);
+
+        $country = array_merge($country, $data);
+
+        if ($this->update($country)) {
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' country';

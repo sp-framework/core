@@ -8,6 +8,14 @@ use System\Base\BaseComponent;
 class CurrenciesComponent extends BaseComponent
 {
     use DynamicTable;
+
+    protected $geoCountries;
+
+    public function initialize()
+    {
+        $this->geoCountries = $this->basepackages->geoCountries->init();
+    }
+
     /**
      * @acl(name=view)
      */
@@ -15,73 +23,52 @@ class CurrenciesComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $user = $this->users->generateViewData($this->getData()['id']);
+                $country =
+                    $this->basepackages->geoCountries->getById($this->getData()['id']);
+
+                $this->view->country = $country;
             } else {
-                $user = $this->users->generateViewData();
+                $this->view->country = [];
             }
-
-            if ($user) {
-                $this->view->components = $this->users->packagesData->components;
-
-                $this->view->acls = $this->users->packagesData->acls;
-
-                $this->view->user = $this->users->packagesData->user;
-
-                $this->view->applications = $this->users->packagesData->applications;
-
-                $this->view->roles = $this->users->packagesData->roles;
-
-                $this->view->canEmail = $this->users->packagesData->canEmail;
-            }
-
-            $this->view->responseCode = $this->users->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
-
-            $this->view->pick('users/view');
+            $this->view->pick('currencies/view');
 
             return;
-        }
-
-        $users = $this->users->init();
-
-        if ($this->request->isPost()) {
-            $rolesIdToName = [];
-            foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
-                $rolesIdToName[$roleValue['id']] = $roleValue['name'] . ' (' . $roleValue['id'] . ')';
-            }
-
-            $replaceColumns =
-                [
-                    'role_id' => ['html'  => $rolesIdToName]
-                ];
-        } else {
-            $replaceColumns = null;
         }
 
         $controlActions =
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'users',
-                    'remove'    => 'users/remove'
+                    'edit'      => 'settings/finances/currencies',
                 ]
             ];
 
+        $replaceColumns =
+            [
+                'currency_enabled'  =>
+                    [
+                        'html' =>
+                            [
+                                '0' => 'No',
+                                '1' => 'Yes'
+                            ]
+                    ]
+                ];
+
         $this->generateDTContent(
-            $users,
-            'users/view',
+            $this->geoCountries,
+            'settings/finances/currencies/view',
             null,
-            ['email', 'role_id'],
+            ['name', 'currency', 'currency_symbol', 'currency_enabled'],
             true,
-            ['email', 'role_id'],
+            ['name', 'currency', 'currency_symbol', 'currency_enabled'],
             $controlActions,
-            ['role_id' => 'role (ID)'],
+            null,
             $replaceColumns,
-            'email'
+            'name',
         );
 
-        $this->view->pick('users/list');
+        $this->view->pick('currencies/list');
     }
 
     /**
@@ -89,23 +76,7 @@ class CurrenciesComponent extends BaseComponent
      */
     public function addAction()
     {
-        if ($this->request->isPost()) {
-
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            $this->users->addUser($this->postData());
-
-            $this->view->responseCode = $this->users->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
+        //
     }
 
     /**
@@ -114,36 +85,15 @@ class CurrenciesComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
-
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            $this->users->updateUser($this->postData());
+            $this->geoCountries->updateCountry($this->postData());
 
-            $this->view->responseCode = $this->users->packagesData->responseCode;
+            $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
-        }
-    }
-
-    /**
-     * @acl(name=remove)
-     */
-    public function removeAction()
-    {
-        if ($this->request->isPost()) {
-
-            $this->users->removeUser($this->postData());
-
-            $this->view->responseCode = $this->users->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->users->packagesData->responseMessage;
+            $this->view->responseMessage = 'Updated ' . $this->postData()['name'] . ' currency';
 
         } else {
             $this->view->responseCode = 1;
