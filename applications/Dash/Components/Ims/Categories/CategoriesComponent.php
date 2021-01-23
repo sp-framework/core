@@ -73,6 +73,14 @@ class CategoriesComponent extends BaseComponent
                 $this->view->imageLink = '';
             }
 
+            $storages = $this->basepackages->storages->getAppStorages();
+
+            if ($storages && isset($storages['public'])) {
+                $this->view->storages = $storages['public'];
+            } else {
+                $this->view->storages = [];
+            }
+
             $this->view->categories = $categories;
 
             $this->view->roles = $this->roles->init()->roles;

@@ -36,6 +36,14 @@ class BrandsComponent extends BaseComponent
                 }
             }
 
+            $storages = $this->basepackages->storages->getAppStorages();
+
+            if ($storages && isset($storages['public'])) {
+                $this->view->storages = $storages['public'];
+            } else {
+                $this->view->storages = [];
+            }
+
             $this->view->brands = [];
 
             $this->view->pick('brands/view');

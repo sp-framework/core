@@ -73,6 +73,21 @@ class SuppliersComponent extends BaseComponent
                 $this->view->supplierType = $this->getData()['type'];
             }
 
+            //Check Geo Locations Dependencies
+            if ($this->basepackages->geoCountries->isEnabled()) {
+                $this->view->geo = true;
+            } else {
+                $this->view->geo = false;
+            }
+
+            $storages = $this->basepackages->storages->getAppStorages();
+
+            if ($storages && isset($storages['public'])) {
+                $this->view->storages = $storages['public'];
+            } else {
+                $this->view->storages = [];
+            }
+
             $this->view->pick('suppliers/view');
 
             return;

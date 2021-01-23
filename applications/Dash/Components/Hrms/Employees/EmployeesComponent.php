@@ -113,7 +113,13 @@ class EmployeesComponent extends BaseComponent
 
             $this->view->locations = $locations;
 
-            $this->view->storage = $this->basepackages->storages->getAppStorages()['private'];
+            $storages = $this->basepackages->storages->getAppStorages();
+
+            if ($storages && isset($storages['private'])) {
+                $this->view->storages = $storages['private'];
+            } else {
+                $this->view->storages = [];
+            }
 
             $this->view->pick('employees/view');
 

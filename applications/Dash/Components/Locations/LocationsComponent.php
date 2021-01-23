@@ -33,6 +33,13 @@ class LocationsComponent extends BaseComponent
                 $this->view->location = $location;
             }
 
+            //Check Geo Locations Dependencies
+            if ($this->basepackages->geoCountries->isEnabled()) {
+                $this->view->geo = true;
+            } else {
+                $this->view->geo = false;
+            }
+
             $this->view->responseCode = $this->locations->packagesData->responseCode;
 
             $this->view->responseMessage = $this->locations->packagesData->responseMessage;

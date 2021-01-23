@@ -59,6 +59,21 @@ class BusinessesComponent extends BaseComponent
                 $this->view->logoLink = $storages->getPublicLink($this->view->business['logo'], 200);
             }
 
+            //Check Geo Locations Dependencies
+            if ($this->basepackages->geoCountries->isEnabled()) {
+                $this->view->geo = true;
+            } else {
+                $this->view->geo = false;
+            }
+
+            $storages = $this->basepackages->storages->getAppStorages();
+
+            if ($storages && isset($storages['public'])) {
+                $this->view->storages = $storages['public'];
+            } else {
+                $this->view->storages = [];
+            }
+
             $this->view->businesses = $businesses;
 
             $this->view->pick('businesses/view');

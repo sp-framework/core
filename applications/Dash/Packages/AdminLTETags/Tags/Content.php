@@ -83,7 +83,9 @@ class Content extends AdminLTETags
         $cardContent = '';
 
         foreach ($this->params['dataDependencies'] as $errorKey => $error) {
-            if (count($error['componentVar']) === 0) {
+            if ((is_array($error['componentVar']) && count($error['componentVar']) === 0) ||
+                $error['componentVar'] === false
+            ) {
                 $hasError = true;
                 $cardContent .=
                     '<div class="callout callout-danger">
