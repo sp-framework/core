@@ -34,32 +34,6 @@
                         }
                     }
             },
-        'dtSecondaryButtons'      :
-            {
-                'componentId'                       : componentId,
-                'sectionId'                         : 'listing',
-                'buttonType'                        : 'DropdownSplitButtons',
-                'dropdownButtonId'                  : 'main',
-                'dropdownButtonTitle'               : 'Settings',
-                'dropdownButtonIcon'                : 'cog',
-                'dropdownButtonType'                : 'secondary',
-                'dropdownButtonAdditionalClass'     : 'text-uppercase',
-                'buttonPosition'                    : 'right',
-                'dropdownAlign'                     : 'right',
-                'buttons'                           :
-                    {
-                        'statuses' : {
-                            'title'                   : 'Statuses',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('hrms/employees/settings/statuses')
-                        },
-                        'designations' : {
-                            'title'                   : 'Designations',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('hrms/employees/settings/designations')
-                        }
-                    }
-            },
         'dtTable'               : table,
         'dtColumns'             : table['columns'],
         'dtPostUrl'             : table['postUrl'],

@@ -1,6 +1,6 @@
 {
     "route"         : "hrms/employees",
-    "name"          : "Employees",
+    "name"          : "HRMS Employees",
     "description"   : "Manage employees via this component",
     "app_type"      : "dash",
     "category"      : "business",
