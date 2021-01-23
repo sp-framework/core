@@ -232,12 +232,14 @@ class Filters extends BasePackage
                 if (isset($sharedFilters)) {
                     return array_merge($filters, $sharedFilters);
                 }
+
                 return $filters;
             }
+
             return $filters;
         }
 
-        return
+        $filtersArr =
             $this->getByParams(
                 [
                     'conditions'    => 'component_id = :cid:',
@@ -246,6 +248,17 @@ class Filters extends BasePackage
                     ]
                 ]
             );
+
+        //Make System Filters above all
+        $filtersArr = msort($filtersArr, 'filter_type');
+
+        foreach ($filtersArr as &$filter) {
+            $filter['shared'] = '0';
+
+            $filter['url'] = $this->links->url($component['route']) . '/q/filter/' . $filter['id'];
+        }
+
+        return $filtersArr;
     }
 
     protected function addShowAllFilter(int $componentId)
@@ -297,9 +310,9 @@ class Filters extends BasePackage
                 $account = $this->auth->account();
 
                 if ($account) {
-                    $this->packagesData->filters = $this->getFiltersForAccountAndComponent($account, $data['component_id']);
+                    $this->packagesData->filters = $this->getFilters($data['component_id'], $account);
                 } else {
-                    $this->packagesData->filters = $this->getFiltersForComponent($data['component_id']);
+                    $this->packagesData->filters = $this->getFilters($data['component_id']);
                 }
                 $this->packagesData->responseCode = 0;
 
