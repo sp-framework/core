@@ -3805,7 +3805,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                             that._clearDatatableFormData(datatable, fieldsetDatatable);
 
-                            $('body').trigger('formToDatatableTableAssignClicked');
+                            $('body').trigger(
+                                {
+                                    'type'     :'formToDatatableTableAssignClicked',
+                                    'rowsCount': sectionOptions['datatables'][datatable].rows().count()
+                                }
+                            );
                         }
                     }
                 });
@@ -4121,7 +4126,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         that._tableDataToObj();
                     }
 
-                    $('body').trigger('formToDatatableTableUpdated');
+                    $('body').trigger(
+                        {
+                            'type'     :'formToDatatableTableUpdated',
+                            'rowsCount': sectionOptions['datatables'][datatable].rows().count()
+                        }
+                    );
 
                     return true;
                 }
@@ -4258,7 +4268,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     $('#' + fieldsetDatatable + '-cancel-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
-                    $('body').trigger('formToDatatableTableUpdatedClicked');
+                    $('body').trigger(
+                        {
+                            'type'     :'formToDatatableTableUpdatedClicked',
+                            'rowsCount': sectionOptions['datatables'][datatable].rows().count()
+                        }
+                    );
                 });
                 $('#' + fieldsetDatatable + '-cancel-button').off();
                 $('#' + fieldsetDatatable + '-cancel-button').click(function() {
@@ -4267,7 +4282,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     $('#' + fieldsetDatatable + '-update-button').attr('hidden', true);
                     $('#' + fieldsetDatatable + '-assign-button').attr('hidden', false);
                     that._clearDatatableFormData(datatable, fieldsetDatatable);
-                    $('body').trigger('formToDatatableTableCancelClicked');
+                    $('body').trigger(
+                        {
+                            'type'     :'formToDatatableTableCancelClicked',
+                            'rowsCount': sectionOptions['datatables'][datatable].rows().count()
+                        }
+                    );
                 });
 
             };
@@ -4528,7 +4548,12 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             );
 
                             if (table.rows().count() === 0) {
-                                $('body').trigger('formToDatatableTableEmpty');
+                                $('body').trigger(
+                                    {
+                                        'type'     :'formToDatatableTableEmpty',
+                                        'rowsCount': table.rows().count()
+                                    }
+                                );
                             }
                             that._tableDataToObj();
                         });
@@ -4684,7 +4709,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         );
                     }
                 }
-                $('body').trigger('formToDatatableTableImportComplete');
+
+                $('body').trigger(
+                    {
+                        'type'     :'formToDatatableTableImportComplete'
+                    });
             }
 
             BazContentSectionWithFormToDatatable._jQueryInterface = function _jQueryInterface(options) {
