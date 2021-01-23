@@ -78,16 +78,6 @@ class Button
                 $button['content'] :
                 '';
 
-            $this->buttonParams['hidden'] =
-                isset($button['hidden']) && $button['hidden'] === true ?
-                'hidden' :
-                '';
-
-            $this->buttonParams['disabled'] =
-                isset($button['disabled']) && $button['disabled'] === true ?
-                'disabled' :
-                '';
-
             $this->buttonParams['position'] =
                 isset($button['position']) ?
                 'float-' . $button['position'] :
@@ -174,6 +164,27 @@ class Button
                 $button['url'] :
                 '';
 
+            $this->buttonParams['hidden'] =
+                isset($button['hidden']) && $button['hidden'] === true ?
+                'hidden' :
+                '';
+
+            if ($this->buttonParams['url'] === '') {
+                $this->buttonParams['disabled'] =
+                    isset($button['disabled']) && $button['disabled'] === true ?
+                    'disabled' :
+                    '';
+            } else {
+                $this->buttonParams['disabled'] = '';
+                if (isset($button['disabled']) && $button['disabled'] === true) {
+                    if (isset($button['buttonAdditionalClass'])) {
+                        $button['buttonAdditionalClass'] = $button['buttonAdditionalClass'] . ' disabled';
+                    } else {
+                        $button['buttonAdditionalClass'] = 'disabled';
+                    }
+                }
+            }
+
             $this->buttonParams['addActionUrl'] = '';
             $this->buttonParams['addSuccessRedirectUrl'] = '';
             $this->buttonParams['updateActionUrl'] = '';
@@ -221,7 +232,6 @@ class Button
                 isset($button['buttonAdditionalClass']) ?
                 $button['buttonAdditionalClass'] :
                 '';
-
             $this->buttonParams['tooltipPosition'] =
                 isset($button['tooltipPosition']) ?
                 $button['tooltipPosition'] :
