@@ -1,17 +1,1 @@
-{
-    "HKG": {
-        "id": 98,
-        "name": "Hong Kong S.A.R.",
-        "iso3": "HKG",
-        "iso2": "HK",
-        "phone_code": "852",
-        "capital": "Hong Kong",
-        "currency": "HKD",
-        "native": "香港",
-        "region": "Asia",
-        "subregion": "Eastern Asia",
-        "emoji": "🇭🇰",
-        "emojiU": "U+1F1ED U+1F1F0",
-        "states": []
-    }
-}
+{"id":98,"name":"Hong Kong S.A.R.","iso3":"HKG","iso2":"HK","phone_code":"852","capital":"Hong Kong","currency":"HKD","currency_symbol":"$","native":"\u9999\u6e2f","region":"Asia","subregion":"Eastern Asia","timezones":[{"zoneName":"Asia\/Hong_Kong","gmtOffset":28800,"gmtOffsetName":"UTC+08:00","abbreviation":"HKT","tzName":"Hong Kong Time"}],"emoji":"\ud83c\udded\ud83c\uddf0","emojiU":"U+1F1ED U+1F1F0","states":[]}

@@ -1,17 +1,1 @@
-{
-    "PSE": {
-        "id": 169,
-        "name": "Palestinian Territory Occupied",
-        "iso3": "PSE",
-        "iso2": "PS",
-        "phone_code": "970",
-        "capital": "East Jerusalem",
-        "currency": "ILS",
-        "native": "فلسطين",
-        "region": "Asia",
-        "subregion": "Western Asia",
-        "emoji": "🇵🇸",
-        "emojiU": "U+1F1F5 U+1F1F8",
-        "states": []
-    }
-}
+{"id":169,"name":"Palestinian Territory Occupied","iso3":"PSE","iso2":"PS","phone_code":"970","capital":"East Jerusalem","currency":"ILS","currency_symbol":"\u20aa","native":"\u0641\u0644\u0633\u0637\u064a\u0646","region":"Asia","subregion":"Western Asia","timezones":[{"zoneName":"Asia\/Gaza","gmtOffset":7200,"gmtOffsetName":"UTC+02:00","abbreviation":"EET","tzName":"Eastern European Time"},{"zoneName":"Asia\/Hebron","gmtOffset":7200,"gmtOffsetName":"UTC+02:00","abbreviation":"EET","tzName":"Eastern European Time"}],"emoji":"\ud83c\uddf5\ud83c\uddf8","emojiU":"U+1F1F5 U+1F1F8","states":[]}

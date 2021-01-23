@@ -1,17 +1,1 @@
-{
-    "NCL": {
-        "id": 157,
-        "name": "New Caledonia",
-        "iso3": "NCL",
-        "iso2": "NC",
-        "phone_code": "687",
-        "capital": "Noumea",
-        "currency": "XPF",
-        "native": "Nouvelle-Calédonie",
-        "region": "Oceania",
-        "subregion": "Melanesia",
-        "emoji": "🇳🇨",
-        "emojiU": "U+1F1F3 U+1F1E8",
-        "states": []
-    }
-}
+{"id":157,"name":"New Caledonia","iso3":"NCL","iso2":"NC","phone_code":"687","capital":"Noumea","currency":"XPF","currency_symbol":"\u20a3","native":"Nouvelle-Cal\u00e9donie","region":"Oceania","subregion":"Melanesia","timezones":[{"zoneName":"Pacific\/Noumea","gmtOffset":39600,"gmtOffsetName":"UTC+11:00","abbreviation":"NCT","tzName":"New Caledonia Time"}],"emoji":"\ud83c\uddf3\ud83c\udde8","emojiU":"U+1F1F3 U+1F1E8","states":[]}

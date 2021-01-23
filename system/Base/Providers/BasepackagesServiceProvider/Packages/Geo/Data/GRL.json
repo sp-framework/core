@@ -1,17 +1,1 @@
-{
-    "GRL": {
-        "id": 86,
-        "name": "Greenland",
-        "iso3": "GRL",
-        "iso2": "GL",
-        "phone_code": "299",
-        "capital": "Nuuk",
-        "currency": "DKK",
-        "native": "Kalaallit Nunaat",
-        "region": "Americas",
-        "subregion": "Northern America",
-        "emoji": "🇬🇱",
-        "emojiU": "U+1F1EC U+1F1F1",
-        "states": []
-    }
-}
+{"id":86,"name":"Greenland","iso3":"GRL","iso2":"GL","phone_code":"299","capital":"Nuuk","currency":"DKK","currency_symbol":"Kr.","native":"Kalaallit Nunaat","region":"Americas","subregion":"Northern America","timezones":[{"zoneName":"America\/Danmarkshavn","gmtOffset":0,"gmtOffsetName":"UTC\u00b100","abbreviation":"GMT","tzName":"Greenwich Mean Time"},{"zoneName":"America\/Nuuk","gmtOffset":-10800,"gmtOffsetName":"UTC-03:00","abbreviation":"WGT","tzName":"West Greenland Time"},{"zoneName":"America\/Scoresbysund","gmtOffset":-3600,"gmtOffsetName":"UTC-01:00","abbreviation":"EGT","tzName":"Eastern Greenland Time"},{"zoneName":"America\/Thule","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\uddec\ud83c\uddf1","emojiU":"U+1F1EC U+1F1F1","states":[]}

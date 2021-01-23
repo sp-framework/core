@@ -1,17 +1,1 @@
-{
-    "VIR": {
-        "id": 242,
-        "name": "Virgin Islands (US)",
-        "iso3": "VIR",
-        "iso2": "VI",
-        "phone_code": "+1-340",
-        "capital": "Charlotte Amalie",
-        "currency": "USD",
-        "native": "United States Virgin Islands",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇻🇮",
-        "emojiU": "U+1F1FB U+1F1EE",
-        "states": []
-    }
-}
+{"id":242,"name":"Virgin Islands (US)","iso3":"VIR","iso2":"VI","phone_code":"+1-340","capital":"Charlotte Amalie","currency":"USD","currency_symbol":"$","native":"United States Virgin Islands","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/St_Thomas","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\uddfb\ud83c\uddee","emojiU":"U+1F1FB U+1F1EE","states":[]}

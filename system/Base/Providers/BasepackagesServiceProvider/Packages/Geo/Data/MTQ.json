@@ -1,17 +1,1 @@
-{
-    "MTQ": {
-        "id": 138,
-        "name": "Martinique",
-        "iso3": "MTQ",
-        "iso2": "MQ",
-        "phone_code": "596",
-        "capital": "Fort-de-France",
-        "currency": "EUR",
-        "native": "Martinique",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇲🇶",
-        "emojiU": "U+1F1F2 U+1F1F6",
-        "states": []
-    }
-}
+{"id":138,"name":"Martinique","iso3":"MTQ","iso2":"MQ","phone_code":"596","capital":"Fort-de-France","currency":"EUR","currency_symbol":"\u20ac","native":"Martinique","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/Martinique","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\uddf2\ud83c\uddf6","emojiU":"U+1F1F2 U+1F1F6","states":[]}

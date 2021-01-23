@@ -1,17 +1,1 @@
-{
-    "SHN": {
-        "id": 184,
-        "name": "Saint Helena",
-        "iso3": "SHN",
-        "iso2": "SH",
-        "phone_code": "290",
-        "capital": "Jamestown",
-        "currency": "SHP",
-        "native": "Saint Helena",
-        "region": "Africa",
-        "subregion": "Western Africa",
-        "emoji": "🇸🇭",
-        "emojiU": "U+1F1F8 U+1F1ED",
-        "states": []
-    }
-}
+{"id":184,"name":"Saint Helena","iso3":"SHN","iso2":"SH","phone_code":"290","capital":"Jamestown","currency":"SHP","currency_symbol":"\u00a3","native":"Saint Helena","region":"Africa","subregion":"Western Africa","timezones":[{"zoneName":"Atlantic\/St_Helena","gmtOffset":0,"gmtOffsetName":"UTC\u00b100","abbreviation":"GMT","tzName":"Greenwich Mean Time"}],"emoji":"\ud83c\uddf8\ud83c\udded","emojiU":"U+1F1F8 U+1F1ED","states":[]}

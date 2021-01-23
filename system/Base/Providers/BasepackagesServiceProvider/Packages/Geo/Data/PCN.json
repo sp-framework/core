@@ -1,17 +1,1 @@
-{
-    "PCN": {
-        "id": 175,
-        "name": "Pitcairn Island",
-        "iso3": "PCN",
-        "iso2": "PN",
-        "phone_code": "870",
-        "capital": "Adamstown",
-        "currency": "NZD",
-        "native": "Pitcairn Islands",
-        "region": "Oceania",
-        "subregion": "Polynesia",
-        "emoji": "🇵🇳",
-        "emojiU": "U+1F1F5 U+1F1F3",
-        "states": []
-    }
-}
+{"id":175,"name":"Pitcairn Island","iso3":"PCN","iso2":"PN","phone_code":"870","capital":"Adamstown","currency":"NZD","currency_symbol":"$","native":"Pitcairn Islands","region":"Oceania","subregion":"Polynesia","timezones":[{"zoneName":"Pacific\/Pitcairn","gmtOffset":-28800,"gmtOffsetName":"UTC-08:00","abbreviation":"PST","tzName":"Pacific Standard Time (North America"}],"emoji":"\ud83c\uddf5\ud83c\uddf3","emojiU":"U+1F1F5 U+1F1F3","states":[]}

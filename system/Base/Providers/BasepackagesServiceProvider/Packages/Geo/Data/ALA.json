@@ -1,17 +1,1 @@
-{
-    "ALA": {
-        "id": 2,
-        "name": "Aland Islands",
-        "iso3": "ALA",
-        "iso2": "AX",
-        "phone_code": "+358-18",
-        "capital": "Mariehamn",
-        "currency": "EUR",
-        "native": "Åland",
-        "region": "Europe",
-        "subregion": "Northern Europe",
-        "emoji": "🇦🇽",
-        "emojiU": "U+1F1E6 U+1F1FD",
-        "states": []
-    }
-}
+{"id":2,"name":"Aland Islands","iso3":"ALA","iso2":"AX","phone_code":"+358-18","capital":"Mariehamn","currency":"EUR","currency_symbol":"\u20ac","native":"\u00c5land","region":"Europe","subregion":"Northern Europe","timezones":[{"zoneName":"Europe\/Mariehamn","gmtOffset":7200,"gmtOffsetName":"UTC+02:00","abbreviation":"EET","tzName":"Eastern European Time"}],"emoji":"\ud83c\udde6\ud83c\uddfd","emojiU":"U+1F1E6 U+1F1FD","states":[]}

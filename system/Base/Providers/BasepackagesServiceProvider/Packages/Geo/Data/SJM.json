@@ -1,17 +1,1 @@
-{
-    "SJM": {
-        "id": 211,
-        "name": "Svalbard And Jan Mayen Islands",
-        "iso3": "SJM",
-        "iso2": "SJ",
-        "phone_code": "47",
-        "capital": "Longyearbyen",
-        "currency": "NOK",
-        "native": "Svalbard og Jan Mayen",
-        "region": "Europe",
-        "subregion": "Northern Europe",
-        "emoji": "🇸🇯",
-        "emojiU": "U+1F1F8 U+1F1EF",
-        "states": []
-    }
-}
+{"id":211,"name":"Svalbard And Jan Mayen Islands","iso3":"SJM","iso2":"SJ","phone_code":"47","capital":"Longyearbyen","currency":"NOK","currency_symbol":"kr","native":"Svalbard og Jan Mayen","region":"Europe","subregion":"Northern Europe","timezones":[{"zoneName":"Arctic\/Longyearbyen","gmtOffset":3600,"gmtOffsetName":"UTC+01:00","abbreviation":"CET","tzName":"Central European Time"}],"emoji":"\ud83c\uddf8\ud83c\uddef","emojiU":"U+1F1F8 U+1F1EF","states":[]}

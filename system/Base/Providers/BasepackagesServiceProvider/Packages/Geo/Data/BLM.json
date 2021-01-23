@@ -1,17 +1,1 @@
-{
-    "BLM": {
-        "id": 189,
-        "name": "Saint-Barthelemy",
-        "iso3": "BLM",
-        "iso2": "BL",
-        "phone_code": "590",
-        "capital": "Gustavia",
-        "currency": "EUR",
-        "native": "Saint-Barthélemy",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇧🇱",
-        "emojiU": "U+1F1E7 U+1F1F1",
-        "states": []
-    }
-}
+{"id":189,"name":"Saint-Barthelemy","iso3":"BLM","iso2":"BL","phone_code":"590","capital":"Gustavia","currency":"EUR","currency_symbol":"\u20ac","native":"Saint-Barth\u00e9lemy","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/St_Barthelemy","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\udde7\ud83c\uddf1","emojiU":"U+1F1E7 U+1F1F1","states":[]}

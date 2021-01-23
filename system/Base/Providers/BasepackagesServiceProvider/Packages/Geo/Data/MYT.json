@@ -1,17 +1,1 @@
-{
-    "MYT": {
-        "id": 141,
-        "name": "Mayotte",
-        "iso3": "MYT",
-        "iso2": "YT",
-        "phone_code": "262",
-        "capital": "Mamoudzou",
-        "currency": "EUR",
-        "native": "Mayotte",
-        "region": "Africa",
-        "subregion": "Eastern Africa",
-        "emoji": "🇾🇹",
-        "emojiU": "U+1F1FE U+1F1F9",
-        "states": []
-    }
-}
+{"id":141,"name":"Mayotte","iso3":"MYT","iso2":"YT","phone_code":"262","capital":"Mamoudzou","currency":"EUR","currency_symbol":"\u20ac","native":"Mayotte","region":"Africa","subregion":"Eastern Africa","timezones":[{"zoneName":"Indian\/Mayotte","gmtOffset":10800,"gmtOffsetName":"UTC+03:00","abbreviation":"EAT","tzName":"East Africa Time"}],"emoji":"\ud83c\uddfe\ud83c\uddf9","emojiU":"U+1F1FE U+1F1F9","states":[]}

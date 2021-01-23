@@ -1,17 +1,1 @@
-{
-    "JEY": {
-        "id": 110,
-        "name": "Jersey",
-        "iso3": "JEY",
-        "iso2": "JE",
-        "phone_code": "+44-1534",
-        "capital": "Saint Helier",
-        "currency": "GBP",
-        "native": "Jersey",
-        "region": "Europe",
-        "subregion": "Northern Europe",
-        "emoji": "🇯🇪",
-        "emojiU": "U+1F1EF U+1F1EA",
-        "states": []
-    }
-}
+{"id":110,"name":"Jersey","iso3":"JEY","iso2":"JE","phone_code":"+44-1534","capital":"Saint Helier","currency":"GBP","currency_symbol":"\u00a3","native":"Jersey","region":"Europe","subregion":"Northern Europe","timezones":[{"zoneName":"Europe\/Jersey","gmtOffset":0,"gmtOffsetName":"UTC\u00b100","abbreviation":"GMT","tzName":"Greenwich Mean Time"}],"emoji":"\ud83c\uddef\ud83c\uddea","emojiU":"U+1F1EF U+1F1EA","states":[]}

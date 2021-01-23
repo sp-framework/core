@@ -1,17 +1,1 @@
-{
-    "CYM": {
-        "id": 41,
-        "name": "Cayman Islands",
-        "iso3": "CYM",
-        "iso2": "KY",
-        "phone_code": "+1-345",
-        "capital": "George Town",
-        "currency": "KYD",
-        "native": "Cayman Islands",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇰🇾",
-        "emojiU": "U+1F1F0 U+1F1FE",
-        "states": []
-    }
-}
+{"id":41,"name":"Cayman Islands","iso3":"CYM","iso2":"KY","phone_code":"+1-345","capital":"George Town","currency":"KYD","currency_symbol":"$","native":"Cayman Islands","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/Cayman","gmtOffset":-18000,"gmtOffsetName":"UTC-05:00","abbreviation":"EST","tzName":"Eastern Standard Time (North America"}],"emoji":"\ud83c\uddf0\ud83c\uddfe","emojiU":"U+1F1F0 U+1F1FE","states":[]}

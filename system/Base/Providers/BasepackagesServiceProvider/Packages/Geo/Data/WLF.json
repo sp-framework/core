@@ -1,17 +1,1 @@
-{
-    "WLF": {
-        "id": 243,
-        "name": "Wallis And Futuna Islands",
-        "iso3": "WLF",
-        "iso2": "WF",
-        "phone_code": "681",
-        "capital": "Mata Utu",
-        "currency": "XPF",
-        "native": "Wallis et Futuna",
-        "region": "Oceania",
-        "subregion": "Polynesia",
-        "emoji": "🇼🇫",
-        "emojiU": "U+1F1FC U+1F1EB",
-        "states": []
-    }
-}
+{"id":243,"name":"Wallis And Futuna Islands","iso3":"WLF","iso2":"WF","phone_code":"681","capital":"Mata Utu","currency":"XPF","currency_symbol":"\u20a3","native":"Wallis et Futuna","region":"Oceania","subregion":"Polynesia","timezones":[{"zoneName":"Pacific\/Wallis","gmtOffset":43200,"gmtOffsetName":"UTC+12:00","abbreviation":"WFT","tzName":"Wallis & Futuna Time"}],"emoji":"\ud83c\uddfc\ud83c\uddeb","emojiU":"U+1F1FC U+1F1EB","states":[]}

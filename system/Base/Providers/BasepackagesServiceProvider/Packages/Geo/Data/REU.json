@@ -1,17 +1,1 @@
-{
-    "REU": {
-        "id": 180,
-        "name": "Reunion",
-        "iso3": "REU",
-        "iso2": "RE",
-        "phone_code": "262",
-        "capital": "Saint-Denis",
-        "currency": "EUR",
-        "native": "La Réunion",
-        "region": "Africa",
-        "subregion": "Eastern Africa",
-        "emoji": "🇷🇪",
-        "emojiU": "U+1F1F7 U+1F1EA",
-        "states": []
-    }
-}
+{"id":180,"name":"Reunion","iso3":"REU","iso2":"RE","phone_code":"262","capital":"Saint-Denis","currency":"EUR","currency_symbol":"\u20ac","native":"La R\u00e9union","region":"Africa","subregion":"Eastern Africa","timezones":[{"zoneName":"Indian\/Reunion","gmtOffset":14400,"gmtOffsetName":"UTC+04:00","abbreviation":"RET","tzName":"R\u00e9union Time"}],"emoji":"\ud83c\uddf7\ud83c\uddea","emojiU":"U+1F1F7 U+1F1EA","states":[]}

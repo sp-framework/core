@@ -1,17 +1,1 @@
-{
-    "FLK": {
-        "id": 71,
-        "name": "Falkland Islands",
-        "iso3": "FLK",
-        "iso2": "FK",
-        "phone_code": "500",
-        "capital": "Stanley",
-        "currency": "FKP",
-        "native": "Falkland Islands",
-        "region": "Americas",
-        "subregion": "South America",
-        "emoji": "🇫🇰",
-        "emojiU": "U+1F1EB U+1F1F0",
-        "states": []
-    }
-}
+{"id":71,"name":"Falkland Islands","iso3":"FLK","iso2":"FK","phone_code":"500","capital":"Stanley","currency":"FKP","currency_symbol":"\u00a3","native":"Falkland Islands","region":"Americas","subregion":"South America","timezones":[{"zoneName":"Atlantic\/Stanley","gmtOffset":-10800,"gmtOffsetName":"UTC-03:00","abbreviation":"FKST","tzName":"Falkland Islands Summer Time"}],"emoji":"\ud83c\uddeb\ud83c\uddf0","emojiU":"U+1F1EB U+1F1F0","states":[]}

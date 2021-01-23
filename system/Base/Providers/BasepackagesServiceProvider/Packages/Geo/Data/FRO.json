@@ -1,17 +1,1 @@
-{
-    "FRO": {
-        "id": 72,
-        "name": "Faroe Islands",
-        "iso3": "FRO",
-        "iso2": "FO",
-        "phone_code": "298",
-        "capital": "Torshavn",
-        "currency": "DKK",
-        "native": "Føroyar",
-        "region": "Europe",
-        "subregion": "Northern Europe",
-        "emoji": "🇫🇴",
-        "emojiU": "U+1F1EB U+1F1F4",
-        "states": []
-    }
-}
+{"id":72,"name":"Faroe Islands","iso3":"FRO","iso2":"FO","phone_code":"298","capital":"Torshavn","currency":"DKK","currency_symbol":"Kr.","native":"F\u00f8royar","region":"Europe","subregion":"Northern Europe","timezones":[{"zoneName":"Atlantic\/Faroe","gmtOffset":0,"gmtOffsetName":"UTC\u00b100","abbreviation":"WET","tzName":"Western European Time"}],"emoji":"\ud83c\uddeb\ud83c\uddf4","emojiU":"U+1F1EB U+1F1F4","states":[]}

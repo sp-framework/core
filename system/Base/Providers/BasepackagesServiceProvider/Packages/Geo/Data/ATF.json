@@ -1,17 +1,1 @@
-{
-    "ATF": {
-        "id": 78,
-        "name": "French Southern Territories",
-        "iso3": "ATF",
-        "iso2": "TF",
-        "phone_code": "",
-        "capital": "Port-aux-Francais",
-        "currency": "EUR",
-        "native": "Territoire des Terres australes et antarctiques fr",
-        "region": "Africa",
-        "subregion": "Southern Africa",
-        "emoji": "🇹🇫",
-        "emojiU": "U+1F1F9 U+1F1EB",
-        "states": []
-    }
-}
+{"id":78,"name":"French Southern Territories","iso3":"ATF","iso2":"TF","phone_code":"","capital":"Port-aux-Francais","currency":"EUR","currency_symbol":"\u20ac","native":"Territoire des Terres australes et antarctiques fr","region":"Africa","subregion":"Southern Africa","timezones":[{"zoneName":"Indian\/Kerguelen","gmtOffset":18000,"gmtOffsetName":"UTC+05:00","abbreviation":"TFT","tzName":"French Southern and Antarctic Time"}],"emoji":"\ud83c\uddf9\ud83c\uddeb","emojiU":"U+1F1F9 U+1F1EB","states":[]}

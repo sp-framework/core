@@ -1,17 +1,1 @@
-{
-    "GIB": {
-        "id": 84,
-        "name": "Gibraltar",
-        "iso3": "GIB",
-        "iso2": "GI",
-        "phone_code": "350",
-        "capital": "Gibraltar",
-        "currency": "GIP",
-        "native": "Gibraltar",
-        "region": "Europe",
-        "subregion": "Southern Europe",
-        "emoji": "🇬🇮",
-        "emojiU": "U+1F1EC U+1F1EE",
-        "states": []
-    }
-}
+{"id":84,"name":"Gibraltar","iso3":"GIB","iso2":"GI","phone_code":"350","capital":"Gibraltar","currency":"GIP","currency_symbol":"\u00a3","native":"Gibraltar","region":"Europe","subregion":"Southern Europe","timezones":[{"zoneName":"Europe\/Gibraltar","gmtOffset":3600,"gmtOffsetName":"UTC+01:00","abbreviation":"CET","tzName":"Central European Time"}],"emoji":"\ud83c\uddec\ud83c\uddee","emojiU":"U+1F1EC U+1F1EE","states":[]}

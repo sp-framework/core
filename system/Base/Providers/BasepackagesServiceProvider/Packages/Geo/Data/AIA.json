@@ -1,17 +1,1 @@
-{
-    "AIA": {
-        "id": 8,
-        "name": "Anguilla",
-        "iso3": "AIA",
-        "iso2": "AI",
-        "phone_code": "+1-264",
-        "capital": "The Valley",
-        "currency": "XCD",
-        "native": "Anguilla",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇦🇮",
-        "emojiU": "U+1F1E6 U+1F1EE",
-        "states": []
-    }
-}
+{"id":8,"name":"Anguilla","iso3":"AIA","iso2":"AI","phone_code":"+1-264","capital":"The Valley","currency":"XCD","currency_symbol":"$","native":"Anguilla","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/Anguilla","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\udde6\ud83c\uddee","emojiU":"U+1F1E6 U+1F1EE","states":[]}

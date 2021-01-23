@@ -1,17 +1,1 @@
-{
-    "MAC": {
-        "id": 128,
-        "name": "Macau S.A.R.",
-        "iso3": "MAC",
-        "iso2": "MO",
-        "phone_code": "853",
-        "capital": "Macao",
-        "currency": "MOP",
-        "native": "澳門",
-        "region": "Asia",
-        "subregion": "Eastern Asia",
-        "emoji": "🇲🇴",
-        "emojiU": "U+1F1F2 U+1F1F4",
-        "states": []
-    }
-}
+{"id":128,"name":"Macau S.A.R.","iso3":"MAC","iso2":"MO","phone_code":"853","capital":"Macao","currency":"MOP","currency_symbol":"$","native":"\u6fb3\u9580","region":"Asia","subregion":"Eastern Asia","timezones":[{"zoneName":"Asia\/Macau","gmtOffset":28800,"gmtOffsetName":"UTC+08:00","abbreviation":"CST","tzName":"China Standard Time"}],"emoji":"\ud83c\uddf2\ud83c\uddf4","emojiU":"U+1F1F2 U+1F1F4","states":[]}

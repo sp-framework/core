@@ -1,17 +1,1 @@
-{
-    "VGB": {
-        "id": 241,
-        "name": "Virgin Islands (British)",
-        "iso3": "VGB",
-        "iso2": "VG",
-        "phone_code": "+1-284",
-        "capital": "Road Town",
-        "currency": "USD",
-        "native": "British Virgin Islands",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇻🇬",
-        "emojiU": "U+1F1FB U+1F1EC",
-        "states": []
-    }
-}
+{"id":241,"name":"Virgin Islands (British)","iso3":"VGB","iso2":"VG","phone_code":"+1-284","capital":"Road Town","currency":"USD","currency_symbol":"$","native":"British Virgin Islands","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/Tortola","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\uddfb\ud83c\uddec","emojiU":"U+1F1FB U+1F1EC","states":[]}

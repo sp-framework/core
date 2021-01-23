@@ -1,17 +1,1 @@
-{
-    "GLP": {
-        "id": 88,
-        "name": "Guadeloupe",
-        "iso3": "GLP",
-        "iso2": "GP",
-        "phone_code": "590",
-        "capital": "Basse-Terre",
-        "currency": "EUR",
-        "native": "Guadeloupe",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇬🇵",
-        "emojiU": "U+1F1EC U+1F1F5",
-        "states": []
-    }
-}
+{"id":88,"name":"Guadeloupe","iso3":"GLP","iso2":"GP","phone_code":"590","capital":"Basse-Terre","currency":"EUR","currency_symbol":"\u20ac","native":"Guadeloupe","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/Guadeloupe","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\uddec\ud83c\uddf5","emojiU":"U+1F1EC U+1F1F5","states":[]}

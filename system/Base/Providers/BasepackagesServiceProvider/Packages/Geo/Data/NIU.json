@@ -1,17 +1,1 @@
-{
-    "NIU": {
-        "id": 162,
-        "name": "Niue",
-        "iso3": "NIU",
-        "iso2": "NU",
-        "phone_code": "683",
-        "capital": "Alofi",
-        "currency": "NZD",
-        "native": "Niuē",
-        "region": "Oceania",
-        "subregion": "Polynesia",
-        "emoji": "🇳🇺",
-        "emojiU": "U+1F1F3 U+1F1FA",
-        "states": []
-    }
-}
+{"id":162,"name":"Niue","iso3":"NIU","iso2":"NU","phone_code":"683","capital":"Alofi","currency":"NZD","currency_symbol":"$","native":"Niu\u0113","region":"Oceania","subregion":"Polynesia","timezones":[{"zoneName":"Pacific\/Niue","gmtOffset":-39600,"gmtOffsetName":"UTC-11:00","abbreviation":"NUT","tzName":"Niue Time"}],"emoji":"\ud83c\uddf3\ud83c\uddfa","emojiU":"U+1F1F3 U+1F1FA","states":[]}

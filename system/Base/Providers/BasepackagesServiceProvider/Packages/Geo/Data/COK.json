@@ -1,17 +1,1 @@
-{
-    "COK": {
-        "id": 52,
-        "name": "Cook Islands",
-        "iso3": "COK",
-        "iso2": "CK",
-        "phone_code": "682",
-        "capital": "Avarua",
-        "currency": "NZD",
-        "native": "Cook Islands",
-        "region": "Oceania",
-        "subregion": "Polynesia",
-        "emoji": "🇨🇰",
-        "emojiU": "U+1F1E8 U+1F1F0",
-        "states": []
-    }
-}
+{"id":52,"name":"Cook Islands","iso3":"COK","iso2":"CK","phone_code":"682","capital":"Avarua","currency":"NZD","currency_symbol":"$","native":"Cook Islands","region":"Oceania","subregion":"Polynesia","timezones":[{"zoneName":"Pacific\/Rarotonga","gmtOffset":-36000,"gmtOffsetName":"UTC-10:00","abbreviation":"CKT","tzName":"Cook Island Time"}],"emoji":"\ud83c\udde8\ud83c\uddf0","emojiU":"U+1F1E8 U+1F1F0","states":[]}

@@ -1,17 +1,1 @@
-{
-    "TKL": {
-        "id": 221,
-        "name": "Tokelau",
-        "iso3": "TKL",
-        "iso2": "TK",
-        "phone_code": "690",
-        "capital": "",
-        "currency": "NZD",
-        "native": "Tokelau",
-        "region": "Oceania",
-        "subregion": "Polynesia",
-        "emoji": "🇹🇰",
-        "emojiU": "U+1F1F9 U+1F1F0",
-        "states": []
-    }
-}
+{"id":221,"name":"Tokelau","iso3":"TKL","iso2":"TK","phone_code":"690","capital":"","currency":"NZD","currency_symbol":"$","native":"Tokelau","region":"Oceania","subregion":"Polynesia","timezones":[{"zoneName":"Pacific\/Fakaofo","gmtOffset":46800,"gmtOffsetName":"UTC+13:00","abbreviation":"TKT","tzName":"Tokelau Time"}],"emoji":"\ud83c\uddf9\ud83c\uddf0","emojiU":"U+1F1F9 U+1F1F0","states":[]}

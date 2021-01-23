@@ -1,17 +1,1 @@
-{
-    "GUF": {
-        "id": 76,
-        "name": "French Guiana",
-        "iso3": "GUF",
-        "iso2": "GF",
-        "phone_code": "594",
-        "capital": "Cayenne",
-        "currency": "EUR",
-        "native": "Guyane française",
-        "region": "Americas",
-        "subregion": "South America",
-        "emoji": "🇬🇫",
-        "emojiU": "U+1F1EC U+1F1EB",
-        "states": []
-    }
-}
+{"id":76,"name":"French Guiana","iso3":"GUF","iso2":"GF","phone_code":"594","capital":"Cayenne","currency":"EUR","currency_symbol":"\u20ac","native":"Guyane fran\u00e7aise","region":"Americas","subregion":"South America","timezones":[{"zoneName":"America\/Cayenne","gmtOffset":-10800,"gmtOffsetName":"UTC-03:00","abbreviation":"GFT","tzName":"French Guiana Time"}],"emoji":"\ud83c\uddec\ud83c\uddeb","emojiU":"U+1F1EC U+1F1EB","states":[]}

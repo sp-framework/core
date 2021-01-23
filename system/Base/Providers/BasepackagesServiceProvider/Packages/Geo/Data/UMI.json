@@ -1,17 +1,1 @@
-{
-    "UMI": {
-        "id": 234,
-        "name": "United States Minor Outlying Islands",
-        "iso3": "UMI",
-        "iso2": "UM",
-        "phone_code": "1",
-        "capital": "",
-        "currency": "USD",
-        "native": "United States Minor Outlying Islands",
-        "region": "Americas",
-        "subregion": "Northern America",
-        "emoji": "🇺🇲",
-        "emojiU": "U+1F1FA U+1F1F2",
-        "states": []
-    }
-}
+{"id":234,"name":"United States Minor Outlying Islands","iso3":"UMI","iso2":"UM","phone_code":"1","capital":"","currency":"USD","currency_symbol":"$","native":"United States Minor Outlying Islands","region":"Americas","subregion":"Northern America","timezones":[{"zoneName":"Pacific\/Midway","gmtOffset":-39600,"gmtOffsetName":"UTC-11:00","abbreviation":"SST","tzName":"Samoa Standard Time"},{"zoneName":"Pacific\/Wake","gmtOffset":43200,"gmtOffsetName":"UTC+12:00","abbreviation":"WAKT","tzName":"Wake Island Time"}],"emoji":"\ud83c\uddfa\ud83c\uddf2","emojiU":"U+1F1FA U+1F1F2","states":[]}

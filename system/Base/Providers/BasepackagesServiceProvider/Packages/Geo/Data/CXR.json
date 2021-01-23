@@ -1,17 +1,1 @@
-{
-    "CXR": {
-        "id": 46,
-        "name": "Christmas Island",
-        "iso3": "CXR",
-        "iso2": "CX",
-        "phone_code": "61",
-        "capital": "Flying Fish Cove",
-        "currency": "AUD",
-        "native": "Christmas Island",
-        "region": "Oceania",
-        "subregion": "Australia and New Zealand",
-        "emoji": "🇨🇽",
-        "emojiU": "U+1F1E8 U+1F1FD",
-        "states": []
-    }
-}
+{"id":46,"name":"Christmas Island","iso3":"CXR","iso2":"CX","phone_code":"61","capital":"Flying Fish Cove","currency":"AUD","currency_symbol":"$","native":"Christmas Island","region":"Oceania","subregion":"Australia and New Zealand","timezones":[{"zoneName":"Indian\/Christmas","gmtOffset":25200,"gmtOffsetName":"UTC+07:00","abbreviation":"CXT","tzName":"Christmas Island Time"}],"emoji":"\ud83c\udde8\ud83c\uddfd","emojiU":"U+1F1E8 U+1F1FD","states":[]}

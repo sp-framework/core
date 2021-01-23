@@ -1,17 +1,1 @@
-{
-    "VAT": {
-        "id": 238,
-        "name": "Vatican City State (Holy See)",
-        "iso3": "VAT",
-        "iso2": "VA",
-        "phone_code": "379",
-        "capital": "Vatican City",
-        "currency": "EUR",
-        "native": "Vaticano",
-        "region": "Europe",
-        "subregion": "Southern Europe",
-        "emoji": "🇻🇦",
-        "emojiU": "U+1F1FB U+1F1E6",
-        "states": []
-    }
-}
+{"id":238,"name":"Vatican City State (Holy See)","iso3":"VAT","iso2":"VA","phone_code":"379","capital":"Vatican City","currency":"EUR","currency_symbol":"\u20ac","native":"Vaticano","region":"Europe","subregion":"Southern Europe","timezones":[{"zoneName":"Europe\/Vatican","gmtOffset":3600,"gmtOffsetName":"UTC+01:00","abbreviation":"CET","tzName":"Central European Time"}],"emoji":"\ud83c\uddfb\ud83c\udde6","emojiU":"U+1F1FB U+1F1E6","states":[]}

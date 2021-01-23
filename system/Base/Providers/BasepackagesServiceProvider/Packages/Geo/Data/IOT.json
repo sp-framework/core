@@ -1,17 +1,1 @@
-{
-    "IOT": {
-        "id": 32,
-        "name": "British Indian Ocean Territory",
-        "iso3": "IOT",
-        "iso2": "IO",
-        "phone_code": "246",
-        "capital": "Diego Garcia",
-        "currency": "USD",
-        "native": "British Indian Ocean Territory",
-        "region": "Africa",
-        "subregion": "Eastern Africa",
-        "emoji": "🇮🇴",
-        "emojiU": "U+1F1EE U+1F1F4",
-        "states": []
-    }
-}
+{"id":32,"name":"British Indian Ocean Territory","iso3":"IOT","iso2":"IO","phone_code":"246","capital":"Diego Garcia","currency":"USD","currency_symbol":"$","native":"British Indian Ocean Territory","region":"Africa","subregion":"Eastern Africa","timezones":[{"zoneName":"Indian\/Chagos","gmtOffset":21600,"gmtOffsetName":"UTC+06:00","abbreviation":"IOT","tzName":"Indian Ocean Time"}],"emoji":"\ud83c\uddee\ud83c\uddf4","emojiU":"U+1F1EE U+1F1F4","states":[]}

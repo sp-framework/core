@@ -1,17 +1,1 @@
-{
-    "PYF": {
-        "id": 77,
-        "name": "French Polynesia",
-        "iso3": "PYF",
-        "iso2": "PF",
-        "phone_code": "689",
-        "capital": "Papeete",
-        "currency": "XPF",
-        "native": "Polynésie française",
-        "region": "Oceania",
-        "subregion": "Polynesia",
-        "emoji": "🇵🇫",
-        "emojiU": "U+1F1F5 U+1F1EB",
-        "states": []
-    }
-}
+{"id":77,"name":"French Polynesia","iso3":"PYF","iso2":"PF","phone_code":"689","capital":"Papeete","currency":"XPF","currency_symbol":"\u20a3","native":"Polyn\u00e9sie fran\u00e7aise","region":"Oceania","subregion":"Polynesia","timezones":[{"zoneName":"Pacific\/Gambier","gmtOffset":-32400,"gmtOffsetName":"UTC-09:00","abbreviation":"GAMT","tzName":"Gambier Islands Time"},{"zoneName":"Pacific\/Marquesas","gmtOffset":-34200,"gmtOffsetName":"UTC-09:30","abbreviation":"MART","tzName":"Marquesas Islands Time"},{"zoneName":"Pacific\/Tahiti","gmtOffset":-36000,"gmtOffsetName":"UTC-10:00","abbreviation":"TAHT","tzName":"Tahiti Time"}],"emoji":"\ud83c\uddf5\ud83c\uddeb","emojiU":"U+1F1F5 U+1F1EB","states":[]}

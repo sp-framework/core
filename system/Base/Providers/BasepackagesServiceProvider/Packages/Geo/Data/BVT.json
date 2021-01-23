@@ -1,17 +1,1 @@
-{
-    "BVT": {
-        "id": 30,
-        "name": "Bouvet Island",
-        "iso3": "BVT",
-        "iso2": "BV",
-        "phone_code": "",
-        "capital": "",
-        "currency": "NOK",
-        "native": "Bouvetøya",
-        "region": "",
-        "subregion": "",
-        "emoji": "🇧🇻",
-        "emojiU": "U+1F1E7 U+1F1FB",
-        "states": []
-    }
-}
+{"id":30,"name":"Bouvet Island","iso3":"BVT","iso2":"BV","phone_code":"0055","capital":"","currency":"NOK","currency_symbol":"kr","native":"Bouvet\u00f8ya","region":"","subregion":"","timezones":[{"zoneName":"Europe\/Oslo","gmtOffset":3600,"gmtOffsetName":"UTC+01:00","abbreviation":"CET","tzName":"Central European Time"}],"emoji":"\ud83c\udde7\ud83c\uddfb","emojiU":"U+1F1E7 U+1F1FB","states":[]}

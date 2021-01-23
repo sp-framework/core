@@ -1,17 +1,1 @@
-{
-    "GGY": {
-        "id": 91,
-        "name": "Guernsey and Alderney",
-        "iso3": "GGY",
-        "iso2": "GG",
-        "phone_code": "+44-1481",
-        "capital": "St Peter Port",
-        "currency": "GBP",
-        "native": "Guernsey",
-        "region": "Europe",
-        "subregion": "Northern Europe",
-        "emoji": "🇬🇬",
-        "emojiU": "U+1F1EC U+1F1EC",
-        "states": []
-    }
-}
+{"id":91,"name":"Guernsey and Alderney","iso3":"GGY","iso2":"GG","phone_code":"+44-1481","capital":"St Peter Port","currency":"GBP","currency_symbol":"\u00a3","native":"Guernsey","region":"Europe","subregion":"Northern Europe","timezones":[{"zoneName":"Europe\/Guernsey","gmtOffset":0,"gmtOffsetName":"UTC\u00b100","abbreviation":"GMT","tzName":"Greenwich Mean Time"}],"emoji":"\ud83c\uddec\ud83c\uddec","emojiU":"U+1F1EC U+1F1EC","states":[]}

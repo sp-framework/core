@@ -1,17 +1,1 @@
-{
-    "MSR": {
-        "id": 148,
-        "name": "Montserrat",
-        "iso3": "MSR",
-        "iso2": "MS",
-        "phone_code": "+1-664",
-        "capital": "Plymouth",
-        "currency": "XCD",
-        "native": "Montserrat",
-        "region": "Americas",
-        "subregion": "Caribbean",
-        "emoji": "🇲🇸",
-        "emojiU": "U+1F1F2 U+1F1F8",
-        "states": []
-    }
-}
+{"id":148,"name":"Montserrat","iso3":"MSR","iso2":"MS","phone_code":"+1-664","capital":"Plymouth","currency":"XCD","currency_symbol":"$","native":"Montserrat","region":"Americas","subregion":"Caribbean","timezones":[{"zoneName":"America\/Montserrat","gmtOffset":-14400,"gmtOffsetName":"UTC-04:00","abbreviation":"AST","tzName":"Atlantic Standard Time"}],"emoji":"\ud83c\uddf2\ud83c\uddf8","emojiU":"U+1F1F2 U+1F1F8","states":[]}
