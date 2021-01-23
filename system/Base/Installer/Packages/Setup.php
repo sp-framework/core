@@ -11,9 +11,9 @@ use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplica
 use System\Base\Installer\Packages\Setup\Register\Application\Type as RegisterApplicationType;
 use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
-use System\Base\Installer\Packages\Setup\Register\CountriesStatesCities;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Register\Filter as RegisterFilter;
+use System\Base\Installer\Packages\Setup\Register\Geo\Countries as RegisterCountries;
 use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
@@ -21,9 +21,9 @@ use System\Base\Installer\Packages\Setup\Register\Repository as RegisterReposito
 use System\Base\Installer\Packages\Setup\Register\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
 use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
-use System\Base\Installer\Packages\Setup\Schema\Addressbook;
-use System\Base\Installer\Packages\Setup\Schema\Applications\Types as ApplicationsTypes;
+use System\Base\Installer\Packages\Setup\Schema\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Applications;
+use System\Base\Installer\Packages\Setup\Schema\Applications\Types as ApplicationsTypes;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Components;
 use System\Base\Installer\Packages\Setup\Schema\Core;
@@ -33,6 +33,7 @@ use System\Base\Installer\Packages\Setup\Schema\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Geo\Countries;
 use System\Base\Installer\Packages\Setup\Schema\Geo\States;
+use System\Base\Installer\Packages\Setup\Schema\Geo\Timezones;
 use System\Base\Installer\Packages\Setup\Schema\Logs;
 use System\Base\Installer\Packages\Setup\Schema\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Middlewares;
@@ -145,9 +146,10 @@ class Setup
 		$this->db->createTable('accounts', $dbName, (new Accounts)->columns());
 		$this->db->createTable('roles', $dbName, (new Roles)->columns());
 		$this->db->createTable('geo_countries', $dbName, (new Countries)->columns());
+		$this->db->createTable('geo_timezones', $dbName, (new Timezones)->columns());
 		$this->db->createTable('geo_states', $dbName, (new States)->columns());
 		$this->db->createTable('geo_cities', $dbName, (new Cities)->columns());
-		$this->db->createTable('addressbook', $dbName, (new Addressbook)->columns());
+		$this->db->createTable('address_book', $dbName, (new AddressBook)->columns());
 		$this->db->createTable('storages', $dbName, (new Storages)->columns());
 		$this->db->createTable('storages_local', $dbName, (new StoragesLocal)->columns());
 	}
@@ -405,9 +407,9 @@ class Setup
 		return (new RegisterFilter())->register($this->db);
 	}
 
-	public function registerCountryStatesCities()
+	public function registerCountries()
 	{
-		return (new CountriesStatesCities())->register($this->db, $this->postData['country'], $this->localContent);
+		return (new RegisterCountries())->register($this->db, $this->localContent);
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true)

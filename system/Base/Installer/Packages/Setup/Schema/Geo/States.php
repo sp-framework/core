@@ -3,7 +3,6 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Geo;
 
 use Phalcon\Db\Column;
-use Phalcon\Db\Index;
 
 class States
 {

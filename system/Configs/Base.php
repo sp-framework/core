@@ -10,7 +10,7 @@ return
 			"username" 			=> "guru",
 			"password" 			=> "123",
 			"port" 				=> "3306",
-			"charset" 	 	    => "utf8"
+			"charset" 	 	    => "utf8mb4"
 		],
 		"cache"			=>
 		[

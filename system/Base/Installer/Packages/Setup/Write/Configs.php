@@ -81,7 +81,7 @@ return
 			"username" 			=> "' . $this->postData['username'] . '",
 			"password" 			=> "' . $this->postData['password'] . '",
 			"port" 				=> "' . $this->postData['port'] . '",
-			"charset" 	 	    => "utf8"
+			"charset" 	 	    => "utf8mb4"
 		],
 		"cache"			=>
 		[

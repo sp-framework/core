@@ -3,7 +3,6 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Geo;
 
 use Phalcon\Db\Column;
-use Phalcon\Db\Index;
 
 class Cities
 {
@@ -30,15 +29,6 @@ class Cities
                     ]
                 ),
                 new Column(
-                    'latitude',
-                    [
-                        'type'    => Column::TYPE_DECIMAL,
-                        'size'    => 10,
-                        'scale'   => 8,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
                     'longitude',
                     [
                         'type'    => Column::TYPE_DECIMAL,
@@ -47,6 +37,23 @@ class Cities
                         'notNull' => false,
                     ]
                 ),
+                new Column(
+                    'latitude',
+                    [
+                        'type'    => Column::TYPE_DECIMAL,
+                        'size'    => 10,
+                        'scale'   => 8,
+                        'notNull' => false,
+                    ]
+                ),
+                // new Column(
+                //     'post_code',
+                //     [
+                //         'type'    => Column::TYPE_VARCHAR,
+                //         'size'    => 50,
+                //         'notNull' => false,
+                //     ]
+                // ),
                 new Column(
                     'state_id',
                     [

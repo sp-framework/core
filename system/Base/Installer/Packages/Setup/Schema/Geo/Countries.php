@@ -3,7 +3,6 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Geo;
 
 use Phalcon\Db\Column;
-use Phalcon\Db\Index;
 
 class Countries
 {
@@ -70,6 +69,14 @@ class Countries
                     ]
                 ),
                 new Column(
+                    'currency_symbol',
+                    [
+                        'type'      => Column::TYPE_VARCHAR,
+                        'size'      => 10,
+                        'notNull'   => false
+                    ]
+                ),
+                new Column(
                     'native',
                     [
                         'type'      => Column::TYPE_VARCHAR,
@@ -107,6 +114,27 @@ class Countries
                         'type'      => Column::TYPE_VARCHAR,
                         'size'      => 255,
                         'notNull'   => false
+                    ]
+                ),
+                new Column(
+                    'installed',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'enabled',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'cached',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(

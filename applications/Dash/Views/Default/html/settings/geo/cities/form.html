@@ -1,0 +1,219 @@
+{% if city['id'] is defined %}
+    {% set cityId = city['id'] %}
+    {% set cityName = city['name'] %}
+    {% set cityLongitude = city['longitude'] %}
+    {% set cityLatitude = city['latitude'] %}
+    {% set cityState = city['state_id'] %}
+    {% set cityCountry = city['country_id'] %}
+{% else %}
+    {% set cityId = '' %}
+    {% set cityName = '' %}
+    {% set cityLongitude = '' %}
+    {% set cityLatitude = '' %}
+    {% set cityState = '' %}
+    {% set cityCountry = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'City ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'City ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : cityId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Name Example: Dandenong',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : cityName
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'longitude',
+                        'fieldLabel'                     : 'Longitude',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'City Longitude',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : cityLongitude
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'latitude',
+                        'fieldLabel'                     : 'Latitude',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'City Latitude',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : cityLatitude
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'state_id',
+                        'fieldLabel'                           : 'State',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'State State Example: Victoria.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : states,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : cityState
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'country_id',
+                        'fieldLabel'                           : 'Country',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'State Country Example: Australia.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : countries,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : cityCountry
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-longitude'               : { },
+        '{{componentId}}-{{sectionId}}-latitude'                : { },
+        '{{componentId}}-{{sectionId}}-state_id'                : {
+            placeholder : 'SELECT STATE'
+        },
+        '{{componentId}}-{{sectionId}}-country_id'              : {
+            placeholder : 'SELECT COUNTRY'
+        },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'            : 'required',
+                '{{componentId}}-{{sectionId}}-longitude'       : 'required',
+                '{{componentId}}-{{sectionId}}-latitude'        : 'required',
+                '{{componentId}}-{{sectionId}}-state_id'        : 'required',
+                '{{componentId}}-{{sectionId}}-country_id'      : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'            : 'Please enter city name',
+                '{{componentId}}-{{sectionId}}-longitude'       : 'Please enter city longitude',
+                '{{componentId}}-{{sectionId}}-latitude'        : 'Please enter city latitude',
+                '{{componentId}}-{{sectionId}}-state_id'        : 'Please select state',
+                '{{componentId}}-{{sectionId}}-country_id'      : 'Please select country',
+            }
+        }
+    });
+</script>

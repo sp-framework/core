@@ -1,0 +1,52 @@
+{
+    "route"         : "settings/geo/timezones",
+    "name"          : "Geo Timezones",
+    "description"   : "Manage geo timezones via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-geo-timezones",
+    "class"         : "Applications\\Dash\\Components\\Settings\\Geo\\Timezones\\TimezonesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 10,
+        "settings"      : {
+            "title"     : "settings",
+            "icon"      : "cogs",
+            "childs"    : {
+                "geo" : {
+                    "title"     : "Geo Locations",
+                    "childs"    : {
+                        "timezones" : {
+                            "title"     : "Time Zones",
+                            "link"      : "settings/geo/timezones"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

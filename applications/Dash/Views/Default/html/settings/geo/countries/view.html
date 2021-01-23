@@ -1,0 +1,35 @@
+{% if country['id'] is defined %}
+    {% set countryId = country['id'] %}
+    {% set title = 'Country (' ~ country['name'] ~ ')' %}
+{% else %}
+    {% set countryId = '' %}
+    {% set title = 'New Country' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'map',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'countries/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : countryId,
+            'addActionUrl'                  : 'settings/geo/countries/add',
+            'addSuccessRedirectUrl'         : 'settings/geo/countries',
+            'updateActionUrl'               : 'settings/geo/countries/update',
+            'updateSuccessRedirectUrl'      : 'settings/geo/countries',
+            'cancelActionUrl'               : 'settings/geo/countries',
+            'closeActionUrl'                : 'settings/geo/countries'
+        ]
+    ]
+)}}

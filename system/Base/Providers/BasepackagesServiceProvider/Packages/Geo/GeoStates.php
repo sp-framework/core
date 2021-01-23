@@ -13,6 +13,32 @@ class GeoStates extends BasePackage
 
     public $geostates;
 
+    public function addState(array $data)
+    {
+        if ($this->add($data)) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' state';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error adding new state.';
+        }
+    }
+
+    public function updateState(array $data)
+    {
+        if ($this->update($data)) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' state';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error updating state.';
+        }
+    }
+
     public function searchStates(string $stateQueryString)
     {
         $searchStates =
@@ -29,10 +55,13 @@ class GeoStates extends BasePackage
             $states = [];
 
             foreach ($searchStates as $stateKey => $stateValue) {
-                $states[$stateKey] = $stateValue;
                 $country = $this->basepackages->geoCountries->getById($stateValue['country_id']);
-                $states[$stateKey]['country_id'] = $country['id'];
-                $states[$stateKey]['country_name'] = $country['name'];
+
+                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                    $states[$stateKey] = $stateValue;
+                    $states[$stateKey]['country_id'] = $country['id'];
+                    $states[$stateKey]['country_name'] = $country['name'];
+                }
             }
 
             $this->packagesData->responseCode = 0;

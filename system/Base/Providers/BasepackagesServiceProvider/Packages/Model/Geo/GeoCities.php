@@ -14,6 +14,8 @@ class GeoCities extends BaseModel
 
     public $longitude;
 
+    // public $post_code;
+
     public $state_id;
 
     public $country_id;
