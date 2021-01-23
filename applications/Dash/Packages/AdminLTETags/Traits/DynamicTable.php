@@ -9,7 +9,7 @@ trait DynamicTable {
     public function generateDTContent(
         $package,
         string $postUrl,
-        int $componentId = null,
+        $postUrlParams,
         array $columnsForTable = [],
         $withFilter = true,
         array $columnsForFilter = [],
@@ -17,7 +17,8 @@ trait DynamicTable {
         array $dtReplaceColumnsTitle = null,
         array $dtReplaceColumns = null,
         string $dtNotificationTextFromColumn = null,
-        array $dtAdditionControlButtons = null
+        array $dtAdditionControlButtons = null,
+        int $componentId = null
     )
     {
         if (gettype($package) === 'string') {
@@ -39,7 +40,7 @@ trait DynamicTable {
                 }
             }
             $table['postUrl'] = $this->links->url($postUrl);
-            $table['postUrlParams'] = [];
+            // $table['postUrlParams'] = $postUrlParams;
 
             $table['component'] = $this->component;
 
@@ -73,7 +74,9 @@ trait DynamicTable {
                     $table['filters'][$filter['id']]['data']['shared_ids'] = $filter['shared_ids'];
                     $table['filters'][$filter['id']]['data']['url'] = $filter['url'];
 
-                    if (isset($this->getData()['filter'])) {
+                    if (isset($postUrlParams) && is_array($postUrlParams)) {
+                        $table['postUrlParams'] = $postUrlParams;
+                    } else if (isset($this->getData()['filter'])) {
                         if ($this->getData()['filter'] === $filter['id']) {
                             $table['filters'][$filter['id']]['data']['queryFilterId'] = $filter['id'];
                             $table['postUrlParams'] = ['conditions' => $filter['conditions']];
@@ -85,6 +88,8 @@ trait DynamicTable {
                                 $filter['is_default'] === '1'
                     ) {
                         $table['postUrlParams'] = ['conditions' => $filter['conditions']];
+                    } else {
+                        $table['postUrlParams'] = [];
                     }
                 }
             } else {
@@ -116,10 +121,18 @@ trait DynamicTable {
                             count($controlActions['disableActionsForIds']) > 0
                         ) {
                             if (!in_array($row['id'], $controlActions['disableActionsForIds'])) {
-                                $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                if (isset($controlActions['includeQ']) && $controlActions['includeQ'] == true) {
+                                    $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                } else {
+                                    $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                }
                             }
                         } else {
-                            $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                            if (isset($controlActions['includeQ']) && $controlActions['includeQ'] == true) {
+                                $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                            } else {
+                                $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                            }
                         }
                     }
 
