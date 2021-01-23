@@ -480,8 +480,6 @@ dataCollectionSection =
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-install-country').click(function(e) {
                     e.preventDefault();
-                    //eslint-disable-next-line
-                    console.log('click');
                     $(this).attr('disabled', true);
                     $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', false);
 
@@ -491,8 +489,6 @@ dataCollectionSection =
                     postData['country_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
                     postData['country_iso3'] = $('#{{componentId}}-{{sectionId}}-iso3').val();
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    //eslint-disable-next-line
-                    console.log(postData);
                     $.post(url, postData, function(data) {
                         if (data.responseCode == 0) {
                             PNotify.success({

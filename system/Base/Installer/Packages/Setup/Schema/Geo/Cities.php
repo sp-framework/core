@@ -47,7 +47,7 @@ class Cities
                     ]
                 ),
                 // new Column(
-                //     'post_code',
+                //     'post_codes',
                 //     [
                 //         'type'    => Column::TYPE_VARCHAR,
                 //         'size'    => 50,

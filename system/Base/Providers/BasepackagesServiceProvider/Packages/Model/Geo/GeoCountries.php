@@ -34,5 +34,7 @@ class GeoCountries extends BaseModel
 
     public $emojiU;
 
+    public $translations;
+
     public $user_added;
 }

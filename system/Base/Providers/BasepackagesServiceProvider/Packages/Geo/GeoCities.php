@@ -9,9 +9,9 @@ class GeoCities extends BasePackage
 {
     protected $modelToUse = GeoCitiesModel::class;
 
-    protected $packageName = 'geocities';
+    protected $packageName = 'geoCities';
 
-    public $geocities;
+    public $geoCities;
 
     public function addCity(array $data)
     {

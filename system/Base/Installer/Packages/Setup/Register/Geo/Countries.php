@@ -53,9 +53,9 @@ class Countries
                     'subregion'         => $country['subregion'],
                     'emoji'             => $country['emoji'],
                     'emojiU'            => $country['emojiU'],
+                    'translations'      => Json::encode($country['translations']),
                     'installed'         => 0,
                     'enabled'           => 0,
-                    'cached'            => 0
                 ]
             );
 

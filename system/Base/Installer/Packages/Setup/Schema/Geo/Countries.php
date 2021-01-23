@@ -124,6 +124,14 @@ class Countries
                     ]
                 ),
                 new Column(
+                    'translations',
+                    [
+                        'type'      => Column::TYPE_JSON,
+                        'size'      => 2048,
+                        'notNull'   => false
+                    ]
+                ),
+                new Column(
                     'installed',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
@@ -132,13 +140,6 @@ class Countries
                 ),
                 new Column(
                     'enabled',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'cached',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => true,

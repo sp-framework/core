@@ -9,9 +9,9 @@ class GeoTimezones extends BasePackage
 {
     protected $modelToUse = GeoTimezonesModel::class;
 
-    protected $packageName = 'geotimezones';
+    protected $packageName = 'geoTimezones';
 
-    public $geotimezones;
+    public $geoTimezones;
 
     public function addTimezone(array $data)
     {

@@ -9,9 +9,9 @@ class GeoStates extends BasePackage
 {
     protected $modelToUse = GeoStatesModel::class;
 
-    protected $packageName = 'geostates';
+    protected $packageName = 'geoStates';
 
-    public $geostates;
+    public $geoStates;
 
     public function addState(array $data)
     {

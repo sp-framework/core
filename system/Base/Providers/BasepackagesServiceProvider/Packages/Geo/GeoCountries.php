@@ -10,9 +10,9 @@ class GeoCountries extends BasePackage
 {
     protected $modelToUse = GeoCountriesModel::class;
 
-    protected $packageName = 'geocountries';
+    protected $packageName = 'geoCountries';
 
-    public $geocountries;
+    public $geoCountries;
 
     public function searchCountries(string $countryQueryString)
     {
@@ -158,6 +158,23 @@ class GeoCountries extends BasePackage
             //         'country_id'    => $country_id
             //     ]
             // );
+        }
+    }
+
+    public function isEnabled()
+    {
+        $searchEnabledCountries =
+            $this->getByParams(
+                [
+                    'conditions'    => 'enabled = :cEnabled:',
+                    'bind'          => [
+                        'cEnabled'  => 1
+                    ]
+                ]
+            );
+
+        if ($searchEnabledCountries) {
+            return true;
         }
     }
 }

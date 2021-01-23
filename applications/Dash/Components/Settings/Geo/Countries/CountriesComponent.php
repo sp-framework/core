@@ -4,6 +4,7 @@ namespace Applications\Dash\Components\Settings\Geo\Countries;
 
 use Applications\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoExtractData;
 
 class CountriesComponent extends BaseComponent
 {
