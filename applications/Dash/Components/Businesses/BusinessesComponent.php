@@ -105,7 +105,7 @@ class BusinessesComponent extends BaseComponent
             'businesses/view',
             null,
             ['abn', 'name', 'type', 'parent'],
-            true,
+            false,
             [],
             $controlActions,
             [],

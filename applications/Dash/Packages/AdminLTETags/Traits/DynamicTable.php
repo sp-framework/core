@@ -93,6 +93,7 @@ trait DynamicTable {
                     }
                 }
             } else {
+                $table['postUrlParams'] = [];
                 $table['filters'] = [];
                 $table['filterColumns'] = [];
             }

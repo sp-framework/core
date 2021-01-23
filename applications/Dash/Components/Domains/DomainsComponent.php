@@ -8,6 +8,14 @@ use System\Base\BaseComponent;
 class DomainsComponent extends BaseComponent
 {
     use DynamicTable;
+
+    protected $domains;
+
+    public function initialize()
+    {
+        $this->domains = $this->basepackages->domains->init();
+    }
+
     /**
      * @acl(name=view)
      */
@@ -47,8 +55,6 @@ class DomainsComponent extends BaseComponent
             return;
         }
 
-        $domains = $this->basepackages->domains->init();
-
         $controlActions =
             [
                 // 'disableActionsForIds'  => [1],
@@ -60,11 +66,11 @@ class DomainsComponent extends BaseComponent
             ];
 
         $this->generateDTContent(
-            $domains,
+            $this->domains,
             'domains/view',
             null,
             ['name'],
-            false,
+            true,
             ['name'],
             $controlActions,
             null,
