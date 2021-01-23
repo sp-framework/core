@@ -86,20 +86,24 @@ class Storages extends BasePackage
 
     public function getAppStorages()
     {
-        foreach ($this->storages as $key => $storage) {
-            if ($storage['allowed_image_mime_types']) {
-                $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
+        if (isset($this->storages) && count($this->storages) > 0) {
+            foreach ($this->storages as $key => $storage) {
+                if ($storage['allowed_image_mime_types']) {
+                    $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
+                }
+                if ($storage['allowed_image_sizes']) {
+                    $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
+                }
+                if ($storage['allowed_file_mime_types']) {
+                    $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
+                }
+                $storages[$storage['permission']] = $storage;
             }
-            if ($storage['allowed_image_sizes']) {
-                $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
-            }
-            if ($storage['allowed_file_mime_types']) {
-                $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);
-            }
-            $storages[$storage['permission']] = $storage;
+
+            return $storages;
         }
 
-        return $storages;
+        return false;
     }
 
     public function getFile(array $getData)
