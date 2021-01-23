@@ -3,7 +3,7 @@
 namespace Applications\Dash\Components\Home;
 
 use Applications\Dash\Components\Filters\Install\Component as FiltersComponent;
-use Applications\Dash\Components\Hrms\Employees\Settings\Designations\Install\Component as EmployeesDesignationsComponent;
+use Applications\Dash\Components\Hrms\Designations\Install\Component as EmployeesDesignationsComponent;
 use Applications\Dash\Components\Hrms\Skills\Install\Component as SkillsComponent;
 use Applications\Dash\Components\Ims\Brands\Install\Component as BrandsComponent;
 use Applications\Dash\Components\Ims\Categories\Install\Component as CategoriesComponent;
@@ -14,8 +14,8 @@ use Applications\Dash\Packages\ABNLookup\Install\Package as ABNLookupPackage;
 use Applications\Dash\Packages\Businesses\Install\Package as BusinessesPackage;
 use Applications\Dash\Packages\Channels\Install\Package as ChannelsPackage;
 use Applications\Dash\Packages\Hrms\Employees\Install\Package as EmployeesPackage;
-use Applications\Dash\Packages\Hrms\Employees\Settings\Designations\Install\Package as EmployeesDesignationsPackage;
-use Applications\Dash\Packages\Hrms\Employees\Settings\Statuses\Install\Package as EmployeesStatusesPackage;
+use Applications\Dash\Packages\Hrms\Designations\Install\Package as EmployeesDesignationsPackage;
+use Applications\Dash\Packages\Hrms\Statuses\Install\Package as EmployeesStatusesPackage;
 use Applications\Dash\Packages\Hrms\Skills\Install\Package as SkillsPackage;
 use Applications\Dash\Packages\Ims\Brands\Install\Package as BrandsPackage;
 use Applications\Dash\Packages\Ims\Categories\Install\Package as CategoriesPackage;

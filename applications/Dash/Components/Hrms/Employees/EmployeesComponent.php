@@ -4,8 +4,8 @@ namespace Applications\Dash\Components\Hrms\Employees;
 
 use Applications\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Applications\Dash\Packages\Hrms\Employees\Employees;
-use Applications\Dash\Packages\Hrms\Employees\Settings\Designations\EmployeesDesignations;
-use Applications\Dash\Packages\Hrms\Employees\Settings\Statuses\EmployeesStatuses;
+use Applications\Dash\Packages\Hrms\Designations\HrmsDesignations;
+use Applications\Dash\Packages\Hrms\Statuses\HrmsStatuses;
 use Applications\Dash\Packages\Locations\Locations;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
@@ -26,9 +26,9 @@ class EmployeesComponent extends BaseComponent
     {
         $this->employees = $this->usePackage(Employees::class);
 
-        $this->statuses = $this->usePackage(EmployeesStatuses::class);
+        $this->statuses = $this->usePackage(HrmsStatuses::class);
 
-        $this->designations = $this->usePackage(EmployeesDesignations::class);
+        $this->designations = $this->usePackage(HrmsDesignations::class);
 
         $this->locations = $this->usePackage(Locations::class);
     }
@@ -38,9 +38,9 @@ class EmployeesComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $statuses = $this->statuses->getAll()->employeesStatuses;
+        $statuses = $this->statuses->getAll()->hrmsStatuses;
 
-        $designations = $this->designations->getAll()->employeesDesignations;
+        $designations = $this->designations->getAll()->hrmsDesignations;
 
         $locations = $this->locations->getAll()->locations;
 

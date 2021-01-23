@@ -1,0 +1,51 @@
+{
+    "route"         : "hrms/designations",
+    "name"          : "Designations",
+    "description"   : "Manage designations via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "hrms",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-hrms-designations",
+    "class"         : "Applications\\Dash\\Components\\Hrms\\Designations\\DesignationsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "HrmsDesignations",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-hrms-designations"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "hrms"      : {
+            "title"     : "HR Management",
+            "icon"      : "users-cog",
+            "childs"    : {
+                "designations"   : {
+                    "title"     : "Designations",
+                    "link"      : "hrms/designations"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}
