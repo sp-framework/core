@@ -455,12 +455,13 @@ class DynamicTable
                     }
 
                     if (isset($this->params['dtAdditionControlButtons'])) {
-
-                        $controlButtons = array_merge($controlButtons,
-                            [
-                                'divider'   => '<div class="dropdown-divider"></div>'
-                            ]
-                        );
+                        if (count($controlButtons) > 1) {
+                            $controlButtons = array_merge($controlButtons,
+                                [
+                                    'divider'   => '<div class="dropdown-divider"></div>'
+                                ]
+                            );
+                        }
 
                         foreach ($this->params['dtAdditionControlButtons']['buttons'] as $additionControlButtonKey => $additionControlButton) {
                             if (isset($this->params['dtAdditionControlButtons']['includeId'])) {
