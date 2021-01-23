@@ -25,8 +25,11 @@ class EmployeesComponent extends BaseComponent
     public function initialize()
     {
         $this->employees = $this->usePackage(Employees::class);
+
         $this->statuses = $this->usePackage(EmployeesStatuses::class);
+
         $this->designations = $this->usePackage(EmployeesDesignations::class);
+
         $this->locations = $this->usePackage(Locations::class);
     }
 

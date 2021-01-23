@@ -80,7 +80,7 @@ class FiltersComponent extends BaseComponent
                 ];
 
             $this->generateDTContent(
-                $this->basepackages->filters,
+                $this->filters,
                 'filters/view',
                 null,
                 ['name', 'filter_type', 'auto_generated', 'is_default'],
