@@ -2,6 +2,8 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
+use Phalcon\Helper\Json;
+
 class CacheTools
 {
 	protected $cacheTimeout;
@@ -51,29 +53,33 @@ class CacheTools
 
 	public function generateCacheKey($cacheKey)
 	{
-		$uniqueKey = [];
-		foreach ($cacheKey as $key => $value) {
-			if (true === is_scalar($value)) {
-				$uniqueKey[] = $value;
-			} elseif (true === is_array($value)) {
-				$uniqueKey[] = sprintf(
-					'%s-%s',
-					$key,
-					$this->generateCacheKey($value)
-				);
-			}
-		}
+		$cacheKey = Json::encode($cacheKey);
 
-		$key =
-			str_replace(
-				' ', '', str_replace(//remove Space
-					':', '', str_replace(//Remove Colon
-						'=', '-', join('-', $uniqueKey)//remove equals
-					)
-				)
-			);
+		$key = preg_replace('/[^A-Za-z0-9.-]/', '', $cacheKey);
 
-		return $key;
+		return md5($key);
+		// $uniqueKey = [];
+		// foreach ($cacheKey as $key => $value) {
+		// 	if (true === is_scalar($value)) {
+		// 		$uniqueKey[] = $value;
+		// 	} elseif (true === is_array($value)) {
+		// 		$uniqueKey[] = sprintf(
+		// 			'%s-%s',
+		// 			$key,
+		// 			$this->generateCacheKey($value)
+		// 		);
+		// 	}
+		// }
+
+		// $key =
+		// 	str_replace(
+		// 		' ', '', str_replace(//remove Space
+		// 			':', '', str_replace(//Remove Colon
+		// 				'=', '-', join('-', $uniqueKey)//remove equals
+		// 			)
+		// 		)
+		// 	);
+
 	}
 
 	public function deleteCache($cacheKey)
