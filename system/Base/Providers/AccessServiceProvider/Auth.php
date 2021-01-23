@@ -80,13 +80,18 @@ class Auth
     public function logout()
     {
         if (!$this->account) {
-            $this->setUserFromSession();
+            try {
+                $this->setUserFromSession();
+            } catch (\Exception $e) {
+                return;
+            }
         }
 
         $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
 
         if ($this->account) {
             $this->clearAccountSessionId();
+
             $this->clearAccountRememberToken($cookieKey);
         }
 
@@ -113,10 +118,10 @@ class Auth
             if (!is_array($this->account['session_ids'])) {
                 $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
             }
+            $sessionIdKey = array_search($this->session->getId(), $this->account['session_ids']);
         }
-        $sessionIdKey = array_search($this->session->getId(), $this->account['session_ids']);
 
-        if ($sessionIdKey !== false) {
+        if (isset($sessionIdKey) && $sessionIdKey !== false) {
             if (count($this->account['session_ids']) === 1) {
                 $this->account['session_ids'] = null;
             } else {
