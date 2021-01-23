@@ -4,7 +4,7 @@ namespace System\Base\Installer\Packages\Setup\Schema;
 
 use Phalcon\Db\Column;
 
-class Addressbook
+class AddressBook
 {
     public function columns()
     {

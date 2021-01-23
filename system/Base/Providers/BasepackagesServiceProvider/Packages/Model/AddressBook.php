@@ -4,7 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model;
 
 use System\Base\BaseModel;
 
-class Addressbook extends BaseModel
+class AddressBook extends BaseModel
 {
     public $id;
 

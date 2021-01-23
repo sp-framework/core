@@ -5,11 +5,11 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Addressbook as AddressbookModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\AddressBook as AddressBookModel;
 
 class Addressbook extends BasePackage
 {
-    protected $modelToUse = AddressbookModel::class;
+    protected $modelToUse = AddressBookModel::class;
 
     protected $packageName = 'addressbook';
 
