@@ -12,6 +12,10 @@ class Error
 
 	protected $logger;
 
+	protected $request;
+
+	protected $response;
+
 	protected $exception;
 
 	protected $applicationDebug;
@@ -20,13 +24,17 @@ class Error
 
 	protected $newException = null;
 
-	public function __construct($applicationInfo, $config, $logger)
+	public function __construct($applicationInfo, $config, $logger, $request, $response)
 	{
 		$this->applicationInfo = $applicationInfo;
 
 		$this->config = $config;
 
 		$this->logger = $logger;
+
+		$this->request = $request;
+
+		$this->response = $response;
 	}
 
 	public function init()
@@ -130,7 +138,6 @@ class Error
 	protected function emailMessage()
 	{
 		try {
-
 			$this->logger->commitEmail($this->buildMessage(true, false));
 
 		} catch (\Exception $exception) {

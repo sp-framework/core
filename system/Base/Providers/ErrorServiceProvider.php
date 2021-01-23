@@ -16,7 +16,9 @@ class ErrorServiceProvider implements ServiceProviderInterface
 				$applicationInfo = $container->getShared('modules')->applications->getApplicationInfo();
 				$config = $container->getShared('config');
 				$logger = $container->getShared('logger');
-				return (new Error($applicationInfo, $config, $logger))->init();
+				$request = $container->getShared('request');
+				$response = $container->getShared('response');
+				return (new Error($applicationInfo, $config, $logger, $request, $response))->init();
 			}
 		);
 	}
