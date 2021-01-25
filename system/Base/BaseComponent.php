@@ -215,21 +215,15 @@ abstract class BaseComponent extends Controller
 	{
 		$this->buildHeaderBreadcrumb();
 
-		if ($this->isJson()) {
-			$this->view->tokenKey = $this->security->getTokenKey();
+		$this->getNewTokenAction();
 
-			$this->view->token = $this->security->getToken();
-
-
-			return $this->sendJson();
+		if (!$this->request->isPost() || !$this->isJson())
+		if ($this->application) {
+			$this->view->menus =
+				$this->basepackages->menus->buildMenusForApplication($this->application['id']);
 		}
 
-		if (!$this->isJson() || $this->request->isAjax()) {
-			if ($this->application) {
-				$this->view->menus =
-					$this->basepackages->menus->buildMenusForApplication($this->application['id']);
-			}
-
+		if ($this->request->isAjax()) {
 			$this->response->setHeader('tokenKey', $this->security->getTokenKey());
 			$this->response->setHeader('token', $this->security->getToken());
 		}
