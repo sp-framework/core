@@ -39,6 +39,10 @@ var BazContentLoader = function() {
                 if (!$(this).parents().is('.treeview')) {
                     $('.tree').trigger('closeAllMenu');
                 }
+                // Close Dropdown
+                if ($(this).closest('.dropdown').length > 0) {
+                    $(this).closest('.dropdown').dropdown('toggle');
+                }
 
                 loadAjax($(this), options); //do the magic
 
