@@ -1,0 +1,38 @@
+{% if auth.account() and auth.account()['profile'] is defined %}
+    {% set account = auth.account() %}
+    {% set profile = auth.account()['profile'] %}
+    {% if profile['full_name'] !== '' %}
+        {% set title = 'Profile (' ~ profile['full_name'] ~ ')' %}
+    {% else %}
+        {% set title = 'Profile' %}
+    {% endif %}
+
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'id-card',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardShowTools'                 : ['maximize', 'collapse'],
+            'cardBodyInclude'               : 'profile/form',
+            'formButtons'                   :
+            [
+                'updateButtonId'                : profile['id'],
+                'addActionUrl'                  : 'users/profile/add',
+                'addSuccessRedirectUrl'         : 'home',
+                'updateActionUrl'               : 'users/profile/update',
+                'updateSuccessRedirectUrl'      : 'home',
+                'cancelActionUrl'               : 'home',
+                'closeActionUrl'                : 'home'
+            ]
+        ]
+    )}}
+{% endif %}

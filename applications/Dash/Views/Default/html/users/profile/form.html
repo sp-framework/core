@@ -1,0 +1,772 @@
+{% set account = auth.account() %}
+{% set profile = auth.account()['profile'] %}
+
+{# {% set profileDesignation = profile['designation'] %}
+{% set profileManagerId = profile['manager_id'] %}
+{% set profileManager = profile['manager_full_name'] %}
+{% set profileType = profile['type_id'] %}
+{% set profileHireDate = profile['hire_date'] %}
+{% set profileTerminateDate = profile['terminate_date'] %}
+{% set profileHireManagerId = profile['hire_manager_id'] %}
+{% set profileHireManager = profile['hire_manager_full_name'] %}
+{% set profileHireReferrerId = profile['hire_referrer_id'] %}
+{% set profileHireReferrer = profile['hire_referrer_full_name'] %}
+{% set profileEmploymentAttachments = profile['employment_attachments'] %}
+{% set profileEmploymentNotes = profile['employment_notes'] %}
+{% set profileWorkType = profile['work_type_id'] %}
+{% set profileContactLocationId = profile['contact_location_id'] %} #}
+
+{#     {% set profileSkills = profile['skills'] %}
+{% set profileSkillsAttachments = profile['skills_attachments'] %} #}
+
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'profile/form/info',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
+                                'contactdetails'   :
+                                [
+                                    'tabTitle'          : 'Contact Details',
+                                    'tabInclude'        : 'profile/form/contactdetails',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ],
+                                'security'   :
+                                [
+                                    'tabTitle'          : 'Security',
+                                    'tabInclude'        : 'profile/form/security',
+                                    'tabIncludeParams'  : ['profile' : profile, 'account' : account]
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<script>
+/* globals BazContentFieldsValidator PNotify autoComplete */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                              : { },
+        '{{componentId}}-{{sectionId}}-current_password'                      : { },
+        '{{componentId}}-{{sectionId}}-new_password'                      : { },
+        '{{componentId}}-{{sectionId}}-confirm_password'                      : { },
+        '{{componentId}}-{{sectionId}}-account_id'                      : { },
+        '{{componentId}}-{{sectionId}}-account_email'                   : {
+            afterInit   : function() {
+                dataCollectionSectionForm['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("hrms/employees/searchAccount")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_email").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.accounts) {
+                                    return data.accounts;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["email"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-account_email",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            /* if set to false, add an eventListener to the selector for event type
+                               "autoComplete" to handle the result */
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_email_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: document.querySelector("#{{componentId}}-{{sectionId}}-account_email"),
+                            position: "afterend",
+                            element: "div"
+                        },
+                        maxResults: 5,                         // Max. number of rendered results | (Optional)
+                        highlight: true,                       // Highlight matching results      | (Optional)
+                        resultItem: {                          // Rendered result item            | (Optional)
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {                     // Action script on noResults      | (Optional)
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list").appendChild(result);
+                        },
+                        onSelection: feedback => {             // Action script onSelection event | (Optional)
+                            $('#{{componentId}}-{{sectionId}}-account_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-account_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-account_email').blur();
+                            $('#{{componentId}}-{{sectionId}}-account_email').val(feedback.selection.value.email);
+                            $('#{{componentId}}-{{sectionId}}-account_email').attr('value', feedback.selection.value.email);
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-account_email').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-account_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-account_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-account_email').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-account_email_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-status'                          : {
+            'placeholder' : "SELECT EMPLOYEE STATUS"
+        },
+        '{{componentId}}-{{sectionId}}-first_name'                      : { },
+        '{{componentId}}-{{sectionId}}-last_name'                       : { },
+        '{{componentId}}-{{sectionId}}-designation'                     : {
+            'placeholder' : "SELECT EMPLOYEE DESIGNATION"
+        },
+        '{{componentId}}-{{sectionId}}-manager_id'                      : { },
+        '{{componentId}}-{{sectionId}}-manager_full_name'               : {
+            afterInit   : function() {
+                dataCollectionSectionForm['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("hrms/employees/searchEmployee")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-manager_full_name").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.employees) {
+                                    return data.employees;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["full_name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-manager_full_name",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            /* if set to false, add an eventListener to the selector for event type
+                               "autoComplete" to handle the result */
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-manager_full_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: document.querySelector("#{{componentId}}-{{sectionId}}-manager_full_name"),
+                            position: "afterend",
+                            element: "div"
+                        },
+                        maxResults: 5,                         // Max. number of rendered results | (Optional)
+                        highlight: true,                       // Highlight matching results      | (Optional)
+                        resultItem: {                          // Rendered result item            | (Optional)
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {                     // Action script on noResults      | (Optional)
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            document.querySelector("#{{componentId}}-{{sectionId}}-manager_full_name_list").appendChild(result);
+                        },
+                        onSelection: feedback => {             // Action script onSelection event | (Optional)
+                            $('#{{componentId}}-{{sectionId}}-manager_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-manager_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-manager_full_name').blur();
+                            $('#{{componentId}}-{{sectionId}}-manager_full_name').val(feedback.selection.value.full_name);
+                            $('#{{componentId}}-{{sectionId}}-manager_full_name').attr('value', feedback.selection.value.full_name);
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-manager_full_name').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-manager_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-manager_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-manager_full_name').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-manager_full_name_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-type_id'                         : {
+            'placeholder' : "SELECT EMPLOYMENT TYPE"
+        },
+        '{{componentId}}-{{sectionId}}-hire_date'                       : {
+            onChange: function(selectedDates, dateStr, instance) {
+                $(dataCollectionSection['formValidator']['currentForm']).valid();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-terminate_date'                  : { },
+        '{{componentId}}-{{sectionId}}-hire_manager_id'                 : { },
+        '{{componentId}}-{{sectionId}}-hire_manager_full_name'          : {
+            afterInit   : function() {
+                dataCollectionSectionForm['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("hrms/employees/searchEmployee")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-hire_manager_full_name").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.employees) {
+                                    return data.employees;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["full_name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-hire_manager_full_name",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            /* if set to false, add an eventListener to the selector for event type
+                               "autoComplete" to handle the result */
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-hire_manager_full_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: document.querySelector("#{{componentId}}-{{sectionId}}-hire_manager_full_name"),
+                            position: "afterend",
+                            element: "div"
+                        },
+                        maxResults: 5,                         // Max. number of rendered results | (Optional)
+                        highlight: true,                       // Highlight matching results      | (Optional)
+                        resultItem: {                          // Rendered result item            | (Optional)
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {                     // Action script on noResults      | (Optional)
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            document.querySelector("#{{componentId}}-{{sectionId}}-hire_manager_full_name_list").appendChild(result);
+                        },
+                        onSelection: feedback => {             // Action script onSelection event | (Optional)
+                            $('#{{componentId}}-{{sectionId}}-hire_manager_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-hire_manager_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-hire_manager_full_name').blur();
+                            $('#{{componentId}}-{{sectionId}}-hire_manager_full_name').val(feedback.selection.value.full_name);
+                            $('#{{componentId}}-{{sectionId}}-hire_manager_full_name').attr('value', feedback.selection.value.full_name);
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-hire_manager_full_name').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-hire_manager_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-hire_manager_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-hire_manager_full_name').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-hire_manager_full_name_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-hire_referrer_id'                : { },
+        '{{componentId}}-{{sectionId}}-hire_referrer_full_name'         : {
+            afterInit   : function() {
+                dataCollectionSectionForm['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("hrms/employees/searchEmployee")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-hire_referrer_full_name").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.employees) {
+                                    return data.employees;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["full_name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-hire_referrer_full_name",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            /* if set to false, add an eventListener to the selector for event type
+                               "autoComplete" to handle the result */
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-hire_referrer_full_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: document.querySelector("#{{componentId}}-{{sectionId}}-hire_referrer_full_name"),
+                            position: "afterend",
+                            element: "div"
+                        },
+                        maxResults: 5,                         // Max. number of rendered results | (Optional)
+                        highlight: true,                       // Highlight matching results      | (Optional)
+                        resultItem: {                          // Rendered result item            | (Optional)
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {                     // Action script on noResults      | (Optional)
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            document.querySelector("#{{componentId}}-{{sectionId}}-hire_referrer_full_name_list").appendChild(result);
+                        },
+                        onSelection: feedback => {             // Action script onSelection event | (Optional)
+                            $('#{{componentId}}-{{sectionId}}-hire_referrer_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-hire_referrer_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-hire_referrer_full_name').blur();
+                            $('#{{componentId}}-{{sectionId}}-hire_referrer_full_name').val(feedback.selection.value.full_name);
+                            $('#{{componentId}}-{{sectionId}}-hire_referrer_full_name').attr('value', feedback.selection.value.full_name);
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-hire_referrer_full_name').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-hire_referrer_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-hire_referrer_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-hire_referrer_full_name').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-hire_referrer_full_name_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-employment_notes'                : { },
+        '{{componentId}}-{{sectionId}}-work_type_id'                    : {
+            'placeholder' : "SELECT WORK TYPE",
+            afterInit : function() {
+                var selectedTypeId = $('#{{componentId}}-{{sectionId}}-work_type_id').val();
+
+                if (selectedTypeId === '1') {
+                    $('#{{componentId}}-{{sectionId}}-contact_location_id').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-contact_location_id').attr('disabled', false);
+                    $('.contact-location-address').attr('hidden', false);
+                } else if (selectedTypeId === '2') {
+                    $('#{{componentId}}-{{sectionId}}-contact_location_id').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').removeClass('d-none');
+                }
+
+                $('#{{componentId}}-{{sectionId}}-work_type_id').on('select2:select', function(e) {
+                    var typeId = e.params.data.id;
+
+                    if (typeId === '1') {
+                        $('#{{componentId}}-{{sectionId}}-contact_location_id').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-contact_location_id').attr('disabled', false);
+                        $('.contact-location-address').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-street_address').val('');
+                        $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-street_address_2').val('');
+                        $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-city_name').val('');
+                        $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-post_code').val('');
+                        $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-state_name').val('');
+                        $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-country_name').val('');
+                    } else if (typeId === '2') {
+                        $('#{{componentId}}-{{sectionId}}-contact_location_id').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-contact_location_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-contact_location_id').val(0).trigger('change');
+                        $('.contact-location-address').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', false);
+                    }
+                    dataCollectionSection['BazContentSectionWithForm']._redoFormJsTree();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_location_id'             : {
+            'placeholder' : "SELECT LOCATION",
+            afterInit : function() {
+
+                var locationId = $('#{{componentId}}-{{sectionId}}-contact_location_id').val();
+
+                if (locationId !== '') {
+                    updateLocation(locationId);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-contact_location_id').on('select2:select', function(e) {
+                    updateLocation(e.params.data.id);
+                });
+
+                function updateLocation(locationId) {
+                    $.post('{{links.url("locations/getlocationbyid")}}', {"id" : locationId}, function(data) {
+                        $('.contact-location-address').attr('hidden', false);
+
+                        if (data.tokenKey && data.token) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
+
+                        if (data.locationAddress) {
+                            $('.cla-street').html(data.locationAddress.street_address);
+                            $('.cla-street2').html(data.locationAddress.street_address_2);
+                            $('.cla-city').html(data.locationAddress.city_name);
+                            $('.cla-postcode').html(data.locationAddress.post_code);
+                            $('.cla-state').html(data.locationAddress.state_name);
+                            $('.cla-country').html(data.locationAddress.country_name);
+                        }
+                    }, 'json');
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_location_address'        : { },
+        '{{componentId}}-{{sectionId}}-contact_address_id'              : { },
+        '{{componentId}}-{{sectionId}}-contact_street_address'          : { },
+        '{{componentId}}-{{sectionId}}-contact_street_address_2'        : { },
+        '{{componentId}}-{{sectionId}}-contact_city_id'                 : { },
+        '{{componentId}}-{{sectionId}}-contact_city_name'               : { },
+        '{{componentId}}-{{sectionId}}-contact_post_code'               : { },
+        '{{componentId}}-{{sectionId}}-contact_state_id'                : { },
+        '{{componentId}}-{{sectionId}}-contact_state_name'              : { },
+        '{{componentId}}-{{sectionId}}-contact_country_id'              : { },
+        '{{componentId}}-{{sectionId}}-contact_country_name'            : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'                   : { },
+        '{{componentId}}-{{sectionId}}-contact_phone_ext'               : { },
+        '{{componentId}}-{{sectionId}}-contact_mobile'                  : { },
+        '{{componentId}}-{{sectionId}}-contact_fax'                     : { },
+        '{{componentId}}-{{sectionId}}-contact_other'                   : { },
+        '{{componentId}}-{{sectionId}}-contact_notes'                   : { },
+        // '{{componentId}}-{{sectionId}}-skills'                          : {
+        //     'placeholder'   : "SELECT SKILLS",
+        //     'tags'          : true,
+        //     'ajax'          : {
+        //         url         : "{{links.url('hrms/skills/searchSkill')}}",
+        //         dataType    : 'json',
+        //         method      : 'post',
+        //         data: function(params) {
+        //             return {
+        //                 search: params.term
+        //             }
+        //         },
+        //         processResults: function(data) {
+        //             if (data.tokenKey && data.token) {
+        //                 $('#security-token').attr('name', data.tokenKey);
+        //                 $('#security-token').val(data.token);
+        //             }
+        //             if (data.skills) {
+        //                 var skillsData = [];
+        //                 for (var item of data.skills) {
+        //                     skillsData.push({
+        //                         'id'    : item['id'],
+        //                         'text'  : item['name']
+        //                     });
+        //                 }
+
+        //                 return {
+        //                     results: skillsData
+        //                 }
+        //             } else {
+        //                 return {
+        //                     results : []
+        //                 }
+        //             }
+        //         },
+        //         cache: true
+        //     },
+        //     minimumInputLength : 2,
+        //     createTag     : function(params) {
+        //         var term = $.trim(params.term);
+
+        //         if (term === '') {
+        //             return null;
+        //         }
+
+        //         return {
+        //             id: term,
+        //             text: term,
+        //             newTag: true
+        //         }
+        //     }
+        // },
+        '{{componentId}}-{{sectionId}}-additional_notes'                : { },
+        '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            invalidHandler: function (form, validator) {
+                // //eslint-disable-next-line
+                // console.log(validator.errorList);
+            },
+            rules: {
+                '{{componentId}}-{{sectionId}}-account_email'               : 'required',
+                '{{componentId}}-{{sectionId}}-status'                      : 'required',
+                '{{componentId}}-{{sectionId}}-first_name'                  : 'required',
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'required',
+                '{{componentId}}-{{sectionId}}-designation'                 : 'required',
+                '{{componentId}}-{{sectionId}}-manager_full_name'           : 'required',
+                '{{componentId}}-{{sectionId}}-type_id'                     : 'required',
+                '{{componentId}}-{{sectionId}}-hire_date'                   : 'required',
+                '{{componentId}}-{{sectionId}}-work_type_id'                : 'required',
+                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'required',
+                '{{componentId}}-{{sectionId}}-contact_phone'               : 'required',
+                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-account_email'               : 'Please select an account',
+                '{{componentId}}-{{sectionId}}-status'                      : 'Please select a status',
+                '{{componentId}}-{{sectionId}}-first_name'                  : 'Please enter first name',
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name',
+                '{{componentId}}-{{sectionId}}-designation'                 : 'Please select a designation',
+                '{{componentId}}-{{sectionId}}-manager_full_name'           : 'Please select a manager',
+                '{{componentId}}-{{sectionId}}-type_id'                     : 'Please select employee type',
+                '{{componentId}}-{{sectionId}}-hire_date'                   : 'Please select hiring date',
+                '{{componentId}}-{{sectionId}}-work_type_id'                : 'Please select work type',
+                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'Please select a location',
+                '{{componentId}}-{{sectionId}}-contact_phone'               : 'Please enter phone number',
+                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'Please enter mobile number'
+            }
+        }
+    });
+</script>
+{#
+    Skills will be added by the Employee himself. There will be a verification process of each skill, example if someone says they are CCIE, they should be able to upload a certificate and that should be processed by the HR department to confirm. Once confirmed a verified tick can show next to their skill.
+    If its a non certified skill, example Juggling, they should get one of their peers to confirm/vouch for them.
+                            'skills'   :
+                                [
+                                    'tabTitle'          : 'Skills',
+                                    'tabInclude'        : 'profile/form/skills',
+                                    'tabIncludeParams'  :
+                                    [
+                                        'profileSkills'                : profileSkills,
+                                        'profileSkillsAttachments'     : profileSkillsAttachments
+                                    ]
+                                ],
+                        'employmentdetails'   :
+                        [
+                            'tabTitle'          : 'Employment Details',
+                            'tabInclude'        : 'profile/form/employmentdetails',
+                            'tabIncludeParams'  :
+                            [
+                                'profileDesignation'          : profileDesignation,
+                                'profileManagerId'            : profileManagerId,
+                                'profileManager'              : profileManager,
+                                'profileType'                 : profileType,
+                                'profileHireDate'             : profileHireDate,
+                                'profileTerminateDate'        : profileTerminateDate,
+                                'profileHireManagerId'        : profileHireManagerId,
+                                'profileHireManager'          : profileHireManager,
+                                'profileHireReferrerId'       : profileHireReferrerId,
+                                'profileHireReferrer'         : profileHireReferrer,
+                                'profileEmploymentAttachments': profileEmploymentAttachments,
+                                'profileEmploymentNotes'      : profileEmploymentNotes
+                            ]
+                        ],
+                        'contactdetails'   :
+                        [
+                            'tabTitle'          : 'Contact Details',
+                            'tabInclude'        : 'profile/form/contactdetails',
+                            'tabIncludeParams'  :
+                            [
+                                'profileContactPhone'              : profileContactPhone,
+                                'profileContactPhoneExt'           : profileContactPhoneExt,
+                                'profileContactMobile'             : profileContactMobile,
+                                'profileContactFax'                : profileContactFax,
+                                'profileContactOther'              : profileContactOther,
+                                'profileWorkType'                  : profileWorkType,
+                                'profileContactLocationId'         : profileContactLocationId,
+                                'profileContactAddressId'          : profileContactAddressId,
+                                'profileContactStreetAddress'      : profileContactStreetAddress,
+                                'profileContactStreetAddress2'     : profileContactStreetAddress2,
+                                'profileContactCityId'             : profileContactCityId,
+                                'profileContactCity'               : profileContactCity,
+                                'profileContactPostCode'           : profileContactPostCode,
+                                'profileContactStateId'            : profileContactStateId,
+                                'profileContactState'              : profileContactState,
+                                'profileContactCountryId'          : profileContactCountryId,
+                                'profileContactCountry'            : profileContactCountry,
+                                'profileContactNotes'              : profileContactNotes
+                            ]
+                        ]
+
+                                #}

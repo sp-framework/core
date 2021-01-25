@@ -8,6 +8,7 @@ use System\Base\BaseComponent;
 class AccountsComponent extends BaseComponent
 {
     use DynamicTable;
+
     /**
      * @acl(name=view)
      */

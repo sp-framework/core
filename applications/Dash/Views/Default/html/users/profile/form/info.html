@@ -1,0 +1,119 @@
+<div class="row vdivide">
+    <div class="col-md-3 col-sm-12">
+        {% if profile['portrait'] !== '' %}
+            {% set portraitLink = links.url('storages/q/uuid/' ~ profile['portrait'] ~ '/w/200') %}
+        {% else %}
+            {% set portraitLink = '' %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'portrait',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'files/croppie',
+                'fieldValue'                     : profile['portrait'],
+                'imageType'                      : 'portrait',
+                'storageType'                    : 'private',
+                'upload'                         : true,
+                'avatar'                         : true,
+                'portraitLink'                   : portraitLink
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_id',
+                        'fieldLabel'                            : 'Account ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : account['id']
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_email',
+                        'fieldLabel'                            : 'Account ID (Email)',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Account ID (Email)',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Account ID (Email)',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : true,
+                        'fieldDisabled'                         : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : account['email']
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'first_name',
+                        'fieldLabel'                     : 'First Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'First Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : profile['first_name']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'last_name',
+                        'fieldLabel'                     : 'Last Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Last Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : profile['last_name']
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>

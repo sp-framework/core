@@ -35,6 +35,8 @@ class Auth
 
     protected $links;
 
+    protected $profile;
+
     public $packagesData;
 
     public function __construct(
@@ -47,7 +49,8 @@ class Auth
         $secTools,
         $validation,
         $logger,
-        $links
+        $links,
+        $profile
     ) {
         $this->config = $config;
 
@@ -68,6 +71,8 @@ class Auth
         $this->logger = $logger;
 
         $this->links = $links;
+
+        $this->profile = $profile;
 
         $this->packagesData = new PackagesData;
     }
@@ -219,7 +224,7 @@ class Auth
         return true;
     }
 
-    protected function checkAccount(array $data)
+    protected function checkAccount(array $data, $viaProfile = null)
     {
         $this->account = $this->accounts->checkAccountByEmail($data['user']);
 
@@ -269,7 +274,11 @@ class Auth
             if (!$this->secTools->checkPassword($data['pass'], $this->account['password'])) {//Password Fail
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+                if ($viaProfile) {
+                    $this->packagesData->responseMessage = 'Error: Current Password incorrect!';
+                } else {
+                    $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+                }
 
                 $this->logger->log->debug('Incorrect username/password entered by account ' . $this->account['email'] . ' on application ' . $this->application['name']);
 
@@ -468,6 +477,13 @@ class Auth
 
             throw new \Exception('User not found in session');
         }
+
+        $this->setAccountProfile();
+    }
+
+    protected function setAccountProfile()
+    {
+        $this->account['profile'] = $this->profile->profile($this->account['id']);
     }
 
     protected function setUserSession()
@@ -541,7 +557,7 @@ class Auth
         return true;
     }
 
-    public function resetPassword(array $data)
+    public function resetPassword(array $data, $viaProfile = null)
     {
         $validate = $this->validateData($data, 'reset');
 
@@ -553,7 +569,7 @@ class Auth
             return false;
         }
 
-        if (!$this->checkAccount($data)) {
+        if (!$this->checkAccount($data, $viaProfile)) {
             return false;
         }
 
@@ -566,7 +582,11 @@ class Auth
 
         $this->packagesData->responseCode = 0;
 
-        $this->packagesData->responseMessage = 'Authenticated. Password changed. Redirecting...';
+        if ($viaProfile) {
+            $this->logout();
+        } else {
+            $this->packagesData->responseMessage = 'Authenticated. Password changed. Redirecting...';
+        }
 
         $this->packagesData->redirectUrl = $this->links->url('/');
 

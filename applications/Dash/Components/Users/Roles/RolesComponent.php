@@ -8,6 +8,7 @@ use System\Base\BaseComponent;
 class RolesComponent extends BaseComponent
 {
     use DynamicTable;
+
     /**
      * @acl(name=view)
      */

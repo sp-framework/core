@@ -43,8 +43,14 @@ class Fields extends AdminLTETags
             '<div class="form-group ' . $this->fieldParams['fieldAdditionalClass'] . ' ' . $this->fieldParams['fieldHidden'] . '">';
 
         if ($this->fieldParams['fieldLabel']) {
+            if (isset($this->params['fieldLabelLegend']) && $this->params['fieldLabelLegend'] == true) {
+                $tag = 'legend';
+            } else {
+                $tag = 'label';
+            }
+
             $this->content .=
-                '<label ' .  $this->fieldParams['fieldLabelClass'] . '>' . strtoupper($this->fieldParams['fieldLabel']) . '</label> ' .
+                '<' . $tag . ' ' .  $this->fieldParams['fieldLabelClass'] . '>' . strtoupper($this->fieldParams['fieldLabel']) . '</' . $tag . '> ' .
                 $this->fieldParams['fieldHelp'] . ' ' .
                 $this->fieldParams['fieldRequired'];
         }

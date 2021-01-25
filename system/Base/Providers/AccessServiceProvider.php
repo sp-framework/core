@@ -4,10 +4,11 @@ namespace System\Base\Providers;
 
 use Phalcon\Di\DiInterface;
 use Phalcon\Di\ServiceProviderInterface;
+use System\Base\Providers\AccessServiceProvider\Accounts;
 use System\Base\Providers\AccessServiceProvider\Acl;
 use System\Base\Providers\AccessServiceProvider\Auth;
+use System\Base\Providers\AccessServiceProvider\Profile;
 use System\Base\Providers\AccessServiceProvider\Roles;
-use System\Base\Providers\AccessServiceProvider\Accounts;
 
 class AccessServiceProvider implements ServiceProviderInterface
 {
@@ -28,6 +29,13 @@ class AccessServiceProvider implements ServiceProviderInterface
         );
 
         $container->setShared(
+            'profile',
+            function () {
+                return (new Profile())->init();
+            }
+        );
+
+        $container->setShared(
             'auth',
             function () use ($container) {
                 $config = $container->getShared('config');
@@ -40,6 +48,7 @@ class AccessServiceProvider implements ServiceProviderInterface
                 $validation = $container->getShared('validation');
                 $logger = $container->getShared('logger');
                 $links = $container->getShared('links');
+                $profile = $container->getShared('profile');
 
                 return (
                     new Auth(
@@ -52,7 +61,8 @@ class AccessServiceProvider implements ServiceProviderInterface
                         $secTools,
                         $validation,
                         $logger,
-                        $links
+                        $links,
+                        $profile
                     ))->init();
             }
         );
