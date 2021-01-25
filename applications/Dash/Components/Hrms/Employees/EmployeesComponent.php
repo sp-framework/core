@@ -116,7 +116,8 @@ class EmployeesComponent extends BaseComponent
             $storages = $this->basepackages->storages->getAppStorages();
 
             if ($storages && isset($storages['private'])) {
-                $this->view->storages = $storages['private'];
+                $this->view->storages = $storages;
+                $this->view->storage = $storages['private'];
             } else {
                 $this->view->storages = [];
             }
