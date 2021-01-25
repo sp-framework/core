@@ -21,8 +21,8 @@ class CitiesComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $countriesArr = $this->basepackages->geoCountries->getAll()->geocountries;
-        $statesArr = $this->basepackages->geoStates->getAll()->geostates;
+        $countriesArr = $this->basepackages->geoCountries->getAll()->geoCountries;
+        $statesArr = $this->basepackages->geoStates->getAll()->geoStates;
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
