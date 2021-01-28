@@ -1,0 +1,11 @@
+{
+    "name"          : "Products",
+    "displayName"   : "Admin Products Package",
+    "description"   : "Package for Products component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "ims",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-ims-products",
+    "settings"      : { }
+}

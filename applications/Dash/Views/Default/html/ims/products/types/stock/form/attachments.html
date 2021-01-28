@@ -1,0 +1,65 @@
+{% if product['images'] is defined %}
+    {% set productImages = product['images'] %}
+{% else %}
+    {% set productImages = [] %}
+{% endif %}
+{% if product['attachments'] is defined %}
+    {% set productAttachments = product['attachments'] %}
+{% else %}
+    {% set productAttachments = [] %}
+{% endif %}
+{% set attachments = [] %}
+<div class="row vdivide">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'images',
+                'fieldType'                     : 'files/dropzone',
+                'fieldLabel'                    : false,
+                'fieldDropzoneLabel'            : 'Images',
+                'fieldRequired'                 : false,
+                'fieldHelp'                     : true,
+                'fieldHelpTooltipContent'       : 'Product images are shown on the product cataloge page on the webshop. The first image is used as thumbnail. Max: 10 images.',
+                'fieldBazScan'                  : true,
+                'fieldBazPostOnCreate'          : true,
+                'fieldBazPostOnUpdate'          : true,
+                'attachments'                   : productImages,
+                'maxAttachments'                : 10,
+                'storage'                       : storage,
+                'sortable'                      : true,
+                'upload'                        : true,
+                'allowedUploads'                : 'images'
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'sectionId'                     : sectionId,
+                'fieldId'                       : 'attachments',
+                'fieldType'                     : 'files/dropzone',
+                'fieldLabel'                    : false,
+                'fieldDropzoneLabel'            : 'Attachments',
+                'fieldRequired'                 : false,
+                'fieldHelp'                     : true,
+                'fieldHelpTooltipContent'       : 'You can attach files here. Example: Product manuals, Service guides, etc. Max: 10 attachments.',
+                'fieldBazScan'                  : true,
+                'fieldBazPostOnCreate'          : true,
+                'fieldBazPostOnUpdate'          : true,
+                'attachments'                   : productAttachments,
+                'maxAttachments'                : 10,
+                'storage'                       : storage,
+                'sortable'                      : false,
+                'upload'                        : true,
+                'allowedUploads'                : 'files'
+            ]
+        )}}
+    </div>
+</div>

@@ -1,0 +1,52 @@
+{% if product['id'] is defined %}
+    {% set productId = product['id'] %}
+    {% set title = 'Product (' ~ product['name'] ~ ')' %}
+{% else %}
+    {% set productId = '' %}
+    {% set title = 'New ' ~ productType ~ ' Product' %}
+{% endif %}
+
+{% if productType === 'stock' %}
+    {% set dataDependencies =
+        [
+            [
+                'componentName'      : 'Geo Locations',
+                'componentVar'       : geo,
+                'componentRoute'     : false
+            ],
+            [
+                'componentName'      : 'Storages',
+                'componentVar'       : storages,
+                'componentRoute'     : false
+            ]
+        ]
+    %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'tags',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'products/types/' ~ productType ~ '/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : productId,
+            'addActionUrl'                  : 'ims/products/add',
+            'addSuccessRedirectUrl'         : 'ims/products',
+            'updateActionUrl'               : 'ims/products/update',
+            'updateSuccessRedirectUrl'      : 'ims/products',
+            'cancelActionUrl'               : 'ims/products',
+            'closeActionUrl'                : 'ims/products'
+        ],
+        'dataDependencies'     : dataDependencies
+    ]
+)}}
