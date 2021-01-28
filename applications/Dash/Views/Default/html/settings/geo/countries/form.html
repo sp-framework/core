@@ -480,7 +480,7 @@ dataCollectionSection =
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-install-country').click(function(e) {
                     e.preventDefault();
-                    $(this).attr('disabled', true);
+                    $(this).addClass('disabled');
                     $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', false);
 
                     var url = $(this).attr('href');
@@ -501,7 +501,7 @@ dataCollectionSection =
                             PNotify.error({
                                 'title' : data.responseMessage
                             });
-                            $('#{{componentId}}-{{sectionId}}-install-country').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-install-country').removeClass('disabled');
                             $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', true);
 
                         }
