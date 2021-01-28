@@ -28,6 +28,9 @@ class LocationsComponent extends BaseComponent
 
                 $address = $this->basepackages->addressbook->getById($location['address_id']);
 
+                unset($address['id']);
+                unset($address['name']);
+
                 $location = array_merge($location, $address);
 
                 $this->view->location = $location;
