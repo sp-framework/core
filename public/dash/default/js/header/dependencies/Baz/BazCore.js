@@ -102,8 +102,19 @@ var BazCore = function() {
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();
         openMenu();
+        // $(document).ready(function() {
+        //     getNewToken();
+        // });
     }
 
+    // function getNewToken() {
+    //     $.post("/getnewtoken", { }, function(response) {
+    //         if (response.tokenKey && response.token) {
+    //             $("#security-token").attr("name", response.tokenKey);
+    //             $("#security-token").val(response.token);
+    //         }
+    //     }, "json");
+    // }
     // Tooltips
     function toolTipsAndPopovers() {
         $('[data-toggle="tooltip"]').tooltip({container:'body'});
