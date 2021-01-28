@@ -53,7 +53,7 @@ class Brands
                 ),
             ],
             'options' => [
-                'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
+                'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ]
         ];
     }

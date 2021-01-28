@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Users;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Profiles
 {
@@ -117,6 +118,15 @@ class Profiles
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'account_id'
+                    ],
+                    'UNIQUE'
+                )
             ]
         ];
     }

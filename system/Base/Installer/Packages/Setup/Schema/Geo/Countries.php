@@ -3,6 +3,7 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Geo;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Countries
 {
@@ -155,6 +156,15 @@ class Countries
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'name'
+                    ],
+                    'UNIQUE'
+                )
             ]
         ];
     }
