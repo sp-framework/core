@@ -1,6 +1,6 @@
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
-        {% if profile['portrait'] !== '' %}
+        {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
             {% set portraitLink = links.url('storages/q/uuid/' ~ profile['portrait'] ~ '/w/200') %}
         {% else %}
             {% set portraitLink = '' %}

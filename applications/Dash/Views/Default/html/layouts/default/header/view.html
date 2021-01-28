@@ -14,7 +14,7 @@
                 {% if auth.account() %}
                     {% set profile = profile.profile(auth.account()['id']) %}
                     <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
-                        {% if profile['portrait'] !== '' %}
+                        {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
                             <img src="{{links.url('storages/q/uuid/' ~ profile['portrait'] ~ '/w/30')}}" class="rounded-sm" style="position:relative;top: -5px;" alt="User Image">
                         {% else %}
                             <i class="far fa-user"></i>
