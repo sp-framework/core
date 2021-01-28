@@ -7,18 +7,20 @@ use Applications\Dash\Components\Hrms\Designations\Install\Component as Employee
 use Applications\Dash\Components\Hrms\Skills\Install\Component as SkillsComponent;
 use Applications\Dash\Components\Ims\Brands\Install\Component as BrandsComponent;
 use Applications\Dash\Components\Ims\Categories\Install\Component as CategoriesComponent;
+use Applications\Dash\Components\Ims\Products\Install\Component as ProductsComponent;
 use Applications\Dash\Components\Ims\Specifications\Install\Component as SpecificationsComponent;
 use Applications\Dash\Components\Ims\Suppliers\Install\Component as SuppliersComponent;
 use Applications\Dash\Components\Storages\Install\Component as StoragesComponent;
 use Applications\Dash\Packages\ABNLookup\Install\Package as ABNLookupPackage;
 use Applications\Dash\Packages\Businesses\Install\Package as BusinessesPackage;
 use Applications\Dash\Packages\Channels\Install\Package as ChannelsPackage;
-use Applications\Dash\Packages\Hrms\Employees\Install\Package as EmployeesPackage;
 use Applications\Dash\Packages\Hrms\Designations\Install\Package as EmployeesDesignationsPackage;
-use Applications\Dash\Packages\Hrms\Statuses\Install\Package as EmployeesStatusesPackage;
+use Applications\Dash\Packages\Hrms\Employees\Install\Package as EmployeesPackage;
 use Applications\Dash\Packages\Hrms\Skills\Install\Package as SkillsPackage;
+use Applications\Dash\Packages\Hrms\Statuses\Install\Package as EmployeesStatusesPackage;
 use Applications\Dash\Packages\Ims\Brands\Install\Package as BrandsPackage;
 use Applications\Dash\Packages\Ims\Categories\Install\Package as CategoriesPackage;
+use Applications\Dash\Packages\Ims\Products\Install\Package as ProductsPackage;
 use Applications\Dash\Packages\Ims\Specifications\Install\Package as SpecificationsPackage;
 use Applications\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
 use Applications\Dash\Packages\Locations\Install\Package as LocationsPackage;
@@ -65,6 +67,12 @@ class HomeComponent extends BaseComponent
         // For Installing Suppliers Package
         $suppliersPackage = new SuppliersPackage();
         // $suppliersPackage->installPackage(true);
+        // For Installing Products
+        // $productsComponent = new ProductsComponent();
+        // $productsComponent->installComponent();
+        // For Installing Products Package
+        $productsPackage = new ProductsPackage();
+        // $productsPackage->installPackage(true);
 
         // var_dump($this->basepackages->geoCountries->getById(1));
         // var_dump($this->geodb);
