@@ -14,6 +14,8 @@ class ProfileComponent extends BaseComponent
         if (!$this->auth->account()) {
             return;
         }
+
+        $this->useStorage('private');
     }
 
     /**

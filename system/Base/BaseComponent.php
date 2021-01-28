@@ -521,6 +521,22 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
+	protected function useStorage($storageType)
+	{
+		$storages = $this->basepackages->storages->getAppStorages();
+
+		if ($storages && isset($storages[$storageType])) {//Assign type of storage for uploads
+			$this->view->storages = $storages;
+			$this->view->storage = $storages[$storageType];
+		} else {
+			$this->view->storages = [];
+		}
+
+		if (!isset($this->domain['applications'][$this->application['id']][$storageType . 'Storage'])) {
+			$this->view->storages = [];
+		}
+	}
+
 	protected function checkPackage($packageClass)
 	{
 		return

@@ -97,10 +97,12 @@ class EmployeesComponent extends BaseComponent
                     foreach ($attachmentsArr as $key => $attachment) {
                         $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
                         if ($attachmentInfo) {
+                            if ($attachmentInfo['links']) {
+                                $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                            }
                             $attachments[$key] = $attachmentInfo;
                         }
                     }
-
                     $employee['employment_attachments'] = $attachments;
                 }
 
@@ -113,14 +115,7 @@ class EmployeesComponent extends BaseComponent
 
             $this->view->locations = $locations;
 
-            $storages = $this->basepackages->storages->getAppStorages();
-
-            if ($storages && isset($storages['private'])) {
-                $this->view->storages = $storages;
-                $this->view->storage = $storages['private'];
-            } else {
-                $this->view->storages = [];
-            }
+            $this->useStorage('private');
 
             $this->view->pick('employees/view');
 
