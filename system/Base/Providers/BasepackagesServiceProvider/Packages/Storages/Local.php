@@ -15,7 +15,7 @@ class Local extends BasePackage
 
     protected $packageName = 'local';
 
-    public $local;
+    public $storage;
 
     protected $settingsImagesPath;
 
@@ -45,31 +45,33 @@ class Local extends BasePackage
 
     protected $getData;
 
-    public function initLocal(array $local)
+    protected $width;
+
+    public function initLocal(array $storage)
     {
-        $this->local = $local;
+        $this->storage = $storage;
 
         $this->settingsImagesPath =
-            isset($this->local['images_path']) ?
-            $this->local['images_path'] :
+            isset($this->storage['images_path']) ?
+            $this->storage['images_path'] :
             'images';
 
         $this->settingsCachePath =
-            isset($this->local['cache_path']) ?
-            $this->local['cache_path'] :
+            isset($this->storage['cache_path']) ?
+            $this->storage['cache_path'] :
             'cache';
 
         $this->settingsDataPath =
-            isset($this->local['data_path']) ?
-            $this->local['data_path'] :
+            isset($this->storage['data_path']) ?
+            $this->storage['data_path'] :
             'data';
 
         $this->settingsDefaultImageQuality =
-            isset($this->local['default_image_quality']) ?
-            $this->local['default_image_quality'] :
+            isset($this->storage['default_image_quality']) ?
+            $this->storage['default_image_quality'] :
             90;
 
-        $this->storagePath = base_path($this->local['permission'] . '/' . $this->local['id']);
+        $this->storagePath = base_path($this->storage['permission'] . '/' . $this->storage['id']);
 
         $this->imagesPath = $this->storagePath . '/' . $this->settingsImagesPath . '/';
 
@@ -77,32 +79,38 @@ class Local extends BasePackage
 
         $this->dataPath = $this->storagePath . '/' . $this->settingsDataPath . '/';
 
-        $this->imageMimeTypes =
-            isset($this->local['allowed_image_mime_types']) ?
-            Json::decode($this->local['allowed_image_mime_types']) :
+        $this->storage['allowed_image_mime_types'] =
+            isset($this->storage['allowed_image_mime_types']) ?
+            Json::decode($this->storage['allowed_image_mime_types']) :
             [];
 
-        $this->allowedImageSizes =
-            isset($this->local['allowed_image_sizes']) ?
-            Json::decode($this->local['allowed_image_sizes']) :
+        $this->imageMimeTypes = $this->storage['allowed_image_mime_types'];
+
+        $this->storage['allowed_image_sizes'] =
+            isset($this->storage['allowed_image_sizes']) ?
+            Json::decode($this->storage['allowed_image_sizes']) :
             [30, 80, 200, 800, 1200, 2000];
+
+        $this->allowedImageSizes = $this->storage['allowed_image_sizes'];
+
+        $this->storage['allowed_file_mime_types'] =
+            isset($this->storage['allowed_file_mime_types']) ?
+            Json::decode($this->storage['allowed_file_mime_types']) :
+            [];
+
+        $this->fileMimeTypes = $this->storage['allowed_file_mime_types'];
 
         $this->imageStorage =
             (new Content())->init(
-                '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsImagesPath . '/',
-                ['visibility' => $this->local['permission']]
+                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . '/',
+                ['visibility' => $this->storage['permission']]
             );
 
         $this->fileStorage =
             (new Content())->init(
-                '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsDataPath . '/',
-                ['visibility' => $this->local['permission']]
+                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/',
+                ['visibility' => $this->storage['permission']]
             );
-
-        $this->fileMimeTypes =
-            isset($this->local['allowed_file_mime_types']) ?
-            Json::decode($this->local['allowed_file_mime_types']) :
-            [];
 
         return $this;
     }
@@ -135,8 +143,8 @@ class Local extends BasePackage
             $this->generateUUID();
 
             if (in_array($this->mimeType, $this->imageMimeTypes)) {
-                if (isset($this->local['max_image_file_size']) &&
-                    $file->getSize() > $this->local['max_image_file_size']
+                if (isset($this->storage['max_image_file_size']) &&
+                    $file->getSize() > $this->storage['max_image_file_size']
                 ) {
                     $this->packagesData->responseCode = 1;
 
@@ -148,8 +156,8 @@ class Local extends BasePackage
                 $this->storeImage();
 
             } else if (in_array($this->mimeType, $this->fileMimeTypes)) {
-                if (isset($this->local['max_data_file_size']) &&
-                    $file->getSize() > $this->local['max_data_file_size']
+                if (isset($this->storage['max_data_file_size']) &&
+                    $file->getSize() > $this->storage['max_data_file_size']
                 ) {
                     $this->packagesData->responseCode = 1;
 
@@ -182,7 +190,7 @@ class Local extends BasePackage
 
     protected function storeImage()
     {
-        if ($this->directory && !is_dir($this->dataPath . $this->directory)) {
+        if ($this->directory && !is_dir($this->imagesPath . $this->directory)) {
             $this->imageStorage->createDir($this->directory);
         }
 
@@ -223,7 +231,7 @@ class Local extends BasePackage
     {
         $data =
             [
-                'storages_id'           => $this->local['id'],
+                'storages_id'           => $this->storage['id'],
                 'uuid'                  => $this->uuid,
                 'uuid_location'         => $this->directory . '/',
                 'org_file_name'         => $this->fileName,
@@ -241,7 +249,6 @@ class Local extends BasePackage
         $this->getData = $getData;
 
         $file = $this->getFileInfo($this->getData['uuid']);
-
         if (!$file) {
             return $this->response->setStatusCode(404, 'Not Found');
         }
@@ -264,13 +271,17 @@ class Local extends BasePackage
             }
         } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
             $dataFile =
-                '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'];
+                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid'];
 
             $this->updateFileLink(
                 $file[0],
                 null,
-                '/' . $this->local['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid']
+                '/' . $this->storage['id'] . '/' . $this->settingsDataPath . '/' . $file[0]['uuid_location'] . $file[0]['uuid']
             );
+
+            if (isset($this->request->getPost()['getpubliclinks'])) {
+                return;
+            }
 
             $this->response->setContentType($file[0]['type']);
 
@@ -299,7 +310,7 @@ class Local extends BasePackage
 
     protected function getSizedImage($file, $width)
     {
-        $imageFile = '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsImagesPath . '/' . $file['uuid_location'] . $file['uuid'];
+        $imageFile = '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . '/' . $file['uuid_location'] . $file['uuid'];
 
         if (!$this->localContent->has($imageFile)) {
 
@@ -314,16 +325,20 @@ class Local extends BasePackage
 
         // If max width of image is less than requested size, make width to image size.
         if ($image->getWidth() < $width) {
-            $width = $image->getWidth();
+            $this->width = $image->getWidth();
+        } else {
+            $this->width = $width;
         }
 
         $sizedImage =
-            '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $width;
+            '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width;
 
         if ($this->localContent->has($sizedImage) && !isset($this->getData['quality'])) {
+
             return $sizedImage;
+
         } else {
-            $image->resize($width, null, Enum::WIDTH);
+            $image->resize($this->width, null, Enum::WIDTH);
 
             //Put empty content that will be overridden on image save
             $this->localContent->put($sizedImage, '');
@@ -331,14 +346,15 @@ class Local extends BasePackage
             if (isset($this->getData['quality'])) {
                 $this->settingsDefaultImageQuality = $this->getData['quality'];
             }
-            $image->save($this->cachePath . $file['uuid_location'] . $file['uuid'] . '/' . $width, $this->settingsDefaultImageQuality);
+
+            $image->save($this->cachePath . $file['uuid_location'] . $file['uuid'] . '/' . $this->width, $this->settingsDefaultImageQuality);
 
             //Only update links for public as users cannot access private folder.
-            if ($this->local['permission'] === 'public') {
+            if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file,
-                    $width,
-                    '/' . $this->local['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $width
+                    $this->width,
+                    '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width
                 );
             }
 
@@ -360,12 +376,20 @@ class Local extends BasePackage
 
         if ($width) {
             if (isset($file[0]['links'][$width])) {
-                return $file[0]['links'][$width];
+                if (isset($this->request->getPost()['getpubliclinks'])) {
+                    return [$width => $file[0]['links'][$width]];
+                } else {
+                    return $file[0]['links'][$width];
+                }
             }
 
-            $this->getSizedImage($file[0], $width);
+            if ($this->width) {
+                $this->getSizedImage($file[0], $this->width);
+            } else {
+                $this->getSizedImage($file[0], $width);
+            }
 
-            return $this->getPublicLink($uuid, $width);
+            return $this->getPublicLink($uuid, $this->width);
 
         } else {
             if (isset($file[0]['links']['data'])) {
@@ -420,12 +444,12 @@ class Local extends BasePackage
 
                 $fileDeleted =
                     $this->removeFileFromLocation(
-                        '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsImagesPath . $fileLocation . $file[0]['uuid']
+                        '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . $fileLocation . $file[0]['uuid']
                     );
 
                 $fileCacheDeleted =
                     $this->removeFileCache(
-                        '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsCachePath . $fileLocation . $file[0]['uuid']
+                        '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . $fileLocation . $file[0]['uuid']
                     );
 
                 if (!$fileRemovedFromDB) {
@@ -454,7 +478,7 @@ class Local extends BasePackage
                 $fileRemovedFromDB = $this->removeFileFromDb($file[0]['id']);
 
                 $fileDeleted = $this->removeFileFromLocation(
-                    '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsDataPath . $fileLocation . $file[0]['uuid']
+                    '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . $fileLocation . $file[0]['uuid']
                 );
 
                 if (!$fileRemovedFromDB) {
@@ -475,13 +499,13 @@ class Local extends BasePackage
             }
         } else if ($file && count($file) === 0) {
             $fileImageDeleted = $this->removeFileFromLocation(
-                '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsImagesPath . $fileLocation . $file[0]['uuid']
+                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . $fileLocation . $file[0]['uuid']
             );
             $fileDataDeleted = $this->removeFileFromLocation(
-                '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsDataPath . $fileLocation . $file[0]['uuid']
+                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsDataPath . $fileLocation . $file[0]['uuid']
             );
             $fileCacheDeleted = $this->removeFileCache(
-                '/' . $this->local['permission'] . '/' . $this->local['id'] . '/' . $this->settingsCachePath . $fileLocation . $file[0]['uuid']
+                '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . $fileLocation . $file[0]['uuid']
             );
 
             if ($fileImageDeleted || $fileDataDeleted || $fileCacheDeleted) {

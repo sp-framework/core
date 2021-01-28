@@ -108,12 +108,15 @@ class Storages extends BasePackage
 
     public function getFile(array $getData)
     {
-        // if ($getData['storagetype'] === 'public') {
-        //     $public = true;
-        // } else if ($getData['storagetype'] === 'private') {
-        //     $public = false;
-        // }
-        return $this->initStorage(false)->get($getData);
+        if (isset($getData['storagetype']) && $getData['storagetype'] === 'public') {
+            $public = true;
+        } else if (isset($getData['storagetype']) && $getData['storagetype'] === 'private') {
+            $public = false;
+        } else {
+            $public = false;
+        }
+
+        return $this->initStorage($public)->get($getData);
     }
 
     public function getFileInfo($uuid)
@@ -138,21 +141,52 @@ class Storages extends BasePackage
             $public = true;
         }
 
-        $storage = $this->initStorage($public);
+        $this->initStorage($public);
 
-        if ($storage) {
-            if ($storage->store()) {
-                $this->packagesData->storageData = $storage->packagesData->storageData;
+        if ($this->storage) {
+            if ($this->storage->store()) {
+                $storageData = $this->storage->packagesData->storageData;
 
-                $this->packagesData->responseCode = $storage->packagesData->responseCode;
+                $fileInfo = $this->storage->getFileInfo($storageData['uuid']);
 
-                $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+                if (isset($fileInfo[0])) {
+                    $fileType = $fileInfo[0]['type'];
+                }
+
+                if (in_array($fileType, $this->storage->storage['allowed_image_mime_types'])) {
+                    if (isset($this->request->getPost()['getpubliclinks'])) {
+                        $widths = explode(',', $this->request->getPost()['getpubliclinks']);
+
+                        $storageData['publicLinks'] = [];
+
+                        foreach ($widths as $width) {
+                            $width = trim($width);
+
+                            array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], (int) $width));
+                        }
+                    }
+
+                    $this->packagesData->responseMessage = 'Files Uploaded!';
+
+                } else if (in_array($fileType, $this->storage->storage['allowed_file_mime_types'])) {
+                    if (isset($this->request->getPost()['getpubliclinks'])) {
+                        $storageData['publicLinks'] = [];
+
+                        array_push($storageData['publicLinks'], $this->getPublicLink($storageData['uuid'], null));
+                    }
+
+                    $this->packagesData->responseMessage = 'Files Uploaded!';
+                }
+
+                $this->packagesData->storageData = $storageData;
+
+                $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
 
                 return true;
             } else {
-                $this->packagesData->responseCode = $storage->packagesData->responseCode;
+                $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
 
-                $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+                $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
 
                 return false;
             }
@@ -177,18 +211,18 @@ class Storages extends BasePackage
             $public = true;
         }
 
-        $storage = $this->initStorage($public);
+        $this->initStorage($public);
 
-        if ($storage->removeFile($uuid)) {
-            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+        if ($this->storage->removeFile($uuid)) {
+            $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
 
-            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
 
             return true;
         } else {
-            $this->packagesData->responseCode = $storage->packagesData->responseCode;
+            $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
 
-            $this->packagesData->responseMessage = $storage->packagesData->responseMessage;
+            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
 
             return false;
         }

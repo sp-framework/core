@@ -93,7 +93,6 @@ class StoragesComponent extends BaseComponent
             if ($this->storages->storeFile()) {
                 $this->view->storageData = $this->storages->packagesData->storageData;
             }
-
             $this->view->responseCode = $this->storages->packagesData->responseCode;
 
             $this->view->responseMessage = $this->storages->packagesData->responseMessage;
