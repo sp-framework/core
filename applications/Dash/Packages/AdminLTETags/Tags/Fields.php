@@ -194,6 +194,8 @@ class Fields extends AdminLTETags
 
             $this->fieldParams['fieldRequired'] =
                 '<span><sup><i data-toggle="tooltip" data-html="true" data-placement="' . $this->fieldParams['fieldRequiredTooltipPosition'] . '" title="' . $this->fieldParams['fieldRequiredTooltipTitle'] . '" style="font-size: 7px;" class="fas fa-fw fa-star fa-1 helper text-danger"></i></sup></span>';
+        } else if (isset($this->params['fieldRequired']) && $this->params['fieldRequired'] === false) {
+            $this->fieldParams['fieldRequired'] = false;//cascading further down
         } else {
             $this->fieldParams['fieldRequired'] = '';
         }
