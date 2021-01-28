@@ -91,4 +91,21 @@ class Suppliers extends BasePackage
 
         return $data;
     }
+
+    public function getAllManufacturers()
+    {
+        $suppliers = $this->getAll()->suppliers;
+
+        $filter =
+            $this->model->filter(
+                function($supplier) {
+                    $supplier = $supplier->toArray();
+                    if ($supplier['is_manufacturer'] == 1) {
+                        return $supplier;
+                    }
+                }
+            );
+
+        return $filter;
+    }
 }
