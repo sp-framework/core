@@ -173,20 +173,28 @@
     </div>
     {# Only Enable if Private storage is enabled #}
     <div class="col">
-        {% include '../common/files/dropzone' with
+        {{adminltetags.useTag('fields',
             [
                 'component'                     : component,
                 'componentName'                 : componentName,
                 'componentId'                   : componentId,
                 'sectionId'                     : sectionId,
                 'fieldId'                       : 'employment_attachments',
-                'fieldLabel'                    : 'Employment Documents',
-                'fieldHelpTooltipContent'       : 'Max: 5. You can attach employee resume or any other documents',
+                'fieldType'                     : 'files/dropzone',
+                'fieldLabel'                    : false,
+                'fieldDropzoneLabel'            : 'Employment Documents',
+                'fieldRequired'                 : false,
+                'fieldHelp'                     : true,
+                'fieldHelpTooltipContent'       : 'Max: 10. You can attach employee resume or any other documents',
+                'fieldBazScan'                  : true,
+                'fieldBazPostOnCreate'          : true,
+                'fieldBazPostOnUpdate'          : true,
                 'attachments'                   : employeeEmploymentAttachments,
-                'maxAttachments'                : 5,
-                'storage'                       : storage
+                'maxAttachments'                : 10,
+                'storage'                       : storage,
+                'upload'                        : true
             ]
-        %}
+        )}}
     </div>
 </div>
 <div class="row">
