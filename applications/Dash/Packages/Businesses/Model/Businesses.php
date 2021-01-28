@@ -8,9 +8,11 @@ class Businesses extends BaseModel
 {
     public $id;
 
-    public $name;
+    public $logo;
 
     public $abn;
+
+    public $name;
 
     public $type;
 
