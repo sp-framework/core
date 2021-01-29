@@ -213,7 +213,7 @@ class Dropzone
                         </ul>
                     </div>
                 </div>
-                <div class="row border-top pt-2" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachment">
+                <div class="row border-top pt-2" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments">
                     <div class="col">
                         <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
 
@@ -382,6 +382,7 @@ class Dropzone
                                     previewsContainer   : "#' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-previews",
                                     clickable           : "#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-upload"
                                 });
+
                                 initChocolat();
                                 initEvents();
                                 registerDeleteButtons();
@@ -639,16 +640,19 @@ class Dropzone
                             }
 
                             function initChocolat() {
-                                if ($(".chocolat-parent").length > 0 || $(".chocolat-image").length > 0) {
+                                if ($("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments .chocolat-parent").length > 0 ||
+                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments .chocolat-image").length > 0
+                                ) {
                                     if (fieldId["chocolat"]) {
                                         fieldId["chocolat"].destroy();
                                     }
-                                    fieldId["chocolat"] = Chocolat(document.querySelectorAll(".chocolat-parent .chocolat-image"));
+                                    fieldId["chocolat"] =
+                                        Chocolat(document.querySelectorAll("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments .chocolat-parent .chocolat-image"));
                                 }
                             }
 
                             function registerDeleteButtons() {
-                                $(".uploads-delete").each(function(index,button) {
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-attachments .uploads-delete").each(function(index,button) {
                                    $(button).off();
                                    $(button).removeClass("disabled");
 
@@ -760,6 +764,7 @@ class Dropzone
                                         onEnd: function() {
                                             window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["data"]["' . $this->params['fieldId'] . '"] =
                                                 fieldId["sortable"].toArray();
+
                                             initChocolat();
                                         }
                                     });
