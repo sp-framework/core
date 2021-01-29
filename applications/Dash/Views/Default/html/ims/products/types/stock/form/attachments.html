@@ -3,12 +3,11 @@
 {% else %}
     {% set productImages = [] %}
 {% endif %}
-{% if product['attachments'] is defined %}
-    {% set productAttachments = product['attachments'] %}
+{% if product['downloadables'] is defined %}
+    {% set productDownloadables = product['downloadables'] %}
 {% else %}
-    {% set productAttachments = [] %}
+    {% set productDownloadables = [] %}
 {% endif %}
-{% set attachments = [] %}
 <div class="row vdivide">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -43,17 +42,17 @@
                 'componentName'                 : componentName,
                 'componentId'                   : componentId,
                 'sectionId'                     : sectionId,
-                'fieldId'                       : 'attachments',
+                'fieldId'                       : 'downloadables',
                 'fieldType'                     : 'files/dropzone',
                 'fieldLabel'                    : false,
-                'fieldDropzoneLabel'            : 'Attachments',
+                'fieldDropzoneLabel'            : 'Downloadables',
                 'fieldRequired'                 : false,
                 'fieldHelp'                     : true,
-                'fieldHelpTooltipContent'       : 'You can attach files here. Example: Product manuals, Service guides, etc. Max: 10 attachments.',
+                'fieldHelpTooltipContent'       : 'You can attach downloadable files here. Example: Product manuals, Service guides, etc. Max: 10 attachments.',
                 'fieldBazScan'                  : true,
                 'fieldBazPostOnCreate'          : true,
                 'fieldBazPostOnUpdate'          : true,
-                'attachments'                   : productAttachments,
+                'attachments'                   : productDownloadables,
                 'maxAttachments'                : 10,
                 'storage'                       : storage,
                 'sortable'                      : false,

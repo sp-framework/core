@@ -38,7 +38,42 @@ class ProductsComponent extends BaseComponent
 
                 $this->view->productType = $product['product_type'];
 
+                if ($product['images']) {
+                    $attachments = [];
+
+                    $attachmentsArr = Json::decode($product['images'], true);
+
+                    foreach ($attachmentsArr as $key => $attachment) {
+                        $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
+                        if ($attachmentInfo) {
+                            if ($attachmentInfo['links']) {
+                                $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                            }
+                            $attachments[$key] = $attachmentInfo;
+                        }
+                    }
+                    $product['images'] = $attachments;
+                }
+
+                if ($product['downloadables']) {
+                    $attachments = [];
+
+                    $attachmentsArr = Json::decode($product['downloadables'], true);
+
+                    foreach ($attachmentsArr as $key => $attachment) {
+                        $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
+                        if ($attachmentInfo) {
+                            if ($attachmentInfo['links']) {
+                                $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                            }
+                            $attachments[$key] = $attachmentInfo;
+                        }
+                    }
+                    $product['downloadables'] = $attachments;
+                }
+
                 $this->view->product = $product;
+
             } else {
                 $this->view->productType = $this->getData()['type'];
 

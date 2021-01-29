@@ -11,7 +11,6 @@
     {% set productDescription = product['description'] %}
 {% else %}
     {% set productId = '' %}
-    {% set productType = '' %}
     {% set productCodeMPN = '' %}
     {% set productCodeSKU = '' %}
     {% set productCodeUPC = '' %}
@@ -58,7 +57,7 @@
                 'fieldHelpTooltipContent'        : 'Product Type',
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldHidden'                    : true,
                 'fieldDisabled'                  : true,

@@ -1,12 +1,5 @@
-{% if product['id'] is defined %}
-    {% set productId = product['id'] %}
-    {% set title = 'Product (' ~ product['name'] ~ ')' %}
-{% else %}
-    {% set productId = '' %}
-    {% set title = 'New ' ~ productType ~ ' Product' %}
-{% endif %}
-
-{% if productType === 'stock' %}
+{% if productType == 1 %}
+    {% set type = 'stock' %}
     {% set dataDependencies =
         [
             [
@@ -21,7 +14,20 @@
             ]
         ]
     %}
+{% elseif productType == 2 %}
+    {#  #}
+{% else %}
+    {% set type = 'stock' %}
 {% endif %}
+
+{% if product['id'] is defined %}
+    {% set productId = product['id'] %}
+    {% set title = 'Product (' ~ product['title'] ~ ')' %}
+{% else %}
+    {% set productId = '' %}
+    {% set title = 'New ' ~ type ~ ' Product' %}
+{% endif %}
+
 {{adminltetags.useTag('content',
     [
         'component'                     : component,
@@ -36,7 +42,7 @@
         'cardIcon'                      : 'tags',
         'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'products/types/' ~ productType ~ '/form',
+        'cardBodyInclude'               : 'products/types/' ~ type ~ '/form',
         'formButtons'                   :
         [
             'updateButtonId'                : productId,

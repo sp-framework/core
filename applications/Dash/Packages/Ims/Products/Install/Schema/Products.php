@@ -98,7 +98,7 @@ class Products
                     ]
                 ),
                 new Column(
-                    'attachments',
+                    'downloadables',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 4096,
