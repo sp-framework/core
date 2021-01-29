@@ -418,7 +418,7 @@ class Local extends BasePackage
         $this->update($file);
     }
 
-    public function removeFile($uuid)
+    public function removeFile($uuid, $purge = false)
     {
         if (!$uuid) {
             $this->packagesData->responseCode = 1;
@@ -428,6 +428,15 @@ class Local extends BasePackage
             return false;
         }
 
+        if ($purge) {
+            return $this->purgeFile($uuid);
+        } else {
+            return $this->flipOrphanStatus($uuid, 1);
+        }
+    }
+
+    protected function purgeFile($uuid)
+    {
         $file = $this->getFileInfo($uuid);
 
         if ($file && count($file) === 1) {
@@ -454,24 +463,32 @@ class Local extends BasePackage
 
                 if (!$fileRemovedFromDB) {
                     $this->packagesData->responseCode = 1;
+
                     $this->packagesData->responseMessage = 'Error deleting file from DB';
+
                     return true;
                 }
 
                 if (!$fileDeleted) {
                     $this->packagesData->responseCode = 1;
+
                     $this->packagesData->responseMessage = 'Error deleting file from location';
+
                     return true;
                 }
 
                 if (!$fileCacheDeleted) {
                     $this->packagesData->responseCode = 1;
+
                     $this->packagesData->responseMessage = 'Error deleting file from cache';
+
                     return true;
                 }
 
                 $this->packagesData->responseCode = 0;
-                $this->packagesData->responseMessage = 'File removed from DB, Location and cache';
+
+                $this->packagesData->responseMessage = 'File purged from DB, Location and cache';
+
                 return true;
 
             } else if (in_array($file[0]['type'], $this->fileMimeTypes)) {
@@ -515,11 +532,15 @@ class Local extends BasePackage
             }
 
             $this->packagesData->responseCode = 1;
+
             $this->packagesData->responseMessage = 'Incorrect UUID, Not in DB and/or location/cache.';
+
             return true;
         }
         $this->packagesData->responseCode = 1;
+
         $this->packagesData->responseMessage = 'Incorrect UUID, Not in DB and/or location/cache.';
+
         return true;
     }
 
@@ -589,9 +610,58 @@ class Local extends BasePackage
         }
     }
 
+    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false)
+    {
+        if ($array) {
+            if ($oldUUID) {
+                $olduuids = Json::decode($oldUUID, true);
+
+                foreach ($olduuids as $olduuidKey => $olduuid) {
+                    $this->flipOrphanStatus($olduuid, 1);
+                }
+            }
+
+            if ($newUUID) {
+                $uuids = Json::decode($newUUID, true);
+                foreach ($uuids as $uuidKey => $newuuid) {
+                    $this->flipOrphanStatus($newuuid, 0);
+                }
+            }
+
+        } else {
+            if ($oldUUID) {
+                $this->flipOrphanStatus($oldUUID, 1);
+            }
+
+            if ($newUUID) {
+                $this->flipOrphanStatus($newUUID, 0);
+            }
+        }
+    }
+
+    protected function flipOrphanStatus($uuid, $status)
+    {
+        $file = $this->getFileInfo($uuid);
+
+        if ($file && count($file) === 1) {
+            $file[0]['orphan'] = $status;
+
+            if ($this->update($file[0])) {
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'UUID is now marked orphan';
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function clearOrphans()
     {
         // @todo orphan also needs to search whole DB for uploads_data and compare with files table.
+        // We need to make a backup of orphans and keep them zipped in a directory. Take database snapshot as json in it. This way we can recover it if something important is lost.
         $dataDirContents = $this->fileStorage->listContents('/data', true);
 
         $dataDirFiles = [];

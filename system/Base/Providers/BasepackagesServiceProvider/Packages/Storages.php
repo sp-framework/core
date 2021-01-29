@@ -213,7 +213,17 @@ class Storages extends BasePackage
 
         $this->initStorage($public);
 
-        if ($this->storage->removeFile($uuid)) {
+        if (isset($this->request->getPost()['purge'])) {
+            if ($this->request->getPost()['purge'] == 'true') {
+                $purge = true;
+            } else {
+                $purge = true;
+            }
+        } else {
+            $purge = false;
+        }
+
+        if ($this->storage->removeFile($uuid, $purge)) {
             $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
 
             $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
@@ -272,5 +282,10 @@ class Storages extends BasePackage
     public function getPublicLink($uuid, $width = null)
     {
         return $this->initStorage()->getPublicLink($uuid, $width);
+    }
+
+    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false)
+    {
+        return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array);
     }
 }
