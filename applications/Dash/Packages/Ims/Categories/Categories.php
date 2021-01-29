@@ -33,6 +33,8 @@ class Categories extends BasePackage
             $data['product_count'] = 0;
 
             if ($this->add($data)) {
+                $this->basepackages->storages->changeOrphanStatus($data['image']);
+
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' category';
@@ -56,10 +58,13 @@ class Categories extends BasePackage
             return false;
 
         } else {
+            $category = $this->getById($data['id']);
 
             $data = $this->buildCategory($data);
 
             if ($this->update($data)) {
+                $this->basepackages->storages->changeOrphanStatus($data['image'], $category['image']);
+
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' category';
@@ -135,6 +140,8 @@ class Categories extends BasePackage
         }
 
         if ($this->remove($data['id'])) {
+            $this->basepackages->storages->changeOrphanStatus(null, $category['image']);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Removed category';

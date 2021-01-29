@@ -17,6 +17,9 @@ class Brands extends BasePackage
     public function addBrand(array $data)
     {
         if ($this->add($data)) {
+
+            $this->basepackages->storages->changeOrphanStatus($data['logo']);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' brand';
@@ -29,7 +32,12 @@ class Brands extends BasePackage
 
     public function updateBrand(array $data)
     {
+        $brand = $this->getById($data['id']);
+
         if ($this->update($data)) {
+
+            $this->basepackages->storages->changeOrphanStatus($data['logo'], $brand['logo']);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' brand';
@@ -53,6 +61,8 @@ class Brands extends BasePackage
         }
 
         if ($this->remove($data['id'])) {
+            $this->basepackages->storages->changeOrphanStatus(null, $brand['logo']);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Removed brand';

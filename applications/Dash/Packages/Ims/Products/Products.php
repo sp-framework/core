@@ -17,6 +17,14 @@ class Products extends BasePackage
     public function addProduct(array $data)
     {
         if ($this->add($data)) {
+            if ($data['images'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus($data['images'], null, true);
+            }
+
+            if ($data['downloadables'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus($data['downloadables'], null, true);
+            }
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['title'] . ' product';
@@ -29,7 +37,18 @@ class Products extends BasePackage
 
     public function updateProduct(array $data)
     {
+        $product = $this->getById($data['id']);
+
         if ($this->update($data)) {
+
+            if ($data['images'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus($data['images'], $product['images'], true);
+            }
+
+            if ($data['downloadables'] !== '') {
+                $this->basepackages->storages->changeOrphanStatus($data['downloadables'], $product['downloadables'], true);
+            }
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['title'] . ' product';

@@ -111,7 +111,11 @@ class Profile extends BasePackage
             $profile['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
         }
 
+        $portrait = $this->getById($this->auth->account()['id'])['portrait'];
+
         if ($this->update($profile)) {
+            $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Profile updated';

@@ -26,6 +26,8 @@ class Suppliers extends BasePackage
         $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
 
         if ($this->add($data)) {
+            $this->basepackages->storages->changeOrphanStatus($data['logo']);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' supplier';
@@ -44,7 +46,11 @@ class Suppliers extends BasePackage
 
         $this->basepackages->addressbook->mergeAndUpdate($data);
 
+        $supplier = $this->getById($data['id']);
+
         if ($this->update($data)) {
+            $this->basepackages->storages->changeOrphanStatus($data['logo'], $supplier['logo']);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' supplier';
@@ -57,9 +63,13 @@ class Suppliers extends BasePackage
 
     public function removeSupplier(array $data)
     {
+        $supplier = $this->getById($data['id']);
         //Check relations before removing.
         //Remove Address
+
         if ($this->remove($data['id'])) {
+            $this->basepackages->storages->changeOrphanStatus(null, $supplier['logo']);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Removed supplier';
