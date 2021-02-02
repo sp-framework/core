@@ -1,0 +1,31 @@
+{% if supplier['id'] is defined %}
+    {% set supplierInternalNotes = supplier['internal_notes'] %}
+{% else %}
+    {% set supplierInternalNotes = '' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'internal_notes',
+                'fieldLabel'                     : 'Internal Notes',
+                'fieldType'                      : 'textarea',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Internal Notes for Supplier',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 4096,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : supplierInternalNotes
+            ]
+        )}}
+    </div>
+</div>

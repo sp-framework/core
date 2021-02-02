@@ -2,11 +2,7 @@
 
 namespace System\Base\Providers\ModulesServiceProvider;
 
-use System\Base\Providers\ModulesServiceProvider\Modules\Applications;
 use System\Base\Providers\ModulesServiceProvider\Modules\Components;
-use System\Base\Providers\ModulesServiceProvider\Modules\Core;
-use System\Base\Providers\ModulesServiceProvider\Modules\Domains;
-use System\Base\Providers\ModulesServiceProvider\Modules\Menus;
 use System\Base\Providers\ModulesServiceProvider\Modules\Middlewares;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages;
 use System\Base\Providers\ModulesServiceProvider\Modules\Repositories;
@@ -16,10 +12,6 @@ use System\Base\Providers\ModulesServiceProvider\Installer;
 
 class Modules
 {
-	protected $core;
-
-	protected $applications;
-
 	protected $components;
 
 	protected $packages;
@@ -47,20 +39,6 @@ class Modules
 		}
 
 		return $this->{$name};
-	}
-
-	protected function initCore()
-	{
-		$this->core = (new Core())->init();
-
-		return $this->core;
-	}
-
-	protected function initApplications()
-	{
-		$this->applications = (new Applications())->init();
-
-		return $this->applications;
 	}
 
 	protected function initComponents()

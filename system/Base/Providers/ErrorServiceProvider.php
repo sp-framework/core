@@ -13,12 +13,12 @@ class ErrorServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'error',
 			function () use ($container) {
-				$applicationInfo = $container->getShared('modules')->applications->getApplicationInfo();
+				$appInfo = $container->getShared('apps')->getAppInfo();
 				$config = $container->getShared('config');
 				$logger = $container->getShared('logger');
 				$request = $container->getShared('request');
 				$response = $container->getShared('response');
-				return (new Error($applicationInfo, $config, $logger, $request, $response))->init();
+				return (new Error($appInfo, $config, $logger, $request, $response))->init();
 			}
 		);
 	}

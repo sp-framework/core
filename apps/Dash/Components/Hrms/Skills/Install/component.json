@@ -1,0 +1,51 @@
+{
+    "route"         : "hrms/skills",
+    "name"          : "Skills",
+    "description"   : "Manage skills via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "hrms",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-hrms-skills",
+    "class"         : "Apps\\Dash\\Components\\Hrms\\Skills\\SkillsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Skills",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-hrms-skills"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "hrms"      : {
+            "title"     : "HR Management",
+            "icon"      : "users-cog",
+            "childs"    : {
+                "skills"   : {
+                    "title"     : "Skills",
+                    "link"      : "hrms/skills"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

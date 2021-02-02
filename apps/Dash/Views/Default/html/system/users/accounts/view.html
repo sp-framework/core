@@ -1,0 +1,34 @@
+{% if account['id'] is defined %}
+    {% set accountId = account['id'] %}
+    {% set title = 'Account (' ~ account['email'] ~ ')' %}
+{% else %}
+    {% set accountId = '' %}
+    {% set title = 'New Account' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'user',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'accounts/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : accountId,
+            'addActionUrl'                  : 'system/users/accounts/add',
+            'addSuccessRedirectUrl'         : 'system/users/accounts',
+            'updateActionUrl'               : 'system/users/accounts/update',
+            'updateSuccessRedirectUrl'      : 'system/users/accounts',
+            'cancelActionUrl'               : 'system/users/accounts',
+            'closeActionUrl'                : 'system/users/accounts'
+        ]
+    ]
+)}}

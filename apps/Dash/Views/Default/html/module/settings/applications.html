@@ -1,0 +1,139 @@
+<ul class="nav nav-tabs" id="application-settings-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        <a class="nav-link" id="email-tab" data-toggle="tab" href="#email" role="tab" aria-controls="email" aria-selected="false">Email</a>
+    </li>
+</ul>
+<div class="tab-content" id="application-settings-tab-content">
+    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+        {% include 'settings/applications/general.html' %}
+    </div>
+    <div class="tab-pane fade" id="email" role="tabpanel" aria-labelledby="email-tab">
+        {% include 'settings/applications/email.html' %}
+    </div>
+</div>
+<script>
+/*global PNotify Swal */
+$('.mode-options').each(function(index, option) {
+
+    $($(option).parent()).click(function() {
+        var selectedOptionId = $(this).children()[0].id;
+
+        if (selectedOptionId === 'production') {
+            $('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+            $('#development').parent().removeClass('btn-primary').addClass('btn-secondary');
+        }
+
+        if (selectedOptionId === 'development') {
+            $('#' + selectedOptionId).parent().addClass('btn-primary').removeClass('btn-secondary');
+            $('#production').parent().removeClass('btn-primary').addClass('btn-secondary');
+        }
+    });
+});
+
+$('#modal-save').click(function() {
+
+    var postData = { };
+
+    postData['type'] = 'apps';
+    postData['id'] = $('#id').val();
+    postData['is_default'] = $('#is-default')[0].checked;
+    postData['force'] = '0';
+    postData['name'] = $('#name').val();
+    postData['route'] = $('#route').val();
+    postData['display_name'] = $('#display-name').val();
+    postData['description'] = $('#description').val();
+    postData['repo'] = $('#app-repo').val();
+    postData['settings'] = { };
+    postData['settings']['domain'] = $('#settings-app-domain').val();
+    postData['settings']['component'] = $('#settings-app-component').val();
+    postData['settings']['view'] = $('#settings-app-view').val();
+    postData['settings']['errorComponent'] = $('#settings-app-error-component').val();
+    postData['settings']['email'] = { };
+    postData['settings']['email']['enabled'] = $('#email-enabled')[0].checked;
+    postData['settings']['email']['host'] = $('#email-host').val();
+    postData['settings']['email']['port'] = $('#email-port').val();
+    postData['settings']['email']['auth'] = $('#email-auth')[0].checked;
+    postData['settings']['email']['encryption'] = $('#email-encryption')[0].checked;
+    postData['settings']['email']['allow_html_body'] = $('#email-allow-html-body')[0].checked;
+    postData['settings']['email']['username'] = $('#email-username').val();
+    postData['settings']['email']['password'] = $('#email-password').val();
+
+    if ($('input[name=mode-options]:checked')[0].id === 'production') {
+        postData['mode'] = 0;
+    } else if ($('input[name=mode-options]:checked')[0].id === 'development') {
+        postData['mode'] = 1;
+    }
+
+    if ($('#settings-app-component').val() === '0') {
+        $('#settings-app-component').addClass('is-invalid');
+        $('#settings-app-component').focus(function() {
+            $(this).removeClass('is-invalid');
+        });
+    } else if ($('#settings-app-view').val() === '0') {
+        $('#settings-app-view').addClass('is-invalid');
+        $('#settings-app-view').focus(function() {
+            $(this).removeClass('is-invalid');
+        });
+    } else {
+        $.post('/{{route}}/module/settings/edit', postData, function(data) {
+            if (data.responseCode === 0) {
+                location.reload();
+            } else if (data.responseCode === 2) {
+                Swal.fire({
+                    title               : data.responseMessage,
+                    icon                : 'info',
+                    showCancelButton    : true,
+                    showDenyButton      : true,
+                    confirmButtonText   : 'Save & Make Default',
+                    denyButtonText      : 'Save & Don\'t Make Default',
+                    width               : '50%'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        postData['force'] = "1";
+
+                        $.post('/{{route}}/module/settings/edit', postData, function(data) {
+                            if (data && data.responseCode === 0) {
+                                location.reload();
+                            } else if (data && data.responseCode === 1) {
+                                PNotify.error({
+                                    text            : data.responseMessage,
+                                    textTrusted     : true
+                                });
+                            }
+                        }, 'json');
+                    } else if (result.isDenied) {
+
+                        $('#is-default')[0].checked = false;
+                        postData['is_default'] = false;
+
+                        $.post('/{{route}}/module/settings/edit', postData, function(data) {
+                            if (data && data.responseCode === 0) {
+                                location.reload();
+                            } else if (data && data.responseCode === 1) {
+                                PNotify.error({
+                                    text        : data.responseMessage,
+                                    textTrusted : true
+                                });
+                            }
+                        }, 'json');
+                    }
+                });
+            } else if (data.responseCode === 3) {
+                Swal.fire({
+                    icon    : 'error',
+                    title   : data.responseMessage
+                });
+            } else {
+                PNotify.error({
+                    text        : data.responseMessage,
+                    textTrusted : true
+                });
+            }
+        }, 'json');
+    }
+});
+</script>

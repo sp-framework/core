@@ -6,10 +6,10 @@ use Phalcon\Mvc\Controller;
 
 abstract class BaseMiddleware extends Controller
 {
-    protected $application;
+    protected $app;
 
     public function onConstruct()
     {
-        $this->application = $this->modules->applications->getApplicationInfo();
+        $this->app = $this->apps->getAppInfo();
     }
 }

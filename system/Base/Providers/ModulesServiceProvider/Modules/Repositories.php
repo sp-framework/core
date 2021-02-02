@@ -3,11 +3,11 @@
 namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Repositories as RepositoriesModel;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesRepositories;
 
 class Repositories extends BasePackage
 {
-	protected $modelToUse = RepositoriesModel::class;
+	protected $modelToUse = ModulesRepositories::class;
 
 	protected $packageNameS = 'Repository';
 

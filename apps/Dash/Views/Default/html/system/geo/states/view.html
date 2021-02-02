@@ -1,0 +1,35 @@
+{% if state['id'] is defined %}
+    {% set stateId = state['id'] %}
+    {% set title = 'State (' ~ state['name'] ~ ')' %}
+{% else %}
+    {% set stateId = '' %}
+    {% set title = 'New State' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'globe',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'states/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : stateId,
+            'addActionUrl'                  : 'system/geo/states/add',
+            'addSuccessRedirectUrl'         : 'system/geo/states',
+            'updateActionUrl'               : 'system/geo/states/update',
+            'updateSuccessRedirectUrl'      : 'system/geo/states',
+            'cancelActionUrl'               : 'system/geo/states',
+            'closeActionUrl'                : 'system/geo/states'
+        ]
+    ]
+)}}

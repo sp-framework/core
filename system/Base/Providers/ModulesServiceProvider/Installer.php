@@ -8,7 +8,7 @@ class Installer extends BasePackage
 {
     protected $token = 'f21251a1fd1d764a7cca2ad127f16521aa76ea2d';
 
-    protected $applicationName = null;
+    protected $appName = null;
 
     protected $postData;
 
@@ -69,7 +69,7 @@ class Installer extends BasePackage
                 return $this->packagesData;
             }
 
-            // Sort using type, so we first install application, then components and so on.
+            // Sort using type, so we first install app, then components and so on.
             $this->modulesToInstall =
                 msort(array_merge($this->modulesToInstall, $this->dependenciesToDownload), 'type');
         }
@@ -230,7 +230,7 @@ class Installer extends BasePackage
         $this->dependenciesToDownload = [];
 
         foreach ($dependencies as $dependencyKey => $dependencyValue) {
-            if ($dependencyKey === 'application') {
+            if ($dependencyKey === 'app') {
                 $dependencyKey = $dependencyKey . 's';
             }
 
@@ -464,7 +464,7 @@ class Installer extends BasePackage
                 $extractedLocation
                     = $this->downloadLocation . '/' . strtolower($repoName) .
                     '-master/';
-            } else if ($type === 'application') {
+            } else if ($type === 'app') {
                 $extractedLocation
                     = $this->downloadLocation . '/' . strtolower($repoName) .
                     '-master/' . $type . 's/';
@@ -517,19 +517,19 @@ class Installer extends BasePackage
         // if ($type === 'components' || $type === 'packages' || $type === 'middlewares') {
         //  if ($type === 'components') {
         //      $this->localContent->put(
-        //          $type . '/'. $this->applicationName . '/Install/' . $this->componentName . '/files.info', json_encode($installedFiles)
+        //          $type . '/'. $this->appName . '/Install/' . $this->componentName . '/files.info', json_encode($installedFiles)
         //      );
         //  } else if ($type === 'packages') {
         //      $this->localContent->put(
-        //          $type . '/'. $this->applicationName . '/Install/' . $this->packageName . '/files.info', json_encode($installedFiles)
+        //          $type . '/'. $this->appName . '/Install/' . $this->packageName . '/files.info', json_encode($installedFiles)
         //      );
         //  } else if ($type === 'middlewares') {
         //      $this->localContent->put(
-        //          $type . '/'. $this->applicationName . '/Install/' . $this->middlewareName . '/files.info', json_encode($installedFiles)
+        //          $type . '/'. $this->appName . '/Install/' . $this->middlewareName . '/files.info', json_encode($installedFiles)
         //      );
         //  }
         // } else {
-        //  $this->localContent->put($type . '/'. $this->applicationName . '/files.info', json_encode($installedFiles));
+        //  $this->localContent->put($type . '/'. $this->appName . '/files.info', json_encode($installedFiles));
         // }
     }
 
@@ -570,8 +570,8 @@ class Installer extends BasePackage
 
     // protected function getPostDataArr()
     // {
-    //  if ($this->postData['type'] === 'applications') {
-    //      $this->applicationName = $this->postData['name'];
+    //  if ($this->postData['type'] === 'apps') {
+    //      $this->appName = $this->postData['name'];
     //  }
 
     //  $this->postDataArr = [];
@@ -597,8 +597,8 @@ class Installer extends BasePackage
     //                      $this->postDataArr[$dependenciesCount]['type'] = $dependenciesKey;
     //                  }
 
-    //                  if ($dependenciesKey === 'application') {
-    //                      $this->applicationName = $dependenciesValue['name'];
+    //                  if ($dependenciesKey === 'app') {
+    //                      $this->appName = $dependenciesValue['name'];
     //                  }
 
     //                  $dependenciesCount = $dependenciesCount + 1;
@@ -613,12 +613,12 @@ class Installer extends BasePackage
     // protected function checkDuplicateInstalledModules()
     // {
     //  $installedCore = $this->core->getCoreInfo();
-    //  $installedApplications = $this->applications->getAllApplications();
+    //  $installedApps = $this->apps->getAllApps();
     //  $installedComponents = $this->components->getAllComponents();
     //  $installedPackages = $this->packages->getAllPackages();
     //  $installedViews = $this->views->getAllViews();
 
-    //  //$this->postDataArr[0]['type'] !== 'applications' = New application dont need to check components and views.
+    //  //$this->postDataArr[0]['type'] !== 'apps' = New app dont need to check components and views.
     //  foreach ($this->postDataArr as $postDataKey => $postDataValue) {
     //      if ($postDataValue['type'] === 'core') {
     //          foreach ($installedCore as $installedCoreKey => $core) {
@@ -630,17 +630,17 @@ class Installer extends BasePackage
     //                  }
     //              }
     //          }
-    //      } else if ($postDataValue['type'] === 'applications') {
-    //          foreach ($installedApplications as $installedApplicationKey => $installedApplication) {
-    //              if ($installedApplication->get('name') === $postDataValue['name'] &&
-    //                  $installedApplication->get('repo') === $postDataValue['repo']
+    //      } else if ($postDataValue['type'] === 'apps') {
+    //          foreach ($installedApps as $installedAppKey => $installedApp) {
+    //              if ($installedApp->get('name') === $postDataValue['name'] &&
+    //                  $installedApp->get('repo') === $postDataValue['repo']
     //                 ) {
-    //                  if (!$this->moduleNeedsUpgrade($postDataValue, $installedApplication)) {
+    //                  if (!$this->moduleNeedsUpgrade($postDataValue, $installedApp)) {
     //                      unset($this->postDataArr[$postDataKey]);
     //                  }
     //              }
     //          }
-    //      } else if ($this->postDataArr[0]['type'] !== 'applications' && $postDataValue['type'] === 'components') {
+    //      } else if ($this->postDataArr[0]['type'] !== 'apps' && $postDataValue['type'] === 'components') {
     //          foreach ($installedComponents as $installedComponentKey => $installedComponent) {
     //              if ($installedComponent->get('name') === $postDataValue['name'] &&
     //                  $installedComponent->get('repo') === $postDataValue['repo']
@@ -660,7 +660,7 @@ class Installer extends BasePackage
     //                  }
     //              }
     //          }
-    //      } else if ($this->postDataArr[0]['type'] !== 'applications' && $postDataValue['type'] === 'views') {
+    //      } else if ($this->postDataArr[0]['type'] !== 'apps' && $postDataValue['type'] === 'views') {
     //          foreach ($installedViews as $installedViewKey => $installedView) {
     //              if ($installedView->get('name') === $postDataValue['name'] &&
     //                  $installedView->get('repo') === $postDataValue['repo']

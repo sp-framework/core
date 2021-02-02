@@ -10,7 +10,7 @@ class Domain
 	{
 		$request->setStrictHostCheck(true);
 
-		$applications =
+		$apps =
 		[
 			'1' =>
 			[
@@ -26,9 +26,9 @@ class Domain
 			[
 				'name'   							=> $request->getHttpHost(),
 				'description' 						=> '',
-				"default_application_id"			=> 1,
-				"exclusive_to_default_application"	=> 0,
-				"applications"			    		=> Json::encode($applications),
+				"default_app_id"					=> 1,
+				"exclusive_to_default_app"			=> 0,
+				"apps"			    				=> Json::encode($apps),
 				'settings'			 				=> Json::encode([])
 			]
 		);

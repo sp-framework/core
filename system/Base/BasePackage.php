@@ -14,7 +14,7 @@ abstract class BasePackage extends Controller
 {
 	public $packagesData;
 
-	protected $application;
+	protected $app;
 
 	protected $domain;
 
@@ -49,7 +49,7 @@ abstract class BasePackage extends Controller
 
 	public function init()
 	{
-		$this->application = $this->modules->applications->getApplicationInfo();
+		$this->app = $this->apps->getAppInfo();
 
 		return $this;
 	}
@@ -592,14 +592,14 @@ abstract class BasePackage extends Controller
 
 	protected function usePackage($packageClass)
 	{
-		$this->application = $this->modules->applications->getApplicationInfo();
+		$this->app = $this->apps->getAppInfo();
 
 		if ($this->checkPackage($packageClass)) {
 			return (new $packageClass())->init();
 		} else {
 			throw new \Exception(
 				'Package class : ' . $packageClass .
-				' not available for application ' . $this->application['name']
+				' not available for app ' . $this->app['name']
 			);
 		}
 	}
@@ -607,9 +607,9 @@ abstract class BasePackage extends Controller
 	protected function checkPackage($packageClass)
 	{
 		return
-			$this->modules->packages->getNamedPackageForApplication(
+			$this->modules->packages->getNamedPackageForApp(
 				Arr::last(explode('\\', $packageClass)),
-				$this->application['id']
+				$this->app['id']
 			);
 	}
 

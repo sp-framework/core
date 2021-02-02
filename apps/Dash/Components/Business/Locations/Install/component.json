@@ -1,0 +1,51 @@
+{
+    "route"         : "business/locations",
+    "name"          : "Locations",
+    "description"   : "List business locations via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-locations",
+    "class"         : "Apps\\Dash\\Components\\Business\\Locations\\LocationsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Locations",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-locations"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 5,
+        "business"      : {
+            "icon"      : "suitcase",
+            "title"     : "business",
+            "childs"    : {
+                "locations" : {
+                    "title"     : "locations",
+                    "link"      : "business/locations"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

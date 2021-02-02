@@ -2,8 +2,10 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider;
 
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Addressbook;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Domains;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Book as Addressbook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Types as Addresstypes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
@@ -11,9 +13,22 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
 
 class Basepackages
 {
+	protected $accounts;
+
+	protected $roles;
+
+	protected $profiles;
+
+	protected $email;
+
+	protected $emailservices;
+
 	protected $filters;
 
 	protected $domains;
@@ -30,6 +45,10 @@ class Basepackages
 
 	protected $storages;
 
+	protected $addressbook;
+
+	protected $addresstypes;
+
 	public function __construct()
 	{
 	}
@@ -45,18 +64,46 @@ class Basepackages
 		return $this->{$name};
 	}
 
+	protected function initAccounts()
+	{
+		$this->accounts = (new Accounts())->init();
+
+		return $this->accounts;
+	}
+
+	protected function initRoles()
+	{
+		$this->roles = (new Roles())->init();
+
+		return $this->roles;
+	}
+
+	protected function initProfile()
+	{
+		$this->profile = (new Profile())->init();
+
+		return $this->profile;
+	}
+
+	protected function initEmail()
+	{
+		$this->email = (new Email())->init();
+
+		return $this->email;
+	}
+
+	protected function initEmailservices()
+	{
+		$this->emailservices = (new EmailServices())->init();
+
+		return $this->emailservices;
+	}
+
 	protected function initFilters()
 	{
 		$this->filters = (new Filters())->init();
 
 		return $this->filters;
-	}
-
-	protected function initDomains()
-	{
-		$this->domains = (new Domains())->init();
-
-		return $this->domains;
 	}
 
 	protected function initMenus()
@@ -106,5 +153,12 @@ class Basepackages
 		$this->addressbook = (new Addressbook())->init();
 
 		return $this->addressbook;
+	}
+
+	protected function initAddresstypes()
+	{
+		$this->addresstypes = (new Addresstypes())->init();
+
+		return $this->addresstypes;
 	}
 }

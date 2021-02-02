@@ -7,45 +7,47 @@ use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
-use System\Base\Installer\Packages\Setup\Register\Application as RegisterApplication;
-use System\Base\Installer\Packages\Setup\Register\Application\Type as RegisterApplicationType;
-use System\Base\Installer\Packages\Setup\Register\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
+use System\Base\Installer\Packages\Setup\Register\App\Type as RegisterAppType;
+use System\Base\Installer\Packages\Setup\Register\App as RegisterApp;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
-use System\Base\Installer\Packages\Setup\Register\Filter as RegisterFilter;
-use System\Base\Installer\Packages\Setup\Register\Geo\Countries as RegisterCountries;
-use System\Base\Installer\Packages\Setup\Register\Menu as RegisterMenu;
-use System\Base\Installer\Packages\Setup\Register\Middleware as RegisterMiddleware;
-use System\Base\Installer\Packages\Setup\Register\Package as RegisterPackage;
-use System\Base\Installer\Packages\Setup\Register\Repository as RegisterRepository;
-use System\Base\Installer\Packages\Setup\Register\User\Account as RegisterRootAdminAccount;
-use System\Base\Installer\Packages\Setup\Register\User\Profile as RegisterRootAdminProfile;
-use System\Base\Installer\Packages\Setup\Register\User\Role as RegisterRootAdminRole;
-use System\Base\Installer\Packages\Setup\Register\View as RegisterView;
-use System\Base\Installer\Packages\Setup\Schema\AddressBook;
-use System\Base\Installer\Packages\Setup\Schema\Applications;
-use System\Base\Installer\Packages\Setup\Schema\Applications\Types as ApplicationsTypes;
-use System\Base\Installer\Packages\Setup\Schema\Cache;
-use System\Base\Installer\Packages\Setup\Schema\Components;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Address\Type as RegisterAddressType;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterMenu;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRootAdminRole;
+use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
+use System\Base\Installer\Packages\Setup\Register\Modules\Middleware as RegisterMiddleware;
+use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPackage;
+use System\Base\Installer\Packages\Setup\Register\Modules\Repository as RegisterRepository;
+use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Core;
+use System\Base\Installer\Packages\Setup\Schema\Apps\Types as AppsTypes;
+use System\Base\Installer\Packages\Setup\Schema\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Domains;
-use System\Base\Installer\Packages\Setup\Schema\EmailServices;
-use System\Base\Installer\Packages\Setup\Schema\Filters;
-use System\Base\Installer\Packages\Setup\Schema\Geo\Cities;
-use System\Base\Installer\Packages\Setup\Schema\Geo\Countries;
-use System\Base\Installer\Packages\Setup\Schema\Geo\States;
-use System\Base\Installer\Packages\Setup\Schema\Geo\Timezones;
+use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Logs;
-use System\Base\Installer\Packages\Setup\Schema\Menus;
-use System\Base\Installer\Packages\Setup\Schema\Middlewares;
-use System\Base\Installer\Packages\Setup\Schema\Packages;
-use System\Base\Installer\Packages\Setup\Schema\Repositories;
-use System\Base\Installer\Packages\Setup\Schema\Storages;
-use System\Base\Installer\Packages\Setup\Schema\StoragesLocal;
-use System\Base\Installer\Packages\Setup\Schema\Users\Accounts;
-use System\Base\Installer\Packages\Setup\Schema\Users\Profiles;
-use System\Base\Installer\Packages\Setup\Schema\Users\Roles;
-use System\Base\Installer\Packages\Setup\Schema\Views;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Book as AddressBook;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Types as AddressTypes;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Profiles;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Roles;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Repositories;
+use System\Base\Installer\Packages\Setup\Schema\Modules\Views;
 use System\Base\Installer\Packages\Setup\Write\Configs;
 use System\Base\Installer\Packages\Setup\Write\Pdo;
 
@@ -132,34 +134,41 @@ class Setup
 		$dbName = $this->dbConfig['db']['dbname'];
 
 		$this->db->createTable('core', $dbName, (new Core)->columns());
-		$this->db->createTable('applications', $dbName, (new Applications)->columns());
-		$this->db->createTable('application_types', $dbName, (new ApplicationsTypes)->columns());
-		$this->db->createTable('components', $dbName, (new Components)->columns());
-		$this->db->createTable('packages', $dbName, (new Packages)->columns());
-		$this->db->createTable('middlewares', $dbName, (new Middlewares)->columns());
-		$this->db->createTable('views', $dbName, (new Views)->columns());
-		$this->db->createTable('repositories', $dbName, (new Repositories)->columns());
-		$this->db->createTable('cache', $dbName, (new Cache)->columns());
-		$this->db->createTable('logs', $dbName, (new Logs)->columns());
-		$this->db->createTable('email_services', $dbName, (new EmailServices)->columns());
+		$this->db->createTable('apps_types', $dbName, (new AppsTypes)->columns());
+		$this->db->createTable('apps', $dbName, (new Apps)->columns());
 		$this->db->createTable('domains', $dbName, (new Domains)->columns());
-		$this->db->createTable('menus', $dbName, (new Menus)->columns());
-		$this->db->createTable('filters', $dbName, (new Filters)->columns());
-		$this->db->createTable('accounts', $dbName, (new Accounts)->columns());
-		$this->db->createTable('profiles', $dbName, (new Profiles)->columns());
-		$this->db->createTable('roles', $dbName, (new Roles)->columns());
-		$this->db->createTable('geo_countries', $dbName, (new Countries)->columns());
-		$this->db->createTable('geo_timezones', $dbName, (new Timezones)->columns());
-		$this->db->createTable('geo_states', $dbName, (new States)->columns());
-		$this->db->createTable('geo_cities', $dbName, (new Cities)->columns());
-		$this->db->createTable('address_book', $dbName, (new AddressBook)->columns());
-		$this->db->createTable('storages', $dbName, (new Storages)->columns());
-		$this->db->createTable('storages_local', $dbName, (new StoragesLocal)->columns());
+		$this->db->createTable('modules_components', $dbName, (new Components)->columns());
+		$this->db->createTable('modules_packages', $dbName, (new Packages)->columns());
+		$this->db->createTable('modules_middlewares', $dbName, (new Middlewares)->columns());
+		$this->db->createTable('modules_views', $dbName, (new Views)->columns());
+		$this->db->createTable('modules_repositories', $dbName, (new Repositories)->columns());
+		$this->db->createTable('basepackages_cache', $dbName, (new Cache)->columns());
+		$this->db->createTable('basepackages_logs', $dbName, (new Logs)->columns());
+		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
+		$this->db->createTable('basepackages_users_accounts', $dbName, (new Accounts)->columns());
+		$this->db->createTable('basepackages_users_profiles', $dbName, (new Profiles)->columns());
+		$this->db->createTable('basepackages_users_roles', $dbName, (new Roles)->columns());
+		$this->db->createTable('basepackages_menus', $dbName, (new Menus)->columns());
+		$this->db->createTable('basepackages_filters', $dbName, (new Filters)->columns());
+		$this->db->createTable('basepackages_geo_countries', $dbName, (new Countries)->columns());
+		$this->db->createTable('basepackages_geo_timezones', $dbName, (new Timezones)->columns());
+		$this->db->createTable('basepackages_geo_states', $dbName, (new States)->columns());
+		$this->db->createTable('basepackages_geo_cities', $dbName, (new Cities)->columns());
+		$this->db->createTable('basepackages_address_book', $dbName, (new AddressBook)->columns());
+		$this->db->createTable('basepackages_address_types', $dbName, (new AddressTypes)->columns());
+		$this->registerAddressTypes();
+		$this->db->createTable('basepackages_storages', $dbName, (new Storages)->columns());
+		$this->db->createTable('basepackages_storages_local', $dbName, (new StoragesLocal)->columns());
 	}
 
 	public function registerRepository()
 	{
 		(new RegisterRepository())->register($this->db);
+	}
+
+	public function registerDomain()
+	{
+		return (new RegisterDomain())->register($this->db, $this->request);
 	}
 
 	public function registerCore(array $baseConfig)
@@ -171,17 +180,28 @@ class Setup
 		(new RegisterCore())->register($installedFiles, $baseConfig, $this->db);
 	}
 
+	public function registerApp()
+	{
+		$this->registerAppTypes();
+
+		return $this->registerAdminApp();
+	}
+
+	protected function registerAppTypes()
+	{
+		return (new RegisterAppType())->register($this->db);
+	}
+
+	protected function registerAdminApp()
+	{
+		return (new RegisterApp())->register($this->db);
+	}
+
 	public function registerModule($type)
 	{
-		if ($type === 'applications') {
+		if ($type === 'components') {
 
-			$this->registerApplicationTypes();
-
-			return $this->registerAdminApplication();
-
-		} else if ($type === 'components') {
-
-			$adminComponents = $this->localContent->listContents('applications/Dash/Components/', true);
+			$adminComponents = $this->localContent->listContents('apps/Dash/Components/', true);
 
 			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
 				if ($adminComponent['basename'] === 'component.json') {
@@ -206,12 +226,12 @@ class Setup
 			}
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->localContent->listContents('applications/Dash/Packages/', true);
+			$adminPackages = $this->localContent->listContents('apps/Dash/Packages/', true);
 
 			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
 				if ($adminPackage['basename'] === 'package.json') {
 					if ($adminPackage['path'] !==
-						'applications/Dash/Packages/Barebone/Data/applications/Barebone/Packages/Home/Install/package.json'
+						'apps/Dash/Packages/Barebone/Data/apps/Barebone/Packages/Home/Install/package.json'
 					) {
 						$jsonFile =
 							json_decode(
@@ -228,7 +248,7 @@ class Setup
 				}
 			}
 
-			$commonPackages = $this->localContent->listContents('applications/Ecom/Common/Packages/', true);
+			$commonPackages = $this->localContent->listContents('apps/Ecom/Common/Packages/', true);
 
 			foreach ($commonPackages as $commonPackageKey => $commonPackage) {
 				if ($commonPackage['basename'] === 'package.json') {
@@ -247,7 +267,7 @@ class Setup
 			}
 		} else if ($type === 'middlewares') {
 
-			$adminMiddlewares = $this->localContent->listContents('applications/Dash/Middlewares/', true);
+			$adminMiddlewares = $this->localContent->listContents('apps/Dash/Middlewares/', true);
 
 			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
 				if ($adminMiddleware['basename'] === 'middleware.json') {
@@ -265,7 +285,7 @@ class Setup
 				}
 			}
 
-			$commonMiddlewares = $this->localContent->listContents('applications/Ecom/Common/Middlewares/', true);
+			$commonMiddlewares = $this->localContent->listContents('apps/Ecom/Common/Middlewares/', true);
 
 			foreach ($commonMiddlewares as $commonMiddlewareKey => $commonMiddleware) {
 				if ($commonMiddleware['basename'] === 'middleware.json') {
@@ -285,7 +305,7 @@ class Setup
 		} else if ($type === 'views') {
 			$jsonFile =
 				json_decode(
-					$this->localContent->read('applications/Dash/Views/Default/view.json'),
+					$this->localContent->read('apps/Dash/Views/Default/view.json'),
 					true
 				);
 
@@ -297,26 +317,16 @@ class Setup
 		}
 	}
 
-	protected function registerApplicationTypes()
-	{
-		return (new RegisterApplicationType())->register($this->db);
-	}
-
-	protected function registerAdminApplication()
-	{
-		return (new RegisterApplication())->register($this->db);
-	}
-
 	protected function registerAdminComponent(array $componentFile, $menuId)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Dash/Components/' . $componentFile['name']);
+		$installedFiles = $this->getInstalledFiles('apps/Dash/Components/' . $componentFile['name']);
 
 		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
 	}
 
-	public function updateAdminApplicationComponents()
+	public function updateAdminAppComponents()
 	{
-		return (new RegisterApplication())->update($this->db);
+		return (new RegisterApp())->update($this->db);
 	}
 
 	protected function registerAdminMenu(array $menu)
@@ -333,45 +343,26 @@ class Setup
 
 	protected function registerAdminPackage(array $packageFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Dash/Packages/' . $packageFile['name']);
-
-		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
-	}
-
-	protected function registerCommonPackage(array $packageFile)
-	{
-		$installedFiles = $this->getInstalledFiles('applications/Ecom/Common/Packages/' . $packageFile['name']);
+		$installedFiles = $this->getInstalledFiles('apps/Dash/Packages/' . $packageFile['name']);
 
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
 
 	public function registerAdminMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->getInstalledFiles('applications/Dash/Middlewares/' . $middlewareFile['name']);
-
-		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
-	}
-
-	public function registerCommonMiddleware(array $middlewareFile)
-	{
-		$installedFiles = $this->getInstalledFiles('applications/Ecom/Common/Middlewares/' . $middlewareFile['name']);
+		$installedFiles = $this->getInstalledFiles('apps/Dash/Middlewares/' . $middlewareFile['name']);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
 
 	protected function registerAdminView(array $viewFile)
 	{
-		$applicationInstalledFiles = $this->getInstalledFiles('applications/Dash/Views/');
+		$appInstalledFiles = $this->getInstalledFiles('apps/Dash/Views/');
 		$publicInstalledFiles = $this->getInstalledFiles('public/dash/');
 
-		$installedFiles = array_merge($applicationInstalledFiles, $publicInstalledFiles);
+		$installedFiles = array_merge($appInstalledFiles, $publicInstalledFiles);
 
 		return (new RegisterView())->register($this->db, $viewFile, $installedFiles);
-	}
-
-	public function registerDomain()
-	{
-		return (new RegisterDomain())->register($this->db, $this->request);
 	}
 
 	public function validateData()
@@ -418,6 +409,11 @@ class Setup
 	public function registerCountries()
 	{
 		return (new RegisterCountries())->register($this->db, $this->localContent);
+	}
+
+	protected function registerAddressTypes()
+	{
+		return (new RegisterAddressType())->register($this->db);
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true)

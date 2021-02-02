@@ -1,0 +1,98 @@
+{% if location['id'] is defined %}
+    {% set locationStreetAddress = location['street_address'] %}
+    {% set locationStreetAddress2 = location['street_address_2'] %}
+    {% set locationCityId = location['city_id'] %}
+    {% set locationCity = location['city_name'] %}
+    {% set locationPostCode = location['post_code'] %}
+    {% set locationStateId = location['state_id'] %}
+    {% set locationState = location['state_name'] %}
+    {% set locationCountryId = location['country_id'] %}
+    {% set locationCountry = location['country_name'] %}
+    {% set locationAddressId = location['address_id'] %}
+{% else %}
+    {% set locationStreetAddress = '' %}
+    {% set locationStreetAddress2 = '' %}
+    {% set locationCityId = '' %}
+    {% set locationCity = '' %}
+    {% set locationPostCode = '' %}
+    {% set locationStateId = '' %}
+    {% set locationState = '' %}
+    {% set locationCountryId = '' %}
+    {% set locationCountry = '' %}
+    {% set locationAddressId = '' %}
+{% endif %}
+{% if locationInboundShipping == '1' %}
+    {% set locationInboundShippingChecked = true %}
+{% else %}
+    {% set locationInboundShippingChecked = false %}
+{% endif %}
+{% if locationOutboundShipping == '1' %}
+    {% set locationOutboundShippingChecked = true %}
+{% else %}
+    {% set locationOutboundShippingChecked = false %}
+{% endif %}
+{% if locationCanStock == '1' %}
+    {% set locationCanStockChecked = true %}
+{% else %}
+    {% set locationCanStockChecked = false %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {% include '../common/address/view' with
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : locationStreetAddress,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : locationStreetAddress2,
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : locationCityId,
+                'cityName'                                    : locationCity,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : locationPostCode,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : locationStateId,
+                'stateName'                                   : locationState,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : locationCountryId,
+                'countryName'                                 : locationCountry,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        %}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Location Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Location Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : locationAddressId
+            ]
+        )}}
+    </div>
+</div>

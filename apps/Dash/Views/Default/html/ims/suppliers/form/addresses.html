@@ -1,0 +1,84 @@
+{% if supplier['id'] is defined %}
+    {% set supplierStreetAddress = supplier['street_address'] %}
+    {% set supplierStreetAddress2 = supplier['street_address_2'] %}
+    {% set supplierCityId = supplier['city_id'] %}
+    {% set supplierCity = supplier['city_name'] %}
+    {% set supplierPostCode = supplier['post_code'] %}
+    {% set supplierStateId = supplier['state_id'] %}
+    {% set supplierState = supplier['state_name'] %}
+    {% set supplierCountryId = supplier['country_id'] %}
+    {% set supplierCountry = supplier['country_name'] %}
+    {% set supplierAddressId = supplier['address_id'] %}
+    {% set supplierInternalNotes = supplier['internal_notes'] %}
+{% else %}
+    {% set supplierStreetAddress = '' %}
+    {% set supplierStreetAddress2 = '' %}
+    {% set supplierCityId = '' %}
+    {% set supplierCity = '' %}
+    {% set supplierPostCode = '' %}
+    {% set supplierStateId = '' %}
+    {% set supplierState = '' %}
+    {% set supplierCountryId = '' %}
+    {% set supplierCountry = '' %}
+    {% set supplierAddressId = '' %}
+    {% set supplierInternalNotes = '' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {% include '../common/address/view' with
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : supplierStreetAddress,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : supplierStreetAddress2,
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : supplierCityId,
+                'cityName'                                    : supplierCity,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : supplierPostCode,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : supplierStateId,
+                'stateName'                                   : supplierState,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : supplierCountryId,
+                'countryName'                                 : supplierCountry,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        %}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Supplier Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Supplier Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : supplierAddressId
+            ]
+        )}}
+    </div>
+</div>

@@ -1,0 +1,53 @@
+{
+    "route"         : "system/geo/countries",
+    "name"          : "Geo Countries",
+    "description"   : "Manage geo countries via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-geo-countries",
+    "class"         : "Apps\\Dash\\Components\\System\\Geo\\Countries\\CountriesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "geo" : {
+                    "title"     : "Geo Locations",
+                    "icon"      : "globe",
+                    "childs"    : {
+                        "countries" : {
+                            "title"     : "Countries",
+                            "link"      : "system/geo/countries"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}

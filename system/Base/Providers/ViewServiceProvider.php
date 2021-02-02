@@ -59,28 +59,17 @@ class ViewServiceProvider implements ServiceProviderInterface
 		$tags = $container->getShared('modules')->views->getViewTags();
 
 		if ($tags) {
-			$application = $container->getShared('modules')->applications->getApplicationInfo();
+			$app = $container->getShared('apps')->getAppInfo();
 			$tagsName = strtolower($tags['name']);
 
 			$appPackage =
-				'Applications\\' .
-				ucfirst($application['app_type']) . '\\' .
-				// ucfirst($application['sub_category']) . '\\' .
+				'Apps\\' .
+				ucfirst($app['app_type']) . '\\' .
 				'Packages\\' . $tags['name'] . '\\' . $tags['name'];
-
-			// $commonPackage =
-			// 	'Applications\\' .
-			// 	ucfirst($application['app_type']) .
-			// 	'\\Common\\' . 'Packages\\' . $tags['name'] . '\\' . $tags['name'];
 
 			try {
 				$reflection = new \ReflectionClass($appPackage);
 				$package = $appPackage;
-			// } catch (\Exception $e) {
-			// 	if ($e->getCode()) {
-			// 		$reflection = new \ReflectionClass($commonPackage);
-			// 		$package = $commonPackage;
-			// 	}
 			} catch (\Exception $e) {
 				throw $e;
 			}

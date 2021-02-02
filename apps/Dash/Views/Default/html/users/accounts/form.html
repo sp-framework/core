@@ -1,0 +1,793 @@
+{% if not canEmail %}
+    {% set emailCheck = true %}
+{% else %}
+    {% set emailCheck = false %}
+{% endif %}
+{% if account['id'] is defined %}
+    {% set accountId = account['id'] %}
+    {% set accountEmail = account['email'] %}
+    {% set accountRole = account['role_id'] %}
+{% else %}
+    {% set accountId = '' %}
+    {% set accountEmail = '' %}
+    {% set accountRole = 0 %}
+{% endif %}
+{% if account['override_role'] is defined and account['override_role'] == '1' %}
+    {% set override = true %}
+{% else %}
+    {% set override = false %}
+{% endif %}
+{% set accountPermissions = account['permissions'] %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Account ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Account ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : accountId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'email',
+                        'fieldLabel'                     : 'Email',
+                        'fieldType'                      : 'input',
+                        'fieldInputType'                 : 'email',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Account Email Address',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : accountEmail
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'role_id',
+                        'fieldLabel'                     : 'Select Role',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select a role for this account.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : true,
+                        'fieldDataSelect2Options'        : roles,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': accountRole
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'override_role',
+                        'fieldLabel'                     : 'Account Level Permissions',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select permissions for the account<br>NOTE: These permissions override role permissions',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'warning',
+                        'fieldCheckboxLabel'             : '',
+                        'fieldCheckboxChecked'           : override,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'can_login',
+                        'fieldLabel'                     : 'Can Login To App?',
+                        'fieldHelp'                      : true,
+                        'fieldAdditionalClass'           : 'mb-1',
+                        'fieldHelpTooltipContent'        : 'Select apps to which this account can login',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'html',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+                {% for app in apps %}
+                    {% set checkboxIds[componentId ~ '-' ~ sectionId ~ '-can_login-' ~ app['route']] = app['route'] %}
+                    {% if account['can_login'][app['route']] is defined %}
+                        {% if account['can_login'][app['route']] == true %}
+                            {% set checked = true %}
+                        {% else %}
+                            {% set checked = false %}
+                        {% endif %}
+                    {% else %}
+                        {% set checked = false %}
+                    {% endif %}
+                    <div class="app" data-id="{{app['id']}}" data-route="{{app['route']}}">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'can_login-' ~ app['route'],
+                                'fieldLabel'                     : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'success',
+                                'fieldCheckboxLabel'             : app['name'],
+                                'fieldCheckboxChecked'           : checked,
+                                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                                'fieldBazScan'                   : false
+                            ]
+                        )}}
+                    </div>
+                {% endfor %}
+                {% set checkboxIds = json_encode(checkboxIds, 16) %}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'email_new_password',
+                        'fieldLabel'                     : 'Email New Password',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Email New Password to this account.<br>NOTE: Email Settings must be configured and attached to the domain for this option to work.',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxLabel'             : '',
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldDisabled'                  : emailCheck,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if account['force_pwreset'] is defined %}
+                    {% if account['force_pwreset'] == 1 %}
+                        {% set reset_checked = true %}
+                    {% else %}
+                        {% set reset_checked = false %}
+                    {% endif %}
+                {% else %}
+                    {% set reset_checked = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'force_pwreset',
+                        'fieldLabel'                     : 'Force Account Change Password',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Force use to change password at next login.',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxLabel'             : '',
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true,
+                        'fieldCheckboxChecked'           : reset_checked
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'force_logout',
+                        'fieldLabel'                     : 'Force logout account',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Destroys all account sessions.',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'danger',
+                        'fieldCheckboxLabel'             : '',
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row" id="account-permissions" hidden>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                                   : component,
+                        'componentName'                               : componentName,
+                        'componentId'                                 : componentId,
+                        'sectionId'                                   : sectionId,
+                        'fieldId'                                     : 'permissions',
+                        'fieldLabel'                                  : 'Permissions',
+                        'fieldType'                                   : 'jstree',
+                        'fieldHelp'                                   : true,
+                        'fieldHelpTooltipContent'                     : 'Select permissions for the account<br>NOTE: These permissions override role permissions',
+                        'fieldRequired'                               : false,
+                        'fieldBazScan'                                : true,
+                        'fieldBazPostOnCreate'                        : true,
+                        'fieldBazPostOnUpdate'                        : true,
+                        'fieldJstreeSearch'                           : true,
+                        'fieldJstreeAdd'                              : false,
+                        'fieldJstreeEdit'                             : false,
+                        'fieldJstreeExpand'                           : true,
+                        'fieldJstreeCollapse'                         : true,
+                        'fieldJstreeFirstOpen'                        : true,
+                        'fieldJstreeAllOpen'                          : true,
+                        'fieldJstreeToggleAllChildren'                : false,
+                        'fieldJstreeIncludeRootInPath'                : false,
+                        'fieldJstreeRootIcon'                         : 'lock',
+                        'fieldJstreeSelectEndNodeOnly'                : false,
+                        'fieldJstreeShowDots'                         : true,
+                        'fieldJstreeDoubleClickToggle'                : true,
+                        'fieldJstreeMultiple'                         : false,
+                        'fieldJstreeSearchCaseSensitive'              : false,
+                        'fieldJstreeSearchShowOnlyMatches'            : false,
+                        'fieldJstreeSearchShowOnlyMatchesChildren'    : false,
+                        'fieldJstreeHideJstreeIcons'                  : false,
+                        'fieldJstreeDataSrcArr'                       :
+                            [
+                                'components'   :
+                                    [
+                                        'srcArr'                : components
+                                    ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+var acls = JSON.parse('{{acls}}');
+var gridColumns = [];
+gridColumns.push(
+    {
+        header          :   '<p class="text-center mb-0">' +
+                                '<span class="cursor-pointer">' +
+                                    '<i id="{{componentId}}-{{sectionId}}-permissions-components-denyall" ' +
+                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                        'data-original-title="Deny All" class="fas fa-fw fa-times-circle ' +
+                                        'mr-1 text-danger helper components">' +
+                                    '</i>' +
+                                '</span>' +
+                                    ' COMPONENTS ' +
+                                '<span class="cursor-pointer">' +
+                                    '<i id="{{componentId}}-{{sectionId}}-permissions-components-permitall" ' +
+                                        'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                        'data-original-title="Permit All" class="fas fa-fw fa-check-circle ' +
+                                        'ml-1 text-success helper components">' +
+                                    '</i>' +
+                                '</span>' +
+                            '</p>',
+        wideCellClass   : 'text-center components',
+        title           : "_DATA_",
+        width           : 300
+    }
+);
+
+for (var acl in acls) {
+    gridColumns.push(
+        {
+            header          :   '<p class="text-center mb-0">' +
+                                    '<span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-permissions-' + acls[acl] + '-denyall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Deny all ' + acls[acl] + '" class="fas fa-fw fa-times-circle ' +
+                                            'mr-1 text-danger helper ' + acls[acl] + '">' +
+                                        '</i>' +
+                                    '</span> ' +
+                                        acls[acl].toUpperCase() +
+                                    ' <span class="cursor-pointer">' +
+                                        '<i id="{{componentId}}-{{sectionId}}-permissions-' + acls[acl] + '-permitall" ' +
+                                            'data-toggle="tooltip" data-html="true" data-placement="bottom" '+
+                                            'data-original-title="Permit all ' + acls[acl] + '" class="fas fa-fw fa-check-circle ' +
+                                            'ml-1 text-success helper ' + acls[acl] + '">' +
+                                        '</i>' +
+                                    '</span>' +
+                                '</p>',
+            wideCellClass   : 'text-center ACL-' + acls[acl],
+            cellClass       : 'empty ACL-' + acls[acl]
+        }
+    );
+}
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                          : { },
+        '{{componentId}}-{{sectionId}}-email'                       : { },
+        '{{componentId}}-{{sectionId}}-email_new_password'          : { },
+        '{{componentId}}-{{sectionId}}-force_pwreset'               : { },
+        '{{componentId}}-{{sectionId}}-force_logout'                : { },
+        '{{componentId}}-{{sectionId}}-can_login'                   : {
+            'afterInit'     : function () {
+                //CanLogin
+                dataCollectionSection['data']['can_login'] = { };
+                var checkboxIds = JSON.parse('{{checkboxIds}}');
+                for (var checkbox in checkboxIds) {
+                    $('#' + checkbox).click(function() {
+                        var id = $(this)[0].id;
+                        extractCheckboxData(id, $('#' + id).parents('.app').data('route'))
+                    });
+                    extractCheckboxData(checkbox, $('#' + checkbox).parents('.app').data('route'))
+                }
+                function extractCheckboxData(checkbox, app) {
+                    if ($('#' + checkbox)[0].checked === true) {
+                        dataCollectionSection['data']['can_login'][app] = true;
+                    } else {
+                        dataCollectionSection['data']['can_login'][app] = false;
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-role_id'                     : {
+            'placeholder'   : 'SELECT ROLE'
+        },
+        '{{componentId}}-{{sectionId}}-override_role'   : {
+            'afterInit' : function () {
+
+                function fixGrid() {
+                    var gridCount = $('.jstree-grid-column').length - 1;
+                    var gridWidth = $('.jstree-grid-wrapper').width();
+                    var colWidth = (gridWidth - 300) / gridCount;
+                    $('.jstree-grid-column').each(function(index,grid) {
+                        if (index !== 0) {
+                            $(grid).css({
+                                width: colWidth
+                            });
+                        }
+                    });
+                }
+                function toggleGrid() {
+                    var checked = $('#' + '{{componentId}}-{{sectionId}}-override_role')[0].checked;
+                    if (checked) {
+                        $('#account-permissions').attr('hidden', false);
+                        fixGrid();
+                    } else if (!checked) {
+                        $('#account-permissions').attr('hidden', true);
+                    }
+                }
+                $('#' + '{{componentId}}-{{sectionId}}-override_role').click(function() {
+                    toggleGrid();
+                });
+                toggleGrid();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-permissions'                 :
+        $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-permissions'], {
+            plugins: [
+                        "search",
+                        "types",
+                        "dnd",
+                        "grid"
+            ],
+            grid: {
+                columns: gridColumns,
+                resizable   : true
+            },
+            afterInit : function(dataCollection) {
+                //Fix Grid Width
+                (function fixGrid() {
+                    var gridCount = $('.jstree-grid-column').length - 1;
+                    var gridWidth = $('.jstree-grid-wrapper').width();
+                    var colWidth = (gridWidth - 300) / gridCount;
+                    $('.jstree-grid-column').each(function(index,grid) {
+                        if (index !== 0) {
+                            $(grid).css({
+                                width: colWidth
+                            });
+                        }
+                    });
+                })();
+
+                var allIds, gridData, permissions, parents, children, jstreeId;
+
+                allIds =
+                    $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
+                        .jstree(true).get_json('#', {flat: true});
+
+                // Make a data object
+                if (!dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data']) {
+                    dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'] = { };
+                }
+
+                gridData = dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['data'];
+
+                permissions = JSON.parse('{{accountPermissions}}');//Parse DB Data
+
+                for (var app in permissions) {
+                    for (var component in permissions[app]) {
+                        jstreeId =
+                            $($('#{{componentId}}-{{sectionId}}-permissions ul.jstree-children')
+                                .find('[data-id="' + app + '"]'))
+                            .find('[data-id="' + component + '"]');
+
+                        if (jstreeId.length > 0) {
+                            gridData[jstreeId[0].id] = { };
+                            gridData[jstreeId[0].id]['app_id'] = app;
+                            gridData[jstreeId[0].id]['component_id'] = component;
+                            gridData[jstreeId[0].id]['permissions'] = permissions[app][component];
+                            gridData[jstreeId[0].id]['parents'] = [];
+                            gridData[jstreeId[0].id]['children'] = [];
+                        }
+                    }
+                }
+
+                $.each(allIds, function(index, obj) {
+                    if (gridData[obj.id]) {
+                        var jstreeIdStructure =
+                            $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
+                                .jstree(true).get_json(obj.id, {flat: true})
+
+                        $.each(jstreeIdStructure, function(index, childrenObj) {
+                            if (childrenObj.id !== obj.id) {
+                                gridData[obj.id]['children'].push(childrenObj.id);
+                            }
+                        });
+
+                        $.each(gridData[obj.id]['children'], function(index, childrenId) {
+                            gridData[childrenId]['parents'].push(obj.id);
+                        });
+                    }
+                });
+
+                //Build Permissions grid
+                function buildPermissionsGrid(gridData) {
+                    for (var jstreeGridId in gridData) {
+                        $('.jstree-grid-wrapper')
+                            .find('[data-jstreegrid="' + jstreeGridId + '"]')
+                            .each(function(index, column) {
+                                var permission, spanClass, spanData;
+                                var spanClasses = $(this).children('span').attr("class").split(/\s+/);
+                                $(spanClasses).each(function(index, sclass) {
+                                    if (sclass.search(/ACL-.*/) === 0) {
+                                        permission = sclass.replace('ACL-', '');
+                                        spanClass = permission + ' ';
+                                    }
+                                });
+
+                                if (gridData[jstreeGridId]['permissions'][permission] == '0') {
+                                    spanClass += 'text-danger cursor-pointer';
+                                    spanData = '<i class="fa fa-fw fa-times-circle"></i>';
+                                    $(this).children('span').removeClass('empty');
+                                } else if (gridData[jstreeGridId]['permissions'][permission] == '1') {
+                                    spanClass += 'text-success cursor-pointer';
+                                    spanData = '<i class="fa fa-fw fa-check-circle"></i>';
+                                    $(this).children('span').removeClass('empty');
+                                } else {
+                                    spanClass = 'na';
+                                    spanData = '<p class="text-secondary">-</p>';
+                                }
+                                $(this).children('span').addClass(spanClass).html(spanData);
+                            }
+                        );
+                    }
+                    extractData();
+                }
+                buildPermissionsGrid(gridData);
+
+                //Search
+                $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
+                    .on('search.jstree after_open.jstree after_close.jstree close_all.jstree open_all.jstree', function(e, data) {
+                        var notHidden = $('#{{componentId}}-{{sectionId}}-permissions').find('.jstree-node').not('.jstree-hidden');
+
+                        $('#{{componentId}}-{{sectionId}}-permissions-tree-search-input').keyup(function() {
+                            if ($('#{{componentId}}-{{sectionId}}-permissions-tree-search-input').val() === '') {
+                                $('#{{componentId}}-{{sectionId}}-permissions .bg-info').removeClass('bg-info');
+                                $('.jstree-grid-wrapper .bg-info').removeClass('bg-info');
+                                buildPermissionsGrid(gridData);
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-permissions .bg-info').removeClass('bg-info');
+                                $('.jstree-grid-wrapper .bg-info').removeClass('bg-info');
+                                $('.jstree-search').addClass('bg-info');
+                            }
+                        });
+
+                        buildPermissionsGrid(gridData);
+                });
+
+                function findSiblings(id) {
+                    return $('.jstree-grid-wrapper').find('[data-jstreegrid="' + id + '"]');
+                }
+
+                //Click Toggle
+                $(dataCollection['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-permissions']['jstree'])
+                    .on('select_cell.jstree-grid', function(e, data) {
+                        toggleGridCell($(data.grid)[0].id, $(data.node)[0].id, false, null);
+                    }
+                );
+
+                function toggleGridCell(dataGridId, dataNodeId, bulk, bulkState) {
+                    // Only run on columns that have data and are not empty or na (N/A)
+                    if (!$('#' + dataGridId).children('span').hasClass('empty') && !$('#' + dataGridId).children('span').hasClass('na')) {
+                        parents = gridData[dataNodeId]['parents'];
+                        children = gridData[dataNodeId]['children'];
+                        var siblings = findSiblings(dataNodeId);
+                        var viewId, viewState, myState;
+
+                        viewId = $(siblings)[0].id;
+
+                        if ($('#' + viewId).children('span').hasClass('text-danger')) {
+                            viewState = 'deny';
+                        } else if ($('#' + viewId).children('span').hasClass('text-success')) {
+                            viewState = 'permit';
+                        }
+
+                        if ($('#' + dataGridId).children('span').hasClass('text-danger')) {
+                            myState = 'deny';
+                        } else if ($('#' + dataGridId).children('span').hasClass('text-success')) {
+                            myState = 'permit'
+                        }
+
+                        if (bulkState === true) {
+                            viewState = 'deny';
+                        } else if (bulkState === false) {
+                            viewState = 'permit';
+                        }
+                        //We only need this to store data at the moment. If the array is going to be named array like view => 0, then we dont need this.
+                        var permission, spanClass, spanData;
+                        var spanClasses = $('#' + dataGridId).children('span').attr("class").split(/\s+/);
+                        $(spanClasses).each(function(index, sclass) {
+                            if (sclass.search(/ACL-.*/) === 0) {
+                                permission = sclass.replace('ACL-', '');
+                                spanClass = permission + ' ';
+                            }
+                        });
+                        if (viewState === 'deny' && myState === 'deny') {
+                            $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
+                            $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                            $('#' + viewId).children('span').removeClass('text-danger').addClass('text-success');
+                            $('#' + viewId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                            gridData[dataNodeId]['permissions']['view'] = 1;
+                            gridData[dataNodeId]['permissions'][permission] = 1;
+                        } else if (viewState === 'permit' && myState === 'permit') {
+                            $('#' + dataGridId).children('span').removeClass('text-success').addClass('text-danger');
+                            $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                            gridData[dataNodeId]['permissions'][permission] = 0;
+                        } else if (viewState === 'permit' && myState === 'deny') {
+                            $('#' + dataGridId).children('span').removeClass('text-danger').addClass('text-success');
+                            $('#' + dataGridId).children('span').html('<i class="fas fa-fw fa-check-circle"></i>');
+                            gridData[dataNodeId]['permissions'][permission] = 1;
+                        }
+
+                        // Disable all siblings if view is disabled
+                        if ($('#' + dataGridId)[0].id === viewId) {
+                            if (children.length === 0) {
+                                if (!bulk) {
+                                    if (viewState === 'permit') {
+                                        $.each(siblings, function(index, sibl) {
+                                            if (index > 0) {
+                                                if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
+                                                    var permission, spanClass, spanData;
+                                                    var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
+                                                    $(spanClasses).each(function(index, sclass) {
+                                                        if (sclass.search(/ACL-.*/) === 0) {
+                                                            permission = sclass.replace('ACL-', '');
+                                                            spanClass = permission + ' ';
+                                                        }
+                                                        gridData[dataNodeId]['permissions'][permission] = 0;
+                                                    });
+                                                    $(sibl).children('span').removeClass('text-success').addClass('text-danger');
+                                                    $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                                                }
+                                            }
+                                        });
+                                    } else if (viewState === 'deny') {
+                                        $.each(siblings, function(index, sibl) {
+                                            if (index > 0) {
+                                                if (!$(sibl).children('span').hasClass('empty') && !$(sibl).children('span').hasClass('na')) {
+                                                    var permission, spanClass, spanData;
+                                                    var spanClasses = $(sibl).children('span').attr("class").split(/\s+/);
+                                                    $(spanClasses).each(function(index, sclass) {
+                                                        if (sclass.search(/ACL-.*/) === 0) {
+                                                            permission = sclass.replace('ACL-', '');
+                                                            spanClass = permission + ' ';
+                                                        }
+                                                        gridData[dataNodeId]['permissions'][permission] = 0;
+                                                    });
+                                                    $(sibl).children('span').removeClass('text-success').addClass('text-danger');
+                                                    $(sibl).children('span').html('<i class="fas fa-fw fa-times-circle"></i>');
+                                                }
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    //
+                                }
+                            }
+                        }
+
+                    }
+                    extractData();
+                }
+
+                (function registerBulkButtons() {
+                    // Bulk deny/permit (All)
+                    $('#{{componentId}}-{{sectionId}}-permissions-components-denyall').click(function(e) {
+                        e.preventDefault();
+                        denyPermitAll(null, null, false, null);
+                    });
+                    $('#{{componentId}}-{{sectionId}}-permissions-components-permitall').click(function(e) {
+                        e.preventDefault();
+                        denyPermitAll(null, null, true, null);
+                    });
+
+                    for (var aclAll in acls) {
+                        $('#{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-denyall').click(function(e) {
+                            e.preventDefault();
+
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-view-denyall') {
+                                denyPermitAll(null, null, false, true);
+                            } else {
+                                denyPermitAll(this, false, null, null);
+                            }
+                        });
+                        $('#{{componentId}}-{{sectionId}}-permissions-' + acls[aclAll] + '-permitall').click(function(e) {
+                            e.preventDefault();
+                            if ($(this)[0].id === '{{componentId}}-{{sectionId}}-permissions-view-permitall') {
+                                denyPermitAll(this, true, null, true);
+                            } else {
+                                denyPermitAll(this, true, null, null);
+                            }
+                        });
+                    }
+                })();
+
+                // Function to make bulk changes
+                function denyPermitAll(denyPermitPermissionIconId, permit, component, view) {
+                    if (denyPermitPermissionIconId) {
+                        var colNum, column;
+                        column = $(denyPermitPermissionIconId).parents('div').next('div')[0].id.split('col');
+                        colNum = column[1] - 1;
+                    }
+                    // Deny All in that Column
+                    $.each(allIds, function(index, child) {
+                        if (denyPermitPermissionIconId) {
+                            toggleGridCell(
+                                $('.jstree-grid-wrapper')
+                                .find('[data-jstreegrid="' + child.id + '"]')[colNum].id, child.id, true, permit
+                            );
+                        } else {
+                            $('.jstree-grid-wrapper').find('[data-jstreegrid="' + child.id + '"]')
+                                .children('span')
+                                .each(function(index,span) {
+                                    if (!$(span).hasClass('empty') && !$(span).hasClass('na')) {
+                                        var permission, spanClass, spanData;
+                                        var spanClasses = $(span).attr("class").split(/\s+/);
+                                        $(spanClasses).each(function(index, sclass) {
+                                            if (sclass.search(/ACL-.*/) === 0) {
+                                                permission = sclass.replace('ACL-', '');
+                                                spanClass = permission + ' ';
+                                            }
+                                            if (component) {
+                                                $(span).removeClass('text-danger').addClass('text-success');
+                                                $(span).html('<i class="fas fa-fw fa-check-circle"></i>');
+                                                gridData[child.id]['permissions'][permission] = 1;
+                                            } else {
+                                                $(span).removeClass('text-success').addClass('text-danger');
+                                                $(span).html('<i class="fas fa-fw fa-times-circle"></i>');
+                                                gridData[child.id]['permissions'][permission] = 0;
+                                            }
+                                        });
+                                    }
+                            });
+                        }
+                    });
+
+                    extractData();
+                }
+
+                //Extract data to post;
+                function extractData() {
+                    // Make a data object
+                    if (!dataCollectionSectionForm['data']) {
+                        dataCollectionSectionForm['data'] = { };
+                    }
+                    if (!dataCollectionSection['data']['permissions']) {
+                        dataCollectionSection['data']['permissions'] = { };
+                    }
+                    var data = dataCollectionSection['data']['permissions'];
+
+                    for (var app in permissions) {
+                        data[app] = { };
+                    }
+
+                    for (var nodeId in gridData) {
+                        data[gridData[nodeId]['app_id']][gridData[nodeId]['component_id']] =
+                            gridData[nodeId]['permissions'];
+                    }
+                }
+            }
+        }),
+        //Validation
+        '{{componentId}}-{{sectionId}}-form' : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-email'       : {'required' : true, 'email' : true},
+                '{{componentId}}-{{sectionId}}-role_id'     : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-email'       : 'Please enter correct email address',
+                '{{componentId}}-{{sectionId}}-role_id'     : 'Please select role',
+            }
+        }
+});
+</script>

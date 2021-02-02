@@ -25,7 +25,7 @@ class Auth
 
     protected $account;
 
-    protected $application;
+    protected $app;
 
     protected $secTools;
 
@@ -44,12 +44,12 @@ class Auth
         $session,
         $sessionTools,
         $cookies,
-        $accounts,
-        $applications,
+        $apps,
         $secTools,
         $validation,
         $logger,
         $links,
+        $accounts,
         $profile
     ) {
         $this->config = $config;
@@ -60,9 +60,7 @@ class Auth
 
         $this->cookies = $cookies;
 
-        $this->accounts = $accounts;
-
-        $this->application = $applications->getApplicationInfo();
+        $this->app = $apps->getAppInfo();
 
         $this->secTools = $secTools;
 
@@ -71,6 +69,8 @@ class Auth
         $this->logger = $logger;
 
         $this->links = $links;
+
+        $this->accounts = $accounts;
 
         $this->profile = $profile;
 
@@ -112,7 +112,7 @@ class Auth
             $this->session->remove($this->key);
         }
 
-        $this->logger->log->debug($this->account['email'] . ' logged out successfully from application: ' . $this->application['name']);
+        $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->app['name']);
 
         return true;
     }
@@ -219,7 +219,7 @@ class Auth
 
         $this->setSessionAndToken($data);
 
-        $this->logger->log->debug($this->account['email'] . ' authenticated successfully on application ' . $this->application['name']);
+        $this->logger->log->debug($this->account['email'] . ' authenticated successfully on app ' . $this->app['name']);
 
         return true;
     }
@@ -233,27 +233,27 @@ class Auth
                 $this->account['can_login'] = Json::decode($this->account['can_login'], true);
             }
 
-            if (isset($this->account['can_login'][$this->application['route']]) &&
-                !$this->account['can_login'][$this->application['route']]
-            ) {//Not allowed for application
+            if (isset($this->account['can_login'][$this->app['route']]) &&
+                !$this->account['can_login'][$this->app['route']]
+            ) {//Not allowed for app
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                $this->logger->log->debug($this->account['email'] . ' is not allowed to login to application ' . $this->application['name']);
+                $this->logger->log->debug($this->account['email'] . ' is not allowed to login to app ' . $this->app['name']);
 
                 return false;
             }
 
-            if (!isset($this->account['can_login'][$this->application['route']])) {//New Application OR New account via rego
+            if (!isset($this->account['can_login'][$this->app['route']])) {//New App OR New account via rego
 
-                if ($this->application['can_login_role_ids']) {
+                if ($this->app['can_login_role_ids']) {
 
-                    $this->application['can_login_role_ids'] = Json::decode($this->application['can_login_role_ids'], true);
+                    $this->app['can_login_role_ids'] = Json::decode($this->app['can_login_role_ids'], true);
 
-                    if (in_array($this->account['role_id'], $this->application['can_login_role_ids'])) {
+                    if (in_array($this->account['role_id'], $this->app['can_login_role_ids'])) {
 
-                        $this->account['can_login'][$this->application['route']] = true;
+                        $this->account['can_login'][$this->app['route']] = true;
 
                         $this->account['can_login'] = Json::encode($this->account['can_login']);
 
@@ -264,7 +264,7 @@ class Auth
 
                         $this->packagesData->responseMessage = 'Error: Contact System Administrator';
 
-                        $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to application ' . $this->application['name']);
+                        $this->logger->log->debug($this->account['email'] . ' and their role is not allowed to login to app ' . $this->app['name']);
 
                         return false;
                     }
@@ -280,7 +280,7 @@ class Auth
                     $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
                 }
 
-                $this->logger->log->debug('Incorrect username/password entered by account ' . $this->account['email'] . ' on application ' . $this->application['name']);
+                $this->logger->log->debug('Incorrect username/password entered by account ' . $this->account['email'] . ' on app ' . $this->app['name']);
 
                 return false;
             }
@@ -291,7 +291,7 @@ class Auth
 
             $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
 
-            $this->logger->log->debug($data['account'] . ' is not in DB. Application: ' . $this->application['name']);
+            $this->logger->log->debug($data['account'] . ' is not in DB. App: ' . $this->app['name']);
 
             return false;
         }
@@ -356,7 +356,7 @@ class Auth
             $this->cookies->delete($cookieKey);
 
             $this->logger->log->debug(
-                'Cannot set account : ' . $this->account['email'] . ' via cookie for application: ' . $this->application['name']
+                'Cannot set account : ' . $this->account['email'] . ' via cookie for app: ' . $this->app['name']
             );
 
             throw new \Exception('Cannot set account from cookie');
@@ -445,7 +445,7 @@ class Auth
 
     protected function setKey()
     {
-        $this->key = strtolower($this->application['route']);
+        $this->key = strtolower($this->app['route']);
     }
 
     public function setUserFromSession()
@@ -473,7 +473,7 @@ class Auth
         }
 
         if (!$this->account) {
-            $this->logger->log->debug($this->account['email'] . ' not found in session for application: ' . $this->application['name']);
+            $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
 
             throw new \Exception('User not found in session');
         }

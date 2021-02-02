@@ -4,11 +4,11 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Packages as PackagesModel;;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesPackages;
 
 class Packages extends BasePackage
 {
-	protected $modelToUse = PackagesModel::class;
+	protected $modelToUse = ModulesPackages::class;
 
 	public $packages;
 
@@ -20,16 +20,16 @@ class Packages extends BasePackage
 	}
 
 
-	public function getNamedPackageForApplication($name, $applicationId)
+	public function getNamedPackageForApp($name, $appId)
 	{
 		$filter =
 			$this->model->filter(
-				function($package) use ($name, $applicationId) {
+				function($package) use ($name, $appId) {
 					$package = $package->toArray();
-					$package['applications'] = Json::decode($package['applications'], true);
-					if (isset($package['applications'][$applicationId])) {
+					$package['apps'] = Json::decode($package['apps'], true);
+					if (isset($package['apps'][$appId])) {
 						if ($package['name'] === ucfirst($name) &&
-							$package['applications'][$applicationId]['enabled'] === true
+							$package['apps'][$appId]['enabled'] === true
 						) {
 							return $package;
 						}

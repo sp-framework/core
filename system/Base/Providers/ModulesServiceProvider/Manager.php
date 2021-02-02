@@ -20,7 +20,7 @@ class Manager extends BasePackage
 
     protected $core;
 
-    protected $applications;
+    protected $apps;
 
     protected $packages;
 
@@ -62,8 +62,8 @@ class Manager extends BasePackage
 
     public function getLocalModules($filter = null, $inclCore = false, $getFresh = false)
     {
-        $this->packagesData->applicationInfo =
-            $this->modules->applications->getApplicationInfo();
+        $this->packagesData->appInfo =
+            $this->apps->getAppInfo();
 
         if ($getFresh) {
             $this->core = $this->modules->core->init(true)->core;
@@ -170,48 +170,48 @@ class Manager extends BasePackage
     protected function applyFilters($filter = null, $getFresh = false)
     {
         if ($filter) {
-            $application = $this->modules->applications->getById($filter);
+            $app = $this->apps->getById($filter);
 
             if ($getFresh) {
                 $this->components =
                     $this->modules->components->init(true)
-                    // ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getComponentsForAppType($application['app_type']);
+                    // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getComponentsForAppType($app['app_type']);
 
                 $this->packages =
                     $this->modules->packages->init(true)
-                    // ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getPackagesForAppType($application['app_type']);
+                    // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getPackagesForAppType($app['app_type']);
 
                 $this->middlewares =
                     $this->modules->middlewares->init(true)
-                    // ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getMiddlewaresForAppType($application['app_type']);
+                    // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getMiddlewaresForAppType($app['app_type']);
 
                 $this->views =
                     $this->modules->views->init(true)
-                    // ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getViewsForAppType($application['app_type']);
+                    // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getViewsForAppType($app['app_type']);
             } else {
                 $this->components =
                     $this->modules->components
-                    // ->getComponentsForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getComponentsForAppType($application['app_type']);
+                    // ->getComponentsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getComponentsForAppType($app['app_type']);
 
                 $this->packages =
                     $this->modules->packages
-                    // ->getPackagesForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getPackagesForAppType($application['app_type']);
+                    // ->getPackagesForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getPackagesForAppType($app['app_type']);
 
                 $this->middlewares =
                     $this->modules->middlewares
-                    // ->getMiddlewaresForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getMiddlewaresForAppType($application['app_type']);
+                    // ->getMiddlewaresForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getMiddlewaresForAppType($app['app_type']);
 
                 $this->views =
                     $this->modules->views
-                    // ->getViewsForCategoryAndSubcategory($application['category'], $application['sub_category']);
-                    ->getViewsForAppType($application['app_type']);
+                    // ->getViewsForCategoryAndSubcategory($app['category'], $app['sub_category']);
+                    ->getViewsForAppType($app['app_type']);
             }
         } else {
             $this->components = $this->modules->components->components;
@@ -233,7 +233,7 @@ class Manager extends BasePackage
                 [
                     'headers'   =>
                         [
-                            'accept'    =>  'application/json'
+                            'accept'    =>  'app/json'
                         ]
                 ];
             $siteUrl = $this->repository['site_url'];
@@ -244,7 +244,7 @@ class Manager extends BasePackage
                 [
                     'headers'   =>
                         [
-                            'accept'    =>  'application/vnd.github.mercy-preview+json'
+                            'accept'    =>  'app/vnd.github.mercy-preview+json'
                         ]
                 ];
             $siteUrl = $this->repository['site_url'];//https://raw.githubusercontent.com/
@@ -517,7 +517,7 @@ class Manager extends BasePackage
                             }
                             $menu['menu'] = Json::encode($registerRemoteComponent['menu']);
                             $menu['sequence'] = $sequence;
-                            $menu['applications'] = Json::encode([]);
+                            $menu['apps'] = Json::encode([]);
 
                             $this->basepackages->menus->add($menu);
 
@@ -535,7 +535,7 @@ class Manager extends BasePackage
                             Json::encode($registerRemoteComponent['settings']) :
                             Json::encode([]);
 
-                        $registerRemoteComponent['applications'] =
+                        $registerRemoteComponent['apps'] =
                             Json::encode([]);
 
                         $registerRemoteComponent['installed'] = 0;
@@ -584,7 +584,7 @@ class Manager extends BasePackage
                             Json::encode($registerRemotePackage['settings']) :
                             Json::encode([]);
 
-                        $registerRemotePackage['applications'] = Json::encode([]);
+                        $registerRemotePackage['apps'] = Json::encode([]);
 
                         $registerRemotePackage['installed'] = 0;
 
@@ -632,7 +632,7 @@ class Manager extends BasePackage
                             Json::encode($registerRemoteMiddleware['settings']) :
                             Json::encode([]);
 
-                        $registerRemoteMiddleware['applications'] = Json::encode([]);
+                        $registerRemoteMiddleware['apps'] = Json::encode([]);
 
                         $registerRemoteMiddleware['installed'] = 0;
 
@@ -677,7 +677,7 @@ class Manager extends BasePackage
                             Json::encode($registerRemoteView['settings']) :
                             Json::encode([]);
 
-                        $registerRemoteView['applications'] =
+                        $registerRemoteView['apps'] =
                             Json::encode([]);
 
                         $registerRemoteView['installed'] = 0;

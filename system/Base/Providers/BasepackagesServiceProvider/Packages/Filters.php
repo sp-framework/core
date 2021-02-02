@@ -2,15 +2,15 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Applications\Dash\Packages\Hrms\Employees\Employees;
+use Apps\Dash\Packages\Hrms\Employees\Employees;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Filters as FiltersModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesFilters;
 
 class Filters extends BasePackage
 {
-    protected $modelToUse = FiltersModel::class;
+    protected $modelToUse = BasepackagesFilters::class;
 
     protected $packageName = 'filters';
 
@@ -62,10 +62,10 @@ class Filters extends BasePackage
     {
         $component = $this->modules->components->getComponentById($componentId);
 
-        $employeesPackage = $this->init()->checkPackage('Applications\Dash\Packages\Hrms\Employees\Employees');
+        $employeesPackage = $this->init()->checkPackage('Apps\Dash\Packages\Hrms\Employees\Employees');
 
         if ($employeesPackage) {
-            $employeesPackage = new \Applications\Dash\Packages\Hrms\Employees\Employees;
+            $employeesPackage = new \Apps\Dash\Packages\Hrms\Employees\Employees;
         }
 
         if ($account && isset($account['id'])) {

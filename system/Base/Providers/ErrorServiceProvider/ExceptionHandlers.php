@@ -31,7 +31,7 @@ class ExceptionHandlers extends BaseComponent
 		return $this->view->partial('permissionDenied');
 	}
 
-	public function handleApplicationNotAllowedException($exception)
+	public function handleAppNotAllowedException($exception)
 	{
 		if ($this->request->getBestAccept() === 'application/json') {
 

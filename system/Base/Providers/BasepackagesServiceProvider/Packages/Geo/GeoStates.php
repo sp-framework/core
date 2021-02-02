@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Geo;
 
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\GeoStates as GeoStatesModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoStates as GeoStatesModel;
 use System\Base\BasePackage;
 
 class GeoStates extends BasePackage

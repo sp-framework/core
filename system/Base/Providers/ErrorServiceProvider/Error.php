@@ -6,7 +6,7 @@ use System\Base\Providers\ErrorServiceProvider\ExceptionHandlers;
 
 class Error
 {
-	protected $applicationInfo;
+	protected $appInfo;
 
 	protected $config;
 
@@ -18,15 +18,15 @@ class Error
 
 	protected $exception;
 
-	protected $applicationDebug;
+	protected $appDebug;
 
 	protected $class;
 
 	protected $newException = null;
 
-	public function __construct($applicationInfo, $config, $logger, $request, $response)
+	public function __construct($appInfo, $config, $logger, $request, $response)
 	{
-		$this->applicationInfo = $applicationInfo;
+		$this->appInfo = $appInfo;
 
 		$this->config = $config;
 
@@ -39,19 +39,19 @@ class Error
 
 	public function init()
 	{
-		// if ($this->applicationInfo) {
-		// 	if ($this->applicationInfo['mode'] === 0) {
-		// 		$this->applicationDebug = false;
-		// 	} else if ($this->applicationInfo['mode'] === 1) {
-		// 		$this->applicationDebug = true;
+		// if ($this->appInfo) {
+		// 	if ($this->appInfo['mode'] === 0) {
+		// 		$this->appDebug = false;
+		// 	} else if ($this->appInfo['mode'] === 1) {
+		// 		$this->appDebug = true;
 		// 	} else {
-		// 		$this->applicationDebug = (bool) $this->config->debug;
+		// 		$this->appDebug = (bool) $this->config->debug;
 		// 	}
 		// } else {
-			$this->applicationDebug = (bool) $this->config->debug;
+			$this->appDebug = (bool) $this->config->debug;
 		// }
 
-		if ($this->applicationDebug) {
+		if ($this->appDebug) {
 			error_reporting(-1);
 		} else {
 			error_reporting(0);
@@ -83,7 +83,7 @@ class Error
 		$customHandler = $this->customHandler($this->class);
 
 		if (!$customHandler) {
-			if ($this->applicationDebug) {
+			if ($this->appDebug) {
 				$this->showOnScreen();
 			}
 		} else {

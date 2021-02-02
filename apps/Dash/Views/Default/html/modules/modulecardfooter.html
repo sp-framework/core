@@ -1,0 +1,9 @@
+{% if modulesKey != 'core' %}
+    {% set datacategory = 'data-category="' ~ module['category'] ~ '"' %}
+{% else %}
+    {% set datacategory = '' %}
+{% endif %}
+{% if module['update_available'] == true %}
+    <a href="module" data-type="{{modulesKey}}" {{datacategory}} data-name="{{module['name']}}" data-process="view" data-subprocess="update" data-id="{{module['id']}}" class="btn-update btn btn-sm btn-info float-right mr-2 contentAjaxLink">Update
+    </a>
+{% endif %}

@@ -1,0 +1,46 @@
+{
+	"route"			: "barebone",
+	"name"			: "Barebone",
+	"description"	: "Manage admin barebone via this component",
+	"app_type"      : "dash",
+	"category"      : "system",
+	"sub_category"  : "devtools",
+	"version"		: "0.0.1",
+	"repo"			: "https://.../dash-component-system-devtools-barebone",
+	"class"			: "Apps\\Dash\\Components\\Barebone\\BareboneComponent",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://.../core"
+		},
+		"components"	: [],
+		"packages"		:
+		[
+			{
+				"name"      : "Barebone",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../dash-package-system-devtools-barebone"
+			}
+		],
+		"middlewares"	: [],
+		"views"			:
+		[
+			{
+				"name"      : "Default",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../dash-view-default"
+			}
+		]
+	},
+	"menu"				: {
+		"seq"			: 99,
+		"barebone"		: {
+			"title"		: "barebone",
+			"icon"		: "wrench",
+			"link"		: "barebone"
+		}
+	},
+	"settings"          : {
+	}
+}

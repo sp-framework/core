@@ -16,15 +16,15 @@ class Dispatcher
 
     protected $events;
 
-    protected $applicationsInfo;
+    protected $appsInfo;
 
     protected $components;
 
     protected $router;
 
-    public function __construct($applicationsInfo, $config, $events, $components, $router)
+    public function __construct($appsInfo, $config, $events, $components, $router)
     {
-        $this->applicationsInfo = $applicationsInfo;
+        $this->appsInfo = $appsInfo;
 
         $this->events = $events;
 
@@ -38,11 +38,11 @@ class Dispatcher
 
         $this->dispatcher->setDefaultAction('view');
 
-        if ($this->applicationsInfo) {
-            $component = $this->components->getComponentById($this->applicationsInfo['errors_component']);
+        if ($this->appsInfo) {
+            $component = $this->components->getComponentById($this->appsInfo['errors_component']);
 
-            if (isset($this->applicationsInfo['errors_component']) &&
-                $this->applicationsInfo['errors_component'] != 0
+            if (isset($this->appsInfo['errors_component']) &&
+                $this->appsInfo['errors_component'] != 0
             ) {
                 $errorClassArr = explode('\\', $component['class']);
                 unset($errorClassArr[Arr::lastKey($errorClassArr)]);

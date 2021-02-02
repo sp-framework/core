@@ -1,0 +1,556 @@
+{% if country['id'] is defined %}
+    {% set countryId = country['id'] %}
+    {% set countryName = country['name'] %}
+    {% set countryNameNative = country['native'] %}
+    {% set countryFlag = country['emoji'] %}
+    {% set countryFlagU = country['emojiU'] %}
+    {% set countryCapital = country['capital'] %}
+    {% set countryCurrency = country['currency'] %}
+    {% set countryCurrencySymbol = country['currency_symbol'] %}
+    {% set countryPhoneCode = country['phone_code'] %}
+    {% set countryIso2 = country['iso2'] %}
+    {% set countryIso3 = country['iso3'] %}
+    {% set countryRegion = country['region'] %}
+    {% set countrySubregion = country['subregion'] %}
+    {% if country['enabled'] == 1 %}
+        {% set enableChecked = true %}
+    {% else %}
+        {% set enableChecked = false %}
+    {% endif %}
+{% else %}
+    {% set countryId = '' %}
+    {% set countryName = '' %}
+    {% set countryNameNative = '' %}
+    {% set countryFlag = '' %}
+    {% set countryFlagU = '' %}
+    {% set countryCapital = '' %}
+    {% set countryCurrency = '' %}
+    {% set countryCurrencySymbol = '' %}
+    {% set countryPhoneCode = '' %}
+    {% set countryIso2 = '' %}
+    {% set countryIso3 = '' %}
+    {% set countryRegion = '' %}
+    {% set countrySubregion = '' %}
+    {% set enableChecked = false %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Country ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Country ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : countryId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% if country['installed'] is defined and country['installed'] == 0 %}
+                    {# {% set cacheButtonHidden = 'd-none' %} #}
+                    {% set enableCheckboxHidden = true %}
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'buttonType'                     : 'button',
+                            'buttons'                        :
+                                {
+                                    'install-country' : {
+                                        'title'                   : 'Install',
+                                        'size'                    : 'sm',
+                                        'type'                    : 'success',
+                                        'icon'                    : 'cog fa-spin',
+                                        'iconHidden'              : true,
+                                        'url'                     : links.url('system/geo/countries/install')
+                                    }
+                                }
+                        ]
+                    )}}
+                {% else %}
+                    {# {% set cacheButtonHidden = '' %} #}
+                    {% set enableCheckboxHidden = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'enabled',
+                        'fieldLabel'                     : 'Enabled?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enable/Disable Country',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'success',
+                        'fieldHidden'                    : enableCheckboxHidden,
+                        'fieldCheckboxChecked'           : enableChecked,
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase m-0',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true
+                    ]
+                )}}
+            </div>
+{#             <div class="col">
+                {% if not country['cached'] or country['cached'] == 0 %}
+                    {% set cacheButtonDisabled = false %}
+                    {% set cacheButtonTitle = 'Cache' %}
+                    {% set cacheButtonType = 'primary' %}
+                {% else %}
+                    {% set cacheButtonDisabled = true %}
+                    {% set cacheButtonTitle = 'Cached' %}
+                    {% set cacheButtonType = 'success' %}
+                {% endif %}
+                <div id="cache-button" class="{{cacheButtonHidden}}">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldHidden'                    : cacheButtonHidden,
+                            'buttonLabel'                    : 'Caching',
+                            'buttonType'                     : 'button',
+                            'buttons'                        :
+                                {
+                                    'install-country' : {
+                                        'title'                   : cacheButtonTitle,
+                                        'size'                    : 'xs',
+                                        'type'                    : cacheButtonType,
+                                        'icon'                    : 'cog fa-spin',
+                                        'iconHidden'              : true,
+                                        'disabled'                : cacheButtonDisabled,
+                                        'url'                     : links.url('system/geo/q/cache/' ~ country['id'])
+                                    }
+                                }
+                        ]
+                    )}}
+                </div>
+            </div> #}
+        </div>
+        <hr>
+        <div class="row">
+            {% if country['id'] is defined %}
+                <div class="col-md-4 col-xs-12">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'flag',
+                            'fieldLabel'                     : 'Country Flag',
+                            'fieldType'                      : 'html',
+                            'fieldHelp'                      : false,
+                            'fieldHelpTooltipContent'        : 'Country Flag',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : false,
+                            'fieldBazPostOnUpdate'           : false,
+                            'fieldHtmlContent'               : '<h4>' ~ countryFlag ~ '</h4>'
+                        ]
+                    )}}
+                </div>
+            {% else %}
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'emoji',
+                            'fieldLabel'                     : 'Country Flag Emoji Code',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Country Flag Emoji Example: &#127462;&#127482; for Australia',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 100,
+                            'fieldValue'                     : countryFlag
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'emojiU',
+                            'fieldLabel'                     : 'Country Flag Emoji Unicode',
+                            'fieldType'                      : 'input',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Country Flag Emoji Unicode Example: U+1F1E6 U+1F1FA for Australia',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldDataInputMinLength'        : 1,
+                            'fieldDataInputMaxLength'        : 100,
+                            'fieldValue'                     : countryFlagU
+                        ]
+                    )}}
+                </div>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Name Example: Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : countryName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'native',
+                        'fieldLabel'                     : 'Name (Native)',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Native Language Name Example: Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : countryNameNative
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'capital',
+                        'fieldLabel'                     : 'Capital',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Capital Example: Canberra for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : countryCapital
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'currency',
+                        'fieldLabel'                     : 'Currency Code',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Currency Code. Example: AUD for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 10,
+                        'fieldValue'                     : countryCurrency
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'currency_symbol',
+                        'fieldLabel'                     : 'Currency Symbol',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Currency Symbol Example: $ for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 10,
+                        'fieldValue'                     : countryCurrencySymbol
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'phone_code',
+                        'fieldLabel'                     : 'Phone Code',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Phone Code Example: 61 for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 10,
+                        'fieldValue'                     : countryPhoneCode
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'iso2',
+                        'fieldLabel'                     : 'Country ISO2',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Country ISO2 Name. Example: AU for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 2,
+                        'fieldValue'                     : countryIso2
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'iso3',
+                        'fieldLabel'                     : 'Country ISO3',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Country ISO3 Name. Example: AUS for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 3,
+                        'fieldValue'                     : countryIso3
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'region',
+                        'fieldLabel'                     : 'Country Region',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Country Region Name. Example: Oceania for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : countryRegion
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'subregion',
+                        'fieldLabel'                     : 'Country Subregion',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Country Subregion Name. Example: Australia & New Zealand for Australia',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : countrySubregion
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals BazContentFieldsValidator PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-enabled'                 : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-install-country').click(function(e) {
+                    e.preventDefault();
+                    $(this).addClass('disabled');
+                    $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', false);
+
+                    var url = $(this).attr('href');
+                    var postData = { };
+
+                    postData['country_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+                    postData['country_iso3'] = $('#{{componentId}}-{{sectionId}}-iso3').val();
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    $.post(url, postData, function(data) {
+                        if (data.responseCode == 0) {
+                            PNotify.success({
+                                'title' : data.responseMessage
+                            });
+                            $('#{{componentId}}-{{sectionId}}-install-country').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-install-country').siblings().removeClass('d-none');
+
+                        } else {
+                            PNotify.error({
+                                'title' : data.responseMessage
+                            });
+                            $('#{{componentId}}-{{sectionId}}-install-country').removeClass('disabled');
+                            $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', true);
+
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-flag'                    : { },
+        '{{componentId}}-{{sectionId}}-emoji'                   : { },
+        '{{componentId}}-{{sectionId}}-emojiU'                  : { },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-native'                  : { },
+        '{{componentId}}-{{sectionId}}-capital'                 : { },
+        '{{componentId}}-{{sectionId}}-currency'                : { },
+        '{{componentId}}-{{sectionId}}-currency_symbol'         : { },
+        '{{componentId}}-{{sectionId}}-phone_code'              : { },
+        '{{componentId}}-{{sectionId}}-iso2'                    : { },
+        '{{componentId}}-{{sectionId}}-iso3'                    : { },
+        '{{componentId}}-{{sectionId}}-region'                  : { },
+        '{{componentId}}-{{sectionId}}-subregion'               : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-native'                  : 'required',
+                '{{componentId}}-{{sectionId}}-capital'                 : 'required',
+                '{{componentId}}-{{sectionId}}-currency'                : 'required',
+                '{{componentId}}-{{sectionId}}-currency_symbol'         : 'required',
+                '{{componentId}}-{{sectionId}}-phone_code'              : 'required',
+                '{{componentId}}-{{sectionId}}-iso2'                    : 'required',
+                '{{componentId}}-{{sectionId}}-iso3'                    : 'required',
+                '{{componentId}}-{{sectionId}}-region'                  : 'required',
+                '{{componentId}}-{{sectionId}}-subregion'               : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter country name',
+                '{{componentId}}-{{sectionId}}-native'                  : 'Please enter country name in native language',
+                '{{componentId}}-{{sectionId}}-capital'                 : 'Please enter country capital',
+                '{{componentId}}-{{sectionId}}-currency'                : 'Please enter country currency code',
+                '{{componentId}}-{{sectionId}}-currency_symbol'         : 'Please enter country currency symbol',
+                '{{componentId}}-{{sectionId}}-phone_code'              : 'Please enter country phone code',
+                '{{componentId}}-{{sectionId}}-iso2'                    : 'Please enter country iso2 code',
+                '{{componentId}}-{{sectionId}}-iso3'                    : 'Please enter country iso3 code',
+                '{{componentId}}-{{sectionId}}-region'                  : 'Please enter country region',
+                '{{componentId}}-{{sectionId}}-subregion'               : 'Please enter country subregion'
+            }
+        }
+    });
+</script>

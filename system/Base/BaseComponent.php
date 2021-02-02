@@ -2,7 +2,7 @@
 
 namespace System\Base;
 
-use Applications\Ecom\Admin\Packages\AdminLTETags\AdminLTETags;
+use Apps\Ecom\Admin\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Assets\Collection;
 use Phalcon\Assets\Inline;
 use Phalcon\Di\DiInterface;
@@ -23,7 +23,7 @@ abstract class BaseComponent extends Controller
 
 	protected $domain;
 
-	protected $application;
+	protected $app;
 
 	protected $component;
 
@@ -37,10 +37,10 @@ abstract class BaseComponent extends Controller
 
 	protected function onConstruct()
 	{
-		$this->domain = $this->basepackages->domains->getDomain();
+		$this->domain = $this->domains->getDomain();
 
-		$this->application = $this->modules->applications->getApplicationInfo();
-		if (!$this->application) {
+		$this->app = $this->apps->getAppInfo();
+		if (!$this->app) {
 			return;
 		}
 
@@ -74,8 +74,8 @@ abstract class BaseComponent extends Controller
 			str_replace('Component', '', $this->reflection->getShortName());
 
 		$this->component =
-			$this->modules->components->getNamedComponentForApplication(
-				$this->componentName, $this->application['id']
+			$this->modules->components->getNamedComponentForApp(
+				$this->componentName, $this->app['id']
 			);
 
 		$url = explode('/', explode('/q/', trim($this->request->getURI(), '/'))[0]);
@@ -84,7 +84,7 @@ abstract class BaseComponent extends Controller
 			unset($url[Arr::lastKey($url)]);
 		}
 
-		if ($url[0] === $this->application['route']) {
+		if ($url[0] === $this->app['route']) {
 			unset($url[0]);
 		}
 
@@ -92,19 +92,19 @@ abstract class BaseComponent extends Controller
 
 		if (!$this->component) {
 			$this->component =
-				$this->modules->components->getRouteComponentForApplication(
-					strtolower($this->componentRoute), $this->application['id']
+				$this->modules->components->getRouteComponentForApp(
+					strtolower($this->componentRoute), $this->app['id']
 				);
 		}
 	}
 
 	public function beforeExecuteRoute(Dispatcher $dispatcher)
 	{
-		if (!$this->component && $this->application) {
-			$component = $this->modules->components->getComponentById($this->application['errors_component']);
+		if (!$this->component && $this->app) {
+			$component = $this->modules->components->getComponentById($this->app['errors_component']);
 
-			if (isset($this->application['errors_component']) &&
-				$this->application['errors_component'] != 0
+			if (isset($this->app['errors_component']) &&
+				$this->app['errors_component'] != 0
 			) {
 				$errorClassArr = explode('\\', $component['class']);
 				unset($errorClassArr[Arr::lastKey($errorClassArr)]);
@@ -148,14 +148,14 @@ abstract class BaseComponent extends Controller
 	{
 		$this->view->widget = $this->widget;
 
-		$this->view->applicationName = $this->application['name'];
+		$this->view->appName = $this->app['name'];
 
-		$this->view->applicationRoute = $this->application['route'];
+		$this->view->appRoute = $this->app['route'];
 
-		if (isset($this->application['route']) && $this->application['route'] !== '') {
-			$this->view->route = strtolower($this->application['route']);
+		if (isset($this->app['route']) && $this->app['route'] !== '') {
+			$this->view->route = strtolower($this->app['route']);
 		} else {
-			$this->view->route = strtolower($this->application['name']);
+			$this->view->route = strtolower($this->app['name']);
 		}
 
 		$this->view->component = $this->component;
@@ -163,7 +163,7 @@ abstract class BaseComponent extends Controller
 		$this->view->componentName = strtolower($this->componentName);
 
 		$this->view->componentId =
-			strtolower($this->view->applicationRoute) . '-' . strtolower($this->componentName);
+			strtolower($this->view->appRoute) . '-' . strtolower($this->componentName);
 
 		$reflection = Arr::sliceRight(explode('\\', $this->reflection->getName()), 3);
 
@@ -183,7 +183,7 @@ abstract class BaseComponent extends Controller
 
 		$this->view->viewName = $this->views['name'];
 
-		if ($this->application && $this->componentRoute) {
+		if ($this->app && $this->componentRoute) {
 			$this->view->breadcrumb = $this->componentRoute;
 		}
 	}
@@ -218,9 +218,9 @@ abstract class BaseComponent extends Controller
 		$this->getNewTokenAction();
 
 		if (!$this->request->isPost() || !$this->isJson())
-		if ($this->application) {
+		if ($this->app) {
 			$this->view->menus =
-				$this->basepackages->menus->buildMenusForApplication($this->application['id']);
+				$this->basepackages->menus->buildMenusForApp($this->app['id']);
 		}
 
 		if ($this->request->isAjax()) {
@@ -231,7 +231,7 @@ abstract class BaseComponent extends Controller
 
 	protected function buildHeaderBreadcrumb()
 	{
-		if ($this->application && $this->componentRoute) {
+		if ($this->app && $this->componentRoute) {
 			$this->response->setHeader(
 				'breadcrumb',
 				$this->componentRoute
@@ -257,8 +257,8 @@ abstract class BaseComponent extends Controller
 		$firstKey = Arr::firstKey($url);
 		$lastKey = Arr::lastKey($url);
 
-		if (isset($this->domain['exclusive_to_default_application']) &&
-			$this->domain['exclusive_to_default_application'] == 1
+		if (isset($this->domain['exclusive_to_default_app']) &&
+			$this->domain['exclusive_to_default_app'] == 1
 		) {
 			unset($url[$lastKey]);
 		} else {
@@ -406,7 +406,7 @@ abstract class BaseComponent extends Controller
 		if (isset($this->viewSettings['head']['title'])) {
 			Tag::setTitle($this->viewSettings['head']['title']);
 		} else {
-			Tag::setTitle(ucfirst($this->application['name']));
+			Tag::setTitle(ucfirst($this->app['name']));
 		}
 
 		if (isset($this->componentName)) {
@@ -516,7 +516,7 @@ abstract class BaseComponent extends Controller
 		} else {
 			throw new \Exception(
 				'Package class : ' . $packageClass .
-				' not available for application ' . $this->application['name']
+				' not available for app ' . $this->app['name']
 			);
 		}
 	}
@@ -532,7 +532,7 @@ abstract class BaseComponent extends Controller
 			$this->view->storages = [];
 		}
 
-		if (!isset($this->domain['applications'][$this->application['id']][$storageType . 'Storage'])) {
+		if (!isset($this->domain['apps'][$this->app['id']][$storageType . 'Storage'])) {
 			$this->view->storages = [];
 		}
 	}
@@ -540,22 +540,22 @@ abstract class BaseComponent extends Controller
 	protected function checkPackage($packageClass)
 	{
 		return
-			$this->modules->packages->getNamedPackageForApplication(
+			$this->modules->packages->getNamedPackageForApp(
 				Arr::last(explode('\\', $packageClass)),
-				$this->application['id']
+				$this->app['id']
 			);
 	}
 
 	protected function useComponent($componentClass)
 	{
-		$this->application = $this->modules->applications->getApplicationInfo();
+		$this->app = $this->apps->getAppInfo();
 
 		if ($this->checkComponent($componentClass)) {
 			return new $componentClass();
 		} else {
 			throw new \Exception(
 				'Component class : ' . $componentClass .
-				' not available for application ' . $this->application['name']
+				' not available for app ' . $this->app['name']
 			);
 		}
 	}
@@ -563,9 +563,9 @@ abstract class BaseComponent extends Controller
 	protected function checkComponent($componentClass)
 	{
 		return
-			$this->modules->components->getNamedComponentForApplication(
+			$this->modules->components->getNamedComponentForApp(
 				str_replace('Component', '', Arr::last(explode('\\', $componentClass))),
-				$this->application['id']
+				$this->app['id']
 			);
 	}
 
@@ -573,7 +573,7 @@ abstract class BaseComponent extends Controller
 	{
 		//To Use from Component - $this->useComponentWithView(HomeComponent::class);
 		//This will generate 2 view variables 1) {{home}} & {{homeTemplate}}
-		$this->application = $this->modules->applications->getApplicationInfo();
+		$this->app = $this->apps->getAppInfo();
 
 		$component = $this->checkComponent($componentClass);
 

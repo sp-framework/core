@@ -1,0 +1,234 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'contact_address_id',
+                'fieldLabel'                     : 'Profile Contact Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Profile Contact Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : profile['contact_address_id']
+            ]
+        )}}
+        {% include '../../common/address/view' with
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : profile['street_address'],
+                'streetAddressFieldRequired'                  : false,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : profile['street_address_2'],
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : profile['city_id'],
+                'cityName'                                    : profile['city_name'],
+                'cityFieldRequired'                           : false,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : profile['post_code'],
+                'postCodeFieldRequired'                       : false,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : profile['state_id'],
+                'stateName'                                   : profile['state_name'],
+                'stateFieldRequired'                          : false,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : profile['country_id'],
+                'countryName'                                 : profile['country_name'],
+                'countryFieldRequired'                        : false,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        %}
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        <div id="work-phone" class="row">
+            <div class="col-md-9">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_phone',
+                        'fieldLabel'                     : 'Phone',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Phone number of the profile',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : profile['contact_phone']
+                    ]
+                )}}
+            </div>
+            <div class="col-md-3">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_phone_ext',
+                        'fieldLabel'                     : 'Extension',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Phone number extension of the profile',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : profile['contact_phone_ext']
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_mobile',
+                        'fieldLabel'                     : 'Mobile',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Mobile phone number of the profile',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : profile['contact_mobile']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_fax',
+                        'fieldLabel'                     : 'Fax',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Fax number of the profile',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : profile['contact_fax']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'secondary_email',
+                        'fieldLabel'                     : 'Secondary Email',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Secondary Email Address',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : profile['secondary_email']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_other',
+                        'fieldLabel'                     : 'Other Contact #',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Any other contact # of the profile',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : profile['contact_other']
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'contact_notes',
+                'fieldLabel'                     : 'Contact Notes',
+                'fieldType'                      : 'textarea',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Contact Notes',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : profile['contact_notes']
+            ]
+        )}}
+    </div>
+</div>

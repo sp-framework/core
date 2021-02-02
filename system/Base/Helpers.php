@@ -1,25 +1,10 @@
 <?php
 
-// use Laminas\Diactoros\Response\RedirectResponse;
-// use System\Base\Providers\DatabaseServiceProvider\Model;
-
-// if (!function_exists('redirect')) {
-//     function redirect($path) {
-//         return new RedirectResponse($path);
-//     }
-// }
-
 if (!function_exists('base_path')) {
     function base_path($path = '') {
         return __DIR__ . '/../..' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
     }
 }
-
-// if (!function_exists('uploads_path')) {
-//     function uploads_path($path = '') {
-//         return base_path('public/' . $path);
-//     }
-// }
 
 if (!function_exists('flatten_array')) {
     function flatten_array(array $items) {
@@ -82,21 +67,6 @@ if (!function_exists('xmlToArray')) {
     }
 }
 
-// if (!function_exists('getAllArr')) {
-//     function getAllArr(array $array)
-//     {
-//         $objArr = [];
-
-//         foreach ($array as $arrayKey => $arrayValue) {
-//             if ($arrayValue instanceof Model) {
-//                 $objArr[$arrayKey] = $arrayValue->getAllArr();
-//             }
-//         }
-
-//         return $objArr;
-//     }
-// }
-
 if (!function_exists('msort')) {
     function msort($array, $key, $sort_flags = SORT_REGULAR, $order = SORT_ASC) {
         if (is_array($array) && count($array) > 0) {
@@ -110,7 +80,6 @@ if (!function_exists('msort')) {
                         foreach ($key as $key_key) {
                             $sort_key .= $v[$key_key];
                         }
-                        // $sort_flags = SORT_STRING;
                     }
                     $mapping[$k] = $sort_key;
                 }

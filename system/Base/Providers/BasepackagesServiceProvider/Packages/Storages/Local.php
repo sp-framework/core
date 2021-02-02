@@ -6,12 +6,12 @@ use Phalcon\Helper\Json;
 use Phalcon\Image\Adapter\Gd;
 use Phalcon\Image\Enum;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages\Local as LocalModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages\BasepackagesStoragesLocal;
 use System\Base\Providers\ContentServiceProvider\Local\Content;
 
 class Local extends BasePackage
 {
-    protected $modelToUse = LocalModel::class;
+    protected $modelToUse = BasepackagesStoragesLocal::class;
 
     protected $packageName = 'local';
 

@@ -37,7 +37,7 @@ class OpCache
                 return isset($val) ? $val : false;
             }
 
-            $data = array_fill(0, 1000000, ‘hi’); // your application data here
+            $data = array_fill(0, 1000000, ‘hi’); // your app data here
             cache_set('my_key', $data);
             apc_store('my_key', $data);
             $t = microtime(true);

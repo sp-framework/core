@@ -4,11 +4,11 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Components as ComponentsModel;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesComponents;
 
 class Components extends BasePackage
 {
-	protected $modelToUse = ComponentsModel::class;
+	protected $modelToUse = ModulesComponents::class;
 
 	public $components;
 
@@ -41,17 +41,17 @@ class Components extends BasePackage
 		}
 	}
 
-	public function getRouteComponentForApplication($route, $applicationId)
+	public function getRouteComponentForApp($route, $appId)
 	{
 		$filter =
 			$this->model->filter(
-				function($component) use ($route, $applicationId) {
+				function($component) use ($route, $appId) {
 					$component = $component->toArray();
 
-					$component['applications'] = Json::decode($component['applications'], true);
+					$component['apps'] = Json::decode($component['apps'], true);
 
-					if (isset($component['applications'][$applicationId])) {
-						if ($component['applications'][$applicationId]['enabled'] === true &&
+					if (isset($component['apps'][$appId])) {
+						if ($component['apps'][$appId]['enabled'] === true &&
 							$component['route'] === $route
 						) {
 							return $component;
@@ -69,16 +69,16 @@ class Components extends BasePackage
 		}
 	}
 
-	public function getNamedComponentForApplication($name, $applicationId)
+	public function getNamedComponentForApp($name, $appId)
 	{
 		$filter =
 			$this->model->filter(
-				function($component) use ($name, $applicationId) {
+				function($component) use ($name, $appId) {
 					$component = $component->toArray();
-					$component['applications'] = Json::decode($component['applications'], true);
+					$component['apps'] = Json::decode($component['apps'], true);
 
-					if (isset($component['applications'][$applicationId])) {
-						if ($component['applications'][$applicationId]['enabled'] === true &&
+					if (isset($component['apps'][$appId])) {
+						if ($component['apps'][$appId]['enabled'] === true &&
 							$component['name'] === ucfirst($name)
 						) {
 							return $component;
@@ -96,15 +96,15 @@ class Components extends BasePackage
 		}
 	}
 
-	public function getComponentsForApplication($applicationId)
+	public function getComponentsForApp($appId)
 	{
 		$filter =
 			$this->model->filter(
-				function($component) use ($applicationId) {
+				function($component) use ($appId) {
 					$component = $component->toArray();
-					$component['applications'] = Json::decode($component['applications'], true);
-					if (isset($component['applications'][$applicationId]['enabled']) &&
-						$component['applications'][$applicationId]['enabled'] === true
+					$component['apps'] = Json::decode($component['apps'], true);
+					if (isset($component['apps'][$appId]['enabled']) &&
+						$component['apps'][$appId]['enabled'] === true
 					) {
 						return $component;
 					}
@@ -114,14 +114,14 @@ class Components extends BasePackage
 		return $filter;
 	}
 
-	public function getComponentsForApplicationAndType($applicationId, $type)
+	public function getComponentsForAppAndType($appId, $type)
 	{
 		$components = [];
 
 		$filter =
 			$this->model->filter(
-				function($component) use ($applicationId, $type) {
-					if ($component->application_id === $applicationId && $component->type === $type) {
+				function($component) use ($appId, $type) {
+					if ($component->app_id === $appId && $component->type === $type) {
 						return $component;
 					}
 				}
@@ -209,10 +209,10 @@ class Components extends BasePackage
 		foreach ($components as $componentId => $status) {
 			$component = $this->getById($componentId);
 
-			$component['applications'] = Json::decode($component['applications'], true);
+			$component['apps'] = Json::decode($component['apps'], true);
 
 			if ($status === true) {
-				$component['applications'][$data['id']]['enabled'] = true;
+				$component['apps'][$data['id']]['enabled'] = true;
 
 				$component['dependencies'] = Json::decode($component['dependencies'], true);
 
@@ -223,11 +223,11 @@ class Components extends BasePackage
 						$package = $this->modules->packages->getNamedPackageForRepo($dependencyPackage['name'], $dependencyPackage['repo']);
 
 						if ($package) {
-							$package['applications'] = Json::decode($package['applications'], true);
+							$package['apps'] = Json::decode($package['apps'], true);
 
-							$package['applications'][$data['id']]['enabled'] = true;
+							$package['apps'][$data['id']]['enabled'] = true;
 
-							$package['applications'] = Json::encode($package['applications']);
+							$package['apps'] = Json::encode($package['apps']);
 
 							$this->modules->packages->update($package);
 						}
@@ -237,14 +237,14 @@ class Components extends BasePackage
 				$component['dependencies'] = Json::encode($component['dependencies']);
 
 			} else if ($status === false) {
-				$component['applications'][$data['id']]['enabled'] = false;
+				$component['apps'][$data['id']]['enabled'] = false;
 			}
 
 			// if ($component['menu_id']) {
 			// 	$this->updateMenu($data, $component, $status);
 			// }
 
-			$component['applications'] = Json::encode($component['applications']);
+			$component['apps'] = Json::encode($component['apps']);
 
 			$this->update($component);
 		}
@@ -256,15 +256,15 @@ class Components extends BasePackage
 	// {
 	// 	$menu = $this->basepackages->menus->getById($component['menu_id']);
 
-	// 	$menu['applications'] = Json::decode($menu['applications'], true);
+	// 	$menu['apps'] = Json::decode($menu['apps'], true);
 
 	// 	if ($status === true) {
-	// 		$menu['applications'][$data['id']]['enabled'] = true;
+	// 		$menu['apps'][$data['id']]['enabled'] = true;
 	// 	} else if ($status === false) {
-	// 		$menu['applications'][$data['id']]['enabled'] = false;
+	// 		$menu['apps'][$data['id']]['enabled'] = false;
 	// 	}
 
-	// 	$menu['applications'] = Json::encode($menu['applications']);
+	// 	$menu['apps'] = Json::encode($menu['apps']);
 
 	// 	$this->basepackages->menus->update($menu);
 

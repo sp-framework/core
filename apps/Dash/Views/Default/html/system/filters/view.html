@@ -1,0 +1,34 @@
+{% if filter['id'] is defined %}
+    {% set filterId = filter['id'] %}
+    {% set title = 'Filter (' ~ filter['name'] ~ ')' %}
+{% else %}
+    {% set filterId = '' %}
+    {% set title = 'New Filter' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'filter',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'filters/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : filterId,
+            'addActionUrl'                  : 'system/filters/add',
+            'addSuccessRedirectUrl'         : 'system/filters',
+            'updateActionUrl'               : 'system/filters/update',
+            'updateSuccessRedirectUrl'      : 'system/filters',
+            'cancelActionUrl'               : 'system/filters',
+            'closeActionUrl'                : 'system/filters'
+        ]
+    ]
+)}}

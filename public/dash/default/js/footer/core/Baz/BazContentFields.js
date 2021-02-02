@@ -445,8 +445,16 @@ var BazContentFields = function() {
             tagsToRemove: ['script', 'link'],
             btnsDef: {
                 image: {
-                    dropdown: ['insertImage', 'base64', 'upload', 'noembed'],
+                    dropdown: ['insertImage', 'base64', 'upload'],
                     ico: 'insertImage'
+                },
+                justifyFull: {
+                    dropdown: ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
+                    ico: 'justifyFull'
+                },
+                unorderedList: {
+                    dropdown: ['unorderedList', 'orderedList'],
+                    ico: 'unorderedList'
                 }
             },
             btns: [
@@ -454,9 +462,10 @@ var BazContentFields = function() {
                 ['fontfamily', 'fontsize', 'superscript', 'subscript'],
                 ['strong', 'em', 'del', 'lineheight', 'preformatted', 'specialChars'],
                 ['foreColor', 'backColor', 'link', 'image'],
-                ['justifyLeft', 'justifyCenter', 'justifyRight', 'justifyFull'],
-                ['unorderedList', 'orderedList', 'table', 'horizontalRule'],
-                ['removeformat', 'fullscreen']
+                ['justifyFull'],
+                ['unorderedList'],
+                ['table', 'horizontalRule'],
+                ['removeformat', 'fullscreen', 'template']
             ],
             plugins: {
                 table: {

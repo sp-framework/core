@@ -13,11 +13,11 @@ class MiddlewaresServiceProvider extends Injectable
         DispatcherInterface $dispatcher,
         $data
     ) {
-        $application = $this->modules->applications->getApplicationInfo();
+        $app = $this->apps->getAppInfo();
 
-        if ($application) {
+        if ($app) {
             $middlewares =
-                msort($this->modules->middlewares->getMiddlewaresForApplication($application['id']), 'sequence');
+                msort($this->modules->middlewares->getMiddlewaresForApp($app['id']), 'sequence');
 
             foreach ($middlewares as $middleware) {
                 if ($middleware['enabled'] == true) {

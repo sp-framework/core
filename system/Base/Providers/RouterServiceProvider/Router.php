@@ -5,7 +5,7 @@ namespace System\Base\Providers\RouterServiceProvider;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Router as PhalconRouter;
-use System\Base\Providers\RouterServiceProvider\Exceptions\ApplicationNotAllowedException;
+use System\Base\Providers\RouterServiceProvider\Exceptions\AppNotAllowedException;
 use System\Base\Providers\RouterServiceProvider\Exceptions\DomainNotRegisteredException;
 
 class Router
@@ -18,7 +18,7 @@ class Router
 
 	protected $domainDefaults;
 
-	protected $applications;
+	protected $apps;
 
 	protected $components;
 
@@ -30,9 +30,9 @@ class Router
 
 	protected $router;
 
-	protected $applicationInfo;
+	protected $appInfo;
 
-	protected $applicationDefaults;
+	protected $appDefaults;
 
 	protected $requestUri;
 
@@ -48,11 +48,11 @@ class Router
 
 	protected $uri;
 
-	public function __construct($domains, $applications, $components, $views, $logger, $request)
+	public function __construct($domains, $apps, $components, $views, $logger, $request)
 	{
 		$this->domains = $domains;
 
-		$this->applications = $applications;
+		$this->apps = $apps;
 
 		$this->components = $components;
 
@@ -75,24 +75,24 @@ class Router
 
 			$this->getURI();
 
-			if ($this->applicationInfo && $this->applicationDefaults) {
-				if ($this->applicationInfo['route'] !== $this->applicationDefaults['application']) {
+			if ($this->appInfo && $this->appDefaults) {
+				if ($this->appInfo['route'] !== $this->appDefaults['app']) {
 					if ($this->uri !== '' &&
-						$this->uri !== strtolower($this->applicationInfo['route'])
+						$this->uri !== strtolower($this->appInfo['route'])
 					) {
 						$this->registerRoute($this->uri);
 					}
 				} else {
 					if ($this->uri !== '' &&
-						$this->uri !== strtolower($this->applicationDefaults['application']) &&
-						$this->uri !== strtolower($this->applicationInfo['route'])
+						$this->uri !== strtolower($this->appDefaults['app']) &&
+						$this->uri !== strtolower($this->appInfo['route'])
 					) {
 
 						$this->registerRoute($this->uri);
 
 					} else if ($this->uri === '' ||
-							   $this->uri === strtolower($this->applicationDefaults['application']) ||
-							   $this->uri === strtolower($this->applicationInfo['route'])
+							   $this->uri === strtolower($this->appDefaults['app']) ||
+							   $this->uri === strtolower($this->appInfo['route'])
 					) {
 						$this->registerHome();
 					}
@@ -111,30 +111,24 @@ class Router
 	{
 		if ($home) {
 			$this->defaultNamespace =
-				'Applications\\' .
-				ucfirst($this->applicationDefaults['app_type']) .
-				// '\\' .
-				// ucfirst($this->applicationDefaults['sub_category']) .
+				'Apps\\' .
+				ucfirst($this->appDefaults['app_type']) .
 				'\\Components\\' .
-				ucfirst($this->applicationDefaults['component'])
+				ucfirst($this->appDefaults['component'])
 				;
 		} else {
 			if ($this->givenRouteClass !== '') {
 				$this->defaultNamespace =
-					'Applications\\' .
-					ucfirst($this->applicationDefaults['app_type']) .
-					// '\\' .
-					// ucfirst($this->applicationDefaults['sub_category']) .
+					'Apps\\' .
+					ucfirst($this->appDefaults['app_type']) .
 					'\\Components' .
 					$this->givenRouteClass . '\\' .
 					ucfirst($this->controller)
 					;
 			} else {
 				$this->defaultNamespace =
-					'Applications\\' .
-					ucfirst($this->applicationDefaults['app_type']) .
-					// '\\' .
-					// ucfirst($this->applicationDefaults['sub_category']) .
+					'Apps\\' .
+					ucfirst($this->appDefaults['app_type']) .
 					'\\Components\\' .
 					$this->givenRouteClass .
 					ucfirst($this->controller)
@@ -152,23 +146,23 @@ class Router
 		$this->router->add(
 			'/',
 			[
-				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'controller'	=> 	strtolower($this->appDefaults['component']),
 				'action'		=> 'view'
 			]
 		);
 
 		$this->router->add(
-			'/' . strtolower($this->applicationInfo['route']),
+			'/' . strtolower($this->appInfo['route']),
 			[
-				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'controller'	=> 	strtolower($this->appDefaults['component']),
 				'action'		=> 'view'
 			]
 		);
 
 		$this->router->add(
-			'/' . strtolower($this->applicationInfo['route']) . '/',
+			'/' . strtolower($this->appInfo['route']) . '/',
 			[
-				'controller'	=> 	strtolower($this->applicationDefaults['component']),
+				'controller'	=> 	strtolower($this->appDefaults['component']),
 				'action'		=> 'view'
 			]
 		);
@@ -202,7 +196,7 @@ class Router
 	protected function getGivenRouteClass(array $routeArray)
 	{
 		if (!$this->domainAppExclusive) {
-			unset($routeArray[0]); //Remove application name
+			unset($routeArray[0]); //Remove app name
 		}
 
 		if ($this->request->isGet()) {
@@ -236,10 +230,10 @@ class Router
 
 	protected function regitserNotFound()
 	{
-		if ($this->applicationDefaults) {
-			if (isset($this->applicationDefaults['errorComponent'])) {
+		if ($this->appDefaults) {
+			if (isset($this->appDefaults['errorComponent'])) {
 
-				$errorComponent = ucfirst($this->applicationDefaults['errorComponent']);
+				$errorComponent = ucfirst($this->appDefaults['errorComponent']);
 
 			} else {
 
@@ -247,13 +241,7 @@ class Router
 			}
 
 		} else {
-			// $this->router->setDefaultNamespace
-			// (
-			// 	'System\Base\Providers\ErrorServiceProvider'
-			// );
-
 			$errorComponent = 'Errors';
-			// $errorComponent = 'Errors';
 		}
 
 		$this->router->notFound(
@@ -275,46 +263,44 @@ class Router
 			throw new DomainNotRegisteredException('Domain ' . $this->request->getHttpHost() . ' is not registered with system!');
 		}
 
-		if (isset($this->domain['exclusive_to_default_application']) &&
-			$this->domain['exclusive_to_default_application'] == 1
+		if (isset($this->domain['exclusive_to_default_app']) &&
+			$this->domain['exclusive_to_default_app'] == 1
 		) {
-			$this->applicationInfo = $this->applications->getIdApplication($this->domain['default_application_id']);
+			$this->appInfo = $this->apps->getIdApp($this->domain['default_app_id']);
 
 			$this->domainAppExclusive = true;
 
 		} else  {
-			$this->applicationInfo = $this->applications->getApplicationInfo();
+			$this->appInfo = $this->apps->getAppInfo();
 
-			if (!$this->applicationInfo) {
+			if (!$this->appInfo) {
 				return false;
 			}
 
-			if ((isset($this->domain['applications'][$this->applicationInfo['id']]['allowed']) &&
-				!$this->domain['applications'][$this->applicationInfo['id']]['allowed']) ||
-				!isset($this->domain['applications'][$this->applicationInfo['id']])
+			if ((isset($this->domain['apps'][$this->appInfo['id']]['allowed']) &&
+				!$this->domain['apps'][$this->appInfo['id']]['allowed']) ||
+				!isset($this->domain['apps'][$this->appInfo['id']])
 			) {
 				$this->logger->log->alert(
-					'Trying to access application ' . $this->applicationInfo['name'] .
+					'Trying to access app ' . $this->appInfo['name'] .
 					' on domain ' . $this->request->getHttpHost()
 				);
-				throw new ApplicationNotAllowedException('Trying to access application ' . $this->applicationInfo['name'] .
+				throw new AppNotAllowedException('Trying to access app ' . $this->appInfo['name'] .
 					' on domain ' . $this->request->getHttpHost());
 			}
 		}
 
-		$this->applicationDefaults['id'] = $this->applicationInfo['id'];
-		$this->applicationDefaults['application'] = $this->applicationInfo['route'];
-		$this->applicationDefaults['app_type'] = $this->applicationInfo['app_type'];
-		// $this->applicationDefaults['category'] = $this->applicationInfo['category'];
-		// $this->applicationDefaults['sub_category'] = $this->applicationInfo['sub_category'];
-		$this->applicationDefaults['component'] =
-			$this->components->getComponentById($this->applicationInfo['default_component'])['route'];
-		$this->applicationDefaults['errorComponent'] =
-			isset($this->applicationInfo['errors_component']) && $this->applicationInfo['errors_component'] != 0 ?
-			$this->components->getComponentById($this->applicationInfo['errors_component'])['route'] :
+		$this->appDefaults['id'] = $this->appInfo['id'];
+		$this->appDefaults['app'] = $this->appInfo['route'];
+		$this->appDefaults['app_type'] = $this->appInfo['app_type'];
+		$this->appDefaults['component'] =
+			$this->components->getComponentById($this->appInfo['default_component'])['route'];
+		$this->appDefaults['errorComponent'] =
+			isset($this->appInfo['errors_component']) && $this->appInfo['errors_component'] != 0 ?
+			$this->components->getComponentById($this->appInfo['errors_component'])['route'] :
 			null;
-		$this->applicationDefaults['view'] =
-			$this->views->getIdViews($this->domain['applications'][$this->applicationInfo['id']]['view'])['name'];
+		$this->appDefaults['view'] =
+			$this->views->getIdViews($this->domain['apps'][$this->appInfo['id']]['view'])['name'];
 
 		return true;
 	}

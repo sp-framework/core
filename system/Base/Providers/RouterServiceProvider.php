@@ -14,13 +14,13 @@ class RouterServiceProvider implements ServiceProviderInterface
 		$container->setShared(
 			'router',
 			function () use ($container) {
-				$domains = $container->getShared('basepackages')->domains;
-				$applications = $container->getShared('modules')->applications;
+				$domains = $container->getShared('domains');
+				$apps = $container->getShared('apps');
 				$components = $container->getShared('modules')->components;
 				$views = $container->getShared('modules')->views;
 				$logger = $container->getShared('logger');
 				$request = $container->getShared('request');
-				return (new Router($domains, $applications, $components, $views, $logger, $request))->init();
+				return (new Router($domains, $apps, $components, $views, $logger, $request))->init();
 			}
 		);
 	}

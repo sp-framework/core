@@ -4,7 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Geo;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\GeoCountries as GeoCountriesModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCountries as GeoCountriesModel;
 
 class GeoCountries extends BasePackage
 {

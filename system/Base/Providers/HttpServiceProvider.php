@@ -35,7 +35,7 @@ class HttpServiceProvider implements ServiceProviderInterface
                 $response = $container->getShared('response');
                 $crypt = $container->getShared('crypt');
                 $random = $container->getShared('random');
-                $core = $container->getShared('modules')->core;
+                $core = $container->getShared('core');
                 return (new Cookies($response, $crypt, $random, $core))->init();
             }
         );
@@ -44,10 +44,10 @@ class HttpServiceProvider implements ServiceProviderInterface
             'links',
             function () use ($container) {
                 $request = $container->getShared('request');
-                $application = $container->getShared('modules')->applications->getApplicationInfo();
+                $app = $container->getShared('apps')->getAppInfo();
                 $view = $container->getShared('modules')->views->getViewInfo();
-                $domain = $container->getShared('basepackages')->domains->getDomain();
-                return new Links($request, $application, $view, $domain);
+                $domain = $container->getShared('domains')->getDomain();
+                return new Links($request, $app, $view, $domain);
             }
         );
     }

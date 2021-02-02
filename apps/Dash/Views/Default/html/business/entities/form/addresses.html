@@ -1,0 +1,78 @@
+{% if entity['id'] is defined %}
+    {% set entityAddressId = entity['address_id'] %}
+    {% set entityStreetAddress = entity['street_address'] %}
+    {% set entityStreetAddress2 = entity['street_address_2'] %}
+    {% set entityCityId = entity['city_id'] %}
+    {% set entityCity = entity['city_name'] %}
+    {% set entityPostCode = entity['post_code'] %}
+    {% set entityStateId = entity['state_id'] %}
+    {% set entityState = entity['state_name'] %}
+    {% set entityCountryId = entity['country_id'] %}
+    {% set entityCountry = entity['country_name'] %}
+{% else %}
+    {% set entityAddressId = '' %}
+    {% set entityStreetAddress = '' %}
+    {% set entityStreetAddress2 = '' %}
+    {% set entityCityId = '' %}
+    {% set entityCity = '' %}
+    {% set entityPostCode = '' %}
+    {% set entityStateId = '' %}
+    {% set entityState = '' %}
+    {% set entityCountryId = '' %}
+    {% set entityCountry = '' %}
+{% endif %}
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Business Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Business Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : entityAddressId
+            ]
+        )}}
+        {% include 'common/address/view' with
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : entityStreetAddress,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : entityStreetAddress2,
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : entityCityId,
+                'cityName'                                    : entityCity,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : entityPostCode,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : entityStateId,
+                'stateName'                                   : entityState,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : entityCountryId,
+                'countryName'                                 : entityCountry,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        %}
+    </div>
+</div>

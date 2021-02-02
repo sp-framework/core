@@ -38,21 +38,21 @@ class Domains
 						]
 					),
 					new Column(
-						'default_application_id',
+						'default_app_id',
 						[
 							'type'    => Column::TYPE_TINYINTEGER,
 							'notNull' => true,
 						]
 					),
 					new Column(
-						'exclusive_to_default_application',
+						'exclusive_to_default_app',
 						[
 							'type'    => Column::TYPE_TINYINTEGER,
 							'notNull' => false,
 						]
 					),
 					new Column(
-						'applications',
+						'apps',
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 2048,

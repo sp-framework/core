@@ -2,15 +2,15 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Applications\Ecom\Admin\Packages\Channels\Channels;
+use Apps\Ecom\Admin\Packages\Channels\Channels;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages as StoragesModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesStorages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages\Local;
 
 class Storages extends BasePackage
 {
-    protected $modelToUse = StoragesModel::class;
+    protected $modelToUse = BasepackagesStorages::class;
 
     public $storages;
 
@@ -247,26 +247,26 @@ class Storages extends BasePackage
 
             $channel['settings'] = Json::decode($channel['settings'], true);
 
-            $domain = $this->basepackages->domains->getById($channel['settings']['domain_id']);
-            $domain['applications'] = Json::decode($domain['applications'], true);
+            $domain = $this->domains->getById($channel['settings']['domain_id']);
+            $domain['apps'] = Json::decode($domain['apps'], true);
 
-            $application = $this->modules->applications->getById($channel['settings']['application_id']);
+            $app = $this->apps->getById($channel['settings']['app_id']);
 
         } else {
-            $domain = $this->basepackages->domains->domain;
+            $domain = $this->domains->domain;
 
-            $application = $this->modules->applications->getApplicationInfo();
+            $app = $this->apps->getAppInfo();
         }
 
-        if ((isset($domain['applications'][$application['id']]['publicStorage']) &&
-            $domain['applications'][$application['id']]['publicStorage'] !== '') &&
-            (isset($domain['applications'][$application['id']]['privateStorage']) &&
-            $domain['applications'][$application['id']]['privateStorage'] !== '')
+        if ((isset($domain['apps'][$app['id']]['publicStorage']) &&
+            $domain['apps'][$app['id']]['publicStorage'] !== '') &&
+            (isset($domain['apps'][$app['id']]['privateStorage']) &&
+            $domain['apps'][$app['id']]['privateStorage'] !== '')
         ) {
             if ($public) {
-                $storage = $this->getById($domain['applications'][$application['id']]['publicStorage']);
+                $storage = $this->getById($domain['apps'][$app['id']]['publicStorage']);
             } else {
-                $storage = $this->getById($domain['applications'][$application['id']]['privateStorage']);
+                $storage = $this->getById($domain['apps'][$app['id']]['privateStorage']);
             }
         } else {
             return false;

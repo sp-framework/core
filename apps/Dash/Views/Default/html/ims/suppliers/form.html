@@ -1,0 +1,363 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'suppliers/form/info'
+                                ],
+                                'contacts'   :
+                                [
+                                    'tabTitle'          : 'Contacts',
+                                    'tabInclude'        : 'suppliers/form/contacts'
+                                ],
+                                'addresses'   :
+                                [
+                                    'tabTitle'          : 'Addresses',
+                                    'tabInclude'        : 'suppliers/form/addresses'
+                                ],
+                                'notes'   :
+                                [
+                                    'tabTitle'          : 'Notes',
+                                    'tabInclude'        : 'suppliers/form/notes'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'info-modal',
+            'modalBodyInclude'          : 'suppliers/info',
+            'modalSize'                 : 'lg',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> SUPPLIER BUSINESS INFORMATION',
+            'modalEscClose'             : 'true'
+        ]
+    )}}
+</div>
+<script>
+/* globals BazContentFieldsValidator PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-abn'                     : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-abn').on('input propertychange', function() {
+                    if ($(this).val().length === 11) {
+                        $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-abn-search').click(function(e) {
+                    e.preventDefault();
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+                    var postData = { };
+                    postData['abn'] = $('#{{componentId}}-{{sectionId}}-abn').val();
+
+                    $.post('{{links.url("ims/suppliers/searchABN")}}', postData, function(data) {
+                        $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-abn-search').children('i').attr('hidden', true);
+
+                        if (data.tokenKey && data.token) {
+                            $("#security-token").attr("name", data.tokenKey);
+                            $("#security-token").val(data.token);
+                        }
+
+                        if (data.responseCode === 0) {
+                            if (data.supplierDetails.exception) {
+                                PNotify.error({
+                                    text : data.supplierDetails.exception.exceptionDescription
+                                });
+                                return;
+                            }
+                            if (data.supplierDetails.businessEntity202001.entityStatus.entityStatusCode === 'Cancelled') {
+                                PNotify.notice({
+                                    textTrusted : true,
+                                    text : 'Details for ABN: ' + $('#{{componentId}}-{{sectionId}}-abn').val() + ' found.' +
+                                           '<br>Status: ' + data.supplierDetails.businessEntity202001.entityStatus.entityStatusCode
+                                });
+                            } else {
+                                PNotify.success({
+                                    text : 'Details for ABN: ' + $('#{{componentId}}-{{sectionId}}-abn').val() + ' found.'
+                                });
+
+
+                                if (data.supplierDetails.businessEntity202001.businessName) {
+                                    $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').addClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').removeClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', false);
+                                    $('#{{componentId}}-{{sectionId}}-name').val('');
+                                    var newOption;
+                                    newOption = new Option(data.supplierDetails.businessEntity202001.mainName.organisationName, 0, false, false);
+                                    $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
+                                    $.each(data.supplierDetails.businessEntity202001.businessName, function(index, businessName) {
+                                        newOption = new Option(businessName.organisationName, index + 1, false, false);
+                                        $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
+                                    });
+                                    $('#{{componentId}}-{{sectionId}}-name_list').on('select2:select', function(e) {
+                                        $('#{{componentId}}-{{sectionId}}-name').val('');
+                                        $('#{{componentId}}-{{sectionId}}-name').val(e.params.data.text);
+                                        $('#{{componentId}}-{{sectionId}}-name').attr('value', e.params.data.text);
+                                    });
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').addClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-name_list').val(null).trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-name_list').empty().trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
+                                    if (data.supplierDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                                        $('#{{componentId}}-{{sectionId}}-name').val(data.supplierDetails.businessEntity202001.mainName.organisationName);
+                                    } else {
+                                        $('#{{componentId}}-{{sectionId}}-name').val(data.supplierDetails.businessEntity202001.mainTradingName.organisationName);
+                                    }
+                                }
+
+                                $('#{{componentId}}-{{sectionId}}-type').val(data.supplierDetails.businessEntity202001.entityType.entityTypeCode);
+                                $('#{{componentId}}-{{sectionId}}-type').trigger('change');
+
+                                $('#{{componentId}}-{{sectionId}}-post_code').val(data.supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', false);
+                            updateModalInfo(data.supplierDetails);
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-abn-info').click(function(e) {
+                    e.preventDefault();
+                    $('#{{componentId}}-{{sectionId}}-info-modal').modal('show');
+                });
+
+                function updateModalInfo(supplierDetails) {
+                    if (supplierDetails) {
+                        if (supplierDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                            $('#entity-name').html(supplierDetails.businessEntity202001.mainName.organisationName);
+                        } else {
+                            $('#entity-name').html(supplierDetails.businessEntity202001.mainTradingName.organisationName);
+                        }
+                        $('#entity-status').html(supplierDetails.businessEntity202001.entityStatus.entityStatusCode);
+                        if (supplierDetails.businessEntity202001.businessName) {
+                            var businessNames = [];
+                            $.each(supplierDetails.businessEntity202001.businessName, function(index, businessName) {
+                                businessNames.push(businessName.organisationName);
+                            });
+                            var names = businessNames.join(', ');
+                            $('#entity-business-names').html(names);
+                        } else {
+                            if (supplierDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                                $('#entity-business-names').html(supplierDetails.businessEntity202001.mainName.organisationName);
+                            } else {
+                                $('#entity-business-names').html(supplierDetails.businessEntity202001.mainTradingName.organisationName);
+                            }
+                        }
+                        $('#entity-abn').html(supplierDetails.businessEntity202001.ABN.identifierValue);
+                        $('#entity-asic').html(supplierDetails.businessEntity202001.ASICNumber);
+                        $('#entity-code').html(supplierDetails.businessEntity202001.entityType.entityTypeCode);
+                        $('#entity-description').html(supplierDetails.businessEntity202001.entityType.entityDescription);
+                        $('#entity-post-code').html(supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                        $('#entity-state').html(supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.stateCode);
+                        $('#entity-record-updated').html(supplierDetails.businessEntity202001.recordLastUpdatedDate);
+                        $('#entity-register-updated').html(supplierDetails.dateRegisterLastUpdated);
+                        $('#entity-disclaimer').html(supplierDetails.usageStatement);
+                    } else {
+                        $('#entity-name').html('');
+                        $('#entity-status').html('');
+                        $('#entity-abn').html('');
+                        $('#entity-asic').html('');
+                        $('#entity-code').html('');
+                        $('#entity-description').html('');
+                        $('#entity-post-code').html('');
+                        $('#entity-state').html('');
+                        $('#entity-record-updated').html('');
+                        $('#entity-register-updated').html('');
+                        $('#entity-disclaimer').html('');
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-name_list'               : {
+            placeholder : 'SELECT A BUSINESS NAME'
+        },
+        '{{componentId}}-{{sectionId}}-type'                    : { },
+        '{{componentId}}-{{sectionId}}-is_manufacturer'         : { },
+        '{{componentId}}-{{sectionId}}-does_dropship'           : { },
+        '{{componentId}}-{{sectionId}}-brands'                  : {
+            'placeholder'   : "SUPPLIER BRAND(s)",
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('ims/brands/searchBrand')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(data) {
+                    if (data.tokenKey && data.token) {
+                        $('#security-token').attr('name', data.tokenKey);
+                        $('#security-token').val(data.token);
+                    }
+                    if (data.brands) {
+                        var brandsData = [];
+                        for (var item of data.brands) {
+                            brandsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: brandsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_first_name'      : { },
+        '{{componentId}}-{{sectionId}}-contact_last_name'       : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : { },
+        '{{componentId}}-{{sectionId}}-contact_email'           : { },
+        '{{componentId}}-{{sectionId}}-address_id'              : { },
+        '{{componentId}}-{{sectionId}}-internal_notes'          : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-abn'                    : 'required',
+                '{{componentId}}-{{sectionId}}-name'                   : 'required',
+                '{{componentId}}-{{sectionId}}-brands'                 : 'required',
+                '{{componentId}}-{{sectionId}}-contact_first_name'     : 'required',
+                '{{componentId}}-{{sectionId}}-contact_last_name'      : 'required',
+                '{{componentId}}-{{sectionId}}-contact_phone'          : 'required',
+                '{{componentId}}-{{sectionId}}-contact_email'          : 'required',
+                '{{componentId}}-{{sectionId}}-street_address'         : 'required',
+                '{{componentId}}-{{sectionId}}-city_name'              : 'required',
+                '{{componentId}}-{{sectionId}}-post_code'              : 'required',
+                '{{componentId}}-{{sectionId}}-state_name'             : 'required',
+                '{{componentId}}-{{sectionId}}-country_name'           : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
+                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name',
+                '{{componentId}}-{{sectionId}}-brands'                 : 'Please select supplier brands',
+                '{{componentId}}-{{sectionId}}-contact_first_name'     : 'Please enter contact first name',
+                '{{componentId}}-{{sectionId}}-contact_last_name'      : 'Please enter contact last name',
+                '{{componentId}}-{{sectionId}}-contact_phone'          : 'Please enter contact phone',
+                '{{componentId}}-{{sectionId}}-contact_email'          : 'Please enter contact email',
+                '{{componentId}}-{{sectionId}}-parent'                 : 'Please select parent supplier',
+                '{{componentId}}-{{sectionId}}-street_address'         : 'Please enter street address',
+                '{{componentId}}-{{sectionId}}-city_name'              : 'Please enter city',
+                '{{componentId}}-{{sectionId}}-post_code'              : 'Please enter post code',
+                '{{componentId}}-{{sectionId}}-state_name'             : 'Please enter state',
+                '{{componentId}}-{{sectionId}}-country_name'           : 'Please enter country'
+            }
+        }
+    });
+</script>

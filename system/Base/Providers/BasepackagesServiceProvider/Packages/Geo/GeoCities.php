@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Geo;
 
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\GeoCities as GeoCitiesModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Geo\BasepackagesGeoCities as GeoCitiesModel;
 use System\Base\BasePackage;
 
 class GeoCities extends BasePackage

@@ -17,7 +17,7 @@ class LoggerServiceProvider implements ServiceProviderInterface
 				$session = $container->getShared('session');
 				$connection = $container->getShared('connection');
 				$request = $container->getShared('request');
-				$email = $container->getShared('email');
+				$email = $container->getShared('basepackages')->email;
 				return (new Logger($logsConfig, $session, $connection, $request, $email))->init();
 			}
 		);

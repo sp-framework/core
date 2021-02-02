@@ -2,7 +2,7 @@
 
 namespace System\Base\Providers\RouterServiceProvider\Exceptions;
 
-class ApplicationNotAllowedException extends \Exception
+class AppNotAllowedException extends \Exception
 {
     //
 }

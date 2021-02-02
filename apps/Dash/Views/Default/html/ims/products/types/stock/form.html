@@ -1,0 +1,186 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'products/types/stock/form/info'
+                                ],
+                                'attachments'   :
+                                [
+                                    'tabTitle'          : 'Attachments',
+                                    'tabInclude'        : 'products/types/stock/form/attachments'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+{# <div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'info-modal',
+            'modalBodyInclude'          : 'products/types/local/info',
+            'modalSize'                 : 'lg',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> SUPPLIER INFORMATION',
+            'modalEscClose'             : 'true'
+        ]
+    )}}
+</div> #}
+<script>
+/* globals BazContentFieldsValidator PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-product_type'                      : { },
+        '{{componentId}}-{{sectionId}}-code_mpn'                      : { },
+        '{{componentId}}-{{sectionId}}-code_sku'                      : { },
+        '{{componentId}}-{{sectionId}}-code_upc'                      : { },
+        '{{componentId}}-{{sectionId}}-title'                      : { },
+        '{{componentId}}-{{sectionId}}-subtitle'                      : { },
+        '{{componentId}}-{{sectionId}}-manufacturer'                      : {
+            placeholder : 'SELECT MANUFACTURER'
+        },
+        '{{componentId}}-{{sectionId}}-brand'                  : {
+            'placeholder'   : "SUPPLIER BRAND",
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('ims/brands/searchBrand')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(data) {
+                    if (data.tokenKey && data.token) {
+                        $('#security-token').attr('name', data.tokenKey);
+                        $('#security-token').val(data.token);
+                    }
+                    if (data.brands) {
+                        var brandsData = [];
+                        for (var item of data.brands) {
+                            brandsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: brandsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-description'                      : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-title'                    : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-title'                    : 'Please enter product title',
+            }
+        }
+    });
+</script>

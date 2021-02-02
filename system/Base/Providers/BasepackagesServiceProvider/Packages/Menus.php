@@ -4,11 +4,11 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Menus as MenusModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesMenus;
 
 class Menus extends BasePackage
 {
-    protected $modelToUse = MenusModel::class;
+    protected $modelToUse = BasepackagesMenus::class;
 
     protected $packageNameS = 'Menu';
 
@@ -21,9 +21,9 @@ class Menus extends BasePackage
         return $this;
     }
 
-    public function buildMenusForApplication($applicationId)
+    public function buildMenusForApp($appId)
     {
-        $menus = $this->getMenusForApplication($applicationId);
+        $menus = $this->getMenusForApp($appId);
 
         $cachedMenu = $this->cacheTools->getCache('menus');
 
@@ -40,24 +40,24 @@ class Menus extends BasePackage
             }
         }
 
-        $this->cacheTools->setCache('menus_' . $applicationId, $buildMenu);
+        $this->cacheTools->setCache('menus_' . $appId, $buildMenu);
 
         return $buildMenu;
     }
 
-    public function getMenusForApplication($applicationId)
+    public function getMenusForApp($appId)
     {
         $menus = [];
 
         $filter =
             $this->model->filter(
-                function($menu) use ($applicationId) {
+                function($menu) use ($appId) {
                     $menu = $menu->toArray();
 
-                    $menu['applications'] = Json::decode($menu['applications'], true);
-                    if (count($menu['applications']) > 0) {
-                        if (isset($menu['applications'][$applicationId]) &&
-                            $menu['applications'][$applicationId]['enabled'] === true
+                    $menu['apps'] = Json::decode($menu['apps'], true);
+                    if (count($menu['apps']) > 0) {
+                        if (isset($menu['apps'][$appId]) &&
+                            $menu['apps'][$appId]['enabled'] === true
                         ) {
 
                             return $menu;
@@ -82,11 +82,11 @@ class Menus extends BasePackage
             foreach ($menus as $menuId => $value) {
                 $menu = $this->getById($menuId);
 
-                $menu['applications'] = Json::decode($menu['applications'], true);
+                $menu['apps'] = Json::decode($menu['apps'], true);
 
-                $menu['applications'] = array_replace($menu['applications'], $value);
+                $menu['apps'] = array_replace($menu['apps'], $value);
 
-                $menu['applications'] = Json::encode($menu['applications']);
+                $menu['apps'] = Json::encode($menu['apps']);
 
                 $this->update($menu);
             }

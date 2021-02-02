@@ -137,25 +137,25 @@ Class Setup
 
 				$this->setupPackage->registerRepository();
 
+				$this->setupPackage->registerDomain();
+
 				$baseConfig = $this->setupPackage->writeConfigs($this->coreJson);
 
 				$this->setupPackage->registerCore($baseConfig);
 
-				$adminApplicationId = $this->setupPackage->registerModule('applications');
+				$adminAppId = $this->setupPackage->registerApp();
 
-				if ($adminApplicationId) {
+				if ($adminAppId) {
 
 					$this->setupPackage->registerModule('components');
 
-					$this->setupPackage->updateAdminApplicationComponents();
+					$this->setupPackage->updateAdminAppComponents();
 
 					$this->setupPackage->registerModule('packages');
 
 					$this->setupPackage->registerModule('middlewares');
 
 					$this->setupPackage->registerModule('views');
-
-					$this->setupPackage->registerDomain();
 
 					$adminRoleId = $this->setupPackage->registerRootAdminRole();
 
@@ -193,12 +193,6 @@ Class Setup
 				throw $e;
 			}
 		} else {
-
-			// $this->view->countries =
-			// 	Json::decode(
-			// 		$this->localContent->read('/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/Countries.json'),
-			// 		true
-			// 	);
 
 			echo $this->container->getShared('view')->render('setup');
 		}

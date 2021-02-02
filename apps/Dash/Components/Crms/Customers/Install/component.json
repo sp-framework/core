@@ -1,0 +1,51 @@
+{
+    "route"         : "users/customers",
+    "name"          : "Customers",
+    "description"   : "Manage customers via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "crms",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-crms-customers",
+    "class"         : "Apps\\Dash\\Components\\Crms\\Customers\\CustomersComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Customers",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-crms-customers"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 3,
+        "crms"      : {
+            "title"     : "CR Management",
+            "icon"      : "hands-helping",
+            "childs"    : {
+                "customers"   : {
+                    "title"     : "Customers",
+                    "link"      : "crms/customers"
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

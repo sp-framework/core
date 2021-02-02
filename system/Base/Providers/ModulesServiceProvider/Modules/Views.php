@@ -5,19 +5,15 @@ namespace System\Base\Providers\ModulesServiceProvider\Modules;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
-use System\Base\Providers\ModulesServiceProvider\Modules\Model\Views as ViewsModel;
+use System\Base\Providers\ModulesServiceProvider\Modules\Model\ModulesViews;
 
 class Views extends BasePackage
 {
-    protected $modelToUse = ViewsModel::class;
+    protected $modelToUse = ModulesViews::class;
 
     public $views;
 
     protected $view;
-
-    protected $applications;
-
-    protected $application;
 
     protected $voltCompiledPath;
 
@@ -37,9 +33,7 @@ class Views extends BasePackage
     {
         $this->getAll($resetCache);
 
-        $this->applications = $this->modules->applications;
-
-        $this->setApplication();
+        $this->setApp();
 
         $this->setVoltCompiledPath();
 
@@ -60,12 +54,11 @@ class Views extends BasePackage
         }
 
         if (!isset($this->voltCompiledPath)) {
-            if ($this->application && $this->view) {
+            if ($this->app && $this->view) {
                 $this->voltCompiledPath =
-                    base_path('applications/' .
-                              ucfirst($this->application['app_type']) .
-                              // ucfirst($this->application['sub_category']) .
-                              '/Views/Html_compiled/' . ucfirst($this->application['route']) . '/' . $this->view['name'] . '/'
+                    base_path('apps/' .
+                              ucfirst($this->app['app_type']) .
+                              '/Views/Html_compiled/' . ucfirst($this->app['route']) . '/' . $this->view['name'] . '/'
                           );
             } else {
                 $this->voltCompiledPath =
@@ -90,11 +83,10 @@ class Views extends BasePackage
         }
 
         if (!isset($this->phalconViewPath)) {
-            if ($this->application && $this->view) {
+            if ($this->app && $this->view) {
                 $this->phalconViewPath =
-                    base_path('applications/' .
-                              ucfirst($this->application['app_type']) .
-                              // ucfirst($this->application['sub_category']) .
+                    base_path('apps/' .
+                              ucfirst($this->app['app_type']) .
                               '/Views/' . $this->view['name'] .
                               '/html/');
             } else {
@@ -112,11 +104,10 @@ class Views extends BasePackage
         }
 
         if (!isset($this->phalconViewLayoutPath)) {
-            if ($this->application && $this->view) {
+            if ($this->app && $this->view) {
                 $this->phalconViewLayoutPath =
-                    base_path('applications/' .
-                              ucfirst($this->application['app_type']) .
-                              // ucfirst($this->application['sub_category']) .
+                    base_path('apps/' .
+                              ucfirst($this->app['app_type']) .
                               '/Views/' . $this->view['name'] .
                               '/html/layouts/');
             } else {
@@ -175,25 +166,25 @@ class Views extends BasePackage
         return $this->tags;
     }
 
-    protected function setApplication()
+    protected function setApp()
     {
-        if (!$this->application) {
-            $this->application = $this->applications->getApplicationInfo();
+        if (!$this->app) {
+            $this->app = $this->apps->getAppInfo();
 
-            $this->domain = $this->basepackages->domains->getDomain();
+            $this->domain = $this->domains->getDomain();
 
-            if ($this->application &&
-                isset($this->domain['applications'][$this->application['id']]['view'])
+            if ($this->app &&
+                isset($this->domain['apps'][$this->app['id']]['view'])
             ) {
-                $viewsName = $this->getIdViews($this->domain['applications'][$this->application['id']]['view'])['name'];
+                $viewsName = $this->getIdViews($this->domain['apps'][$this->app['id']]['view'])['name'];
             } else {
                 $viewsName =  'Default';
             }
 
             if (!$this->view) {
-                //Make sure view has proper application ID.
-                if ($this->application) {
-                    $this->view = $this->getApplicationView($this->application['id'], $viewsName);
+                //Make sure view has proper app ID.
+                if ($this->app) {
+                    $this->view = $this->getAppView($this->app['id'], $viewsName);
                 }
             }
             if ($this->view) {
@@ -214,21 +205,21 @@ class Views extends BasePackage
     protected function checkTagsPackage($packageName)
     {
         return
-            $this->modules->packages->getNamedPackageForApplication(
+            $this->modules->packages->getNamedPackageForApp(
                 Arr::last(explode('\\', $packageName)),
-                $this->modules->applications->getApplicationInfo()['id']
+                $this->apps->getAppInfo()['id']
             );
     }
 
-    public function getApplicationView($applicationId, $name)
+    public function getAppView($appId, $name)
     {
         $filter =
             $this->model->filter(
-                function($view) use ($applicationId, $name) {
+                function($view) use ($appId, $name) {
                     $view = $view->toArray();
-                    $view['applications'] = Json::decode($view['applications'], true);
-                    if ((isset($view['applications'][$applicationId]['enabled']) &&
-                        $view['applications'][$applicationId]['enabled'] === true) &&
+                    $view['apps'] = Json::decode($view['apps'], true);
+                    if ((isset($view['apps'][$appId]['enabled']) &&
+                        $view['apps'][$appId]['enabled'] === true) &&
                         $view['name'] === ucfirst($name)
                     ) {
                         return $view;
@@ -237,7 +228,7 @@ class Views extends BasePackage
             );
 
         if (count($filter) > 1) {
-            throw new \Exception('Duplicate default view for application ' . $name);
+            throw new \Exception('Duplicate default view for app ' . $name);
         } else if (count($filter) === 1) {
             return $filter[0];
         } else {
@@ -245,15 +236,15 @@ class Views extends BasePackage
         }
     }
 
-    public function getViewsForApplication($applicationId)
+    public function getViewsForApp($appId)
     {
         $filter =
             $this->model->filter(
-                function($view) use ($applicationId) {
+                function($view) use ($appId) {
                     $view = $view->toArray();
-                    $view['applications'] = Json::decode($view['applications'], true);
-                    if (isset($view['applications'][$applicationId]['enabled']) &&
-                        $view['applications'][$applicationId]['enabled'] === true
+                    $view['apps'] = Json::decode($view['apps'], true);
+                    if (isset($view['apps'][$appId]['enabled']) &&
+                        $view['apps'][$appId]['enabled'] === true
                     ) {
                         return $view;
                     }
@@ -371,15 +362,15 @@ class Views extends BasePackage
         foreach ($views as $viewId => $status) {
             $view = $this->getById($viewId);
 
-            $view['applications'] = Json::decode($view['applications'], true);
+            $view['apps'] = Json::decode($view['apps'], true);
 
             if ($status === true) {
-                $view['applications'][$data['id']]['enabled'] = true;
+                $view['apps'][$data['id']]['enabled'] = true;
             } else if ($status === false) {
-                $view['applications'][$data['id']]['enabled'] = false;
+                $view['apps'][$data['id']]['enabled'] = false;
             }
 
-            $view['applications'] = Json::encode($view['applications']);
+            $view['apps'] = Json::encode($view['apps']);
 
             $view['settings'] = Json::decode($view['settings'], true);
 
@@ -387,11 +378,11 @@ class Views extends BasePackage
                 $package = $this->modules->packages->getNamePackage($view['settings']['tags']);
 
                 if ($package) {
-                    $package['applications'] = Json::decode($package['applications'], true);
+                    $package['apps'] = Json::decode($package['apps'], true);
 
-                    $package['applications'][$data['id']]['enabled'] = true;
+                    $package['apps'][$data['id']]['enabled'] = true;
 
-                    $package['applications'] = Json::encode($package['applications']);
+                    $package['apps'] = Json::encode($package['apps']);
 
                     $this->modules->packages->update($package);
                 }

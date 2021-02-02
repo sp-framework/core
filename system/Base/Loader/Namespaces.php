@@ -1,7 +1,7 @@
 <?php
 
 return
-	[
-		'Applications'      				=> '../applications/',
-		'System'            				=> '../system/'
-	];
+    [
+        'Apps'        => '../apps/',
+        'System'      => '../system/'
+    ];
