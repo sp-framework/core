@@ -2,8 +2,10 @@
 
 namespace Apps\Dash\Packages\Ims\Products;
 
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Apps\Dash\Packages\Ims\Products\Model\ImsProducts;
+use Apps\Dash\Packages\System\Tools\Barcodes\Barcodes;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -17,9 +19,23 @@ class Products extends BasePackage
 
     public function addProduct(array $data)
     {
-        $data = $this->addBrands($data);
+        if ($data['code_ean'] !== '') {
+            if (!$this->checkEAN($data['code_ean'])) {
+                $this->packagesData->responseCode = 1;
 
-        if ($this->add($data)) {
+                $this->packagesData->responseMessage = 'UPC is incorrect!';
+
+                return;
+            }
+        }
+
+        $data = $this->addBrand($data);
+
+        $data = $this->addManufacturer($data);
+
+        $add = $this->add($data);
+
+        if ($add) {
             if ($data['images'] !== '') {
                 $this->basepackages->storages->changeOrphanStatus($data['images'], null, true);
             }
@@ -27,6 +43,15 @@ class Products extends BasePackage
             if ($data['downloadables'] !== '') {
                 $this->basepackages->storages->changeOrphanStatus($data['downloadables'], null, true);
             }
+
+            $data = $this->packagesData->last;
+
+            if ($data['code_ean'] === '') {
+                $data['code_ean'] = $this->generateEAN($data['id']);
+                $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
+            }
+
+            $this->update($data);
 
             $this->packagesData->responseCode = 0;
 
@@ -40,12 +65,20 @@ class Products extends BasePackage
 
     public function updateProduct(array $data)
     {
-        $data = $this->addBrands($data);
+        $data = $this->addBrand($data);
+
+        $data = $this->addManufacturer($data);
 
         $product = $this->getById($data['id']);
 
-        if ($this->update($data)) {
+        if ($data['code_ean'] === '') {
+            $data['code_ean'] = $this->generateEAN($data['id']);
+            $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
+        } else if (!$product['code_ean_barcode']) {
+            $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
+        }
 
+        if ($this->update($data)) {
             if ($data['images'] !== '') {
                 $this->basepackages->storages->changeOrphanStatus($data['images'], $product['images'], true);
             }
@@ -87,40 +120,70 @@ class Products extends BasePackage
         }
     }
 
-    public function addProductCount(int $id)
-    {
-        $product = $this->getById($id);
-
-        if ($product['product_count'] && $product['product_count'] != '') {
-            $product['product_count'] = (int) $product['product_count'] + 1;
-        } else {
-            $product['product_count'] = 1;
-        }
-
-        $this->update($product);
-    }
-
-    public function removeProductCount(int $id)
-    {
-        $product = $this->getById($id);
-
-        if ($product['product_count'] && $product['product_count'] != '') {
-            $product['product_count'] = (int) $product['product_count'] - 1;
-        } else {
-            $product['product_count'] = 0;
-        }
-
-        $this->update($product);
-    }
-
-    public function searchProducts(string $productQueryString)
+    public function searchByMPN(string $mpnQueryString)
     {
         $searchProducts =
             $this->getByParams(
                 [
-                    'conditions'    => 'name LIKE :bName:',
+                    'conditions'    => 'code_mpn LIKE :aMPN:',
                     'bind'          => [
-                        'bName'     => '%' . $productQueryString . '%'
+                        'aMPN'     => '%' . $mpnQueryString . '%'
+                    ]
+                ]
+            );
+
+        if ($searchProducts) {
+            $products = [];
+
+            foreach ($searchProducts as $productKey => $productValue) {
+                $products[$productKey]['id'] = $productValue['id'];
+                $products[$productKey]['code_mpn'] = $productValue['code_mpn'];
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->products = $products;
+
+            return true;
+        }
+    }
+
+    public function searchByTitle(string $titleQueryString)
+    {
+        $searchProducts =
+            $this->getByParams(
+                [
+                    'conditions'    => 'title LIKE :aTitle:',
+                    'bind'          => [
+                        'aTitle'     => '%' . $titleQueryString . '%'
+                    ]
+                ]
+            );
+
+        if ($searchProducts) {
+            $products = [];
+
+            foreach ($searchProducts as $productKey => $productValue) {
+                $products[$productKey]['id'] = $productValue['id'];
+                $products[$productKey]['title'] = $productValue['title'];
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->products = $products;
+
+            return true;
+        }
+    }
+
+    public function searchByCodeEAN(string $ean)
+    {
+        $searchProducts =
+            $this->getByParams(
+                [
+                    'conditions'    => 'code_ean = :aEAN:',
+                    'bind'          => [
+                        'aEAN'      => $ean
                     ]
                 ]
             );
@@ -140,25 +203,131 @@ class Products extends BasePackage
         }
     }
 
-    protected function addBrands(array $data)
+    public function searchByCodeSKU(string $sku)
+    {
+        $searchProducts =
+            $this->getByParams(
+                [
+                    'conditions'    => 'code_sku LIKE :aSKU:',
+                    'bind'          => [
+                        'aSKU'     => '%' . $sku . '%'
+                    ]
+                ]
+            );
+
+        if ($searchProducts) {
+            $products = [];
+
+            foreach ($searchProducts as $productKey => $productValue) {
+                $products[$productKey]['id'] = $productValue['id'];
+                $products[$productKey]['code_sku'] = $productValue['code_sku'];
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->products = $products;
+
+            return true;
+        }
+    }
+
+    protected function addBrand(array $data)
     {
         $brands = $this->usePackage(Brands::class);
 
-        $data['brands'] = Json::decode($data['brands'], true);
+        $data['brand'] = Json::decode($data['brand'], true);
 
-        if (isset($data['brands']['newTags']) &&
-            count($data['brands']['newTags']) > 0
+        if (isset($data['brand']['newTags']) &&
+            count($data['brand']['newTags']) > 0
         ) {
-            foreach ($data['brands']['newTags'] as $brand) {
+            foreach ($data['brand']['newTags'] as $brand) {
                 $newBrand = $brands->add(['name' => $brand]);
+
                 if ($newBrand) {
-                    array_push($data['brands']['data'], $brands->packagesData->last['id']);
+                    $data['brand'] = $brands->packagesData->last['id'];
+                } else {
+                    $data['brand'] = 0;
                 }
             }
+        } else {
+            $data['brand'] = $data['brand']['data'][0];
         }
 
-        $data['brands'] = Json::encode($data['brands']['data']);
+        return $data;
+    }
+
+    protected function addManufacturer(array $data)
+    {
+        $manufacturers = $this->usePackage(Vendors::class);
+
+        $data['manufacturer'] = Json::decode($data['manufacturer'], true);
+
+        if (isset($data['manufacturer']['newTags']) &&
+            count($data['manufacturer']['newTags']) > 0
+        ) {
+            foreach ($data['manufacturer']['newTags'] as $manufacturer) {
+                $newManufacturer = $manufacturers->add(
+                    [
+                        'name'              => $manufacturer,
+                        'is_manufacturer'   => '1',
+
+                    ]
+                );
+                if ($newManufacturer) {
+                    $data['manufacturer'] = $manufacturers->packagesData->last['id'];
+                } else {
+                    $data['manufacturer'] = 0;
+                }
+            }
+        } else {
+            $data['manufacturer'] = $data['manufacturer']['data'][0];
+        }
 
         return $data;
+    }
+
+    protected function checkEAN($ean)
+    {
+        $checksumDigit = substr($ean, -1);
+
+        $barcodes = $this->usePackage(Barcodes::class);
+
+        if ($checksumDigit == $barcodes->generateBarcodeChecksum(rtrim($ean), 'EAN13')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected function generateEAN($id)
+    {
+        //Total 12 digits for EAN + 1 digit for checksum.
+        $gs1PrivateRange = '040';//040-049, UPC-A compatible - Used to issue restricted circulation numbers within a company (Source:Wikipedia)
+
+        $ourRange = '01';//01-99 for different packages (99 max) 01 = Product package
+
+        $code = str_pad($id, 7, "0", STR_PAD_LEFT);
+
+        $barcodes = $this->usePackage(Barcodes::class);
+
+        return $barcodes->getBarcodeWithChecksum($gs1PrivateRange.$ourRange.$code, 'EAN13');
+    }
+
+    protected function generateEANBarcode($ean)
+    {
+        $barcodes = $this->usePackage(Barcodes::class);
+
+        $settings = $barcodes->getBarcodesSettings();
+
+        return $barcodes->generateBarcode(
+            $ean,
+            'EAN13',
+            $settings['defaultGenerator'],
+            $settings['widthFactor'],
+            $settings['height'],
+            $settings['foreground'],
+            $settings['showText'],
+            $settings['defaultTextPlacement']
+        );
     }
 }

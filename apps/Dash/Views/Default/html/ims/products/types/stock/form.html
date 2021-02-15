@@ -37,7 +37,7 @@
         )}}
     </div>
     <div class="col">
-        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
                 {{adminltetags.useTag('tabs',
                     [
@@ -84,7 +84,7 @@
     )}}
 </div> #}
 <script>
-/* globals BazContentFieldsValidator PNotify */
+/* globals BazContentFieldsValidator autoComplete PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -111,18 +111,391 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                      : { },
-        '{{componentId}}-{{sectionId}}-product_type'                      : { },
-        '{{componentId}}-{{sectionId}}-code_mpn'                      : { },
-        '{{componentId}}-{{sectionId}}-code_sku'                      : { },
-        '{{componentId}}-{{sectionId}}-code_upc'                      : { },
-        '{{componentId}}-{{sectionId}}-title'                      : { },
-        '{{componentId}}-{{sectionId}}-subtitle'                      : { },
-        '{{componentId}}-{{sectionId}}-manufacturer'                      : {
-            placeholder : 'SELECT MANUFACTURER'
+        '{{componentId}}-{{sectionId}}-id'                          : { },
+        '{{componentId}}-{{sectionId}}-product_type'                : { },
+        '{{componentId}}-{{sectionId}}-code_mpn'                    : {
+            afterInit   : function() {
+                var found = 0;
+
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeMPN'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("ims/products/searchProductMpn")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-code_mpn").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.products) {
+                                    found = data.products.length;
+                                    return data.products;
+                                } else {
+                                    found = 0;
+                                    return [];
+                                }
+                            },
+                            key: ["code_mpn"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-code_mpn",
+                        threshold : 2,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-code_mpn_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-code_mpn",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + ' - <span class="text-danger">MPN already exists.</span>';
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-code_mpn').val('');
+                            $('#{{componentId}}-{{sectionId}}-code_mpn').attr('value', '');
+                        }
+                    });
+
+                $('#{{componentId}}-{{sectionId}}-code_mpn').focusout(function() {
+                    if (found > 0) {
+                        $('#{{componentId}}-{{sectionId}}-code_mpn').val('');
+                        $('#{{componentId}}-{{sectionId}}-code_mpn').attr('value', '');
+                    }
+                    $('#{{componentId}}-{{sectionId}}-code_mpn_list').children('li').remove();
+                });
+            }
         },
-        '{{componentId}}-{{sectionId}}-brand'                  : {
-            'placeholder'   : "SUPPLIER BRAND",
+        '{{componentId}}-{{sectionId}}-code_sku'                    : {
+            afterInit   : function() {
+                var found = 0;
+
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeSKU'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("ims/products/searchProductSKU")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-code_sku").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.products) {
+                                    found = data.products.length;
+                                    return data.products;
+                                } else {
+                                    found = 0;
+                                    return [];
+                                }
+                            },
+                            key: ["code_sku"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-code_sku",
+                        threshold : 2,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-code_sku_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-code_sku",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 2,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + ' - <span class="text-danger">SKU already exists.</span>';
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-code_sku').val('');
+                            $('#{{componentId}}-{{sectionId}}-code_sku').attr('value', '');
+                        }
+                    });
+
+                $('#{{componentId}}-{{sectionId}}-code_sku').focusout(function() {
+                    if (found > 0) {
+                        $('#{{componentId}}-{{sectionId}}-code_sku').val('');
+                        $('#{{componentId}}-{{sectionId}}-code_sku').attr('value', '');
+                    }
+                    $('#{{componentId}}-{{sectionId}}-code_sku_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-code_ean'                    : {
+            afterInit   : function() {
+                var found = 0;
+
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeEAN'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("ims/products/searchProductEAN")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-code_ean").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.products) {
+                                    found = data.products.length;
+                                    return data.products;
+                                } else {
+                                    found = 0;
+                                    return [];
+                                }
+                            },
+                            key: ["code_ean"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-code_ean",
+                        threshold : 5,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-code_ean_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-code_ean",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + ' - <span class="text-danger">EAN/UPC already exists.</span>';
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-code_ean').val('');
+                            $('#{{componentId}}-{{sectionId}}-code_ean').attr('value', '');
+                        }
+                    });
+
+                $('#{{componentId}}-{{sectionId}}-code_ean').focusout(function() {
+                    if (found > 0) {
+                        $('#{{componentId}}-{{sectionId}}-code_ean').val('');
+                        $('#{{componentId}}-{{sectionId}}-code_ean').attr('value', '');
+                    }
+                    $('#{{componentId}}-{{sectionId}}-code_ean_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-title'                       : {
+            afterInit   : function() {
+                var found = 0;
+
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeTitle'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("ims/products/searchProductTitle")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-title").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.products) {
+                                    found = data.products.length;
+                                    return data.products;
+                                } else {
+                                    found = 0;
+                                    return [];
+                                }
+                            },
+                            key: ["title"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-title",
+                        threshold : 5,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-title_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-title",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + ' - <span class="text-danger">Title already exists.</span>';
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-title').val('');
+                            $('#{{componentId}}-{{sectionId}}-title').attr('value', '');
+                        }
+                    });
+
+                $('#{{componentId}}-{{sectionId}}-title').focusout(function() {
+                    if (found > 0) {
+                        $('#{{componentId}}-{{sectionId}}-title').val('');
+                        $('#{{componentId}}-{{sectionId}}-title').attr('value', '');
+                    }
+                    $('#{{componentId}}-{{sectionId}}-title_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-subtitle'                    : { },
+        '{{componentId}}-{{sectionId}}-manufacturer'                : {
+            placeholder : 'SELECT/CREATE MANUFACTURER',
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(data) {
+                    if (data.tokenKey && data.token) {
+                        $('#security-token').attr('name', data.tokenKey);
+                        $('#security-token').val(data.token);
+                    }
+                    if (data.vendors) {
+                        var vendorsData = [];
+                        for (var item of data.vendors) {
+                            vendorsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: vendorsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-brand'                       : {
+            'placeholder'   : "SELECT/CREATE BRAND",
             'tags'          : true,
             'ajax'          : {
                 url         : "{{links.url('ims/brands/searchBrand')}}",
@@ -173,13 +546,15 @@ dataCollectionSection =
                 }
             }
         },
-        '{{componentId}}-{{sectionId}}-description'                      : { },
-        '{{componentId}}-{{sectionId}}-form'                    : {
+        '{{componentId}}-{{sectionId}}-description'                 : { },
+        '{{componentId}}-{{sectionId}}-form'                        : {
             rules: {
-                '{{componentId}}-{{sectionId}}-title'                    : 'required',
+                '{{componentId}}-{{sectionId}}-code_mpn'            : 'required',
+                '{{componentId}}-{{sectionId}}-title'               : 'required',
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-title'                    : 'Please enter product title',
+                '{{componentId}}-{{sectionId}}-code_mpn'            : 'Please enter product manufacturer part number',
+                '{{componentId}}-{{sectionId}}-title'               : 'Please enter product title',
             }
         }
     });

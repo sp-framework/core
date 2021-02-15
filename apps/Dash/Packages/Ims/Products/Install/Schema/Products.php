@@ -45,10 +45,18 @@ class Products
                     ]
                 ),
                 new Column(
-                    'code_upc',
+                    'code_ean',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 12,
+                        'size'    => 13,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'code_ean_barcode',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 8192,
                         'notNull' => false,
                     ]
                 ),
@@ -72,7 +80,7 @@ class Products
                     'manufacturer',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(

@@ -3,9 +3,9 @@
 namespace Apps\Dash\Components\Ims\Products;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Apps\Dash\Packages\Ims\Products\Products;
-use Apps\Dash\Packages\Ims\Suppliers\Suppliers;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -28,7 +28,7 @@ class ProductsComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             $this->view->brands = $this->usePackage(Brands::class)->getAll()->brands;
 
-            $this->view->manufacturers = $this->usePackage(Suppliers::class)->getAllManufacturers();
+            $this->view->manufacturers = $this->usePackage(Vendors::class)->getAllManufacturers();
 
             if ($this->getData()['id'] != 0) {
 
@@ -204,6 +204,61 @@ class ProductsComponent extends BaseComponent
             $this->view->responseCode = 1;
 
             $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function searchProductMPNAction()
+    {
+        $this->search('mpn');
+    }
+
+    public function searchProductTitleAction()
+    {
+        $this->search('title');
+    }
+
+    public function searchProductEANAction()
+    {
+        $this->search('code_ean');
+    }
+
+    public function searchProductSKUAction()
+    {
+        $this->search('code_sku');
+    }
+
+    protected function search($field)
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if ($field === 'mpn') {
+                    if (strlen($searchQuery) < 2) {
+                        return;
+                    }
+                    $searchProduct = $this->products->searchByMPN($searchQuery);
+                } else if ($field === 'title') {
+                    if (strlen($searchQuery) < 5) {
+                        return;
+                    }
+                    $searchProduct = $this->products->searchByTitle($searchQuery);
+                } else if ($field === 'code_ean') {
+                    $searchProduct = $this->products->searchByCodeEAN($searchQuery);
+                } else if ($field === 'code_sku') {
+                    $searchProduct = $this->products->searchByCodeSKU($searchQuery);
+                }
+
+                if ($searchProduct) {
+                    $this->view->responseCode = $this->products->packagesData->responseCode;
+
+                    $this->view->products = $this->products->packagesData->products;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
         }
     }
 }
