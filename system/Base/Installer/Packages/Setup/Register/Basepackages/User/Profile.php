@@ -15,13 +15,8 @@ class Profile
                 'first_name'            => 'System',
                 'last_name'             => 'Administrator',
                 'full_name'             => 'System Administrator',
-                'contact_address_ids'   => Json::encode([]),
                 'contact_phone'         => '',
-                'contact_phone_ext'     => '',
-                'contact_mobile'        => '',
-                'contact_fax'           => '',
-                'contact_other'         => '',
-                'contact_notes'         => ''
+                'contact_mobile'        => ''
             ]
         );
     }

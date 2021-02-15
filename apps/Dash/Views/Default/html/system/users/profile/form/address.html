@@ -1,0 +1,61 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'contact_address_id',
+                'fieldLabel'                     : 'Profile Contact Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Profile Contact Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : profile['contact_address_id']
+            ]
+        )}}
+        {{adminltetags.useTag('addresses',
+            [
+                'component'                                   : component,
+                'componentName'                               : componentName,
+                'componentId'                                 : componentId,
+                'sectionId'                                   : sectionId,
+                'addressFieldType'                            : 'single',
+                'includeStreet'                               : true,
+                'searchType'                                  : 'city',
+                'streetAddress'                               : profile['street_address'],
+                'streetAddressFieldRequired'                  : false,
+                'streetAddressFieldBazPostOnCreate'           : true,
+                'streetAddressFieldBazPostOnUpdate'           : true,
+                'streetAddress2'                              : profile['street_address_2'],
+                'streetAddress2FieldBazPostOnCreate'          : true,
+                'streetAddress2FieldBazPostOnUpdate'          : true,
+                'cityId'                                      : profile['city_id'],
+                'cityName'                                    : profile['city_name'],
+                'cityFieldRequired'                           : false,
+                'cityFieldBazPostOnCreate'                    : true,
+                'cityFieldBazPostOnUpdate'                    : true,
+                'postCode'                                    : profile['post_code'],
+                'postCodeFieldRequired'                       : false,
+                'postCodeFieldBazPostOnCreate'                : true,
+                'postCodeFieldBazPostOnUpdate'                : true,
+                'stateId'                                     : profile['state_id'],
+                'stateName'                                   : profile['state_name'],
+                'stateFieldRequired'                          : false,
+                'stateFieldBazPostOnCreate'                   : true,
+                'stateFieldBazPostOnUpdate'                   : true,
+                'countryId'                                   : profile['country_id'],
+                'countryName'                                 : profile['country_name'],
+                'countryFieldRequired'                        : false,
+                'countryFieldBazPostOnCreate'                 : true,
+                'countryFieldBazPostOnUpdate'                 : true
+            ]
+        )}}
+    </div>
+</div>

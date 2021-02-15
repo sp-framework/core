@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
 
 class Profile extends BasePackage
 {
@@ -46,6 +47,10 @@ class Profile extends BasePackage
 
         if (count($profile) === 1) {
             $profile = $profile[0];
+
+            $profile['role'] =
+                $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+
             if ($profile['contact_address_id'] && $profile['contact_address_id'] !== '') {
                 $address = $this->basepackages->addressbook->getById($profile['contact_address_id']);
 

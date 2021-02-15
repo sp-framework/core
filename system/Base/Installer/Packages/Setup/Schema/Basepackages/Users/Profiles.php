@@ -61,10 +61,9 @@ class Profiles
                     ]
                 ),
                 new Column(
-                    'contact_address_ids',
+                    'contact_address_id',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'type'    => Column::TYPE_INTEGER,
                         'notNull' => false,
                     ]
                 ),

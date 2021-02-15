@@ -1,68 +1,7 @@
 <div class="row">
     <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'contact_address_id',
-                'fieldLabel'                     : 'Profile Contact Address ID',
-                'fieldType'                      : 'input',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Profile Contact Address ID',
-                'fieldRequired'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : false,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldHidden'                    : true,
-                'fieldDisabled'                  : true,
-                'fieldValue'                     : profile['contact_address_id']
-            ]
-        )}}
-        {% include '../../common/address/view' with
-            [
-                'component'                                   : component,
-                'componentName'                               : componentName,
-                'componentId'                                 : componentId,
-                'sectionId'                                   : sectionId,
-                'includeStreet'                               : true,
-                'searchType'                                  : 'city',
-                'streetAddress'                               : profile['street_address'],
-                'streetAddressFieldRequired'                  : false,
-                'streetAddressFieldBazPostOnCreate'           : true,
-                'streetAddressFieldBazPostOnUpdate'           : true,
-                'streetAddress2'                              : profile['street_address_2'],
-                'streetAddress2FieldBazPostOnCreate'          : true,
-                'streetAddress2FieldBazPostOnUpdate'          : true,
-                'cityId'                                      : profile['city_id'],
-                'cityName'                                    : profile['city_name'],
-                'cityFieldRequired'                           : false,
-                'cityFieldBazPostOnCreate'                    : true,
-                'cityFieldBazPostOnUpdate'                    : true,
-                'postCode'                                    : profile['post_code'],
-                'postCodeFieldRequired'                       : false,
-                'postCodeFieldBazPostOnCreate'                : true,
-                'postCodeFieldBazPostOnUpdate'                : true,
-                'stateId'                                     : profile['state_id'],
-                'stateName'                                   : profile['state_name'],
-                'stateFieldRequired'                          : false,
-                'stateFieldBazPostOnCreate'                   : true,
-                'stateFieldBazPostOnUpdate'                   : true,
-                'countryId'                                   : profile['country_id'],
-                'countryName'                                 : profile['country_name'],
-                'countryFieldRequired'                        : false,
-                'countryFieldBazPostOnCreate'                 : true,
-                'countryFieldBazPostOnUpdate'                 : true
-            ]
-        %}
-    </div>
-</div>
-<hr>
-<div class="row">
-    <div class="col">
         <div id="work-phone" class="row">
-            <div class="col-md-9">
+            <div class="col">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -85,7 +24,7 @@
                     ]
                 )}}
             </div>
-            <div class="col-md-3">
+            <div class="col">
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -108,8 +47,6 @@
                     ]
                 )}}
             </div>
-        </div>
-        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -133,6 +70,8 @@
                     ]
                 )}}
             </div>
+        </div>
+        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -163,6 +102,29 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_other',
+                        'fieldLabel'                     : 'Other Contact #',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Any other contact # of the profile',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : profile['contact_other']
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
                         'fieldId'                        : 'secondary_email',
                         'fieldLabel'                     : 'Secondary Email',
                         'fieldType'                      : 'input',
@@ -180,25 +142,33 @@
                 )}}
             </div>
             <div class="col">
+                {% if profile['cc_emails_to_secondary_email'] is defined %}
+                    {% if profile['cc_emails_to_secondary_email'] == 1 %}
+                        {% set ccEmailsChecked = true %}
+                    {% else %}
+                        {% set ccEmailsChecked = false %}
+                    {% endif %}
+                {% else %}
+                    {% set ccEmailsChecked = false %}
+                {% endif %}
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'contact_other',
-                        'fieldLabel'                     : 'Other Contact #',
-                        'fieldType'                      : 'input',
+                        'fieldId'                        : 'cc_emails_to_secondary_email',
+                        'fieldLabel'                     : 'CC Emails?',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Any other contact # of the profile',
+                        'fieldHelpTooltipContent'        : 'CC Emails to secondary email address?',
                         'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : ccEmailsChecked,
                         'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
-                        'fieldValue'                     : profile['contact_other']
+                        'fieldBazScan'                   : true
                     ]
                 )}}
             </div>

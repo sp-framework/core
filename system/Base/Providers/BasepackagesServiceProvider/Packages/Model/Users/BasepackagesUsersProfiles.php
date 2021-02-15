@@ -28,6 +28,10 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public $contact_fax;
 
+    public $contact_secondary_email;
+
+    public $cc_emails_to_secondary_email;
+
     public $contact_other;
 
     public $contact_notes;
