@@ -1,0 +1,353 @@
+{% if contact['id'] is defined %}
+    {% set contactPortrait = contact['portrait'] %}
+    {% set contactId = contact['id'] %}
+    {% set contactAccountId = contact['account_id'] %}
+    {% set contactAccountEmail = contact['account_email'] %}
+    {% set contactFirstName = contact['first_name'] %}
+    {% set contactLastName = contact['last_name'] %}
+    {% set contactJobTitle = contact['job_title'] %}
+    {% set contactManagerId = contact['contact_manager_id'] %}
+    {% set contactManager = contact['contact_manager_full_name'] %}
+    {% set contactSource = contact['contact_source'] %}
+    {% set contactSourceDetails = contact['contact_source_details'] %}
+    {% set contactReferrerId = contact['contact_referrer_id'] %}
+    {% set contactReferrer = contact['contact_referrer_full_name'] %}
+{% else %}
+    {% set contactPortrait = '' %}
+    {% set contactId = '' %}
+    {% set contactAccountId = '' %}
+    {% set contactAccountEmail = '' %}
+    {% set contactFirstName = '' %}
+    {% set contactLastName = '' %}
+    {% set contactJobTitle = '' %}
+    {% set contactManagerId = '' %}
+    {% set contactManager = '' %}
+    {% set contactSource = '' %}
+    {% set contactSourceDetails = '' %}
+    {% set contactReferrerId = '' %}
+    {% set contactReferrer = '' %}
+{% endif %}
+<div class="row vdivide">
+    <div class="col-md-3 col-sm-12">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'portrait',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'files/croppie',
+                'fieldValue'                     : contactPortrait,
+                'imageType'                      : 'portrait',
+                'storageType'                    : 'private',
+                'upload'                         : true,
+                'portraitLink'                   : portraitLink
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Contact ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Contact ID (Auto Generated)',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : contactId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_id',
+                        'fieldLabel'                            : 'Account ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : contactAccountId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_email',
+                        'fieldLabel'                            : 'Email',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Email',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Contact Email address. If field is disabled, it means contact has an account on this system. Only Systems Administrators can change the email address.',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldRequired'                         : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : contactAccountEmail
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'first_name',
+                        'fieldLabel'                     : 'First Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'First Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : contactFirstName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'last_name',
+                        'fieldLabel'                     : 'Last Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Last Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : contactLastName
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'job_title',
+                        'fieldLabel'                     : 'Job Title',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Job Title of the contact',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 100,
+                        'fieldValue'                     : contactJobTitle
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'contact_manager_id',
+                        'fieldLabel'                            : 'Manager ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : contactManagerId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'manager_full_name',
+                        'fieldLabel'                            : 'Manager',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Search Contact',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Search Contact.',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : false,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : contactManager
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_source',
+                        'fieldLabel'                     : 'Contact Source',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Source where you got the contact information from.',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        :
+                            [
+                                'phone_call'            :
+                                    [
+                                        'id'            : 'phone_call',
+                                        'name'          : 'Phone Call'
+                                    ],
+                                'email'            :
+                                    [
+                                        'id'            : 'email',
+                                        'name'          : 'Email'
+                                    ],
+                                'website'            :
+                                    [
+                                        'id'            : 'website',
+                                        'name'          : 'Website'
+                                    ],
+                                'tv'            :
+                                    [
+                                        'id'            : 'tv',
+                                        'name'          : 'Tv'
+                                    ],
+                                'radio'            :
+                                    [
+                                        'id'            : 'radio',
+                                        'name'          : 'Radio'
+                                    ],
+                                'walk_ins'            :
+                                    [
+                                        'id'            : 'walk_ins',
+                                        'name'          : 'Walk Ins'
+                                    ],
+                                'contact_referrer'            :
+                                    [
+                                        'id'            : 'contact_referrer',
+                                        'name'          : 'Contact Referrer'
+                                    ]
+                            ],
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : contactSource
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'contact_source_details',
+                        'fieldLabel'                            : 'Contact Source Details',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Contact source details.',
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : contactSourceDetails
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'contact_referrer_id',
+                        'fieldLabel'                            : 'Contact Referrer ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : contactReferrerId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'referrer_full_name',
+                        'fieldLabel'                            : 'Contact Referrer',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Search Contact',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Search Contact.',
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldRequired'                         : false,
+                        'fieldHidden'                           : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : contactReferrer
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>

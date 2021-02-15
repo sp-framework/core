@@ -1,0 +1,11 @@
+{
+    "name"          : "Contacts",
+    "displayName"   : "Business Directory Contacts Package",
+    "description"   : "Package for Business Directory Contacts component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-business-admin-contacts",
+    "settings"      : { }
+}

@@ -1,0 +1,31 @@
+{% if contact['id'] is defined %}
+    {% set contactInternalNotes = contact['internal_notes'] %}
+{% else %}
+    {% set contactInternalNotes = '' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'internal_notes',
+                'fieldLabel'                     : 'Internal Notes',
+                'fieldType'                      : 'textarea',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Internal Notes',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : contactInternalNotes
+            ]
+        )}}
+    </div>
+</div>
