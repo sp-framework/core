@@ -1,6 +1,6 @@
 {
     "route"         : "hrms/statuses",
-    "name"          : "HRMS Statuses",
+    "name"          : "Statuses",
     "description"   : "Manage statuses via this component",
     "app_type"      : "dash",
     "category"      : "business",
@@ -34,7 +34,7 @@
         ]
     },
     "menu"              : {
-        "seq"           : 3,
+        "seq"           : 5,
         "hrms"      : {
             "title"     : "HR Management",
             "icon"      : "users-cog",

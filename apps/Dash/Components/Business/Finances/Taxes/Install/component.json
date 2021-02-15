@@ -34,7 +34,7 @@
         ]
     },
     "menu"              : {
-        "seq"           : 10,
+        "seq"           : 4,
         "business"      : {
             "title"     : "business",
             "icon"      : "suitcase",

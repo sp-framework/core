@@ -34,7 +34,7 @@
         ]
     },
     "menu"              : {
-        "seq"           : 3,
+        "seq"           : 5,
         "hrms"      : {
             "title"     : "HR Management",
             "icon"      : "users-cog",

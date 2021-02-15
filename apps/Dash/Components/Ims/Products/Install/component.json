@@ -64,7 +64,7 @@
         ]
     },
     "menu"              : {
-        "seq"           : 3,
+        "seq"           : 5,
         "ims"           : {
             "title"     : "Inventory",
             "icon"      : "clipboard-list",

@@ -1,6 +1,6 @@
 {
     "route"         : "business/locations",
-    "name"          : "Locations",
+    "name"          : "Business Locations",
     "description"   : "List business locations via this component",
     "app_type"      : "dash",
     "category"      : "business",
@@ -34,7 +34,7 @@
         ]
     },
     "menu"              : {
-        "seq"           : 5,
+        "seq"           : 4,
         "business"      : {
             "icon"      : "suitcase",
             "title"     : "business",

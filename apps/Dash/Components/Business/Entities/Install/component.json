@@ -39,7 +39,7 @@
         ]
     },
     "menu"              : {
-        "seq"           : 5,
+        "seq"           : 4,
         "business"      : {
             "icon"      : "suitcase",
             "title"     : "business",

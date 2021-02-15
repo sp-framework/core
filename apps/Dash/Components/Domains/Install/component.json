@@ -27,7 +27,7 @@
         ]
     },
     "menu"              : {
-        "seq"           : 4,
+        "seq"           : 3,
         "domains"       : {
             "title"     : "domains",
             "icon"      : "globe-asia",
