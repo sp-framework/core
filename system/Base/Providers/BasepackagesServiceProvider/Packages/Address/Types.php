@@ -7,13 +7,20 @@ use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Address\BasepackagesAddressTypes;
 
-class Addressbook extends BasePackage
+class Types extends BasePackage
 {
     protected $modelToUse = BasepackagesAddressTypes::class;
 
     protected $packageName = 'addresstypes';
 
     public $addresstypes;
+
+    public function init(bool $resetCache = false)
+    {
+        $this->getAll($resetCache);
+
+        return $this;
+    }
 
     public function addAddressType(array $data)
     {
