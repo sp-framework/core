@@ -43,12 +43,13 @@
                 'fieldValue'                     : entityAddressId
             ]
         )}}
-        {% include '../common/address/view' with
+        {{adminltetags.useTag('addresses',
             [
                 'component'                                   : component,
                 'componentName'                               : componentName,
                 'componentId'                                 : componentId,
                 'sectionId'                                   : sectionId,
+                'addressFieldType'                            : 'single',
                 'includeStreet'                               : true,
                 'searchType'                                  : 'city',
                 'streetAddress'                               : entityStreetAddress,
@@ -73,6 +74,6 @@
                 'countryFieldBazPostOnCreate'                 : true,
                 'countryFieldBazPostOnUpdate'                 : true
             ]
-        %}
+        )}}
     </div>
 </div>

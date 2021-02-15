@@ -37,7 +37,7 @@
         )}}
     </div>
     <div class="col">
-        <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
                 {{adminltetags.useTag('tabs',
                     [
@@ -120,6 +120,17 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
                     } else {
                         $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-name_list').val(null).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-name_list').empty().trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-name').val('');
+                        $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-type').val(0);
+                        $('#{{componentId}}-{{sectionId}}-type').trigger('change');
+                        updateModalInfo(false);
                     }
                 });
 
@@ -210,46 +221,46 @@ dataCollectionSection =
                 function updateModalInfo(businessDetails) {
                     if (businessDetails) {
                         if (businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
-                            $('#entity-name').html(businessDetails.businessEntity202001.mainName.organisationName);
+                            $('#company-name').html(businessDetails.businessEntity202001.mainName.organisationName);
                         } else {
-                            $('#entity-name').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
+                            $('#company-name').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
                         }
-                        $('#entity-status').html(businessDetails.businessEntity202001.entityStatus.entityStatusCode);
+                        $('#company-status').html(businessDetails.businessEntity202001.entityStatus.entityStatusCode);
                         if (businessDetails.businessEntity202001.businessName) {
                             var businessNames = [];
                             $.each(businessDetails.businessEntity202001.businessName, function(index, businessName) {
                                 businessNames.push(businessName.organisationName);
                             });
                             var names = businessNames.join(', ');
-                            $('#entity-business-names').html(names);
+                            $('#company-business-names').html(names);
                         } else {
                             if (businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
-                                $('#entity-business-names').html(businessDetails.businessEntity202001.mainName.organisationName);
+                                $('#company-business-names').html(businessDetails.businessEntity202001.mainName.organisationName);
                             } else {
-                                $('#entity-business-names').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
+                                $('#company-business-names').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
                             }
                         }
-                        $('#entity-abn').html(businessDetails.businessEntity202001.ABN.identifierValue);
-                        $('#entity-asic').html(businessDetails.businessEntity202001.ASICNumber);
-                        $('#entity-code').html(businessDetails.businessEntity202001.entityType.entityTypeCode);
-                        $('#entity-description').html(businessDetails.businessEntity202001.entityType.entityDescription);
-                        $('#entity-post-code').html(businessDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
-                        $('#entity-state').html(businessDetails.businessEntity202001.mainBusinessPhysicalAddress.stateCode);
-                        $('#entity-record-updated').html(businessDetails.businessEntity202001.recordLastUpdatedDate);
-                        $('#entity-register-updated').html(businessDetails.dateRegisterLastUpdated);
-                        $('#entity-disclaimer').html(businessDetails.usageStatement);
+                        $('#company-abn').html(businessDetails.businessEntity202001.ABN.identifierValue);
+                        $('#company-asic').html(businessDetails.businessEntity202001.ASICNumber);
+                        $('#company-code').html(businessDetails.businessEntity202001.entityType.entityTypeCode);
+                        $('#company-description').html(businessDetails.businessEntity202001.entityType.entityDescription);
+                        $('#company-post-code').html(businessDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                        $('#company-state').html(businessDetails.businessEntity202001.mainBusinessPhysicalAddress.stateCode);
+                        $('#company-record-updated').html(businessDetails.businessEntity202001.recordLastUpdatedDate);
+                        $('#company-register-updated').html(businessDetails.dateRegisterLastUpdated);
+                        $('#company-disclaimer').html(businessDetails.usageStatement);
                     } else {
-                        $('#entity-name').html('');
-                        $('#entity-status').html('');
-                        $('#entity-abn').html('');
-                        $('#entity-asic').html('');
-                        $('#entity-code').html('');
-                        $('#entity-description').html('');
-                        $('#entity-post-code').html('');
-                        $('#entity-state').html('');
-                        $('#entity-record-updated').html('');
-                        $('#entity-register-updated').html('');
-                        $('#entity-disclaimer').html('');
+                        $('#company-name').html('');
+                        $('#company-status').html('');
+                        $('#company-abn').html('');
+                        $('#company-asic').html('');
+                        $('#company-code').html('');
+                        $('#company-description').html('');
+                        $('#company-post-code').html('');
+                        $('#company-state').html('');
+                        $('#company-record-updated').html('');
+                        $('#company-register-updated').html('');
+                        $('#company-disclaimer').html('');
                     }
                 }
             }
@@ -263,7 +274,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-address_id'              : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
-            ignore: ':submit, :reset, :image, :hidden, :disabled, .ignore, .cr-slider',
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {
                 // //eslint-disable-next-line
                 // console.log(validator.errorList);
