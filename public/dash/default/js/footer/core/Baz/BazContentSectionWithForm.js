@@ -349,7 +349,8 @@
                             if ($(bazScanField).data('bazpostoncreate') === true ||
                                 $(bazScanField).data('bazpostonupdate') === true ||
                                 $(bazScanField).data('bazdevpost') === true) {
-                                if ($(thatV)[0]['multiple']) {
+
+                                if ($(thatV)[0]['multiple'] || $(thatV).data('create') == true) {
                                     dataCollection[componentId][sectionId]['data'][extractComponentId] = { };
                                     dataCollection[componentId][sectionId]['data'][extractComponentId]['data'] = [];
                                     var select2Data = $(bazScanField).select2('data');
