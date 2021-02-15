@@ -156,9 +156,10 @@ dataCollectionSection =
                                 source.setAttribute("id", "{{componentId}}-{{sectionId}}-primary_contact_employee_list");
                                 source.setAttribute("class", "autoComplete_results");
                             },
-                            destination: document.querySelector("#{{componentId}}-{{sectionId}}-primary_contact_employee"),
+                            destination: "#{{componentId}}-{{sectionId}}-primary_contact_employee",
                             position: "afterend",
-                            element: "div"
+                            element: "div",
+                            className: "autoComplete_results"
                         },
                         maxResults: 5,                         // Max. number of rendered results | (Optional)
                         highlight: true,                       // Highlight matching results      | (Optional)
@@ -168,12 +169,19 @@ dataCollectionSection =
                             },
                             element: "div"
                         },
-                        noResults: () => {                     // Action script on noResults      | (Optional)
+                        noResults: () => {
                             const result = document.createElement("li");
                             result.setAttribute("class", "autoComplete_result text-danger");
                             result.setAttribute("tabindex", "1");
                             result.innerHTML = "No search results. Click field help for more information.";
-                            document.querySelector("#{{componentId}}-{{sectionId}}-primary_contact_employee_list").appendChild(result);
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-primary_contact_employee_list")) {
+                                document.querySelector("#{{componentId}}-{{sectionId}}-primary_contact_employee_list").appendChild(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-primary_contact_employee").parent('.form-group').append(
+                                    '<div id="{{componentId}}-{{sectionId}}-primary_contact_employee_list"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-primary_contact_employee_list").appendChild(result);
+                            }
                         },
                         onSelection: feedback => {             // Action script onSelection event | (Optional)
                             $('#{{componentId}}-{{sectionId}}-primary_contact_employee_id').val(feedback.selection.value.id);
@@ -245,9 +253,10 @@ dataCollectionSection =
                                 source.setAttribute("id", "{{componentId}}-{{sectionId}}-secondary_contact_employee_list");
                                 source.setAttribute("class", "autoComplete_results");
                             },
-                            destination: document.querySelector("#{{componentId}}-{{sectionId}}-secondary_contact_employee"),
+                            destination: "#{{componentId}}-{{sectionId}}-secondary_contact_employee",
                             position: "afterend",
-                            element: "div"
+                            element: "div",
+                            className: "autoComplete_results"
                         },
                         maxResults: 5,                         // Max. number of rendered results | (Optional)
                         highlight: true,                       // Highlight matching results      | (Optional)
@@ -285,21 +294,26 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-address_id'                      : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
+            ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            invalidHandler: function (form, validator) {
+                // //eslint-disable-next-line
+                // console.log(validator.errorList);
+            },
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-street_address'          : 'required',
-                '{{componentId}}-{{sectionId}}-city'                    : 'required',
+                '{{componentId}}-{{sectionId}}-city_name'               : 'required',
                 '{{componentId}}-{{sectionId}}-post_code'               : 'required',
-                '{{componentId}}-{{sectionId}}-state'                   : 'required',
-                '{{componentId}}-{{sectionId}}-country'                 : 'required',
+                '{{componentId}}-{{sectionId}}-state_name'              : 'required',
+                '{{componentId}}-{{sectionId}}-country_name'            : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter location name',
                 '{{componentId}}-{{sectionId}}-street_address'          : 'Please enter street address',
-                '{{componentId}}-{{sectionId}}-city'                    : 'Please enter city',
+                '{{componentId}}-{{sectionId}}-city_name'               : 'Please enter city',
                 '{{componentId}}-{{sectionId}}-post_code'               : 'Please enter post code',
-                '{{componentId}}-{{sectionId}}-state'                   : 'Please enter state',
-                '{{componentId}}-{{sectionId}}-country'                 : 'Please enter country'
+                '{{componentId}}-{{sectionId}}-state_name'              : 'Please enter state',
+                '{{componentId}}-{{sectionId}}-country_name'            : 'Please enter country'
             }
         }
     });

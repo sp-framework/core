@@ -38,12 +38,33 @@
 {% endif %}
 <div class="row">
     <div class="col">
-        {% include '../common/address/view' with
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Location Address ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Location Address ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : locationAddressId
+            ]
+        )}}
+        {{adminltetags.useTag('addresses',
             [
                 'component'                                   : component,
                 'componentName'                               : componentName,
                 'componentId'                                 : componentId,
                 'sectionId'                                   : sectionId,
+                'addressFieldType'                            : 'single',
                 'includeStreet'                               : true,
                 'searchType'                                  : 'city',
                 'streetAddress'                               : locationStreetAddress,
@@ -67,31 +88,6 @@
                 'countryName'                                 : locationCountry,
                 'countryFieldBazPostOnCreate'                 : true,
                 'countryFieldBazPostOnUpdate'                 : true
-            ]
-        %}
-    </div>
-</div>
-<hr>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'address_id',
-                'fieldLabel'                     : 'Location Address ID',
-                'fieldType'                      : 'input',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Location Address ID',
-                'fieldRequired'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : false,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldHidden'                    : true,
-                'fieldDisabled'                  : true,
-                'fieldValue'                     : locationAddressId
             ]
         )}}
     </div>
