@@ -7774,6 +7774,8 @@ var BazContentFields = function() {
                         initRadio(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
                     } else if (bazScanField.dataset.bazscantype === 'flatpickr') {
                         initFlatpickr(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
+                    } else if (bazScanField.dataset.bazscantype === 'colorpicker') {
+                        initColorpicker(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
                     } else if (bazScanField.dataset.bazscantype === 'textarea') {
                         initTextarea(bazScanField.id, dataCollection[componentId][sectionId][bazScanField.id]);
                     } else if (bazScanField.dataset.bazscantype === 'trumbowyg') {
@@ -8057,6 +8059,20 @@ var BazContentFields = function() {
                 dataCollection[componentId][sectionId][fieldId]['flatpickr'].close();
             });
         }
+        if (options.afterInit) {
+            options.afterInit(dataCollection);
+        }
+    }
+
+    function initColorpicker(fieldId, options) {
+        if (options.beforeInit) {
+            options.beforeInit();
+        }
+
+        var id = $('#' + fieldId).parents('.input-group')[0].id;
+
+        dataCollection[componentId][sectionId][fieldId]['colorpicker'] = $('#' + id).colorpicker(options);
+
         if (options.afterInit) {
             options.afterInit(dataCollection);
         }
