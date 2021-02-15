@@ -1,0 +1,61 @@
+{
+    "route"         : "system/tools/qrcodes",
+    "name"          : "Qrcodes",
+    "description"   : "Manage Qrcodes via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-tools-qrcodes",
+    "class"         : "Apps\\Dash\\Components\\System\\Tools\\Qrcodes\\QrcodesComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Qrcodes",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-system-admin-tools-qrcodes"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "tools" : {
+                    "title"     : "Tools",
+                    "icon"      : "wrench",
+                    "childs"    : {
+                        "qrcodes" : {
+                            "title"     : "Qrcodes",
+                            "icon"      : "qrcode",
+                            "link"      : "system/tools/qrcodes"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}
