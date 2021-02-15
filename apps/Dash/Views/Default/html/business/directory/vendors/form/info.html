@@ -1,0 +1,283 @@
+{% if vendor['id'] is defined %}
+    {% set vendorId = vendor['id'] %}
+    {% set vendorLogo = vendor['logo'] %}
+    {% set vendorAbn = vendor['abn'] %}
+    {% set vendorName = vendor['name'] %}
+    {% set vendorIsManufacturer = vendor['is_manufacturer'] %}
+    {% set vendorDoesDropship = vendor['does_dropship'] %}
+    {% set vendorDoesJobwork = vendor['does_jobwork'] %}
+    {% set vendorBrands = vendor['brands'] %}
+{% else %}
+    {% set vendorId = '' %}
+    {% set vendorLogo = '' %}
+    {% set vendorAbn = '' %}
+    {% set vendorName = '' %}
+    {% set vendorIsManufacturer = '' %}
+    {% set vendorDoesDropship = '' %}
+    {% set vendorDoesJobwork = '' %}
+    {% set vendorBrands = '' %}
+{% endif %}
+
+<div class="row vdivide">
+    <div class="col-md-3 col-sm-12">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'logo',
+                'fieldLabel'                     : false,
+                'fieldType'                      : 'files/croppie',
+                'fieldValue'                     : vendorLogo,
+                'imageType'                      : 'logo',
+                'upload'                         : true,
+                'logoLink'                       : logoLink
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Vendor ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Vendor ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : vendorId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'abn',
+                        'fieldLabel'                            : 'Abn',
+                        'fieldType'                             : 'input',
+                        'fieldGroupPostAddonButtons'          :
+                            [
+                                'abn-search'   : [
+                                    'title'                   : 'Search ABN',
+                                    'icon'                    : 'cog fa-spin',
+                                    'iconHidden'              : true,
+                                    'noMargin'                : true,
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                    'position'                : 'right'
+                                ],
+                                'abn-info'   : [
+                                    'title'                   : false,
+                                    'type'                    : 'info',
+                                    'icon'                    : 'info',
+                                    'noMargin'                : true,
+                                    'disabled'                : true,
+                                    'buttonAdditionalClass'   : 'rounded-0',
+                                    'position'                : 'right'
+                                ]
+                            ],
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Australia Business Number',
+                        'fieldRequired'                         : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinLength'               : 11,
+                        'fieldDataInputMaxLength'               : 11,
+                        'fieldValue'                            : vendorAbn
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'name_list',
+                        'fieldLabel'                            : 'Business Name',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Business Names List',
+                        'fieldRequired'                         : true,
+                        'fieldDisabled'                         : true,
+                        'fieldHidden'                           : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldDataSelect2Options'               : [],
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'name',
+                        'fieldLabel'                            : 'Business Name',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Vendor Business Name Example: My Vendor Pty Ltd',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100,
+                        'fieldValue'                            : vendorName
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% if vendorIsManufacturer is defined %}
+                    {% if vendorIsManufacturer == 1 %}
+                        {% set vendorIsManufacturerChecked = true %}
+                    {% else %}
+                        {% set vendorIsManufacturerChecked = false %}
+                    {% endif %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'is_manufacturer',
+                        'fieldLabel'                     : 'is Manufacturer?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is vendor also the manufacturer for their brand?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : vendorIsManufacturerChecked,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if vendorDoesDropship is defined %}
+                    {% if vendorDoesDropship == 1 %}
+                        {% set vendorDoesDropshipChecked = true %}
+                    {% else %}
+                        {% set vendorDoesDropshipChecked = false %}
+                    {% endif %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'does_dropship',
+                        'fieldLabel'                     : 'does dropship?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Does vendor provide dropship service to end customers?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : vendorDoesDropshipChecked,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if vendorDoesJobwork is defined %}
+                    {% if vendorDoesJobwork == 1 %}
+                        {% set vendorDoesJobworkChecked = true %}
+                    {% else %}
+                        {% set vendorDoesJobworkChecked = false %}
+                    {% endif %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'does_jobwork',
+                        'fieldLabel'                     : 'does jobwork?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Does vendor provide jobwork service?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : vendorDoesJobworkChecked,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'brands',
+                        'fieldLabel'                           : 'Brand(s)',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Brands that vendor deals in. Select or add new brand',
+                        'fieldRequired'                        : false,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Multiple'             : true,
+                        'fieldDataSelect2Options'              : brands,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : vendorBrands
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>

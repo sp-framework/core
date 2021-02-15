@@ -1,0 +1,353 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'vendors/form/info',
+                                    'tabIncludeParams'  : ['vendor': vendor]
+                                ],
+                                'contacts'   :
+                                [
+                                    'tabTitle'          : 'Contacts',
+                                    'tabInclude'        : 'vendors/form/contacts',
+                                    'tabIncludeParams'  : ['vendor': vendor]
+                                ],
+                                'addresses'   :
+                                [
+                                    'tabTitle'          : 'Addresses',
+                                    'tabInclude'        : 'vendors/form/addresses',
+                                    'tabIncludeParams'  : ['vendor': vendor]
+                                ],
+                                'notes'   :
+                                [
+                                    'tabTitle'          : 'Notes',
+                                    'tabInclude'        : 'vendors/form/notes',
+                                    'tabIncludeParams'  : ['vendor': vendor]
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<div>
+    {{adminltetags.useTag('modal',
+        [
+            'component'                 : component,
+            'componentName'             : componentName,
+            'componentId'               : componentId,
+            'sectionId'                 : sectionId,
+            'modalId'                   : 'info-modal',
+            'modalBodyInclude'          : 'vendors/info',
+            'modalSize'                 : 'lg',
+            'modalHeader'               : true,
+            'modalFooter'               : true,
+            'modalTitle'                : '<i class="fa fas fa-fw fa-info"></i> VENDOR BUSINESS INFORMATION',
+            'modalEscClose'             : 'true'
+        ]
+    )}}
+</div>
+<script>
+/* globals BazContentFieldsValidator PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-abn'                     : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-abn').on('input propertychange', function() {
+                    if ($(this).val().length === 11) {
+                        $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-name_list').val(null).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-name_list').empty().trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-name').val('');
+                        $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
+                        updateModalInfo(false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-abn-search').click(function(e) {
+                    e.preventDefault();
+                    $(this).attr('disabled', true);
+                    $(this).children('i').attr('hidden', false);
+                    var postData = { };
+                    postData['abn'] = $('#{{componentId}}-{{sectionId}}-abn').val();
+
+                    $.post('{{links.url("business/directory/vendors/searchABN")}}', postData, function(data) {
+                        $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-abn-search').children('i').attr('hidden', true);
+
+                        if (data.tokenKey && data.token) {
+                            $("#security-token").attr("name", data.tokenKey);
+                            $("#security-token").val(data.token);
+                        }
+
+                        if (data.responseCode === 0) {
+                            if (data.vendorDetails.exception) {
+                                PNotify.error({
+                                    text : data.vendorDetails.exception.exceptionDescription
+                                });
+                                return;
+                            }
+                            if (data.vendorDetails.businessEntity202001.entityStatus.entityStatusCode === 'Cancelled') {
+                                PNotify.notice({
+                                    textTrusted : true,
+                                    text : 'Details for ABN: ' + $('#{{componentId}}-{{sectionId}}-abn').val() + ' found.' +
+                                           '<br>Status: ' + data.vendorDetails.businessEntity202001.entityStatus.entityStatusCode
+                                });
+                            } else {
+                                PNotify.success({
+                                    text : 'Details for ABN: ' + $('#{{componentId}}-{{sectionId}}-abn').val() + ' found.'
+                                });
+
+
+                                if (data.vendorDetails.businessEntity202001.businessName) {
+                                    $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').addClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').removeClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', false);
+                                    $('#{{componentId}}-{{sectionId}}-name').val('');
+                                    var newOption;
+                                    newOption = new Option(data.vendorDetails.businessEntity202001.mainName.organisationName, 0, false, false);
+                                    $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
+                                    $.each(data.vendorDetails.businessEntity202001.businessName, function(index, businessName) {
+                                        newOption = new Option(businessName.organisationName, index + 1, false, false);
+                                        $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
+                                    });
+                                    $('#{{componentId}}-{{sectionId}}-name_list').on('select2:select', function(e) {
+                                        $('#{{componentId}}-{{sectionId}}-name').val('');
+                                        $('#{{componentId}}-{{sectionId}}-name').val(e.params.data.text);
+                                        $('#{{componentId}}-{{sectionId}}-name').attr('value', e.params.data.text);
+                                    });
+                                } else {
+                                    $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').addClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-name_list').val(null).trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-name_list').empty().trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
+                                    if (data.vendorDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                                        $('#{{componentId}}-{{sectionId}}-name').val(data.vendorDetails.businessEntity202001.mainName.organisationName);
+                                    } else {
+                                        $('#{{componentId}}-{{sectionId}}-name').val(data.vendorDetails.businessEntity202001.mainTradingName.organisationName);
+                                    }
+                                }
+
+                                $('#{{componentId}}-{{sectionId}}-type').val(data.vendorDetails.businessEntity202001.entityType.entityTypeCode);
+                                $('#{{componentId}}-{{sectionId}}-type').trigger('change');
+
+                                $('#{{componentId}}-{{sectionId}}-post_code').val(data.vendorDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                            }
+
+                            $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', false);
+                            updateModalInfo(data.vendorDetails);
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-abn-info').click(function(e) {
+                    e.preventDefault();
+                    $('#{{componentId}}-{{sectionId}}-info-modal').modal('show');
+                });
+
+                function updateModalInfo(vendorDetails) {
+                    if (vendorDetails) {
+                        if (vendorDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                            $('#company-name').html(vendorDetails.businessEntity202001.mainName.organisationName);
+                        } else {
+                            $('#company-name').html(vendorDetails.businessEntity202001.mainTradingName.organisationName);
+                        }
+                        $('#company-status').html(vendorDetails.businessEntity202001.entityStatus.entityStatusCode);
+                        if (vendorDetails.businessEntity202001.businessName) {
+                            var businessNames = [];
+                            $.each(vendorDetails.businessEntity202001.businessName, function(index, businessName) {
+                                businessNames.push(businessName.organisationName);
+                            });
+                            var names = businessNames.join(', ');
+                            $('#company-business-names').html(names);
+                        } else {
+                            if (vendorDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                                $('#company-business-names').html(vendorDetails.businessEntity202001.mainName.organisationName);
+                            } else {
+                                $('#company-business-names').html(vendorDetails.businessEntity202001.mainTradingName.organisationName);
+                            }
+                        }
+                        $('#company-abn').html(vendorDetails.businessEntity202001.ABN.identifierValue);
+                        $('#company-asic').html(vendorDetails.businessEntity202001.ASICNumber);
+                        $('#company-code').html(vendorDetails.businessEntity202001.entityType.entityTypeCode);
+                        $('#company-description').html(vendorDetails.businessEntity202001.entityType.entityDescription);
+                        $('#company-post-code').html(vendorDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                        $('#company-state').html(vendorDetails.businessEntity202001.mainBusinessPhysicalAddress.stateCode);
+                        $('#company-record-updated').html(vendorDetails.businessEntity202001.recordLastUpdatedDate);
+                        $('#company-register-updated').html(vendorDetails.dateRegisterLastUpdated);
+                        $('#company-disclaimer').html(vendorDetails.usageStatement);
+                    } else {
+                        $('#company-name').html('');
+                        $('#company-status').html('');
+                        $('#company-abn').html('');
+                        $('#company-asic').html('');
+                        $('#company-code').html('');
+                        $('#company-description').html('');
+                        $('#company-post-code').html('');
+                        $('#company-state').html('');
+                        $('#company-record-updated').html('');
+                        $('#company-register-updated').html('');
+                        $('#company-disclaimer').html('');
+                    }
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-name_list'               : {
+            placeholder : 'SELECT A BUSINESS NAME'
+        },
+        '{{componentId}}-{{sectionId}}-type'                    : { },
+        '{{componentId}}-{{sectionId}}-is_manufacturer'         : { },
+        '{{componentId}}-{{sectionId}}-does_dropship'           : { },
+        '{{componentId}}-{{sectionId}}-does_jobwork'            : { },
+        '{{componentId}}-{{sectionId}}-brands'                  : {
+            'placeholder'   : "SUPPLIER BRAND(s)",
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('ims/brands/searchBrand')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(data) {
+                    if (data.tokenKey && data.token) {
+                        $('#security-token').attr('name', data.tokenKey);
+                        $('#security-token').val(data.token);
+                    }
+                    if (data.brands) {
+                        var brandsData = [];
+                        for (var item of data.brands) {
+                            brandsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: brandsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-internal_notes'          : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-abn'                    : 'required',
+                '{{componentId}}-{{sectionId}}-name'                   : 'required',
+                '{{componentId}}-{{sectionId}}-brands'                 : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
+                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name',
+                '{{componentId}}-{{sectionId}}-brands'                 : 'Please select supplier brands'
+            }
+        }
+    });
+</script>
