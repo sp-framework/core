@@ -50,7 +50,7 @@ class EmployeesComponent extends BaseComponent
                 $employee = $this->employees->getById($this->getData()['id']);
 
                 if ($employee['portrait'] && $employee['portrait'] !== '') {
-                    $this->view->portraitLink = $this->links->url('storages/q/uuid/' . $employee['portrait'] . '/w/200');
+                    $this->view->portraitLink = $this->links->url('system/storages/q/uuid/' . $employee['portrait'] . '/w/200');
                 }
 
                 $employee['account_email'] = $this->basepackages->accounts->getById($employee['account_id'])['email'];
@@ -105,9 +105,11 @@ class EmployeesComponent extends BaseComponent
                     }
                     $employee['employment_attachments'] = $attachments;
                 }
-
-                $this->view->employee = $employee;
+            } else {
+                $employee = [];
             }
+
+            $this->view->employee = $employee;
 
             $this->view->statuses = $statuses;
 

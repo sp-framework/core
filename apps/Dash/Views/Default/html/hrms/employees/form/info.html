@@ -1,3 +1,26 @@
+{% if employee['id'] is defined %}
+    {% set employeePortrait = employee['portrait'] %}
+    {% set employeeId = employee['id'] %}
+    {% set employeeAccountId = employee['account_id'] %}
+    {% set employeeAccountEmail = employee['account_email'] %}
+    {% set employeeStatus = employee['status'] %}
+    {% set employeeFirstName = employee['first_name'] %}
+    {% set employeeLastName = employee['last_name'] %}
+    {% set employeeDesignation = employee['designation'] %}
+    {% set employeeManagerId = employee['manager_id'] %}
+    {% set employeeManager = employee['manager_full_name'] %}
+{% else %}
+    {% set employeePortrait = '' %}
+    {% set employeeId = '' %}
+    {% set employeeAccountId = '' %}
+    {% set employeeAccountEmail = '' %}
+    {% set employeeStatus = '' %}
+    {% set employeeFirstName = '' %}
+    {% set employeeLastName = '' %}
+    {% set employeeDesignation = '' %}
+    {% set employeeManagerId = '' %}
+    {% set employeeManager = '' %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
         {{adminltetags.useTag('fields',

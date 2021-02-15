@@ -1,3 +1,24 @@
+{% if employee['id'] is defined %}
+    {% set employeeType = employee['type_id'] %}
+    {% set employeeHireDate = employee['hire_date'] %}
+    {% set employeeTerminateDate = employee['terminate_date'] %}
+    {% set employeeHireManagerId = employee['hire_manager_id'] %}
+    {% set employeeHireManager = employee['hire_manager_full_name'] %}
+    {% set employeeHireReferrerId = employee['hire_referrer_id'] %}
+    {% set employeeHireReferrer = employee['hire_referrer_full_name'] %}
+    {% set employeeEmploymentAttachments = employee['employment_attachments'] %}
+    {% set employeeEmploymentNotes = employee['employment_notes'] %}
+{% else %}
+    {% set employeeType = '' %}
+    {% set employeeHireDate = '' %}
+    {% set employeeTerminateDate = '' %}
+    {% set employeeHireManagerId = '' %}
+    {% set employeeHireManager = '' %}
+    {% set employeeHireReferrerId = '' %}
+    {% set employeeHireReferrer = '' %}
+    {% set employeeEmploymentAttachments = [] %}
+    {% set employeeEmploymentNotes = '' %}
+{% endif %}
 <div class="row vdivide">
     <div class="col">
         <div class="row">

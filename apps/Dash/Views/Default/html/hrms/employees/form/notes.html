@@ -1,3 +1,8 @@
+{% if employee['id'] is defined %}
+    {% set employeeAdditionalNotes = employee['additional_notes'] %}
+{% else %}
+    {% set employeeAdditionalNotes = '' %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',

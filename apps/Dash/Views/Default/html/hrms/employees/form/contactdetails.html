@@ -1,3 +1,42 @@
+{% if employee['id'] is defined %}
+    {% set employeeWorkType = employee['work_type_id'] %}
+    {% set employeeContactLocationId = employee['contact_location_id'] %}
+    {% set employeeContactAddressId = employee['contact_address_id'] %}
+    {% set employeeContactStreetAddress = employee['street_address'] %}
+    {% set employeeContactStreetAddress2 = employee['street_address_2'] %}
+    {% set employeeContactCityId = employee['city_id'] %}
+    {% set employeeContactCity = employee['city_name'] %}
+    {% set employeeContactPostCode = employee['post_code'] %}
+    {% set employeeContactStateId = employee['state_id'] %}
+    {% set employeeContactState = employee['state_name'] %}
+    {% set employeeContactCountryId = employee['country_id'] %}
+    {% set employeeContactCountry = employee['country_name'] %}
+    {% set employeeContactPhone = employee['contact_phone'] %}
+    {% set employeeContactPhoneExt = employee['contact_phone_ext'] %}
+    {% set employeeContactMobile = employee['contact_mobile'] %}
+    {% set employeeContactFax = employee['contact_fax'] %}
+    {% set employeeContactOther = employee['contact_other'] %}
+    {% set employeeContactNotes = employee['contact_notes'] %}
+{% else %}
+    {% set employeeWorkType = '' %}
+    {% set employeeContactLocationId = '' %}
+    {% set employeeContactAddressId = '' %}
+    {% set employeeContactStreetAddress = '' %}
+    {% set employeeContactStreetAddress2 = '' %}
+    {% set employeeContactCityId = '' %}
+    {% set employeeContactCity = '' %}
+    {% set employeeContactPostCode = '' %}
+    {% set employeeContactStateId = '' %}
+    {% set employeeContactState = '' %}
+    {% set employeeContactCountryId = '' %}
+    {% set employeeContactCountry = '' %}
+    {% set employeeContactPhone = '' %}
+    {% set employeeContactPhoneExt = '' %}
+    {% set employeeContactMobile = '' %}
+    {% set employeeContactFax = '' %}
+    {% set employeeContactOther = '' %}
+    {% set employeeContactNotes = '' %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -125,12 +164,13 @@
                         'fieldValue'                     : employeeContactAddressId
                     ]
                 )}}
-                {% include '../common/address/view' with
+                {{adminltetags.useTag('addresses',
                     [
                         'component'                                   : component,
                         'componentName'                               : componentName,
                         'componentId'                                 : componentId,
                         'sectionId'                                   : sectionId,
+                        'addressFieldType'                            : 'single',
                         'includeStreet'                               : true,
                         'searchType'                                  : 'city',
                         'streetAddress'                               : employeeContactStreetAddress,
@@ -166,7 +206,7 @@
                         'countryFieldBazPostOnUpdate'                 : true,
                         'countryFieldHidden'                          : true
                     ]
-                %}
+                )}}
             </div>
         </div>
     </div>
