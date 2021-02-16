@@ -66,6 +66,22 @@ class Croppie
             return;
         }
 
+        if (!isset($this->params['fieldCroppieSize'])) {
+            $this->params['fieldCroppieSize'] = 'viewport';//sizes: viewport, original
+        }
+
+        if (!isset($this->params['fieldCroppieFormat'])) {
+            $this->params['fieldCroppieFormat'] = 'jpeg';//formats: png, jpeg, webp
+        }
+
+        if (isset($this->params['fieldCroppieViewportCircle']) && $this->params['fieldCroppieViewportCircle'] === true) {
+            $this->params['fieldCroppieViewportCircle'] = 'true';//circle: true/false
+            $this->params['fieldCroppieViewportType'] = 'circle';
+        } else {
+            $this->params['fieldCroppieViewportCircle'] = 'false';//circle: true/false
+            $this->params['fieldCroppieViewportType'] = 'square';
+        }
+
         $croppieButtons = [];
 
         if (isset($this->params['upload']) && $this->params['upload'] === true) {
@@ -274,6 +290,7 @@ class Croppie
                                         viewport: {
                                             width: 200,
                                             height: 200,
+                                            type: "' . $this->params['fieldCroppieViewportType'] . '"
                                         },
                                         boundary: {
                                             width: 250,
@@ -309,9 +326,9 @@ class Croppie
                                 //To Canvas for show
                                 window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["' . $this->compSecId . '-' . $this->params['fieldId'] . '"].croppie("result", {
                                     type    : "canvas",
-                                    size    : "viewport",
-                                    format  : "jpeg",
-                                    circle  : false
+                                    size    : "' . $this->params['fieldCroppieSize'] . '",
+                                    format  : "' . $this->params['fieldCroppieFormat'] . '",
+                                    circle  : ' . $this->params['fieldCroppieViewportCircle'] . '
                                 }).then(function (croppedImage) {
                                     imageBlob = croppedImage;
                                     $("#' . $this->compSecId . '-croppie").attr("hidden", true);
@@ -323,9 +340,9 @@ class Croppie
                                 //To Blob for upload
                                 window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["' . $this->compSecId . '-' . $this->params['fieldId'] . '"].croppie("result", {
                                     type    : "blob",
-                                    size    : "viewport",
-                                    format  : "jpeg",
-                                    circle  : false
+                                    size    : "' . $this->params['fieldCroppieSize'] . '",
+                                    format  : "' . $this->params['fieldCroppieFormat'] . '",
+                                    circle  : ' . $this->params['fieldCroppieViewportCircle'] . '
                                 }).then(function (croppedImage) {
                                     imageBlob = croppedImage;
                                     newImage = true;
