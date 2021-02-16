@@ -59,17 +59,7 @@ class BarcodesComponent extends BaseComponent
                 return;
             }
 
-            $this->generateBarcodeAction(
-                $this->postData()['barcode'],
-                $this->postData()['barcodeType'],
-                $this->postData()['generatorName'],
-                $this->postData()['width'],
-                $this->postData()['height'],
-                $this->postData()['foreground'],
-                $this->postData()['showText'],
-                $this->postData()['textPlacement'],
-                true
-            );
+            $this->generateBarcodeAction(false);
 
             if ($this->barcodes->packagesData->responseCode === 0) {
                 $this->view->barcode = $this->barcodes->packagesData->barcode;
@@ -82,18 +72,14 @@ class BarcodesComponent extends BaseComponent
         }
     }
 
-    public function generateBarcodeAction(
-        $barcode,
-        $barcodeType = "C128",
-        $generatorName = "HTML",
-        $scale = 2,
-        $height = 30,
-        $foreground = '#000000',
-        $showText = false,
-        $textPlacement = 'BOTTOM',
-        $test = false
-    ) {
-        $this->barcodes->generateBarcode($barcode, $barcodeType, $generatorName, $scale, $height, $foreground, $showText, $textPlacement, $test);
+    public function generateBarcodeAction($test = false)
+    {
+        $this->barcodes->generateBarcode(
+            $this->postData()['barcode'],
+            $this->postData()['barcodeType'],
+            $this->postData(),
+            $test
+        );
 
         $this->view->responseCode = $this->barcodes->packagesData->responseCode;
 

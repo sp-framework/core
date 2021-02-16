@@ -186,7 +186,7 @@
                                 'fieldId'                               : 'foreground',
                                 'fieldLabel'                            : 'Color',
                                 'fieldType'                             : 'colorpicker',
-                                'fieldColorpickerPreAddonColorSquare'  : true,
+                                'fieldColorpickerPreAddonColorSquare'   : true,
                                 'fieldHelp'                             : true,
                                 'fieldHelpTooltipContent'               : 'Color of the barcode',
                                 'fieldRequired'                         : true,
@@ -437,6 +437,8 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').click(function(e) {
                     e.preventDefault();
 
+                    $('#barcode-image').empty();
+
                     $(this).attr('disabled', true);
                     $(this).children('i').attr('hidden', false);
 
@@ -444,7 +446,7 @@ dataCollectionSection =
                     postData['barcode'] = $('#{{componentId}}-{{sectionId}}-test-barcode-text').val();
                     postData['barcodeType'] = $('#{{componentId}}-{{sectionId}}-test-barcode-select').select2('data')[0].id;
                     postData['generatorName'] = $('#{{componentId}}-{{sectionId}}-defaultGenerator').select2('data')[0].id;
-                    postData['width'] = $('#{{componentId}}-{{sectionId}}-widthFactor').select2('data')[0].id;
+                    postData['widthFactor'] = $('#{{componentId}}-{{sectionId}}-widthFactor').select2('data')[0].id;
                     postData['height'] = $('#{{componentId}}-{{sectionId}}-height').val();
                     postData['foreground'] = $('#{{componentId}}-{{sectionId}}-foreground').val();
                     postData['showText'] = $('#{{componentId}}-{{sectionId}}-showText')[0].checked;
@@ -458,7 +460,7 @@ dataCollectionSection =
                             if (postData['generatorName'] === 'HTML' ||
                                 postData['generatorName'] === 'SVG'
                             ) {
-                                $('#barcode-image').empty().append(data.barcode);
+                                $('#barcode-image').append(data.barcode);
                             } else if (postData['generatorName'] === 'PNG' ||
                                        postData['generatorName'] === 'JPG'
                             ) {
@@ -468,7 +470,7 @@ dataCollectionSection =
                                 } else if (postData['generatorName'] === 'JPG') {
                                     imgSrc = 'data:image/jpeg;charset=utf-8;base64, ' + data.barcode;
                                 }
-                                $('#barcode-image').empty().append(
+                                $('#barcode-image').append(
                                     '<img src="' + imgSrc + '" />'
                                 );
                             }

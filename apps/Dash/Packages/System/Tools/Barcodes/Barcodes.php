@@ -66,60 +66,103 @@ class Barcodes extends BasePackage
     }
 
     public function generateBarcode(
-        $barcode,
-        $barcodeType = "C128",
-        $generatorName = "HTML",
-        $scale = 2,
-        $height = 30,
-        $foreground = '#000000',
-        $showText = false,
-        $textPlacement = 'BOTTOM',
-        $test = false
+        string $barcode,
+        $barcodeType = 'EAN13',
+        array $settings = [],
+        bool $test = false
     ) {
+        $this->getBarcodesSettings();
+
         if (!$test) {
-            if (!in_array($barcodeType, $this->barcodesSettings['enabledCodes'])) {
+            if (isset($barcodeType)) {
+                if (!in_array($barcodeType, $this->barcodesSettings['enabledCodes'])) {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Requested barcode type not enabled';
+
+                    return;
+                }
+            } else {
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Requested barcode type not enabled';
+                $this->packagesData->responseMessage = 'barcodeType not set.';
 
                 return;
             }
 
-            if (!in_array($generatorName, $this->barcodesSettings['availableGenerators'])) {
-                $this->packagesData->responseCode = 1;
+            if (isset($settings['generatorName'])) {
+                if (!in_array($settings['generatorName'], $this->barcodesSettings['availableGenerators'])) {
+                    $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Requested barcode generator not defined';
+                    $this->packagesData->responseMessage = 'Requested barcode generator not defined';
 
-                return;
+                    return;
+                }
+            } else {
+                $settings['generatorName'] = $this->barcodesSettings['defaultGenerator'];
+            }
+
+            if (!isset($settings['widthFactor'])) {
+                $settings['widthFactor'] = $this->barcodesSettings['widthFactor'];
+            }
+
+            if (!isset($settings['height'])) {
+                $settings['height'] = $this->barcodesSettings['height'];
+            }
+
+            if (!isset($settings['foreground'])) {
+                $settings['foreground'] = $this->barcodesSettings['foreground'];
+            }
+
+            if (!isset($settings['showText'])) {
+                $settings['showText'] = $this->barcodesSettings['showText'];
+            }
+
+            if (!isset($settings['textPlacement'])) {
+                $settings['textPlacement'] = $this->barcodesSettings['defaultTextPlacement'];
             }
         }
 
-        if ($generatorName === 'PNG') {
-            $foreground = $this->hex2rgb($foreground);
+        if ($settings['generatorName'] === 'PNG') {
+            $settings['foreground'] = $this->hex2rgb($settings['foreground']);
         }
 
-        $generatorClass = 'Picqer\\Barcode\\BarcodeGenerator' . $generatorName;
+        $generatorClass = 'Picqer\\Barcode\\BarcodeGenerator' . $settings['generatorName'];
 
         try {
             $this->generator = new $generatorClass();
 
             $generatedBarcode = '';
 
-            if ($textPlacement === 'TOP') {
-                if ($showText == 'true') {
-                    $generatedBarcode .= '<div class="text-center"><p class="font-weight-bold mb-1" style="color: ' . $foreground . '">' . $barcode . '</p></div>';
+            if ($settings['textPlacement'] === 'TOP') {
+                if ($settings['showText'] == 'true') {
+                    $generatedBarcode .= '<div class="text-center"><p class="font-weight-bold mb-1" style="color: ' . $settings['foreground'] . '">' . $barcode . '</p></div>';
                 }
             }
-            if ($generatorName === 'HTML' || $generatorName === 'SVG') {
+            if ($settings['generatorName'] === 'HTML' || $settings['generatorName'] === 'SVG') {
                 $generatedBarcode .=
-                    $this->generator->getBarcode($barcode, $barcodeType, $scale, $height, $foreground);
-            } else if ($generatorName === 'PNG') {
+                    $this->generator->getBarcode(
+                        $barcode,
+                        $barcodeType,
+                        $settings['widthFactor'],
+                        $settings['height'],
+                        $settings['foreground']
+                    );
+            } else if ($settings['generatorName'] === 'PNG') {
                 $generatedBarcode .=
-                    base64_encode($this->generator->getBarcode($barcode, $barcodeType, $scale, $height, $foreground));
+                    base64_encode(
+                        $this->generator->getBarcode(
+                            $barcode,
+                            $barcodeType,
+                            $settings['widthFactor'],
+                            $settings['height'],
+                            $settings['foreground']
+                        )
+                    );
             }
-            if ($textPlacement === 'BOTTOM') {
-                if ($showText == 'true') {
-                    $generatedBarcode .= '<div class="text-center"><p class="font-weight-bold mt-1" style="color: ' . $foreground . '">' . $barcode . '</p></div>';
+            if ($settings['textPlacement'] === 'BOTTOM') {
+                if ($settings['showText'] == 'true') {
+                    $generatedBarcode .= '<div class="text-center"><p class="font-weight-bold mt-1" style="color: ' . $settings['foreground'] . '">' . $barcode . '</p></div>';
                 }
             }
 
