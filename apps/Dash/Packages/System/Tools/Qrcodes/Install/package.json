@@ -8,7 +8,7 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-system-admin-tools-qrcodes",
     "settings"      : {
-        "availableEncoding"     : {
+        "availableEncodings"    : {
             "ISO-8859-1"        : "ISO-8859-1",
             "ISO-8859-2"        : "ISO-8859-2",
             "ISO-8859-3"        : "ISO-8859-3",
@@ -37,12 +37,7 @@
             "EUC-KR"            : "EUC-KR"
         },
         "defaultEncoding"       : "UTF-8",
-        "defaultSize"           : 300,
-        "defaultMargin"         : 10,
         "availableWriters"      : {
-            "binary"            : "BINARY",
-            "eps"               : "ESP",
-            "fpdf"              : "PDF",
             "png"               : "PNG",
             "svg"               : "SVG"
         },
@@ -54,11 +49,13 @@
             "HIGH"              : "HIGH"
         },
         "defaultECL"            : "LOW",
+        "defaultSize"           : 190,
+        "defaultMargin"         : 5,
         "foregroundColor"       : {
             "r" : 0,
             "g" : 0,
             "b" : 0,
-            "a" : 0
+            "a" : 1
         },
         "backgroundColor"       : {
             "r" : 255,
@@ -66,15 +63,17 @@
             "b" : 255,
             "a" : 0
         },
+        "showLabel"             : true,
         "labelAlignments"       : {
-            "LEFT"      : "LEFT",
-            "RIGHT"     : "RIGHT",
-            "CENTER"    : "CENTER"
+            "left"      : "LEFT",
+            "center"    : "CENTER",
+            "right"     : "RIGHT"
         },
-        "defaultLabelAlignment" : "CENTER",
-        "labelText"             : "Scan the code",
+        "defaultLabelAlignment" : "center",
         "labelFontSize"         : "16",
+        "labelText"             : "SCAN THE CODE",
+        "showLogo"              : true,
         "logo"                  : "",
-        "logoWidth"             : 100
+        "logoWidth"             : 30
     }
 }
