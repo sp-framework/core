@@ -57,8 +57,8 @@ class StoragesComponent extends BaseComponent
                 [
                     'actionsToEnable'       =>
                     [
-                        'edit'      => 'storages',
-                        'remove'    => 'storages/remove'
+                        'edit'      => 'system/storages',
+                        'remove'    => 'system/storages/remove'
                     ]
                 ];
 

@@ -3,7 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 use Phalcon\Helper\Json;
-use Phalcon\Image\Adapter\Gd;
+use Phalcon\Image\Adapter\Imagick;
 use Phalcon\Image\Enum;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Storages\BasepackagesStoragesLocal;
@@ -321,7 +321,7 @@ class Local extends BasePackage
             return false;
         }
 
-        $image = new Gd(base_path($imageFile));
+        $image = new Imagick(base_path($imageFile));
 
         // If max width of image is less than requested size, make width to image size.
         if ($image->getWidth() < $width) {
@@ -330,8 +330,16 @@ class Local extends BasePackage
             $this->width = $width;
         }
 
+        if ($image->getMime() === 'image/PNG') {
+            $imageFormat = '.png';
+        } else if ($image->getMime() === 'image/JPEG') {
+            $imageFormat = '.jpg';
+        } else if ($image->getMime() === 'image/GIF') {
+            $imageFormat = '.gif';
+        }
+
         $sizedImage =
-            '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width;
+            '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat;
 
         if ($this->localContent->has($sizedImage) && !isset($this->getData['quality'])) {
 
@@ -347,14 +355,14 @@ class Local extends BasePackage
                 $this->settingsDefaultImageQuality = $this->getData['quality'];
             }
 
-            $image->save($this->cachePath . $file['uuid_location'] . $file['uuid'] . '/' . $this->width, $this->settingsDefaultImageQuality);
+            $image->save($this->cachePath . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat, $this->settingsDefaultImageQuality);
 
             //Only update links for public as users cannot access private folder.
             if ($this->storage['permission'] === 'public') {
                 $this->updateFileLink(
                     $file,
                     $this->width,
-                    '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width
+                    '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat
                 );
             }
 
@@ -384,9 +392,25 @@ class Local extends BasePackage
             }
 
             if ($this->width) {
-                $this->getSizedImage($file[0], $this->width);
+                if (in_array($this->width, $this->allowedImageSizes)) {
+                    $this->getSizedImage($file[0], $this->width);
+                } else {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Requested Width not registered with system.';
+
+                    return false;
+                }
             } else {
-                $this->getSizedImage($file[0], $width);
+                if (in_array($width, $this->allowedImageSizes)) {
+                    $this->getSizedImage($file[0], $width);
+                } else {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Requested Width not registered with system.';
+
+                    return false;
+                }
             }
 
             return $this->getPublicLink($uuid, $this->width);
