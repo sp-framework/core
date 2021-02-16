@@ -48,6 +48,8 @@ class Qrcodes extends BasePackage
 
         $data = $this->extractRGB($data);
 
+        $this->qrcodesSettings['foregroundColor'] = $data['foregroundColor'];
+        $this->qrcodesSettings['backgroundColor'] = $data['backgroundColor'];
         if ($data['showLogo'] == '0') {
             $this->qrcodesSettings['showLogo'] = false;
         } else if ($data['showLogo'] == '1') {
