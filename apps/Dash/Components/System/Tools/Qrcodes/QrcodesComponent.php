@@ -6,15 +6,19 @@ use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\System\Tools\Qrcodes\Qrcodes;
 use System\Base\BaseComponent;
 
-class QcodesComponent extends BaseComponent
+class QrcodesComponent extends BaseComponent
 {
     use DynamicTable;
 
     protected $qrcodes;
 
+    protected $qrcodesSettings;
+
     public function initialize()
     {
         $this->qrcodes = $this->usePackage(Qrcodes::class);
+
+        $this->qrcodesSettings = $this->qrcodes->getQrcodesSettings();
     }
 
     /**
@@ -22,7 +26,27 @@ class QcodesComponent extends BaseComponent
      */
     public function viewAction()
     {
-        //
+        $storages = $this->basepackages->storages;
+
+        if ($this->qrcodesSettings['logo'] && $this->qrcodesSettings['logo'] !== '') {
+            $this->view->logoLink = $storages->getPublicLink($this->qrcodesSettings['logo'], 200);
+        } else {
+            $this->view->logoLink = '';
+        }
+
+        $storages = $this->basepackages->storages->getAppStorages();
+
+        if ($storages && isset($storages['public'])) {
+            $this->view->storages = $storages['public'];
+        } else {
+            $this->view->storages = [];
+        }
+
+        $this->qrcodesSettings['foregroundColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['foregroundColor']) . ')';
+
+        $this->qrcodesSettings['backgroundColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['backgroundColor']) . ')';
+
+        $this->view->qrcodesSettings = $this->qrcodesSettings;
     }
 
     /**
@@ -35,7 +59,7 @@ class QcodesComponent extends BaseComponent
                 return;
             }
 
-            $this->qrcodes->updateBarcode($this->postData());
+            $this->qrcodes->updateQrcodesSettings($this->postData());
 
             $this->view->responseCode = $this->qrcodes->packagesData->responseCode;
 
@@ -46,5 +70,34 @@ class QcodesComponent extends BaseComponent
 
             $this->view->responseMessage = 'Method Not Allowed';
         }
+    }
+
+    public function testQrcodeAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->generateQrcodeAction();
+
+            if ($this->qrcodes->packagesData->responseCode === 0) {
+                $this->view->qrcode = $this->qrcodes->packagesData->qrcode;
+            }
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function generateQrcodeAction()
+    {
+        $this->qrcodes->generateQrcode($this->postData()['qrcode'], $this->postData());
+
+        $this->view->responseCode = $this->qrcodes->packagesData->responseCode;
+
+        $this->view->responseMessage = $this->qrcodes->packagesData->responseMessage;
     }
 }
