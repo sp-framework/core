@@ -6,8 +6,6 @@
     {% set productCodeEAN = product['code_ean'] %}
     {% set productTitle = product['title'] %}
     {% set productSubtitle = product['subtitle'] %}
-    {% set productManufacturer = product['manufacturer'] %}
-    {% set productBrand = product['brand'] %}
     {% set productDescription = product['description'] %}
 {% else %}
     {% set productId = '' %}
@@ -16,8 +14,6 @@
     {% set productCodeEAN = '' %}
     {% set productTitle = '' %}
     {% set productSubtitle = '' %}
-    {% set productManufacturer = '' %}
-    {% set productBrand = '' %}
     {% set productDescription = '' %}
 {% endif %}
 <div class="row">
@@ -138,6 +134,7 @@
         )}}
     </div>
 </div>
+<hr>
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -182,60 +179,6 @@
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 80,
                 'fieldValue'                     : productSubtitle
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                            : component,
-                'componentName'                        : componentName,
-                'componentId'                          : componentId,
-                'sectionId'                            : sectionId,
-                'fieldId'                              : 'manufacturer',
-                'fieldLabel'                           : 'Manufacturer',
-                'fieldType'                            : 'select2',
-                'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Select or add new manufacturer',
-                'fieldRequired'                        : false,
-                'fieldBazScan'                         : true,
-                'fieldBazPostOnCreate'                 : true,
-                'fieldBazPostOnUpdate'                 : true,
-                'fieldBazJstreeSearch'                 : true,
-                'fieldDataSelect2Create'               : true,
-                'fieldDataSelect2Options'              : manufacturers,
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2OptionsSelected'      : productManufacturer
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                            : component,
-                'componentName'                        : componentName,
-                'componentId'                          : componentId,
-                'sectionId'                            : sectionId,
-                'fieldId'                              : 'brand',
-                'fieldLabel'                           : 'Brand',
-                'fieldType'                            : 'select2',
-                'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Select or add new brand',
-                'fieldRequired'                        : false,
-                'fieldDataSelect2Create'               : true,
-                'fieldBazScan'                         : true,
-                'fieldBazPostOnCreate'                 : true,
-                'fieldBazPostOnUpdate'                 : true,
-                'fieldBazJstreeSearch'                 : true,
-                'fieldDataSelect2Options'              : brands,
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2OptionsSelected'      : productBrand
             ]
         )}}
     </div>

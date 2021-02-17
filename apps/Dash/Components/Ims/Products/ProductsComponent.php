@@ -5,6 +5,7 @@ namespace Apps\Dash\Components\Ims\Products;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
+use Apps\Dash\Packages\Ims\Categories\Categories;
 use Apps\Dash\Packages\Ims\Products\Products;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
@@ -29,6 +30,8 @@ class ProductsComponent extends BaseComponent
             $this->view->brands = $this->usePackage(Brands::class)->getAll()->brands;
 
             $this->view->manufacturers = $this->usePackage(Vendors::class)->getAllManufacturers();
+
+            // $this->view->categories = $this->usePackage(Categories::class)->getAllCategories();
 
             if ($this->getData()['id'] != 0) {
 
