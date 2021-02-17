@@ -160,7 +160,7 @@ class Vendors extends BasePackage
                         unset($contact['new']);
                         unset($contact['seq']);
 
-                        $contact['contact_address_ids'] = Json::encode([]);
+                        $contact['address_ids'] = Json::encode([]);
 
                         $contacts->addContact($contact);
                     } else {
