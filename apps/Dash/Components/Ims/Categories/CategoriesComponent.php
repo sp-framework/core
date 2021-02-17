@@ -24,6 +24,7 @@ class CategoriesComponent extends BaseComponent
      */
     public function viewAction()
     {
+        $this->view->imageLink = '';
         $channels = $this->usePackage(Channels::class)->getAll();
 
         $localChannels = [];
@@ -98,7 +99,7 @@ class CategoriesComponent extends BaseComponent
             foreach ($categories as $categoryKey => $categoryValue) {
                 if ($categoryValue['parent'] != '0') {
                     $parent = $this->categories->getById($categoryValue['parent']);
-                    $parentToName[$categoryValue['parent']] = $parent['name'];
+                    $parentToName[$categoryValue['parent']] = $parent['name'] . ' (' . $categoryValue['parent'] . ')';
                 } else {
                     $parentToName[$categoryValue['parent']] = '-';
                 }
