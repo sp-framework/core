@@ -20,7 +20,7 @@ class Specifications extends BasePackage
 
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Category name cannot special characters';
+            $this->packagesData->responseMessage = 'Specification name cannot special characters';
 
             return false;
 
@@ -50,7 +50,7 @@ class Specifications extends BasePackage
 
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Category name cannot special characters';
+            $this->packagesData->responseMessage = 'Specification name cannot special characters';
 
             return false;
 
@@ -173,7 +173,7 @@ class Specifications extends BasePackage
                 'conditions'    => 'id != :id: AND is_group = :is_group: AND name = :name:',
                 'bind'          =>
                     [
-                        'id'          => $data['id'],
+                        'id'          => isset($data['id']) ? $data['id'] : 0,
                         'is_group'    => '1',
                         'name'        => $data['name']
                     ]
@@ -195,7 +195,7 @@ class Specifications extends BasePackage
                 'conditions'    => 'id != :id: AND group_id = :group_id: AND name = :name:',
                 'bind'          =>
                     [
-                        'id'          => $data['id'],
+                        'id'          => isset($data['id']) ? $data['id'] : 0,
                         'group_id'    => $data['group_id'],
                         'name'        => $data['name']
                     ]

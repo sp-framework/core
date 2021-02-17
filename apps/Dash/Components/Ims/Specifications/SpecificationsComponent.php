@@ -69,7 +69,7 @@ class SpecificationsComponent extends BaseComponent
                 foreach ($specifications as $specificationKey => $specificationValue) {
                     if ($specificationValue['group_id'] != '0') {
                         $group = $this->specifications->getById($specificationValue['group_id']);
-                        $groupToName[$specificationValue['group_id']] = $group['name'];
+                        $groupToName[$specificationValue['group_id']] = $group['name'] . ' (' . $specificationValue['group_id'] . ')';
                     }
                 }
 
