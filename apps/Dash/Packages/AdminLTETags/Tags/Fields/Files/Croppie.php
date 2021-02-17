@@ -52,6 +52,26 @@ class Croppie
 
     protected function generateContent()
     {
+        $this->fieldParams['fieldCroppieLabel'] =
+            isset($this->params['fieldCroppieLabel']) ?
+            $this->params['fieldCroppieLabel'] :
+            false;
+
+        $this->fieldParams['fieldHelpTooltipContent'] =
+            isset($this->params['fieldHelpTooltipContent']) ?
+            $this->params['fieldHelpTooltipContent'] :
+            '';
+
+        $this->fieldParams['fieldRequired'] =
+            isset($this->params['fieldRequired']) && $this->params['fieldRequired'] === true ?
+            true :
+            false;
+
+        $this->fieldParams['fieldBazJstreeSearch'] =
+            isset($this->params['fieldBazJstreeSearch']) && $this->params['fieldBazJstreeSearch'] === true ?
+            true :
+            false;
+
         if (!isset($this->params['fieldValue'])) {
             $this->params['fieldValue'] = '';
         }
@@ -71,15 +91,15 @@ class Croppie
         }
 
         if (!isset($this->params['fieldCroppieFormat'])) {
-            $this->params['fieldCroppieFormat'] = 'jpeg';//formats: png, jpeg, webp
+            $this->params['fieldCroppieFormat'] = 'png';//formats: png, jpeg, webp
         }
 
         if (isset($this->params['fieldCroppieViewportCircle']) && $this->params['fieldCroppieViewportCircle'] === true) {
-            $this->params['fieldCroppieViewportCircle'] = 'true';//circle: true/false
-            $this->params['fieldCroppieViewportType'] = 'circle';
+            $this->fieldParams['fieldCroppieViewportCircle'] = 'true';//circle: true/false
+            $this->fieldParams['fieldCroppieViewportType'] = 'circle';
         } else {
-            $this->params['fieldCroppieViewportCircle'] = 'false';//circle: true/false
-            $this->params['fieldCroppieViewportType'] = 'square';
+            $this->fieldParams['fieldCroppieViewportCircle'] = 'false';//circle: true/false
+            $this->fieldParams['fieldCroppieViewportType'] = 'square';
         }
 
         $croppieButtons = [];
@@ -196,6 +216,25 @@ class Croppie
                             'componentId'                   => $this->params['componentId'],
                             'sectionId'                     => $this->params['sectionId'],
                             'fieldId'                       => $this->params['fieldId'],
+                            'fieldLabel'                    => $this->fieldParams['fieldCroppieLabel'],
+                            'fieldType'                     => 'html',
+                            'fieldHelp'                     => true,
+                            'fieldHelpTooltipContent'       => $this->fieldParams['fieldHelpTooltipContent'],
+                            'fieldAdditionalClass'          => 'mb-0',
+                            'fieldRequired'                 => $this->fieldParams['fieldRequired'],
+                            'fieldBazScan'                  => true,
+                            'fieldBazJstreeSearch'          => $this->fieldParams['fieldBazJstreeSearch'],
+                            'fieldBazPostOnCreate'          => false,
+                            'fieldBazPostOnUpdate'          => false
+                        ]
+                    ) .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                     => $this->params['component'],
+                            'componentName'                 => $this->params['componentName'],
+                            'componentId'                   => $this->params['componentId'],
+                            'sectionId'                     => $this->params['sectionId'],
+                            'fieldId'                       => $this->params['fieldId'],
                             'fieldLabel'                    => false,
                             'fieldType'                     => 'input',
                             'fieldHelp'                     => true,
@@ -290,7 +329,7 @@ class Croppie
                                         viewport: {
                                             width: 200,
                                             height: 200,
-                                            type: "' . $this->params['fieldCroppieViewportType'] . '"
+                                            type: "' . $this->fieldParams['fieldCroppieViewportType'] . '"
                                         },
                                         boundary: {
                                             width: 250,
@@ -328,7 +367,7 @@ class Croppie
                                     type    : "canvas",
                                     size    : "' . $this->params['fieldCroppieSize'] . '",
                                     format  : "' . $this->params['fieldCroppieFormat'] . '",
-                                    circle  : ' . $this->params['fieldCroppieViewportCircle'] . '
+                                    circle  : ' . $this->fieldParams['fieldCroppieViewportCircle'] . '
                                 }).then(function (croppedImage) {
                                     imageBlob = croppedImage;
                                     $("#' . $this->compSecId . '-croppie").attr("hidden", true);
@@ -342,7 +381,7 @@ class Croppie
                                     type    : "blob",
                                     size    : "' . $this->params['fieldCroppieSize'] . '",
                                     format  : "' . $this->params['fieldCroppieFormat'] . '",
-                                    circle  : ' . $this->params['fieldCroppieViewportCircle'] . '
+                                    circle  : ' . $this->fieldParams['fieldCroppieViewportCircle'] . '
                                 }).then(function (croppedImage) {
                                     imageBlob = croppedImage;
                                     newImage = true;

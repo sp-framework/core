@@ -58,15 +58,25 @@ class Dropzone
             throw new \Exception('storage information missing for dropzone.');
         }
 
-        if (isset($this->params['fieldDropzoneLabel'])) {
-            $this->fieldParams['fieldDropzoneLabel'] =
-                $this->params['fieldDropzoneLabel'] ?
-                $this->params['fieldDropzoneLabel'] :
-                false;
+        $this->fieldParams['fieldDropzoneLabel'] =
+            isset($this->params['fieldDropzoneLabel']) ?
+            $this->params['fieldDropzoneLabel'] :
+            false;
 
-        } else {
-            $this->fieldParams['fieldDropzoneLabel'] = '<label>missing_fieldLabel</label>';
-        }
+        $this->fieldParams['fieldHelpTooltipContent'] =
+            isset($this->params['fieldHelpTooltipContent']) ?
+            $this->params['fieldHelpTooltipContent'] :
+            '';
+
+        $this->fieldParams['fieldRequired'] =
+            isset($this->params['fieldRequired']) && $this->params['fieldRequired'] === true ?
+            true :
+            false;
+
+        $this->fieldParams['fieldBazJstreeSearch'] =
+            isset($this->params['fieldBazJstreeSearch']) && $this->params['fieldBazJstreeSearch'] === true ?
+            true :
+            false;
 
         $this->fieldParams['sortable'] =
             isset($this->params['sortable']) ?
@@ -163,10 +173,11 @@ class Dropzone
                                 'fieldLabel'                    => $this->fieldParams['fieldDropzoneLabel'],
                                 'fieldType'                     => 'html',
                                 'fieldHelp'                     => true,
-                                'fieldHelpTooltipContent'       => $this->params['fieldHelpTooltipContent'],
+                                'fieldHelpTooltipContent'       => $this->fieldParams['fieldHelpTooltipContent'],
                                 'fieldAdditionalClass'          => 'mb-0',
                                 'fieldRequired'                 => $this->fieldParams['fieldRequired'],
                                 'fieldBazScan'                  => true,
+                                'fieldBazJstreeSearch'          => $this->fieldParams['fieldBazJstreeSearch'],
                                 'fieldBazPostOnCreate'          => true,
                                 'fieldBazPostOnUpdate'          => true
                             ]
