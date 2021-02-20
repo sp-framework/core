@@ -339,14 +339,32 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function disableViewLevel()
+	protected function disableViewLevel($level = 0)
 	{
-		$this->view->disableLevel(
-			[
-				View::LEVEL_LAYOUT 		=> true,
-				View::LEVEL_MAIN_LAYOUT => true
-			]
-		);
+		if ($level === 1) {
+			$disableLevel =
+				[
+					View::LEVEL_ACTION_VIEW 		=> true,
+				];
+		} else if ($level === 3) {
+			$disableLevel =
+				[
+					View::LEVEL_LAYOUT => true
+				];
+		} else if ($level === 5) {
+			$disableLevel =
+				[
+					View::LEVEL_MAIN_LAYOUT => true
+				];
+		} else {
+			$disableLevel =
+				[
+					View::LEVEL_LAYOUT 		=> true,
+					View::LEVEL_MAIN_LAYOUT => true
+				];
+		}
+
+		$this->view->disableLevel($disableLevel);
 	}
 
 	protected function buildGetQueryParamsArr()
