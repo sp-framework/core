@@ -1,0 +1,122 @@
+<div class="row">
+    <div class="col">
+        <h5>Click the button below to start user authorization process.</h5>
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'begin-user-autho' : [
+                            'title'                   : 'Begin User Authorization',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'external-link-alt'
+                        ],
+                        'check-user-autho' : [
+                            'title'                   : 'Check User Authorization',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'hidden'                  : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row mt-3">
+    <div class="col" id="{{componentId}}-{{sectionId}}-user-autho-data"></div>
+</div>
+<script>
+/* globals eModal PNotify */
+$('#{{componentId}}-{{sectionId}}-begin-user-autho').click(function(e) {
+    e.preventDefault();
+
+    window.name = "bazaari-api";
+
+    // $(this).attr('disabled', true);
+
+    var registerFormId;
+
+    if ($('#{{componentId}}-{{sectionId}}-id').val() != '') {
+        registerFormId = $('#{{componentId}}-{{sectionId}}-id').val();
+    } else {
+        registerFormId = window['dataCollection']["{{componentId}}"]["{{componentId}}-{{sectionId}}"]["steps"]['1']['responseData']['id'];
+    }
+
+    var postData = { };
+    postData['apiId'] = registerFormId;
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post('{{links.url("system/api/getEbayUserTokenUrl")}}', postData, function(data) {
+        if ($('#security-token').length === 1) {
+            $('#security-token').attr('name', data.tokenKey);
+            $('#security-token').val(data.token);
+        }
+
+        if (data.responseCode == '0') {
+            window.open(data.responseData);
+            $('body').off('ebay-api-success');
+            $('body').on('ebay-api-success', function() {
+                $('#{{componentId}}-{{sectionId}}-begin-user-autho').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
+            });
+        } else {
+            PNotify.error({
+                title   : data.responseMessage,
+            });
+        }
+    }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
+
+    $(this).attr('disabled', true);
+
+    $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', false);
+
+    var registerFormId;
+
+    if ($('#{{componentId}}-{{sectionId}}-id').val() != '') {
+        registerFormId = $('#{{componentId}}-{{sectionId}}-id').val();
+    } else {
+        registerFormId = window['dataCollection']["{{componentId}}"]["{{componentId}}-{{sectionId}}"]["steps"]['1']['responseData']['id'];
+    }
+
+    var postData = { };
+    postData['apiId'] = registerFormId;
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post('{{links.url("system/api/checkEbayUserToken")}}', postData, function(data) {
+        if ($('#security-token').length === 1) {
+            $('#security-token').attr('name', data.tokenKey);
+            $('#security-token').val(data.token);
+        }
+
+        if (data.responseCode == '0') {
+            $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-next').attr('disabled', false);
+            if (data.responseData) {
+                $('#{{componentId}}-{{sectionId}}-user-autho-data').empty().append(
+                    '<dl class="row">' +
+                        '<dt class="text-uppercase col">User Authorization Token Valid Till</dt>' +
+                        '<dd class="text-uppercase col">' +
+                            '<h6><span class="badge badge-success">' +
+                                data.responseData.user_access_token_valid_until +
+                            '</span></h6>' +
+                        '</dd>' +
+                    '</dl>'
+                );
+            }
+        } else {
+            $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('disabled', false);
+            PNotify.error({
+                title   : data.responseMessage,
+            });
+        }
+    }, 'json');
+});
+</script>

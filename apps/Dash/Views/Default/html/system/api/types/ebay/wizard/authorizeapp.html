@@ -1,0 +1,67 @@
+<div class="row">
+    <div class="col">
+        <h5>Click the button below to start App authorization process.</h5>
+        {{adminltetags.useTag('buttons',
+            [
+                'componentId'           : componentId,
+                'sectionId'             : sectionId,
+                'buttonType'            : 'button',
+                'buttons'               :
+                    [
+                        'begin-app-autho' : [
+                            'title'                   : 'Begin App Authorization',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<script>
+/* globals PNotify */
+$('#{{componentId}}-{{sectionId}}-begin-app-autho').click(function(e) {
+    e.preventDefault();
+
+    $(this).attr('disabled', true);
+    $('#{{componentId}}-{{sectionId}}-begin-app-autho').children().attr('hidden', false);
+
+    var registerFormId;
+
+    if ($('#{{componentId}}-{{sectionId}}-id').val() != '') {
+        registerFormId = $('#{{componentId}}-{{sectionId}}-id').val();
+    } else {
+        registerFormId = window['dataCollection']["{{componentId}}"]["{{componentId}}-{{sectionId}}"]["steps"]['1']['responseData']['id'];
+    }
+
+    var postData = { };
+    postData['apiId'] = registerFormId;
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post('{{links.url("system/api/getEbayAppToken")}}', postData, function(data) {
+        if ($('#security-token').length === 1) {
+            $('#security-token').attr('name', data.tokenKey);
+            $('#security-token').val(data.token);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-begin-app-autho').children().attr('hidden', true);
+        if (data.responseCode == '0') {
+            PNotify.success({
+                title   : data.responseMessage,
+            });
+            $('#{{componentId}}-{{sectionId}}-next').attr('disabled', false);
+        } else {
+            $('#{{componentId}}-{{sectionId}}-begin-app-autho').attr('disabled', false);
+            PNotify.error({
+                title   : data.responseMessage,
+            });
+        }
+    }, 'json');
+});
+$(document).ready(function() {
+    //eslint-disable-next-line
+    console.log($('#{{componentId}}-{{sectionId}}-next'));
+})
+</script>

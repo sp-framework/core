@@ -1,0 +1,103 @@
+{% if api['id'] is defined %}
+    {% set apiId = api['id'] %}
+    {% set apiName = api['name'] %}
+    {% set apiInUse = api['in_use'] %}
+    {% set apiDescription = api['description'] %}
+{% else %}
+    {% set apiId = '' %}
+    {% set apiName = '' %}
+    {% set apiInUse = '0' %}
+    {% set apiDescription = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        {% include 'api/types/common.html' %}
+        {% if api['id'] is defined %}
+            {% set api['refresh_token_valid_until'] = date('m/d/Y H:i:s', api['refresh_token_valid_until']) %}
+                {{dump(api)}}
+        {% endif %}
+    </fieldset>
+</form>
+<script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-name'                                : { },
+        '{{componentId}}-{{sectionId}}-api_type'                            : { },
+        '{{componentId}}-{{sectionId}}-in_use'                              : { },
+        '{{componentId}}-{{sectionId}}-description'                         : { },
+        '{{componentId}}-{{sectionId}}-authorization'                       : { },
+        '{{componentId}}-{{sectionId}}-generate'                            : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-generate-token').click(function(e) {
+                    e.preventDefault();
+                    $(this).addClass('disabled');
+                    $('#{{componentId}}-{{sectionId}}-generate-token').children().attr('hidden', false);
+
+                    var url = $(this).attr('href');
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post(url, postData, function(data) {
+                        if (data.responseCode == 0) {
+                            PNotify.success({
+                                'title' : data.responseMessage
+                            });
+                            $('#{{componentId}}-{{sectionId}}-generate-token').attr('hidden', true);
+                            $('#{{componentId}}-{{sectionId}}-generate-token').siblings().removeClass('d-none');
+
+                        } else {
+                            PNotify.error({
+                                'title' : data.responseMessage
+                            });
+                            $('#{{componentId}}-{{sectionId}}-generate-token').removeClass('disabled');
+                            $('#{{componentId}}-{{sectionId}}-generate-token').children().attr('hidden', true);
+
+                        }
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-token_status'                        : { },
+        '{{componentId}}-{{sectionId}}-token_valid_until'                   : { },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'required',
+                '{{componentId}}-{{sectionId}}-api_type'                    : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                        : 'Please enter api name',
+                '{{componentId}}-{{sectionId}}-api_type'                    : 'Please enter api type',
+            }
+        }
+    });
+</script>
