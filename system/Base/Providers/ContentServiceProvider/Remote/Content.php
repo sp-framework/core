@@ -8,7 +8,7 @@ class Content
 {
     public function __construct()
     {
-        include (__DIR__ . '/vendor/autoload.php');
+        // include (__DIR__ . '/vendor/autoload.php');
     }
 
     public function init()

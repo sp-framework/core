@@ -39,7 +39,7 @@ class Email extends BasePackage
 
     public function init()
     {
-        include (__DIR__ . '/vendor/autoload.php');
+        // include (__DIR__ . '/vendor/autoload.php');
 
         $this->email = new PHPMailer(true);
 

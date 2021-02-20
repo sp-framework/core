@@ -15,7 +15,7 @@ class Profiles
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,

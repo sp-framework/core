@@ -14,7 +14,7 @@ class Book
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_INTEGER,
+                        'type'          => Column::TYPE_MEDIUMINTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,

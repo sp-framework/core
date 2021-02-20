@@ -15,7 +15,7 @@ class Products
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_MEDIUMINTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,

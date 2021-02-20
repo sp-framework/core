@@ -1,4 +1,4 @@
-
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -19,6 +19,7 @@
         <script>
 /* globals dataCollection */
 if (!window.dataCollection) {
+    window.name = 'Bazaari';
     //For all data collection. Section Data collection, has list of fields, whole section HTML, section fields data
     window.dataCollection = { };
     dataCollection = window.dataCollection;
@@ -62,3 +63,4 @@ if (!window.dataCollection) {
         {{content()}}
     </body>
 </html>
+<!-- htmlmin:ignore -->
