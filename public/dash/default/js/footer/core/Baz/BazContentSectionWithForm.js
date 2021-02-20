@@ -91,7 +91,7 @@
                 });
 
                 if (options.task === 'validateForm') {
-                    this._validateForm(options.buttonId);
+                    this._validateForm();
                 } else if (options.task === 'sectionToObj') {
                     this._sectionToObj();
                 } else {

@@ -3100,7 +3100,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 });
 
                 if (options.task === 'validateForm') {
-                    this._validateForm(options.buttonId);
+                    this._validateForm();
                 } else if (options.task === 'sectionToObj') {
                     this._sectionToObj();
                 } else {
@@ -5927,6 +5927,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             $('#security-token').attr('name', data.tokenKey);
                             $('#security-token').val(data.token);
                         }
+                        $('body').trigger(
+                            {
+                                'type'     :'sectionWithListingLoaded'
+                            }
+                        );
                     }
                 }).done(function() {
                     that._tableInit(reDraw);

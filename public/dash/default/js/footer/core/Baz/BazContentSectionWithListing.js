@@ -1159,6 +1159,11 @@
                             $('#security-token').attr('name', data.tokenKey);
                             $('#security-token').val(data.token);
                         }
+                        $('body').trigger(
+                            {
+                                'type'     :'sectionWithListingLoaded'
+                            }
+                        );
                     }
                 }).done(function() {
                     that._tableInit(reDraw);
