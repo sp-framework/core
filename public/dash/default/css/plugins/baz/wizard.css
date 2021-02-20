@@ -1,4 +1,4 @@
-/* -------------------------------- 
+/* --------------------------------
 Basic Style
 -------------------------------- */
 .wizard, .wizard.multi-steps {
@@ -23,8 +23,9 @@ Basic Style
     margin: 0.5em 0;
 }
 .wizard li::after, .wizard.multi-steps li::after {
-    font-family: 'fontawesome';
-    content: '\f105';
+    font-family: 'Font Awesome\ 5 Free';
+    font-weight: 900;
+    content: '\f054';
     vertical-align: bottom;
     color: #959fa5;
     margin-left: .5rem;
@@ -61,13 +62,14 @@ Basic Style
         text-transform: uppercase;
     }
 }
-/* -------------------------------- 
+/* --------------------------------
 Triangle basic
 -------------------------------- */
 @media only screen and (min-width: 768px) {
     .wizard.triangle {
         background-color: transparent;
         padding: 0;
+        line-height: 1.55;
     }
     .wizard.triangle li {
         position: relative;
@@ -112,7 +114,7 @@ Triangle basic
         width: 0;
         border: .88rem solid transparent;
         border-top-width: .89rem;
-        border-bottom-width: .89rem;        
+        border-bottom-width: .89rem;
         border-right-width: 0;
         border-left-width: 20px;
     }
@@ -140,8 +142,8 @@ Triangle basic
         }
     }
 }
-/* -------------------------------- 
-Multi steps indicator 
+/* --------------------------------
+Multi steps indicator
 -------------------------------- */
 @media only screen and (min-width: 768px) {
     .wizard.multi-steps {
@@ -198,7 +200,7 @@ Multi steps indicator
     }
     .wizard.multi-steps.text-center li.current > * {
         color: #ffffff;
-        background-color: #3498DB;              
+        background-color: #3498DB;
     }
     .wizard.multi-steps.text-top li, .wizard.multi-steps.text-bottom li {
         width: 100px;
@@ -229,7 +231,7 @@ Multi steps indicator
     .wizard.multi-steps.text-bottom li.visited > *::before {
         background-color: #18BC9C;
     }
-    .wizard.multi-steps.text-top li.current > *::before, 
+    .wizard.multi-steps.text-top li.current > *::before,
     .wizard.multi-steps.text-bottom li.current > *::before {
         background-color: #3498DB;
     }
@@ -253,8 +255,8 @@ Multi steps indicator
         top: 0;
     }
 }
-/* -------------------------------- 
-Add a counter to the multi-steps indicator 
+/* --------------------------------
+Add a counter to the multi-steps indicator
 -------------------------------- */
 .wizard.multi-steps.count li {
     counter-increment: steps;
@@ -286,7 +288,7 @@ Add a counter to the multi-steps indicator
     .wizard.multi-steps.text-bottom.count li.visited:not(.current) span::before {
         /* steps not visited yet - counter color */
         color: #ffffff;
-    }    
+    }
 
     .wizard.multi-steps.text-top.count li::after {
         bottom: 11px;

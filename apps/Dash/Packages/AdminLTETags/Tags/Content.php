@@ -41,10 +41,10 @@ class Content extends AdminLTETags
                     } else {
                         $this->content .= $this->getContentTypeSectionWithForm();
                     }
-                } else if ($this->params['contentType'] === 'sectionWithFormToDatatable') {
-                    $this->content .= $this->getContentTypeSectionWithFormToDatatable();
                 } else if ($this->params['contentType'] === 'sectionWithWizard') {
                     $this->content .= $this->getContentTypeSectionWithWizard();
+                } else if ($this->params['contentType'] === 'sectionWithFormToDatatable') {
+                    $this->content .= $this->getContentTypeSectionWithFormToDatatable();
                 } else if ($this->params['contentType'] === 'sectionWithListing') {
                     $this->content .= $this->getContentTypeSectionWithListing();
                 } else if ($this->params['contentType'] === 'sectionWithStorage') {
@@ -160,6 +160,37 @@ class Content extends AdminLTETags
         return $sectionForm;
     }
 
+    protected function getContentTypeSectionWithWizard()
+    {
+        $sectionWizard = '';
+
+        $this->params['cardFooterContent'] =
+            $this->useTag('buttons',
+                [
+                    'componentId'            => $this->params['componentId'],
+                    'sectionId'              => $this->params['sectionId'],
+                    'buttonLabel'            => false,
+                    'buttonType'             => 'sectionWithWizardButtons',
+                    'buttonParams'           => $this->params
+                ]
+            );
+
+        $this->params['cardBodyContent'] = $this->useTag('wizard', $this->params);
+
+        $sectionWizard .=
+            '<section id="' . $this->compSecId . '" class="sectionWithWizard">' .
+                $this->useTag('card', $this->params) .
+            '</section>';
+
+        $sectionWizard .=
+            '<script>
+                window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
+                window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
+            </script>';
+
+        return $sectionWizard;
+    }
+
     protected function getContentTypeSectionWithFormToDatatable()
     {
         return
@@ -170,25 +201,6 @@ class Content extends AdminLTETags
                 window["dataCollection"]["env"]["currentComponentId"] = "' . $this->params['componentId'] . '";
                 window["dataCollection"]["env"]["parentComponentId"] = "' . $this->params['parentComponentId'] . '";
             </script>';
-    }
-
-    protected function getContentTypeSectionWithWizard()
-    {
-        // <section id="{{cardParams['componentId']}}-{{cardParams['sectionId']}}" class="sectionWithWizard">
-        //     {% include 'thelpers/card/card.html' with
-        //         [
-        //             'cardFooterContent' : view.partial('thelpers/buttons',
-        //                                     [
-        //                                         'buttonType'    : 'sectionWithWizard-buttons'
-        //                                     ]),
-        //             'cardBodyInclude'   : 'thelpers/content/wizard/wizard'
-        //         ]
-        //     %}
-        // </section>
-        // <script>
-        //     window['dataCollection']['env']['currentComponentId'] = '{{cardParams['componentId']}}';
-        //     window['dataCollection']['env']['parentComponentId'] = '{{parentComponentId}}';
-        // </script>
     }
 
     protected function getContentTypeSectionWithListing()

@@ -16,6 +16,11 @@ class Buttons extends AdminLTETags
     {
         $this->params = $params;
 
+        $this->buttonParams =
+            isset($this->params['buttonParams']) ?
+            $this->params['buttonParams'] :
+            [];
+
         $this->generateContent();
 
         return $this->content;
