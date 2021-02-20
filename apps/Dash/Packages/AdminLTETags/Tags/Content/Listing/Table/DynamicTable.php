@@ -405,6 +405,12 @@ class DynamicTable
                     $controlbuttons = '';
                     $controlButtons = [];
 
+                    if (isset($this->params['dtAdditionControlButtonsBeforeControlButtons']) &&
+                        $this->params['dtAdditionControlButtonsBeforeControlButtons'] === true
+                    ) {
+                        $controlButtons = array_merge($controlButtons, $this->additionalControlButtons($controlButtons, $columns));
+                    }
+
                     foreach ($column as $controlKey => $control) {
 
                         $this->dtParams['dtControlsLinkClass'] =
@@ -413,40 +419,106 @@ class DynamicTable
                             'contentAjaxLink';
 
                         if ($controlKey === 'view') {
+
+                            if (is_array($control)) {
+                                $control = $control['link'];
+                                $title =
+                                    isset($control['title']) ?
+                                    strtoupper($control['title']) :
+                                    'VIEW';
+                                $icon =
+                                    isset($control['icon']) ?
+                                    strtoupper($control['icon']) :
+                                    'eye';
+                                $type =
+                                    isset($control['type']) ?
+                                    strtoupper($control['type']) :
+                                    'info';
+
+                            } else {
+                                $title = 'VIEW';
+                                $icon = 'eye';
+                                $type = 'info';
+                            }
+
                             $controlButtons = array_merge($controlButtons,
                                 [
                                     $controlKey =>
                                     [
-                                        'title'             => 'VIEW',
+                                        'title'             => $title,
                                         'additionalClass'   => 'rowView ' . $this->dtParams['dtControlsLinkClass'],
-                                        'icon'              => 'eye',
-                                        'buttonType'        => 'info',
+                                        'icon'              => $icon,
+                                        'buttonType'        => $type,
                                         'link'              => $control
                                     ]
                                 ]
                             );
-                        } else if ($controlKey === 'edit' || $controlKey === 'update') {
+                        } else if ($controlKey === 'edit') {
+
+                            if (is_array($control)) {
+                                $control = $control['link'];
+                                $title =
+                                    isset($control['title']) ?
+                                    strtoupper($control['title']) :
+                                    'EDIT';
+                                $icon =
+                                    isset($control['icon']) ?
+                                    strtoupper($control['icon']) :
+                                    'edit';
+                                $type =
+                                    isset($control['type']) ?
+                                    strtoupper($control['type']) :
+                                    'primary';
+
+                            } else {
+                                $title = 'EDIT';
+                                $icon = 'edit';
+                                $type = 'primary';
+                            }
+
                             $controlButtons = array_merge($controlButtons,
                                 [
                                     $controlKey =>
                                     [
-                                        'title'             => 'EDIT',
+                                        'title'             => $title,
                                         'additionalClass'   => 'rowEdit ' . $this->dtParams['dtControlsLinkClass'],
-                                        'icon'              => 'edit',
-                                        'buttonType'        => 'warning',
+                                        'icon'              => $icon,
+                                        'buttonType'        => $type,
                                         'link'              => $control
                                     ]
                                 ]
                             );
-                        } else if ($controlKey === 'remove' || $controlKey === 'delete') {
+                        } else if ($controlKey === 'remove') {
+
+                            if (is_array($control)) {
+                                $control = $control['link'];
+                                $title =
+                                    isset($control['title']) ?
+                                    strtoupper($control['title']) :
+                                    'REMOVE';
+                                $icon =
+                                    isset($control['icon']) ?
+                                    strtoupper($control['icon']) :
+                                    'trash';
+                                $type =
+                                    isset($control['type']) ?
+                                    strtoupper($control['type']) :
+                                    'danger';
+
+                            } else {
+                                $title = 'REMOVE';
+                                $icon = 'trash';
+                                $type = 'danger';
+                            }
+
                             $controlButtons = array_merge($controlButtons,
                                 [
                                     $controlKey =>
                                     [
-                                        'title'             => 'REMOVE',
+                                        'title'             => $title,
                                         'additionalClass'   => 'rowRemove',
-                                        'icon'              => 'trash',
-                                        'buttonType'        => 'danger',
+                                        'icon'              => $icon,
+                                        'buttonType'        => $type,
                                         'link'              => $control
                                     ]
                                 ]
@@ -454,51 +526,11 @@ class DynamicTable
                         }
                     }
 
-                    if (isset($this->params['dtAdditionControlButtons'])) {
-                        if (count($controlButtons) > 1) {
-                            $controlButtons = array_merge($controlButtons,
-                                [
-                                    'divider'   => '<div class="dropdown-divider"></div>'
-                                ]
-                            );
-                        }
-
-                        foreach ($this->params['dtAdditionControlButtons']['buttons'] as $additionControlButtonKey => $additionControlButton) {
-                            if (isset($this->params['dtAdditionControlButtons']['includeId'])) {
-                                if (isset($this->params['dtAdditionControlButtons']['includeQ']) &&
-                                    $this->params['dtAdditionControlButtons']['includeQ']
-                                ) {
-                                    $additionControlButtonLink = $additionControlButton['link'] . '/q/id/' . $columns['id'];
-                                } else {
-                                    $additionControlButtonLink = $additionControlButton['link'] . '/id/' . $columns['id'];
-                                }
-                            }
-
-                            $controlButtons = array_merge($controlButtons,
-                                [
-                                    $additionControlButtonKey =>
-                                        [
-                                            'title'             =>
-                                                isset($additionControlButton['title']) ?
-                                                $additionControlButton['title'] :
-                                                'MISSING TITLE',
-                                            'additionalClass'   =>
-                                                isset($additionControlButton['additionalClass']) ?
-                                                $additionControlButton['additionalClass'] :
-                                                'contentAjaxLink',
-                                            'icon'              =>
-                                                isset($additionControlButton['icon']) ?
-                                                $additionControlButton['icon'] :
-                                                'circle',
-                                            'buttonType'        =>
-                                                isset($additionControlButton['buttonType']) ?
-                                                $additionControlButton['buttonType'] :
-                                                'primary',
-                                            'link'              => $additionControlButtonLink
-                                        ]
-                                ]
-                            );
-                        }
+                    if (!isset($this->params['dtAdditionControlButtonsBeforeControlButtons']) ||
+                        (isset($this->params['dtAdditionControlButtonsBeforeControlButtons']) &&
+                               $this->params['dtAdditionControlButtonsBeforeControlButtons'] === false)
+                    ) {
+                        $controlButtons = array_merge($controlButtons, $this->additionalControlButtons($controlButtons, $columns));
                     }
 
                     if (count($controlButtons) === 1) {
@@ -545,5 +577,59 @@ class DynamicTable
                     'replaceColumns'    => isset($this->params["dtReplaceColumns"]) ? $this->params["dtReplaceColumns"] : false
                 ]
             );
+    }
+
+    protected function additionalControlButtons($controlButtons, $columns)
+    {
+        if (!isset($this->params['dtAdditionControlButtons'])) {
+            return $controlButtons;
+        }
+
+        if (count($controlButtons) > 1) {
+            $controlButtons = array_merge($controlButtons,
+                [
+                    'divider'   => '<div class="dropdown-divider"></div>'
+                ]
+            );
+        }
+
+        foreach ($this->params['dtAdditionControlButtons']['buttons'] as $additionControlButtonKey => $additionControlButton) {
+            if (isset($this->params['dtAdditionControlButtons']['includeId'])) {
+                if (isset($this->params['dtAdditionControlButtons']['includeQ']) &&
+                    $this->params['dtAdditionControlButtons']['includeQ']
+                ) {
+                    $additionControlButtonLink = $additionControlButton['link'] . '/q/id/' . $columns['id'];
+                } else {
+                    $additionControlButtonLink = $additionControlButton['link'] . '/id/' . $columns['id'];
+                }
+            }
+
+            $controlButtons = array_merge($controlButtons,
+                [
+                    $additionControlButtonKey =>
+                        [
+                            'title'             =>
+                                isset($additionControlButton['title']) ?
+                                $additionControlButton['title'] :
+                                'MISSING TITLE',
+                            'additionalClass'   =>
+                                isset($additionControlButton['additionalClass']) ?
+                                $additionControlButton['additionalClass'] :
+                                'contentAjaxLink',
+                            'icon'              =>
+                                isset($additionControlButton['icon']) ?
+                                $additionControlButton['icon'] :
+                                'circle',
+                            'buttonType'        =>
+                                isset($additionControlButton['buttonType']) ?
+                                $additionControlButton['buttonType'] :
+                                'primary',
+                            'link'              => $additionControlButtonLink
+                        ]
+                ]
+            );
+        }
+
+        return $controlButtons;
     }
 }

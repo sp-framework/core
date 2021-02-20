@@ -18,6 +18,7 @@ trait DynamicTable {
         array $dtReplaceColumns = null,
         string $dtNotificationTextFromColumn = null,
         array $dtAdditionControlButtons = null,
+        bool $dtAdditionControlButtonsBeforeControlButtons = false,
         int $componentId = null
     )
     {
@@ -146,13 +147,14 @@ trait DynamicTable {
             $this->view->rows =
                 $adminltetags->useTag('content/listing/table',
                     [
-                        'componentId'                   => $this->view->componentId,
-                        'dtRows'                        => $rows,
-                        'dtNotificationTextFromColumn'  => $dtNotificationTextFromColumn,
-                        'dtPagination'                  => true,
-                        'dtPaginationCounters'          => $package->packagesData->paginationCounters,
-                        'dtReplaceColumns'              => $dtReplaceColumns,
-                        'dtAdditionControlButtons'      => $dtAdditionControlButtons
+                        'componentId'                                        => $this->app['route'] . '-' . strtolower($this->componentName),
+                        'dtRows'                                             => $rows,
+                        'dtNotificationTextFromColumn'                       => $dtNotificationTextFromColumn,
+                        'dtPagination'                                       => true,
+                        'dtPaginationCounters'                               => $package->packagesData->paginationCounters,
+                        'dtReplaceColumns'                                   => $dtReplaceColumns,
+                        'dtAdditionControlButtons'                           => $dtAdditionControlButtons,
+                        'dtAdditionControlButtonsBeforeControlButtons'       => $dtAdditionControlButtonsBeforeControlButtons
                     ]
                 );
         }
