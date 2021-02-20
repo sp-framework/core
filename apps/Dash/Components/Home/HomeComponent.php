@@ -10,6 +10,7 @@ namespace Apps\Dash\Components\Home;
 // use Apps\Dash\Components\Ims\Specifications\Install\Component as SpecificationsComponent;
 // use Apps\Dash\Components\Ims\Suppliers\Install\Component as SuppliersComponent;
 // use Apps\Dash\Components\Storages\Install\Component as StoragesComponent;
+use Apps\Dash\Components\System\Api\Install\Component as ApiComponent;
 use Apps\Dash\Packages\Business\ABNLookup\Install\Package as ABNLookupPackage;
 use Apps\Dash\Packages\Business\Channels\Install\Package as ChannelsPackage;
 use Apps\Dash\Packages\Business\Directory\Contacts\Install\Package as ContactsPackage;
@@ -27,6 +28,7 @@ use Apps\Dash\Packages\Ims\Categories\Install\Package as CategoriesPackage;
 use Apps\Dash\Packages\Ims\Products\Install\Package as ProductsPackage;
 use Apps\Dash\Packages\Ims\Specifications\Install\Package as SpecificationsPackage;
 use Apps\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
+use Apps\Dash\Packages\System\Api\Install\Package as ApiPackage;
 use System\Base\BaseComponent;
 
 class HomeComponent extends BaseComponent
@@ -37,6 +39,8 @@ class HomeComponent extends BaseComponent
     public function viewAction()
     {
         // $this->reset();
+        $apiPackage = new ApiPackage();
+        $apiPackage->installPackage(true);
     }
 
     protected function reset()
@@ -112,6 +116,13 @@ class HomeComponent extends BaseComponent
         $employeesDesignationsPackage = new EmployeesDesignationsPackage();
         $employeesDesignationsPackage->installPackage(true);
         $this->addDesignations();
+
+        // For Installing Api (component installation works)
+        $apiComponent = new ApiComponent();
+        $apiComponent->installComponent();
+        // For Installing Api Package
+        $apiPackage = new ApiPackage();
+        $apiPackage->installPackage(true);
     }
 
     protected function addStatuses()
