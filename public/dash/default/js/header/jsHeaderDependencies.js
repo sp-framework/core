@@ -519,7 +519,7 @@ var BazCore = function() {
     }
 
     function openMenu() {
-        var currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + dataCollection.env.currentRoute + '"]');
+        var currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + dataCollection.env.currentRoute + '"].nav-link');
 
         if (currentActiveLocation.length === 0) {
             if (dataCollection.env['parentComponentId']) {
@@ -529,12 +529,20 @@ var BazCore = function() {
                 currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + '/"]');
             }
         }
-
-        if ($(currentActiveLocation).parents().is('.nav-treeview')) {
+        if ($(currentActiveLocation).parents().is('ul.nav-treeview')) {
             $(currentActiveLocation).addClass('active');
-            $(currentActiveLocation).parents('.nav-treeview').show();
-            $(currentActiveLocation).parents('.nav-treeview').siblings('a').addClass('active');
-            $(currentActiveLocation).parents('.has-treeview').addClass('menu-open');
+            $(currentActiveLocation).parents('ul.nav-treeview').show();
+            // $(currentActiveLocation).parents('ul.nav-treeview').siblings('a').addClass('active');
+            $(currentActiveLocation).parents('li.has-treeview').addClass('menu-open');
+            if ($(currentActiveLocation).parents('ul.nav-treeview').length > 1) {
+                $(document).ready(function() {
+                    $(currentActiveLocation).parents('.has-treeview').siblings('.has-treeview').children('.nav-treeview').hide();
+                });
+            } else {
+                $(document).ready(function() {
+                    $(currentActiveLocation).parent().siblings('.has-treeview').children('.nav-treeview').hide();
+                });
+            }
         } else {
             $(currentActiveLocation).addClass('active');
         }
