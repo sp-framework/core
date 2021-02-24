@@ -1,0 +1,74 @@
+{% set modalContent =
+    '<fieldset id="{{componentId}}-{{sectionId}}-extract-fieldset">
+        <div class="row">
+            <div class="col">' ~
+                adminltetags.useTag('fields',
+                    [
+                        'componentId'                         : componentId,
+                        'sectionId'                           : sectionId,
+                        'fieldId'                             : 'extract-link',
+                        'fieldLabel'                          : 'Link',
+                        'fieldType'                           : 'input',
+                        'fieldInputType'                      : 'text',
+                        'fieldHelp'                           : true,
+                        'fieldHelpTooltipContent'             : 'Link from where Enums will be extracted.',
+                        'fieldRequired'                       : true,
+                        'fieldBazScan'                        : true,
+                        'fieldDataInputMinLength'             : 1,
+                        'fieldDataInputMaxLength'             : 1024
+                    ]
+                ) ~
+            '</div>
+        </div>
+        <div class="row">
+            <div class="col">' ~
+                adminltetags.useTag('fields',
+                    [
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'html-tag-class',
+                        'fieldLabel'                            : 'Html Tag Class',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Enter Html Tag Class',
+                        'fieldInputType'                        : 'text',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'HTML Tag Class of Enum Text/html',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 100
+                    ]
+                ) ~
+            '</div>
+        </div>
+    </fieldset>'
+%}
+{{adminltetags.useTag('modal',
+    [
+        'componentId'               : componentId,
+        'sectionId'                 : sectionId,
+        'modalId'                   : 'extract-modal',
+        'modalBodyContent'          : modalContent,
+        'modalSize'                 : 'lg',
+        'modalHeader'               : true,
+        'modalFooter'               : true,
+        'modalTitle'                : '<i class="fa fas fa-fw fa-download"></i> Extract Enums From A Site',
+        'modalEscClose'             : 'false',
+        'modalFooterButtons'        :
+            [
+                'componentId'                       : componentId,
+                'sectionId'                         : sectionId,
+                'buttonType'                        : 'button',
+                'buttonSize'                        : 'sm',
+                'buttons'                           :
+                    [
+                        'extract' : [
+                            'title'                 : 'extract',
+                            'icon'                  : 'cog fa-spin',
+                            'iconHidden'            : true
+                        ]
+                    ]
+            ]
+    ]
+)}}

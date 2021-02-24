@@ -1,0 +1,246 @@
+{% if enum['id'] is defined %}
+    {% set enumId = enum['id'] %}
+    {% set enumName = enum['name'] %}
+    {% set enumContractId = enum['contract_id'] %}
+    {% set enumConstantPrefix = enum['constant_prefix'] %}
+    {% set enumEnums = enum['enums'] %}
+{% else %}
+    {% set enumId = '' %}
+    {% set enumName = '' %}
+    {% set enumContractId = '' %}
+    {% set enumConstantPrefix = 'C_' %}
+    {% set enumEnums = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Enum Set ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enum Set ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : enumId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'name',
+                        'fieldLabel'                     : 'Enum Set Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enum Set Name Example: Ebay Identity Enum Set',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : enumName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'constant_prefix',
+                        'fieldLabel'                     : 'Enum Constant Prefix',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Enum Constant Prefix. Example: const C_IN_STOCK = "IN_STOCK"',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : enumConstantPrefix
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contract_id',
+                        'fieldLabel'                     : 'Contract',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select a contract for this enum set.',
+                        'fieldBazScan'                   : true,
+                        'fieldRequired'                  : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        : contracts,
+                        'fieldDataSelect2OptionsKey'     : 'id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': enumContractId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'enums',
+                        'fieldLabel'                     : 'Enums (Comma Separated)',
+                        'fieldType'                      : 'textarea',
+                        'fieldHelp'                      : true,
+                        'fieldRequired'                  : true,
+                        'fieldHelpTooltipContent'        : 'Enums (Comma Separated)',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldTextareaRows'              : 8,
+                        'fieldValue'                     : enumEnums
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'componentId'           : componentId,
+                        'sectionId'             : sectionId,
+                        'buttonType'            : 'button',
+                        'buttons'               :
+                            [
+                                'extract-tool' : [
+                                    'title'                   : 'Extract Tool',
+                                    'size'                    : 'sm',
+                                    'type'                    : 'primary',
+                                    'icon'                    : 'download'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+        {% include 'enums/extract.html' %}
+    </fieldset>
+</form>
+<script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-constant_prefix'         : { },
+        '{{componentId}}-{{sectionId}}-contract_id'             : {
+            placeholder: "SELECT CONTRACT"
+        },
+        '{{componentId}}-{{sectionId}}-enums'                   : { },
+        '{{componentId}}-{{sectionId}}-extract-link'            : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-extract-tool').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-extract-modal').modal('show');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-extract').click(function(e) {
+                    e.preventDefault();
+
+                    $(this).children().attr('hidden', false);
+                    $(this).attr('disabled', true);
+
+                    var postData = { };
+                    postData['link'] = $('#{{componentId}}-{{sectionId}}-extract-link').val();
+                    postData['class'] = $('#{{componentId}}-{{sectionId}}-html-tag-class').val();
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("devtools/api/enums/extract")}}', postData, function(data) {
+                        if ($('#security-token').length === 1) {
+                            $('#security-token').attr('name', data.tokenKey);
+                            $('#security-token').val(data.token);
+                        }
+                        $('#{{componentId}}-{{sectionId}}-extract').attr('hidden', true);
+
+                        if (data.responseCode == '0') {
+                            $('#{{componentId}}-{{sectionId}}-enums').val(data.responseData);
+                            $('#{{componentId}}-{{sectionId}}-extract-modal').modal('hide');
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-extract').attr('disabled', false);
+                            PNotify.error({
+                                title   : data.responseMessage,
+                            });
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-html-tag-class'          : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-contract_id'             : 'required',
+                '{{componentId}}-{{sectionId}}-enums'                   : 'required',
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter contract name',
+                '{{componentId}}-{{sectionId}}-contract_id'             : 'Please enter contract',
+                '{{componentId}}-{{sectionId}}-enums'                   : 'Please enter enums',
+            }
+        }
+    });
+</script>
