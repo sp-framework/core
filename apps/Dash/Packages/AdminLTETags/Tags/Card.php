@@ -174,11 +174,11 @@ class Card extends AdminLTETags
             $cardBody = 'cardBodyInclude/Content missing';
         }
 
-        if (isset($this->params['cardFooter'])) {
-            isset($this->params['cardFooterAdditionalClass']) ?
-                $cardFooterAdditionalClass = $this->params['cardFooterAdditionalClass'] :
-                $cardFooterAdditionalClass = '';
+        isset($this->params['cardFooterAdditionalClass']) ?
+            $cardFooterAdditionalClass = $this->params['cardFooterAdditionalClass'] :
+            $cardFooterAdditionalClass = '';
 
+        if (isset($this->params['cardFooter']) && $this->params['cardFooter'] === true) {
             if (isset($this->params['cardFooterContent'])) {
 
                 $cardFooter = $this->params['cardFooterContent'];
@@ -202,6 +202,8 @@ class Card extends AdminLTETags
             } else {
                 $cardFooter = 'cardFooterInclude/Content missing';
             }
+        } else {
+            $cardFooter = false;
         }
 
         // card content
@@ -217,7 +219,7 @@ class Card extends AdminLTETags
             }
 
         } else {
-            if (isset($this->params['cardHeader'])) {
+            if (isset($this->params['cardHeader']) && $this->params['cardHeader'] !== false) {
                 $this->content .=
                     '<div class="card-header rounded-0 ' . $cardType . ' ' . $cardHeaderAdditionalClass . '">
                         <h3 class="card-title">' . $cardIcon . '<span class="title ml-1">' . $cardTitle . '</span></h3>
@@ -228,10 +230,9 @@ class Card extends AdminLTETags
             $this->content .=
                 '<div class="card-body ' . $cardBodyAdditionalClass . '">' . $cardBody . '</div>';
 
-            if (isset($this->params['cardFooter'])) {
+            if ($cardFooter) {
                 $this->content .=
                     '<div class="card-footer ' . $cardFooterAdditionalClass . '">' . $cardFooter . '</div>';
-
             }
         }
         $this->content .= '</div>';
