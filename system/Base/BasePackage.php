@@ -8,6 +8,7 @@ use Phalcon\Mvc\Model\Transaction\Manager;
 use Phalcon\Paginator\Adapter\Model;
 use Phalcon\Paginator\Adapter\NativeArray;
 use Phalcon\Paginator\Exception;
+use System\Base\Exceptions\IdNotFoundException;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 abstract class BasePackage extends Controller
@@ -95,7 +96,13 @@ abstract class BasePackage extends Controller
 
 			$this->model = $this->modelToUse::find($parameters);
 
-			return $this->getDbData($parameters, $enableCache);
+			$data = $this->getDbData($parameters, $enableCache);
+
+			if ($data) {
+				return $data;
+			} else {
+				throw new IdNotFoundException;
+			}
 		}
 
 		throw new \Exception('getById needs id parameter to be set.');
