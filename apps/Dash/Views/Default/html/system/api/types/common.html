@@ -21,6 +21,28 @@
             ]
         )}}
     </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'setup',
+                'fieldLabel'                     : 'Setup',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Setup',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : apiSetup
+            ]
+        )}}
+    </div>
 </div>
 <div class="row">
     <div class="col">
@@ -68,31 +90,53 @@
             ]
         )}}
     </div>
-    <div class="col">
-        {% if apiInUse == 1 %}
-            {% set inUse = '<h5><span class="badge badge-primary">Yes</span></h5>' %}
-        {% elseif apiInUse == 0 %}
-            {% set inUse = '<h5><span class="badge badge-secondary">No</span></h5>' %}
-        {% endif %}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'in_use',
-                'fieldLabel'                     : 'In Use',
-                'fieldType'                      : 'html',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Is API being used somewhere?',
-                'fieldRequired'                  : false,
-                'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : false,
-                'fieldBazPostOnUpdate'           : false,
-                'fieldHtmlContent'               : inUse
-            ]
-        )}}
-    </div>
+    {% if api['id'] is defined %}
+        <div class="col">
+            {% if apiInUse == 1 %}
+                {% set inUse = '<h5><span class="badge badge-success">Yes</span></h5>' %}
+            {% elseif apiInUse == 0 %}
+                {% set inUse = '<h5><span class="badge badge-secondary">No</span></h5>' %}
+            {% endif %}
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'in_use',
+                    'fieldLabel'                     : 'In Use',
+                    'fieldType'                      : 'html',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Is API being used somewhere?',
+                    'fieldRequired'                  : false,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldHtmlContent'               : inUse
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'used_by',
+                    'fieldLabel'                     : 'Used By',
+                    'fieldType'                      : 'html',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Api used by package',
+                    'fieldRequired'                  : false,
+                    'fieldBazScan'                   : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldHtmlContent'               : apiUsedBy
+                ]
+            )}}
+        </div>
+    {% endif %}
 </div>
 <div class="row">
     <div class="col">

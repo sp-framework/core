@@ -8,7 +8,7 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types;
 
-use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
 class GetAppTokenRestRequest extends BaseType
 {
@@ -16,23 +16,23 @@ class GetAppTokenRestRequest extends BaseType
      * @var array Properties belonging to objects of this class.
      */
     private static $propertyTypes = [
-        'grant_type' => [
-            'type' => 'string',
-            'repeatable' => false,
-            'attribute' => false,
-            'elementName' => 'grant_type'
+        'grant_type'    => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'grant_type'
         ],
-        'redirect_uri' => [
-            'type' => 'string',
-            'repeatable' => false,
-            'attribute' => false,
-            'elementName' => 'redirect_uri'
+        'redirect_uri'  => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'redirect_uri'
         ],
-        'scope' => [
-            'type' => 'string',
-            'repeatable' => false,
-            'attribute' => false,
-            'elementName' => 'scope'
+        'scope'         => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'scope'
         ]
     ];
 

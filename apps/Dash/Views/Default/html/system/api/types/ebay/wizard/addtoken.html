@@ -27,12 +27,16 @@ $('#close').click(function(e) {
 });
 $('#try-again').click(function(e) {
     e.preventDefault();
-    goBack('ebay-api-failed');
+    goBack('ebay-api-error');
 });
+
+var tokenData = { };
+tokenData['tokenKey'] = $('#security-token').attr('name');
+tokenData['token'] = $('#security-token').val();
 
 function goBack(message) {
     var goBack = window.open('', window.opener.name);
-    window.opener.$('body').trigger(message);
+    window.opener.$('body').trigger(message, tokenData);
     window.close();
     goBack.focus();
 }

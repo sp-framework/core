@@ -2,13 +2,12 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Services;
 
-use Apps\Dash\Packages\System\Api\Apis\Ebay\ConfigurationResolver;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\Credentials\CredentialsProvider;
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\GetAppTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\GetUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\RefreshUserTokenRestRequest;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\UriResolver;
+use Apps\Dash\Packages\System\Api\Base\ConfigurationResolver;
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Base\UriResolver;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 
@@ -64,7 +63,7 @@ class OAuthService
     /**
      * @var array Associative array storing the current configuration option values.
      */
-    private $config;
+    private static $config;
 
     private static $sandbox;
 
@@ -77,17 +76,17 @@ class OAuthService
      */
     public function __construct(array $config)
     {
-        self::$credentials = $config['bebayConfig'];
+        self::$credentials = $config['credentials'];
 
-        self::$sandbox = isset($config['sandbox']) ? $config['sandbox'] : true;
+        self::$sandbox = $config['sandbox'];
 
-        self::$debug = isset($config['debug']) ? $config['debug'] : false;
+        self::$debug = $config['debug'];
 
         $this->resolver = new ConfigurationResolver(static::getConfigDefinitions());
 
         $this->uriResolver = new UriResolver();
 
-        $this->config = $this->resolver->resolve($config);
+        self::$config = $this->resolver->resolve($config);
     }
 
     /**
@@ -105,20 +104,20 @@ class OAuthService
             ],
             'profile'       => [
                 'valid'     => ['string'],
-                'fn'        => 'Apps\Dash\Packages\System\Api\Apis\Ebay\Functions::applyProfile',
+                'fn'        => 'Apps\Dash\Packages\System\Api\Base\Functions::applyProfile',
             ],
             'credentials'   => [
                 'valid'     => ['array'],
-                'default'   => self::$credentials['sandbox']['credentials']
+                'default'   => self::$credentials
             ],
             'debug'         => [
                 'valid'     => ['bool', 'array'],
-                'fn'        => 'Apps\Dash\Packages\System\Api\Apis\Ebay\Functions::applyDebug',
+                'fn'        => 'Apps\Dash\Packages\System\Api\Base\Functions::applyDebug',
                 'default'   => self::$debug
             ],
             'httpHandler'   => [
                 'valid'     => ['callable'],
-                'default'   => 'Apps\Dash\Packages\System\Api\Apis\Ebay\Functions::defaultHttpHandler'
+                'default'   => 'Apps\Dash\Packages\System\Api\Base\Functions::defaultHttpHandler'
             ],
             'httpOptions'   => [
                 'valid'     => ['array'],
@@ -128,7 +127,7 @@ class OAuthService
             ],
             'ruName'        => [
                 'valid'     => ['string'],
-                'default'   => self::$credentials['sandbox']['ruName'],
+                'default'   => self::$credentials['ruName'],
                 'required'  => true
             ],
             'sandbox'       => [
@@ -149,9 +148,9 @@ class OAuthService
     public function getConfig($option = null)
     {
         return $option === null
-            ? $this->config
-            : (isset($this->config[$option])
-                ? $this->config[$option]
+            ? self::$config
+            : (isset(self::$config[$option])
+                ? self::$config[$option]
                 : null);
     }
 
@@ -162,8 +161,8 @@ class OAuthService
      */
     public function setConfig(array $configuration)
     {
-        $this->config = Functions::arrayMergeDeep(
-            $this->config,
+        self::$config = Functions::arrayMergeDeep(
+            self::$config,
             $this->resolver->resolveOptions($configuration)
         );
     }

@@ -1,7 +1,9 @@
 {% if api['id'] is defined %}
     {% set apiId = api['id'] %}
+    {% set apiSetup = api['setup'] %}
     {% set apiName = api['name'] %}
     {% set apiInUse = api['in_use'] %}
+    {% set apiUsedBy = api['used_by'] %}
     {% set apiDescription = api['description'] %}
     {% set apiApiUrl = api['api_url'] %}
     {% set apiAuthType = api['auth_type'] %}
@@ -11,8 +13,10 @@
     {% set apiAuthorization = api['authorization'] %}
 {% else %}
     {% set apiId = '' %}
+    {% set apiSetup = '' %}
     {% set apiName = '' %}
     {% set apiInUse = '0' %}
+    {% set apiUsedBy = '' %}
     {% set apiDescription = '' %}
     {% set apiApiUrl = '' %}
     {% set apiAuthType = 'none' %}
@@ -241,9 +245,11 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-setup'                               : { },
         '{{componentId}}-{{sectionId}}-name'                                : { },
         '{{componentId}}-{{sectionId}}-api_type'                            : { },
         '{{componentId}}-{{sectionId}}-in_use'                              : { },
+        '{{componentId}}-{{sectionId}}-used_by'                             : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
         '{{componentId}}-{{sectionId}}-api_url'                             : { },
         '{{componentId}}-{{sectionId}}-auth_type'                           : {

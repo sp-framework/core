@@ -1,20 +1,381 @@
 {% if api['id'] is defined %}
     {% set apiId = api['id'] %}
+    {% set apiSetup = api['setup'] %}
     {% set apiName = api['name'] %}
     {% set apiInUse = api['in_use'] %}
+    {% set apiUsedBy = api['used_by'] %}
     {% set apiDescription = api['description'] %}
+    {% set api['refresh_token_valid_until'] = date('m/d/Y H:i:s', api['refresh_token_valid_until']) %}
+    {% set apiUseSystemsCredentials = api['use_systems_credentials'] %}
+    {% set apiUserCredentialsApp = api['user_credentials_app_id'] %}
+    {% set apiUserCredentialsDev = api['user_credentials_dev_id'] %}
+    {% set apiUserCredentialsCert = api['user_credentials_cert_id'] %}
+    {% set apiUserCredentialsRuName = api['user_credentials_ru_name'] %}
+    {% set apiUserCredentialsScopes = api['user_credentials_scopes'] %}
 {% else %}
     {% set apiId = '' %}
+    {% set apiSetup = '' %}
     {% set apiName = '' %}
     {% set apiInUse = '0' %}
+    {% set apiUsedBy = '' %}
     {% set apiDescription = '' %}
+    {% set apiUseSystemsCredentials = '1' %}
+    {% set apiUserCredentialsApp = '' %}
+    {% set apiUserCredentialsDev = '' %}
+    {% set apiUserCredentialsCert = '' %}
+    {% set apiUserCredentialsRuName = '' %}
+    {% set apiUserCredentialsScopes = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         {% include 'api/types/common.html' %}
-        {% if api['id'] is defined %}
-            {% set api['refresh_token_valid_until'] = date('m/d/Y H:i:s', api['refresh_token_valid_until']) %}
-                {{dump(api)}}
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'marketplace_id',
+                        'fieldLabel'                     : 'Marketplace',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Select ebay marketplace for this API.',
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldRequired'                  : true,
+                        'fieldDataSelect2Options'        : ebayIds,
+                        'fieldDataSelect2OptionsKey'     : 'marketplace_id',
+                        'fieldDataSelect2OptionsValue'   : 'name',
+                        'fieldDataSelect2OptionsArray'   : true,
+                        'fieldDataSelect2OptionsSelected': 'EBAY-AU'
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if apiUseSystemsCredentials == 1 %}
+                    {% set systemsCredentialsChecked = true %}
+                {% else %}
+                    {% set systemsCredentialsChecked = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'use_systems_credentials',
+                        'fieldLabel'                     : 'Use Systems Credentials?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Either you can use our (systems) credentials that are already registered with this system or you can grab new credentials from ebay developer program.',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'primary',
+                        'fieldCheckboxChecked'           : systemsCredentialsChecked,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            {% if wizard is not defined %}
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'refresh_token',
+                            'fieldLabel'                     : 'Refresh Token on update?',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'If you are making any changes to api parameters, check this to run refresh token wizard',
+                            'fieldRequired'                  : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'info',
+                            'fieldCheckboxChecked'           : false,
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldBazScan'                   : true
+                        ]
+                    )}}
+                </div>
+            {% endif %}
+        </div>
+        <div class="row" id="{{componentId}}-{{sectionId}}-user-credentials">
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'user_credentials_app_id',
+                                'fieldLabel'                     : 'App Id',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'App Id received from eBay dev program',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 512,
+                                'fieldDisabled'                  : false,
+                                'fieldValue'                     : apiUserCredentialsApp
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'user_credentials_dev_id',
+                                'fieldLabel'                     : 'Dev Id',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Dev Id received from eBay dev program',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 512,
+                                'fieldDisabled'                  : false,
+                                'fieldValue'                     : apiUserCredentialsDev
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'user_credentials_cert_id',
+                                'fieldLabel'                     : 'Cert Id',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Cert Id received from eBay dev program',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 512,
+                                'fieldDisabled'                  : false,
+                                'fieldValue'                     : apiUserCredentialsCert
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'user_credentials_ru_name',
+                                'fieldLabel'                     : 'RuName',
+                                'fieldType'                      : 'input',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'RuName received from eBay dev program',
+                                'fieldRequired'                  : true,
+                                'fieldBazScan'                   : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMinLength'        : 1,
+                                'fieldDataInputMaxLength'        : 512,
+                                'fieldDisabled'                  : false,
+                                'fieldValue'                     : apiUserCredentialsRuName
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'user_credentials_scopes',
+                                'fieldLabel'                     : 'Scopes (comma separated)',
+                                'fieldType'                      : 'textarea',
+                                'fieldDataMaxLength'             : 2048,
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Scopes received from eBay dev program. NOTE: Enter each scope comma separated',
+                                'fieldRequired'                  : false,
+                                'fieldBazScan'                   : true,
+                                'fieldRequired'                  : true,
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldDataInputMaxLength'        : 2048,
+                                'fieldTextareaRows'              : 4,
+                                'fieldValue'                     : apiUserCredentialsScopes
+                            ]
+                        )}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if wizard is not defined %}
+            <hr>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'componentId'           : componentId,
+                            'sectionId'             : sectionId,
+                            'buttonType'            : 'button',
+                            'buttons'               :
+                                [
+                                    'check-user-autho' : [
+                                        'title'                   : 'Check User Authorization',
+                                        'size'                    : 'sm',
+                                        'type'                    : 'primary',
+                                        'iconHidden'              : true,
+                                        'icon'                    : 'cog fa-spin'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
+            <hr>
+            <div class="row" id="{{componentId}}-{{sectionId}}-user-autho-data">
+                <div class="col">
+                    <div class="text-uppercase text-center" id="{{componentId}}-{{sectionId}}-user-autho-data-heading"></div>
+                    <div class="table-responsive p-0">
+                        <table class="table table-sm table-hover text-nowrap">
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="text-info" id="{{componentId}}-{{sectionId}}-user-autho-data-footer" hidden>
+                        <p>NOTE: User Information received is read only. If you would like to update the user information you will have to do it via eBay.</p>
+                    </div>
+                </div>
+            </div>
+            <script>
+/* globals PNotify */
+$('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
+
+    $(this).attr('disabled', true);
+
+    $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', false);
+
+    var postData = { };
+    postData['api_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post('{{links.url("system/api/refreshEbayUserdata")}}', postData, function(data) {
+        if ($('#security-token').length === 1) {
+            $('#security-token').attr('name', data.tokenKey);
+            $('#security-token').val(data.token);
+        }
+
+        if (data.responseCode == '0') {
+            $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
+
+            if (data.responseData) {
+                var authoData =
+                    '<tr>' +
+                        '<td>User Authorization Token Valid Till</td>' +
+                        '<td>' + data.responseData.user_access_token_valid_until + '</td>' +
+                    '</tr>';
+
+                    if (data.responseData.user_data) {
+                        var userTypeData = { };
+
+                        if (data.responseData.user_data.accountType === 'BUSINESS') {
+                            userTypeData = data.responseData.user_data.businessAccount;
+                        } else if (data.responseData.user_data.accountType === 'INDIVIDUAL') {
+                            userTypeData = data.responseData.user_data.individualAccount;
+                        }
+
+                        authoData +=
+                            '<tr>' +
+                                '<td>Username</td>' +
+                                '<td>' + data.responseData.user_data.username + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Account Type</td>' +
+                                '<td>' + data.responseData.user_data.accountType + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Registration Marketplace ID</td>' +
+                                '<td>' + data.responseData.user_data.registrationMarketplaceId + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Status</td>' +
+                                '<td>' + data.responseData.user_data.status + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Account First Name</td>' +
+                                '<td>' + userTypeData.firstName + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Account Last Name</td>' +
+                                '<td>' + userTypeData.lastName + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Email</td>' +
+                                '<td>' + userTypeData.email + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Phone</td>' +
+                                '<td>' + userTypeData.primaryPhone.number + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Street</td>' +
+                                '<td>' + userTypeData.registrationAddress.addressLine1 + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>City</td>' +
+                                '<td>' + userTypeData.registrationAddress.city + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>State</td>' +
+                                '<td>' + userTypeData.registrationAddress.stateOrProvince + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Post Code</td>' +
+                                '<td>' + userTypeData.registrationAddress.postalCode + '</td>' +
+                            '</tr>' +
+                            '<tr>' +
+                                '<td>Country</td>' +
+                                '<td>' + userTypeData.registrationAddress.country + '</td>' +
+                            '</tr>';
+                    }
+
+                $('#{{componentId}}-{{sectionId}}-user-autho-data tbody').empty().append(authoData);
+                $('#{{componentId}}-{{sectionId}}-user-autho-data-heading').empty().append(
+                    '<h5>USER INFORMATION</h5>'
+                );
+                $('#{{componentId}}-{{sectionId}}-user-autho-data-footer').attr('hidden', false);
+            }
+        } else {
+            $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('disabled', false);
+            PNotify.error({
+                title   : data.responseMessage,
+            });
+        }
+    }, 'json');
+});
+</script>
         {% endif %}
     </fieldset>
 </form>
@@ -47,56 +408,70 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-marketplace_id'                      : {
+            placeholder: 'SELECT EBAY MARKETPLACE'
+        },
+        '{{componentId}}-{{sectionId}}-setup'                               : { },
         '{{componentId}}-{{sectionId}}-name'                                : { },
         '{{componentId}}-{{sectionId}}-api_type'                            : { },
         '{{componentId}}-{{sectionId}}-in_use'                              : { },
+        '{{componentId}}-{{sectionId}}-used_by'                             : { },
         '{{componentId}}-{{sectionId}}-description'                         : { },
-        '{{componentId}}-{{sectionId}}-authorization'                       : { },
-        '{{componentId}}-{{sectionId}}-generate'                            : {
+        '{{componentId}}-{{sectionId}}-use_systems_credentials'             : {
             afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-generate-token').click(function(e) {
-                    e.preventDefault();
-                    $(this).addClass('disabled');
-                    $('#{{componentId}}-{{sectionId}}-generate-token').children().attr('hidden', false);
+                if ($('#{{componentId}}-{{sectionId}}-use_systems_credentials')[0].checked === true) {
+                    $('#{{componentId}}-{{sectionId}}-user-credentials').attr('hidden', true);
+                }
 
-                    var url = $(this).attr('href');
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode == 0) {
-                            PNotify.success({
-                                'title' : data.responseMessage
-                            });
-                            $('#{{componentId}}-{{sectionId}}-generate-token').attr('hidden', true);
-                            $('#{{componentId}}-{{sectionId}}-generate-token').siblings().removeClass('d-none');
-
-                        } else {
-                            PNotify.error({
-                                'title' : data.responseMessage
-                            });
-                            $('#{{componentId}}-{{sectionId}}-generate-token').removeClass('disabled');
-                            $('#{{componentId}}-{{sectionId}}-generate-token').children().attr('hidden', true);
-
-                        }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
-                        }
-                    }, 'json');
+                $('#{{componentId}}-{{sectionId}}-use_systems_credentials').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-user-credentials').attr('hidden', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-user-credentials').attr('hidden', false);
+                    }
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-token_status'                        : { },
-        '{{componentId}}-{{sectionId}}-token_valid_until'                   : { },
+        '{{componentId}}-{{sectionId}}-refresh_token'                        : {
+            afterInit: function() {
+                var originalUrl = $('#{{componentId}}-{{sectionId}}-updateData').attr('href');
+                var apiId = $('#{{componentId}}-{{sectionId}}-id').val();
+                var apiSetup = $('#{{componentId}}-{{sectionId}}-setup').val();
+
+                $('#{{componentId}}-{{sectionId}}-refresh_token').click(function() {
+                    if ($(this)[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-updateData').attr('href', '{{links.url("system/api/q/id/' + apiId + '")}}');
+                        $('#{{componentId}}-{{sectionId}}-setup').val('2');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-updateData').attr('href', originalUrl);
+                        $('#{{componentId}}-{{sectionId}}-setup').val(apiSetup);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-user_credentials_app_id'             : { },
+        '{{componentId}}-{{sectionId}}-user_credentials_dev_id'             : { },
+        '{{componentId}}-{{sectionId}}-user_credentials_cert_id'            : { },
+        '{{componentId}}-{{sectionId}}-user_credentials_ru_name'            : { },
+        '{{componentId}}-{{sectionId}}-user_credentials_scopes'             : { },
         '{{componentId}}-{{sectionId}}-form'                                : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'required',
                 '{{componentId}}-{{sectionId}}-api_type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-user_credentials_app_id'     : 'required',
+                '{{componentId}}-{{sectionId}}-user_credentials_dev_id'     : 'required',
+                '{{componentId}}-{{sectionId}}-user_credentials_cert_id'    : 'required',
+                '{{componentId}}-{{sectionId}}-user_credentials_ru_name'    : 'required',
+                '{{componentId}}-{{sectionId}}-user_credentials_scopes'     : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                        : 'Please enter api name',
                 '{{componentId}}-{{sectionId}}-api_type'                    : 'Please enter api type',
+                '{{componentId}}-{{sectionId}}-user_credentials_app_id'     : 'Please enter user app id',
+                '{{componentId}}-{{sectionId}}-user_credentials_dev_id'     : 'Please enter user dev id',
+                '{{componentId}}-{{sectionId}}-user_credentials_cert_id'    : 'Please enter user cert id',
+                '{{componentId}}-{{sectionId}}-user_credentials_ru_name'    : 'Please enter user ruName',
+                '{{componentId}}-{{sectionId}}-user_credentials_scopes'     : 'Please enter user scopes',
             }
         }
     });

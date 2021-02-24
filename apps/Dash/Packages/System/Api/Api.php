@@ -2,9 +2,10 @@
 
 namespace Apps\Dash\Packages\System\Api;
 
+use Apps\Dash\Packages\System\Api\Model\SystemApi;
 use Apps\Dash\Packages\System\Api\Model\SystemApiEbay;
 use Apps\Dash\Packages\System\Api\Model\SystemApiGeneric;
-use Apps\Dash\Packages\System\Api\Model\SystemApi;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Api extends BasePackage
@@ -63,36 +64,6 @@ class Api extends BasePackage
         throw new \Exception('getById needs id parameter to be set.');
     }
 
-    public function addApi(array $data)
-    {
-        $data['api_type'] = strtolower($data['api_type']);
-
-        $data['setup'] = 1;
-
-        $data = $this->initAPIType($data);
-
-        $apiData = $data;
-
-        if ($this->add($apiData)) {
-            $data['api_id'] = $this->packagesData->last['id'];
-
-            $this->init();
-
-            if ($this->add($data)) {
-
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' API';
-
-                return true;
-            } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error adding new API.';
-            }
-        }
-    }
-
     public function init()
     {
         $this->modelToUse = SystemApi::class;
@@ -120,6 +91,49 @@ class Api extends BasePackage
         return $data;
     }
 
+    public function addApi(array $data)
+    {
+        $data['api_type'] = strtolower($data['api_type']);
+
+        $data['setup'] = 1;
+
+        $data = $this->initAPIType($data);
+
+        $apiData = $data;
+
+        if ($apiData['api_type'] === 'ebay') {
+            if ($apiData['user_credentials_scopes'] !== '') {
+                $scopes = explode(',', $apiData['user_credentials_scopes']);
+                foreach ($scopes as &$scope) {
+                    $scope = trim($scope);
+                }
+
+                $apiData['user_credentials_scopes'] = Json::encode($scopes);
+            } else {
+                $apiData['user_credentials_scopes'] = Json::encode([]);
+            }
+        }
+
+        if ($this->add($apiData)) {
+            $data['api_id'] = $this->packagesData->last['id'];
+
+            $this->init();
+
+            if ($this->add($data)) {
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' API';
+
+                return true;
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error adding new API.';
+            }
+        }
+    }
+
     public function updateApi(array $data)
     {
         $data['api_type'] = strtolower($data['api_type']);
@@ -132,6 +146,20 @@ class Api extends BasePackage
             $api = $this->initAPIType($api);
 
             $api['id'] = $api['api_id'];
+
+            if ($api['api_type'] === 'ebay') {
+                if (!isset($api['credentials'])) { // Data is coming from EbayAPI, no need to update scopes.
+                    if ($api['user_credentials_scopes'] !== '') {
+                        $scopes = explode(',', $api['user_credentials_scopes']);
+                        foreach ($scopes as &$scope) {
+                            $scope = trim($scope);
+                        }
+                        $api['user_credentials_scopes'] = Json::encode($scopes);
+                    } else {
+                        $api['user_credentials_scopes'] = Json::encode([]);
+                    }
+                }
+            }
 
             if ($this->update($api)) {
                 $this->packagesData->responseCode = 0;
@@ -187,15 +215,14 @@ class Api extends BasePackage
         $apiConfig = null;
 
         if (isset($data['state'])) {
-
             $this->initAPIType(['api_type' => 'ebay']);
 
             $ebayApi = $this->getByParams(
                 [
-                    'conditions'    => 'session_id = :sessionId:',
+                    'conditions'    => 'identifier = :identifier:',
                     'bind'          =>
                         [
-                            'sessionId'    => $data['state']
+                            'identifier'    => $data['state']
                         ]
                 ]
             );
@@ -220,14 +247,14 @@ class Api extends BasePackage
                 }
             }
 
-        } else if (!isset($data['apiId'])) {
+        } else if (!isset($data['api_id'])) {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'API Id missing.';
 
-        } else if (isset($data['apiId'])) {
+        } else if (isset($data['api_id'])) {
 
-            $apiConfig = $this->getApiById($data['apiId']);
+            $apiConfig = $this->getApiById($data['api_id']);
         }
 
         if ($apiConfig) {
@@ -282,5 +309,41 @@ class Api extends BasePackage
         }
 
         return $apiClass;
+    }
+
+    public function getApiByType($type, $inuse = null)
+    {
+        $this->getAll();
+
+        if (isset($inuse)) {
+            if ($inuse === true) {
+                $inUse = '1';
+            } else {
+                $inUse = '0'|null;
+            }
+            $filter =
+                $this->model->filter(
+                    function($api) use ($type, $inUse) {
+                        $api = $api->toArray();
+                        if ($api['api_type'] === strtolower($type) &&
+                            $api['in_use'] == $inUse
+                        ) {
+                            return $api;
+                        }
+                    }
+                );
+        } else {
+            $filter =
+                $this->model->filter(
+                    function($api) use ($type) {
+                        $api = $api->toArray();
+                        if ($api['api_type'] == $type) {
+                            return $api;
+                        }
+                    }
+                );
+        }
+
+        return $filter;
     }
 }

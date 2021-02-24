@@ -25,7 +25,14 @@
 $('#{{componentId}}-{{sectionId}}-begin-app-autho').click(function(e) {
     e.preventDefault();
 
+    $(this).removeClass('btn-success').addClass('btn-primary');
+
+    $(this).html(
+        '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> RUNNING AUTHORIZATION. PLEASE WAIT...'
+    );
+
     $(this).attr('disabled', true);
+
     $('#{{componentId}}-{{sectionId}}-begin-app-autho').children().attr('hidden', false);
 
     var registerFormId;
@@ -37,7 +44,7 @@ $('#{{componentId}}-{{sectionId}}-begin-app-autho').click(function(e) {
     }
 
     var postData = { };
-    postData['apiId'] = registerFormId;
+    postData['api_id'] = registerFormId;
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
     $.post('{{links.url("system/api/getEbayAppToken")}}', postData, function(data) {
@@ -52,16 +59,19 @@ $('#{{componentId}}-{{sectionId}}-begin-app-autho').click(function(e) {
                 title   : data.responseMessage,
             });
             $('#{{componentId}}-{{sectionId}}-next').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-begin-app-autho').removeClass('btn-primary').addClass('btn-success');
+            $('#{{componentId}}-{{sectionId}}-begin-app-autho').html(
+                '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> AUTHORIZED! CLICK TO RE-AUTHORIZATION'
+            );
         } else {
-            $('#{{componentId}}-{{sectionId}}-begin-app-autho').attr('disabled', false);
             PNotify.error({
                 title   : data.responseMessage,
             });
+            $('#{{componentId}}-{{sectionId}}-begin-app-autho').html(
+                '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> AUTHORIZATION ERROR! TRY AGAIN?'
+            );
         }
+        $('#{{componentId}}-{{sectionId}}-begin-app-autho').attr('disabled', false);
     }, 'json');
 });
-$(document).ready(function() {
-    //eslint-disable-next-line
-    console.log($('#{{componentId}}-{{sectionId}}-next'));
-})
 </script>

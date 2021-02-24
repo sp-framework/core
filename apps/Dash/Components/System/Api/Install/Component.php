@@ -2,7 +2,6 @@
 
 namespace Apps\Dash\Components\System\Api\Install;
 
-use Apps\Dash\Components\Storages\StoragesComponent;
 use Apps\Dash\Components\System\Api\ApiComponent;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;

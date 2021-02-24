@@ -7244,7 +7244,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 });
 
 /* exported BazContentSectionWithWizard */
-/* globals */
+/* globals PNotify */
 /*
 * @title                    : BazContentSectionWithWizard
 * @description              : Baz Core Lib
@@ -7548,7 +7548,10 @@ var BazContentSectionWithWizard = function() {
 
                     // Submit form if submitOnNext
                     if (steps[wizardOptions['currentStep']]['submitOnNext']) {
-                        if ($('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-addData').length > 0) {
+                        var formIdVal = $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-id').val();
+                        if ($('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-addData').length > 0 &&
+                            formIdVal === ''
+                        ) {
                             doAjax(
                                 $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-addData').attr('actionurl'),
                                 steps[wizardOptions['currentStep']]['componentId'],
@@ -7556,9 +7559,10 @@ var BazContentSectionWithWizard = function() {
                                 wizardOptions['currentStep'],
                                 false
                                 );
-                        } else if ($('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-editData').length > 0) {
+                        } else if ($('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-updateData').length > 0 &&
+                                   formIdVal !== '') {
                             doAjax(
-                                $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-editData').attr('actionurl'),
+                                $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-updateData').attr('actionurl'),
                                 steps[wizardOptions['currentStep']]['componentId'],
                                 steps[wizardOptions['currentStep']]['sectionId'],
                                 wizardOptions['currentStep'],
@@ -7641,6 +7645,9 @@ var BazContentSectionWithWizard = function() {
                 success = true;
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-danger').addClass('bg-success');
             } else {
+                PNotify.error({
+                    title   : data.responseMessage,
+                });
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-success').addClass('bg-danger');
             }
             if (lastStep) {

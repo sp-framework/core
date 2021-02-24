@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types;
 
-use Apps\Dash\Packages\System\Api\Apis\Ebay\HttpHeadersTrait;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\StatusCodeTrait;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
+use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
 /**
  *
@@ -16,7 +16,7 @@ use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
  * @property string $error_description
  * @property string $error_uri
  */
-class RefreshUserTokenRestResponse  extends BaseType
+class RefreshUserTokenRestResponse extends BaseType
 {
     use StatusCodeTrait;
     use HttpHeadersTrait;

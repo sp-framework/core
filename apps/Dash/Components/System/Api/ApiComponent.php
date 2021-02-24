@@ -37,8 +37,34 @@ class ApiComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
+
                 $api = $this->api->getApiById($this->getData()['id']);
+
+                if ($api['api_type'] === 'ebay') {
+                    if (isset($api['user_credentials_scopes'])) {
+                        $api['user_credentials_scopes'] = Json::decode($api['user_credentials_scopes'], true);
+                        $api['user_credentials_scopes'] = implode(', ', $api['user_credentials_scopes']);
+                    }
+
+                    try {
+                        $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
+
+                        $this->view->ebayIds = $ebayIds['ebay_ids'];
+                    } catch (\Exception $e) {
+                        throw new \Exception($e->getMessage());
+                    }
+                }
             } else {
+                if ((isset($this->getData()['type']) && $this->getData()['type'] === 'ebay')) {
+                    try {
+                        $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
+
+                        $this->view->ebayIds = $ebayIds['ebay_ids'];
+                    } catch (\Exception $e) {
+                        throw new \Exception($e->getMessage());
+                    }
+                }
+
                 $api = [];
 
                 $api['setup'] = 0;
@@ -73,7 +99,8 @@ class ApiComponent extends BaseComponent
                             '1' => '<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Complete Setup</span></a>',
                             '2' => '<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Complete Setup</span></a>',
                             '3' => '<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Complete Setup</span></a>',
-                            '4' => '<h6><span class="badge badge-success">Complete</span></h6>'
+                            '4' => '<h6><span class="badge badge-success">Complete</span></h6>',
+                            '5' => '<a href="' . $this->links->url('system/api/q/') . '" type="button" data-id="" data-rowid="" class="pl-2 pr-2 text-white btn btn-primary btn-xs rowSetup contentAjaxLink"><i class="mr-1 fas fa-fw fa-xs fa-magic"></i> <span class="text-xs text-uppercase">Refresh Token</span></a>'//When token is about to expire <= 10 days
                         ]
                     ],
                 ];
@@ -94,9 +121,9 @@ class ApiComponent extends BaseComponent
             $this->api,
             'system/api/view',
             null,
-            ['name', 'api_type', 'in_use', 'setup'],
+            ['name', 'api_type', 'in_use', 'used_by', 'setup'],
             true,
-            ['name', 'api_type', 'in_use', 'setup'],
+            ['name', 'api_type', 'in_use', 'used_by', 'setup'],
             $controlActions,
             null,
             $replaceColumns,
@@ -184,7 +211,7 @@ class ApiComponent extends BaseComponent
                 return;
             }
 
-            $api = $this->api->useApi($this->postData(['apiId']));
+            $api = $this->api->useApi($this->postData(['api_id']));
 
             $api->getAppToken();
 
@@ -205,9 +232,9 @@ class ApiComponent extends BaseComponent
                 return;
             }
 
-            $api = $this->api->useApi($this->postData(['apiId']));
+            $api = $this->api->useApi($this->postData(['api_id']));
 
-            $api->getUserTokenUrl($this->session->getId());
+            $api->getUserTokenUrl($this->random->uuid());
 
             $this->view->responseCode = $api->packagesData->responseCode;
 
@@ -224,11 +251,17 @@ class ApiComponent extends BaseComponent
     public function checkEbayUserTokenAction()
     {
         if ($this->request->isPost()) {
-            $api = $this->api->useApi($this->postData(['apiId']));
+            $api = $this->api->useApi($this->postData(['api_id']));
 
             $api->checkUserToken();
 
-            $this->view->responseData = $api->packagesData->responseData;
+            $responseData = $api->packagesData->responseData;
+
+            if (isset($this->postData()['get_user_data'])) {
+                $responseData = array_merge($responseData, $this->refreshEbayUserdataAction($api));
+            }
+
+            $this->view->responseData = $responseData;
 
             $this->view->responseCode = $api->packagesData->responseCode;
 
@@ -255,5 +288,32 @@ class ApiComponent extends BaseComponent
 
             $this->view->responseMessage = 'State received is incorrect.';
         }
+    }
+
+    public function refreshEbayUserdataAction($api = null)
+    {
+        if (!$api) {
+            $api = $this->api->useApi($this->postData(['api_id']));
+
+            $api->checkUserToken();
+
+            $responseData = $api->packagesData->responseData;
+        }
+
+        $identity = $api->useService('Identity');
+
+        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Identity\Types\GetUserRestRequest();
+
+        $response = $identity->getUser($request);
+
+        $responseData['user_data'] = $response->toArray();
+
+        $this->view->responseData = $responseData;
+
+        $this->view->responseCode = $api->packagesData->responseCode;
+
+        $this->view->responseMessage = $api->packagesData->responseMessage;
+
+        return $responseData;
     }
 }

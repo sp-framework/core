@@ -1,6 +1,6 @@
+<h5>Click the button below to start user authorization process.</h5>
 <div class="row">
     <div class="col">
-        <h5>Click the button below to start user authorization process.</h5>
         {{adminltetags.useTag('buttons',
             [
                 'componentId'           : componentId,
@@ -26,8 +26,19 @@
         )}}
     </div>
 </div>
-<div class="row mt-3">
-    <div class="col" id="{{componentId}}-{{sectionId}}-user-autho-data"></div>
+<hr>
+<div class="row" id="{{componentId}}-{{sectionId}}-user-autho-data">
+    <div class="col">
+        <div class="text-uppercase text-center" id="{{componentId}}-{{sectionId}}-user-autho-data-heading"></div>
+        <div class="table-responsive p-0">
+            <table class="table table-sm table-hover text-nowrap">
+                <tbody></tbody>
+            </table>
+        </div>
+        <div class="text-info" id="{{componentId}}-{{sectionId}}-user-autho-data-footer" hidden>
+            <p>NOTE: User Information received is read only. If you would like to update the user information you will have to do it via eBay.</p>
+        </div>
+    </div>
 </div>
 <script>
 /* globals eModal PNotify */
@@ -36,7 +47,13 @@ $('#{{componentId}}-{{sectionId}}-begin-user-autho').click(function(e) {
 
     window.name = "bazaari-api";
 
-    // $(this).attr('disabled', true);
+    $(this).html(
+        '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> RUNNING AUTHORIZATION IN ANOTHER WINDOW...'
+    );
+
+    $(this).attr('disabled', true);
+
+    $(this).children().attr('hidden', false);
 
     var registerFormId;
 
@@ -47,7 +64,7 @@ $('#{{componentId}}-{{sectionId}}-begin-user-autho').click(function(e) {
     }
 
     var postData = { };
-    postData['apiId'] = registerFormId;
+    postData['api_id'] = registerFormId;
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
     $.post('{{links.url("system/api/getEbayUserTokenUrl")}}', postData, function(data) {
@@ -59,9 +76,30 @@ $('#{{componentId}}-{{sectionId}}-begin-user-autho').click(function(e) {
         if (data.responseCode == '0') {
             window.open(data.responseData);
             $('body').off('ebay-api-success');
-            $('body').on('ebay-api-success', function() {
+            $('body').on('ebay-api-success', function(e, data) {
+                if ($('#security-token').length === 1) {
+                    $('#security-token').attr('name', data.tokenKey);
+                    $('#security-token').val(data.token);
+                }
                 $('#{{componentId}}-{{sectionId}}-begin-user-autho').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-begin-user-autho').html(
+                    '<i class="fas fa-fw fa-external-link-alt"></i> AUTHORIZATION SUCCESS!'
+                );
                 $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
+            });
+            $('body').off('ebay-api-error');
+            $('body').on('ebay-api-error', function(e, data) {
+                if ($('#security-token').length === 1) {
+                    $('#security-token').attr('name', data.tokenKey);
+                    $('#security-token').val(data.token);
+                }
+                $('#{{componentId}}-{{sectionId}}-begin-user-autho').attr('hidden', false);
+                $('#{{componentId}}-{{sectionId}}-begin-user-autho').attr('disabled', false);
+                $('#{{componentId}}-{{sectionId}}-begin-user-autho').html(
+                    '<i class="fas fa-fw fa-external-link-alt"></i> AUTHORIZATION ERROR! TRY AGAIN?'
+                );
+                $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('hidden', true);
                 $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
             });
         } else {
@@ -87,7 +125,8 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
     }
 
     var postData = { };
-    postData['apiId'] = registerFormId;
+    postData['api_id'] = registerFormId;
+    postData['get_user_data'] = true;
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
     $.post('{{links.url("system/api/checkEbayUserToken")}}', postData, function(data) {
@@ -99,17 +138,127 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
         if (data.responseCode == '0') {
             $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
             $('#{{componentId}}-{{sectionId}}-next').attr('disabled', false);
+            $('#{{componentId}}-{{sectionId}}-previous').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-cancel').addClass('disabled');
             if (data.responseData) {
-                $('#{{componentId}}-{{sectionId}}-user-autho-data').empty().append(
-                    '<dl class="row">' +
-                        '<dt class="text-uppercase col">User Authorization Token Valid Till</dt>' +
-                        '<dd class="text-uppercase col">' +
-                            '<h6><span class="badge badge-success">' +
-                                data.responseData.user_access_token_valid_until +
-                            '</span></h6>' +
-                        '</dd>' +
-                    '</dl>'
+                var authoData =
+                    '<tr>' +
+                        '<td>User Authorization Token Valid Till</td>' +
+                        '<td>' + data.responseData.user_access_token_valid_until + '</td>' +
+                    '</tr>';
+
+                    if (data.responseData.user_data) {
+                        var userTypeData = { };
+
+                        if (data.responseData.user_data.accountType === 'BUSINESS') {
+                            if (data.responseData.user_data.businessAccount) {
+                                userTypeData = data.responseData.user_data.businessAccount;
+                            }
+                        } else if (data.responseData.user_data.accountType === 'INDIVIDUAL') {
+                            if (data.responseData.user_data.individualAccount) {
+                                userTypeData = data.responseData.user_data.individualAccount;
+                            }
+                        }
+
+                        if (data.responseData.user_data.username) {
+                            authoData +=
+                                '<tr>' +
+                                    '<td>Username</td>' +
+                                    '<td>' + data.responseData.user_data.username + '</td>' +
+                                '</tr>';
+                        }
+                        if (data.responseData.user_data.accountType) {
+                            authoData +=
+                                '<tr>' +
+                                    '<td>Account Type</td>' +
+                                    '<td>' + data.responseData.user_data.accountType + '</td>' +
+                                '</tr>';
+                        }
+                        if (data.responseData.user_data.registrationMarketplaceId) {
+                            authoData +=
+                                '<tr>' +
+                                    '<td>Registration Marketplace ID</td>' +
+                                    '<td>' + data.responseData.user_data.registrationMarketplaceId + '</td>' +
+                                '</tr>';
+                        }
+                        if (data.responseData.user_data.status) {
+                            authoData +=
+                                '<tr>' +
+                                    '<td>Status</td>' +
+                                    '<td>' + data.responseData.user_data.status + '</td>' +
+                                '</tr>';
+                        }
+
+                        if (userTypeData.firstName) {
+                            authoData +=
+                                '<tr>' +
+                                    '<td>Account First Name</td>' +
+                                    '<td>' + userTypeData.firstName + '</td>' +
+                                '</tr>';
+                        }
+                        if (userTypeData.lastName) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>Account Last Name</td>' +
+                                '<td>' + userTypeData.lastName + '</td>' +
+                            '</tr>';
+                        }
+                        if (userTypeData.email) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>Email</td>' +
+                                '<td>' + userTypeData.email + '</td>' +
+                            '</tr>';
+                        }
+                        if (userTypeData.primaryPhone.number) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>Phone</td>' +
+                                '<td>' + userTypeData.primaryPhone.number + '</td>' +
+                            '</tr>';
+                        }
+                        if (userTypeData.registrationAddress.addressLine1) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>Street</td>' +
+                                '<td>' + userTypeData.registrationAddress.addressLine1 + '</td>' +
+                            '</tr>';
+                        }
+                        if (userTypeData.registrationAddress.city) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>City</td>' +
+                                '<td>' + userTypeData.registrationAddress.city + '</td>' +
+                            '</tr>';
+                        }
+                        if (userTypeData.registrationAddress.stateOrProvince) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>State</td>' +
+                                '<td>' + userTypeData.registrationAddress.stateOrProvince + '</td>' +
+                            '</tr>';
+                        }
+                        if (userTypeData.registrationAddress.postalCode) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>Post Code</td>' +
+                                '<td>' + userTypeData.registrationAddress.postalCode + '</td>' +
+                            '</tr>';
+                        }
+                        if (userTypeData.registrationAddress.country) {
+                            authoData +=
+                            '<tr>' +
+                                '<td>Country</td>' +
+                                '<td>' + userTypeData.registrationAddress.country + '</td>' +
+                            '</tr>';
+                        }
+                    }
+
+                $('#{{componentId}}-{{sectionId}}-user-autho-data tbody').empty().append(authoData);
+                $('#{{componentId}}-{{sectionId}}-user-autho-data-heading').empty().append(
+                    '<h5>USER INFORMATION</h5>'
                 );
+                $('#{{componentId}}-{{sectionId}}-user-autho-data-footer').attr('hidden', false);
             }
         } else {
             $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('disabled', false);

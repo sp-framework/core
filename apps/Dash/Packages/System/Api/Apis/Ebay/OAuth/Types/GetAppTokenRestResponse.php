@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types;
 
-use Apps\Dash\Packages\System\Api\Apis\Ebay\HttpHeadersTrait;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\StatusCodeTrait;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
+use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
 /**
  *
@@ -16,7 +16,7 @@ use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
  * @property string $error_description
  * @property string $error_uri
  */
-class GetAppTokenRestResponse  extends BaseType
+class GetAppTokenRestResponse extends BaseType
 {
     use StatusCodeTrait;
     use HttpHeadersTrait;
@@ -25,43 +25,43 @@ class GetAppTokenRestResponse  extends BaseType
      * @var array Properties belonging to objects of this class.
      */
     private static $propertyTypes = [
-        'access_token' => [
-            'type' => 'string',
+        'access_token'  => [
+            'type'          => 'string',
             'repeatable' => false,
             'attribute' => false,
             'elementName' => 'access_token'
         ],
-        'token_type' => [
+        'token_type'    => [
             'type' => 'string',
             'repeatable' => false,
             'attribute' => false,
             'elementName' => 'token_type'
         ],
-        'expires_in' => [
+        'expires_in'    => [
             'type' => 'integer',
             'repeatable' => false,
             'attribute' => false,
             'elementName' => 'expires_in'
         ],
-        'refresh_token' => [
+        'refresh_token'     => [
             'type' => 'string',
             'repeatable' => false,
             'attribute' => false,
             'elementName' => 'refresh_token'
         ],
-        'error' => [
+        'error'     => [
             'type' => 'string',
             'repeatable' => false,
             'attribute' => false,
             'elementName' => 'error'
         ],
-        'error_description' => [
+        'error_description'     => [
             'type' => 'string',
             'repeatable' => false,
             'attribute' => false,
             'elementName' => 'error_description'
         ],
-        'error_uri' => [
+        'error_uri'     => [
             'type' => 'string',
             'repeatable' => false,
             'attribute' => false,

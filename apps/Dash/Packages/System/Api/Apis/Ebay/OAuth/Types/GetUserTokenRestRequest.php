@@ -9,7 +9,7 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types;
 
-use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
 class GetUserTokenRestRequest extends BaseType
 {

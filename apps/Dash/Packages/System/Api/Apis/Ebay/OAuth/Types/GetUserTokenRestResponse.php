@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types;
 
-use Apps\Dash\Packages\System\Api\Apis\Ebay\HttpHeadersTrait;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\StatusCodeTrait;
-use Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
+use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
 /**
  *
