@@ -2,8 +2,8 @@
     {% set channelId = channel['id'] %}
     {% set channelName = channel['name'] %}
     {% set channelDescription = channel['description'] %}
-    {% set channelDomainId = channel['settings']['domain_id'] %}
-    {% set channelAppId = channel['settings']['app_id'] %}
+    {% set channelDomainId = channel['domain_id'] %}
+    {% set channelAppId = channel['app_id'] %}
 {% else %}
     {% set channelId = '' %}
     {% set channelName = '' %}
@@ -96,7 +96,7 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-name'                    : { },
-        '{{componentId}}-{{sectionId}}-type'                    : { },
+        '{{componentId}}-{{sectionId}}-channel_type'            : { },
         '{{componentId}}-{{sectionId}}-description'             : { },
         '{{componentId}}-{{sectionId}}-domain_id'               : {
             'placeholder'   : 'SELECT DOMAIN'
@@ -107,13 +107,13 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
-                '{{componentId}}-{{sectionId}}-type'                    : 'required',
+                '{{componentId}}-{{sectionId}}-channel_type'            : 'required',
                 '{{componentId}}-{{sectionId}}-domain_id'               : 'required',
                 '{{componentId}}-{{sectionId}}-app_id'                  : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter channel name',
-                '{{componentId}}-{{sectionId}}-type'                    : 'Please enter channel type',
+                '{{componentId}}-{{sectionId}}-channel_type'            : 'Please enter channel type',
                 '{{componentId}}-{{sectionId}}-domain_id'               : 'Please select a domain',
                 '{{componentId}}-{{sectionId}}-app_id'                  : 'Please select an app'
             }

@@ -2,73 +2,209 @@
 
 namespace Apps\Dash\Packages\Business\Channels;
 
-use Apps\Dash\Packages\Business\Channels\Model\BusinessChannels as BusinessChannelsModel;
+use Apps\Dash\Packages\Business\Channels\Model\BusinessChannels;
+use Apps\Dash\Packages\Business\Channels\Model\BusinessChannelsEbay;
+use Apps\Dash\Packages\Business\Channels\Model\BusinessChannelsEshop;
+use Apps\Dash\Packages\Business\Channels\Model\BusinessChannelsPos;
+use Apps\Dash\Packages\System\Api\Api;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
+use System\Base\Exceptions\IdNotFoundException;
 
 class Channels extends BasePackage
 {
-    protected $modelToUse = BusinessChannelsModel::class;
+    protected $modelToUse = BusinessChannels::class;
 
     protected $packageName = 'channels';
 
     public $channels;
 
-    public function addChannel(array $data)
+    public function getChannelById(int $id, bool $resetCache = false, bool $enableCache = true)
     {
-        if ($data['type'] === 'eshop') {
-            $data = $this->getEcomChannelSettings($data);
+        if ($id) {
+            if ($enableCache) {
+                $parameters = $this->paramsWithCache($this->getIdParams($id));
+            } else {
+                $parameters = $this->getIdParams($id);
+            }
+
+            if (!$this->config->cache->enabled) {
+                $parameters = $this->getIdParams($id);
+            }
+
+            $this->model = $this->modelToUse::find($parameters);
+
+            $channel = $this->getDbData($parameters, $enableCache);
+
+            if ($channel) {
+                $channel = $this->initChannelType($channel);
+
+                $this->model = $this->modelToUse::find($channel['channel_id']);
+
+                $channelData = $this->getDbData($parameters, $enableCache);
+
+                if ($channelData) {
+                    $channel = array_merge($channel, $channelData);
+                }
+
+                return $channel;
+            } else {
+                throw new IdNotFoundException;
+            }
         }
 
-        if ($this->add($data)) {
-            $this->packagesData->responseCode = 0;
+        throw new \Exception('getById needs id parameter to be set.');
+    }
 
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' channel.';
-        } else {
-            $this->packagesData->responseCode = 1;
+    public function init()
+    {
+        $this->modelToUse = BusinessChannels::class;
 
-            $this->packagesData->responseMessage = 'Error adding new channel.';
+        $this->packageName = 'channels';
+
+        return $this;
+    }
+
+    protected function initChannelType($data)
+    {
+        if ($data) {
+            if ($data['channel_type'] === 'eshop') {
+                $this->modelToUse = BusinessChannelsEshop::class;
+
+                $this->packageName = 'channelEshop';
+
+            } else if ($data['channel_type'] === 'ebay') {
+                $this->modelToUse = BusinessChannelsEbay::class;
+
+                $this->packageName = 'channelEbay';
+            } else if ($data['channel_type'] === 'pos') {
+                $this->modelToUse = BusinessChannelsPos::class;
+
+                $this->packageName = 'channelPos';
+            }
+
+            return $data;
         }
     }
 
-    public function getEcomChannelSettings(array $data)
+    public function addChannel(array $data)
     {
-        $data['settings']['app_id'] = $data['app_id'];
-        $data['settings']['domain_id'] = $data['domain_id'];
-        $data['settings'] = Json::encode($data['settings']);
+        $data['channel_type'] = strtolower($data['channel_type']);
 
-        return $data;
+        $data = $this->initChannelType($data);
+
+        $channelData = $data;
+
+        if ($this->add($channelData)) {
+            $data['channel_id'] = $this->packagesData->last['id'];
+
+            $this->init();
+
+            if ($this->add($data)) {
+
+                if ($data['channel_type'] === 'ebay') {
+                    $apiPackage = $this->usePackage(Api::class);
+
+                    $api = $apiPackage->getById($channelData['api_id']);
+
+                    $api['in_use'] = 1;
+
+                    $api['used_by'] = 'Channel (' . $data['channel_id'] . ')';
+
+                    $apiPackage->update($api);
+                }
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' Channel';
+
+                return true;
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error adding new Channel.';
+            }
+        }
     }
 
     public function updateChannel(array $data)
     {
-        if ($data['type'] === 'eshop') {
-            $data = $this->getEcomChannelSettings($data);
-        }
+        $data['channel_type'] = strtolower($data['channel_type']);
 
-        if ($this->update($data)) {
-            $this->packagesData->responseCode = 0;
+        $channelData = $this->getById($data['id']);
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' channel.';
+        $channelData = array_merge($channelData, $data);
+
+        if ($this->update($channelData)) {
+            $channelData = $this->initChannelType($channelData);
+
+            $channelData['id'] = $channelData['api_id'];
+
+            if ($this->update($channelData)) {
+
+                if ($data['channel_type'] === 'ebay') {
+                    $apiPackage = $this->usePackage(Api::class);
+
+                    $api = $apiPackage->getById($channelData['api_id']);
+
+                    $api['in_use'] = 1;
+
+                    $api['used_by'] = 'Channel (' . $data['id'] . ')';
+
+                    $apiPackage->update($api);
+                }
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' Channel';
+
+                return true;
+            }
+
         } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error updating channel.';
+            $this->packagesData->responseMessage = 'Error updating Channel.';
         }
     }
 
-
     public function removeChannel(array $data)
     {
-        //Check relations before removing.
-        if ($this->remove($data['id'])) {
-            $this->packagesData->responseCode = 0;
+        $channel = $this->getById($data['id']);
 
-            $this->packagesData->responseMessage = 'Removed channel.';
+        if ($channel['product_count'] || $channel['product_count'] > 0) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Channel has products assigned to it. Error removing channel.';
+
+            return;
+        } else if ($channel['order_count'] || $channel['order_count'] > 0) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Channel has orders assigned to it. Error removing channel.';
+
+            return;
+        }
+
+        $this->initChannelType($channel);
+
+        if ($this->remove($channel['channel_id'])) {
+
+            $this->init();
+
+            if ($this->remove($data['id'])) {
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Removed Channel';
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error removing Channel.';
+            }
         } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error removing channel.';
+            $this->packagesData->responseMessage = 'Error removing Channel.';
         }
     }
 }

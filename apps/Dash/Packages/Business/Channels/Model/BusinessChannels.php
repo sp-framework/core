@@ -8,11 +8,15 @@ class BusinessChannels extends BaseModel
 {
     public $id;
 
+    public $channel_id;
+
     public $name;
 
-    public $type;
+    public $channel_type;
 
     public $description;
 
-    public $settings;
+    public $order_count;
+
+    public $product_count;
 }

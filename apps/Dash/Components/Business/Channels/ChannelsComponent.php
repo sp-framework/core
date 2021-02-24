@@ -4,6 +4,7 @@ namespace Apps\Dash\Components\Business\Channels;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Channels\Channels;
+use Apps\Dash\Packages\System\Api\Api;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -13,9 +14,15 @@ class ChannelsComponent extends BaseComponent
 
     protected $channels;
 
+    protected $apiPackage;
+
+    protected $api;
+
     public function initialize()
     {
         $this->channels = $this->usePackage(Channels::class);
+
+        $this->apiPackage = $this->usePackage(Api::class);
     }
 
     /**
@@ -28,18 +35,39 @@ class ChannelsComponent extends BaseComponent
         // foreach ($locations as $key => $value) {
         //     var_dump($value->toArray());
         // }
+        $channel = $this->channels->getChannelById($this->getData()['id']);
 
+        $api = $this->apiPackage->useApi($channel);
+
+        $identity = $api->useService('Identity');
+        var_dump($identity);
+
+        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Identity\Types\GetUserRestRequest();
+        var_dump($request);
+
+        $response = $identity->getUser($request);
+        var_dump($response);
+
+        return false;
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $channel = $this->channels->getById($this->getData()['id']);
-
-                $channel['settings'] = Json::decode($channel['settings'], true);
+                $channel = $this->channels->getChannelById($this->getData()['id']);
 
                 $this->view->channel = $channel;
 
-                $this->view->channelType = $channel['type'];
+                $this->view->channelType = $channel['channel_type'];
+
+                if (isset($channel['api_id'])) {
+                    $apis = $this->apiPackage->getApiByType($channel['channel_type'], false);
+
+                    $thisChannelsApi = [$this->apiPackage->getById($channel['api_id'])];
+
+                    $this->view->apis = array_merge($apis, $thisChannelsApi);
+                }
             } else {
                 $this->view->channelType = $this->getData()['type'];
+
+                $this->view->apis = $this->apiPackage->getApiByType($this->getData()['type'], false);
             }
 
             $this->view->domains = $this->domains->domains;
@@ -70,9 +98,9 @@ class ChannelsComponent extends BaseComponent
             $channels,
             'business/channels/view',
             null,
-            ['name', 'type'],
+            ['name', 'channel_type'],
             true,
-            ['name', 'type'],
+            ['name', 'channel_type'],
             $controlActions,
             null,
             null,
@@ -88,7 +116,6 @@ class ChannelsComponent extends BaseComponent
     public function addAction()
     {
         if ($this->request->isPost()) {
-
             if (!$this->checkCSRF()) {
                 return;
             }
@@ -112,7 +139,6 @@ class ChannelsComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
-
             if (!$this->checkCSRF()) {
                 return;
             }
@@ -136,6 +162,9 @@ class ChannelsComponent extends BaseComponent
     public function removeAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->channels->removeChannel($this->postData());
 

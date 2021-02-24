@@ -2,6 +2,10 @@
 
 namespace Apps\Dash\Packages\Business\Channels\Install;
 
+use Apps\Dash\Packages\Business\Channels\Install\Schema\BusinessChannels;
+use Apps\Dash\Packages\Business\Channels\Install\Schema\BusinessChannelsEbay;
+use Apps\Dash\Packages\Business\Channels\Install\Schema\BusinessChannelsEshop;
+use Apps\Dash\Packages\Business\Channels\Install\Schema\BusinessChannelsPos;
 use Apps\Dash\Packages\Business\Channels\Install\Schema\Channels as ChannelsSchema;
 use Apps\Dash\Packages\Channels\Channels;
 use System\Base\BasePackage;
@@ -29,9 +33,19 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
-                $this->createTable('business_channels', '', (new $this->schemaToUse)->columns(), $dropTables);
+                try {
+                    $this->createTable('business_channels_eshop', '', (new BusinessChannelsEshop)->columns(), $dropTables);
+                    $this->createTable('business_channels_ebay', '', (new BusinessChannelsEbay)->columns(), $dropTables);
+                    $this->createTable('business_channels_pos', '', (new BusinessChannelsPos)->columns(), $dropTables);
+                    $this->createTable('business_channels', '', (new BusinessChannels)->columns(), $dropTables);
+                } catch (\Exception $e) {
+                    var_dump($e);die();
+                }
             } else {
-                $this->createTable('business_channels', '', (new $this->schemaToUse)->columns());
+                $this->createTable('business_channels_eshop', '', (new BusinessChannelsEshop)->columns());
+                $this->createTable('business_channels_ebay', '', (new BusinessChannelsEbay)->columns());
+                $this->createTable('business_channels_pos', '', (new BusinessChannelsPos)->columns());
+                $this->createTable('business_channels', '', (new BusinessChannels)->columns());
             }
 
             // $this->registerPackage();

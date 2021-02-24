@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\Business\Channels\Install\Schema;
 
 use Phalcon\Db\Column;
 
-class Channels
+class BusinessChannelsEshop
 {
     public function columns()
     {
@@ -21,36 +21,19 @@ class Channels
                     ]
                 ),
                 new Column(
-                    'name',
+                    'domain_id',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'type'    => Column::TYPE_INTEGER,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'type',
+                    'app_id',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'type'    => Column::TYPE_INTEGER,
                         'notNull' => true,
                     ]
                 ),
-                new Column(
-                    'description',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'settings',
-                    [
-                        'type'    => Column::TYPE_TEXT,
-                        'notNull' => false,
-                    ]
-                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
