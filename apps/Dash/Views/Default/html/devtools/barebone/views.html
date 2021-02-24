@@ -1,0 +1,211 @@
+<div class="row">
+    <div class="col">
+        <h5>Install View Barebone Module</h5>
+        <p>This will install a view barebone module that you can develop on your own.</p>
+        <p>Select view and component to install component specific view file.</p>
+        <p>Eg: If you select app Admin, view Default and component Home, then the view files will be installed under location - apps/Admin/Views/Default/html/home/view.html. So, when you access https://example.com/admin/home - it will access that file.</p>
+        <p class="card-text">And if you do not select either of view or component a new views will be installed under the selected app.</p>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <label class="input-group-text" for="view-barebone-app">Select App</label>
+            </div>
+            <select class="custom-select" id="view-barebone-app">
+                <option value="0" selected="selected">Select...</option>
+                {% for app in apps %}
+                    {% if app['name'] != 'Admin' %}
+                        <option value="{{app['id']}}">{{app['name']}}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="view-barebone-view">Select View</label>
+                    </div>
+                    <select class="custom-select" id="view-barebone-view"></select>
+                </div>
+            </div>
+            <div class="col">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="view-barebone-component">Select Component</label>
+                    </div>
+                    <select class="custom-select" id="view-barebone-component"></select>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="view-barebone-name">View Name *</label>
+            <div class="input-group">
+                <input type="text" name="view-barebone-name" id="view-barebone-name" class="form-control" placeholder="Eg: Coolview/Bootstrap">
+            </div>
+        </div>
+        <button class="btn btn-primary float-right" type="button" id="view-install-barebone-button">Install</button>
+    </div>
+</div>
+<script>
+/*global PNotify Swal */
+var completeView = true;
+var customView = false;
+
+$('#view-barebone-app').change(function() {
+    if ($('#view-barebone-app option:selected').val() !== '0') {
+        $.post('/{{route}}/barebone/getselectedappviewscomponents',
+               {"app_id" : $('#view-barebone-app option:selected').val()},
+               function(data) {
+                    if (data) {
+                        $('#view-barebone-component').empty();
+                        $('#view-barebone-component').append(
+                            $("<option></option>").attr("value", '0').text('Select...')
+                        );
+                        $('#view-barebone-view').empty();
+                        $('#view-barebone-view').append(
+                            $("<option></option>").attr("value", '0').text('Select...')
+                        );
+                        $.each(data.appComponents, function (index, component) {
+                            $('#view-barebone-component').append(
+                                $("<option></option>").attr("value", component.id).text(component['display_name'])
+                            );
+                        });
+                        $.each(data.appViews, function (index, view) {
+                            $('#view-barebone-view').append(
+                                $("<option></option>").attr("value", view.id).text(view['display_name'])
+                            );
+                        });
+                    } else {
+                        PNotify.error({
+                            text        : data.responseMessage,
+                            textTrusted : true
+                        });
+                    }
+        }, 'json');
+    } else {
+        $('#view-barebone-component').empty();
+        $('#view-barebone-component').append(
+            $("<option></option>").attr("value", '0').text('Select...')
+        );
+        $('#view-barebone-view').empty();
+        $('#view-barebone-view').append(
+            $("<option></option>").attr("value", '0').text('Select...')
+        );
+        $('#view-barebone-name').attr('disabled', false);
+        completeView = true;
+        customView = false;
+    }
+});
+
+$('#view-barebone-view, #view-barebone-component').change(function() {
+    $('#view-barebone-name').removeClass('is-invalid');
+    if ($('#view-barebone-view option:selected').val() !== '0' ||
+        $('#view-barebone-component option:selected').val() !== '0'
+        ) {
+        $('#view-barebone-name').val('');
+        $('#view-barebone-name').attr('disabled', true);
+        completeView = false;
+        customView = true;
+    } else {
+        $('#view-barebone-name').attr('disabled', false);
+        completeView = true;
+        customView = false;
+    }
+});
+
+$('#view-install-barebone-button').click(function() {
+
+    $('#alert').attr('hidden', true);
+
+    var postData;
+
+    if (completeView) {
+        if ($('#view-barebone-app option:selected').val() === '0') {
+            $('#view-barebone-app').addClass('is-invalid');
+            $('#view-barebone-app').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#view-barebone-name').val() === '') {
+            $('#view-barebone-name').addClass('is-invalid');
+            $('#view-barebone-name').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else {
+            postData =
+                {
+                    'task'                      : 'view',
+                    'app_id'                    : $('#view-barebone-app option:selected').val(),
+                    'viewName'                  : $('#view-barebone-name').val().trim(),
+                };
+            runPost(postData);
+        }
+    } else if (customView) {
+        if ($('#view-barebone-app option:selected').val() === '0') {
+            $('#view-barebone-app').addClass('is-invalid');
+            $('#view-barebone-app').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#view-barebone-component option:selected').val() === '0') {
+            $('#view-barebone-component').addClass('is-invalid');
+            $('#view-barebone-component').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else if ($('#view-barebone-view option:selected').val() === '0') {
+            $('#view-barebone-view').addClass('is-invalid');
+            $('#view-barebone-view').focus(function() {
+                $(this).removeClass('is-invalid');
+            });
+        } else {
+            postData =
+                {
+                    'task'                      : 'view',
+                    'app_id'                    : $('#view-barebone-app option:selected').val(),
+                    'view_id'                   : $('#view-barebone-view option:selected').val(),
+                    'component_id'              : $('#view-barebone-component option:selected').val()
+                };
+            runPost(postData);
+        }
+    }
+});
+
+function runPost(postData) {
+    $.post('/{{route}}/barebone/install', postData, function(data) {
+        if (data && data.responseCode === 0) {
+            PNotify.success({
+                text        : data.responseMessage,
+                textTrusted : true
+            });
+
+        } else if (data && data.responseCode === 1) {
+            PNotify.error({
+                text        : data.responseMessage,
+                textTrusted : true
+            });
+        } else if (data && data.responseCode === 2) {
+            Swal.fire({
+                    title               : data.responseMessage,
+                    icon                : 'info',
+                    showCancelButton    : true,
+                    confirmButtonText   : 'Overwrite',
+                    width               : '50%'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var rePostData =
+                            {
+                                'task'                      : 'view',
+                                'app_id'                    : $('#view-barebone-app option:selected').val(),
+                                'view_id'                   : $('#view-barebone-view option:selected').val(),
+                                'component_id'              : $('#view-barebone-component option:selected').val(),
+                                'force'                     : '1'
+                            };
+                        runPost(rePostData);
+
+                    } else {
+                        $('#all-install-barebone-button').attr('disabled', false);
+                    }
+                });
+        }
+
+        $('#view-install-barebone-button').attr('disabled', false);
+    }, 'json');
+}
+</script>

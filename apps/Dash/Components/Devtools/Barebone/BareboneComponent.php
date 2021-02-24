@@ -1,12 +1,22 @@
 <?php
 
-namespace Apps\Dash\Components\Barebone;
+namespace Apps\Dash\Components\Devtools\Barebone;
 
+use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Barebone\Barebone;
 use System\Base\BaseComponent;
 
 class BareboneComponent extends BaseComponent
 {
+	use DynamicTable;
+
+	protected $barebonePackage;
+
+	public function initialize()
+	{
+		$barebonePackage = $this->usePackage(Barebone::class);
+	}
+
 	/**
 	 * @acl(name=view)
 	 */
@@ -20,8 +30,6 @@ class BareboneComponent extends BaseComponent
 	 */
 	public function installAction()
 	{
-		$barebonePackage = $this->usePackage(Barebone::class);
-
 		$bareboneModule = $barebonePackage->install($this->postData());
 
 		if ($bareboneModule) {

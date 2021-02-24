@@ -1,13 +1,13 @@
 {
-	"route"			: "barebone",
+	"route"			: "devtools/barebone",
 	"name"			: "Barebone",
-	"description"	: "Manage admin barebone via this component",
+	"description"	: "Create Barebone components via this tool",
 	"app_type"      : "dash",
 	"category"      : "system",
 	"sub_category"  : "devtools",
 	"version"		: "0.0.1",
 	"repo"			: "https://.../dash-component-system-devtools-barebone",
-	"class"			: "Apps\\Dash\\Components\\Barebone\\BareboneComponent",
+	"class"			: "Apps\\Dash\\Components\\Devtools\\Barebone\\BareboneComponent",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
@@ -35,10 +35,15 @@
 	},
 	"menu"				: {
 		"seq"			: 99,
-		"barebone"		: {
-			"title"		: "barebone",
-			"icon"		: "wrench",
-			"link"		: "barebone"
+		"devtools"			: {
+			"title"		: "devtools",
+			"icon"		: "code",
+			"childs"	: {
+				"barebone"		: {
+					"title"		: "barebone",
+					"link"		: "devtools/barebone"
+				}
+			}
 		}
 	},
 	"settings"          : {

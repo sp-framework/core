@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Ecom\Admin\Packages\Barebone;
+namespace Apps\Dash\Packages\Barebone;
 
 use Apps\Ecom\Admin\Packages\Barebone\Tasks\All;
 use Apps\Ecom\Admin\Packages\Barebone\Tasks\Component;
