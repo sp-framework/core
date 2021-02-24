@@ -134,7 +134,7 @@ class Categories extends BasePackage
         if ($category['product_count'] || $category['product_count'] > 0) {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Category has products assgined to it. Error removing category.';
+            $this->packagesData->responseMessage = 'Category has products assigned to it. Error removing category.';
 
             return;
         }
