@@ -47,6 +47,22 @@ class ExceptionHandlers extends BaseComponent
 		return $this->view->partial('notFound');
 	}
 
+	public function handleIdNotFoundException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
+
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = 'Not Found!';
+
+			return $this->sendJson();
+		}
+
+		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/View/errors/'));
+
+		return $this->view->partial('notFound');
+	}
+
 	public function handleValidationException()
 	{
 		$this->session->set([

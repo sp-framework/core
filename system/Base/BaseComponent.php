@@ -134,7 +134,7 @@ abstract class BaseComponent extends Controller
 			if (!$this->security->checkToken()) {
 				$this->view->responseCode = 2;
 
-				$this->view->responseMessage = 'CSRF TOKEN ERROR';
+				$this->view->responseMessage = 'CSRF Token Error! Please restart form';
 
 				$this->sendJson();
 
