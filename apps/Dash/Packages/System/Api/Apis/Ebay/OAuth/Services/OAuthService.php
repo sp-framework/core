@@ -18,7 +18,7 @@ class OAuthService
     /**
      * @var array $endPoints The API endpoints.
      */
-    private static $endPoints = [
+    protected static $endPoints = [
         'sandbox'    => 'https://api.sandbox.ebay.com/identity',
         'production' => 'https://api.ebay.com/identity'
     ];
@@ -26,7 +26,7 @@ class OAuthService
     /**
      * @property array $operations Associative array of operations provided by the service.
      */
-    private static $operations = [
+    protected static $operations = [
         'getUserToken' => [
             'method' => 'POST',
             'resource' => 'oauth2/token',
@@ -53,23 +53,23 @@ class OAuthService
     /**
      * @var \Apps\Dash\Packages\System\Api\Apis\Ebay\ConfigurationResolver Resolves configuration options.
      */
-    private $resolver;
+    protected $resolver;
 
     /**
      * @var \Apps\Dash\Packages\System\Api\Apis\Ebay\UriResolver Resolves uri parameters.
      */
-    private $uriResolver;
+    protected $uriResolver;
 
     /**
      * @var array Associative array storing the current configuration option values.
      */
-    private static $config;
+    protected static $config;
 
-    private static $sandbox;
+    protected static $sandbox;
 
-    private static $debug;
+    protected static $debug;
 
-    private static $credentials;
+    protected static $credentials;
 
     /**
      * @param array $config Configuration option values.
@@ -301,7 +301,7 @@ class OAuthService
      *
      * @return \GuzzleHttp\Promise\PromiseInterface A promise that will be resolved with an object created from the JSON response.
      */
-    private function callOperationAsync($name, BaseType $request = null)
+    protected function callOperationAsync($name, BaseType $request = null)
     {
         $operation = static::$operations[$name];
         $paramValues = [];
@@ -314,7 +314,7 @@ class OAuthService
         }
 
         $url = $this->uriResolver->resolve(
-            $this->getUrl(),
+            $this->getUrl($name),
             $this->getConfig('apiVersion'),
             $operation['resource'],
             $operation['params'],
@@ -357,7 +357,7 @@ class OAuthService
      *
      * @return string Either the production or sandbox URL.
      */
-    private function getUrl()
+    protected function getUrl()
     {
         return $this->getConfig('sandbox') ? static::$endPoints['sandbox'] : static::$endPoints['production'];
     }
@@ -369,7 +369,7 @@ class OAuthService
      *
      * @return string The request body in URL-encoded format.
      */
-    private function buildRequestBody(array $request)
+    protected function buildRequestBody(array $request)
     {
         $params = array_reduce(array_keys($request), function ($carry, $key) use($request) {
             $value = $request[$key];
@@ -387,7 +387,7 @@ class OAuthService
      *
      * @return array An associative array of HTTP headers.
      */
-    private function buildRequestHeaders($body)
+    protected function buildRequestHeaders($body)
     {
         $credentials = $this->getConfig('credentials');
         $appId = $credentials['appId'];
@@ -410,7 +410,7 @@ class OAuthService
      * @param array $headers Associative array of HTTP headers.
      * @param string $body The JSON body of the request.
       */
-    private function debugRequest($url, array $headers, $body)
+    protected function debugRequest($url, array $headers, $body)
     {
         $str = $url.PHP_EOL;
 
@@ -429,7 +429,7 @@ class OAuthService
      *
      * @param string $body The JSON body of the response.
       */
-    private function debugResponse($body)
+    protected function debugResponse($body)
     {
         $this->debug($body);
     }
@@ -439,7 +439,7 @@ class OAuthService
      *
      * @param string $str The debug information.
      */
-    private function debug($str)
+    protected function debug($str)
     {
         $debugger = $this->getConfig('debug');
         $debugger($str);

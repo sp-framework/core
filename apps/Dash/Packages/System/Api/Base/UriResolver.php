@@ -37,7 +37,7 @@ class UriResolver
      */
     public function resolve(
         $uri,
-        // $version,
+        $version,
         $resource,
         array $paramDefs,
         array $paramValues
@@ -70,7 +70,7 @@ class UriResolver
 
         return (
             "$uri/".
-            // "$version/".
+            "$version/".
             $this->fillPathParams($resource, $paramValues).
             $this->buildQueryParameters($paramValues)
         );
