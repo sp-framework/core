@@ -788,11 +788,15 @@ abstract class BasePackage extends Controller
 
 	public function createTable(string $table, string $dbName = '', array $columns, $drop = false)
 	{
-		if ($drop) {
-			$this->dropTable($table);
-		}
+		try {
+			if ($drop) {
+				$this->dropTable($table);
+			}
 
-		return $this->db->createTable($table, $dbName, $columns);
+			return $this->db->createTable($table, $dbName, $columns);
+		} catch (\PDOException $e) {
+			throw new \Exception($e->getMessage());
+		}
 	}
 
 	public function alterTable()
