@@ -1,0 +1,68 @@
+<?php
+
+namespace Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Operations;
+
+class ReviseSellingManagerTemplateResponse extends \Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Types\AbstractResponseType
+{
+    private static $propertyTypes = [
+        'SaleTemplateID' => [
+          'type' => 'integer',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'SaleTemplateID',
+        ],
+        'Fees' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Types\FeesType',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Fees',
+        ],
+        'CategoryID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'CategoryID',
+        ],
+        'Category2ID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Category2ID',
+        ],
+        'VerifyOnly' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'VerifyOnly',
+        ],
+        'SaleTemplateName' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'SaleTemplateName',
+        ],
+        'SellingManagerProductDetails' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Types\SellingManagerProductDetailsType',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'SellingManagerProductDetails',
+        ],
+      ];
+
+    public function __construct(array $values = [])
+    {
+        list($parentValues, $childValues) = self::getParentValues(self::$propertyTypes, $values);
+
+        parent::__construct($parentValues);
+
+        if (!array_key_exists(__CLASS__, self::$properties)) {
+            self::$properties[__CLASS__] = array_merge(self::$properties[get_parent_class()], self::$propertyTypes);
+        }
+
+        if (!array_key_exists(__CLASS__, self::$xmlNamespaces)) {
+            self::$xmlNamespaces[__CLASS__] = 'xmlns="urn:ebay:apis:eBLBaseComponents"';
+        }
+
+        $this->setValues(__CLASS__, $childValues);
+    }
+}
