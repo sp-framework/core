@@ -21,15 +21,6 @@
           "default": "/sell/inventory/v1"
         }
       }
-    },
-    {
-      "url": "https://api.sandbox.ebay.com{basePath}",
-      "description": "Sandbox",
-      "variables": {
-        "basePath": {
-          "default": "/sell/inventory/v1"
-        }
-      }
     }
   ],
   "paths": {

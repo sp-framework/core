@@ -21,15 +21,6 @@
           "default": "/commerce/identity/v1"
         }
       }
-    },
-    {
-      "url": "https://apiz.sandbox.ebay.com{basePath}",
-      "description": "Sandbox",
-      "variables": {
-        "basePath": {
-          "default": "/commerce/identity/v1"
-        }
-      }
     }
   ],
   "paths": {
