@@ -41,7 +41,7 @@ class Products
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 50,
-                        'notNull' => false,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
@@ -100,8 +100,7 @@ class Products
                 new Column(
                     'images',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
+                        'type'    => Column::TYPE_TEXT,
                         'notNull' => false
                     ]
                 ),
