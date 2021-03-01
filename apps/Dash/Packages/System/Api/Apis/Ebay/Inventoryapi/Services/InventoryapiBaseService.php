@@ -8,8 +8,9 @@ class InventoryapiBaseService extends BaseRestService
 {
     protected static $endPoints =
         [
-        'production' => 'https://api.ebay.com/sell/inventory/v1',
-        'sandbox' => 'https://api.sandbox.ebay.com/sell/inventory/v1',
+        'primary' => [
+          'production' => 'https://api.ebay.com/sell/inventory/v1',
+        ],
       ];
 
     const HDR_AUTHORIZATION = 'Authorization';

@@ -4,6 +4,7 @@ namespace Apps\Dash\Packages\System\Api\Apis\Ebay\Inventoryapi\Operations;
 
 use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
 use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
+
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
 class WithdrawOfferByInventoryItemGroupRestResponse extends BaseType
