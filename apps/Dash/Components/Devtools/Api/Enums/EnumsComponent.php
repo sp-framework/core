@@ -35,7 +35,7 @@ class EnumsComponent extends BaseComponent
 				$this->view->enum =
 					$this->enumsPackage->getById($this->getData()['id']);
 
-				if ($this->getData()['view'] == 'true') {
+				if (isset($this->getData()['view']) && $this->getData()['view'] == 'true') {
 					$this->enumsPackage->generateEnum($this->getData()['id']);
 					return false;
 					$this->view->pick('enums/viewenum');

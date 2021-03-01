@@ -41,11 +41,6 @@ class ApiComponent extends BaseComponent
                 $api = $this->api->getApiById($this->getData()['id']);
 
                 if ($api['api_type'] === 'ebay') {
-                    if (isset($api['user_credentials_scopes'])) {
-                        $api['user_credentials_scopes'] = Json::decode($api['user_credentials_scopes'], true);
-                        $api['user_credentials_scopes'] = implode(', ', $api['user_credentials_scopes']);
-                    }
-
                     try {
                         $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
 
@@ -300,9 +295,9 @@ class ApiComponent extends BaseComponent
             $responseData = $api->packagesData->responseData;
         }
 
-        $identity = $api->useService('Identity');
+        $identity = $api->useService('Identityapi');
 
-        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Identity\Types\GetUserRestRequest();
+        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Identityapi\Operations\GetUserRestRequest;
 
         $response = $identity->getUser($request);
 

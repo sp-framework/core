@@ -8,8 +8,9 @@ class IdentityapiBaseService extends BaseRestService
 {
     protected static $endPoints =
         [
-        'production' => 'https://apiz.ebay.com/commerce/identity/v1',
-        'sandbox' => 'https://apiz.sandbox.ebay.com/commerce/identity/v1',
+        'primary' => [
+          'production' => 'https://apiz.ebay.com/commerce/identity/v1',
+        ],
       ];
 
     const HDR_AUTHORIZATION = 'Authorization';

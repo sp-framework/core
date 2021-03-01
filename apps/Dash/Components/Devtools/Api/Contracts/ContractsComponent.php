@@ -29,7 +29,7 @@ class ContractsComponent extends BaseComponent
 			if ($this->getData()['id'] != 0) {
 				$contract = $this->contractsPackage->getById($this->getData()['id']);
 
-				if ($this->getData()['view'] == 'true') {
+				if (isset($this->getData()['view']) && $this->getData()['view'] == 'true') {
 					$this->contractsPackage->generateClassesFromContract($this->getData()['id']);
 					return false;
 					$this->view->pick('contracts/viewcontract');

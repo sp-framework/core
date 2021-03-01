@@ -149,14 +149,18 @@ class Api extends BasePackage
 
             if ($api['api_type'] === 'ebay') {
                 if (!isset($api['credentials'])) { // Data is coming from EbayAPI, no need to update scopes.
-                    if ($api['user_credentials_scopes'] !== '') {
+                    if ($api['user_credentials_scopes'] && $api['user_credentials_scopes'] !== '') {
                         $scopes = explode(',', $api['user_credentials_scopes']);
-                        foreach ($scopes as &$scope) {
-                            $scope = trim($scope);
+                        if (count($scopes) > 0) {
+                            foreach ($scopes as &$scope) {
+                                $scope = trim($scope);
+                            }
+                            $api['user_credentials_scopes'] = $scopes;
+                        } else {
+                            $api['user_credentials_scopes'] = '';
                         }
-                        $api['user_credentials_scopes'] = Json::encode($scopes);
                     } else {
-                        $api['user_credentials_scopes'] = Json::encode([]);
+                        $api['user_credentials_scopes'] = '';
                     }
                 }
             }

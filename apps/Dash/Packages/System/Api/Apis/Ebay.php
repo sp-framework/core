@@ -17,7 +17,7 @@ class Ebay
 
     public static $STRICT_PROPERTY_TYPES = true;
 
-    private static $sandbox = true;
+    private static $sandbox = false;
 
     private static $debug = false;
 
@@ -235,6 +235,8 @@ class Ebay
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = $e->getMessage();
+
+            throw $e;
         }
     }
 
@@ -244,8 +246,10 @@ class Ebay
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = $token->error_description;
-        } else {
 
+            $this->packagesData->responseData = false;
+
+        } else {
             $config = $this->apiConfig;
 
             if ($type === 'app') {
@@ -276,7 +280,6 @@ class Ebay
             $this->api->init();
 
             if ($this->api->updateApi($config)) {
-
                 $newData = $this->api->packagesData->last;
                 $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $newData['refresh_token_valid_until']);
 
