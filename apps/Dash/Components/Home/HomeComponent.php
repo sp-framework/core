@@ -34,6 +34,7 @@ use Apps\Dash\Packages\Ims\Specifications\Install\Package as SpecificationsPacka
 use Apps\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
 use Apps\Dash\Packages\System\Api\Api;
 use Apps\Dash\Packages\System\Api\Install\Package as ApiPackage;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class HomeComponent extends BaseComponent
@@ -44,39 +45,111 @@ class HomeComponent extends BaseComponent
     public function viewAction()
     {
         // $this->reset();
-        // $this->resetTemp();
+        // $this->resetTemp();return;
 
-        // $apiPackage = $this->usePackage(Api::class);
+        $apiPackage = $this->usePackage(Api::class);
 
-        // $api = $apiPackage->useApi(['api_id' => '2']);
+        $api = $apiPackage->useApi(['api_id' => '2']);
 
-        // $api->checkUserToken();
+        $responseData = $api->packagesData->responseData;
 
-        // $responseData = $api->packagesData->responseData;
+        // $taxonomy = $api->useService('Taxonomyapi');
 
-        // // $identity = $api->useService('Identity');
+        // $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Taxonomyapi\Operations\GetDefaultCategoryTreeIdRestRequest;
+
+        // $request->marketplace_id = \Apps\Dash\Packages\System\Api\Apis\Ebay\Taxonomyapi\Enums\TaxonomyapiEnum::TAXONOMY_EBAY_AU;
+
+        // $response = $taxonomy->getDefaultCategoryTreeId($request);
+
+        // $categoryTreeId = $response->toArray()['categoryTreeId'];
+
+        // All Categories
+        // $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Taxonomyapi\Operations\GetCategoryTreeRestRequest;
+
+        // $request->category_tree_id = $categoryTreeId;
+
+        // $response = $taxonomy->getCategoryTree($request);
+
+        // $this->localContent->put('private/0/Api/Ebay/Taxonomy/Taxonomy.json', Json::encode($response->toArray()));
+
+        // $categories = $this->localContent->read('private/0/Api/Ebay/Taxonomy/Taxonomy.json');
+
+        // dump(Json::decode($categories, true));
+
+        // Only Vehicles
+        // $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Taxonomyapi\Operations\GetCategorySubtreeRestRequest;
+
+        // $request->category_tree_id = $categoryTreeId;
+
+        // $request->category_id = '131090';
+
+        // $response = $taxonomy->getCategorySubtree($request);
+
+        // $this->localContent->put('private/0/Api/Ebay/Taxonomy/Vehicles.json', Json::encode($response->toArray()));
+
+        // $categoriesJson = $this->localContent->read('private/0/Api/Ebay/Taxonomy/Taxonomy.json');
+
+        // $categories = Json::decode($categoriesJson, true);
+
+        // $taxonomy = [];
+        // $taxonomy['categoryTreeId'] = $categories['categoryTreeId'];
+        // $taxonomy['categoryTreeVersion'] = $categories['categoryTreeVersion'];
+        // $this->localContent->put('private/0/Api/Ebay/Taxonomy/Version.json', Json::encode($taxonomy));
+        // dump($categories);
+        // $taxonomy = [];
+        // foreach ($categories['rootCategoryNode']['childCategoryTreeNodes'] as $rootCategoryKey => $rootCategory) {
+        //     $rootCategoryArr = [];
+
+        //     $rootCategoryArr[$rootCategory['category']['categoryId']] = $rootCategory;
+
+        //     $this->localContent->put(
+        //         'private/0/Api/Ebay/Taxonomy/' . $rootCategory['category']['categoryId'] . '.json', Json::encode($rootCategoryArr)
+        //     );
+        // }
+        // dump(Json::decode($this->localContent->read('private/0/Api/Ebay/Taxonomy/131090.json'), true));
         // $identity = $api->useService('Identityapi');
-
         // $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Identityapi\Operations\GetUserRestRequest;
+
+        // $inventory = $api->useService('Inventoryapi');
+
+        // var_dump($inventory);
+        // $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Inventoryapi\Operations\GetInventoryItemsRestRequest;
+
+        // $response = $inventory->getInventoryItems($request);
+        // var_dump($response->toArray());
 
         // $response = $identity->getUser($request);
 
-        // var_dump($response->individualAccount->toArray());die();
+        // var_dump($response->toArray());die();
         // $responseData['user_data'] = $response->toArray();
 
+        // Tradingapi
+
+        $trading = $api->useService('Tradingapi');
+
+        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Operations\GetStoreRequest;
+
+        // $request->RequesterCredentials = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Types\CustomSecurityHeaderType;
+        // $request->RequesterCredentials->eBayAuthToken = $trading->getConfig('user_access_token');
+
+        $response = $trading->getStore($request);
+
+        var_dump($response);
         return false;
     }
 
     protected function resetTemp()
     {
-        $contractsComponent = new ContractsComponent();
-        $contractsComponent->installComponent();
-        $contractsPackage = new ContractsPackage();
-        $contractsPackage->installPackage(true);
-        $enumComponent = new EnumsComponent();
-        $enumComponent->installComponent();
-        $enumPackage = new EnumsPackage();
-        $enumPackage->installPackage(true);
+        // $contractsComponent = new ContractsComponent();
+        // $contractsComponent->installComponent();
+        // $contractsPackage = new ContractsPackage();
+        // $contractsPackage->installPackage(true);
+        // $enumComponent = new EnumsComponent();
+        // $enumComponent->installComponent();
+        // $enumPackage = new EnumsPackage();
+        // $enumPackage->installPackage(true);
+        $productsPackage = new ProductsPackage();
+        $productsPackage->installPackage(true);
     }
 
     protected function reset()
