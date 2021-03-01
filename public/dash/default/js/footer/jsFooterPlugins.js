@@ -3917,7 +3917,7 @@ var a,b;a=this,b=function(){"use strict";function e(e,t){for(var n=0;n<t.length;
         }
 
         if (this.settings.fullScreen) {
-          this.state.fullScreenOpen = openFullScreen(this.elems.wrapper);
+          openFullScreen(this.elems.wrapper);
         }
 
         if (this.settings.currentImageIndex === index) {
@@ -4073,7 +4073,7 @@ var a,b;a=this,b=function(){"use strict";function e(e,t){for(var n=0;n<t.length;
         }
 
         if (this.state.fullScreenOpen) {
-          this.state.fullScreenOpen = exitFullScreen();
+          exitFullScreen();
         }
 
         this.settings.currentImageIndex = undefined;
@@ -4186,7 +4186,15 @@ var a,b;a=this,b=function(){"use strict";function e(e,t){for(var n=0;n<t.length;
         });
         this.off(document, 'fullscreenchange.chocolat');
         this.on(document, 'fullscreenchange.chocolat', () => {
-          if (document.fullscreenElement) {
+          if (document.fullscreenElement || document.webkitCurrentFullScreenElement || document.webkitFullscreenElement) {
+            this.state.fullScreenOpen = true;
+          } else {
+            this.state.fullScreenOpen = false;
+          }
+        });
+        this.off(document, 'webkitfullscreenchange.chocolat');
+        this.on(document, 'webkitfullscreenchange.chocolat', () => {
+          if (document.fullscreenElement || document.webkitCurrentFullScreenElement || document.webkitFullscreenElement) {
             this.state.fullScreenOpen = true;
           } else {
             this.state.fullScreenOpen = false;

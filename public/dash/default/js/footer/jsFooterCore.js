@@ -7327,8 +7327,7 @@ var BazContentSectionWithWizard = function() {
                 $('#' + sectionId + '-' + step + '-data').load(dataCollection.env.rootPath + steps[step]['ajax']);
             }
         }
-        //eslint-disable-next-line
-        console.log(steps);
+
         // Make all contentAjaxLink to contentModalLink if section is Datatable
         // $('#' + sectionId + '-data .contentAjaxLink').addClass('contentModalLink').removeClass('contentAjaxLink');
         // Change Modal Size to xl
@@ -7638,6 +7637,7 @@ var BazContentSectionWithWizard = function() {
     function doAjax(formUrl, formComponentId, formSectionId, step, lastStep) {
         $.post(formUrl, $.param(dataCollection[formComponentId][formSectionId].dataToSubmit), function(data) {
             var success = false;
+
             if (data.responseCode == 0) {
                 if (data.responseData) {
                     wizardOptions['steps'][step]['responseData'] = data.responseData;
