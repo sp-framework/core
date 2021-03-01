@@ -25,21 +25,21 @@ class CategoriesComponent extends BaseComponent
     public function viewAction()
     {
         $this->view->imageLink = '';
-        $channels = $this->usePackage(Channels::class)->getAll();
+        $channels = $this->usePackage(Channels::class)->getAll()->channels;
 
         $localChannels = [];
-        $remoteChannels = [];
-
-        foreach ($channels->channels as $key => $value) {
-            if ($value['type'] === 'eshop') {
-                array_push($localChannels, $channels->channels[$key]);
-            } else if ($value['type'] === 'ebay') {
-                array_push($remoteChannels, $channels->channels[$key]);
+        // $remoteChannels = [];
+        if (count($channels) > 0) {
+            foreach ($channels as $channelKey => $channel) {
+                if ($channel['channel_type'] === 'eshop') {
+                    array_push($localChannels, $channels[$channelKey]);
+                // } else if ($channel['channel_type'] === 'ebay') {
+                //     array_push($remoteChannels, $channels[$channelKey]);
+                }
             }
         }
-
         $this->view->localChannels = $localChannels;
-        $this->view->remoteChannels = $remoteChannels;
+        // $this->view->remoteChannels = $remoteChannels;
 
         if (isset($this->getData()['id'])) {
             $categoriesArr = $this->categories->getAll()->categories;

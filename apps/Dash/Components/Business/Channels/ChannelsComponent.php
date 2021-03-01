@@ -35,20 +35,6 @@ class ChannelsComponent extends BaseComponent
         // foreach ($locations as $key => $value) {
         //     var_dump($value->toArray());
         // }
-        $channel = $this->channels->getChannelById($this->getData()['id']);
-
-        $api = $this->apiPackage->useApi($channel);
-
-        $identity = $api->useService('Identity');
-        var_dump($identity);
-
-        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Identity\Types\GetUserRestRequest();
-        var_dump($request);
-
-        $response = $identity->getUser($request);
-        var_dump($response);
-
-        return false;
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $channel = $this->channels->getChannelById($this->getData()['id']);
