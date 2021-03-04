@@ -28,7 +28,6 @@ class Api extends BasePackage
             if (!$this->config->cache->enabled) {
                 $parameters = $this->getIdParams($id);
             }
-
             $this->model = $this->modelToUse::find($parameters);
 
             $api = $this->getDbData($parameters, $enableCache);
@@ -38,7 +37,6 @@ class Api extends BasePackage
             $this->model = $this->modelToUse::find($api['api_id']);
 
             $apiData = $this->getDbData($parameters, $enableCache);
-
             if ($apiData) {
                 $api = array_merge($api, $apiData);
             }
@@ -102,15 +100,18 @@ class Api extends BasePackage
         $apiData = $data;
 
         if ($apiData['api_type'] === 'ebay') {
-            if ($apiData['user_credentials_scopes'] !== '') {
-                $scopes = explode(',', $apiData['user_credentials_scopes']);
-                foreach ($scopes as &$scope) {
-                    $scope = trim($scope);
+            if (isset($api['user_credentials_scopes']) && $api['user_credentials_scopes'] !== '') {
+                $scopes = explode(',', $api['user_credentials_scopes']);
+                if (count($scopes) > 0) {
+                    foreach ($scopes as &$scope) {
+                        $scope = trim($scope);
+                    }
+                    $api['user_credentials_scopes'] = $scopes;
+                } else {
+                    $api['user_credentials_scopes'] = '';
                 }
-
-                $apiData['user_credentials_scopes'] = Json::encode($scopes);
             } else {
-                $apiData['user_credentials_scopes'] = Json::encode([]);
+                $api['user_credentials_scopes'] = '';
             }
         }
 
@@ -149,7 +150,7 @@ class Api extends BasePackage
 
             if ($api['api_type'] === 'ebay') {
                 if (!isset($api['credentials'])) { // Data is coming from EbayAPI, no need to update scopes.
-                    if ($api['user_credentials_scopes'] && $api['user_credentials_scopes'] !== '') {
+                    if (isset($api['user_credentials_scopes']) && $api['user_credentials_scopes'] !== '') {
                         $scopes = explode(',', $api['user_credentials_scopes']);
                         if (count($scopes) > 0) {
                             foreach ($scopes as &$scope) {
