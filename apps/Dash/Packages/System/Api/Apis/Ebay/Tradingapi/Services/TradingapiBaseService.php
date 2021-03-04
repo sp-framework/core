@@ -94,14 +94,12 @@ class TradingapiBaseService extends BaseXMLService
         //     $headers[self::HDR_DEV_ID] = $devId;
         // }
 
-        if ($this->getConfig('user_access_token')) {
-            $headers[self::HDR_AUTHORIZATION] = $this->getConfig('user_access_token');
-        }
+        $headers[self::HDR_AUTHORIZATION] = $this->getConfig('user_access_token');
 
         if ($operationName === 'UploadSiteHostedPictures') {
             $headers['Content-Type'] = 'multipart/form-data;boundary="boundary"';
         }
-        // var_dump($headers);die();
+
         return $headers;
     }
 

@@ -76,6 +76,39 @@ class Categories extends BasePackage
         }
     }
 
+    public function removeCategory(array $data)
+    {
+        $category = $this->getById($data['id']);
+
+        if ($category['has_childs'] == 1) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Category has childs. Error removing category.';
+
+            return;
+        }
+
+        if ($category['product_count'] || $category['product_count'] > 0) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Category has products assigned to it. Error removing category.';
+
+            return;
+        }
+
+        if ($this->remove($data['id'])) {
+            $this->basepackages->storages->changeOrphanStatus(null, $category['image']);
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Removed category';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error removing category.';
+        }
+    }
+
     protected function buildCategory(array $data)
     {
         $data['visible_to_role_ids'] = Json::decode($data['visible_to_role_ids'], true);
@@ -117,39 +150,6 @@ class Categories extends BasePackage
         }
 
         return $data;
-    }
-
-    public function removeCategory(array $data)
-    {
-        $category = $this->getById($data['id']);
-
-        if ($category['has_childs'] == 1) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Category has childs. Error removing category.';
-
-            return;
-        }
-
-        if ($category['product_count'] || $category['product_count'] > 0) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Category has products assigned to it. Error removing category.';
-
-            return;
-        }
-
-        if ($this->remove($data['id'])) {
-            $this->basepackages->storages->changeOrphanStatus(null, $category['image']);
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Removed category';
-        } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing category.';
-        }
     }
 
     protected function traverseCategoriesArray($parentCategoryId, &$parentCategory, $newCategory)
