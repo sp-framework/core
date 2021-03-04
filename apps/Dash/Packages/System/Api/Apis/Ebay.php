@@ -184,12 +184,15 @@ class Ebay
             $timeDiff = (int) $this->apiConfig['user_access_token_valid_until'] - time();
 
             if ($timeDiff <= self::MIN_USER_TOKEN_TIME) {
-                if (isset($this->apiConfig['refresh_token'])) {
+                if ($this->apiConfig['refresh_token'] &&
+                    $this->apiConfig['refresh_token'] !== ''
+                ) {
                     $refreshTokenTimeDiff = (int) $this->apiConfig['refresh_token_valid_until'] - time();
 
                     if ($refreshTokenTimeDiff > self::MAX_REFRESH_TOKEN_TIME) { //10 days
                         $this->refreshUserToken();
                     } else {
+                        die();
                         //We have to send notification to refresh token to admin.
                         $config = $this->apiConfig;
 
@@ -205,6 +208,22 @@ class Ebay
 
                             $this->packagesData->responseMessage = 'Note: Token will expire in less than 10 days. Please refresh token.';
                         }
+                    }
+                } else {
+                    //refreshToken missing
+                    $config = $this->apiConfig;
+
+                    $config['setup'] = '2';
+
+                    unset($config['ebayIds']);
+                    unset($config['bebayConfig']);
+
+                    $this->api->init();
+
+                    if ($this->api->updateApi($config)) {
+                        $this->packagesData->responseCode = 1;
+
+                        $this->packagesData->responseMessage = 'Note: Token missing. Please refresh token.';
                     }
                 }
             } else {
@@ -283,11 +302,19 @@ class Ebay
                 $newData = $this->api->packagesData->last;
                 $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $newData['refresh_token_valid_until']);
 
+                // Get updated config as original call via useService will use the old configuration.
+                $this->api->init();
+                $this->apiConfig = $this->api->getApiById($config['id']);
+
                 $this->packagesData->responseData = $responseData;
 
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = ucfirst($type) . ' token granted and stored.';
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error updating api after refresh_token';
             }
         }
     }
