@@ -15,6 +15,8 @@ class Categories extends BasePackage
 
     public $categories;
 
+    const MAX_HIERARCHY_LEVEL = 5;
+
     public function addCategory(array $data)
     {
         if (!ctype_alnum(trim(str_replace(' ', '' , $data['name'])))) {
@@ -27,17 +29,28 @@ class Categories extends BasePackage
             return false;
 
         } else {
-
-            $data = $this->buildCategory($data);
+            if (!isset($data['parent_id'])) {
+                $data['parent_id'] = 0;
+            }
 
             $data['product_count'] = 0;
 
             if ($this->add($data)) {
-                $this->basepackages->storages->changeOrphanStatus($data['image']);
+                $newCategory = $this->packagesData->last;
+
+                $newCategory = $this->buildHierarchy($newCategory);
+
+                $newCategory['hierarchy_str'] = $this->buildHierarchyStr($newCategory['hierarchy']);
+
+                $newCategory['hierarchy'] = Json::encode($newCategory['hierarchy']);
+
+                $this->update($newCategory);
+
+                $this->basepackages->storages->changeOrphanStatus($newCategory['image']);
 
                 $this->packagesData->responseCode = 0;
 
-                $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' category';
+                $this->packagesData->responseMessage = 'Added ' . $newCategory['name'] . ' category';
             } else {
                 $this->packagesData->responseCode = 1;
 
@@ -58,11 +71,25 @@ class Categories extends BasePackage
             return false;
 
         } else {
+            if ($data['parent_id'] == $data['id']) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Parent cannot be self!';
+
+                return;
+            }
+
             $category = $this->getById($data['id']);
 
-            $data = $this->buildCategory($data);
+            $category = array_merge($category, $data);
 
-            if ($this->update($data)) {
+            $category = $this->buildHierarchy($category);
+
+            $category['hierarchy_str'] = $this->buildHierarchyStr($category['hierarchy']);
+
+            $category['hierarchy'] = Json::encode($category['hierarchy']);
+
+            if ($this->update($category)) {
                 $this->basepackages->storages->changeOrphanStatus($data['image'], $category['image']);
 
                 $this->packagesData->responseCode = 0;
@@ -109,7 +136,7 @@ class Categories extends BasePackage
         }
     }
 
-    protected function buildCategory(array $data)
+    protected function buildHierarchy(array $data)
     {
         $data['visible_to_role_ids'] = Json::decode($data['visible_to_role_ids'], true);
         if (isset($data['visible_to_role_ids']['data'])) {
@@ -129,24 +156,22 @@ class Categories extends BasePackage
 
         $newCategory[$categoryId] = [
             'title' => $data['name'],
-            'link'  => '/q/category/' . $categoryId
+            'link'  => '/q/category/' . $data['id']
         ];
 
-        if ($data['parent'] != 0) {
-            $parent = $this->getById($data['parent']);
+        if ($data['parent_id'] != 0) {
+            $parent = $this->getById($data['parent_id']);
 
             $parentCategoryId = Str::underscore(strtolower($parent['name']));
-            $parentCategory = Json::decode($parent['category'], true);
+            $parentCategory = Json::decode($parent['hierarchy'], true);
 
             $this->traverseCategoriesArray($parentCategoryId, $parentCategory, $newCategory);
 
-            $parent['has_childs'] = 1;
-
-            $this->update($parent);
-
-            $data['category'] = Json::encode($parentCategory);
+            $data['hierarchy'] = $parentCategory;
+            $data['hierarchy_level'] = (int) $parent['hierarchy_level'] + 1;
         } else {
-            $data['category'] = Json::encode($newCategory);
+            $data['hierarchy'] = $newCategory;
+            $data['hierarchy_level'] = 1;
         }
 
         return $data;
@@ -159,10 +184,61 @@ class Categories extends BasePackage
                 $value["childs"] = $newCategory;
                 return;
             }
-            // var_dump($value);
+
             if ($value['childs']) {
                 $this->traverseCategoriesArray($parentCategoryId, $value['childs'], $newCategory);
             }
+        }
+    }
+
+    protected function buildHierarchyStr($hierarchy)
+    {
+        $strArr = $this->buildHierarchyStrArr($hierarchy);
+
+        return implode(' / ', $strArr);
+    }
+
+    protected function buildHierarchyStrArr($hierarchy)
+    {
+        $arr = [];
+
+        foreach ($hierarchy as $hierarchyKey => $hierarchyValue) {
+            array_push($arr, $hierarchyValue['title']);
+
+            if (isset($hierarchyValue['childs'])) {
+                $arr = array_merge($arr, $this->buildHierarchyStrArr($hierarchyValue['childs']));
+            }
+        }
+
+        return $arr;
+    }
+
+    public function searchCategories(string $categoryQueryString)
+    {
+        $searchCategories =
+            $this->getByParams(
+                [
+                    'conditions'    => 'name LIKE :cName: AND hierarchy_level < :cHierarchyLevel:',
+                    'bind'          => [
+                        'cName'                 => '%' . $categoryQueryString . '%',
+                        'cHierarchyLevel'       => self::MAX_HIERARCHY_LEVEL
+                    ]
+                ]
+            );
+
+        if (count($searchCategories) > 0) {
+            $categories = [];
+
+            foreach ($searchCategories as $employeeKey => $employeeValue) {
+                $categories[$employeeKey]['id'] = $employeeValue['id'];
+                $categories[$employeeKey]['hierarchy_str'] = $employeeValue['hierarchy_str'];
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->categories = $categories;
+
+            return true;
         }
     }
 }

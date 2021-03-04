@@ -3,13 +3,13 @@
 namespace Apps\Dash\Packages\Ims\Categories\Install;
 
 use Apps\Dash\Packages\Ims\Categories\Categories;
-use Apps\Dash\Packages\Ims\Categories\Install\Schema\Categories as CategoriesSchema;
+use Apps\Dash\Packages\Ims\Categories\Install\Schema\ImsCategories;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Package extends BasePackage
 {
-    protected $schemaToUse = CategoriesSchema::class;
+    protected $schemaToUse = ImsCategories::class;
 
     protected $packageToUse = Categories::class;
 

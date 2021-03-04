@@ -18,22 +18,19 @@
         'dtFixedHeader'         : true,
         'dtPrimaryButtons'      :
             {
-                'componentId'                       : componentId,
-                'sectionId'                         : 'listing',
-                'buttonType'                        : 'DropdownSplitButtons',
-                'dropdownButtonId'                  : 'main',
-                'dropdownButtonTitle'               : 'Add New Category',
-                'dropdownButtonIcon'                : 'plus',
-                'dropdownButtonAdditionalClass'     : 'text-uppercase',
-                'buttonPosition'                    : 'right',
-                'dropdownAlign'                     : 'right',
-                'buttons'                           :
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
                     {
-                        'local-category' : {
-                            'title'                   : 'Local Category',
+                        'add-category' : {
+                            'title'                   : 'Add New Category',
+                            'size'                    : 'sm',
                             'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('ims/categories/q/type/local/id/0')
+                            'icon'                    : 'plus',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('ims/categories/q/id/0')
                         }
                     }
             },

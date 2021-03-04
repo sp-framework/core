@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\Ims\Categories\Install\Schema;
 
 use Phalcon\Db\Column;
 
-class Categories
+class ImsCategories
 {
     public function columns()
     {
@@ -37,6 +37,28 @@ class Categories
                     ]
                 ),
                 new Column(
+                    'hierarchy',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'hierarchy_str',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 4096,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'hierarchy_level',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'description',
                     [
                         'type'    => Column::TYPE_VARCHAR,
@@ -45,15 +67,7 @@ class Categories
                     ]
                 ),
                 new Column(
-                    'type',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'parent',
+                    'parent_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'notNull' => false,
@@ -71,14 +85,6 @@ class Categories
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'category',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 2048,
-                        'notNull' => true,
                     ]
                 ),
                 new Column(
@@ -115,7 +121,7 @@ class Categories
                 //     'seo_title',
                 //     [
                 //         'type'    => Column::TYPE_VARCHAR,
-                //         'size'    => 100,
+                //         'size'    => 1024,
                 //         'notNull' => false,
                 //     ]
                 // ),
@@ -123,7 +129,7 @@ class Categories
                 //     'seo_meta_keywords',
                 //     [
                 //         'type'    => Column::TYPE_VARCHAR,
-                //         'size'    => 1024,
+                //         'size'    => 2048,
                 //         'notNull' => false,
                 //     ]
                 // ),
@@ -139,7 +145,7 @@ class Categories
                 //     'seo_heading',
                 //     [
                 //         'type'    => Column::TYPE_VARCHAR,
-                //         'size'    => 100,
+                //         'size'    => 1024,
                 //         'notNull' => false,
                 //     ]
                 // ),

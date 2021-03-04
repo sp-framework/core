@@ -10,11 +10,11 @@ class ImsCategories extends BaseModel
 
     public $image;
 
-    public $channel_id;
-
     public $name;
 
-    public $type;
+    public $hierarchy;
+
+    public $hierarchy_str;
 
     public $description;
 
@@ -24,13 +24,13 @@ class ImsCategories extends BaseModel
 
     public $product_count;
 
-    public $category;
-
     public $sequence;
 
     public $need_auth;
 
     public $visible_to_role_ids;
+
+    public $visible_on_channel_ids;
 
     // public $seo_title;
 
@@ -39,5 +39,4 @@ class ImsCategories extends BaseModel
     // public $seo_meta_description;
 
     // public $seo_heading;
-
 }

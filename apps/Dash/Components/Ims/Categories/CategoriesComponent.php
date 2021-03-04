@@ -12,11 +12,11 @@ class CategoriesComponent extends BaseComponent
 {
     use DynamicTable;
 
-    protected $categories;
+    protected $categoriesPackage;
 
     public function initialize()
     {
-        $this->categories = $this->usePackage(Categories::class);
+        $this->categoriesPackage = $this->usePackage(Categories::class);
     }
 
     /**
@@ -28,21 +28,21 @@ class CategoriesComponent extends BaseComponent
         $channels = $this->usePackage(Channels::class)->getAll()->channels;
 
         $localChannels = [];
-        // $remoteChannels = [];
+
         if (count($channels) > 0) {
             foreach ($channels as $channelKey => $channel) {
-                if ($channel['channel_type'] === 'eshop') {
+                if ($channel['channel_type'] === 'eshop' ||
+                    $channel['channel_type'] === 'pos'
+                ) {
                     array_push($localChannels, $channels[$channelKey]);
-                // } else if ($channel['channel_type'] === 'ebay') {
-                //     array_push($remoteChannels, $channels[$channelKey]);
                 }
             }
         }
+
         $this->view->localChannels = $localChannels;
-        // $this->view->remoteChannels = $remoteChannels;
 
         if (isset($this->getData()['id'])) {
-            $categoriesArr = $this->categories->getAll()->categories;
+            $categoriesArr = $this->categoriesPackage->getAll()->categories;
             $categories = [];
 
             foreach ($categoriesArr as $key => $value) {
@@ -63,13 +63,13 @@ class CategoriesComponent extends BaseComponent
                 $category['visible_to_role_ids'] = Json::decode($category['visible_to_role_ids'], true);
                 $category['visible_on_channel_ids'] = Json::decode($category['visible_on_channel_ids'], true);
 
-                $this->view->categoryType = $category['type'];
+                // $this->view->categoryType = $category['type'];
 
                 $this->view->category = $category;
 
             } else {
 
-                $this->view->categoryType = $this->getData()['type'];
+                // $this->view->categoryType = $this->getData()['type'];
 
                 $this->view->imageLink = '';
             }
@@ -91,27 +91,28 @@ class CategoriesComponent extends BaseComponent
             return;
         }
 
-        if ($this->request->isPost()) {
-            $parentToName = [];
+        // if ($this->request->isPost()) {
+        //     $parentToName = [];
 
-            $categories = $this->categories->getAll()->categories;
+        //     $categories = $this->categoriesPackage->getAll()->categories;
 
-            foreach ($categories as $categoryKey => $categoryValue) {
-                if ($categoryValue['parent'] != '0') {
-                    $parent = $this->categories->getById($categoryValue['parent']);
-                    $parentToName[$categoryValue['parent']] = $parent['name'] . ' (' . $categoryValue['parent'] . ')';
-                } else {
-                    $parentToName[$categoryValue['parent']] = '-';
-                }
-            }
+        //     foreach ($categories as $categoryKey => $categoryValue) {
+        //         if ($categoryValue['parent'] != '0') {
+        //             $parent = $this->categoriesPackage->getById($categoryValue['parent']);
+        //             $parentToName[$categoryValue['parent']] = $parent['name'] . ' (' . $categoryValue['parent'] . ')';
+        //         } else {
+        //             $parentToName[$categoryValue['parent']] = '-';
+        //         }
+        //     }
 
-            $replaceColumns =
-                [
-                    'parent' => ['html'  => $parentToName]
-                ];
-        } else {
-            $replaceColumns = null;
-        }
+        //     $replaceColumns =
+        //         [
+        //             'parent' => ['html'  => $parentToName]
+        //         ];
+        // } else {
+        //     $replaceColumns = null;
+        // }
+        $replaceColumns = null;
 
         $controlActions =
             [
@@ -122,25 +123,25 @@ class CategoriesComponent extends BaseComponent
                 ]
             ];
 
+        $replaceColumnsTitle =
+            [
+                'hierarchy_str' => 'Hierarchy'
+            ];
+
         $this->generateDTContent(
-            $this->categories,
+            $this->categoriesPackage,
             'ims/categories/view',
             null,
-            ['name', 'parent', 'product_count'],
+            ['name', 'hierarchy_str', 'product_count'],
             true,
-            [],
+            ['name', 'hierarchy_str', 'product_count'],
             $controlActions,
-            [],
+            $replaceColumnsTitle,
             $replaceColumns,
             'name'
         );
 
         $this->view->pick('categories/list');
-    }
-
-    public function getAllCategoriesAction()
-    {
-        $this->view->categories = $this->categories->getAll()->categories;
     }
 
     /**
@@ -154,11 +155,11 @@ class CategoriesComponent extends BaseComponent
                 return;
             }
 
-            $this->categories->addCategory($this->postData());
+            $this->categoriesPackage->addCategory($this->postData());
 
-            $this->view->responseCode = $this->categories->packagesData->responseCode;
+            $this->view->responseCode = $this->categoriesPackage->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->categories->packagesData->responseMessage;
+            $this->view->responseMessage = $this->categoriesPackage->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -178,11 +179,11 @@ class CategoriesComponent extends BaseComponent
                 return;
             }
 
-            $this->categories->updateCategory($this->postData());
+            $this->categoriesPackage->updateCategory($this->postData());
 
-            $this->view->responseCode = $this->categories->packagesData->responseCode;
+            $this->view->responseCode = $this->categoriesPackage->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->categories->packagesData->responseMessage;
+            $this->view->responseMessage = $this->categoriesPackage->packagesData->responseMessage;
 
         } else {
             $this->view->responseCode = 1;
@@ -198,12 +199,45 @@ class CategoriesComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->categories->removeCategory($this->postData());
+            $this->categoriesPackage->removeCategory($this->postData());
 
-            $this->view->responseCode = $this->categories->packagesData->responseCode;
+            $this->view->responseCode = $this->categoriesPackage->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->categories->packagesData->responseMessage;
+            $this->view->responseMessage = $this->categoriesPackage->packagesData->responseMessage;
 
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function searchCategoryAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 3) {
+                    return;
+                }
+
+                $searchCategories = $this->categoriesPackage->searchCategories($searchQuery);
+
+                if ($searchCategories) {
+                    $this->view->responseCode = $this->categoriesPackage->packagesData->responseCode;
+
+                    $this->view->categories = $this->categoriesPackage->packagesData->categories;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
         } else {
             $this->view->responseCode = 1;
 
