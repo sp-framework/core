@@ -127,7 +127,7 @@ class Filters extends AdminLTETags
                                         'disabled'                => true,
                                         'buttonAdditionalClass'   => 'rounded-0',
                                         'position'                => 'right',
-                                        'url'                     => $this->links->url('filters/remove')
+                                        'url'                     => $this->links->url('system/filters/remove')
                                     ],
                                     'share'   => [
                                         'title'                   => false,
@@ -155,7 +155,7 @@ class Filters extends AdminLTETags
                                         'noMargin'                => true,
                                         'buttonAdditionalClass'   => 'rounded-0 text-white',
                                         'position'                => 'right',
-                                        'url'                     => $this->links->url('filters/add')
+                                        'url'                     => $this->links->url('system/filters/add')
                                     ],
                                     'reset' => [
                                         'title'                   => false,
@@ -429,7 +429,7 @@ class Filters extends AdminLTETags
                                         'fieldLabel'                            => 'Default?',
                                         'fieldType'                             => 'checkbox',
                                         'fieldCheckboxType'                     => 'info',
-                                        'fieldDataAttributes'                   => ['href' => $this->links->url('filters/getdefaultfilter')],
+                                        'fieldDataAttributes'                   => ['href' => $this->links->url('system/filters/getdefaultfilter')],
                                         'fieldHelp'                             => true,
                                         'fieldHelpTooltipContent'               => 'Make this filter as default filter<br>Note: Only saved filters can be made default.',
                                         'fieldBazScan'                          => true,
@@ -464,14 +464,14 @@ class Filters extends AdminLTETags
                                     'title'                 => 'Add',
                                     'disabled'              => true,
                                     'icon'                  => 'save',
-                                    'url'                   => $this->links->url('filters/add')
+                                    'url'                   => $this->links->url('system/filters/add')
                                 ],
                                 'save-update' => [
                                     'title'                 => 'Update',
                                     'disabled'              => true,
                                     'hidden'                => true,
                                     'icon'                  => 'save',
-                                    'url'                   => $this->links->url('filters/update')
+                                    'url'                   => $this->links->url('system/filters/update')
                                 ],
                             ]
                     ]
@@ -611,7 +611,7 @@ class Filters extends AdminLTETags
                                     'title'                 => 'Share',
                                     'disabled'              => true,
                                     'icon'                  => 'share-alt',
-                                    'url'                   => $this->links->url('filters/update')
+                                    'url'                   => $this->links->url('system/filters/update')
                                 ]
                             ]
                     ]
@@ -646,7 +646,7 @@ class Filters extends AdminLTETags
                             "' . $this->compSecId . '-filter-sharing-rids"        : {
                                 placeholder: "SELECT ROLE(S)",
                                 "ajax"          : {
-                                    url         : "' . $this->links->url('filters/searchRole') . '",
+                                    url         : "' . $this->links->url('system/filters/searchRole') . '",
                                     dataType    : "json",
                                     method      : "post",
                                     data: function(params) {
@@ -684,7 +684,7 @@ class Filters extends AdminLTETags
                             "' . $this->compSecId . '-filter-sharing-eids"        : {
                                 placeholder: "SELECT EMPLOYEE(S)",
                                 "ajax"          : {
-                                    url         : "' . $this->links->url('filters/searchEmployee') . '",
+                                    url         : "' . $this->links->url('system/filters/searchEmployee') . '",
                                     dataType    : "json",
                                     method      : "post",
                                     data: function(params) {
@@ -722,7 +722,7 @@ class Filters extends AdminLTETags
                             "' . $this->compSecId . '-filter-sharing-aids"        : {
                                 placeholder: "SELECT ACCOUNT(S)",
                                 "ajax"          : {
-                                    url         : "' . $this->links->url('filters/searchAccount') . '",
+                                    url         : "' . $this->links->url('system/filters/searchAccount') . '",
                                     dataType    : "json",
                                     method      : "post",
                                     data: function(params) {
