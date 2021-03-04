@@ -303,6 +303,23 @@ class ApiComponent extends BaseComponent
 
         $responseData['user_data'] = $response->toArray();
 
+        if (isset($responseData['user_data']['accountType']) &&
+            $responseData['user_data']['accountType'] === 'BUSINESS'
+        ) {
+            $trading = $api->useService('Tradingapi');
+
+            $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Operations\GetStoreRequest;
+
+            $response = $trading->getStore($request);
+
+            $responseArr = $response->toArray();
+
+            if (isset($responseArr['Store'])) {
+                $responseData['store_data']['name'] = $responseArr['Store']['Name'];
+                $responseData['store_data']['url'] = $responseArr['Store']['URL'];
+            }
+        }
+
         $this->view->responseData = $responseData;
 
         $this->view->responseCode = $api->packagesData->responseCode;

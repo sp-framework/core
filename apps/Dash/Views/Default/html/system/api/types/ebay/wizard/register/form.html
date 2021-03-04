@@ -234,7 +234,7 @@
         </div>
         {% if wizard is not defined %}
             <hr>
-            <div class="row">
+            <div class="row vdivide">
                 <div class="col">
                     {{adminltetags.useTag('buttons',
                         [
@@ -249,6 +249,26 @@
                                         'type'                    : 'primary',
                                         'iconHidden'              : true,
                                         'icon'                    : 'cog fa-spin'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'componentId'           : componentId,
+                            'sectionId'             : sectionId,
+                            'buttonType'            : 'button',
+                            'buttons'               :
+                                [
+                                    'manage-taxonomy' : [
+                                        'title'                   : 'Manage eBay Taxonomy',
+                                        'size'                    : 'sm',
+                                        'type'                    : 'primary',
+                                        'buttonAdditionalClass'   : 'contentAjaxLink',
+                                        'icon'                    : 'sitemap',
+                                        'url'                     : links.url('system/api/ebay/taxonomy')
                                     ]
                                 ]
                         ]
@@ -298,12 +318,21 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
                     '</tr>';
 
                     if (data.responseData.user_data) {
+                        var contactFirstName, contactLastName, storeName, storeUrl;
                         var userTypeData = { };
 
                         if (data.responseData.user_data.accountType === 'BUSINESS') {
                             userTypeData = data.responseData.user_data.businessAccount;
+                            contactFirstName = userTypeData.primaryContact.firstName;
+                            contactLastName = userTypeData.primaryContact.lastName;
+                            if (data.responseData.store_data) {
+                                storeName = data.responseData.store_data.name;
+                                storeUrl = data.responseData.store_data.url;
+                            }
                         } else if (data.responseData.user_data.accountType === 'INDIVIDUAL') {
                             userTypeData = data.responseData.user_data.individualAccount;
+                            contactFirstName = userTypeData.firstName;
+                            contactLastName = userTypeData.lastName;
                         }
 
                         authoData +=
@@ -318,18 +347,36 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
                             '<tr>' +
                                 '<td>Registration Marketplace ID</td>' +
                                 '<td>' + data.responseData.user_data.registrationMarketplaceId + '</td>' +
-                            '</tr>' +
-                            '<tr>' +
-                                '<td>Status</td>' +
-                                '<td>' + data.responseData.user_data.status + '</td>' +
-                            '</tr>' +
+                            '</tr>';
+
+                            if (data.responseData.user_data.status) {
+                                authoData +=
+                                    '<tr>' +
+                                        '<td>Status</td>' +
+                                        '<td>' + data.responseData.user_data.status + '</td>' +
+                                    '</tr>';
+                            }
+
+                            if (data.responseData.store_data) {
+                                authoData +=
+                                    '<tr>' +
+                                        '<td>Store Name</td>' +
+                                        '<td>' + storeName + '</td>' +
+                                    '</tr>' +
+                                    '<tr>' +
+                                        '<td>Store Url</td>' +
+                                        '<td>' + storeUrl + '</td>' +
+                                    '</tr>';
+                            }
+
+                        authoData +=
                             '<tr>' +
                                 '<td>Account First Name</td>' +
-                                '<td>' + userTypeData.firstName + '</td>' +
+                                '<td>' + contactFirstName + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Account Last Name</td>' +
-                                '<td>' + userTypeData.lastName + '</td>' +
+                                '<td>' + contactLastName + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Email</td>' +
@@ -341,23 +388,23 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
                             '</tr>' +
                             '<tr>' +
                                 '<td>Street</td>' +
-                                '<td>' + userTypeData.registrationAddress.addressLine1 + '</td>' +
+                                '<td>' + userTypeData.address.addressLine1 + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>City</td>' +
-                                '<td>' + userTypeData.registrationAddress.city + '</td>' +
+                                '<td>' + userTypeData.address.city + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>State</td>' +
-                                '<td>' + userTypeData.registrationAddress.stateOrProvince + '</td>' +
+                                '<td>' + userTypeData.address.stateOrProvince + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Post Code</td>' +
-                                '<td>' + userTypeData.registrationAddress.postalCode + '</td>' +
+                                '<td>' + userTypeData.address.postalCode + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Country</td>' +
-                                '<td>' + userTypeData.registrationAddress.country + '</td>' +
+                                '<td>' + userTypeData.address.country + '</td>' +
                             '</tr>';
                     }
 
