@@ -1,0 +1,11 @@
+{
+    "name"          : "EbayTaxonomy",
+    "displayName"   : "Ebay Taxonomy Package",
+    "description"   : "Package for managing eBay Taxonomy",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-system-admin-api-ebay-taxonomy",
+    "settings"      : { }
+}
