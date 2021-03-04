@@ -12,6 +12,7 @@ namespace Apps\Dash\Components\Home;
 // use Apps\Dash\Components\Storages\Install\Component as StoragesComponent;
 use Apps\Dash\Components\Devtools\Api\Contracts\Install\Component as ContractsComponent;
 use Apps\Dash\Components\Devtools\Api\Enums\Install\Component as EnumsComponent;
+use Apps\Dash\Components\System\Api\Ebay\Taxonomy\Install\Component as TaxonomyComponent;
 use Apps\Dash\Components\System\Api\Install\Component as ApiComponent;
 use Apps\Dash\Packages\Business\ABNLookup\Install\Package as ABNLookupPackage;
 use Apps\Dash\Packages\Business\Channels\Install\Package as ChannelsPackage;
@@ -33,6 +34,7 @@ use Apps\Dash\Packages\Ims\Products\Install\Package as ProductsPackage;
 use Apps\Dash\Packages\Ims\Specifications\Install\Package as SpecificationsPackage;
 use Apps\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
 use Apps\Dash\Packages\System\Api\Api;
+use Apps\Dash\Packages\System\Api\Ebay\Taxonomy\Install\Package as TaxonomyPackage;
 use Apps\Dash\Packages\System\Api\Install\Package as ApiPackage;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
@@ -45,11 +47,12 @@ class HomeComponent extends BaseComponent
     public function viewAction()
     {
         // $this->reset();
-        // $this->resetTemp();return;
+        $this->resetTemp();
+        return;
 
         $apiPackage = $this->usePackage(Api::class);
 
-        $api = $apiPackage->useApi(['api_id' => '2']);
+        $api = $apiPackage->useApi(['api_id' => '3']);
 
         $responseData = $api->packagesData->responseData;
 
@@ -129,17 +132,18 @@ class HomeComponent extends BaseComponent
 
         $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Operations\GetStoreRequest;
 
-        // $request->RequesterCredentials = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Types\CustomSecurityHeaderType;
-        // $request->RequesterCredentials->eBayAuthToken = $trading->getConfig('user_access_token');
-
         $response = $trading->getStore($request);
 
-        var_dump($response);
+        var_dump($response->toArray());
         return false;
     }
 
     protected function resetTemp()
     {
+        // $taxonomyComponent = new TaxonomyComponent();
+        // $taxonomyComponent->installComponent();
+        // $taxonomyPackage = new TaxonomyPackage();
+        // $taxonomyPackage->installPackage(true);
         // $contractsComponent = new ContractsComponent();
         // $contractsComponent->installComponent();
         // $contractsPackage = new ContractsPackage();
@@ -148,8 +152,10 @@ class HomeComponent extends BaseComponent
         // $enumComponent->installComponent();
         // $enumPackage = new EnumsPackage();
         // $enumPackage->installPackage(true);
-        $productsPackage = new ProductsPackage();
-        $productsPackage->installPackage(true);
+        // $productsPackage = new ProductsPackage();
+        // $productsPackage->installPackage(true);
+        $categoriesPackage = new CategoriesPackage();
+        $categoriesPackage->installPackage(true);
     }
 
     protected function reset()
