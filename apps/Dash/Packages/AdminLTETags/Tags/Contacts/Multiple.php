@@ -413,7 +413,6 @@ class Multiple
                                     $("#' . $this->compSecId . '-contact_phone").val(data.contact.contact_phone);
                                     $("#' . $this->compSecId . '-contact_phone_ext").val(data.contact.contact_phone_ext);
                                     $("#' . $this->compSecId . '-account_email").attr("disabled", true);
-                                    console.log(data);
                                 } else {
                                     $("#' . $this->compSecId . '-contact_id").val("");
                                     $("#' . $this->compSecId . '-account_email").val("");

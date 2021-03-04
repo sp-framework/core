@@ -33,7 +33,7 @@
             "title"     : "system",
             "childs"    : {
                 "emailservices" : {
-                    "title"     : "emailservices",
+                    "title"     : "Email Services",
                     "icon"      : "envelope",
                     "link"      : "system/emailservices"
                 }
