@@ -118,11 +118,22 @@ trait DynamicTable {
                     $actions = [];
 
                     foreach ($controlActions['actionsToEnable'] as $key => &$action) {
-                        if (isset($controlActions['disableActionsForIds']) &&
-                            is_array($controlActions['disableActionsForIds']) &&
-                            count($controlActions['disableActionsForIds']) > 0
+                        if (isset($controlActions['disableActionsForIds'][$key]) &&
+                            is_array($controlActions['disableActionsForIds'][$key]) &&
+                            count($controlActions['disableActionsForIds'][$key]) > 0
                         ) {
-                            if (!in_array($row['id'], $controlActions['disableActionsForIds'])) {
+                            if (!in_array($row['id'], $controlActions['disableActionsForIds'][$key])) {
+                                if (isset($controlActions['includeQ']) && $controlActions['includeQ'] == true) {
+                                    $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
+                                } else {
+                                    $actions[$key] = $this->links->url($action . '/q/id/' . $row['id']);
+                                }
+                            }
+                        } else if (isset($controlActions['enableActionsForIds'][$key]) &&
+                            is_array($controlActions['enableActionsForIds'][$key]) &&
+                            count($controlActions['enableActionsForIds'][$key]) > 0
+                        ) {
+                            if (in_array($row['id'], $controlActions['enableActionsForIds'][$key])) {
                                 if (isset($controlActions['includeQ']) && $controlActions['includeQ'] == true) {
                                     $actions[$key] = $this->links->url($action . '/id/' . $row['id']);
                                 } else {
