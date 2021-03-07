@@ -4,6 +4,7 @@ namespace Apps\Dash\Packages\Ims\Products;
 
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
+use Apps\Dash\Packages\Ims\Categories\Categories;
 use Apps\Dash\Packages\Ims\Products\Model\ImsProducts;
 use Apps\Dash\Packages\System\Tools\Barcodes\Barcodes;
 use Phalcon\Helper\Json;
@@ -32,6 +33,8 @@ class Products extends BasePackage
         $data = $this->addBrand($data);
 
         $data = $this->addManufacturer($data);
+
+        $data = $this->addCategory($data);
 
         $add = $this->add($data);
 
@@ -68,6 +71,8 @@ class Products extends BasePackage
         $data = $this->addBrand($data);
 
         $data = $this->addManufacturer($data);
+
+        $data = $this->addCategory($data);
 
         $product = $this->getById($data['id']);
 
@@ -286,6 +291,92 @@ class Products extends BasePackage
         return $data;
     }
 
+    protected function addCategory($data)
+    {
+        $categoryPackage = $this->usePackage(Categories::class);
+
+        if ($data['category_ids'] !== '') {
+            $data['category_ids'] = Json::decode($data['category_ids'], true);
+
+            if (count($data['category_ids']) > 0) {
+                foreach ($data['category_ids'] as $channelKey => $channel) {
+                    if (count($channel) > 0) {
+                        foreach ($channel as $categoryKey => $category) {
+                            try {
+                                $categoryArr = $categoryPackage->getById($category['category_id']);
+                            } catch (\Exception $e) {
+                                if ($e->getMessage() === 'Not Found') {
+                                    $categoryTree = explode('/', $category['category']);
+
+                                    foreach ($categoryTree as &$value) {
+                                        $value = trim($value);
+                                    }
+
+                                    $parent = null;
+
+                                    for ($i = 0; $i < count($categoryTree); $i++) {
+                                        if (!$parent) {
+                                            $conditions =
+                                                [
+                                                    'conditions'    => 'name = :name:',
+                                                    'bind'          =>
+                                                        [
+                                                            'name'    => $categoryTree[$i]
+                                                        ]
+                                                ];
+
+                                            $categoryTreeParent = $categoryPackage->getByParams($conditions);
+
+                                            if ($categoryTreeParent) {
+                                                $parent = $categoryTreeParent[0]['id'];
+                                                continue;
+                                            } else {
+                                                $newCategoryArr =
+                                                [
+                                                    'name'     => $categoryTree[$i]
+                                                ];
+
+                                                $categoryPackage->addCategory($newCategoryArr);
+                                                $parent = $categoryPackage->packagesData->last['id'];
+                                            }
+                                        } else {
+                                            $conditions =
+                                                [
+                                                    'conditions'    => 'name = :name: AND parent_id = :parent:',
+                                                    'bind'          =>
+                                                        [
+                                                            'name'      => $categoryTree[$i],
+                                                            'parent'    => $parent
+                                                        ]
+                                                ];
+
+                                            $categoryTreeParent = $categoryPackage->getByParams($conditions);
+
+                                            if ($categoryTreeParent) {
+                                                $parent = $categoryTreeParent[0]['id'];
+                                                continue;
+                                            } else {
+                                                $newCategoryArr =
+                                                [
+                                                    'name'      => $categoryTree[$i],
+                                                    'parent_id' => $parent
+                                                ];
+
+                                                $categoryPackage->addCategory($newCategoryArr);
+                                                $parent = $categoryPackage->packagesData->last['id'];
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        die();
+    }
+
     protected function checkEAN($ean)
     {
         $checksumDigit = substr($ean, -1);
@@ -322,12 +413,7 @@ class Products extends BasePackage
         return $barcodes->generateBarcode(
             $ean,
             'EAN13',
-            $settings['defaultGenerator'],
-            $settings['widthFactor'],
-            $settings['height'],
-            $settings['foreground'],
-            $settings['showText'],
-            $settings['defaultTextPlacement']
+            $settings
         );
     }
 }

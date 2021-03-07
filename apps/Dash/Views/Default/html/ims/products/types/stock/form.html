@@ -39,6 +39,7 @@
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% set channelIds = [] %}
                 {{adminltetags.useTag('tabs',
                     [
                         'component'                     : component,
@@ -447,110 +448,6 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-subtitle'                    : { },
-        '{{componentId}}-{{sectionId}}-manufacturer'                : {
-            placeholder : 'SELECT/CREATE MANUFACTURER',
-            'tags'          : true,
-            'ajax'          : {
-                url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
-                dataType    : 'json',
-                method      : 'post',
-                data: function(params) {
-                    return {
-                        search: params.term
-                    }
-                },
-                processResults: function(data) {
-                    if (data.tokenKey && data.token) {
-                        $('#security-token').attr('name', data.tokenKey);
-                        $('#security-token').val(data.token);
-                    }
-                    if (data.vendors) {
-                        var vendorsData = [];
-                        for (var item of data.vendors) {
-                            vendorsData.push({
-                                'id' : item['id'],
-                                'text' : item['name']
-                            });
-                        }
-
-                        return {
-                            results: vendorsData
-                        }
-                    } else {
-                        return {
-                            results : []
-                        }
-                    }
-                },
-                cache: true
-            },
-            minimumInputLength : 2,
-            createTag     : function(params) {
-                var term = $.trim(params.term);
-
-                if (term === '') {
-                    return null;
-                }
-
-                return {
-                    id: term,
-                    text: term,
-                    newTag: true
-                }
-            }
-        },
-        '{{componentId}}-{{sectionId}}-brand'                       : {
-            'placeholder'   : "SELECT/CREATE BRAND",
-            'tags'          : true,
-            'ajax'          : {
-                url         : "{{links.url('ims/brands/searchBrand')}}",
-                dataType    : 'json',
-                method      : 'post',
-                data: function(params) {
-                    return {
-                        search: params.term
-                    }
-                },
-                processResults: function(data) {
-                    if (data.tokenKey && data.token) {
-                        $('#security-token').attr('name', data.tokenKey);
-                        $('#security-token').val(data.token);
-                    }
-                    if (data.brands) {
-                        var brandsData = [];
-                        for (var item of data.brands) {
-                            brandsData.push({
-                                'id' : item['id'],
-                                'text' : item['name']
-                            });
-                        }
-
-                        return {
-                            results: brandsData
-                        }
-                    } else {
-                        return {
-                            results : []
-                        }
-                    }
-                },
-                cache: true
-            },
-            minimumInputLength : 2,
-            createTag     : function(params) {
-                var term = $.trim(params.term);
-
-                if (term === '') {
-                    return null;
-                }
-
-                return {
-                    id: term,
-                    text: term,
-                    newTag: true
-                }
-            }
-        },
         '{{componentId}}-{{sectionId}}-description'                 : { },
         '{{componentId}}-{{sectionId}}-form'                        : {
             rules: {

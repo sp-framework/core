@@ -205,12 +205,12 @@ class TaxonomyComponent extends BaseComponent
                     return;
                 }
 
-                $searchCountries = $this->basepackages->taxonomyPackage->searchCountries($searchQuery);
+                $searchTaxonomy = $this->taxonomyPackage->searchTaxonomy($searchQuery);
 
-                if ($searchCountries) {
-                    $this->view->responseCode = $this->basepackages->taxonomyPackage->packagesData->responseCode;
+                if ($searchTaxonomy) {
+                    $this->view->responseCode = $this->taxonomyPackage->packagesData->responseCode;
 
-                    $this->view->countries = $this->basepackages->taxonomyPackage->packagesData->countries;
+                    $this->view->taxonomy = $this->taxonomyPackage->packagesData->taxonomy;
                 }
             } else {
                 $this->view->responseCode = 1;

@@ -55,8 +55,7 @@ class Products
                 new Column(
                     'code_ean_barcode',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 8192,
+                        'type'    => Column::TYPE_TEXT,
                         'notNull' => false,
                     ]
                 ),
@@ -98,6 +97,14 @@ class Products
                     ]
                 ),
                 new Column(
+                    'category_ids',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 512,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'images',
                     [
                         'type'    => Column::TYPE_TEXT,
@@ -107,8 +114,7 @@ class Products
                 new Column(
                     'downloadables',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
+                        'type'    => Column::TYPE_TEXT,
                         'notNull' => false
                     ]
                 ),
@@ -120,7 +126,7 @@ class Products
                 new Index(
                     'column_UNIQUE',
                     [
-                        'title'
+                        'title', 'code_mpn', 'code_sku', 'code_ean'
                     ],
                     'UNIQUE'
                 )

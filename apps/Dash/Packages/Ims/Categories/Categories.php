@@ -138,18 +138,26 @@ class Categories extends BasePackage
 
     protected function buildHierarchy(array $data)
     {
-        $data['visible_to_role_ids'] = Json::decode($data['visible_to_role_ids'], true);
-        if (isset($data['visible_to_role_ids']['data'])) {
-            $data['visible_to_role_ids'] = Json::encode($data['visible_to_role_ids']['data']);
+        if (isset($data['visible_to_role_ids'])) {
+            $data['visible_to_role_ids'] = Json::decode($data['visible_to_role_ids'], true);
+            if (isset($data['visible_to_role_ids']['data'])) {
+                $data['visible_to_role_ids'] = Json::encode($data['visible_to_role_ids']['data']);
+            } else {
+                $data['visible_to_role_ids'] = Json::encode($data['visible_to_role_ids']);
+            }
         } else {
-            $data['visible_to_role_ids'] = Json::encode($data['visible_to_role_ids']);
+            $data['visible_to_role_ids'] = Json::encode([]);
         }
 
-        $data['visible_on_channel_ids'] = Json::decode($data['visible_on_channel_ids'], true);
-        if (isset($data['visible_on_channel_ids']['data'])) {
-            $data['visible_on_channel_ids'] = Json::encode($data['visible_on_channel_ids']['data']);
+        if (isset($data['visible_on_channel_ids'])) {
+            $data['visible_on_channel_ids'] = Json::decode($data['visible_on_channel_ids'], true);
+            if (isset($data['visible_on_channel_ids']['data'])) {
+                $data['visible_on_channel_ids'] = Json::encode($data['visible_on_channel_ids']['data']);
+            } else {
+                $data['visible_on_channel_ids'] = Json::encode($data['visible_on_channel_ids']);
+            }
         } else {
-            $data['visible_on_channel_ids'] = Json::encode($data['visible_on_channel_ids']);
+            $data['visible_on_channel_ids'] = Json::encode([]);
         }
 
         $categoryId = Str::underscore(strtolower($data['name']));
@@ -159,7 +167,9 @@ class Categories extends BasePackage
             'link'  => '/q/category/' . $data['id']
         ];
 
-        if ($data['parent_id'] != 0) {
+        if (isset($data['parent_id']) &&
+            $data['parent_id'] != 0
+        ) {
             $parent = $this->getById($data['parent_id']);
 
             $parentCategoryId = Str::underscore(strtolower($parent['name']));

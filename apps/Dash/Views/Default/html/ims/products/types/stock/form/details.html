@@ -1,9 +1,11 @@
 {% if product['id'] is defined %}
     {% set productManufacturer = product['manufacturer'] %}
     {% set productBrand = product['brand'] %}
+    {% set productCategoryIds = product['category_ids'] %}
 {% else %}
     {% set productManufacturer = '' %}
     {% set productBrand = '' %}
+    {% set productCategoryIds = [] %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -60,6 +62,741 @@
     </div>
 </div>
 <hr>
-<div class="row vdivide">
-
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'category_channel',
+                'fieldLabel'                           : 'Channel',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select channel for category',
+                'fieldRequired'                        : true,
+                'fieldDataSelect2Create'               : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldDataSelect2Options'              : channels,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'category_source',
+                'fieldLabel'                           : 'Category Source',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select Category Source',
+                'fieldRequired'                        : true,
+                'fieldDisabled'                        : true,
+                'fieldDataSelect2Create'               : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldBazJstreeSearch'                 : true,
+                'fieldDataSelect2Options'              : categorySources,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
 </div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_category_id',
+                'fieldLabel'                     : 'Search Category ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Category ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_category_parent',
+                'fieldLabel'                     : 'Search Category Parent ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Category Parent ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_category',
+                'fieldLabel'                     : 'Search/Create Category',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search/Category. To create a new root category - Enter the category name. To create a new subcategory, enter the new category name /NEW_CATEGORY_NAME<br>Example: RootCategory / Sub Category / Sub Category 2. This will create a new category with name Sub Category 2 with parent as Sub Category.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_taxonomy_id',
+                'fieldLabel'                     : 'Search Taxonomy ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Taxonomy ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_taxonomy_parent',
+                'fieldLabel'                     : 'Search Taxonomy Parent ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Taxonomy Parent ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_taxonomy',
+                'fieldLabel'                     : 'Search Taxonomy',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search eBay Taxonomy',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'add-category'       : [
+                            'title'                   : 'Add',
+                            'disabled'                : true,
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'position'                : 'right'
+                        ],
+                        'cancel-category'    : [
+                            'title'                   : 'Cancel',
+                            'disabled'                : true,
+                            'size'                    : 'xs',
+                            'type'                    : 'secondary',
+                            'icon'                    : 'times',
+                            'position'                : 'right'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'category_ids',
+                'fieldLabel'                     : 'Category IDs',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Category IDs',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {% set channelIds = [] %}
+        {% if channels is defined and channels|length > 0 %}
+            {% for channelKey, channel in channels %}
+                {% set channelIds[componentId ~ '-' ~ sectionId ~ '-channels-' ~ channel['id']] = channel['id'] %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                     : component,
+                                'componentName'                 : componentName,
+                                'componentId'                   : componentId,
+                                'sectionId'                     : sectionId,
+                                'fieldId'                       : 'channels-' ~ channel['id'],
+                                'fieldLabel'                    : channel['name'] ~ ' Categories',
+                                'fieldType'                     : 'html',
+                                'fieldHelp'                     : true,
+                                'fieldHelpTooltipContent'       : channel['name'] ~ ' Note: First category is the list is primary category',
+                                'fieldAdditionalClass'          : 'mb-0',
+                                'fieldRequired'                 : false,
+                                'fieldBazScan'                  : false,
+                                'fieldBazJstreeSearch'          : true,
+                                'fieldBazPostOnCreate'          : false,
+                                'fieldBazPostOnUpdate'          : false
+                            ]
+                        )}}
+                        <ul class="list-group list-group-sortable" data-sortlistchannelid="{{channel['id']}}" id="{{componentId}}-{{sectionId}}-sortable-channels-{{channel['id']}}">
+                            {% if productCategoryIds|length > 0 and productCategoryIds[channel['id']]|length > 0 %}
+                                {% for categoryKey, category in productCategoryIds[channel['id']] %}
+                                    <li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="{{channel['id']}}" data-new="0" data-address-id="{{category['id']}}">
+                                        <div class="row">
+                                            <div class="col">
+                                                <i class="fa fa-sort fa-fw handle"></i>
+                                            </div>
+                                            <div class="col">
+                                                <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 categoryDeleteButton">
+                                                    <i class="fa fas fa-fw text-xs fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col list-group-item-data">
+                                                <dl class="row mb-0">
+                                                    <dt class="text-uppercase mb-0 col-sm-2">Category</dt>
+                                                    <dd class="text-uppercase mb-0 col-sm-10 cla-category">{{category['hierarchy_str']}}</dd>
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <hr>
+            {% endfor %}
+        {% endif %}
+        {% set channelIds = json_encode(channelIds, 16) %}
+    </div>
+</div>
+<script>
+/* globals BazContentFieldsValidator PNotify autoComplete */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-manufacturer'                : {
+            placeholder : 'SELECT/CREATE MANUFACTURER',
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(data) {
+                    if (data.tokenKey && data.token) {
+                        $('#security-token').attr('name', data.tokenKey);
+                        $('#security-token').val(data.token);
+                    }
+                    if (data.vendors) {
+                        var vendorsData = [];
+                        for (var item of data.vendors) {
+                            vendorsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: vendorsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-brand'                       : {
+            'placeholder'   : "SELECT/CREATE BRAND",
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('ims/brands/searchBrand')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(data) {
+                    if (data.tokenKey && data.token) {
+                        $('#security-token').attr('name', data.tokenKey);
+                        $('#security-token').val(data.token);
+                    }
+                    if (data.brands) {
+                        var brandsData = [];
+                        for (var item of data.brands) {
+                            brandsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: brandsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-category_channel'            : {
+            placeholder : 'SELECT CHANNEL'
+        },
+        '{{componentId}}-{{sectionId}}-category_source'             : {
+            placeholder : 'SELECT CATEGORY SOURCE',
+            afterInit : function () {
+                var selectedChannelId, selectedSourceId;
+
+                var channelIds = JSON.parse('{{channelIds}}');
+                dataCollectionSection["data"] = { };
+                dataCollectionSection["data"]["category_ids"] = { };
+
+                $("#{{componentId}}-{{sectionId}}-category_channel").on("select2:select", function(e) {
+                    selectedChannelId = e.params.data.id;
+
+                    if (selectedChannelId != 0) {
+                        $("#{{componentId}}-{{sectionId}}-category_source").attr('disabled', false);
+                    } else {
+                        $("#{{componentId}}-{{sectionId}}-category_source").attr('disabled', true);
+                    }
+
+                    initMainButtons();
+                });
+
+                $("#{{componentId}}-{{sectionId}}-category_source").on("select2:select", function(e) {
+                    selectedSourceId = e.params.data.id;
+
+                    toggleSearchFields(selectedSourceId);
+                });
+
+                function initMainButtons() {
+                    $("#{{componentId}}-{{sectionId}}-cancel-category").off();
+                    $("#{{componentId}}-{{sectionId}}-cancel-category").click(function(e) {
+                        $("#{{componentId}}-{{sectionId}}-category_channel").val(0);
+                        $("#{{componentId}}-{{sectionId}}-category_channel").trigger("change");
+                        $(".categoryDeleteButton").attr("disabled", false);
+                        e.preventDefault();
+                        resetFields();
+                    });
+
+                    $("#{{componentId}}-{{sectionId}}-add-category").off();
+                    $("#{{componentId}}-{{sectionId}}-add-category").click(function(e) {
+                        $("#{{componentId}}-{{sectionId}}-category_channel").val(0);
+                        $("#{{componentId}}-{{sectionId}}-category_channel").trigger("change");
+                        $(".categoryDeleteButton").attr("disabled", false);
+                        e.preventDefault();
+                        extractData();
+                    });
+                }
+
+                function toggleSearchFields(id) {
+                    if (id == 1) {
+                        $("#{{componentId}}-{{sectionId}}-search_category").parents('.form-group').removeClass("d-none");
+                        $("#{{componentId}}-{{sectionId}}-search_category").attr('disabled', false);
+                        $("#{{componentId}}-{{sectionId}}-search_taxonomy").parents('.form-group').addClass("d-none");
+                        $("#{{componentId}}-{{sectionId}}-search_taxonomy").attr('disabled', true);
+                        $("#{{componentId}}-{{sectionId}}-search_taxonomy_id").val('0');
+                        $("#{{componentId}}-{{sectionId}}-search_taxonomy").val('');
+                    } else if (id == 2) {
+                        $("#{{componentId}}-{{sectionId}}-search_taxonomy").parents('.form-group').removeClass("d-none");
+                        $("#{{componentId}}-{{sectionId}}-search_taxonomy").attr('disabled', false);
+                        $("#{{componentId}}-{{sectionId}}-search_category").parents('.form-group').addClass("d-none");
+                        $("#{{componentId}}-{{sectionId}}-search_category").attr('disabled', true);
+                        $("#{{componentId}}-{{sectionId}}-search_category_id").val('0');
+                        $("#{{componentId}}-{{sectionId}}-search_category").val('');
+                    }
+                }
+
+                function resetFields() {
+                    $("#{{componentId}}-{{sectionId}}-category_channel").val(0);
+                    $("#{{componentId}}-{{sectionId}}-category_channel").trigger("change");
+                    $("#{{componentId}}-{{sectionId}}-category_source").val(0);
+                    $("#{{componentId}}-{{sectionId}}-category_source").trigger("change");
+                    $("#{{componentId}}-{{sectionId}}-search_category_id").val('');
+                    $("#{{componentId}}-{{sectionId}}-search_category").val('');
+                    $("#{{componentId}}-{{sectionId}}-search_category_parent").val('');
+                    $("#{{componentId}}-{{sectionId}}-search_taxonomy_id").val('');
+                    $("#{{componentId}}-{{sectionId}}-search_taxonomy").val('');
+                    $("#{{componentId}}-{{sectionId}}-search_taxonomy_parent").val('');
+                    $("#{{componentId}}-{{sectionId}}-search_category").attr('disabled', true);
+                    $("#{{componentId}}-{{sectionId}}-search_category").parents('.form-group').addClass('d-none');
+                    $("#{{componentId}}-{{sectionId}}-search_taxonomy").attr('disabled', true);
+                    $("#{{componentId}}-{{sectionId}}-search_taxonomy").parents('.form-group').addClass('d-none');
+                    $("#{{componentId}}-{{sectionId}}-add-category").attr('disabled', true);
+                    $("#{{componentId}}-{{sectionId}}-cancel-category").attr('disabled', true);
+                }
+
+                function extractData() {
+                    var categoryId, categoryParentId, category, categoryNew;
+                    var found = false;
+
+                    if (selectedSourceId == 1) {
+                        categoryId = $("#{{componentId}}-{{sectionId}}-search_category_id").val();
+                        categoryParentId = $("#{{componentId}}-{{sectionId}}-search_category_parent").val();
+                        category = $("#{{componentId}}-{{sectionId}}-search_category").val();
+                    } else if (selectedSourceId == 2) {
+                        categoryId = $("#{{componentId}}-{{sectionId}}-search_taxonomy_id").val();
+                        categoryParentId = $("#{{componentId}}-{{sectionId}}-search_taxonomy_parent").val();
+                        category = $("#{{componentId}}-{{sectionId}}-search_taxonomy").val();
+                    }
+
+                    var html =
+                        '<div class="mb-0">' +
+                            '<p class="text-uppercase mb-0 cla-category">' + category + '</p>' +
+                        '</div>';
+
+                    if ($("#{{componentId}}-{{sectionId}}-sortable-channels-" + selectedChannelId).length > 0) {
+                        if ($("#{{componentId}}-{{sectionId}}-sortable-channels-" + selectedChannelId + " li").length > 0) {
+                            $("#{{componentId}}-{{sectionId}}-sortable-channels-" + selectedChannelId + " li").each(function(index, li) {
+                                if (categoryId == $(li).data('category-id')) {
+                                    PNotify.error({title: 'Product already assigned to category ' + category});
+                                    found = true;
+                                    resetFields();
+                                    collectData();
+                                    registerCategoryButtons();
+                                }
+                            });
+                        }
+
+                        if (found) {
+                            return;
+                        }
+
+                        if (categoryId == "0") {
+                            categoryId = Date.now();
+                            categoryNew = "1";
+                        } else {
+                            categoryNew = "0";
+                        }
+
+                        var list =
+                            '<li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="' + selectedChannelId +
+                                '" data-new="' + categoryNew + '" data-category-id="' + categoryId + '" data-category-parent-id="' + categoryParentId + '">' +
+                                '<div class="row">' +
+                                    '<div class="col">' +
+                                        '<p class="font-weight-bold text-uppercase">Category:</p>' +
+                                    '</div>' +
+                                    '<div class="col">' +
+                                        '<button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 categoryDeleteButton">' +
+                                            '<i class="fa fas fa-fw text-xs fa-trash"></i>' +
+                                        '</button>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div class="row">' +
+                                    '<div class="col list-group-item-data">' +
+                                        html +
+                                    '</div>' +
+                                '</div>' +
+                            '</li>';
+
+                        $("#{{componentId}}-{{sectionId}}-sortable-channels-" + selectedChannelId).append(list);
+                    }
+
+                    resetFields();
+                    collectData();
+                    registerCategoryButtons();
+                }
+
+                function collectData() {
+                    for (var channelId in channelIds) {
+                        dataCollectionSection["data"]["category_ids"][channelIds[channelId]] = { };
+
+                        if ($("#{{componentId}}-{{sectionId}}-sortable-channels-" + channelIds[channelId] + " li").length > 0) {
+                            $("#{{componentId}}-{{sectionId}}-sortable-channels-" + channelIds[channelId] + " li").each(function(index, li) {
+                                var data = { };
+                                data['category_id'] = $(li).data("category-id");
+                                data['category_parent'] = $(li).data("category-parent-id");
+                                data['category'] = $(li).find('.cla-category').html();
+                                data["new"] = $(li).data("new");
+
+                                dataCollectionSection["data"]["category_ids"][channelIds[channelId]][data['category_id']] = data;
+                            });
+                        }
+                    }
+                }
+
+                function registerCategoryButtons() {
+                    $(".categoryDeleteButton").each(function(index, button) {
+                        $(button).off();
+                        $(button).click(function() {
+                            $(this).parents("li").remove();
+                            collectData();
+                        });
+                    });
+                }
+
+                collectData();
+                registerCategoryButtons();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-search_category'             : { },
+        '{{componentId}}-{{sectionId}}-search_taxonomy'             : {
+            afterInit: function() {
+                var searchUrl;
+
+                $("#{{componentId}}-{{sectionId}}-category_source option").each(function(index, option) {
+                    if ($(option).data('value') && $(option).data('value') == 2) {
+                        searchUrl = $(option).data('url');
+                    }
+                });
+
+                dataCollectionSectionForm['autoCompleteSearchTaxonomy'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = searchUrl;
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-search_taxonomy").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.taxonomy) {
+                                    return data.taxonomy;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["hierarchy_str"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-search_taxonomy",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-search_taxonomy_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-search_taxonomy",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 10,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-search_taxonomy_list")) {
+                                $("#{{componentId}}-{{sectionId}}-search_taxonomy_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-search_taxonomy").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-search_taxonomy_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-search_taxonomy_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').val(feedback.selection.value.parent);
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').attr('value', feedback.selection.value.parent);
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy').blur();
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy').val(feedback.selection.value.hierarchy_str);
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy').attr('value', feedback.selection.value.hierarchy_str);
+                        }
+                    });
+
+                // On delete/Change
+                $('#{{componentId}}-{{sectionId}}-search_taxonomy').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-search_taxonomy_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-search_taxonomy_id').attr('value', 0);
+                    $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').val(0);
+                    $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').attr('value', 0);
+                    if ($('#{{componentId}}-{{sectionId}}-search_taxonomy').val() !== '') {
+                        $('#{{componentId}}-{{sectionId}}-add-category, #{{componentId}}-{{sectionId}}-cancel-category').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-add-category, #{{componentId}}-{{sectionId}}-cancel-category').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-search_taxonomy').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-search_taxonomy_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-category_ids'                : { }
+    });
+</script>

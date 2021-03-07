@@ -207,4 +207,22 @@ class Channels extends BasePackage
             $this->packagesData->responseMessage = 'Error removing Channel.';
         }
     }
+
+    public function getChannelByType($type)
+    {
+        $this->getAll();
+
+        $filter =
+            $this->model->filter(
+                function($channel) use ($type) {
+                    $channel = $channel->toArray();
+
+                    if ($channel['channel_type'] === $type) {
+                        return $channel;
+                    }
+                }
+            );
+
+        return $filter;
+    }
 }

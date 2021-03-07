@@ -202,6 +202,35 @@ class EbayTaxonomy extends BasePackage
         return $arr;
     }
 
+    public function searchTaxonomy(string $taxonomy)
+    {
+        $searchTaxonomy =
+            $this->getByParams(
+                [
+                    'conditions'    => 'hierarchy_str LIKE :aTaxonomy:',
+                    'bind'          => [
+                        'aTaxonomy'     => '%' . $taxonomy . '%'
+                    ]
+                ]
+            );
+
+        if ($searchTaxonomy) {
+            $taxonomyArr = [];
+
+            foreach ($searchTaxonomy as $taxonomyKey => $taxonomy) {
+                $taxonomyArr[$taxonomyKey]['id'] = $taxonomy['id'];
+                $taxonomyArr[$taxonomyKey]['hierarchy_str'] = $taxonomy['hierarchy_str'];
+                $taxonomyArr[$taxonomyKey]['parent'] = $taxonomy['parent'];
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->taxonomy = $taxonomyArr;
+
+            return true;
+        }
+    }
+
     public function isEnabled()
     {
         $searchEnabledTaxonomy =

@@ -3,10 +3,12 @@
 namespace Apps\Dash\Components\Ims\Products;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Dash\Packages\Business\Channels\Channels;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Apps\Dash\Packages\Ims\Categories\Categories;
 use Apps\Dash\Packages\Ims\Products\Products;
+use Apps\Dash\Packages\System\Api\Ebay\Taxonomy\EbayTaxonomy;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -31,7 +33,10 @@ class ProductsComponent extends BaseComponent
 
             $this->view->manufacturers = $this->usePackage(Vendors::class)->getAllManufacturers();
 
-            // $this->view->categories = $this->usePackage(Categories::class)->getAllCategories();
+            $channelsEshopArr = $this->usePackage(Channels::class)->getChannelByType('eshop');
+            $channelsPosArr = $this->usePackage(Channels::class)->getChannelByType('pos');
+
+            $this->view->channels = array_merge($channelsEshopArr, $channelsPosArr);
 
             if ($this->getData()['id'] != 0) {
 
@@ -82,6 +87,31 @@ class ProductsComponent extends BaseComponent
 
                 $this->view->product = [];
             }
+
+            $categorySources = [];
+            if ($this->checkPackage(Categories::class)) {
+                $categorySources['categories'] =
+                    [
+                        'id'    => 1,
+                        'name'  => 'Categories',
+                        'data'  =>
+                        [
+                            'url'   => $this->links->url('/ims/categories/searchCategory')
+                        ]
+                    ];
+            }
+            if ($this->checkPackage(EbayTaxonomy::class)) {
+                $categorySources['ebay_taxonomy'] =
+                    [
+                        'id'    => 2,
+                        'name'  => 'eBay Taxonomy',
+                        'data'  =>
+                        [
+                            'url'   => $this->links->url('/system/api/ebay/taxonomy/searchtaxonomy')
+                        ]
+                    ];
+            }
+            $this->view->categorySources = $categorySources;
 
             //Check Geo Locations Dependencies
             if ($this->basepackages->geoCountries->isEnabled()) {
