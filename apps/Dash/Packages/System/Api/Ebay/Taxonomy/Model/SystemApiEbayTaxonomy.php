@@ -20,7 +20,7 @@ class SystemApiEbayTaxonomy extends BaseModel
 
     public $root_id;
 
-    public $parent;
+    public $parent_id;
 
     public $has_childs;
 

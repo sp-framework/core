@@ -136,7 +136,7 @@ class EbayTaxonomy extends BasePackage
                 'installed'         => 0,
                 'enabled'           => 0,
                 'root_id'           => $rootId,
-                'parent'            => $parent,
+                'parent_id'         => $parent,
                 'product_count'     => 0,
                 'taxonomy_version'  => $version
             ];
@@ -150,8 +150,8 @@ class EbayTaxonomy extends BasePackage
             'title' => $data['name'],
         ];
 
-        if ($data['parent'] != 0) {
-            $parent = $this->getById($data['parent']);
+        if ($data['parent_id'] != 0) {
+            $parent = $this->getById($data['parent_id']);
 
             $parentCategoryId = Str::underscore(strtolower($parent['name']));
             $parentCategory = Json::decode($parent['hierarchy'], true);
@@ -207,20 +207,21 @@ class EbayTaxonomy extends BasePackage
         $searchTaxonomy =
             $this->getByParams(
                 [
-                    'conditions'    => 'hierarchy_str LIKE :aTaxonomy:',
+                    'conditions'    => 'hierarchy_str LIKE :aTaxonomy: AND enabled = :enabled:',
                     'bind'          => [
-                        'aTaxonomy'     => '%' . $taxonomy . '%'
+                        'aTaxonomy'     => '%' . $taxonomy . '%',
+                        'enabled'       => 1
                     ]
                 ]
             );
 
-        if ($searchTaxonomy) {
+        if ($searchTaxonomy && is_array($searchTaxonomy) && count($searchTaxonomy) > 0) {
             $taxonomyArr = [];
 
             foreach ($searchTaxonomy as $taxonomyKey => $taxonomy) {
                 $taxonomyArr[$taxonomyKey]['id'] = $taxonomy['id'];
                 $taxonomyArr[$taxonomyKey]['hierarchy_str'] = $taxonomy['hierarchy_str'];
-                $taxonomyArr[$taxonomyKey]['parent'] = $taxonomy['parent'];
+                $taxonomyArr[$taxonomyKey]['parent_id'] = $taxonomy['parent_id'];
             }
 
             $this->packagesData->responseCode = 0;

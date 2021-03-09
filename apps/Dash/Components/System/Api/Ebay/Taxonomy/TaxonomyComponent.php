@@ -34,7 +34,6 @@ class TaxonomyComponent extends BaseComponent
 
             return false;
         }
-
         $rootIdsArr =
             $this->taxonomyPackage->getByParams([
                 'conditions'    => 'root_id = :id:',
@@ -46,7 +45,7 @@ class TaxonomyComponent extends BaseComponent
 
         $rootIds = [];
 
-        if (count($rootIdsArr) > 0) {
+        if ($rootIdsArr && count($rootIdsArr) > 0) {
             foreach ($rootIdsArr as $rootId) {
                 array_push($rootIds, (int) $rootId['id']);
             }

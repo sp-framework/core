@@ -66,7 +66,7 @@ class SystemApiEbayTaxonomy
                     ]
                 ),
                 new Column(
-                    'parent',
+                    'parent_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'notNull' => false,
