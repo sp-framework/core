@@ -244,7 +244,7 @@ class VendorsComponent extends BaseComponent
             if ($this->postData()['search']) {
                 $searchQuery = $this->postData()['search'];
 
-                if (strlen($searchQuery) < 3) {
+                if (strlen($searchQuery) < 1) {
                     return;
                 }
 
