@@ -260,4 +260,30 @@ class Vendors extends BasePackage
             return true;
         }
     }
+
+    public function addProductCount(int $id)
+    {
+        $vendor = $this->getById($id);
+
+        if ($vendor['product_count'] && $vendor['product_count'] != '') {
+            $vendor['product_count'] = (int) $vendor['product_count'] + 1;
+        } else {
+            $vendor['product_count'] = 1;
+        }
+
+        $this->update($vendor);
+    }
+
+    public function removeProductCount(int $id)
+    {
+        $vendor = $this->getById($id);
+
+        if ($vendor['product_count'] && $vendor['product_count'] != '') {
+            $vendor['product_count'] = (int) $vendor['product_count'] - 1;
+        } else {
+            $vendor['product_count'] = 0;
+        }
+
+        $this->update($vendor);
+    }
 }

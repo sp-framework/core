@@ -74,6 +74,13 @@ class Vendors
                     ]
                 ),
                 new Column(
+                    'product_count',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'contact_ids',
                     [
                         'type'    => Column::TYPE_VARCHAR,
