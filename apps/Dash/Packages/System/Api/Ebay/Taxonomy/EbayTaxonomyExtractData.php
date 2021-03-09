@@ -198,7 +198,7 @@ class EbayTaxonomyExtractData extends BasePackage
                 'installed'         => 0,
                 'enabled'           => 0,
                 'root_id'           => 0,
-                'parent'            => 0,
+                'parent_id'         => 0,
                 'product_count'     => 0,
                 'has_childs'        => $hasChilds,
                 'taxonomy_version'  => $this->taxonomyVersion

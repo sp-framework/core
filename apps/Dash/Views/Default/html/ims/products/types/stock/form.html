@@ -121,7 +121,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-product_type'                : { },
         '{{componentId}}-{{sectionId}}-code_mpn'                    : {
             afterInit   : function() {
-                var found = 0;
+                var found = false;
 
                 dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeMPN'] =
                     new autoComplete({
@@ -150,11 +150,16 @@ dataCollectionSection =
                                     $('#security-token').attr('name', data.tokenKey);
                                     $('#security-token').val(data.token);
                                 }
+
                                 if (data.products) {
-                                    found = data.products.length;
+                                    $(data.products).each(function(index, product) {
+                                        if (product == $('#{{componentId}}-{{sectionId}}-code_mpn').val()) {
+                                            found = true;
+                                        }
+                                    });
                                     return data.products;
                                 } else {
-                                    found = 0;
+                                    found = false;
                                     return [];
                                 }
                             },
@@ -180,7 +185,11 @@ dataCollectionSection =
                         highlight: true,
                         resultItem: {
                             content: (data, source) => {
-                                source.innerHTML = data.match + ' - <span class="text-danger">MPN already exists.</span>';
+                                if (data.value.code_mpn == $('#{{componentId}}-{{sectionId}}-code_mpn').val()) {
+                                    source.innerHTML = data.match + ' - <span class="text-danger">MPN already exists.</span>';
+                                } else {
+                                    source.innerHTML = data.match;
+                                }
                             },
                             element: "div"
                         },
@@ -193,7 +202,7 @@ dataCollectionSection =
                     });
 
                 $('#{{componentId}}-{{sectionId}}-code_mpn').focusout(function() {
-                    if (found > 0) {
+                    if (found) {
                         $('#{{componentId}}-{{sectionId}}-code_mpn').val('');
                         $('#{{componentId}}-{{sectionId}}-code_mpn').attr('value', '');
                     }
@@ -203,7 +212,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-code_sku'                    : {
             afterInit   : function() {
-                var found = 0;
+                var found = false;
 
                 dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeSKU'] =
                     new autoComplete({
@@ -232,11 +241,16 @@ dataCollectionSection =
                                     $('#security-token').attr('name', data.tokenKey);
                                     $('#security-token').val(data.token);
                                 }
+
                                 if (data.products) {
-                                    found = data.products.length;
+                                    $(data.products).each(function(index, product) {
+                                        if (product == $('#{{componentId}}-{{sectionId}}-code_sku').val()) {
+                                            found = true;
+                                        }
+                                    });
                                     return data.products;
                                 } else {
-                                    found = 0;
+                                    found = false;
                                     return [];
                                 }
                             },
@@ -262,7 +276,11 @@ dataCollectionSection =
                         highlight: true,
                         resultItem: {
                             content: (data, source) => {
-                                source.innerHTML = data.match + ' - <span class="text-danger">SKU already exists.</span>';
+                                if (data.value.code_sku == $('#{{componentId}}-{{sectionId}}-code_sku').val()) {
+                                    source.innerHTML = data.match + ' - <span class="text-danger">SKU already exists.</span>';
+                                } else {
+                                    source.innerHTML = data.match;
+                                }
                             },
                             element: "div"
                         },
@@ -275,7 +293,7 @@ dataCollectionSection =
                     });
 
                 $('#{{componentId}}-{{sectionId}}-code_sku').focusout(function() {
-                    if (found > 0) {
+                    if (found) {
                         $('#{{componentId}}-{{sectionId}}-code_sku').val('');
                         $('#{{componentId}}-{{sectionId}}-code_sku').attr('value', '');
                     }
@@ -285,7 +303,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-code_ean'                    : {
             afterInit   : function() {
-                var found = 0;
+                var found = false;
 
                 dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeEAN'] =
                     new autoComplete({
@@ -314,11 +332,16 @@ dataCollectionSection =
                                     $('#security-token').attr('name', data.tokenKey);
                                     $('#security-token').val(data.token);
                                 }
+
                                 if (data.products) {
-                                    found = data.products.length;
+                                    $(data.products).each(function(index, product) {
+                                        if (product == $('#{{componentId}}-{{sectionId}}-code_ean').val()) {
+                                            found = true;
+                                        }
+                                    });
                                     return data.products;
                                 } else {
-                                    found = 0;
+                                    found = false;
                                     return [];
                                 }
                             },
@@ -344,7 +367,11 @@ dataCollectionSection =
                         highlight: true,
                         resultItem: {
                             content: (data, source) => {
-                                source.innerHTML = data.match + ' - <span class="text-danger">EAN/UPC already exists.</span>';
+                                if (data.value.code_sku == $('#{{componentId}}-{{sectionId}}-code_ean').val()) {
+                                    source.innerHTML = data.match + ' - <span class="text-danger">EAN/UPC already exists.</span>';
+                                } else {
+                                    source.innerHTML = data.match;
+                                }
                             },
                             element: "div"
                         },
@@ -357,7 +384,7 @@ dataCollectionSection =
                     });
 
                 $('#{{componentId}}-{{sectionId}}-code_ean').focusout(function() {
-                    if (found > 0) {
+                    if (found) {
                         $('#{{componentId}}-{{sectionId}}-code_ean').val('');
                         $('#{{componentId}}-{{sectionId}}-code_ean').attr('value', '');
                     }
@@ -397,10 +424,14 @@ dataCollectionSection =
                                     $('#security-token').val(data.token);
                                 }
                                 if (data.products) {
-                                    found = data.products.length;
+                                    $(data.products).each(function(index, product) {
+                                        if (product == $('#{{componentId}}-{{sectionId}}-title').val()) {
+                                            found = true;
+                                        }
+                                    });
                                     return data.products;
                                 } else {
-                                    found = 0;
+                                    found = false;
                                     return [];
                                 }
                             },
@@ -426,7 +457,11 @@ dataCollectionSection =
                         highlight: true,
                         resultItem: {
                             content: (data, source) => {
-                                source.innerHTML = data.match + ' - <span class="text-danger">Title already exists.</span>';
+                                if (data.value.title == $('#{{componentId}}-{{sectionId}}-title').val()) {
+                                    source.innerHTML = data.match + ' - <span class="text-danger">Title already exists.</span>';
+                                } else {
+                                    source.innerHTML = data.match;
+                                }
                             },
                             element: "div"
                         },
@@ -439,7 +474,7 @@ dataCollectionSection =
                     });
 
                 $('#{{componentId}}-{{sectionId}}-title').focusout(function() {
-                    if (found > 0) {
+                    if (found) {
                         $('#{{componentId}}-{{sectionId}}-title').val('');
                         $('#{{componentId}}-{{sectionId}}-title').attr('value', '');
                     }

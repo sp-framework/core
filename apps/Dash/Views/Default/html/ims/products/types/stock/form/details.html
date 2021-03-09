@@ -80,7 +80,6 @@
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : false,
                 'fieldBazPostOnUpdate'                 : false,
-                'fieldBazJstreeSearch'                 : true,
                 'fieldDataSelect2Options'              : channels,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'name',
@@ -107,7 +106,6 @@
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : false,
                 'fieldBazPostOnUpdate'                 : false,
-                'fieldBazJstreeSearch'                 : true,
                 'fieldDataSelect2Options'              : categorySources,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'name',
@@ -331,10 +329,10 @@
                         <ul class="list-group list-group-sortable" data-sortlistchannelid="{{channel['id']}}" id="{{componentId}}-{{sectionId}}-sortable-channels-{{channel['id']}}">
                             {% if productCategoryIds|length > 0 and productCategoryIds[channel['id']]|length > 0 %}
                                 {% for categoryKey, category in productCategoryIds[channel['id']] %}
-                                    <li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="{{channel['id']}}" data-new="0" data-address-id="{{category['id']}}">
+                                    <li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="{{channel['id']}}" data-category-parent-id="{{category['parent_id']}}" data-category-id="{{category['id']}}">
                                         <div class="row">
                                             <div class="col">
-                                                <i class="fa fa-sort fa-fw handle"></i>
+                                                <p class="font-weight-bold text-uppercase">Category:</p>
                                             </div>
                                             <div class="col">
                                                 <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 categoryDeleteButton">
@@ -344,10 +342,9 @@
                                         </div>
                                         <div class="row">
                                             <div class="col list-group-item-data">
-                                                <dl class="row mb-0">
-                                                    <dt class="text-uppercase mb-0 col-sm-2">Category</dt>
-                                                    <dd class="text-uppercase mb-0 col-sm-10 cla-category">{{category['hierarchy_str']}}</dd>
-                                                </dl>
+                                                <div class="mb-0">
+                                                    <p class="text-uppercase mb-0 cla-category">{{category['hierarchy_str']}}</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </li>
@@ -582,7 +579,7 @@ dataCollectionSection =
                 }
 
                 function extractData() {
-                    var categoryId, categoryParentId, category, categoryNew;
+                    var categoryId, categoryParentId, category;
                     var found = false;
 
                     if (selectedSourceId == 1) {
@@ -619,14 +616,11 @@ dataCollectionSection =
 
                         if (categoryId == "0") {
                             categoryId = Date.now();
-                            categoryNew = "1";
-                        } else {
-                            categoryNew = "0";
                         }
 
                         var list =
                             '<li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="' + selectedChannelId +
-                                '" data-new="' + categoryNew + '" data-category-id="' + categoryId + '" data-category-parent-id="' + categoryParentId + '">' +
+                                '" data-category-id="' + categoryId + '" data-category-parent-id="' + categoryParentId + '">' +
                                 '<div class="row">' +
                                     '<div class="col">' +
                                         '<p class="font-weight-bold text-uppercase">Category:</p>' +
@@ -659,10 +653,10 @@ dataCollectionSection =
                         if ($("#{{componentId}}-{{sectionId}}-sortable-channels-" + channelIds[channelId] + " li").length > 0) {
                             $("#{{componentId}}-{{sectionId}}-sortable-channels-" + channelIds[channelId] + " li").each(function(index, li) {
                                 var data = { };
+
                                 data['category_id'] = $(li).data("category-id");
                                 data['category_parent'] = $(li).data("category-parent-id");
                                 data['category'] = $(li).find('.cla-category').html();
-                                data["new"] = $(li).data("new");
 
                                 dataCollectionSection["data"]["category_ids"][channelIds[channelId]][data['category_id']] = data;
                             });
@@ -684,7 +678,118 @@ dataCollectionSection =
                 registerCategoryButtons();
             }
         },
-        '{{componentId}}-{{sectionId}}-search_category'             : { },
+        '{{componentId}}-{{sectionId}}-search_category'             : {
+            afterInit: function() {
+                var searchUrl;
+
+                $("#{{componentId}}-{{sectionId}}-category_source option").each(function(index, option) {
+                    if ($(option).data('value') && $(option).data('value') == 1) {
+                        searchUrl = $(option).data('url');
+                    }
+                });
+
+                dataCollectionSectionForm['autoCompleteSearchCategory'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = searchUrl;
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-search_category").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const response = await fetch(url, requestOptions);
+
+                                const data = await response.json();
+
+                                if (data.tokenKey && data.token) {
+                                    $('#security-token').attr('name', data.tokenKey);
+                                    $('#security-token').val(data.token);
+                                }
+                                if (data.categories) {
+                                    return data.categories;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["hierarchy_str"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-search_category",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-search_category_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-search_category",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 10,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-search_category_list")) {
+                                $("#{{componentId}}-{{sectionId}}-search_category_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-search_category").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-search_category_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-search_category_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-search_category_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-search_category_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-search_category_parent').val(feedback.selection.value.parent_id);
+                            $('#{{componentId}}-{{sectionId}}-search_category_parent').attr('value', feedback.selection.value.parent_id);
+                            $('#{{componentId}}-{{sectionId}}-search_category').blur();
+                            $('#{{componentId}}-{{sectionId}}-search_category').val(feedback.selection.value.hierarchy_str);
+                            $('#{{componentId}}-{{sectionId}}-search_category').attr('value', feedback.selection.value.hierarchy_str);
+                        }
+                    });
+
+                // On delete/Change
+                $('#{{componentId}}-{{sectionId}}-search_category').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-search_category_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-search_category_id').attr('value', 0);
+                    $('#{{componentId}}-{{sectionId}}-search_category_parent').val(0);
+                    $('#{{componentId}}-{{sectionId}}-search_category_parent').attr('value', 0);
+                    if ($('#{{componentId}}-{{sectionId}}-search_category').val() !== '') {
+                        $('#{{componentId}}-{{sectionId}}-add-category, #{{componentId}}-{{sectionId}}-cancel-category').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-add-category, #{{componentId}}-{{sectionId}}-cancel-category').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-search_category').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-search_category_list').children('li').remove();
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-search_taxonomy'             : {
             afterInit: function() {
                 var searchUrl;
@@ -771,8 +876,8 @@ dataCollectionSection =
                         onSelection: feedback => {
                             $('#{{componentId}}-{{sectionId}}-search_taxonomy_id').val(feedback.selection.value.id);
                             $('#{{componentId}}-{{sectionId}}-search_taxonomy_id').attr('value', feedback.selection.value.id);
-                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').val(feedback.selection.value.parent);
-                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').attr('value', feedback.selection.value.parent);
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').val(feedback.selection.value.parent_id);
+                            $('#{{componentId}}-{{sectionId}}-search_taxonomy_parent').attr('value', feedback.selection.value.parent_id);
                             $('#{{componentId}}-{{sectionId}}-search_taxonomy').blur();
                             $('#{{componentId}}-{{sectionId}}-search_taxonomy').val(feedback.selection.value.hierarchy_str);
                             $('#{{componentId}}-{{sectionId}}-search_taxonomy').attr('value', feedback.selection.value.hierarchy_str);
