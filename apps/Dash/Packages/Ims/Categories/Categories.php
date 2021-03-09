@@ -19,7 +19,7 @@ class Categories extends BasePackage
 
     public function addCategory(array $data)
     {
-        if (!ctype_alnum(trim(str_replace(' ', '' , $data['name'])))) {
+        if (!ctype_alnum(trim(str_replace([' ', '&amp;', '&', ',', ':', ';'], '' , $data['name'])))) {
 
             $this->packagesData->responseCode = 1;
 
@@ -61,7 +61,7 @@ class Categories extends BasePackage
 
     public function updateCategory(array $data)
     {
-        if (!ctype_alnum(trim(str_replace(' ', '' , $data['name'])))) {
+        if (!ctype_alnum(trim(str_replace([' ', '&amp;', '&'], '' , $data['name'])))) {
 
             $this->packagesData->responseCode = 1;
 
@@ -223,12 +223,18 @@ class Categories extends BasePackage
         return $arr;
     }
 
-    public function searchCategories(string $categoryQueryString)
+    public function searchCategories(string $categoryQueryString, $hierarchy = true)
     {
+        if ($hierarchy) {
+            $conditions = 'hierarchy_str LIKE :cName: AND hierarchy_level <= :cHierarchyLevel:';
+        } else {
+            $conditions = 'name LIKE :cName: AND hierarchy_level <= :cHierarchyLevel:';
+        }
+
         $searchCategories =
             $this->getByParams(
                 [
-                    'conditions'    => 'name LIKE :cName: AND hierarchy_level < :cHierarchyLevel:',
+                    'conditions'    => $conditions,
                     'bind'          => [
                         'cName'                 => '%' . $categoryQueryString . '%',
                         'cHierarchyLevel'       => self::MAX_HIERARCHY_LEVEL
@@ -236,12 +242,13 @@ class Categories extends BasePackage
                 ]
             );
 
-        if (count($searchCategories) > 0) {
+        if ($searchCategories && is_array($searchCategories) && count($searchCategories) > 0) {
             $categories = [];
 
-            foreach ($searchCategories as $employeeKey => $employeeValue) {
-                $categories[$employeeKey]['id'] = $employeeValue['id'];
-                $categories[$employeeKey]['hierarchy_str'] = $employeeValue['hierarchy_str'];
+            foreach ($searchCategories as $categoryKey => $categoryValue) {
+                $categories[$categoryKey]['id'] = $categoryValue['id'];
+                $categories[$categoryKey]['hierarchy_str'] = $categoryValue['hierarchy_str'];
+                $categories[$categoryKey]['parent_id'] = $categoryValue['parent_id'];
             }
 
             $this->packagesData->responseCode = 0;
@@ -250,5 +257,50 @@ class Categories extends BasePackage
 
             return true;
         }
+    }
+
+    public function searchByHierarchyString(string $hierarchyStr)
+    {
+        $searchCategories =
+            $this->getByParams(
+                [
+                    'conditions'    => 'hierarchy_str = :hierarchyStr:',
+                    'bind'          => [
+                        'hierarchyStr'  => $hierarchyStr
+                    ]
+                ]
+            );
+
+        if ($searchCategories && is_array($searchCategories) && count($searchCategories) > 0) {
+            return $searchCategories[0];
+        }
+
+        return false;
+    }
+
+    public function addProductCount(int $id)
+    {
+        $category = $this->getById($id);
+
+        if ($category['product_count'] && $category['product_count'] != '') {
+            $category['product_count'] = (int) $category['product_count'] + 1;
+        } else {
+            $category['product_count'] = 1;
+        }
+
+        $this->update($category);
+    }
+
+    public function removeProductCount(int $id)
+    {
+        $category = $this->getById($id);
+
+        if ($category['product_count'] && $category['product_count'] != '') {
+            $category['product_count'] = (int) $category['product_count'] - 1;
+        } else {
+            $category['product_count'] = 0;
+        }
+
+        $this->update($category);
     }
 }
