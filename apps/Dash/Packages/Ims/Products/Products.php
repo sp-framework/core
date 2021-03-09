@@ -18,6 +18,148 @@ class Products extends BasePackage
 
     public $products;
 
+    protected $brandsPackage;
+
+    protected $categoriesPackage;
+
+    protected $manufacturersPackage;
+
+    protected function initPackages()
+    {
+        $this->brandsPackage = $this->usePackage(Brands::class);
+
+        $this->categoriesPackage = $this->usePackage(Categories::class);
+
+        $this->manufacturersPackage = $this->usePackage(Vendors::class);
+    }
+
+    protected function processAddUpdateData(array $data)
+    {
+        $this->initPackages();
+
+        $data = $this->addBrand($data);
+
+        $data = $this->addManufacturer($data);
+
+        $data = $this->addCategory($data);
+
+        return $data;
+    }
+
+    protected function updateProductCount(array $data = null, array $oldData = null)
+    {
+        if ($data && !$oldData) {
+            if ($data['brand'] !== '') {
+                $this->brandsPackage->addProductCount($data['brand']);
+            }
+
+            if ($data['manufacturer'] !== '') {
+                $this->manufacturersPackage->addProductCount($data['manufacturer']);
+            }
+
+            if ($data['category_ids'] !== '') {
+                $addProductCountArr = [];
+                $categoriesIds = Json::decode($data['category_ids'], true);
+                foreach ($categoriesIds as $channelKey => $channel) {
+                    if (count($channel) > 0) {
+                        foreach ($channel as $categoryKey => $category) {
+                            if (!in_array($category, $addProductCountArr)) {
+                                array_push($addProductCountArr, $category);
+                            }
+                        }
+                    }
+                }
+                if (count($addProductCountArr) > 0) {
+                    foreach ($addProductCountArr as $addCount) {
+                        $this->categoriesPackage->addProductCount($addCount);
+                    }
+                }
+            }
+        } else if ($data && $oldData) {
+            if ($data['category_ids'] !== '') {
+                $addProductCountArr = [];
+                $categoriesIds = Json::decode($data['category_ids'], true);
+                foreach ($categoriesIds as $channelKey => $channel) {
+                    if (count($channel) > 0) {
+                        foreach ($channel as $categoryKey => $category) {
+                            if (!in_array($category, $addProductCountArr)) {
+                                array_push($addProductCountArr, $category);
+                            }
+                        }
+                    }
+                }
+                if (count($addProductCountArr) > 0) {
+                    foreach ($addProductCountArr as $addCount) {
+                        $this->categoriesPackage->addProductCount($addCount);
+                    }
+                }
+            }
+            if ($oldData['category_ids'] !== '') {
+                $removeProductCountArr = [];
+                $categoriesIds = Json::decode($oldData['category_ids'], true);
+                foreach ($categoriesIds as $channelKey => $channel) {
+                    if (count($channel) > 0) {
+                        foreach ($channel as $categoryKey => $category) {
+                            if (!in_array($category, $removeProductCountArr)) {
+                                array_push($removeProductCountArr, $category);
+                            }
+                        }
+                    }
+                }
+
+                if (count($removeProductCountArr) > 0) {
+                    foreach ($removeProductCountArr as $removeCount) {
+                        $this->categoriesPackage->removeProductCount($removeCount);
+                    }
+                }
+            }
+
+            if ($data['brand'] !== '') {
+                $this->brandsPackage->addProductCount($data['brand']);
+            }
+            if ($oldData['brand'] !== '') {
+                $this->brandsPackage->removeProductCount($oldData['brand']);
+            }
+
+            if ($data['manufacturer'] !== '') {
+                $this->manufacturersPackage->addProductCount($data['manufacturer']);
+            }
+            if ($oldData['manufacturer'] !== '') {
+                $this->manufacturersPackage->removeProductCount($oldData['manufacturer']);
+            }
+        } else if (!$data && $oldData) {
+            if ($oldData['category_ids'] !== '') {
+                $removeProductCountArr = [];
+                $categoriesIds = Json::decode($oldData['category_ids'], true);
+                foreach ($categoriesIds as $channelKey => $channel) {
+                    if (count($channel) > 0) {
+                        foreach ($channel as $categoryKey => $category) {
+                            if (!in_array($category, $removeProductCountArr)) {
+                                array_push($removeProductCountArr, $category);
+                            }
+                        }
+                    }
+                }
+
+                if (count($removeProductCountArr) > 0) {
+                    foreach ($removeProductCountArr as $removeCount) {
+                        $this->categoriesPackage->removeProductCount($removeCount);
+                    }
+                }
+            }
+
+            if ($oldData['brand'] !== '') {
+                $this->brandsPackage->removeProductCount($oldData['brand']);
+            }
+
+            if ($oldData['manufacturer'] !== '') {
+                $this->manufacturersPackage->removeProductCount($oldData['manufacturer']);
+            }
+        }
+
+        return;
+    }
+
     public function addProduct(array $data)
     {
         if ($data['code_ean'] !== '') {
@@ -30,11 +172,7 @@ class Products extends BasePackage
             }
         }
 
-        $data = $this->addBrand($data);
-
-        $data = $this->addManufacturer($data);
-
-        $data = $this->addCategory($data);
+        $data = $this->processAddUpdateData($data);
 
         $add = $this->add($data);
 
@@ -56,6 +194,8 @@ class Products extends BasePackage
 
             $this->update($data);
 
+            $this->updateProductCount($data);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['title'] . ' product';
@@ -68,11 +208,17 @@ class Products extends BasePackage
 
     public function updateProduct(array $data)
     {
-        $data = $this->addBrand($data);
+        if ($data['code_ean'] !== '') {
+            if (!$this->checkEAN($data['code_ean'])) {
+                $this->packagesData->responseCode = 1;
 
-        $data = $this->addManufacturer($data);
+                $this->packagesData->responseMessage = 'UPC is incorrect!';
 
-        $data = $this->addCategory($data);
+                return;
+            }
+        }
+
+        $data = $this->processAddUpdateData($data);
 
         $product = $this->getById($data['id']);
 
@@ -92,6 +238,8 @@ class Products extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['downloadables'], $product['downloadables'], true);
             }
 
+            $this->updateProductCount($data, $product);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['title'] . ' product';
@@ -104,17 +252,14 @@ class Products extends BasePackage
 
     public function removeProduct(array $data)
     {
-        // $product = $this->getById($data['id']);
+        $this->initPackages();
 
-        // if ($product['product_count'] && (int) $product['product_count'] > 0) {
-        //     $this->packagesData->responseCode = 1;
+        $product = $this->getById($data['id']);
 
-        //     $this->packagesData->responseMessage = 'Product is assigned to ' . $product['product_count'] . ' products. Error removing product.';
+        if ($this->remove($product['id'])) {
 
-        //     return false;
-        // }
+            $this->updateProductCount(null, $product);
 
-        if ($this->remove($data['id'])) {
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Removed product';
@@ -238,18 +383,16 @@ class Products extends BasePackage
 
     protected function addBrand(array $data)
     {
-        $brands = $this->usePackage(Brands::class);
-
         $data['brand'] = Json::decode($data['brand'], true);
 
         if (isset($data['brand']['newTags']) &&
             count($data['brand']['newTags']) > 0
         ) {
             foreach ($data['brand']['newTags'] as $brand) {
-                $newBrand = $brands->add(['name' => $brand]);
+                $newBrand = $this->brandsPackage->add(['name' => $brand]);
 
                 if ($newBrand) {
-                    $data['brand'] = $brands->packagesData->last['id'];
+                    $data['brand'] = $this->brandsPackage->packagesData->last['id'];
                 } else {
                     $data['brand'] = 0;
                 }
@@ -263,15 +406,13 @@ class Products extends BasePackage
 
     protected function addManufacturer(array $data)
     {
-        $manufacturers = $this->usePackage(Vendors::class);
-
         $data['manufacturer'] = Json::decode($data['manufacturer'], true);
 
         if (isset($data['manufacturer']['newTags']) &&
             count($data['manufacturer']['newTags']) > 0
         ) {
             foreach ($data['manufacturer']['newTags'] as $manufacturer) {
-                $newManufacturer = $manufacturers->add(
+                $newManufacturer = $this->manufacturersPackage->add(
                     [
                         'name'              => $manufacturer,
                         'is_manufacturer'   => '1',
@@ -279,7 +420,7 @@ class Products extends BasePackage
                     ]
                 );
                 if ($newManufacturer) {
-                    $data['manufacturer'] = $manufacturers->packagesData->last['id'];
+                    $data['manufacturer'] = $this->manufacturersPackage->packagesData->last['id'];
                 } else {
                     $data['manufacturer'] = 0;
                 }
@@ -293,88 +434,98 @@ class Products extends BasePackage
 
     protected function addCategory($data)
     {
-        $categoryPackage = $this->usePackage(Categories::class);
-
         if ($data['category_ids'] !== '') {
-            $data['category_ids'] = Json::decode($data['category_ids'], true);
+            $categoryIds = Json::decode($data['category_ids'], true);
 
-            if (count($data['category_ids']) > 0) {
-                foreach ($data['category_ids'] as $channelKey => $channel) {
+            $data['category_ids'] = [];
+            if (count($categoryIds) > 0) {
+                foreach ($categoryIds as $channelKey => $channel) {
+                    $data['category_ids'][$channelKey] = [];
                     if (count($channel) > 0) {
                         foreach ($channel as $categoryKey => $category) {
-                            try {
-                                $categoryArr = $categoryPackage->getById($category['category_id']);
-                            } catch (\Exception $e) {
-                                if ($e->getMessage() === 'Not Found') {
-                                    $categoryTree = explode('/', $category['category']);
+                            $categoryById = $this->categoriesPackage->getById($category['category_id']);
+                            $categoryByHStr = $this->categoriesPackage->searchByHierarchyString($category['category']);
 
-                                    foreach ($categoryTree as &$value) {
-                                        $value = trim($value);
-                                    }
+                            if (($categoryById && $categoryByHStr) &&
+                                ($categoryById['id'] === $categoryByHStr['id'])
+                            ) {
+                                array_push($data['category_ids'][$channelKey], $categoryById['id']);
+                            } else if (!$categoryById && $categoryByHStr) {
+                                array_push($data['category_ids'][$channelKey], $categoryByHStr['id']);
+                            } else {
+                                $categoryTree = explode('/', $category['category']);
+                                foreach ($categoryTree as &$value) {
+                                    $value = trim($value);
+                                }
 
-                                    $parent = null;
+                                $newCategoryId = null;
 
-                                    for ($i = 0; $i < count($categoryTree); $i++) {
-                                        if (!$parent) {
-                                            $conditions =
-                                                [
-                                                    'conditions'    => 'name = :name:',
-                                                    'bind'          =>
-                                                        [
-                                                            'name'    => $categoryTree[$i]
-                                                        ]
-                                                ];
+                                for ($i = 0; $i < count($categoryTree); $i++) {
+                                    if (!$newCategoryId) {
+                                        $conditions =
+                                            [
+                                                'conditions'    => 'name = :name:',
+                                                'bind'          =>
+                                                    [
+                                                        'name'    => $categoryTree[$i]
+                                                    ]
+                                            ];
 
-                                            $categoryTreeParent = $categoryPackage->getByParams($conditions);
+                                        $categoryTreeParent = $this->categoriesPackage->getByParams($conditions);
 
-                                            if ($categoryTreeParent) {
-                                                $parent = $categoryTreeParent[0]['id'];
-                                                continue;
-                                            } else {
-                                                $newCategoryArr =
-                                                [
-                                                    'name'     => $categoryTree[$i]
-                                                ];
-
-                                                $categoryPackage->addCategory($newCategoryArr);
-                                                $parent = $categoryPackage->packagesData->last['id'];
-                                            }
+                                        if ($categoryTreeParent) {
+                                            $newCategoryId = $categoryTreeParent[0]['id'];
                                         } else {
-                                            $conditions =
-                                                [
-                                                    'conditions'    => 'name = :name: AND parent_id = :parent:',
-                                                    'bind'          =>
-                                                        [
-                                                            'name'      => $categoryTree[$i],
-                                                            'parent'    => $parent
-                                                        ]
-                                                ];
+                                            $newCategoryArr =
+                                            [
+                                                'name'     => $categoryTree[$i]
+                                            ];
 
-                                            $categoryTreeParent = $categoryPackage->getByParams($conditions);
+                                            $this->categoriesPackage->addCategory($newCategoryArr);
 
-                                            if ($categoryTreeParent) {
-                                                $parent = $categoryTreeParent[0]['id'];
-                                                continue;
-                                            } else {
-                                                $newCategoryArr =
-                                                [
-                                                    'name'      => $categoryTree[$i],
-                                                    'parent_id' => $parent
-                                                ];
+                                            if ($this->categoriesPackage->packagesData->responseCode === 0) {
+                                                $newCategoryId = $this->categoriesPackage->packagesData->last['id'];
+                                            }
+                                        }
+                                    } else {
+                                        $conditions =
+                                            [
+                                                'conditions'    => 'name = :name: AND parent_id = :parent:',
+                                                'bind'          =>
+                                                    [
+                                                        'name'          => $categoryTree[$i],
+                                                        'parent'        => $newCategoryId
+                                                    ]
+                                            ];
+                                        $categoryTreeParent = $this->categoriesPackage->getByParams($conditions);
 
-                                                $categoryPackage->addCategory($newCategoryArr);
-                                                $parent = $categoryPackage->packagesData->last['id'];
+                                        if ($categoryTreeParent) {
+                                            $newCategoryId = $categoryTreeParent[0]['id'];
+                                        } else {
+                                            $newCategoryArr =
+                                            [
+                                                'name'      => $categoryTree[$i],
+                                                'parent_id' => $newCategoryId
+                                            ];
+
+                                            $this->categoriesPackage->addCategory($newCategoryArr);
+
+                                            if ($this->categoriesPackage->packagesData->responseCode === 0) {
+                                                $newCategoryId = $this->categoriesPackage->packagesData->last['id'];
                                             }
                                         }
                                     }
                                 }
+                                array_push($data['category_ids'][$channelKey], $newCategoryId);
                             }
                         }
                     }
                 }
             }
+            $data['category_ids'] = Json::encode($data['category_ids']);
         }
-        die();
+
+        return $data;
     }
 
     protected function checkEAN($ean)

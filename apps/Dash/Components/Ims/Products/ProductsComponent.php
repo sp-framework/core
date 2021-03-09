@@ -38,6 +38,34 @@ class ProductsComponent extends BaseComponent
 
             $this->view->channels = array_merge($channelsEshopArr, $channelsPosArr);
 
+            $categorySources = [];
+
+            $this->categoriesPackage = $this->usePackage(Categories::class);
+
+            $categorySources['categories'] =
+                [
+                    'id'    => 1,
+                    'name'  => 'Categories',
+                    'data'  =>
+                    [
+                        'url'   => $this->links->url('/ims/categories/searchCategory')
+                    ]
+                ];
+
+            if ($this->checkPackage(EbayTaxonomy::class)) {
+                $categorySources['ebay_taxonomy'] =
+                    [
+                        'id'    => 2,
+                        'name'  => 'eBay Taxonomy',
+                        'data'  =>
+                        [
+                            'url'   => $this->links->url('/system/api/ebay/taxonomy/searchtaxonomy')
+                        ]
+                    ];
+            }
+
+            $this->view->categorySources = $categorySources;
+
             if ($this->getData()['id'] != 0) {
 
                 $product = $this->products->getById($this->getData()['id']);
@@ -80,6 +108,18 @@ class ProductsComponent extends BaseComponent
                     $product['downloadables'] = $attachments;
                 }
 
+                if ($product['category_ids']) {
+                    $product['category_ids'] = Json::decode($product['category_ids'], true);
+
+                    foreach ($product['category_ids'] as $channelKey => &$channel) {
+                        if (count($channel) > 0) {
+                            foreach ($channel as $categoryKey => &$category) {
+                                $category = $this->categoriesPackage->getById($category);
+                            }
+                        }
+                    }
+                }
+
                 $this->view->product = $product;
 
             } else {
@@ -87,31 +127,6 @@ class ProductsComponent extends BaseComponent
 
                 $this->view->product = [];
             }
-
-            $categorySources = [];
-            if ($this->checkPackage(Categories::class)) {
-                $categorySources['categories'] =
-                    [
-                        'id'    => 1,
-                        'name'  => 'Categories',
-                        'data'  =>
-                        [
-                            'url'   => $this->links->url('/ims/categories/searchCategory')
-                        ]
-                    ];
-            }
-            if ($this->checkPackage(EbayTaxonomy::class)) {
-                $categorySources['ebay_taxonomy'] =
-                    [
-                        'id'    => 2,
-                        'name'  => 'eBay Taxonomy',
-                        'data'  =>
-                        [
-                            'url'   => $this->links->url('/system/api/ebay/taxonomy/searchtaxonomy')
-                        ]
-                    ];
-            }
-            $this->view->categorySources = $categorySources;
 
             //Check Geo Locations Dependencies
             if ($this->basepackages->geoCountries->isEnabled()) {
@@ -160,11 +175,11 @@ class ProductsComponent extends BaseComponent
             $this->products,
             'ims/products/view',
             null,
-            ['title'],
+            ['code_mpn', 'title'],
             true,
-            ['title'],
+            ['code_mpn', 'title'],
             $controlActions,
-            [],
+            ['code_mpn' => 'mpn'],
             $replaceColumns,
             'title'
         );
