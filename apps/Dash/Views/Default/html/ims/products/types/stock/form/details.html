@@ -813,16 +813,20 @@ dataCollectionSection =
                 function extractData() {
                     var specificationGroupId, specificationGroupName, specificationId, specificationName, specificationValue;
                     var found = false;
+                    var newSpecificationGroup = 0;
+                    var newSpecification = 0;
 
                     specificationGroupId = $("#{{componentId}}-{{sectionId}}-specification_group_id").val();
                     specificationGroupName = $("#{{componentId}}-{{sectionId}}-specification_group").val();
                     if (specificationGroupId == 0) {
                         specificationGroupId = BazHelpers.md5(specificationGroupName);
+                        newSpecificationGroup = 1;
                     }
                     specificationId = $("#{{componentId}}-{{sectionId}}-specification_id").val();
                     specificationName = $("#{{componentId}}-{{sectionId}}-specification").val();
                     if (specificationId == 0) {
                         specificationId = BazHelpers.md5(specificationName);
+                        newSpecification = 1;
                     }
                     specificationValue = $("#{{componentId}}-{{sectionId}}-specification_value").val();
 
@@ -834,7 +838,7 @@ dataCollectionSection =
                                 ' data-bazscantype="html" class="" id="{{componentId}}-{{sectionId}}-specifications-' + specificationGroupId + '">' +
                                 '</div>' +
                             '</div>' +
-                            '<ul class="list-group list-group-sortable" data-listspecificationsgroupid="' + specificationGroupId + '" data-listspecificationsgroupname="' + specificationGroupName + '" id="{{componentId}}-{{sectionId}}-sortable-specifications-' + specificationGroupId + '"></ul>'
+                            '<ul class="list-group list-group-sortable" data-newSpecificationGroup="' + newSpecificationGroup + '" data-listspecificationsgroupid="' + specificationGroupId + '" data-listspecificationsgroupname="' + specificationGroupName + '" id="{{componentId}}-{{sectionId}}-sortable-specifications-' + specificationGroupId + '"></ul><hr>'
                         );
                         initSortable('{{componentId}}-{{sectionId}}-sortable-specifications-' + specificationGroupId, specificationGroupId);
                     }
@@ -866,6 +870,7 @@ dataCollectionSection =
 
                         var list =
                             '<li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" ' +
+                                'data-newSpecification="' + newSpecification + '" ' +
                                 'data-listspecificationsgroupid="' + specificationGroupId + '" ' +
                                 'data-listspecificationsgroupname="' + specificationGroupName + '" data-specification-id="' + specificationId + '">' +
                                 '<div class="row">' +
@@ -904,25 +909,34 @@ dataCollectionSection =
 
                 function collectData() {
                     var specificationGroupId, specificationGroupName, specificationId, specificationName, specificationValue;
+                    var newSpecificationGroup, newSpecification;
+
+                    dataCollectionSection["data"]["specifications"] = { };
+
                     var data = dataCollectionSection["data"]["specifications"];
 
                     $(".specifications ul").each(function(index, ul) {
                         specificationGroupId = $(ul).data('listspecificationsgroupid');
                         specificationGroupName = $(ul).data('listspecificationsgroupname');
+                        newSpecificationGroup = $(ul).data('newspecificationgroup');
 
                         data[specificationGroupId] = { };
                         data[specificationGroupId]["specifications"] = { };
                         data[specificationGroupId]["group_id"] = specificationGroupId;
                         data[specificationGroupId]["group"] = specificationGroupName;
+                        data[specificationGroupId]["new"] = newSpecificationGroup;
 
                         $("#{{componentId}}-{{sectionId}}-sortable-specifications-" + specificationGroupId + " li").each(function(index, li) {
                             specificationId = $(li).data('specification-id');
                             specificationName = $($(li).children(".row")[1]).find('dt')[0].innerHTML;
                             specificationValue = $($(li).children(".row")[1]).find('dd')[0].innerHTML;
+                            newSpecification = $(li).data('newspecification');
+
                             data[specificationGroupId]['specifications'][specificationId] = { };
                             data[specificationGroupId]['specifications'][specificationId]["specification_id"] = specificationId;
                             data[specificationGroupId]['specifications'][specificationId]["specification"] = specificationName;
                             data[specificationGroupId]['specifications'][specificationId]["specification_value"] = specificationValue;
+                            data[specificationGroupId]['specifications'][specificationId]["new"] = newSpecification;
                         });
 
                         $(dataCollectionSection["{{componentId}}-{{sectionId}}-form"]["sortable"][specificationGroupId].toArray()).each(function(index, specId) {
@@ -963,7 +977,8 @@ dataCollectionSection =
                             $(this).parents("li").remove();
 
                             if ($(ul).find('li').length === 0) {
-                                $(ul).parents(".form-group")[0].remove();
+                                $(ul).siblings(".form-group")[0].remove();
+                                $(ul).remove();
                             }
 
                             collectData();
