@@ -108,13 +108,29 @@ class ProductsComponent extends BaseComponent
                     $product['downloadables'] = $attachments;
                 }
 
-                if ($product['category_ids']) {
+                if ($product['category_ids'] && $product['category_ids'] !== '') {
                     $product['category_ids'] = Json::decode($product['category_ids'], true);
 
                     foreach ($product['category_ids'] as $channelKey => &$channel) {
                         if (count($channel) > 0) {
                             foreach ($channel as $categoryKey => &$category) {
                                 $category = $this->categoriesPackage->getById($category);
+                            }
+                        }
+                    }
+                }
+
+                if ($product['specifications'] && $product['specifications'] !== '') {
+                    $product['specifications'] = Json::decode($product['specifications'], true);
+                    foreach ($product['specifications'] as $groupKey => &$group) {
+                        foreach ($group as $specificationsKey => &$specifications) {
+                            if (is_array($specifications)) {
+                                $specifications = msort($specifications, 'sort');
+
+                                foreach ($specifications as $specificationKey => $specification) {
+                                    $specifications[$specification['specification_id']] = $specification;
+                                    unset($specifications[$specificationKey]);
+                                }
                             }
                         }
                     }
