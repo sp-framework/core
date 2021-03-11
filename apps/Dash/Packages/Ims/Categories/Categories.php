@@ -19,12 +19,12 @@ class Categories extends BasePackage
 
     public function addCategory(array $data)
     {
-        if (!ctype_alnum(trim(str_replace([' ', '&amp;', '&', ',', ':', ';'], '' , $data['name'])))) {
+        if (!checkCtype($data['name'])) {
 
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage =
-                'Category name cannot special characters';
+                'Category name cannot have special characters';
 
             return false;
 
@@ -61,12 +61,12 @@ class Categories extends BasePackage
 
     public function updateCategory(array $data)
     {
-        if (!ctype_alnum(trim(str_replace([' ', '&amp;', '&'], '' , $data['name'])))) {
+        if (!checkCtype($data['name'])) {
 
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage =
-                'Category name cannot special characters';
+                'Category name cannot have special characters';
 
             return false;
 

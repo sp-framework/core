@@ -16,35 +16,57 @@ class Brands extends BasePackage
 
     public function addBrand(array $data)
     {
-        if ($this->add($data)) {
+        if (!checkCtype($data['name'])) {
 
-            $this->basepackages->storages->changeOrphanStatus($data['logo']);
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' brand';
-        } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error adding new brand.';
+            $this->packagesData->responseMessage =
+                'Brand name cannot have special characters';
+
+            return false;
+
+        } else {
+            if ($this->add($data)) {
+
+                $this->basepackages->storages->changeOrphanStatus($data['logo']);
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' brand';
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error adding new brand.';
+            }
         }
     }
 
     public function updateBrand(array $data)
     {
-        $brand = $this->getById($data['id']);
+        if (!checkCtype($data['name'])) {
 
-        if ($this->update($data)) {
-
-            $this->basepackages->storages->changeOrphanStatus($data['logo'], $brand['logo']);
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' brand';
-        } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error updating brand.';
+            $this->packagesData->responseMessage =
+                'Brand name cannot have special characters';
+
+            return false;
+
+        } else {
+            $brand = $this->getById($data['id']);
+
+            if ($this->update($data)) {
+
+                $this->basepackages->storages->changeOrphanStatus($data['logo'], $brand['logo']);
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' brand';
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error updating brand.';
+            }
         }
     }
 

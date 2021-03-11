@@ -67,6 +67,22 @@ if (!function_exists('xmlToArray')) {
     }
 }
 
+if (!function_exists('checkCtype')) {
+    function checkCtype($str, $ctype = 'alum', $ignoreChars = null) {
+        if (!$ignoreChars) {
+            $ignoreChars = [' ', '&amp;', '&', ',', ':', ';'];
+        }
+
+        if ($ctype === 'alum') {
+            return ctype_alnum(trim(str_replace($ignoreChars, '' , $str)));
+        } else if ($ctype === 'alpha') {
+            return ctype_alpha(trim(str_replace($ignoreChars, '' , $str)));
+        } else if ($ctype === 'digits') {
+            return ctype_digit(trim(str_replace($ignoreChars, '' , $str)));
+        }
+    }
+}
+
 if (!function_exists('msort')) {
     function msort($array, $key, $sort_flags = SORT_REGULAR, $order = SORT_ASC) {
         if (is_array($array) && count($array) > 0) {

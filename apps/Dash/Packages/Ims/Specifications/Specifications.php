@@ -16,11 +16,12 @@ class Specifications extends BasePackage
 
     public function addSpecification(array $data)
     {
-        if (!ctype_alnum(trim(str_replace(' ', '' , $data['name'])))) {
+        if (!checkCtype($data['name'])) {
 
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Specification name cannot special characters';
+            $this->packagesData->responseMessage =
+                'Specification name cannot have special characters';
 
             return false;
 
@@ -46,11 +47,12 @@ class Specifications extends BasePackage
 
     public function updateSpecification(array $data)
     {
-        if (!ctype_alnum(trim(str_replace(' ', '' , $data['name'])))) {
+        if (!checkCtype($data['name'])) {
 
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Specification name cannot special characters';
+            $this->packagesData->responseMessage =
+                'Specification name cannot have special characters';
 
             return false;
 
