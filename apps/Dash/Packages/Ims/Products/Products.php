@@ -80,7 +80,43 @@ class Products extends BasePackage
                     }
                 }
             }
+
+            if ($data['specifications'] !== '') {
+                $addProductCountArr = [];
+                $specificationsIds = Json::decode($data['specifications'], true);
+
+                foreach ($specificationsIds as $specificationGroupKey => $specificationGroup) {
+                    array_push($addProductCountArr, $specificationGroupKey);
+                    if ($specificationGroup['specifications'] &&
+                        count($specificationGroup['specifications']) > 0
+                    ) {
+                        foreach ($specificationGroup['specifications'] as $specificationKey => $specification) {
+                            array_push($addProductCountArr, $specificationKey);
+                        }
+                    }
+                }
+
+                if (count($addProductCountArr) > 0) {
+                    foreach ($addProductCountArr as $addCount) {
+                        $this->specificationsPackage->addProductCount($addCount);
+                    }
+                }
+            }
         } else if ($data && $oldData) {
+            if ($data['brand'] !== '' && $data['brand'] != '0') {
+                $this->brandsPackage->addProductCount($data['brand']);
+            }
+            if ($oldData['brand'] !== '' && $oldData['brand'] != '0') {
+                $this->brandsPackage->removeProductCount($oldData['brand']);
+            }
+
+            if ($data['manufacturer'] !== '' && $data['manufacturer'] != '0') {
+                $this->manufacturersPackage->addProductCount($data['manufacturer']);
+            }
+            if ($oldData['manufacturer'] !== '' && $oldData['manufacturer'] != '0') {
+                $this->manufacturersPackage->removeProductCount($oldData['manufacturer']);
+            }
+
             if ($data['category_ids'] !== '') {
                 $addProductCountArr = [];
                 $categoriesIds = Json::decode($data['category_ids'], true);
@@ -93,6 +129,7 @@ class Products extends BasePackage
                         }
                     }
                 }
+
                 if (count($addProductCountArr) > 0) {
                     foreach ($addProductCountArr as $addCount) {
                         $this->categoriesPackage->addProductCount($addCount);
@@ -119,20 +156,57 @@ class Products extends BasePackage
                 }
             }
 
-            if ($data['brand'] !== '' && $data['brand'] != '0') {
-                $this->brandsPackage->addProductCount($data['brand']);
+            if ($data['specifications'] !== '') {
+                $addProductCountArr = [];
+                $specificationsIds = Json::decode($data['specifications'], true);
+
+                foreach ($specificationsIds as $specificationGroupKey => $specificationGroup) {
+                    array_push($addProductCountArr, $specificationGroupKey);
+                    if ($specificationGroup['specifications'] &&
+                        count($specificationGroup['specifications']) > 0
+                    ) {
+                        foreach ($specificationGroup['specifications'] as $specificationKey => $specification) {
+                            array_push($addProductCountArr, $specificationKey);
+                        }
+                    }
+                }
+
+                if (count($addProductCountArr) > 0) {
+                    foreach ($addProductCountArr as $addCount) {
+                        $this->specificationsPackage->addProductCount($addCount);
+                    }
+                }
             }
+            if ($data['specifications'] !== '') {
+                $removeProductCountArr = [];
+                $specificationsIds = Json::decode($data['specifications'], true);
+
+                foreach ($specificationsIds as $specificationGroupKey => $specificationGroup) {
+                    array_push($removeProductCountArr, $specificationGroupKey);
+                    if ($specificationGroup['specifications'] &&
+                        count($specificationGroup['specifications']) > 0
+                    ) {
+                        foreach ($specificationGroup['specifications'] as $specificationKey => $specification) {
+                            array_push($removeProductCountArr, $specificationKey);
+                        }
+                    }
+                }
+
+                if (count($removeProductCountArr) > 0) {
+                    foreach ($removeProductCountArr as $removeCount) {
+                        $this->specificationsPackage->removeProductCount($removeCount);
+                    }
+                }
+            }
+        } else if (!$data && $oldData) {
             if ($oldData['brand'] !== '' && $oldData['brand'] != '0') {
                 $this->brandsPackage->removeProductCount($oldData['brand']);
             }
 
-            if ($data['manufacturer'] !== '' && $data['manufacturer'] != '0') {
-                $this->manufacturersPackage->addProductCount($data['manufacturer']);
-            }
             if ($oldData['manufacturer'] !== '' && $oldData['manufacturer'] != '0') {
                 $this->manufacturersPackage->removeProductCount($oldData['manufacturer']);
             }
-        } else if (!$data && $oldData) {
+
             if ($oldData['category_ids'] !== '') {
                 $removeProductCountArr = [];
                 $categoriesIds = Json::decode($oldData['category_ids'], true);
@@ -153,12 +227,26 @@ class Products extends BasePackage
                 }
             }
 
-            if ($oldData['brand'] !== '' && $oldData['brand'] != '0') {
-                $this->brandsPackage->removeProductCount($oldData['brand']);
-            }
+            if ($oldData['specifications'] !== '') {
+                $removeProductCountArr = [];
+                $specificationsIds = Json::decode($oldData['specifications'], true);
 
-            if ($oldData['manufacturer'] !== '' && $oldData['manufacturer'] != '0') {
-                $this->manufacturersPackage->removeProductCount($oldData['manufacturer']);
+                foreach ($specificationsIds as $specificationGroupKey => $specificationGroup) {
+                    array_push($removeProductCountArr, $specificationGroupKey);
+                    if ($specificationGroup['specifications'] &&
+                        count($specificationGroup['specifications']) > 0
+                    ) {
+                        foreach ($specificationGroup['specifications'] as $specificationKey => $specification) {
+                            array_push($removeProductCountArr, $specificationKey);
+                        }
+                    }
+                }
+
+                if (count($removeProductCountArr) > 0) {
+                    foreach ($removeProductCountArr as $removeCount) {
+                        $this->specificationsPackage->removeProductCount($removeCount);
+                    }
+                }
             }
         }
 
@@ -557,28 +645,65 @@ class Products extends BasePackage
 
     protected function addSpecification(array $data)
     {
-        // $data['specifications'] = Json::decode($data['specifications'], true);
+        $data['specifications'] = Json::decode($data['specifications'], true);
 
-        // if (isset($data['specifications']['newTags']) &&
-        //     count($data['specifications']['newTags']) > 0
-        // ) {
-        //     foreach ($data['specifications']['newTags'] as $specification) {
-        //         $newManufacturer = $this->specificationsPackage->add(
-        //             [
-        //                 'name'              => $specification,
-        //                 'is_specification'   => '1',
+        if (is_array($data['specifications']) && count($data['specifications']) > 0) {
+            foreach ($data['specifications'] as $groupKey => $group) {
+                if (isset($group['new']) && $group['new'] == 1) {
+                    $newGroup = $this->specificationsPackage->add(
+                        [
+                            'name'          => $group['group'],
+                            'is_group'      => 1,
+                            'group_id'      => 0,
+                            'product_count' => 0
+                        ]
+                    );
 
-        //             ]
-        //         );
-        //         if ($newManufacturer) {
-        //             $data['specifications'] = $this->specificationsPackage->packagesData->last['id'];
-        //         } else {
-        //             $data['specifications'] = 0;
-        //         }
-        //     }
-        // } else {
-        //     $data['specifications'] = $data['specifications']['data'][0];
-        // }
+                    if ($newGroup) {
+                        $newGroupId = $this->specificationsPackage->packagesData->last['id'];
+
+                        $data['specifications'][$newGroupId] = $group;
+                        $data['specifications'][$newGroupId]['group_id'] = $newGroupId;
+
+                        unset($data['specifications'][$newGroupId]['new']);
+                        unset($data['specifications'][$groupKey]);
+
+                        $groupId = $newGroupId;
+                    }
+                } else {
+                    $groupId = $groupKey;
+                }
+
+                if (is_array($group)) {
+                    foreach ($group['specifications'] as $specificationKey => $specification) {
+                        if (isset($specification['new']) && $specification['new'] == 1) {
+                            $newSpecification = $this->specificationsPackage->add(
+                                [
+                                    'name'          => $specification['specification'],
+                                    'is_group'      => 0,
+                                    'group_id'      => $groupId,
+                                    'product_count' => 0
+                                ]
+                            );
+
+                            if ($newSpecification) {
+                                $newSpecificationId = $this->specificationsPackage->packagesData->last['id'];
+
+                                $data['specifications'][$groupId]['specifications'][$newSpecificationId] = $specification;
+                                $data['specifications'][$groupId]['specifications'][$newSpecificationId]['specification_id']
+                                    = $newSpecificationId;
+
+                                unset($data['specifications'][$groupId]['specifications'][$newSpecificationId]['new']);
+                                unset($data['specifications'][$groupId]['specifications'][$specificationKey]);
+                            }
+                        }
+                    }
+                }
+            }
+            $data['specifications'] = Json::encode($data['specifications']);
+        } else {
+            $data['specifications'] = Json::encode($data['specifications']);
+        }
 
         return $data;
     }

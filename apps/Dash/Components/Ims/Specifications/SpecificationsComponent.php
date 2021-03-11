@@ -205,7 +205,7 @@ class SpecificationsComponent extends BaseComponent
                     $searchSpecifications = $this->specifications->searchSpecifications($searchQuery, false, $this->postData()['group_id']);
                 }
 
-                if ($searchSpecifications) {
+                if (isset($searchSpecifications)) {
                     $this->view->responseCode = $this->specifications->packagesData->responseCode;
 
                     $this->view->specifications = $this->specifications->packagesData->specifications;
