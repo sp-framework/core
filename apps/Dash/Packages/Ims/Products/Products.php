@@ -6,6 +6,7 @@ use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Apps\Dash\Packages\Ims\Categories\Categories;
 use Apps\Dash\Packages\Ims\Products\Model\ImsProducts;
+use Apps\Dash\Packages\Ims\Specifications\Specifications;
 use Apps\Dash\Packages\System\Tools\Barcodes\Barcodes;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -28,9 +29,11 @@ class Products extends BasePackage
     {
         $this->brandsPackage = $this->usePackage(Brands::class);
 
+        $this->manufacturersPackage = $this->usePackage(Vendors::class);
+
         $this->categoriesPackage = $this->usePackage(Categories::class);
 
-        $this->manufacturersPackage = $this->usePackage(Vendors::class);
+        $this->specificationsPackage = $this->usePackage(Specifications::class);
     }
 
     protected function processAddUpdateData(array $data)
@@ -43,17 +46,19 @@ class Products extends BasePackage
 
         $data = $this->addCategory($data);
 
+        $data = $this->addSpecification($data);
+
         return $data;
     }
 
     protected function updateProductCount(array $data = null, array $oldData = null)
     {
         if ($data && !$oldData) {
-            if ($data['brand'] !== '') {
+            if ($data['brand'] !== '' && $data['brand'] != '0') {
                 $this->brandsPackage->addProductCount($data['brand']);
             }
 
-            if ($data['manufacturer'] !== '') {
+            if ($data['manufacturer'] !== '' && $data['manufacturer'] != '0') {
                 $this->manufacturersPackage->addProductCount($data['manufacturer']);
             }
 
@@ -114,17 +119,17 @@ class Products extends BasePackage
                 }
             }
 
-            if ($data['brand'] !== '') {
+            if ($data['brand'] !== '' && $data['brand'] != '0') {
                 $this->brandsPackage->addProductCount($data['brand']);
             }
-            if ($oldData['brand'] !== '') {
+            if ($oldData['brand'] !== '' && $oldData['brand'] != '0') {
                 $this->brandsPackage->removeProductCount($oldData['brand']);
             }
 
-            if ($data['manufacturer'] !== '') {
+            if ($data['manufacturer'] !== '' && $data['manufacturer'] != '0') {
                 $this->manufacturersPackage->addProductCount($data['manufacturer']);
             }
-            if ($oldData['manufacturer'] !== '') {
+            if ($oldData['manufacturer'] !== '' && $oldData['manufacturer'] != '0') {
                 $this->manufacturersPackage->removeProductCount($oldData['manufacturer']);
             }
         } else if (!$data && $oldData) {
@@ -148,11 +153,11 @@ class Products extends BasePackage
                 }
             }
 
-            if ($oldData['brand'] !== '') {
+            if ($oldData['brand'] !== '' && $oldData['brand'] != '0') {
                 $this->brandsPackage->removeProductCount($oldData['brand']);
             }
 
-            if ($oldData['manufacturer'] !== '') {
+            if ($oldData['manufacturer'] !== '' && $oldData['manufacturer'] != '0') {
                 $this->manufacturersPackage->removeProductCount($oldData['manufacturer']);
             }
         }
@@ -162,91 +167,113 @@ class Products extends BasePackage
 
     public function addProduct(array $data)
     {
-        if ($data['code_ean'] !== '') {
-            if (!$this->checkEAN($data['code_ean'])) {
-                $this->packagesData->responseCode = 1;
+        if (!checkCtype($data['title'])) {
 
-                $this->packagesData->responseMessage = 'UPC is incorrect!';
-
-                return;
-            }
-        }
-
-        $data = $this->processAddUpdateData($data);
-
-        $add = $this->add($data);
-
-        if ($add) {
-            if ($data['images'] !== '') {
-                $this->basepackages->storages->changeOrphanStatus($data['images'], null, true);
-            }
-
-            if ($data['downloadables'] !== '') {
-                $this->basepackages->storages->changeOrphanStatus($data['downloadables'], null, true);
-            }
-
-            $data = $this->packagesData->last;
-
-            if ($data['code_ean'] === '') {
-                $data['code_ean'] = $this->generateEAN($data['id']);
-                $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
-            }
-
-            $this->update($data);
-
-            $this->updateProductCount($data);
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['title'] . ' product';
-        } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error adding new product.';
+            $this->packagesData->responseMessage =
+                'Product title cannot have special characters';
+
+            return false;
+
+        } else {
+            if ($data['code_ean'] !== '') {
+                if (!$this->checkEAN($data['code_ean'])) {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'UPC is incorrect!';
+
+                    return;
+                }
+            }
+
+            $data = $this->processAddUpdateData($data);
+
+            $add = $this->add($data);
+
+            if ($add) {
+                if ($data['images'] !== '') {
+                    $this->basepackages->storages->changeOrphanStatus($data['images'], null, true);
+                }
+
+                if ($data['downloadables'] !== '') {
+                    $this->basepackages->storages->changeOrphanStatus($data['downloadables'], null, true);
+                }
+
+                $data = $this->packagesData->last;
+
+                if ($data['code_ean'] === '') {
+                    $data['code_ean'] = $this->generateEAN($data['id']);
+                    $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
+                }
+
+                $this->update($data);
+
+                $this->updateProductCount($data);
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Added ' . $data['title'] . ' product';
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error adding new product.';
+            }
         }
     }
 
     public function updateProduct(array $data)
     {
-        if ($data['code_ean'] !== '') {
-            if (!$this->checkEAN($data['code_ean'])) {
-                $this->packagesData->responseCode = 1;
+        if (!checkCtype($data['title'])) {
 
-                $this->packagesData->responseMessage = 'UPC is incorrect!';
-
-                return;
-            }
-        }
-
-        $data = $this->processAddUpdateData($data);
-
-        $product = $this->getById($data['id']);
-
-        if ($data['code_ean'] === '') {
-            $data['code_ean'] = $this->generateEAN($data['id']);
-            $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
-        } else if (!$product['code_ean_barcode']) {
-            $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
-        }
-
-        if ($this->update($data)) {
-            if ($data['images'] !== '') {
-                $this->basepackages->storages->changeOrphanStatus($data['images'], $product['images'], true);
-            }
-
-            if ($data['downloadables'] !== '') {
-                $this->basepackages->storages->changeOrphanStatus($data['downloadables'], $product['downloadables'], true);
-            }
-
-            $this->updateProductCount($data, $product);
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['title'] . ' product';
-        } else {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Error updating product.';
+            $this->packagesData->responseMessage =
+                'Product title cannot have special characters';
+
+            return false;
+
+        } else {
+            if ($data['code_ean'] !== '') {
+                if (!$this->checkEAN($data['code_ean'])) {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'UPC is incorrect!';
+
+                    return;
+                }
+            }
+
+            $data = $this->processAddUpdateData($data);
+
+            $product = $this->getById($data['id']);
+
+            if ($data['code_ean'] === '') {
+                $data['code_ean'] = $this->generateEAN($data['id']);
+                $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
+            } else if (!$product['code_ean_barcode']) {
+                $data['code_ean_barcode'] = $this->generateEANBarcode($data['code_ean']);
+            }
+
+            if ($this->update($data)) {
+                if ($data['images'] !== '') {
+                    $this->basepackages->storages->changeOrphanStatus($data['images'], $product['images'], true);
+                }
+
+                if ($data['downloadables'] !== '') {
+                    $this->basepackages->storages->changeOrphanStatus($data['downloadables'], $product['downloadables'], true);
+                }
+
+                $this->updateProductCount($data, $product);
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Updated ' . $data['title'] . ' product';
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error updating product.';
+            }
         }
     }
 
@@ -524,6 +551,34 @@ class Products extends BasePackage
             }
             $data['category_ids'] = Json::encode($data['category_ids']);
         }
+
+        return $data;
+    }
+
+    protected function addSpecification(array $data)
+    {
+        // $data['specifications'] = Json::decode($data['specifications'], true);
+
+        // if (isset($data['specifications']['newTags']) &&
+        //     count($data['specifications']['newTags']) > 0
+        // ) {
+        //     foreach ($data['specifications']['newTags'] as $specification) {
+        //         $newManufacturer = $this->specificationsPackage->add(
+        //             [
+        //                 'name'              => $specification,
+        //                 'is_specification'   => '1',
+
+        //             ]
+        //         );
+        //         if ($newManufacturer) {
+        //             $data['specifications'] = $this->specificationsPackage->packagesData->last['id'];
+        //         } else {
+        //             $data['specifications'] = 0;
+        //         }
+        //     }
+        // } else {
+        //     $data['specifications'] = $data['specifications']['data'][0];
+        // }
 
         return $data;
     }

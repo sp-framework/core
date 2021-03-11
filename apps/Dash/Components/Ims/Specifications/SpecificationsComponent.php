@@ -181,4 +181,40 @@ class SpecificationsComponent extends BaseComponent
             $this->view->responseMessage = 'Method Not Allowed';
         }
     }
+
+    public function searchSpecificationAction()
+    {
+        if ($this->request->isPost()) {
+            if (isset($this->postData()['search']) &&
+                (isset($this->postData()['is_group']) || isset($this->postData()['group_id']))
+            ) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 2) {
+                    return;
+                }
+
+                if (isset($this->postData()['is_group']) &&
+                    $this->postData()['is_group'] == true
+                ) {
+                    $searchSpecifications = $this->specifications->searchSpecifications($searchQuery, true, null);
+                } else if (isset($this->postData()['group_id']) &&
+                           ($this->postData()['group_id'] != '' &&
+                            $this->postData()['group_id'] != '0')
+                ) {
+                    $searchSpecifications = $this->specifications->searchSpecifications($searchQuery, false, $this->postData()['group_id']);
+                }
+
+                if ($searchSpecifications) {
+                    $this->view->responseCode = $this->specifications->packagesData->responseCode;
+
+                    $this->view->specifications = $this->specifications->packagesData->specifications;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query or group information missing';
+            }
+        }
+    }
 }

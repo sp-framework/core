@@ -1,0 +1,295 @@
+{% if product['id'] is defined %}
+    {% set productCategoryIds = product['category_ids'] %}
+{% else %}
+    {% set productCategoryIds = [] %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'category_channel',
+                'fieldLabel'                           : 'Channel',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select channel for category',
+                'fieldRequired'                        : true,
+                'fieldDataSelect2Create'               : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldDataSelect2Options'              : channels,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'category_source',
+                'fieldLabel'                           : 'Category Source',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select Category Source',
+                'fieldRequired'                        : true,
+                'fieldDisabled'                        : true,
+                'fieldDataSelect2Create'               : true,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldDataSelect2Options'              : categorySources,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_category_id',
+                'fieldLabel'                     : 'Search Category ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Category ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_category_parent',
+                'fieldLabel'                     : 'Search Category Parent ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Category Parent ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_category',
+                'fieldLabel'                     : 'Search/Create Category',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search/Category. To create a new root category - Enter the category name. To create a new subcategory, enter the new category name /NEW_CATEGORY_NAME<br>Example: RootCategory / Sub Category / Sub Category 2. This will create a new category with name Sub Category 2 with parent as Sub Category.',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_taxonomy_id',
+                'fieldLabel'                     : 'Search Taxonomy ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Taxonomy ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_taxonomy_parent',
+                'fieldLabel'                     : 'Search Taxonomy Parent ID',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search Taxonomy Parent ID',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : '0'
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'search_taxonomy',
+                'fieldLabel'                     : 'Search Taxonomy',
+                'fieldType'                      : 'input',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Search eBay Taxonomy',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false,
+                'fieldHidden'                    : true,
+                'fieldDisabled'                  : true,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    [
+                        'add-category'       : [
+                            'title'                   : 'Add Category',
+                            'disabled'                : true,
+                            'size'                    : 'xs',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'position'                : 'right'
+                        ],
+                        'cancel-category'    : [
+                            'title'                   : 'Cancel',
+                            'disabled'                : true,
+                            'size'                    : 'xs',
+                            'type'                    : 'secondary',
+                            'icon'                    : 'times',
+                            'position'                : 'right'
+                        ]
+                    ]
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'category_ids',
+                'fieldLabel'                     : 'Categories',
+                'fieldType'                      : 'html',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Categories assigned to different channels.',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+        {% set channelIds = [] %}
+        {% if channels is defined and channels|length > 0 %}
+            {% for channelKey, channel in channels %}
+                {% set channelIds[componentId ~ '-' ~ sectionId ~ '-channels-' ~ channel['id']] = channel['id'] %}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                     : component,
+                                'componentName'                 : componentName,
+                                'componentId'                   : componentId,
+                                'sectionId'                     : sectionId,
+                                'fieldId'                       : 'channels-' ~ channel['id'],
+                                'fieldLabel'                    : channel['name'] ~ ' Categories',
+                                'fieldType'                     : 'html',
+                                'fieldHelp'                     : false,
+                                'fieldHelpTooltipContent'       : channel['name'],
+                                'fieldAdditionalClass'          : 'mb-0',
+                                'fieldRequired'                 : false,
+                                'fieldBazScan'                  : false,
+                                'fieldBazPostOnCreate'          : false,
+                                'fieldBazPostOnUpdate'          : false
+                            ]
+                        )}}
+                        <ul class="list-group list-group-sortable" data-sortlistchannelid="{{channel['id']}}" id="{{componentId}}-{{sectionId}}-sortable-channels-{{channel['id']}}">
+                            {% if productCategoryIds|length > 0 and productCategoryIds[channel['id']]|length > 0 %}
+                                {% for categoryKey, category in productCategoryIds[channel['id']] %}
+                                    <li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="{{channel['id']}}" data-category-parent-id="{{category['parent_id']}}" data-category-id="{{category['id']}}">
+                                        <div class="row">
+                                            <div class="col">
+                                                <p class="font-weight-bold text-uppercase">Category:</p>
+                                            </div>
+                                            <div class="col">
+                                                <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 categoryDeleteButton">
+                                                    <i class="fa fas fa-fw text-xs fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col list-group-item-data">
+                                                <div class="mb-0">
+                                                    <p class="text-uppercase mb-0 cla-category">{{category['hierarchy_str']}}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <hr>
+            {% endfor %}
+        {% endif %}
+        {% set channelIds = json_encode(channelIds, 16) %}
+    </div>
+</div>

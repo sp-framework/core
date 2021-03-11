@@ -105,6 +105,13 @@ class Products
                     ]
                 ),
                 new Column(
+                    'specifications',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'images',
                     [
                         'type'    => Column::TYPE_TEXT,

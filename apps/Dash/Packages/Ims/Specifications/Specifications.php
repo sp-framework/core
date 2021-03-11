@@ -211,4 +211,44 @@ class Specifications extends BasePackage
 
         return false;
     }
+
+    public function searchSpecifications(string $specificationQueryString, $is_group = false, $group_id = null)
+    {
+        if ($is_group === true) {
+            $conditions =
+                [
+                    'conditions'    => 'name LIKE :bName: AND is_group = :isGroup:',
+                    'bind'          => [
+                        'bName'     => '%' . $specificationQueryString . '%',
+                        'isGroup'   => '1'
+                    ]
+                ];
+        } else if ($group_id) {
+            $conditions =
+                [
+                    'conditions'    => '(name LIKE :bName: AND group_id = :groupId:) AND is_group = :isGroup:',
+                    'bind'          => [
+                        'bName'     => '%' . $specificationQueryString . '%',
+                        'groupId'   => $group_id,
+                        'isGroup'   => '0',
+                    ]
+                ];
+        }
+
+        $searchSpecifications = $this->getByParams($conditions);
+
+        if ($searchSpecifications) {
+            $specifications = [];
+
+            foreach ($searchSpecifications as $specificationKey => $specificationValue) {
+                $specifications[$specificationKey] = $specificationValue;
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->specifications = $specifications;
+
+            return true;
+        }
+    }
 }
