@@ -166,6 +166,13 @@
             ]
         )}}
         {% if productSpecifications is defined and productSpecifications|length > 0 %}
+            <div class="list-group-item list-group-item-secondary no-data rounded-0" id="{{componentId}}-{{sectionId}}-specifications-nodata" hidden>
+                <div class="row">
+                    <div class="col text-uppercase">
+                        <i class="fa fa-fw fa-exclamation"></i> Add specification
+                    </div>
+                </div>
+            </div>
             {% for specificationsKey, specifications in productSpecifications %}
                 {{adminltetags.useTag('fields',
                     [
@@ -188,7 +195,7 @@
                 )}}
                 <ul class="list-group list-group-sortable" data-listspecificationsgroupid="{{specifications['group_id']}}" data-listspecificationsgroupname="{{specifications['group']}}" id="{{componentId}}-{{sectionId}}-sortable-specifications-{{specifications['group_id']}}">
                     {% for specificationKey, specification in specifications['specifications'] %}
-                        <li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listspecificationsgroupid="{{specifications['group_id']}}" data-listspecificationsgroupname="{{specifications['group']}}" data-specification-id="{{specification['specification_id']}}">
+                        <li class="list-group-item list-group-item-primary rounded-0" area-disabled="false" style="cursor: pointer" data-listspecificationsgroupid="{{specifications['group_id']}}" data-listspecificationsgroupname="{{specifications['group']}}" data-specification-id="{{specification['specification_id']}}">
                             <div class="row">
                                 <div class="col">
                                     <i class="fa fa-sort fa-fw handle"></i>
@@ -215,6 +222,14 @@
                 </ul>
                 <hr>
             {% endfor %}
+        {% else %}
+            <div class="list-group-item list-group-item-secondary no-data rounded-0" id="{{componentId}}-{{sectionId}}-specifications-nodata">
+                <div class="row">
+                    <div class="col text-uppercase">
+                        <i class="fa fa-fw fa-exclamation"></i> Add specification
+                    </div>
+                </div>
+            </div>
         {% endif %}
     </div>
 </div>

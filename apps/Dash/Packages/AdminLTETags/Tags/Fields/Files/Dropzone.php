@@ -197,7 +197,7 @@ class Dropzone
                 <div class="row pb-2">
                     <div class="col">
                         <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-previews">
-                            <li class="list-group-item list-group-item-secondary ' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-template" area-disabled="false">
+                            <li class="list-group-item list-group-item-secondary rounded-0 ' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-template" area-disabled="false">
                                 <div class="row">
                                     <div class="col">
                                         <span class="filename"></span>
@@ -229,6 +229,15 @@ class Dropzone
                         <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
 
                             if (count($this->params['attachments']) > 0) {
+                                $this->content .=
+                                    '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata" hidden>
+                                        <div class="row">
+                                            <div class="col text-uppercase">
+                                                <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
+                                            </div>
+                                        </div>
+                                    </div>';
+
                                 foreach ($this->params['attachments'] as $attachmentKey => $attachment) {
                                     if ($attachment['type'] === 'app/pdf') {
                                         $src = $this->links->images('/general/pdf.png');
@@ -263,7 +272,7 @@ class Dropzone
                                     }
 
                                     $this->content .=
-                                        '<li class="list-group-item list-group-item-secondary" area-disabled="false" style="cursor: pointer" data-uuid="' . $attachment['uuid'] . '">';
+                                        '<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer" data-uuid="' . $attachment['uuid'] . '">';
 
                                             if (isset($this->params['sortable']) &&
                                                 $this->params['sortable'] === true
@@ -334,6 +343,15 @@ class Dropzone
                                                     </div>
                                                 </li>';
                                 }
+                            } else {
+                                $this->content .=
+                                    '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata">
+                                        <div class="row">
+                                            <div class="col text-uppercase">
+                                                <i class="fa fa-fw fa-exclamation"></i> Add ' . $this->params['allowedUploads'] . '
+                                            </div>
+                                        </div>
+                                    </div>';
                             }
 
                         $this->content .= '
@@ -551,7 +569,7 @@ class Dropzone
                                             var newList = "";
 
                                             newList +=
-                                                \'<li class="list-group-item list-group-item-secondary" area-disabled="false" style="cursor: pointer" data-uuid="\' + response.storageData.uuid + \'">\';
+                                                \'<li class="list-group-item list-group-item-secondary rounded-0" area-disabled="false" style="cursor: pointer" data-uuid="\' + response.storageData.uuid + \'">\';
 
                                             if (sortable === true) {
                                                 newList +=
@@ -617,6 +635,10 @@ class Dropzone
                                                     \'</div>\' +
                                                 \'</div>\' +
                                             \'</li>\';
+
+                                            if (!$("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata").attr("hidden")) {
+                                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata").attr("hidden", true);
+                                            }
 
                                             $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments").append(newList);
 
@@ -761,6 +783,10 @@ class Dropzone
                                         });
                                     } else {
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments").find(\'[data-uuid="\' + uuid + \'"]\')[0].remove();
+
+                                        if ($("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments").find("li").length === 0) {
+                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments .no-data").attr("hidden", false);
+                                        }
                                     }
                                     collectData();
                                 }, "json");

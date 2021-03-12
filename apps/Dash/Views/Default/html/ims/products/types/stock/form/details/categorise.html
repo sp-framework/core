@@ -262,8 +262,15 @@
                         )}}
                         <ul class="list-group list-group-sortable" data-sortlistchannelid="{{channel['id']}}" id="{{componentId}}-{{sectionId}}-sortable-channels-{{channel['id']}}">
                             {% if productCategoryIds|length > 0 and productCategoryIds[channel['id']]|length > 0 %}
+                                <div class="list-group-item list-group-item-secondary no-data rounded-0" id="{{componentId}}-{{sectionId}}-categories-nodata-{{channel['id']}}" hidden>
+                                    <div class="row">
+                                        <div class="col text-uppercase">
+                                            <i class="fa fa-fw fa-exclamation"></i> Add new category for channel {{channel['name']}}
+                                        </div>
+                                    </div>
+                                </div>
                                 {% for categoryKey, category in productCategoryIds[channel['id']] %}
-                                    <li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="{{channel['id']}}" data-category-parent-id="{{category['parent_id']}}" data-category-id="{{category['id']}}">
+                                    <li class="list-group-item list-group-item-primary rounded-0" area-disabled="false" style="cursor: pointer" data-listchannelid="{{channel['id']}}" data-category-parent-id="{{category['parent_id']}}" data-category-id="{{category['id']}}">
                                         <div class="row">
                                             <div class="col">
                                                 <p class="font-weight-bold text-uppercase">Category:</p>
@@ -283,6 +290,14 @@
                                         </div>
                                     </li>
                                 {% endfor %}
+                            {% else %}
+                                <div class="list-group-item list-group-item-secondary no-data rounded-0" id="{{componentId}}-{{sectionId}}-categories-nodata-{{channel['id']}}">
+                                    <div class="row">
+                                        <div class="col text-uppercase">
+                                            <i class="fa fa-fw fa-exclamation"></i> Add new category for channel {{channel['name']}}
+                                        </div>
+                                    </div>
+                                </div>
                             {% endif %}
                         </ul>
                     </div>

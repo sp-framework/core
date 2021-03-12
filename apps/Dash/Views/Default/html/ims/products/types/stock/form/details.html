@@ -492,7 +492,7 @@ dataCollectionSection =
                         }
 
                         var list =
-                            '<li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" data-listchannelid="' + selectedChannelId +
+                            '<li class="list-group-item list-group-item-primary rounded-0" area-disabled="false" style="cursor: pointer" data-listchannelid="' + selectedChannelId +
                                 '" data-category-id="' + categoryId + '" data-category-parent-id="' + categoryParentId + '">' +
                                 '<div class="row">' +
                                     '<div class="col">' +
@@ -510,6 +510,10 @@ dataCollectionSection =
                                     '</div>' +
                                 '</div>' +
                             '</li>';
+
+                        if (!$('#{{componentId}}-{{sectionId}}-categories-nodata-' + selectedChannelId).attr('hidden')) {
+                            $('#{{componentId}}-{{sectionId}}-categories-nodata-' + selectedChannelId).attr('hidden', true);
+                        }
 
                         $("#{{componentId}}-{{sectionId}}-sortable-channels-" + selectedChannelId).append(list);
                     }
@@ -541,7 +545,16 @@ dataCollectionSection =
                     $(".categoryDeleteButton").each(function(index, button) {
                         $(button).off();
                         $(button).click(function() {
+                            var ul = $(button).parents('ul');
+
                             $(this).parents("li").remove();
+
+                            if ($(ul).children('li').length === 0 &&
+                                $(ul).children('.no-data').length === 1
+                            ) {
+                               $($(ul).children('.no-data')[0]).attr('hidden', false);
+                            }
+
                             collectData();
                         });
                     });
@@ -871,7 +884,7 @@ dataCollectionSection =
                         }
 
                         var list =
-                            '<li class="list-group-item list-group-item-primary" area-disabled="false" style="cursor: pointer" ' +
+                            '<li class="list-group-item list-group-item-primary rounded-0" area-disabled="false" style="cursor: pointer" ' +
                                 'data-newSpecification="' + newSpecification + '" ' +
                                 'data-listspecificationsgroupid="' + specificationGroupId + '" ' +
                                 'data-listspecificationsgroupname="' + specificationGroupName + '" data-specification-id="' + specificationId + '">' +
@@ -896,6 +909,9 @@ dataCollectionSection =
                             '</li>';
 
                         if (!edit) {
+                            if (!$('#{{componentId}}-{{sectionId}}-specifications-nodata').attr('hidden')) {
+                                $('#{{componentId}}-{{sectionId}}-specifications-nodata').attr('hidden', true);
+                            }
                             $("#{{componentId}}-{{sectionId}}-sortable-specifications-" + specificationGroupId).append(list);
                         } else {
                             $($("#{{componentId}}-{{sectionId}}-sortable-specifications-" + specificationGroupId)
@@ -980,7 +996,15 @@ dataCollectionSection =
 
                             if ($(ul).find('li').length === 0) {
                                 $(ul).siblings(".form-group")[0].remove();
+                                $(ul).siblings("hr")[0].remove();
                                 $(ul).remove();
+                            }
+
+                            if ($('.specifications').find('ul').length === 0 &&
+                                $('.specifications').children('.no-data').length === 1
+                            ) {
+                                $('.specifications').find('hr').remove();
+                                $($('.specifications').children('.no-data')[0]).attr('hidden', false);
                             }
 
                             collectData();
