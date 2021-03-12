@@ -178,8 +178,8 @@ class Dropzone
                                 'fieldRequired'                 => $this->fieldParams['fieldRequired'],
                                 'fieldBazScan'                  => true,
                                 'fieldBazJstreeSearch'          => $this->fieldParams['fieldBazJstreeSearch'],
-                                'fieldBazPostOnCreate'          => true,
-                                'fieldBazPostOnUpdate'          => true
+                                'fieldBazPostOnCreate'          => $this->fieldParams['fieldBazPostOnCreate'],
+                                'fieldBazPostOnUpdate'          => $this->fieldParams['fieldBazPostOnUpdate']
                             ]
                         ) .
                         $this->adminLTETags->useTag('buttons',
@@ -398,6 +398,13 @@ class Dropzone
                                 initEvents();
                                 registerDeleteButtons();
                                 collectData();
+
+                                $("body").trigger(
+                                    {
+                                        "type"      : "dropzoneInitDone",
+                                        "fieldId"   : "' . $this->params['fieldId'] . '"
+                                    }
+                                );
                             }
 
                             // function renewToken() {
@@ -791,6 +798,13 @@ class Dropzone
                                     window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["data"]["' . $this->params['fieldId'] . '"] =
                                         fieldId["uuidData"];
                                 }
+
+                                $("body").trigger(
+                                    {
+                                        "type"      : "dropzoneCollectDataDone",
+                                        "fieldId"   : "' . $this->params['fieldId'] . '"
+                                    }
+                                );
                             }
                         }
                     }
