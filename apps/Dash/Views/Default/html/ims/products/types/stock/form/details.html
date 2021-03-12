@@ -29,7 +29,9 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
-dataCollectionSection["data"] = { };
+if (!dataCollectionSection["data"]) {
+    dataCollectionSection["data"] = { };
+}
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {

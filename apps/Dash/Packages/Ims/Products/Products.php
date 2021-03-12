@@ -21,9 +21,11 @@ class Products extends BasePackage
 
     protected $brandsPackage;
 
+    protected $manufacturersPackage;
+
     protected $categoriesPackage;
 
-    protected $manufacturersPackage;
+    protected $specificationsPackage;
 
     protected function initPackages()
     {
@@ -177,9 +179,9 @@ class Products extends BasePackage
                     }
                 }
             }
-            if ($data['specifications'] !== '') {
+            if ($oldData['specifications'] !== '') {
                 $removeProductCountArr = [];
-                $specificationsIds = Json::decode($data['specifications'], true);
+                $specificationsIds = Json::decode($oldData['specifications'], true);
 
                 foreach ($specificationsIds as $specificationGroupKey => $specificationGroup) {
                     array_push($removeProductCountArr, $specificationGroupKey);
@@ -281,11 +283,23 @@ class Products extends BasePackage
 
             if ($add) {
                 if ($data['images'] !== '') {
-                    $this->basepackages->storages->changeOrphanStatus($data['images'], null, true);
+                    $data['images'] = Json::decode($data['images'], true);
+
+                    foreach ($data['images'] as $channelKey => $channel) {
+                        if (is_array($channel) && count($channel) > 0) {
+                            $this->basepackages->storages->changeOrphanStatus(Json::encode($channel), null, true);
+                        }
+                    }
                 }
 
                 if ($data['downloadables'] !== '') {
-                    $this->basepackages->storages->changeOrphanStatus($data['downloadables'], null, true);
+                    $data['downloadables'] = Json::decode($data['downloadables'], true);
+
+                    foreach ($data['downloadables'] as $channelKey => $channel) {
+                        if (is_array($channel) && count($channel) > 0) {
+                            $this->basepackages->storages->changeOrphanStatus(Json::encode($channel), null, true);
+                        }
+                    }
                 }
 
                 $data = $this->packagesData->last;
@@ -345,11 +359,33 @@ class Products extends BasePackage
 
             if ($this->update($data)) {
                 if ($data['images'] !== '') {
-                    $this->basepackages->storages->changeOrphanStatus($data['images'], $product['images'], true);
+                    $data['images'] = Json::decode($data['images'], true);
+                    $product['images'] = Json::decode($product['images'], true);
+
+                    foreach ($data['images'] as $channelKey => $channel) {
+                        if (is_array($channel) && count($channel) > 0) {
+                            if (isset($product['images'][$channelKey])) {
+                                $this->basepackages->storages->changeOrphanStatus(Json::encode($channel), Json::encode($product['images'][$channelKey]), true);
+                            } else {
+                                $this->basepackages->storages->changeOrphanStatus(Json::encode($channel), Json::encode([]), true);
+                            }
+                        }
+                    }
                 }
 
                 if ($data['downloadables'] !== '') {
-                    $this->basepackages->storages->changeOrphanStatus($data['downloadables'], $product['downloadables'], true);
+                    $data['downloadables'] = Json::decode($data['downloadables'], true);
+                    $product['downloadables'] = Json::decode($product['downloadables'], true);
+
+                    foreach ($data['downloadables'] as $channelKey => $channel) {
+                        if (is_array($channel) && count($channel) > 0) {
+                            if (isset($product['downloadables'][$channelKey])) {
+                                $this->basepackages->storages->changeOrphanStatus(Json::encode($channel), Json::encode($product['downloadables'][$channelKey]), true);
+                            } else {
+                                $this->basepackages->storages->changeOrphanStatus(Json::encode($channel), Json::encode([]), true);
+                            }
+                        }
+                    }
                 }
 
                 $this->updateProductCount($data, $product);

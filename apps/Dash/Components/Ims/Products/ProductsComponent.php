@@ -33,10 +33,13 @@ class ProductsComponent extends BaseComponent
 
             $this->view->manufacturers = $this->usePackage(Vendors::class)->getAllManufacturers();
 
-            $channelsEshopArr = $this->usePackage(Channels::class)->getChannelByType('eshop');
-            $channelsPosArr = $this->usePackage(Channels::class)->getChannelByType('pos');
+            $channels =
+                array_merge(
+                    $this->usePackage(Channels::class)->getChannelByType('eshop'),
+                    $this->usePackage(Channels::class)->getChannelByType('pos')
+                );
 
-            $this->view->channels = array_merge($channelsEshopArr, $channelsPosArr);
+            $this->view->channels = $channels;
 
             $categorySources = [];
 
@@ -75,37 +78,35 @@ class ProductsComponent extends BaseComponent
                 $this->view->productType = $product['product_type'];
 
                 if ($product['images']) {
-                    $attachments = [];
+                    $product['images'] = Json::decode($product['images'], true);
 
-                    $attachmentsArr = Json::decode($product['images'], true);
-
-                    foreach ($attachmentsArr as $key => $attachment) {
-                        $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
-                        if ($attachmentInfo) {
-                            if ($attachmentInfo['links']) {
-                                $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                    foreach ($product['images'] as $channelKey => &$channel) {
+                        foreach ($channel as $imageKey => &$image) {
+                            $attachmentInfo = $this->basepackages->storages->getFileInfo($image);
+                            if ($attachmentInfo) {
+                                if ($attachmentInfo['links']) {
+                                    $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                                }
+                                $image = $attachmentInfo;
                             }
-                            $attachments[$key] = $attachmentInfo;
                         }
                     }
-                    $product['images'] = $attachments;
                 }
 
                 if ($product['downloadables']) {
-                    $attachments = [];
+                    $product['downloadables'] = Json::decode($product['downloadables'], true);
 
-                    $attachmentsArr = Json::decode($product['downloadables'], true);
-
-                    foreach ($attachmentsArr as $key => $attachment) {
-                        $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
-                        if ($attachmentInfo) {
-                            if ($attachmentInfo['links']) {
-                                $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                    foreach ($product['downloadables'] as $channelKey => &$channel) {
+                        foreach ($channel as $downloadableKey => &$downloadable) {
+                            $attachmentInfo = $this->basepackages->storages->getFileInfo($downloadable);
+                            if ($attachmentInfo) {
+                                if ($attachmentInfo['links']) {
+                                    $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                                }
+                                $downloadable = $attachmentInfo;
                             }
-                            $attachments[$key] = $attachmentInfo;
                         }
                     }
-                    $product['downloadables'] = $attachments;
                 }
 
                 if ($product['category_ids'] && $product['category_ids'] !== '') {
@@ -303,7 +304,7 @@ class ProductsComponent extends BaseComponent
                     }
                     $searchProduct = $this->products->searchByMPN($searchQuery);
                 } else if ($field === 'title') {
-                    if (strlen($searchQuery) < 5) {
+                    if (strlen($searchQuery) < 2) {
                         return;
                     }
                     $searchProduct = $this->products->searchByTitle($searchQuery);

@@ -349,7 +349,7 @@ dataCollectionSection =
                             cache: false
                         },
                         selector: "#{{componentId}}-{{sectionId}}-code_ean",
-                        threshold : 5,
+                        threshold : 2,
                         debounce: 500,
                         searchEngine: "strict",
                         resultsList: {
@@ -439,7 +439,7 @@ dataCollectionSection =
                             cache: false
                         },
                         selector: "#{{componentId}}-{{sectionId}}-title",
-                        threshold : 5,
+                        threshold : 2,
                         debounce: 500,
                         searchEngine: "strict",
                         resultsList: {
@@ -485,6 +485,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-subtitle'                    : { },
         '{{componentId}}-{{sectionId}}-description'                 : { },
         '{{componentId}}-{{sectionId}}-form'                        : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
                 '{{componentId}}-{{sectionId}}-code_mpn'            : 'required',
                 '{{componentId}}-{{sectionId}}-code_sku'            : 'required',
