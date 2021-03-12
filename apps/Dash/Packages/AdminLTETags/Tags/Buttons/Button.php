@@ -232,6 +232,7 @@ class Button
                 isset($button['buttonAdditionalClass']) ?
                 $button['buttonAdditionalClass'] :
                 '';
+
             $this->buttonParams['tooltipPosition'] =
                 isset($button['tooltipPosition']) ?
                 $button['tooltipPosition'] :
@@ -241,7 +242,7 @@ class Button
                 isset($button['tooltipTitle']) ?
                 $button['tooltipTitle'] :
                 '';
-                // var_dump($this->buttonParams);
+
             $this->buildButton();
         }
     }
