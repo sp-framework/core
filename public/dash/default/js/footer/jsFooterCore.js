@@ -3421,7 +3421,9 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                 });
                             }
                         }
-                        if (dataCollection[componentId][sectionId][$(bazScanField)[0].id].afterExtract) {
+
+                        if (dataCollection[componentId][sectionId][$(bazScanField)[0].id] &&
+                            dataCollection[componentId][sectionId][$(bazScanField)[0].id].afterExtract) {
                             dataCollection[componentId][sectionId][$(bazScanField)[0].id].afterExtract();
                         }
                     }
