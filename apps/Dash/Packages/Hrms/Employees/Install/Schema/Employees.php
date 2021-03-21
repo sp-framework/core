@@ -38,8 +38,7 @@ class Employees
                 new Column(
                     'status',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
+                        'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => true,
                     ]
                 ),
