@@ -282,10 +282,12 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-type'                    : { },
         '{{componentId}}-{{sectionId}}-is_manufacturer'         : { },
+        '{{componentId}}-{{sectionId}}-is_supplier'             : { },
         '{{componentId}}-{{sectionId}}-does_dropship'           : { },
+        '{{componentId}}-{{sectionId}}-is_service_provider'     : { },
         '{{componentId}}-{{sectionId}}-does_jobwork'            : { },
         '{{componentId}}-{{sectionId}}-brands'                  : {
-            'placeholder'   : "SUPPLIER BRAND(s)",
+            'placeholder'   : "VENDOR BRAND(s)",
             'tags'          : true,
             'ajax'          : {
                 url         : "{{links.url('ims/brands/searchBrand')}}",
@@ -340,13 +342,11 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-abn'                    : 'required',
-                '{{componentId}}-{{sectionId}}-name'                   : 'required',
-                '{{componentId}}-{{sectionId}}-brands'                 : 'required'
+                '{{componentId}}-{{sectionId}}-name'                   : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
-                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name',
-                '{{componentId}}-{{sectionId}}-brands'                 : 'Please select supplier brands'
+                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name'
             }
         }
     });

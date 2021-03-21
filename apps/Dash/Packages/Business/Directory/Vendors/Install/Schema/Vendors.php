@@ -33,14 +33,14 @@ class Vendors
                     [
                         'type'    => Column::TYPE_BIGINTEGER,
                         'size'    => 11,
-                        'notNull' => false,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
                     'name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'size'    => 200,
                         'notNull' => true,
                     ]
                 ),
@@ -52,7 +52,21 @@ class Vendors
                     ]
                 ),
                 new Column(
+                    'is_supplier',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'does_dropship',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'is_service_provider',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => false,

@@ -110,13 +110,79 @@ class Vendors extends BasePackage
 
     public function getAllManufacturers()
     {
-        $vendors = $this->getAll()->vendors;
+        $this->getAll()->vendors;
+
+        $manufacturers = [];
 
         $filter =
             $this->model->filter(
                 function($vendor) {
                     $vendor = $vendor->toArray();
                     if ($vendor['is_manufacturer'] == 1) {
+                        return $vendor;
+                    }
+                }
+            );
+
+        foreach ($filter as $key => $value) {
+            $manufacturers[$key] = $value;
+        }
+
+        return $manufacturers;
+    }
+
+    public function getAllSuppliers()
+    {
+        $this->getAll()->vendors;
+
+        $suppliers = [];
+
+        $filter =
+            $this->model->filter(
+                function($vendor) {
+                    $vendor = $vendor->toArray();
+                    if ($vendor['is_supplier'] == 1) {
+                        return $vendor;
+                    }
+                }
+            );
+
+        foreach ($filter as $key => $value) {
+            $suppliers[$key] = $value;
+        }
+
+        return $suppliers;
+    }
+
+    public function getAllManufacturersSuppliers()
+    {
+        $this->getAll()->vendors;
+
+        $filter =
+            $this->model->filter(
+                function($vendor) {
+                    $vendor = $vendor->toArray();
+                    if ($vendor['is_manufacturer'] == 1 ||
+                        $vendor['is_supplier'] == 1 ||
+                        $vendor['does_dropship'] == 1
+                    ) {
+                        return $vendor;
+                    }
+                }
+            );
+
+        return $filter;
+    }
+
+    public function getAllServiceProviders()
+    {
+        $vendors = $this->getAll()->vendors;
+
+        $filter =
+            $this->model->filter(
+                function($vendor) {
+                    $vendor = $vendor->toArray();
+                    if ($vendor['is_service_provider'] == 1) {
                         return $vendor;
                     }
                 }
@@ -133,7 +199,9 @@ class Vendors extends BasePackage
             $this->model->filter(
                 function($vendor) {
                     $vendor = $vendor->toArray();
-                    if ($vendor['does_jobwork'] == 1) {
+                    if ($vendor['is_service_provider'] == 1 &&
+                        $vendor['does_jobwork'] == 1
+                    ) {
                         return $vendor;
                     }
                 }
@@ -256,6 +324,46 @@ class Vendors extends BasePackage
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->vendors = $vendors;
+
+            return true;
+        }
+    }
+
+    public function searchByVendorId($id)
+    {
+        $vendor = $this->getById($id);
+
+        if ($vendor) {
+            if ($vendor['address_ids'] && $vendor['address_ids'] !== '') {
+                $vendor['address_ids'] = Json::decode($vendor['address_ids'], true);
+
+                foreach ($vendor['address_ids'] as $addressTypeKey => $addressType) {
+                    if (is_array($addressType) && count($addressType) > 0) {
+                        foreach ($addressType as $addressKey => $address) {
+                            $vendor['address_ids'][$addressTypeKey][$addressKey] =
+                                $this->basepackages->addressbook->getById($address);
+                        }
+                    }
+                    $vendor['address_ids'][$addressTypeKey] =
+                        msort($vendor['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
+                }
+            }
+
+            if ($vendor['contact_ids'] && $vendor['contact_ids'] !== '') {
+                $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
+
+                $contacts = $this->usePackage(Contacts::class);
+
+                foreach ($vendor['contact_ids'] as $contactKey => $contact) {
+                    $contactArr = $contacts->getById($contact);
+
+                    $vendor['contact_ids'][$contactKey] = $contactArr;
+                }
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->vendor = $vendor;
 
             return true;
         }

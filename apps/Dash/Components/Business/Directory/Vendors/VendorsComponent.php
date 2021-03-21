@@ -128,7 +128,19 @@ class VendorsComponent extends BaseComponent
                             '1' => 'Yes'
                         ]
                     ],
+                    'is_supplier'   => ['html'  =>
+                        [
+                            '0' => 'No',
+                            '1' => 'Yes'
+                        ]
+                    ],
                     'does_dropship'   => ['html'  =>
+                        [
+                            '0' => 'No',
+                            '1' => 'Yes'
+                        ]
+                    ],
+                    'is_service_provider'   => ['html'  =>
                         [
                             '0' => 'No',
                             '1' => 'Yes'
@@ -158,9 +170,9 @@ class VendorsComponent extends BaseComponent
             $this->vendors,
             'business/directory/vendors/view',
             null,
-            ['abn', 'name', 'is_manufacturer', 'does_dropship', 'does_jobwork'],
+            ['abn', 'name', 'is_manufacturer', 'is_supplier', 'does_dropship', 'is_service_provider', 'does_jobwork'],
             true,
-            ['abn', 'name', 'is_manufacturer', 'does_dropship', 'does_jobwork'],
+            ['abn', 'name', 'is_manufacturer', 'is_supplier', 'does_dropship', 'is_service_provider', 'does_jobwork'],
             $controlActions,
             [],
             $replaceColumns,
@@ -259,6 +271,27 @@ class VendorsComponent extends BaseComponent
                 $this->view->responseCode = 1;
 
                 $this->view->responseMessage = 'search query missing';
+            }
+        }
+    }
+
+    public function searchVendorIdAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['vendorId']) {
+                $vendorId = $this->postData()['vendorId'];
+
+                $searchVendor = $this->vendors->searchByVendorId($vendorId);
+
+                if ($searchVendor) {
+                    $this->view->responseCode = $this->vendors->packagesData->responseCode;
+
+                    $this->view->vendor = $this->vendors->packagesData->vendor;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'vendor id missing';
             }
         }
     }

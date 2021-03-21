@@ -4,7 +4,9 @@
     {% set vendorAbn = vendor['abn'] %}
     {% set vendorName = vendor['name'] %}
     {% set vendorIsManufacturer = vendor['is_manufacturer'] %}
+    {% set vendorIsSupplier = vendor['is_supplier'] %}
     {% set vendorDoesDropship = vendor['does_dropship'] %}
+    {% set vendorIsServiceProvider = vendor['is_service_provider'] %}
     {% set vendorDoesJobwork = vendor['does_jobwork'] %}
     {% set vendorBrands = vendor['brands'] %}
 {% else %}
@@ -13,7 +15,9 @@
     {% set vendorAbn = '' %}
     {% set vendorName = '' %}
     {% set vendorIsManufacturer = '' %}
+    {% set vendorIsSupplier = '' %}
     {% set vendorDoesDropship = '' %}
+    {% set vendorIsServiceProvider = '' %}
     {% set vendorDoesJobwork = '' %}
     {% set vendorBrands = '' %}
 {% endif %}
@@ -155,7 +159,7 @@
                         'fieldBazPostOnUpdate'                  : true,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldDataInputMinLength'               : 1,
-                        'fieldDataInputMaxLength'               : 100,
+                        'fieldDataInputMaxLength'               : 200,
                         'fieldValue'                            : vendorName
                     ]
                 )}}
@@ -194,6 +198,37 @@
                 )}}
             </div>
             <div class="col">
+                {% if vendorIsSupplier is defined %}
+                    {% if vendorIsSupplier == 1 %}
+                        {% set vendorIsSupplierChecked = true %}
+                    {% else %}
+                        {% set vendorIsSupplierChecked = false %}
+                    {% endif %}
+                {% else %}
+                    {% set vendorIsSupplierChecked = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'is_supplier',
+                        'fieldLabel'                     : 'is Supplier?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is vendor a supplier of products?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : vendorIsSupplierChecked,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
                 {% if vendorDoesDropship is defined %}
                     {% if vendorDoesDropship == 1 %}
                         {% set vendorDoesDropshipChecked = true %}
@@ -217,6 +252,39 @@
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'info',
                         'fieldCheckboxChecked'           : vendorDoesDropshipChecked,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {% if vendorIsServiceProvider is defined %}
+                    {% if vendorIsServiceProvider == 1 %}
+                        {% set vendorIsServiceProviderChecked = true %}
+                    {% else %}
+                        {% set vendorIsServiceProviderChecked = false %}
+                    {% endif %}
+                {% else %}
+                    {% set vendorIsServiceProviderChecked = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'is_service_provider',
+                        'fieldLabel'                     : 'is Service Provider?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is vendor a service provider?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : vendorIsServiceProviderChecked,
                         'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,

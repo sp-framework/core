@@ -16,7 +16,11 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $is_manufacturer;
 
+    public $is_supplier;
+
     public $does_dropship;
+
+    public $is_service_provider;
 
     public $does_jobwork;
 
@@ -24,15 +28,9 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $product_count;
 
-    public $primary_contact_id;
+    public $contact_ids;
 
-    public $other_contact_ids;
-
-    public $primary_address_id;
-
-    public $other_address_id;
-
-    public $token;
+    public $address_ids;
 
     public $internal_notes;
 }
