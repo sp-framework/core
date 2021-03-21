@@ -565,9 +565,9 @@ class Products extends BasePackage
             foreach ($data['manufacturer']['newTags'] as $manufacturer) {
                 $newManufacturer = $this->manufacturersPackage->add(
                     [
+                        'abn'               => '00000000000',
                         'name'              => $manufacturer,
-                        'is_manufacturer'   => '1',
-
+                        'is_manufacturer'   => '1'
                     ]
                 );
                 if ($newManufacturer) {
