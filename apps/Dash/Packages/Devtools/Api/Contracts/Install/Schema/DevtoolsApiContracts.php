@@ -29,6 +29,14 @@ class DevtoolsApiContracts
                     ]
                 ),
                 new Column(
+                    'api_type',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'link',
                     [
                         'type'    => Column::TYPE_VARCHAR,
@@ -42,6 +50,13 @@ class DevtoolsApiContracts
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
                         'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'wsdl_convert',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(

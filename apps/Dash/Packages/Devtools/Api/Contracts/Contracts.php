@@ -18,9 +18,7 @@ class Contracts extends BasePackage
 
     protected $contractDirectory = null;
 
-    protected $ebayServicesClass = '\\Apps\Dash\Packages\System\Api\Apis\Ebay';
-
-    protected $ebayServicesDirectory = 'apps/Dash/Packages/System/Api/Apis/Ebay/';
+    protected $servicesDirectory = null;
 
     protected $contractFilename;
 
@@ -41,7 +39,7 @@ class Contracts extends BasePackage
             $this->contractDirectory = base_path($directory);
         } else {
             //Default Directory
-            $this->contractDirectory = 'apps/Dash/Packages/System/Api/Contracts/';
+            $this->contractDirectory = 'apps/Dash/Packages/Devtools/Api/Contracts/Contracts/';
         }
 
         return $this->contractDirectory;
@@ -56,11 +54,31 @@ class Contracts extends BasePackage
         return $this->contractDirectory;
     }
 
+    protected function setServicesDirectory($type = null, $directory = null)
+    {
+        if (!$type && $directory) {
+            $this->servicesDirectory = base_path($directory);
+        } else {
+            $this->servicesDirectory = 'apps/Dash/Packages/System/Api/Apis/' . ucfirst($type) . '/';
+        }
+
+        return $this->servicesDirectory;
+    }
+
+    public function getServicesDirectory($type, $directory = null)
+    {
+        if (!$this->servicesDirectory) {
+            return $this->setServicesDirectory($type, $directory);
+        }
+
+        return $this->servicesDirectory;
+    }
+
     protected function checkLink($link)
     {
         $filename = Arr::last(explode('/', $link));
 
-        if (strpos($filename, '.json')) {
+        if (strpos($filename, '.json') || strpos($filename, '.yaml')) {
             return $filename;
         }
 
@@ -69,22 +87,35 @@ class Contracts extends BasePackage
 
     public function addContract(array $data)
     {
+        if (!checkCtype($data['name'])) {
+
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage =
+                'Contract name cannot have special characters';
+
+            return false;
+        } else {
+            $data['name'] = checkCtype($data['name']);
+        }
+
         if (isset($data['link']) && $data['link'] !== '') {
 
             $this->contractFilename = $this->checkLink($data['link']);
 
-            $data['filename'] = $this->contractDirectory . $this->contractFilename;
-
-            if (!$data['filename']) {
+            if (!$this->contractFilename) {
                 $this->packagesData->responseCode = 1;
 
-                $this->packagesData->responseMessage = 'Only filename with extension .json are accepted';
+                $this->packagesData->responseMessage = 'Only filename with extension .json/.yaml are accepted';
 
                 return false;
             }
 
+            $data['filename'] = $this->contractDirectory . $this->contractFilename;
+
             try {
                 $response = $this->remoteContent->request('GET', $data['link']);
+
             } catch (\GuzzleHttp\Exception\ConnectException $e) {
                 $this->packagesData->responseCode = 1;
 
@@ -109,26 +140,10 @@ class Contracts extends BasePackage
 
                 $data['content'] = 'See Link';
 
-                if ($response->getHeaderLine('content-type') === 'application/json') {
+                $body = $response->getBody();
 
-                    $bodyArr = Json::decode($body, true);
+                $this->localContent->put($data['filename'], $body);
 
-                    $title = $bodyArr['info']['title'];
-
-                    $data['name'] = ucfirst(strtolower(str_replace(' ', '', $title)));
-
-                } else if ($response->getHeaderLine('content-type') === 'application/wsdl+xml') {
-                    $body = $response->getBody();
-
-                    $this->localContent->put($data['filename'], $body);
-
-                } else {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'content-type received is incorrect';
-
-                    return;
-                }
             } else {
 
                 $this->packagesData->responseCode = 1;
@@ -140,7 +155,11 @@ class Contracts extends BasePackage
         } else {
             $data['link'] = 'See Content';
 
-            $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.json');
+            if ($data['content_type'] === 'json') {
+                $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.json');
+            } else if ($data['content_type'] === 'yaml') {
+                $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.yaml');
+            }
 
             $this->localContent->put($data['filename'], $data['content']);
         }
@@ -158,6 +177,18 @@ class Contracts extends BasePackage
 
     public function updateContract(array $data)
     {
+        if (!checkCtype($data['name'])) {
+
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage =
+                'Contract name cannot have special characters';
+
+            return false;
+        } else {
+            $data['name'] = checkCtype($data['name']);
+        }
+
         if ($this->update($data)) {
             $this->packagesData->responseCode = 0;
 
@@ -190,7 +221,11 @@ class Contracts extends BasePackage
             $contract['content'] = $this->localContent->read($contract['filename']);
         }
 
-        $contract['content'] = Json::decode($contract['content'], true);
+        try {
+            $contract['content'] = Json::decode($contract['content'], true);
+        } catch (\Exception $e) {
+            $contract['content'] = yaml_parse($contract['content']);
+        }
 
         $this->contract = $contract;
 
@@ -221,20 +256,22 @@ class Contracts extends BasePackage
 
     protected function createServiceDirectories()
     {
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'])) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name']);
+        $this->getServicesDirectory($this->contract['api_type']);
+
+        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'])) {
+            $this->localContent->createDir($this->servicesDirectory . $this->contract['name']);
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Services')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Services');
+        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Services')) {
+            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Services');
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Enums')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Enums');
+        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Enums')) {
+            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Enums');
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Types')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Types');
+        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Types')) {
+            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Types');
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Operations')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Operations');
+        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Operations')) {
+            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Operations');
         }
     }
 }

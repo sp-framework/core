@@ -46,8 +46,7 @@ class DevtoolsApiEnums
                 new Column(
                     'enums',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 8192,
+                        'type'    => Column::TYPE_TEXT,
                         'notNull' => true,
                     ]
                 )

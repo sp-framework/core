@@ -478,7 +478,13 @@ class ' . $typeKey . ' extends BaseType
 
     protected function getRefClass($item)
     {
-        $itemArr = explode('/', $item);
+        if (isset($item['items']['$ref'])) {
+            $itemArr = explode('/', $item['items']['$ref']);
+        } else if (isset($item['$ref'])) {
+            $itemArr = explode('/', $item['$ref']);
+        } else {
+            $itemArr = explode('/', $item);
+        }
 
         return 'Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Types\\' . Arr::last($itemArr);
     }

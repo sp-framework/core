@@ -10,13 +10,17 @@ class ContractsOAPI
 
     protected $localContent;
 
-    protected $ebayServicesClass = '\\Apps\Dash\Packages\System\Api\Apis\Ebay';
+    protected $servicesClass = null;
 
-    protected $ebayServicesDirectory = 'apps/Dash/Packages/System/Api/Apis/Ebay/';
+    protected $servicesDirectory = null;
 
     public function init($contract, $localContent)
     {
         $this->contract = $contract;
+
+        $this->servicesClass = '\\Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']);
+
+        $this->servicesDirectory = 'apps/Dash/Packages/System/Api/Apis/'. ucfirst($this->contract['api_type']) . '/';
 
         $this->localContent = $localContent;
 
@@ -51,7 +55,7 @@ class ContractsOAPI
         return $definitions + [
             \'apiVersion\' => [
                 \'valid\' => [\'string\'],
-                \'default\' => ' . $this->ebayServicesClass . '\\' . $this->contract['name'] . '\Services\\' . $this->contract['name'] . 'Service::API_VERSION,
+                \'default\' => ' . $this->servicesClass . '\\' . $this->contract['name'] . '\Services\\' . $this->contract['name'] . 'Service::API_VERSION,
                 \'required\' => true
             ]
         ];
@@ -79,7 +83,7 @@ class ContractsOAPI
     {
         return '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Services;
+namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Services;
 
 use Apps\Dash\Packages\System\Api\Base\BaseRestService;
 
@@ -137,7 +141,7 @@ class ' . $this->contract['name'] . 'BaseService extends BaseRestService
                         // $operations[ucfirst($method['operationId'])]['method'] = strtoupper($methodKey);
                         // $operations[ucfirst($method['operationId'])]['resource'] = ltrim($pathKey, '/');
                         // $operations[ucfirst($method['operationId'])]['responseClass'] =
-                        //     $this->ebayServicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
+                        //     $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
                         // if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
                         //     $operations[ucfirst($method['operationId'])]['params'] = [];
                         //     foreach ($method['parameters'] as $parameterKey => $parameter) {
@@ -170,17 +174,34 @@ class ' . $this->contract['name'] . 'BaseService extends BaseRestService
                         $operations[ucfirst($method['operationId'])]['method'] = strtoupper($methodKey);
                         $operations[ucfirst($method['operationId'])]['resource'] = ltrim($pathKey, '/');
                         $operations[ucfirst($method['operationId'])]['responseClass'] =
-                            $this->ebayServicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
+                            $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
+
                         if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
-                            $operations[ucfirst($method['operationId'])]['params'] = [];
                             foreach ($method['parameters'] as $parameterKey => $parameter) {
-                                if ($parameter['in'] === 'path' || $parameter['in'] === 'query') {
+                                $operations[ucfirst($method['operationId'])]['params'] = [];
+                                if (isset($parameter['name'])) {
                                     $operations[ucfirst($method['operationId'])]['params'][$parameter['name']] = [];
                                     $operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['valid'] = [];
-                                    array_push($operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['valid'], $parameter['schema']['type']);
-                                    if ($parameter['required'] === true) {
+
+                                    if (isset($parameter['in']) &&
+                                        ($parameter['in'] === 'path' || $parameter['in'] === 'query')
+                                    ) {
+                                        if (isset($parameter['schema']['type'])) {
+                                            array_push($operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['valid'], $parameter['schema']['type']);
+                                        } else if (isset($parameter['schema']['$ref'])) {
+                                            array_push($operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['valid'], $this->getRefClass($parameter['schema']['$ref']));
+                                        }
+                                    } else {
+                                        if (isset($parameter['$ref'])) {
+                                            array_push($operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['valid'], $this->getRefClass($parameter['$ref']));
+                                        }
+                                    }
+
+                                    if (isset($parameter['required']) && $parameter['required'] === true) {
                                         $operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['required'] = $parameter['required'];
                                     }
+                                } else if (isset($parameter['$ref'])) {
+                                    $operations[ucfirst($method['operationId'])]['params'] = $this->getRefClass($parameter['$ref']);
                                 }
                             }
                         } else {
@@ -221,9 +242,9 @@ class ' . $this->contract['name'] . 'BaseService extends BaseRestService
     {
         return '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Services;
+namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Services;
 
-use Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Services\\' . $this->contract['name'] . 'BaseService;
+use Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Services\\' . $this->contract['name'] . 'BaseService;
 
 class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name'] . 'BaseService
 {
@@ -245,12 +266,12 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
                     $methods .=
                     '
 
-    public function ' . $method['operationId'] . '(' . $this->ebayServicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
+    public function ' . $method['operationId'] . '(' . $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
     {
         return $this->' . $method['operationId'] . 'Async($request)->wait();
     }
 
-    public function ' . $method['operationId'] . 'Async(' . $this->ebayServicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
+    public function ' . $method['operationId'] . 'Async(' . $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestRequest $request)
     {
         return $this->callOperationAsync(\'' . ucfirst($method['operationId']) . '\', $request);
     }';
@@ -289,7 +310,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
     public function writeBaseServicesFileContent($file)
     {
         $this->localContent->put(
-            $this->ebayServicesDirectory .
+            $this->servicesDirectory .
             $this->contract['name'] .
             '/Services/' .
             $this->contract['name'] .
@@ -301,7 +322,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
     public function writeServicesFileContent($file)
     {
         $this->localContent->put(
-            $this->ebayServicesDirectory .
+            $this->servicesDirectory .
             $this->contract['name'] .
             '/Services/' .
             $this->contract['name'] .
@@ -313,7 +334,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
     protected function writeTypesFileContent($filename, $file)
     {
         $this->localContent->put(
-            $this->ebayServicesDirectory .
+            $this->servicesDirectory .
             $this->contract['name'] .
             '/Types/' .
             $filename .
@@ -333,7 +354,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
     {
         $file = '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Types;
+namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types;
 
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
@@ -342,32 +363,34 @@ class ' . $typeKey . ' extends BaseType
 
         $propertyTypes = [];
 
-        foreach ($type['properties'] as $propertyKey => $property) {
-            $propertyTypes[$propertyKey] = [];
-            if (isset($property['type'])) {
-                // if ($property['type'] === 'string' || $property['type'] === 'integer') {
-                //     $propertyTypes[$propertyKey]['type'] = $property['type'];
-                //     $propertyTypes[$propertyKey]['repeatable'] = false;
-                // } else if ($property['type'] === 'array') {
-                if ($property['type'] === 'array') {
-                    if (isset($property['items'])) {
-                        if (isset($property['items']['$ref'])) {
-                            $propertyTypes[$propertyKey]['type'] = $this->getRefClass($property['items']['$ref']);
-                        } else if (isset($property['items']['type'])) {
-                            $propertyTypes[$propertyKey]['type'] = $property['items']['type'];
+        if (isset($type['properties'])) {
+            foreach ($type['properties'] as $propertyKey => $property) {
+                $propertyTypes[$propertyKey] = [];
+                if (isset($property['type'])) {
+                    // if ($property['type'] === 'string' || $property['type'] === 'integer') {
+                    //     $propertyTypes[$propertyKey]['type'] = $property['type'];
+                    //     $propertyTypes[$propertyKey]['repeatable'] = false;
+                    // } else if ($property['type'] === 'array') {
+                    if ($property['type'] === 'array') {
+                        if (isset($property['items'])) {
+                            if (isset($property['items']['$ref'])) {
+                                $propertyTypes[$propertyKey]['type'] = $this->getRefClass($property['items']['$ref']);
+                            } else if (isset($property['items']['type'])) {
+                                $propertyTypes[$propertyKey]['type'] = $property['items']['type'];
+                            }
                         }
+                        $propertyTypes[$propertyKey]['repeatable'] = true;
+                    } else {
+                        $propertyTypes[$propertyKey]['type'] = $property['type'];
+                        $propertyTypes[$propertyKey]['repeatable'] = false;
                     }
-                    $propertyTypes[$propertyKey]['repeatable'] = true;
-                } else {
-                    $propertyTypes[$propertyKey]['type'] = $property['type'];
+                } else if (isset($property['$ref'])) {
+                    $propertyTypes[$propertyKey]['type'] = $this->getRefClass($property['$ref']);
                     $propertyTypes[$propertyKey]['repeatable'] = false;
                 }
-            } else if (isset($property['$ref'])) {
-                $propertyTypes[$propertyKey]['type'] = $this->getRefClass($property['$ref']);
-                $propertyTypes[$propertyKey]['repeatable'] = false;
+                $propertyTypes[$propertyKey]['attribute'] = false;
+                $propertyTypes[$propertyKey]['elementName'] = $propertyKey;
             }
-            $propertyTypes[$propertyKey]['attribute'] = false;
-            $propertyTypes[$propertyKey]['elementName'] = $propertyKey;
         }
 
         $file .= '
@@ -395,9 +418,15 @@ class ' . $typeKey . ' extends BaseType
 
     protected function getRefClass($item)
     {
-        $itemArr = explode('/', $item);
+        if (isset($item['items']['$ref'])) {
+            $itemArr = explode('/', $item['items']['$ref']);
+        } else if (isset($item['$ref'])) {
+            $itemArr = explode('/', $item['$ref']);
+        } else {
+            $itemArr = explode('/', $item);
+        }
 
-        return 'Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Types\\' . Arr::last($itemArr);
+        return 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\\' . Arr::last($itemArr);
     }
 
     public function buildOperationsFile()
@@ -410,24 +439,48 @@ class ' . $typeKey . ' extends BaseType
                     }
                     if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
                         $requestParams = [];
+
                         foreach ($method['parameters'] as $parameterKey => $parameter) {
-                            if ($parameter['in'] === 'path' || $parameter['in'] === 'query') {
-                                $requestParams[$parameter['name']] = [];
-                                if ($parameter['schema']['type'] === 'string') {
-                                    $requestParams[$parameter['name']]['type'] = $parameter['schema']['type'];
-                                    $requestParams[$parameter['name']]['repeatable'] = false;
-                                } else if ($parameter['schema']['type'] === 'array') {
-                                    if (isset($property['items'])) {
-                                        foreach ($property['items'] as $itemKey => $item) {
-                                            if ($itemKey === '$ref') {
-                                                $requestParams[$parameter['name']]['type'] = $this->getRefClass($item);
+
+                            if (!isset($parameter['name'])) {
+                                $parameter['name'] = $method['operationId'];
+                            }
+
+                            $requestParams[$parameter['name']] = [];
+
+                            if (isset($parameter['in']) &&
+                                ($parameter['in'] === 'path' || $parameter['in'] === 'query')
+                            ) {
+                                if (isset($parameter['schema']['type'])) {
+                                    if ($parameter['schema']['type'] === 'string') {
+                                        $requestParams[$parameter['name']]['type'] = $parameter['schema']['type'];
+                                        $requestParams[$parameter['name']]['repeatable'] = false;
+                                    } else if ($parameter['schema']['type'] === 'array') {
+                                        if (isset($property['items'])) {
+                                            foreach ($property['items'] as $itemKey => $item) {
+                                                if ($itemKey === '$ref') {
+                                                    $requestParams[$parameter['name']]['type'] = $this->getRefClass($item);
+                                                }
                                             }
                                         }
+                                        $requestParams[$parameter['name']]['repeatable'] = true;
                                     }
-                                    $requestParams[$parameter['name']]['repeatable'] = true;
+                                } else if (isset($parameter['schema']['$ref'])) {
+                                    $requestParams[$parameter['name']]['type'] = $this->getRefClass($parameter['schema']['$ref']);
+                                    $requestParams[$parameter['name']]['repeatable'] = false;
                                 }
+
                                 $requestParams[$parameter['name']]['attribute'] = false;
                                 $requestParams[$parameter['name']]['elementName'] = $parameter['name'];
+                            } else {
+
+                                if (isset($parameter['$ref'])) {
+                                    $requestParams[$parameter['name']]['type'] = $this->getRefClass($parameter['$ref']);
+                                }
+                            }
+
+                            if (isset($parameter['required']) && $parameter['required'] === true) {
+                                $operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['required'] = $parameter['required'];
                             }
                         }
                     } else {
@@ -445,7 +498,7 @@ class ' . $typeKey . ' extends BaseType
     {
         $file = '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Operations;
+namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Operations;
 
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
@@ -476,7 +529,7 @@ class ' . $operationId . 'RestRequest extends BaseType
     protected function writeOperationsRequestFileContent($filename, $file)
     {
         $this->localContent->put(
-            $this->ebayServicesDirectory .
+            $this->servicesDirectory .
             $this->contract['name'] .
             '/Operations/' .
             $filename .
@@ -495,7 +548,7 @@ class ' . $operationId . 'RestRequest extends BaseType
                     }
                     $file = '<?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Operations;
+namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Operations;
 
 use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
 use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
@@ -511,7 +564,7 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
                 $file .= '
 class ' . ucfirst($method['operationId']) . 'RestResponse extends \\' .
                 $this->getRefClass(
-                    $method['responses']['200']['content']['application/json']['schema']['$ref']
+                    $method['responses']['200']['content']['application/json']['schema']
                 );
             }
         } else {
@@ -528,13 +581,13 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
 
     private static $propertyTypes = [
         \'errors\' => [
-            \'type\' => \'Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Types\Error\',
+            \'type\' => \'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\Error\',
             \'repeatable\' => true,
             \'attribute\' => false,
             \'elementName\' => \'errors\'
         ],
         \'warnings\' => [
-            \'type\' => \'Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Types\Error\',
+            \'type\' => \'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\Error\',
             \'repeatable\' => true,
             \'attribute\' => false,
             \'elementName\' => \'warnings\'
@@ -568,7 +621,7 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
     protected function writeOperationsResponseFileContent($filename, $file)
     {
         $this->localContent->put(
-            $this->ebayServicesDirectory .
+            $this->servicesDirectory .
             $this->contract['name'] .
             '/Operations/' .
             $filename .

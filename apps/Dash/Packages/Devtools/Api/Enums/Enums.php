@@ -15,9 +15,9 @@ class Enums extends BasePackage
 
     protected $packageName = 'enums';
 
-    protected $ebayServicesClass = 'Apps\Dash\Packages\System\Api\Apis\Ebay';
+    protected $servicesClass = null;
 
-    protected $ebayServicesDirectory = 'apps/Dash/Packages/System/Api/Apis/Ebay/';
+    protected $servicesDirectory = null;
 
     public $enums;
 
@@ -76,12 +76,18 @@ class Enums extends BasePackage
 
         $html = file_get_html($data['link']);
 
-        $enums = $html->find('div.' . $data['class']);
+        if (!$data['tag']) {
+            $data['tag'] = 'div';
+        }
+
+        $enums = $html->find($data['tag'] . '.' . $data['class']);
 
         if (count($enums) === 0) {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'No Data Found. Check Tag Class';
+
+            $this->packagesData->responseData = [];
 
             return;
         }
@@ -103,8 +109,13 @@ class Enums extends BasePackage
             $enum['enums'] = explode(',', $enum['enums']);
         }
 
-        $enum['contract_name'] =
-            $this->usePackage(Contracts::class)->getById($enum['contract_id'])['name'];
+        $contract = $this->usePackage(Contracts::class)->getById($enum['contract_id']);
+
+        $enum['contract_name'] = $contract['name'];
+
+        $this->getServicesDirectory($contract['api_type']);
+
+        $this->servicesClass = 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($contract['api_type']);
 
         $this->enum = $enum;
 
@@ -115,7 +126,7 @@ class Enums extends BasePackage
     {
         $file = '<?php
 
-namespace ' . $this->ebayServicesClass . '\\' . $this->enum['contract_name'] . '\\Enums;
+namespace ' . $this->servicesClass . '\\' . $this->enum['contract_name'] . '\\Enums;
 
 class ' . $this->enum['contract_name'] . 'Enum
 {';
@@ -134,12 +145,32 @@ class ' . $this->enum['contract_name'] . 'Enum
     protected function writeEnumFile($file)
     {
         $this->localContent->put(
-            $this->ebayServicesDirectory .
+            $this->servicesDirectory .
             $this->enum['contract_name'] .
             '/Enums/' .
             $this->enum['contract_name'] . 'Enum' .
             '.php',
             $file
         );
+    }
+
+    protected function setServicesDirectory($type = null, $directory = null)
+    {
+        if (!$type && $directory) {
+            $this->servicesDirectory = base_path($directory);
+        } else {
+            $this->servicesDirectory = 'apps/Dash/Packages/System/Api/Apis/' . ucfirst($type) . '/';
+        }
+
+        return $this->servicesDirectory;
+    }
+
+    public function getServicesDirectory($type, $directory = null)
+    {
+        if (!$this->servicesDirectory) {
+            return $this->setServicesDirectory($type, $directory);
+        }
+
+        return $this->servicesDirectory;
     }
 }
