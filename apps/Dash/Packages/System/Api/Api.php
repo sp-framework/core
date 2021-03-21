@@ -5,6 +5,7 @@ namespace Apps\Dash\Packages\System\Api;
 use Apps\Dash\Packages\System\Api\Model\SystemApi;
 use Apps\Dash\Packages\System\Api\Model\SystemApiEbay;
 use Apps\Dash\Packages\System\Api\Model\SystemApiGeneric;
+use Apps\Dash\Packages\System\Api\Model\SystemApiXero;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -37,6 +38,9 @@ class Api extends BasePackage
             $this->model = $this->modelToUse::find($api['api_id']);
 
             $apiData = $this->getDbData($parameters, $enableCache);
+
+            unset($apiData['id']);
+
             if ($apiData) {
                 $api = array_merge($api, $apiData);
             }
@@ -84,6 +88,12 @@ class Api extends BasePackage
             $this->modelToUse = SystemApiEbay::class;
 
             $this->packageName = 'apiEbay';
+
+        } else if ($data['api_type'] === 'xero') {
+
+            $this->modelToUse = SystemApiXero::class;
+
+            $this->packageName = 'apiXero';
         }
 
         return $data;
@@ -99,14 +109,21 @@ class Api extends BasePackage
 
         $apiData = $data;
 
-        if ($apiData['api_type'] === 'ebay') {
+        if ($apiData['api_type'] === 'ebay' ||
+            $apiData['api_type'] === 'xero'
+        ) {
             if (isset($api['user_credentials_scopes']) && $api['user_credentials_scopes'] !== '') {
                 $scopes = explode(',', $api['user_credentials_scopes']);
                 if (count($scopes) > 0) {
                     foreach ($scopes as &$scope) {
                         $scope = trim($scope);
                     }
-                    $api['user_credentials_scopes'] = $scopes;
+
+                    if ($api['api_type'] === 'ebay') {
+                        $api['user_credentials_scopes'] = implode(',', $scopes);
+                    } else if ($api['api_type'] === 'xero') {
+                        $api['user_credentials_scopes'] = implode(' ', $scopes);
+                    }
                 } else {
                     $api['user_credentials_scopes'] = '';
                 }
@@ -148,7 +165,9 @@ class Api extends BasePackage
 
             $api['id'] = $api['api_id'];
 
-            if ($api['api_type'] === 'ebay') {
+            if ($api['api_type'] === 'ebay' ||
+                $api['api_type'] === 'xero'
+            ) {
                 if (!isset($api['credentials'])) { // Data is coming from EbayAPI, no need to update scopes.
                     if (isset($api['user_credentials_scopes']) && $api['user_credentials_scopes'] !== '') {
                         $scopes = explode(',', $api['user_credentials_scopes']);
@@ -156,7 +175,11 @@ class Api extends BasePackage
                             foreach ($scopes as &$scope) {
                                 $scope = trim($scope);
                             }
-                            $api['user_credentials_scopes'] = $scopes;
+                            if ($api['api_type'] === 'ebay') {
+                                $api['user_credentials_scopes'] = implode(',', $scopes);
+                            } else if ($api['api_type'] === 'xero') {
+                                $api['user_credentials_scopes'] = implode(' ', $scopes);
+                            }
                         } else {
                             $api['user_credentials_scopes'] = '';
                         }
@@ -220,9 +243,13 @@ class Api extends BasePackage
         $apiConfig = null;
 
         if (isset($data['state'])) {
-            $this->initAPIType(['api_type' => 'ebay']);
+            if (strpos($data['_url'], 'ebay')) {
+                $this->initAPIType(['api_type' => 'ebay']);
+            } else if (strpos($data['_url'], 'xero')) {
+                $this->initAPIType(['api_type' => 'xero']);
+            }
 
-            $ebayApi = $this->getByParams(
+            $api = $this->getByParams(
                 [
                     'conditions'    => 'identifier = :identifier:',
                     'bind'          =>
@@ -232,23 +259,23 @@ class Api extends BasePackage
                 ]
             );
 
-            if ($ebayApi && count($ebayApi) === 1) {
-                $ebayApiId = $ebayApi[0]['id'];
+            if ($api && count($api) === 1) {
+                $apiId = $api[0]['id'];
 
                 $this->init();
 
-                $ebayApiApi = $this->getByParams(
+                $apiApi = $this->getByParams(
                     [
                         'conditions'    => 'api_id = :id:',
                         'bind'          =>
                             [
-                                'id'    => $ebayApiId
+                                'id'    => $apiId
                             ]
                     ]
                 );
 
-                if (count($ebayApiApi) === 1) {
-                    $apiConfig = $this->getApiById($ebayApiApi[0]['id']);
+                if (count($apiApi) === 1) {
+                    $apiConfig = $this->getApiById($apiApi[0]['id']);
                 }
             }
 

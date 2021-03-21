@@ -33,6 +33,7 @@ var BazContentSectionWithWizard = function() {
         if (!dataCollection[componentId][sectionId]) {
             dataCollection[componentId][sectionId] = { };
         }
+
         steps = dataCollection[componentId][sectionId]['steps'];
         dataCollection[componentId][sectionId]['reviewHtml'] = '';
         review = dataCollection[componentId][sectionId]['reviewHtml'];
@@ -236,6 +237,7 @@ var BazContentSectionWithWizard = function() {
         } else if (wizardOptions['currentStep'] === lastStep) {
             if (wizardOptions['steps'][wizardOptions['currentStep']]['goBack'] != false) {
                 $('#' + sectionId + '-previous').attr('hidden', false);
+                $('#' + sectionId + '-previous').attr('disabled', false);
             } else {
                 $('#' + sectionId + '-previous').attr('hidden', true);
             }
@@ -243,6 +245,7 @@ var BazContentSectionWithWizard = function() {
         } else {
             if (wizardOptions['steps'][wizardOptions['currentStep']]['goBack'] != false) {
                 $('#' + sectionId + '-previous').attr('hidden', false);
+                $('#' + sectionId + '-previous').attr('disabled', false);
             } else {
                 $('#' + sectionId + '-previous').attr('hidden', true);
             }
@@ -314,7 +317,8 @@ var BazContentSectionWithWizard = function() {
                                 false
                                 );
                         } else if ($('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-updateData').length > 0 &&
-                                   formIdVal !== '') {
+                                   formIdVal !== ''
+                        ) {
                             doAjax(
                                 $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-updateData').attr('actionurl'),
                                 steps[wizardOptions['currentStep']]['componentId'],
@@ -334,6 +338,16 @@ var BazContentSectionWithWizard = function() {
     }
 
     function goNext() {
+        if (wizardOptions['steps'][wizardOptions['currentStep']]['onNext']) {
+            var onNext = new Promise(wizardOptions['steps'][wizardOptions['currentStep']]['onNext']);
+
+            onNext.then((success) => {
+                if (!success) {
+                    return;
+                }
+            });
+        }
+
         var nextStep = wizardOptions['currentStep'] + 1;
         $('#' + sectionId + '-' + wizardOptions['currentStep'] + '-step').addClass('visited').removeClass('current');
         $('#' + sectionId + '-' + nextStep + '-step').addClass('current');
@@ -342,9 +356,6 @@ var BazContentSectionWithWizard = function() {
         $('#' + sectionId + '-' + nextStep + '-description').attr('hidden', false);
         $('#' + sectionId + '-' + nextStep + '-data').attr('hidden', false);
 
-        if (wizardOptions['steps'][wizardOptions['currentStep']]['onNext']) {
-            wizardOptions['steps'][wizardOptions['currentStep']]['onNext']();
-        }
         wizardOptions['currentStep'] = nextStep;
         if (wizardOptions['currentStep'] === lastStep) {
             if (wizardOptions.showReview) {
@@ -367,13 +378,28 @@ var BazContentSectionWithWizard = function() {
                     for (var step in steps) {
                         if (steps[step].type === 'form') {
                             if (!steps[step].submitted) {
-                                doAjax(
-                                    dataCollection.env.rootPath + 'index.php?route=' + steps[step].route,
-                                    steps[step].componentId,
-                                    steps[step].sectionId,
-                                    step,
-                                    true
-                                    );
+                                var formIdVal = $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-id').val();
+                                if ($('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-addData').length > 0 &&
+                                    formIdVal === ''
+                                ) {
+                                    doAjax(
+                                        $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-addData').attr('actionurl'),
+                                        steps[wizardOptions['currentStep']]['componentId'],
+                                        steps[wizardOptions['currentStep']]['sectionId'],
+                                        wizardOptions['currentStep'],
+                                        false
+                                        );
+                                } else if ($('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-updateData').length > 0 &&
+                                           formIdVal !== ''
+                                ) {
+                                    doAjax(
+                                        $('#' + steps[wizardOptions['currentStep']]['sectionId'] + '-updateData').attr('actionurl'),
+                                        steps[wizardOptions['currentStep']]['componentId'],
+                                        steps[wizardOptions['currentStep']]['sectionId'],
+                                        wizardOptions['currentStep'],
+                                        false
+                                        );
+                                }
                             }
                         }
                     }
@@ -397,6 +423,7 @@ var BazContentSectionWithWizard = function() {
                 if (data.responseData) {
                     wizardOptions['steps'][step]['responseData'] = data.responseData;
                 }
+                wizardOptions['steps'][step]['submitted'] = true;
                 success = true;
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-danger').addClass('bg-success');
             } else {

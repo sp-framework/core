@@ -35,29 +35,29 @@ class ApiComponent extends BaseComponent
             return;
         }
 
+        if (isset($this->getData()['action']) &&
+            $this->getData()['action'] === 'addxerotoken'
+        ) {
+            $this->addXeroTokenAction();
+
+            $this->view->setLayout('auth');
+
+            $this->view->pick('api/types/xero/wizard/addtoken');
+
+            return;
+        }
+
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
 
                 $api = $this->api->getApiById($this->getData()['id']);
 
                 if ($api['api_type'] === 'ebay') {
-                    try {
-                        $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
-
-                        $this->view->ebayIds = $ebayIds['ebay_ids'];
-                    } catch (\Exception $e) {
-                        throw new \Exception($e->getMessage());
-                    }
+                    $this->includeEbayIds();
                 }
             } else {
                 if ((isset($this->getData()['type']) && $this->getData()['type'] === 'ebay')) {
-                    try {
-                        $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
-
-                        $this->view->ebayIds = $ebayIds['ebay_ids'];
-                    } catch (\Exception $e) {
-                        throw new \Exception($e->getMessage());
-                    }
+                    $this->includeEbayIds();
                 }
 
                 $api = [];
@@ -199,6 +199,17 @@ class ApiComponent extends BaseComponent
         }
     }
 
+    protected function includeEbayIds()
+    {
+        try {
+            $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
+
+            $this->view->ebayIds = $ebayIds['ebay_ids'];
+        } catch (\Exception $e) {
+            throw new \Exception($e->getMessage());
+        }
+    }
+
     public function getEbayAppTokenAction()
     {
         if ($this->request->isPost()) {
@@ -285,6 +296,7 @@ class ApiComponent extends BaseComponent
         }
     }
 
+
     public function refreshEbayUserdataAction($api = null)
     {
         if (!$api) {
@@ -327,5 +339,69 @@ class ApiComponent extends BaseComponent
         $this->view->responseMessage = $api->packagesData->responseMessage;
 
         return $responseData;
+    }
+
+    public function getXeroUserTokenUrlAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $api = $this->api->useApi($this->postData(['api_id']));
+
+            $api->getUserTokenUrl($this->random->uuid());
+
+            // $this->view->responseData = 'http://sp.local/admin/system/api/q/action/addxerotoken/token/';
+            $this->view->responseData = $api->packagesData->responseData;
+
+            $this->view->responseCode = $api->packagesData->responseCode;
+
+            $this->view->responseMessage = $api->packagesData->responseMessage;
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function getXeroTenantsAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $api = $this->api->useApi($this->postData(['api_id']));
+
+            $this->view->responseData = $api->getTenants();
+
+            $this->view->responseCode = 0;
+
+            $this->view->responseMessage = '';
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    protected function addXeroTokenAction()
+    {
+        //     $this->view->responseCode = 0;
+        // return;
+        $api = $this->api->useApi($this->request->get());
+
+        if ($api) {
+            $api->addUserToken($this->request->get());
+
+            $this->view->responseCode = $api->packagesData->responseCode;
+
+            $this->view->responseMessage = $api->packagesData->responseMessage;
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'State received is incorrect.';
+        }
     }
 }

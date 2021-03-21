@@ -42,6 +42,7 @@ var BazContentLoader = function() {
 
         ajaxElements.each(function (count) {
             $(this).attr('data-bclaid', count + 1); //set unique id for the popstate
+            $(this).off(options.ajaxTrigger);
             $(this).on(options.ajaxTrigger, function (e) {
                 e.preventDefault();
 
