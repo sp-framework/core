@@ -3,6 +3,7 @@
     {% set locationName = location['name'] %}
     {% set locationDescription = location['description'] %}
     {% set locationInboundShipping = location['inbound_shipping'] %}
+    {% set locationDeliveryInstructions = location['delivery_instructions'] %}
     {% set locationOutboundShipping = location['outbound_shipping'] %}
     {% set locationCanStock = location['can_stock'] %}
 {% else %}
@@ -10,13 +11,16 @@
     {% set locationName = '' %}
     {% set locationDescription = '' %}
     {% set locationInboundShipping = '' %}
+    {% set locationDeliveryInstructions = '' %}
     {% set locationOutboundShipping = '' %}
     {% set locationCanStock = '' %}
 {% endif %}
 {% if locationInboundShipping == '1' %}
     {% set locationInboundShippingChecked = true %}
+    {% set locationDeliveryInstructionsHidden = false %}
 {% else %}
     {% set locationInboundShippingChecked = false %}
+    {% set locationDeliveryInstructionsHidden = true %}
 {% endif %}
 {% if locationOutboundShipping == '1' %}
     {% set locationOutboundShippingChecked = true %}
@@ -167,6 +171,33 @@
                 'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'delivery_instructions',
+                'fieldLabel'                     : 'Delivery instructions',
+                'fieldType'                      : 'textarea',
+                'fieldDataMaxLength'             : 2048,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Delivery instructions of the location',
+                'fieldRequired'                  : false,
+                'fieldHidden'                    : locationDeliveryInstructionsHidden,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldTextareaRows'              : 4,
+                'fieldValue'                     : locationDeliveryInstructions
             ]
         )}}
     </div>

@@ -100,4 +100,22 @@ class Locations extends BasePackage
 
         return true;
     }
+
+    public function getLocationsByInboundShipping()
+    {
+        $this->getAll();
+
+        $filter =
+            $this->model->filter(
+                function($location) {
+                    $location = $location->toArray();
+
+                    if ($location['inbound_shipping'] == 1) {
+                        return $location;
+                    }
+                }
+            );
+
+        return $filter;
+    }
 }

@@ -44,6 +44,14 @@ class Locations
                     ]
                 ),
                 new Column(
+                    'delivery_instructions',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 2048,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'outbound_shipping',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,

@@ -102,9 +102,23 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                              : { },
         '{{componentId}}-{{sectionId}}-name'                            : { },
         '{{componentId}}-{{sectionId}}-description'                     : { },
-        '{{componentId}}-{{sectionId}}-inbound_shipping'                : { },
+        '{{componentId}}-{{sectionId}}-inbound_shipping'                : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-inbound_shipping').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-inbound_shipping').is(':checked') == true) {
+                        $('#{{componentId}}-{{sectionId}}-delivery_instructions').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-delivery_instructions').parents('.form-group').removeClass('d-none');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-delivery_instructions').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-delivery_instructions').val('');
+                        $('#{{componentId}}-{{sectionId}}-delivery_instructions').parents('.form-group').addClass('d-none');
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-outbound_shipping'               : { },
         '{{componentId}}-{{sectionId}}-can_stock'                       : { },
+        '{{componentId}}-{{sectionId}}-delivery_instructions'           : { },
         '{{componentId}}-{{sectionId}}-primary_contact_employee_id'     : { },
         '{{componentId}}-{{sectionId}}-primary_contact_employee'        : {
             afterInit   : function() {

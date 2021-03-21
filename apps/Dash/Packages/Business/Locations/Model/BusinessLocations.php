@@ -12,6 +12,8 @@ class BusinessLocations extends BaseModel
 
     public $inbound_shipping;
 
+    public $delivery_instructions;
+
     public $outbound_shipping;
 
     public $can_stock;
