@@ -1,0 +1,56 @@
+{
+	"route"			: "devtools/api/contracts",
+	"name"			: "Contracts",
+	"description"	: "Contracts generate API code using openapi standard",
+	"app_type"      : "dash",
+	"category"      : "system",
+	"sub_category"  : "devtools",
+	"version"		: "0.0.1",
+	"repo"			: "https://.../dash-component-system-devtools-api-contracts",
+	"class"			: "Apps\\Dash\\Components\\Devtools\\Api\\Contracts\\ContractsComponent",
+	"dependencies"	: {
+		"core"			: {
+			"name"		: "Core",
+			"version"	: "0.0.1",
+			"repo"		: "https://.../core"
+		},
+		"components"	: [],
+		"packages"		:
+		[
+			{
+				"name"      : "Contracts",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../dash-package-system-devtools-api-contracts"
+			}
+		],
+		"middlewares"	: [],
+		"views"			:
+		[
+			{
+				"name"      : "Default",
+				"version"   : "0.0.1",
+				"repo"      : "https://.../dash-view-default"
+			}
+		]
+	},
+	"menu"				: {
+		"seq"			: 6,
+		"ims"           : {
+			"title"     : "Inventory",
+			"icon"      : "clipboard-list",
+			"childs"    : {
+				"stock" : {
+					"title"		: "stock",
+					"childs"	: {
+						"takes"		: {
+							"title"		: "Takes",
+							"link"		: "ims/stock/takes"
+						}
+					}
+				}
+			}
+		}
+	},
+	"settings"          : {
+	}
+}

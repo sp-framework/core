@@ -1,0 +1,117 @@
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'details'   :
+                                [
+                                    'tabTitle'          : 'Details',
+                                    'tabInclude'        : 'purchaseorders/form/details'
+                                ],
+                                'products'   :
+                                [
+                                    'tabTitle'          : 'Products',
+                                    'tabInclude'        : 'purchaseorders/form/products'
+                                ],
+                                'attachments'   :
+                                [
+                                    'tabTitle'          : 'Attachments',
+                                    'tabInclude'        : 'purchaseorders/form/attachments'
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<script>
+/* globals BazContentFieldsValidator autoComplete PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                          : { },
+        '{{componentId}}-{{sectionId}}-form'                        : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules       : {
+                '{{componentId}}-{{sectionId}}-entity_id'           : 'required',
+                '{{componentId}}-{{sectionId}}-status'              : 'required',
+                '{{componentId}}-{{sectionId}}-vendor_id'           : 'required',
+            },
+            messages    : {
+                '{{componentId}}-{{sectionId}}-entity_id'           : 'Please select a business entity',
+                '{{componentId}}-{{sectionId}}-status'              : 'Please select Order Status',
+                '{{componentId}}-{{sectionId}}-vendor_id'           : 'Please select Supplier',
+            }
+        }
+    });
+</script>

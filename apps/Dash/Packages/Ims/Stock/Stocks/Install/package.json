@@ -1,0 +1,11 @@
+{
+    "name"          : "Contracts",
+    "displayName"   : "Contracts",
+    "description"   : "Package for Contracts component",
+    "version"       : "0.0.1",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "devtools",
+    "repo"          : "https://.../dash-package-system-devtools-api-contracts",
+    "settings"      : { }
+}

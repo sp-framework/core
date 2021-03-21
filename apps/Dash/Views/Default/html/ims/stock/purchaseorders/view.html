@@ -1,0 +1,58 @@
+{% if purchaseOrder['id'] is defined %}
+    {% set purchaseOrderId = purchaseOrder['id'] %}
+    {% set title = 'Purchase Order Id: (' ~ purchaseOrder['id'] ~ ')' %}
+{% else %}
+    {% set purchaseOrderId = '' %}
+    {% set title = 'New Purchase Order' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'receipt',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'purchaseorders/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : purchaseOrderId,
+            'addActionUrl'                  : 'ims/stock/purchaseorders/add',
+            'addSuccessRedirectUrl'         : 'ims/stock/purchaseorders',
+            'updateActionUrl'               : 'ims/stock/purchaseorders/update',
+            'updateSuccessRedirectUrl'      : 'ims/stock/purchaseorders',
+            'cancelActionUrl'               : 'ims/stock/purchaseorders',
+            'closeActionUrl'                : 'ims/stock/purchaseorders'
+        ],
+        'dataDependencies'     :
+        [
+            [
+                'componentName'      : 'Storages',
+                'componentVar'       : storages,
+                'componentRoute'     : false
+            ],
+            [
+                'componentName'      : 'Entities',
+                'componentVar'       : entities,
+                'componentRoute'     : false
+            ],
+            [
+                'componentName'      : 'Suppliers',
+                'componentVar'       : suppliers,
+                'componentRoute'     : 'ims/suppliers'
+            ],
+            [
+                'componentName'      : 'Locations',
+                'componentVar'       : locations,
+                'componentRoute'     : false
+            ]
+        ]
+    ]
+)}}
