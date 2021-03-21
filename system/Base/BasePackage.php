@@ -101,7 +101,8 @@ abstract class BasePackage extends Controller
 			if ($data) {
 				return $data;
 			} else {
-				throw new IdNotFoundException('Not Found', 1);
+				return false;
+				// throw new IdNotFoundException('Not Found', 1);
 			}
 		}
 
@@ -420,7 +421,7 @@ abstract class BasePackage extends Controller
 			if (!${$this->packageName}) {
 				$this->packagesData->responseCode = 1;
 
-				$this->packagesData->responseMessage = $data['id'] . " not found!";
+				$this->packagesData->responseMessage = 'ID: ' . $data['id'] . " not found for package {$this->packageName}";
 
 				return;
 			}

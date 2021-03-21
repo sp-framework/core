@@ -6,14 +6,13 @@ use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\GetUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\RefreshUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Base\Functions;
 use Phalcon\Helper\Json;
-use System\Base\BasePackage;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 class Ebay
 {
-     const MIN_USER_TOKEN_TIME = 600;
+    const MIN_USER_TOKEN_TIME = 600;
 
-     const MAX_REFRESH_TOKEN_TIME = 864000;
+    const MAX_REFRESH_TOKEN_TIME = 864000;
 
     public static $STRICT_PROPERTY_TYPES = true;
 

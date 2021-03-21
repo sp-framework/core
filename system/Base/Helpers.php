@@ -74,12 +74,20 @@ if (!function_exists('checkCtype')) {
         }
 
         if ($ctype === 'alum') {
-            return ctype_alnum(trim(str_replace($ignoreChars, '' , $str)));
+            if (ctype_alnum(trim(str_replace($ignoreChars, '' , $str)))) {
+                return trim(str_replace($ignoreChars, '' , $str));
+            }
         } else if ($ctype === 'alpha') {
-            return ctype_alpha(trim(str_replace($ignoreChars, '' , $str)));
+            if (ctype_alpha(trim(str_replace($ignoreChars, '' , $str)))) {
+                return trim(str_replace($ignoreChars, '' , $str));
+            }
         } else if ($ctype === 'digits') {
-            return ctype_digit(trim(str_replace($ignoreChars, '' , $str)));
+            if (ctype_digit(trim(str_replace($ignoreChars, '' , $str)))) {
+                return trim(str_replace($ignoreChars, '' , $str));
+            }
         }
+
+        return false;
     }
 }
 
