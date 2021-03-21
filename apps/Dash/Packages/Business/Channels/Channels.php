@@ -44,6 +44,7 @@ class Channels extends BasePackage
                 $channelData = $this->getDbData($parameters, $enableCache);
 
                 if ($channelData) {
+                    unset($channelData['id']);
                     $channel = array_merge($channel, $channelData);
                 }
 
@@ -109,7 +110,7 @@ class Channels extends BasePackage
 
                     $api['in_use'] = 1;
 
-                    $api['used_by'] = 'Channel (' . $data['channel_id'] . ')';
+                    $api['used_by'] = 'Channel (' . $data['name'] . ')';
 
                     $apiPackage->update($api);
                 }
@@ -138,7 +139,7 @@ class Channels extends BasePackage
         if ($this->update($channelData)) {
             $channelData = $this->initChannelType($channelData);
 
-            $channelData['id'] = $channelData['api_id'];
+            $channelData['id'] = $channelData['channel_id'];
 
             if ($this->update($channelData)) {
 
@@ -149,7 +150,7 @@ class Channels extends BasePackage
 
                     $api['in_use'] = 1;
 
-                    $api['used_by'] = 'Channel (' . $data['id'] . ')';
+                    $api['used_by'] = 'Channel (' . $data['name'] . ')';
 
                     $apiPackage->update($api);
                 }
