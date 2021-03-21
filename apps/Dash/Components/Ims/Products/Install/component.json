@@ -1,5 +1,5 @@
 {
-    "route"         : "products",
+    "route"         : "ims/products",
     "name"          : "Products",
     "description"   : "Manage dash products via this component",
     "app_type"      : "dash",

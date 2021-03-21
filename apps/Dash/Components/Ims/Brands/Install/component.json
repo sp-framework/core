@@ -1,5 +1,5 @@
 {
-    "route"         : "brands",
+    "route"         : "ims/brands",
     "name"          : "Brands",
     "description"   : "Manage dash brands via this component",
     "app_type"      : "dash",

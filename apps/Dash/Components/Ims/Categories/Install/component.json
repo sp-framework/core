@@ -1,5 +1,5 @@
 {
-    "route"         : "categories",
+    "route"         : "ims/categories",
     "name"          : "Categories",
     "description"   : "Manage dash categories via this component",
     "app_type"      : "dash",
