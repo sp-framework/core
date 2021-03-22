@@ -196,9 +196,16 @@
                             ],
                         '4' :
                             [
-                                'title'             : 'Done',
-                                'content'           : view.getPartial('api/types/xero/wizard/info'),
-                                'description'       : 'Done.'
+                                'title'             : 'Assign',
+                                'content'           : view.getPartial('api/types/xero/wizard/assign',
+                                                        [
+                                                            'componentId'       : componentId,
+                                                            'sectionId'         : 'main',
+                                                            'parentComponentId' : parent
+                                                        ]
+                                                    ),
+                                'description'       : 'Step 4: Assign Xero API to a business entity.',
+                                'goBack'            : false
                             ]
                     ]
             ]
