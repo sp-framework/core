@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\System\Api\Apis;
 
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\GetUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\RefreshUserTokenRestRequest;
-use Apps\Dash\Packages\System\Api\Base\Functions;
+use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
 use Phalcon\Helper\Json;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
@@ -14,11 +14,9 @@ class Ebay
 
     const MAX_REFRESH_TOKEN_TIME = 864000;
 
-    public static $STRICT_PROPERTY_TYPES = true;
+    protected static $sandbox = false;
 
-    private static $sandbox = false;
-
-    private static $debug = false;
+    protected static $debug = false;
 
     protected $apiConfig;
 
@@ -56,15 +54,16 @@ class Ebay
         $this->apiConfig['debug'] = self::$debug;
 
         $this->apiConfig['sandbox'] = self::$sandbox;
+
         if ($this->apiConfig['use_systems_credentials'] == 1) {
             try {
-                $config = include(base_path('apps/Dash/Packages/System/Api/Configs/BazaariEbayConfig.php'));
+                $config = include(base_path('apps/Dash/Packages/System/Api/Configs/Ebay/Config.php'));
 
                 if (self::$sandbox) {
-                    $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $config['sandbox']);
+                    $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $config['sandbox']);
                     $this->apiConfig['sandbox'] = true;
                 } else {
-                    $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $config['production']);
+                    $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $config['production']);
                     $this->apiConfig['sandbox'] = false;
                 }
             } catch (\Exception $e) {
@@ -85,13 +84,13 @@ class Ebay
                     ],
                 ];
 
-            $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $userCredentials);
+            $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $userCredentials);
         }
 
         try {
-            $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
+            $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/Ebay/Ids.php'));
 
-            $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $ebayIds);
+            $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $ebayIds);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
@@ -103,7 +102,7 @@ class Ebay
             $serviceClass =
                 "Apps\\Dash\\Packages\\System\\Api\\Apis\\Ebay\\{$serviceName}\\Services\\{$serviceName}Service";
 
-            $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $serviceRequestParams);
+            $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $serviceRequestParams);
 
             return new $serviceClass($this->apiConfig);
 

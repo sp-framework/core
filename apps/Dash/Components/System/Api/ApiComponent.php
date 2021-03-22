@@ -307,9 +307,9 @@ class ApiComponent extends BaseComponent
             $responseData = $api->packagesData->responseData;
         }
 
-        $identity = $api->useService('Identityapi');
+        $identity = $api->useService('EbayIdentityApi');
 
-        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Identityapi\Operations\GetUserRestRequest;
+        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\EbayIdentityApi\Operations\GetUserRestRequest;
 
         $response = $identity->getUser($request);
 
@@ -318,9 +318,9 @@ class ApiComponent extends BaseComponent
         if (isset($responseData['user_data']['accountType']) &&
             $responseData['user_data']['accountType'] === 'BUSINESS'
         ) {
-            $trading = $api->useService('Tradingapi');
+            $trading = $api->useService('EbayTradingApi');
 
-            $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\Tradingapi\Operations\GetStoreRequest;
+            $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\EbayTradingApi\Operations\GetStoreRequest;
 
             $response = $trading->getStore($request);
 

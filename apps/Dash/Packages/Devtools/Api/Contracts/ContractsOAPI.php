@@ -33,35 +33,21 @@ class ContractsOAPI
 
         $file .= $this->generateBaseServicesHeader();
 
+        if ($this->contract['api_type'] === 'ebay') {
+            $const = '
+    const HDR_MARKETPLACE_ID = \'X-EBAY-C-MARKETPLACE-ID\';';
+        } else if ($this->contract['api_type'] === 'xero') {
+            $const = '
+    const HDR_XERO_TENANT_ID = \'xero-tenant-id\';';
+        }
+
         $file .=
 '    protected static $endPoints =
         ' . $this->generateProperties('endPoints') . ';';
 
-        $file .= '
-
-    const HDR_AUTHORIZATION = \'Authorization\';
-
-    const HDR_MARKETPLACE_ID = \'X-EBAY-C-MARKETPLACE-ID\';
-
-    public function __construct(array $config)
-    {
-        parent::__construct($config);
-    }
-
-    public static function getConfigDefinitions()
-    {
-        $definitions = parent::getConfigDefinitions();
-
-        return $definitions + [
-            \'apiVersion\' => [
-                \'valid\' => [\'string\'],
-                \'default\' => ' . $this->servicesClass . '\\' . $this->contract['name'] . '\Services\\' . $this->contract['name'] . 'Service::API_VERSION,
-                \'required\' => true
-            ]
-        ];
-    }
-
-    protected function getEbayHeaders()
+        if ($this->contract['api_type'] === 'ebay') {
+            $headers =
+'    protected function getEbayHeaders()
     {
         $headers = [];
 
@@ -74,20 +60,53 @@ class ContractsOAPI
         }
 
         return $headers;
+    }';
+        } else if ($this->contract['api_type'] === 'xero') {
+            $headers =
+'    protected function getXeroHeaders()
+    {
+        $headers = [];
+
+        // Add required headers first.
+        $headers[self::HDR_AUTHORIZATION] = \'Bearer \' . $this->getConfig(\'user_access_token\');
+
+        $headers[self::HDR_XERO_TENANT_ID] = $this->getConfig("tenantId");
+
+        return $headers;
+    }';
+        }
+        $file .= '
+
+    const HDR_AUTHORIZATION = \'Authorization\';
+' . $const . '
+
+    public function __construct(array $config)
+    {
+        parent::__construct($config);
     }
+
+' . $headers . '
 }';
         return $file;
     }
 
     protected function generateBaseServicesHeader()
     {
+        if ($this->contract['api_type'] === 'ebay') {
+            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Ebay\EbayRESTService';
+            $baseRestService = 'EbayRESTService';
+        } else if ($this->contract['api_type'] === 'xero') {
+            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroRESTService';
+            $baseRestService = 'XeroRESTService';
+        }
+
         return '<?php
 
 namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Services;
 
-use Apps\Dash\Packages\System\Api\Base\BaseRestService;
+use ' . $baseRestServiceNamespace . ';
 
-class ' . $this->contract['name'] . 'BaseService extends BaseRestService
+class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . '
 {
 ';
     }
@@ -248,8 +267,6 @@ use Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type'])
 
 class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name'] . 'BaseService
 {
-    const API_VERSION = \'v1\';
-
 ';
     }
 

@@ -55,11 +55,10 @@ class Api extends BasePackage
                     if ($timeDiff <= 0) {
                         $api['setup'] = 2;
 
-                        $this->updateApi($api);
+                        $this->init()->updateApi($api);
                     }
                 }
             }
-
             return $api;
         }
 

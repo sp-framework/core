@@ -169,10 +169,10 @@ class ContractsXML
 
 namespace Apps\Dash\Packages\System\Api\Apis\Ebay\\' . $this->contract['name'] . '\Services;
 
-use Apps\Dash\Packages\System\Api\Base\BaseXMLService;
+use Apps\Dash\Packages\System\Api\Apis\Ebay\EbayXMLService;
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
-class ' . $this->contract['name'] . 'BaseService extends BaseXMLService
+class ' . $this->contract['name'] . 'BaseService extends EbayXMLService
 {';
     }
 

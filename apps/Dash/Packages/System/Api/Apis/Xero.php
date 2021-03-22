@@ -5,7 +5,7 @@ namespace Apps\Dash\Packages\System\Api\Apis;
 use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\GetTenantsRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\GetUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\RefreshUserTokenRestRequest;
-use Apps\Dash\Packages\System\Api\Base\Functions;
+use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
 use Phalcon\Helper\Json;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
@@ -15,11 +15,7 @@ class Xero
 
     const MAX_REFRESH_TOKEN_TIME = 864000;
 
-    public static $STRICT_PROPERTY_TYPES = true;
-
-    // private static $sandbox = false;
-
-    private static $debug = false;
+    protected static $debug = false;
 
     protected $apiConfig;
 
@@ -56,18 +52,12 @@ class Xero
     {
         $this->apiConfig['debug'] = self::$debug;
 
-        // $this->apiConfig['sandbox'] = self::$sandbox;
-
         if ($this->apiConfig['use_systems_credentials'] == 1) {
             try {
-                $config = include(base_path('apps/Dash/Packages/System/Api/Configs/BazaariXeroConfig.php'));
-                // if (self::$sandbox) {
-                //     $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $config['sandbox']);
-                //     $this->apiConfig['sandbox'] = true;
-                // } else {
-                    $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $config['production']);
-                //     $this->apiConfig['sandbox'] = false;
-                // }
+                $config = include(base_path('apps/Dash/Packages/System/Api/Configs/Xero/Config.php'));
+
+                $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $config['production']);
+
             } catch (\Exception $e) {
                 throw new \Exception($e->getMessage());
             }
@@ -85,16 +75,8 @@ class Xero
                     ],
                 ];
 
-            $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $userCredentials);
+            $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $userCredentials);
         }
-
-        // try {
-        //     $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/XeroIds.php'));
-
-        //     $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $ebayIds);
-        // } catch (\Exception $e) {
-        //     throw new \Exception($e->getMessage());
-        // }
     }
 
     public function useService($serviceName, $serviceRequestParams = [])
@@ -103,7 +85,7 @@ class Xero
             $serviceClass =
                 "Apps\\Dash\\Packages\\System\\Api\\Apis\\Xero\\{$serviceName}\\Services\\{$serviceName}Service";
 
-            $this->apiConfig = Functions::arrayMergeDeep($this->apiConfig, $serviceRequestParams);
+            $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $serviceRequestParams);
 
             return new $serviceClass($this->apiConfig);
 
@@ -111,19 +93,6 @@ class Xero
             throw $e;
         }
     }
-
-    // public function getAppToken()
-    // {
-    //     try {
-    //         $token = $this->useService('OAuth')->getAppToken();
-
-    //         $this->updateApi($token, 'eBayApp');
-    //     } catch (\Exception $e) {
-    //         $this->packagesData->responseCode = 1;
-
-    //         $this->packagesData->responseMessage = $e->getMessage();
-    //     }
-    // }
 
     public function getUserTokenUrl(string $identifier)
     {
@@ -363,19 +332,6 @@ class Xero
                     }
                 }
             }
-            //     $searchFreeTenant = $this->api->getByParams(
-            //         [
-            //             'conditions'    => 'tenant_id = :tid:',
-            //             'bind'          =>
-            //                 [
-            //                     'tid'   => $tenant['tenantId']
-            //                 ]
-            //         ]
-            //     );
-
-            //     if (!$searchFreeTenant) {
-            //     }
-            // }
         }
 
         $responseData['apiConfig'] = $this->apiConfig;

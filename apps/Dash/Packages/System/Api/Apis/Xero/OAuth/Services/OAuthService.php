@@ -15,9 +15,6 @@ class OAuthService
 {
     const API_VERSION = 'v1';
 
-    /**
-     * @var array $endPoints The API endpoints.
-     */
     protected static $endPoints = [
         'login'             => 'https://login.xero.com',
         'getUserToken'      => 'https://identity.xero.com',
@@ -25,9 +22,6 @@ class OAuthService
         'getTenants'        => 'https://api.xero.com'
     ];
 
-    /**
-     * @property array $operations Associative array of operations provided by the service.
-     */
     protected static $operations = [
         'getUserToken' => [
             'method' => 'POST',
@@ -52,22 +46,11 @@ class OAuthService
         ]
     ];
 
-    /**
-     * @var \Apps\Dash\Packages\System\Api\Apis\Xero\ConfigurationResolver Resolves configuration options.
-     */
     protected $resolver;
 
-    /**
-     * @var \Apps\Dash\Packages\System\Api\Apis\Xero\UriResolver Resolves uri parameters.
-     */
     protected $uriResolver;
 
-    /**
-     * @var array Associative array storing the current configuration option values.
-     */
     protected static $config;
-
-    protected static $sandbox;
 
     protected static $debug;
 
@@ -78,17 +61,15 @@ class OAuthService
      */
     public function __construct(array $config)
     {
-        self::$credentials = $config['credentials'];
-
-        // self::$sandbox = $config['sandbox'];
-
-        self::$debug = $config['debug'];
-
         $this->resolver = new ConfigurationResolver(static::getConfigDefinitions());
 
         $this->uriResolver = new UriResolver();
 
         self::$config = $this->resolver->resolve($config);
+
+        self::$debug = $config['debug'];
+
+        self::$credentials = $config['credentials'];
     }
 
     /**
@@ -110,12 +91,12 @@ class OAuthService
             ],
             'debug'         => [
                 'valid'     => ['bool', 'array'],
-                'fn'        => 'Apps\Dash\Packages\System\Api\Base\Functions::applyDebug',
+                'fn'        => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroFunctions::applyDebug',
                 'default'   => self::$debug
             ],
             'httpHandler'   => [
                 'valid'     => ['callable'],
-                'default'   => 'Apps\Dash\Packages\System\Api\Base\Functions::defaultHttpHandler'
+                'default'   => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroFunctions::defaultHttpHandler'
             ],
             'httpOptions'   => [
                 'valid'     => ['array'],
@@ -126,52 +107,6 @@ class OAuthService
         ];
     }
 
-    /**
-     * Method to get the service's configuration.
-     *
-     * @param string|null $option The name of the option whos value will be returned.
-     *
-     * @return mixed Returns an associative array of configuration options if no parameters are passed,
-     * otherwise returns the value for the specified configuration option.
-     */
-    public function getConfig($option = null)
-    {
-        return $option === null
-            ? self::$config
-            : (isset(self::$config[$option])
-                ? self::$config[$option]
-                : null);
-    }
-
-    /**
-     * Set multiple configuration options.
-     *
-     * @param array $configuration Associative array of configuration options and their values.
-     */
-    public function setConfig(array $configuration)
-    {
-        self::$config = Functions::arrayMergeDeep(
-            self::$config,
-            $this->resolver->resolveOptions($configuration)
-        );
-    }
-
-    /**
-     * Helper method to return the value of the credentials configuration option.
-     *
-     * @return \Apps\Dash\Packages\System\Api\Apis\Xero\Credentials\CredentialsInterface
-     */
-    public function getCredentials()
-    {
-        return $this->getConfig('credentials');
-    }
-
-    /**
-     * @param array $params An associative array with state and scope as the keys.
-     *
-     * @return string The redirect URL.
-     * @throws \InvalidArgumentException.
-     */
     public function redirectUrlForUser(array $params)
     {
         if (!array_key_exists('state', $params)) {
@@ -302,9 +237,9 @@ class OAuthService
         $body = $this->buildRequestBody($requestValues);
         $headers = $this->buildRequestHeaders($body, $name);
         $responseClass = $operation['responseClass'];
-        $debug = $this->getConfig('debug');
-        $httpHandler = $this->getConfig('httpHandler');
-        $httpOptions = $this->getConfig('httpOptions');
+        $debug = self::$config['debug'];
+        $httpHandler = self::$config['httpHandler'];
+        $httpOptions = self::$config['httpOptions'];
 
         if ($debug !== false) {
             $this->debugRequest($url, $headers, $body);
@@ -429,7 +364,7 @@ class OAuthService
      */
     protected function debug($str)
     {
-        $debugger = $this->getConfig('debug');
+        $debugger = self::$config['debug'];
         $debugger($str);
     }
 }

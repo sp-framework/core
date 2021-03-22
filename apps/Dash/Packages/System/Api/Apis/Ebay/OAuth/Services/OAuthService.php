@@ -15,17 +15,11 @@ class OAuthService
 {
     const API_VERSION = 'v1';
 
-    /**
-     * @var array $endPoints The API endpoints.
-     */
     protected static $endPoints = [
         'sandbox'    => 'https://api.sandbox.ebay.com/identity',
         'production' => 'https://api.ebay.com/identity'
     ];
 
-    /**
-     * @property array $operations Associative array of operations provided by the service.
-     */
     protected static $operations = [
         'getUserToken' => [
             'method' => 'POST',
@@ -50,19 +44,10 @@ class OAuthService
         ]
     ];
 
-    /**
-     * @var \Apps\Dash\Packages\System\Api\Apis\Ebay\ConfigurationResolver Resolves configuration options.
-     */
     protected $resolver;
 
-    /**
-     * @var \Apps\Dash\Packages\System\Api\Apis\Ebay\UriResolver Resolves uri parameters.
-     */
     protected $uriResolver;
 
-    /**
-     * @var array Associative array storing the current configuration option values.
-     */
     protected static $config;
 
     protected static $sandbox;
@@ -71,9 +56,6 @@ class OAuthService
 
     protected static $credentials;
 
-    /**
-     * @param array $config Configuration option values.
-     */
     public function __construct(array $config)
     {
         self::$credentials = $config['credentials'];
@@ -89,11 +71,6 @@ class OAuthService
         self::$config = $this->resolver->resolve($config);
     }
 
-    /**
-     * Returns definitions for each configuration option that is supported.
-     *
-     * @return array An associative array of configuration definitions.
-     */
     public static function getConfigDefinitions()
     {
         return [
@@ -102,22 +79,18 @@ class OAuthService
                 'default'   => self::API_VERSION,
                 'required'  => true
             ],
-            'profile'       => [
-                'valid'     => ['string'],
-                'fn'        => 'Apps\Dash\Packages\System\Api\Base\Functions::applyProfile',
-            ],
             'credentials'   => [
                 'valid'     => ['array'],
                 'default'   => self::$credentials
             ],
             'debug'         => [
                 'valid'     => ['bool', 'array'],
-                'fn'        => 'Apps\Dash\Packages\System\Api\Base\Functions::applyDebug',
+                'fn'        => 'Apps\Dash\Packages\System\Api\Apis\Ebay\EbayFunctions::applyDebug',
                 'default'   => self::$debug
             ],
             'httpHandler'   => [
                 'valid'     => ['callable'],
-                'default'   => 'Apps\Dash\Packages\System\Api\Base\Functions::defaultHttpHandler'
+                'default'   => 'Apps\Dash\Packages\System\Api\Apis\Ebay\EbayFunctions::defaultHttpHandler'
             ],
             'httpOptions'   => [
                 'valid'     => ['array'],
@@ -137,52 +110,6 @@ class OAuthService
         ];
     }
 
-    /**
-     * Method to get the service's configuration.
-     *
-     * @param string|null $option The name of the option whos value will be returned.
-     *
-     * @return mixed Returns an associative array of configuration options if no parameters are passed,
-     * otherwise returns the value for the specified configuration option.
-     */
-    public function getConfig($option = null)
-    {
-        return $option === null
-            ? self::$config
-            : (isset(self::$config[$option])
-                ? self::$config[$option]
-                : null);
-    }
-
-    /**
-     * Set multiple configuration options.
-     *
-     * @param array $configuration Associative array of configuration options and their values.
-     */
-    public function setConfig(array $configuration)
-    {
-        self::$config = Functions::arrayMergeDeep(
-            self::$config,
-            $this->resolver->resolveOptions($configuration)
-        );
-    }
-
-    /**
-     * Helper method to return the value of the credentials configuration option.
-     *
-     * @return \Apps\Dash\Packages\System\Api\Apis\Ebay\Credentials\CredentialsInterface
-     */
-    public function getCredentials()
-    {
-        return $this->getConfig('credentials');
-    }
-
-    /**
-     * @param array $params An associative array with state and scope as the keys.
-     *
-     * @return string The redirect URL.
-     * @throws \InvalidArgumentException.
-     */
     public function redirectUrlForUser(array $params)
     {
         if (!array_key_exists('state', $params)) {
@@ -193,13 +120,13 @@ class OAuthService
             throw new \InvalidArgumentException('scope parameter required');
         }
 
-        $url = $this->getConfig('sandbox')
+        $url = self::$config['sandbox']
             ? 'https://auth.sandbox.ebay.com/oauth2/authorize?'
             : 'https://auth.ebay.com/oauth2/authorize?';
 
         $urlParams = [
-            'client_id'     => $this->getConfig('credentials')['appId'],
-            'redirect_uri'  => $this->getConfig('ruName'),
+            'client_id'     => self::$config['credentials']['appId'],
+            'redirect_uri'  => self::$config['ruName'],
             'response_type' => 'code',
             'state'         => $params['state'],
             'scope'         => implode(' ', $params['scope']),
@@ -231,7 +158,7 @@ class OAuthService
             $request->grant_type = 'authorization_code';
         }
         if (!isset($request->redirect_uri)) {
-            $request->redirect_uri = $this->getConfig('ruName');
+            $request->redirect_uri = self::$config['ruName'];
         }
 
         return $this->callOperationAsync('getUserToken', $request);
@@ -284,7 +211,7 @@ class OAuthService
             $request->grant_type = 'client_credentials';
         }
         if (!isset($request->redirect_uri)) {
-            $request->redirect_uri = $this->getConfig('ruName');
+            $request->redirect_uri = self::$config['ruName'];
         }
         if (!isset($request->scope)) {
             $request->scope = 'https://api.ebay.com/oauth/api_scope';
@@ -293,14 +220,6 @@ class OAuthService
         return $this->callOperationAsync('getAppToken', $request);
     }
 
-    /**
-     * Sends an asynchronous API request.
-     *
-     * @param string $name The name of the operation.
-     * @param \Apps\Dash\Packages\System\Api\Apis\Ebay\Types\BaseType $request Request object containing the request information.
-     *
-     * @return \GuzzleHttp\Promise\PromiseInterface A promise that will be resolved with an object created from the JSON response.
-     */
     protected function callOperationAsync($name, BaseType $request = null)
     {
         $operation = static::$operations[$name];
@@ -315,7 +234,7 @@ class OAuthService
 
         $url = $this->uriResolver->resolve(
             $this->getUrl($name),
-            $this->getConfig('apiVersion'),
+            self::$config['apiVersion'],
             $operation['resource'],
             $operation['params'],
             $paramValues
@@ -325,9 +244,9 @@ class OAuthService
         $body = $this->buildRequestBody($requestValues);
         $headers = $this->buildRequestHeaders($body);
         $responseClass = $operation['responseClass'];
-        $debug = $this->getConfig('debug');
-        $httpHandler = $this->getConfig('httpHandler');
-        $httpOptions = $this->getConfig('httpOptions');
+        $debug = self::$config['debug'];
+        $httpHandler = self::$config['httpHandler'];
+        $httpOptions = self::$config['httpOptions'];
 
         if ($debug !== false) {
             $this->debugRequest($url, $headers, $body);
@@ -359,7 +278,7 @@ class OAuthService
      */
     protected function getUrl()
     {
-        return $this->getConfig('sandbox') ? static::$endPoints['sandbox'] : static::$endPoints['production'];
+        return self::$config['sandbox'] ? static::$endPoints['sandbox'] : static::$endPoints['production'];
     }
 
     /**
@@ -389,7 +308,7 @@ class OAuthService
      */
     protected function buildRequestHeaders($body)
     {
-        $credentials = $this->getConfig('credentials');
+        $credentials = self::$config['credentials'];
         $appId = $credentials['appId'];
         $certId = $credentials['certId'];
 
@@ -441,7 +360,7 @@ class OAuthService
      */
     protected function debug($str)
     {
-        $debugger = $this->getConfig('debug');
+        $debugger = self::$config['debug'];
         $debugger($str);
     }
 }
