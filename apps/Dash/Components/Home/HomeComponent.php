@@ -12,6 +12,7 @@ namespace Apps\Dash\Components\Home;
 // use Apps\Dash\Components\Storages\Install\Component as StoragesComponent;
 use Apps\Dash\Components\Devtools\Api\Contracts\Install\Component as ContractsComponent;
 use Apps\Dash\Components\Devtools\Api\Enums\Install\Component as EnumsComponent;
+use Apps\Dash\Components\Ims\Stock\Purchaseorders\Install\Component as PurchaseOrdersComponent;
 use Apps\Dash\Components\System\Api\Ebay\Taxonomy\Install\Component as TaxonomyComponent;
 use Apps\Dash\Components\System\Api\Install\Component as ApiComponent;
 use Apps\Dash\Packages\Business\ABNLookup\Install\Package as ABNLookupPackage;
@@ -32,6 +33,7 @@ use Apps\Dash\Packages\Ims\Brands\Install\Package as BrandsPackage;
 use Apps\Dash\Packages\Ims\Categories\Install\Package as CategoriesPackage;
 use Apps\Dash\Packages\Ims\Products\Install\Package as ProductsPackage;
 use Apps\Dash\Packages\Ims\Specifications\Install\Package as SpecificationsPackage;
+use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Package as PurchaseOrdersPackage;
 use Apps\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
 use Apps\Dash\Packages\System\Api\Api;
 use Apps\Dash\Packages\System\Api\Ebay\Taxonomy\Install\Package as TaxonomyPackage;
@@ -46,9 +48,16 @@ class HomeComponent extends BaseComponent
      */
     public function viewAction()
     {
-        // $this->reset();
-        $this->resetTemp();
-        return;
+        // $this->resetTemp();return;
+        // $parser = new \Phalcon\Security\JWT\Token\Parser();
+
+        // $tokenObject = $parser->parse("eyJhbGciOiJSUzI1NiIsImtpZCI6IjFDQUY4RTY2NzcyRDZEQzAyOEQ2NzI2RkQwMjYxNTgxNTcwRUZDMTkiLCJ0eXAiOiJKV1QiLCJ4NXQiOiJISy1PWm5jdGJjQW8xbkp2MENZVmdWY09fQmsifQ.eyJuYmYiOjE2MTYxNTY3NDAsImV4cCI6MTYxNjE1ODU0MCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS54ZXJvLmNvbSIsImF1ZCI6Imh0dHBzOi8vaWRlbnRpdHkueGVyby5jb20vcmVzb3VyY2VzIiwiY2xpZW50X2lkIjoiODRBQ0ZBRTRCREFGNDM3MkJFMTlBQTQ2Njg0QTkyNzIiLCJzdWIiOiIyMTYzNTc4ZmJmZTg1NDMwOGVjZmYzMmVmODUwNGU4MyIsImF1dGhfdGltZSI6MTYxNjE1NjY1NSwieGVyb191c2VyaWQiOiI0YTY2ZTdhNi1lMGNhLTQ3Y2UtOWZlZS04OGU3YWZiY2UxZDYiLCJnbG9iYWxfc2Vzc2lvbl9pZCI6IjI4M2Q3Y2Y0Y2I1YjQzN2FiYTJjODE5Mzg2YzY1NzJjIiwianRpIjoiZTRlZTJiYTlkNjAyNjhjNjdiMjg4MTBiYThjMzU1NGIiLCJhdXRoZW50aWNhdGlvbl9ldmVudF9pZCI6ImJjZjQ1MzQwLTVhMjctNDQwYS1iMmZlLTg1NTAxOWQxNmQ2MCIsInNjb3BlIjpbImVtYWlsIiwicHJvZmlsZSIsIm9wZW5pZCIsImFjY291bnRpbmcucmVwb3J0cy5yZWFkIiwiZmlsZXMiLCJwYXlyb2xsLmVtcGxveWVlcyIsInBheXJvbGwucGF5cnVucyIsInBheXJvbGwucGF5c2xpcCIsInBheXJvbGwudGltZXNoZWV0cyIsInByb2plY3RzIiwiYWNjb3VudGluZy5zZXR0aW5ncyIsImFjY291bnRpbmcuYXR0YWNobWVudHMiLCJhY2NvdW50aW5nLnRyYW5zYWN0aW9ucyIsImFjY291bnRpbmcuam91cm5hbHMucmVhZCIsImFzc2V0cyIsImFjY291bnRpbmcuY29udGFjdHMiLCJwYXlyb2xsLnNldHRpbmdzIiwib2ZmbGluZV9hY2Nlc3MiXX0.INuzO7I6_82EOnT1Kj4N4TzZFrxx4T7X8_z94p5jVg0TYufbDfIt8Xqld09gtj8SfOWIN4iQdkG5TTzakZ86JgNNg6Azca-K6mcGZVwBIw4iaNGkimt3THHJpBsL8SJYMWec_tor47yhvr6s7jJ7t_WIx6rLO5IG11upGfkvK9QC-nDLwrBLgVu5RVVKeBN3hCHpo9eDaRPnE5jIuKY98eYr9HtEFxMos2XPB2c_MO8p9YmO_DWZ1F44-wmkJc265iGcuaHebDax67noXmpV4KbdWFOgb4scCxTgIru-uUMLTh0dHLgeWwAOBHlJcMFBTEwgY9roz_bJrlnC_N4Axw");
+
+        // var_dump($tokenObject->getClaims());
+        // var_dump($tokenObject->getClaims()->get('authentication_event_id'));
+       // $this->reset();
+
+        return false;
 
         $apiPackage = $this->usePackage(Api::class);
 
@@ -154,8 +163,21 @@ class HomeComponent extends BaseComponent
         // $enumPackage->installPackage(true);
         // $productsPackage = new ProductsPackage();
         // $productsPackage->installPackage(true);
-        $categoriesPackage = new CategoriesPackage();
-        $categoriesPackage->installPackage(true);
+        // $categoriesPackage = new CategoriesPackage();
+        // $categoriesPackage->installPackage(true);
+        // $vendorsPackage = new VendorsPackage();
+        // $vendorsPackage->installPackage(true);
+
+        // $locationsPackage = new LocationsPackage();
+        // $locationsPackage->installPackage(true);
+        // $purchaseOrdersComponent = new PurchaseOrdersComponent();
+        // $purchaseOrdersComponent->installComponent();
+        // $employeesPackage = new EmployeesPackage();
+        // $employeesPackage->installPackage(true);
+        // $purchaseOrdersPackage = new PurchaseOrdersPackage();
+        // $purchaseOrdersPackage->installPackage(true);
+        // $apiPackage = new ApiPackage();
+        // $apiPackage->installPackage(true);
     }
 
     protected function reset()
