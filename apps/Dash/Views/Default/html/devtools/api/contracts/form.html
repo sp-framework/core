@@ -1,12 +1,16 @@
 {% if contract['id'] is defined %}
     {% set contractId = contract['id'] %}
     {% set contractName = contract['name'] %}
+    {% set contractApiType = contract['api_type'] %}
+    {% set contractWSDLConvert = contract['wsdl_convert'] %}
     {% set contractLink = contract['link'] %}
     {% set contractContent = contract['content'] %}
     {% set linkDisabled = true %}
 {% else %}
     {% set contractId = '' %}
     {% set contractName = '' %}
+    {% set contractApiType = '' %}
+    {% set contractWSDLConvert = '' %}
     {% set contractLink = '' %}
     {% set contractContent = '' %}
     {% set linkDisabled = false %}
@@ -57,6 +61,58 @@
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 50,
                         'fieldValue'                     : contractName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'api_type',
+                        'fieldLabel'                           : 'Api Type',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select api type',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : apiTypes,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : contractApiType
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if contractWSDLConvert is defined %}
+                    {% if contractWSDLConvert == 1 %}
+                        {% set WSDLConvertChecked = true %}
+                    {% else %}
+                        {% set WSDLConvertChecked = false %}
+                    {% endif %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'wsdl_convert',
+                        'fieldLabel'                     : 'WSDL Convert?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is Json converted from WSDL(for eBay)?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : WSDLConvertChecked,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
                     ]
                 )}}
             </div>
@@ -140,6 +196,10 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-api_type'                : {
+            placeholder: "SELECT API TYPE"
+        },
+        '{{componentId}}-{{sectionId}}-wsdl_convert'            : { },
         '{{componentId}}-{{sectionId}}-link'                    : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-link').keyup(function() {

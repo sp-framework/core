@@ -10,9 +10,13 @@ class DevtoolsApiContracts extends BaseModel
 
     public $name;
 
+    public $api_type;
+
     public $link;
 
     public $filename;
+
+    public $wsdl_convert;
 
     public $content;
 }
