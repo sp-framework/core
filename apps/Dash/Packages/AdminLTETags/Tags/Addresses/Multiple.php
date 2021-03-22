@@ -383,8 +383,6 @@ class Multiple
                                 });
                                 $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").off();
                                 $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").click(function(e) {
-                                    $("#' . $this->compSecId . '-address_types").val(0);
-                                    $("#' . $this->compSecId . '-address_types").trigger("change");
                                     $(".addressEditButton, .addressDeleteButton").attr("disabled", false);
                                     e.preventDefault();
                                     extractData(id);
@@ -453,6 +451,8 @@ class Multiple
                                         $(this).removeClass("is-invalid");
                                     });
                                 } else {
+                                    $("#' . $this->compSecId . '-address_types").val(0);
+                                    $("#' . $this->compSecId . '-address_types").trigger("change");
                                     var data = { };
                                     var addressId, addressNew;
 
@@ -522,7 +522,8 @@ class Multiple
                                                     \'</div>\' +
                                                 \'</div>\' +
                                             \'</li>\';
-
+                                        //Check this again for multiple addresses in the list. This might be a bug.
+                                        //Also add No-data div like we did in dropzone.
                                         if (addressNew === "1") {
                                             $("#' . $this->compSecId . '-sortable-addresses-" + id).append(list);
                                         } else {
@@ -558,7 +559,6 @@ class Multiple
                             }
 
                             function collectData() {
-
                                 for (var typeId in addressTypesIds) {
                                     dataCollectionSection["data"]["address_ids"][addressTypesIds[typeId]] = { };
 
