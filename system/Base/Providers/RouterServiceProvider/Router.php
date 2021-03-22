@@ -170,6 +170,12 @@ class Router
 
 	protected function registerRoute($givenRoute)
 	{
+		//SEO
+		if (isset($this->appInfo['seo_urls']) && $this->appInfo['seo_urls'] == 1) {
+			//Using $this->uri, we can extract the route from seo url from SEO db
+			//$givenRoute = $this->usePackage()
+		}
+
 		$routeArray = explode('/', $givenRoute);
 
 		$this->getGivenRouteClass($routeArray);
