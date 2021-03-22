@@ -4,6 +4,7 @@ namespace Apps\Dash\Components\Devtools\Api\Contracts;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Devtools\Api\Contracts\Contracts;
+use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -25,13 +26,54 @@ class ContractsComponent extends BaseComponent
 	 */
 	public function viewAction()
 	{
+		if (isset($this->getData()['file'])) {
+			$extension = Arr::last(explode('.', $this->getData()['file']));
+
+			if ($extension === 'json') {
+				$this->response->setContentType('application/json');
+			} else if ($extension === 'yaml') {
+				$this->response->setContentType('text/yaml');
+			}
+
+			$this->response->setHeader(
+				"Content-Length",
+				filesize(
+					base_path(
+						'apps/Dash/Packages/Devtools/Api/Contracts/Contracts/' . $this->getData()['file']
+					)
+				)
+			);
+
+			return $this->response->setContent(
+				$this->localContent->read(
+					'apps/Dash/Packages/Devtools/Api/Contracts/Contracts/' . $this->getData()['file']
+				)
+			);
+		}
+
 		if (isset($this->getData()['id'])) {
+			$apiTypes =
+				[
+					[
+						'id'	=> 'ebay',
+						'name'	=> 'eBay'
+					],
+					[
+						'id'	=> 'xero',
+						'name'	=> 'Xero'
+					]
+				];
+
+			$this->view->apiTypes = $apiTypes;
+
 			$this->view->contract = [];
 
 			if ($this->getData()['id'] != 0) {
 				$contract = $this->contractsPackage->getById($this->getData()['id']);
 
 				if (isset($this->getData()['view']) && $this->getData()['view'] == 'true') {
+					$contract = $this->getViewLink($contract);
+
 					$this->view->pick('contracts/viewcontract');
 				} else if (isset($this->getData()['generateclasses']) && $this->getData()['generateclasses'] == 'true') {
 					$this->contractsPackage->generateClassesFromContract($this->getData()['id']);
@@ -150,5 +192,14 @@ class ContractsComponent extends BaseComponent
 
 			$this->view->responseMessage = 'Method Not Allowed';
 		}
+	}
+
+	protected function getViewLink($contract)
+	{
+		$filename = Arr::last(explode('/', $contract['filename']));
+
+		$contract['url'] = $this->links->url('devtools/api/contracts/q/file/' . $filename);
+
+		return $contract;
 	}
 }
