@@ -1,18 +1,11 @@
 <?php
 
-/**
- * @internal Handles outputting debug messages.
- */
+namespace Apps\Dash\Packages\System\Api\Apis\Ebay;
 
-namespace Apps\Dash\Packages\System\Api\Base;
+use Apps\Dash\Packages\System\Api\Base\BaseDebugger;
 
-class EbayDebugger
+class EbayDebugger extends BaseDebugger
 {
-    /**
-     * @var array $config. Debug configuration.
-     */
-    private $config;
-
     /**
      * @var array $credentialsStrings. RegExp patterns to remove credentials from the debug info.
      */
@@ -34,27 +27,6 @@ class EbayDebugger
      */
     public function __construct(array $config)
     {
-        $this->config = $config + [
-            'logfn' => function ($msg) {
-                echo $msg.PHP_EOL;
-            },
-            'scrub_credentials' => true,
-            'scrub_strings' => []
-        ];
-
-        $this->config['scrub_strings'] += self::$credentialsStrings;
-    }
-
-    /**
-     * @param string $info The debug information.
-     */
-    public function __invoke($info)
-    {
-        if ($this->config['scrub_credentials']) {
-            foreach ($this->config['scrub_strings'] as $pattern => $replacement) {
-                $info = preg_replace($pattern, $replacement, $info);
-            }
-        }
-        $this->config['logfn']($info);
+        parent::__construct($config);
     }
 }

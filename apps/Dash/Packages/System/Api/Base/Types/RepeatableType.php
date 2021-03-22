@@ -2,7 +2,7 @@
 
 namespace Apps\Dash\Packages\System\Api\Base\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Functions;
+use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
 use Apps\Dash\Packages\System\Api\Base\Exceptions\InvalidPropertyTypeException;
 
 /**
@@ -168,7 +168,7 @@ class RepeatableType implements \ArrayAccess, \Countable, \Iterator
         $valid = explode('|', $this->expectedType);
         $isValid = false;
         foreach ($valid as $check) {
-            if ($check !== 'any' && Functions::checkPropertyType($check)) {
+            if ($check !== 'any' && BaseFunctions::checkPropertyType($check)) {
                 if ($check === $actualType) {
                     return;
                 }

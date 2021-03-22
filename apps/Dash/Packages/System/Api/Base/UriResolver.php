@@ -37,7 +37,7 @@ class UriResolver
      */
     public function resolve(
         $uri,
-        $version,
+        $version = null,
         $resource,
         array $paramDefs,
         array $paramValues
@@ -68,12 +68,20 @@ class UriResolver
             }
         }
 
-        return (
-            "$uri/".
-            "$version/".
-            $this->fillPathParams($resource, $paramValues).
-            $this->buildQueryParameters($paramValues)
-        );
+        if ($version) {
+            return (
+                "$uri/".
+                "$version/".
+                $this->fillPathParams($resource, $paramValues).
+                $this->buildQueryParameters($paramValues)
+            );
+        } else {
+            return (
+                "$uri/".
+                $this->fillPathParams($resource, $paramValues).
+                $this->buildQueryParameters($paramValues)
+            );
+        }
     }
 
     private function checkType(array $valid, $name, $provided)

@@ -6,7 +6,7 @@ use Apps\Dash\Packages\System\Api\Apis\Ebay;
 use Apps\Dash\Packages\System\Api\Base\EbayDebugger;
 use Apps\Dash\Packages\System\Api\Base\HttpHandler;
 
-class Functions
+class BaseFunctions
 {
     /**
      * Returns a description of the type for the passed value.
@@ -74,21 +74,6 @@ class Functions
     }
 
     /**
-     * Applies the default debugger if required.
-     *
-     * @param mixed $value EbayDebugger options.
-     * @param array &$configuration The configuration array where the resolved debugger will be stored.
-     */
-    public static function applyDebug($value, array &$configuration)
-    {
-        if ($value !== false) {
-            $configuration['debug'] = new EbayDebugger($value === true ? [] : $value);
-        } else {
-            $configuration['debug'] = false;
-        }
-    }
-
-    /**
      * Returns the default HTTP handler.
      *
      * @param array &$configuration Not used.
@@ -109,10 +94,6 @@ class Functions
      */
     public static function checkPropertyType($type)
     {
-        if (Ebay::$STRICT_PROPERTY_TYPES) {
-            return true;
-        }
-
         switch ($type) {
             case 'integer':
             case 'string':

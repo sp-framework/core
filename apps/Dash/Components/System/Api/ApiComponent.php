@@ -202,7 +202,7 @@ class ApiComponent extends BaseComponent
     protected function includeEbayIds()
     {
         try {
-            $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/EbayIds.php'));
+            $ebayIds = include(base_path('apps/Dash/Packages/System/Api/Configs/Ebay/Ids.php'));
 
             $this->view->ebayIds = $ebayIds['ebay_ids'];
         } catch (\Exception $e) {

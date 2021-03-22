@@ -2,8 +2,8 @@
 
 namespace Apps\Dash\Packages\System\Api\Base;
 
+use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
 use Apps\Dash\Packages\System\Api\Base\ConfigurationResolver;
-use Apps\Dash\Packages\System\Api\Base\Functions;
 use Apps\Dash\Packages\System\Api\Base\Parser\JsonParser;
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 use Apps\Dash\Packages\System\Api\Base\UriResolver;
@@ -13,23 +13,8 @@ use Psr\Http\Message\ResponseInterface;
 /**
  * The base class for every eBay REST service class.
  */
-abstract class BaseRestService
+abstract class BaseRESTService
 {
-    /**
-     * HTTP header constant. Describes the natural language provided in the field values of the request payload.
-     */
-    const HDR_REQUEST_LANGUAGE = 'Content-Language';
-
-    /**
-     * HTTP header constant. Tells the server the natural language in which the client desires the response.
-     */
-    const HDR_RESPONSE_LANGUAGE = 'Accept-Language';
-
-    /**
-     * HTTP header constant. Tells the server the encoding in which the client desires the response.
-     */
-    const HDR_RESPONSE_ENCODING = 'Accept-Encoding';
-
     /**
      * @var \DTS\eBaySDK\ConfigurationResolver Resolves configuration options.
      */
@@ -60,56 +45,6 @@ abstract class BaseRestService
     }
 
     /**
-     * Returns definitions for each configuration option that is supported.
-     *
-     * @return array An associative array of configuration definitions.
-     */
-    public static function getConfigDefinitions()
-    {
-        return [
-            'debug'             => [
-                'valid'             => ['bool', 'array'],
-                'fn'                => 'Apps\Dash\Packages\System\Api\Base\Functions::applyDebug',
-                'default'           => false
-            ],
-            'sandbox'           => [
-                'valid'             => ['bool'],
-                'default'           => false
-            ],
-            'authorization'     => [
-                'valid'             => ['string'],
-                'default'           => self::$config['user_access_token'],
-                'required'          => true
-            ],
-            'marketplaceId'     => [
-                'valid'             => ['string'],
-                'default'           => self::$config['marketplace_id'],
-            ],
-            'compressResponse'  => [
-                'valid'             => ['bool'],
-                'default'           => false
-            ],
-            'httpHandler'       => [
-                'valid'             => ['callable'],
-                'default'           => 'Apps\Dash\Packages\System\Api\Base\Functions::defaultHttpHandler'
-            ],
-            'httpOptions'       => [
-                'valid'             => ['array'],
-                'default'           => [
-                    'http_errors'       => false,
-                    'timeout'           => 300
-                ]
-            ],
-            'requestLanguage'   => [
-                'valid'             => ['string']
-            ],
-            'responseLanguage'  => [
-                'valid'             => ['string']
-            ]
-        ];
-    }
-
-    /**
      * Method to get the service's configuration.
      *
      * @param string|null $option The name of the option whos value will be returned.
@@ -133,7 +68,7 @@ abstract class BaseRestService
      */
     public function setConfig(array $configuration)
     {
-        self::$config = Functions::arrayMergeDeep(
+        self::$config = BaseFunctions::arrayMergeDeep(
             self::$config,
             $this->resolver->resolveOptions($configuration)
         );
@@ -161,7 +96,7 @@ abstract class BaseRestService
         }
 
         $url = $this->uriResolver->resolve(
-            $this->getUrl($name),
+            $this->getUrl(),
             $this->getConfig('apiVersion'),
             $operation['resource'],
             $operation['params'],
@@ -204,53 +139,6 @@ abstract class BaseRestService
     }
 
     /**
-     * Helper function to return the URL as determined by the sandbox configuration option.
-     *
-     * @return string Either the production or sandbox URL.
-     */
-    protected function getUrl($name)
-    {
-        if (isset(static::$endPoints[$name])) {
-            if ($this->getConfig('sandbox')) {
-                if (isset(static::$endPoints[$name]['sandbox'])) {
-                    return static::$endPoints[$name]['sandbox'];
-                }
-                if (static::$config['api_type'] === 'ebay') {
-                    return rtrim($this->buildEbaySandboxUrl(static::$endPoints[$name]['production']), '/v1');
-                }
-            } else {
-                return rtrim('v1', static::$endPoints[$name]['production']);
-            }
-        } else {
-            if ($this->getConfig('sandbox')) {
-                if (isset(static::$endPoints[$name]['sandbox'])) {
-                    return static::$endPoints['primary']['sandbox'];
-                }
-                if (static::$config['api_type'] === 'ebay') {
-                    return rtrim($this->buildEbaySandboxUrl(static::$endPoints['primary']['production']), '/v1');
-                }//Improve on this. URL should be autogenerated with prefix/suffix provided.
-            } else {
-                return rtrim(static::$endPoints['primary']['production'], '/v1');
-            }
-        }
-    }
-
-    protected function buildEbaySandboxUrl($url)
-    {
-        $url = ltrim($url, 'https://');
-
-        $urlArr = explode('/', $url);
-
-        $uriArr = explode('.', $urlArr[0]);
-
-        $url = $uriArr[0] . '.sandbox.';
-        unset($urlArr[0]);
-        unset($uriArr[0]);
-
-        return 'https://' . $url . implode('.', $uriArr) . '/' . implode('/', $urlArr);
-    }
-
-    /**
      * Builds the request body string.
      *
      * @param array $request Associative array that is the request body.
@@ -261,44 +149,6 @@ abstract class BaseRestService
     {
         return empty($request) ? '' : json_encode($request);
     }
-
-    /**
-     * Helper function that builds the HTTP request headers.
-     *
-     * @param string $body The request body.
-     *
-     * @return array An associative array of HTTP headers.
-     */
-    protected function buildRequestHeaders($body)
-    {
-        $headers = $this->getEbayHeaders();
-
-        $headers['Accept'] = 'application/json';
-        $headers['Content-Type'] = 'application/json';
-        $headers['Content-Length'] = strlen($body);
-
-        // Add optional headers.
-        if ($this->getConfig('requestLanguage')) {
-            $headers[self::HDR_REQUEST_LANGUAGE] = $this->getConfig('requestLanguage');
-        }
-
-        if ($this->getConfig('responseLanguage')) {
-            $headers[self::HDR_RESPONSE_LANGUAGE] = $this->getConfig('responseLanguage');
-        }
-
-        if ($this->getConfig('compressResponse')) {
-            $headers[self::HDR_RESPONSE_ENCODING] = 'application/gzip';
-        }
-
-        return $headers;
-    }
-
-    /**
-     * Derived classes must implement this method that will build the needed eBay http headers.
-     *
-     * @return array An associative array of eBay http headers.
-     */
-    abstract protected function getEbayHeaders();
 
     /**
      * Sends a debug string of the request details.

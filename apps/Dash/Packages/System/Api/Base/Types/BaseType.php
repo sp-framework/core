@@ -8,7 +8,7 @@ namespace Apps\Dash\Packages\System\Api\Base\Types;
 
 use Apps\Dash\Packages\System\Api\Base\Exceptions\InvalidPropertyTypeException;
 use Apps\Dash\Packages\System\Api\Base\Exceptions\UnknownPropertyException;
-use Apps\Dash\Packages\System\Api\Base\Functions;
+use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
 use Apps\Dash\Packages\System\Api\Base\JmesPath\Env;
 use Apps\Dash\Packages\System\Api\Base\Types\RepeatableType;
 
@@ -484,7 +484,7 @@ class BaseType
         $valid = explode('|', $info['type']);
 
         foreach ($valid as $check) {
-            if ($check !== 'any' && Functions::checkPropertyType($check)) {
+            if ($check !== 'any' && BaseFunctions::checkPropertyType($check)) {
                 if ($check === $actualType || 'array' === $actualType) {
                     return;
                 }
