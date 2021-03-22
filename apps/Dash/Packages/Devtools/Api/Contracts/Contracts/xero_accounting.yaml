@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Xero Accounting API
-  version: "2.10.0"
+  version: "2.10.1"
   termsOfService: "https://developer.xero.com/xero-developer-platform-terms-conditions/"
   contact:
     name: "Xero Platform Team"
@@ -28,6 +28,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status==&quot;ACTIVE&quot; AND Type==&quot;BANK&quot;
+          x-example-csharp: Status==\"ACTIVE\"
           x-example-java: Status==&quot;&apos; + Account.StatusEnum.ACTIVE+ &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Account::STATUS_ACTIVE . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::Account::ACTIVE}
@@ -41,7 +42,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Accounts array with 0 to n Account
+          description: Success - return response of type Accounts array with 0 to n Account 
           content:
             application/json:
               schema:
@@ -76,7 +77,7 @@ paths:
       summary: Creates a new chart of accounts
       x-hasAccountingValidationError: true
       x-node-requestBody: '{ code: "123456", name: "Foobar", type: AccountType.EXPENSE, description: "Hello World" }'
-      x-ruby-requestBody: 'account = { code: "123456", name: "Foobar", type: XeroRuby::Accounting::AccountType::EXPENSE, description: "Hello World" }'
+      x-ruby-requestBody: 'account = { code: "123456", name: "Foobar", type: XeroRuby::Accounting::AccountType::EXPENSE, description: "Hello World" }'      
       x-example:
         - object:
           is_object: true
@@ -102,7 +103,7 @@ paths:
           ruby: XeroRuby::Accounting::AccountType::EXPENSE
           python: AccountType.EXPENSE
           java: com.xero.models.accounting.AccountType.EXPENSE
-          csharp: Account.ClassEnum.EXPENSE
+          csharp: AccountType.EXPENSE
           object: account
         - description:
           is_last: true
@@ -112,7 +113,7 @@ paths:
           object: account
       responses:
         '200':
-          description: Success - created new Account and return response of type Accounts array with new Account
+          description: Success - created new Account and return response of type Accounts array with new Account 
           content:
             application/json:
               schema:
@@ -167,7 +168,7 @@ paths:
                         }'
       requestBody:
         required: true
-        description: Account object in body of request
+        description: Account object in body of request 
         content:
           application/json:
             schema:
@@ -230,7 +231,7 @@ paths:
     post:
       security:
         - OAuth2: [accounting.settings]
-      tags:
+      tags: 
         - Accounting
       operationId: updateAccount
       summary: Updates a chart of accounts
@@ -262,7 +263,7 @@ paths:
           ruby: XeroRuby::Accounting::AccountType::EXPENSE
           python: AccountType.EXPENSE
           java: com.xero.models.accounting.AccountType.EXPENSE
-          csharp: Account.ClassEnum.EXPENSE
+          csharp: AccountType.EXPENSE
           object: account
         - description:
           key: description
@@ -286,6 +287,7 @@ paths:
           key: accounts
           keyPascal: Accounts
           java: Accounts
+          csharp: Account
           object: account
       parameters:
         - required: true
@@ -298,7 +300,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - update existing Account and return response of type Accounts array with updated Account
+          description: Success - update existing Account and return response of type Accounts array with updated Account 
           content:
             application/json:
               schema:
@@ -353,14 +355,14 @@ paths:
                         }'
       requestBody:
         required: true
-        description: Request of type Accounts array with one Account
+        description: Request of type Accounts array with one Account 
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/Accounts'
-            example: '{
-                        "Accounts":[
-                          {
+            example: '{  
+                        "Accounts":[  
+                          {  
                               "Code":"123456",
                               "Name":"BarFoo",
                               "AccountID":"99ce6032-0678-4aa0-8148-240c75fee33a",
@@ -395,7 +397,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - delete existing Account and return response of type Accounts array with deleted Account
+          description: Success - delete existing Account and return response of type Accounts array with deleted Account 
           content:
             application/json:
               schema:
@@ -469,7 +471,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -520,13 +522,13 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Account as binary data
+          description: Success - return response of attachment for Account as binary data 
           content:
              application/octet-stream:
               schema:
@@ -561,13 +563,13 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Account as binary data
+          description: Success - return response of attachment for Account as binary data 
           content:
              application/octet-stream:
               schema:
@@ -599,7 +601,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -660,7 +662,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -708,6 +710,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="AUTHORISED"
+          x-example-csharp: Status==\&quot;AUTHORISED\&quot;
           x-example-java: Status==&quot;&apos; + BatchPayment.StatusEnum.AUTHORISED + &apos;&quot;
           x-example-php: Status==&quot;&apos; . XeroAPI\XeroPHP\Models\Accounting\BatchPayment::STATUS_AUTHORISED . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::BatchPayment::AUTHORISED}
@@ -721,7 +724,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type BatchPayments array of BatchPayment objects
+          description: Success - return response of type BatchPayments array of BatchPayment objects 
           content:
             application/json:
               schema:
@@ -839,7 +842,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -906,6 +909,7 @@ paths:
           key: amount
           keyPascal: Amount
           default: 1.00
+          is_money: true
           object: payment
         - set_invoice:
           is_last: true
@@ -971,12 +975,13 @@ paths:
           keySnake: batch_payments
           java: BatchPayments
           python: batch_payment
+          csharp: BatchPayment
           object: batchPayment
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
       responses:
         '200':
-          description: Success - return response of type BatchPayments array of BatchPayment objects
+          description: Success - return response of type BatchPayments array of BatchPayment objects 
           content:
             application/json:
               schema:
@@ -1156,7 +1161,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -1168,7 +1174,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type HistoryRecords array of HistoryRecord objects
+          description: Success - return response of type HistoryRecords array of HistoryRecord objects 
           content:
             application/json:
               schema:
@@ -1208,6 +1214,7 @@ paths:
           description: Filter by an any element
           example: Status=="AUTHORISED"
           x-example-java: Status==&quot;&apos; + BankTransaction.StatusEnum.AUTHORISED + &apos;&quot;
+          x-example-csharp: Status==\"AUTHORISED\"
           x-example-php: Status==&quot;&apos; . XeroAPI\XeroPHP\Models\Accounting\BankTransaction::STATUS_AUTHORISED . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::BankTransaction::AUTHORISED}
           schema:
@@ -1227,7 +1234,7 @@ paths:
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description:  Success - return response of type BankTransactions array with 0 to n BankTransaction
+          description:  Success - return response of type BankTransactions array with 0 to n BankTransaction 
           content:
             application/json:
               schema:
@@ -1383,6 +1390,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -1390,6 +1398,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -1397,6 +1406,23 @@ paths:
           keyPascal: AccountCode
           keySnake: account_code
           default: "000"
+          object: lineItem
+        - line_items:
+          is_list: true
+          key: lineItems
+          keyPascal: LineItems
+          keySnake: line_items
+          csharp: LineItem
+          java: LineItem
+        - add_lineitems:
+          is_last: true
+          is_list_add: true
+          key: lineItems
+          keyPascal: LineItems
+          keySnake: line_items
+          java: LineItems
+          python: line_item
+          csharp: LineItem
           object: lineItem
         - bankAccount:
           is_object: true
@@ -1435,14 +1461,6 @@ paths:
           keyPascal: Contact
           default: contact
           object: bankTransaction
-        - add_lineitems:
-          is_array_add: true
-          key: lineItems
-          keyPascal: LineItems
-          keySnake: line_items
-          java: LineItems
-          python: line_item
-          object: lineItem
         - set_bankaccount:
           is_last: true
           is_variable: true
@@ -1453,6 +1471,13 @@ paths:
           python: bank_account
           default: bankAccount
           object: bankTransaction
+        - set_lineitems:
+          is_variable: true
+          nonString: true
+          key: lineItems
+          keyPascal: LineItems
+          object: bankTransaction
+          default: lineItems
         - bankTransactions:
           is_object: true
           key: bankTransactions
@@ -1465,13 +1490,14 @@ paths:
           keySnake: bank_transactions
           java: BankTransactions
           python: bank_transaction
+          csharp: BankTransaction
           object: bankTransaction
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type BankTransactions array with new BankTransaction
+          description: Success - return response of type BankTransactions array with new BankTransaction 
           content:
             application/json:
               schema:
@@ -1632,6 +1658,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -1639,6 +1666,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -1646,6 +1674,23 @@ paths:
           keyPascal: AccountCode
           keySnake: account_code
           default: "000"
+          object: lineItem
+        - line_items:
+          is_list: true
+          key: lineItems
+          keyPascal: LineItems
+          keySnake: line_items
+          csharp: LineItem
+          java: LineItem
+        - add_lineitems:
+          is_last: true
+          is_list_add: true
+          key: lineItems
+          keyPascal: LineItems
+          keySnake: line_items
+          java: LineItems
+          python: line_item
+          csharp: LineItem
           object: lineItem
         - bankAccount:
           is_object: true
@@ -1684,14 +1729,13 @@ paths:
           keyPascal: Contact
           default: contact
           object: bankTransaction
-        - add_lineitems:
-          is_array_add: true
+        - set_lineitems:
+          is_variable: true
+          nonString: true
           key: lineItems
           keyPascal: LineItems
-          keySnake: line_items
-          java: LineItems
-          python: line_item
-          object: lineItem
+          object: bankTransaction
+          default: lineItems
         - set_bankaccount:
           is_last: true
           is_variable: true
@@ -1714,13 +1758,14 @@ paths:
           keySnake: bank_transactions
           java: BankTransactions
           python: bank_transaction
+          csharp: BankTransaction
           object: bankTransaction
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type BankTransactions array with new BankTransaction
+          description: Success - return response of type BankTransactions array with new BankTransaction 
           content:
             application/json:
               schema:
@@ -1884,7 +1929,7 @@ paths:
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type BankTransactions array with a specific BankTransaction
+          description: Success - return response of type BankTransactions array with a specific BankTransaction 
           content:
             application/json:
               schema:
@@ -2017,7 +2062,7 @@ paths:
       summary: Updates a single spent or received money transaction
       x-hasAccountingValidationError: true
       x-node-requestBody: '{ bankTransactions: [{ type: BankTransaction.TypeEnum.SPEND, date: "2019-02-25", reference: "You just updated", status: BankTransaction.StatusEnum.AUTHORISED, bankTransactionID: "00000000-0000-0000-0000-000000000000", lineItems: [], contact: {}, bankAccount: { accountID: "00000000-0000-0000-0000-000000000000" }}]}'
-      x-ruby-requestBody: '{ bank_transactions: [{ type: XeroRuby::Accounting::BankTransaction::SPEND, date: "2019-02-25", reference: "You just updated", status: XeroRuby::Accounting::BankTransaction::AUTHORISED, bank_transaction_id: "00000000-0000-0000-0000-000000000000", line_items: [], contact: {}, bank_account: { account_id: "00000000-0000-0000-0000-000000000000" }}]}'
+      x-ruby-requestBody: '{ bank_transactions: [{ type: XeroRuby::Accounting::BankTransaction::SPEND, date: "2019-02-25", reference: "You just updated", status: XeroRuby::Accounting::BankTransaction::AUTHORISED, bank_transaction_id: "00000000-0000-0000-0000-000000000000", line_items: [], contact: {}, bank_account: { account_id: "00000000-0000-0000-0000-000000000000" }}]}'      
       x-example:
         - contact:
           is_object: true
@@ -2046,6 +2091,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -2053,6 +2099,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -2060,6 +2107,23 @@ paths:
           keyPascal: AccountCode
           keySnake: account_code
           default: "000"
+          object: lineItem
+        - line_items:
+          is_list: true
+          key: lineItems
+          keyPascal: LineItems
+          keySnake: line_items
+          csharp: LineItem
+          java: LineItem
+        - add_lineitems:
+          is_last: true
+          is_list_add: true
+          key: lineItems
+          keyPascal: LineItems
+          keySnake: line_items
+          java: LineItems
+          python: line_item
+          csharp: LineItem
           object: lineItem
         - bankAccount:
           is_object: true
@@ -2103,14 +2167,13 @@ paths:
           keyPascal: Contact
           default: contact
           object: bankTransaction
-        - add_lineitems:
-          is_array_add: true
+        - set_lineitems:
+          is_variable: true
+          nonString: true
           key: lineItems
           keyPascal: LineItems
-          keySnake: line_items
-          java: LineItems
-          python: line_item
-          object: lineItem
+          object: bankTransaction
+          default: lineItems
         - set_bankaccount:
           is_last: true
           is_variable: true
@@ -2133,6 +2196,7 @@ paths:
           keySnake: bank_transactions
           java: BankTransactions
           python: bank_transaction
+          csharp: BankTransaction
           object: bankTransaction
       parameters:
         - required: true
@@ -2146,7 +2210,7 @@ paths:
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type BankTransactions array with updated BankTransaction
+          description: Success - return response of type BankTransactions array with updated BankTransaction 
           content:
             application/json:
               schema:
@@ -2365,7 +2429,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type Attachments array with 0 to n Attachment
+          description: Success - return response of type Attachments array with 0 to n Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -2423,18 +2487,18 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for BankTransaction as binary data
+          description: Success - return response of attachment for BankTransaction as binary data 
           content:
              application/octet-stream:
               schema:
                 type: string
-                format: binary
+                format: binary  
   '/BankTransactions/{BankTransactionID}/Attachments/{FileName}':
     parameters:
       - $ref: '#/components/parameters/requiredHeader'
@@ -2464,13 +2528,13 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for BankTransaction as binary data
+          description: Success - return response of attachment for BankTransaction as binary data 
           content:
              application/octet-stream:
               schema:
@@ -2502,7 +2566,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of Attachments array of Attachment
+          description: Success - return response of Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -2559,7 +2623,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of Attachments array of Attachment
+          description: Success - return response of Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -2619,7 +2683,7 @@ paths:
         - Accounting
       operationId: createBankTransactionHistoryRecord
       summary: Creates a history record for a specific bank transactions
-      x-hasAccountingValidationError: true
+      x-hasAccountingValidationError: true   
       x-example:
         - historyRecord:
           is_object: true
@@ -2645,7 +2709,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -2688,7 +2753,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of BankTransfers array of 0 to N BankTransfer
+          description: Success - return response of BankTransfers array of 0 to N BankTransfer 
           content:
             application/json:
               schema:
@@ -2801,6 +2866,7 @@ paths:
           key: amount
           keyPascal: Amount
           default: 1.0
+          is_money: true
           object: bankTransfer
         - bankTransfers:
           is_object: true
@@ -2814,10 +2880,11 @@ paths:
           keySnake: bank_transfers
           java: BankTransfers
           python: bank_transfer
+          csharp: BankTransfer
           object: bankTransfer
       responses:
         '200':
-          description: Success - return response of BankTransfers array of one BankTransfer
+          description: Success - return response of BankTransfers array of one BankTransfer 
           content:
             application/json:
               schema:
@@ -2923,7 +2990,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of BankTransfers array with one BankTransfer
+          description: Success - return response of BankTransfers array with one BankTransfer 
           content:
             application/json:
               schema:
@@ -2988,7 +3055,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of Attachments array of 0 to N Attachment for a Bank Transfer
+          description: Success - return response of Attachments array of 0 to N Attachment for a Bank Transfer 
           x-isAttachment: true
           content:
             application/json:
@@ -3039,7 +3106,7 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
@@ -3117,7 +3184,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of Attachments array of 0 to N Attachment for a Bank Transfer
+          description: Success - return response of Attachments array of 0 to N Attachment for a Bank Transfer 
           x-isAttachment: true
           content:
             application/json:
@@ -3173,7 +3240,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of Attachments array of 0 to N Attachment for a Bank Transfer
+          description: Success - return response of Attachments array of 0 to N Attachment for a Bank Transfer 
           x-isAttachment: true
           content:
             application/json:
@@ -3259,7 +3326,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -3288,7 +3356,7 @@ paths:
       summary: Retrieves all the branding themes
       responses:
         '200':
-          description: Success - return response of type BrandingThemes
+          description: Success - return response of type BrandingThemes          
           content:
             application/json:
               schema:
@@ -3321,14 +3389,14 @@ paths:
         - required: true
           in: path
           name: BrandingThemeID
-          description: Unique identifier for a Branding Theme
+          description: Unique identifier for a Branding Theme         
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
             format: uuid
       responses:
         '200':
-          description: Success - return response of type BrandingThemes with one BrandingTheme
+          description: Success - return response of type BrandingThemes with one BrandingTheme         
           content:
             application/json:
               schema:
@@ -3361,11 +3429,11 @@ paths:
         - required: true
           in: path
           name: BrandingThemeID
-          description: Unique identifier for a Branding Theme
+          description: Unique identifier for a Branding Theme  
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
-            format: uuid
+            format: uuid 
       responses:
         '200':
           description: Success - return response of type PaymentServices array with 0 to N PaymentService
@@ -3434,7 +3502,7 @@ paths:
         - required: true
           in: path
           name: BrandingThemeID
-          description: Unique identifier for a Branding Theme
+          description: Unique identifier for a Branding Theme 
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
@@ -3446,13 +3514,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentServices'
-              example: '{
+              example: '{  
                          "Id": "918feecb-067a-4ed9-841b-571c04eaada3",
                          "Status": "OK",
                          "ProviderName": "Xero API Partner",
                          "DateTimeUTC": "\/Date(1551139338915)\/",
-                         "PaymentServices": [
-                            {
+                         "PaymentServices": [  
+                            {  
                                "PaymentServiceID": "00000000-0000-0000-0000-000000000000",
                                "PaymentServiceName": "ACME Payments",
                                "PaymentServiceUrl": "https://www.payupnow.com/",
@@ -3470,7 +3538,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PaymentService'
-            example: '{
+            example: '{  
                         "PaymentServiceID": "00000000-0000-0000-0000-000000000000",
                         "PaymentServiceName": "ACME Payments",
                         "PaymentServiceUrl": "https://www.payupnow.com/",
@@ -3492,6 +3560,7 @@ paths:
           name: where
           description: Filter by an any element
           example: ContactStatus==&quot;ACTIVE&quot;
+          x-example-csharp: ContactStatus==\&quot;ACTIVE\&quot;
           x-example-java: ContactStatus==&quot;&apos; + Contact.ContactStatusEnum.ACTIVE + &apos;&quot;
           x-example-php: ContactStatus==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Contact::CONTACT_STATUS_ACTIVE . &apos;&quot;
           x-ruby-param: ContactStatus==#{XeroRuby::Accounting::Contact::ACTIVE}
@@ -3511,6 +3580,7 @@ paths:
           example: '&quot;00000000-0000-0000-0000-000000000000&quot;'
           x-example-java: Arrays.asList(UUID.fromString("00000000-0000-0000-0000-000000000000"))
           x-example-php: '&quot;00000000-0000-0000-0000-000000000000&quot;'
+          x-example-csharp: new List&lt;Guid&gt;{Guid.Parse("00000000-0000-0000-0000-000000000000")};
           schema:
             type: array
             items:
@@ -3685,7 +3755,7 @@ paths:
       summary: 'Creates multiple contacts (bulk) in a Xero organisation'
       x-hasAccountingValidationError: true
       x-node-requestBody: '{ contacts: [{ name: "Bruce Banner", emailAddress: "hulk@avengers.com", phones: [{ phoneType: Phone.PhoneTypeEnum.MOBILE, phoneNumber: "555-1212", phoneAreaCode: "415" }], paymentTerms: { bills: { day: 15, type: PaymentTermType.OFCURRENTMONTH }, sales: { day: 10, type: PaymentTermType.DAYSAFTERBILLMONTH }}}]}'
-      x-ruby-requestBody: 'contacts = { contacts: [{ name: "Bruce Banner", email_address: "hulk@avengers.com", phones: [{ phone_type: XeroRuby::Accounting::Phone::MOBILE, phone_number: "555-1212", phone_area_code: "415" }], payment_terms: { bills: { day: 15, type: XeroRuby::Accounting::PaymentTermType::OFCURRENTMONTH }, sales: { day: 10, type: XeroRuby::Accounting::PaymentTermType::DAYSAFTERBILLMONTH }}}]}'
+      x-ruby-requestBody: 'contacts = { contacts: [{ name: "Bruce Banner", email_address: "hulk@avengers.com", phones: [{ phone_type: XeroRuby::Accounting::Phone::MOBILE, phone_number: "555-1212", phone_area_code: "415" }], payment_terms: { bills: { day: 15, type: XeroRuby::Accounting::PaymentTermType::OFCURRENTMONTH }, sales: { day: 10, type: XeroRuby::Accounting::PaymentTermType::DAYSAFTERBILLMONTH }}}]}'      
       x-example:
         - phone:
           is_object: true
@@ -3709,7 +3779,7 @@ paths:
           ruby: XeroRuby::Accounting::PhoneType::MOBILE
           python_string: MOBILE
           java: com.xero.models.accounting.Phone.PhoneTypeEnum.MOBILE
-          csharp: Phone.TypeEnum.MOBILE
+          csharp: Phone.PhoneTypeEnum.MOBILE
           object: phone
         - phones:
           is_list: true
@@ -3754,6 +3824,7 @@ paths:
           key: contacts
           keyPascal: Contacts
           java: Contacts
+          csharp: Contact
           object: contact
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -4016,7 +4087,7 @@ paths:
           ruby: XeroRuby::Accounting::PhoneType::MOBILE
           python_string: MOBILE
           java: com.xero.models.accounting.Phone.PhoneTypeEnum.MOBILE
-          csharp: Phone.TypeEnum.MOBILE
+          csharp: Phone.PhoneTypeEnum.MOBILE
           object: phone
         - phones:
           is_list: true
@@ -4061,6 +4132,7 @@ paths:
           key: contacts
           keyPascal: Contacts
           java: Contacts
+          csharp: Contact
           object: contact
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -4253,7 +4325,7 @@ paths:
         - required: true
           in: path
           name: ContactNumber
-          description: This field is read only on the Xero contact screen, used to identify contacts in external systems (max length = 50).
+          description: This field is read only on the Xero contact screen, used to identify contacts in external systems (max length = 50). 
           example: "SB2"
           schema:
             type: string
@@ -4406,7 +4478,7 @@ paths:
         - required: true
           in: path
           name: ContactID
-          description: Unique identifier for a Contact
+          description: Unique identifier for a Contact 
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
@@ -4583,6 +4655,7 @@ paths:
           key: contacts
           keyPascal: Contacts
           java: Contacts
+          csharp: Contact
           object: contact
       parameters:
         - required: true
@@ -4764,7 +4837,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Contact as binary data
+          description: Success - return response of attachment for Contact as binary data 
           content:
              application/octet-stream:
               schema:
@@ -4805,7 +4878,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Contact as binary data
+          description: Success - return response of attachment for Contact as binary data 
           content:
              application/octet-stream:
               schema:
@@ -5004,7 +5077,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -5036,6 +5110,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="ACTIVE"
+          x-example-csharp: Status==\"ACTIVE\"
           x-example-java: Status==&quot;&apos; + ContactGroup.StatusEnum.ACTIVE + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\ContactGroup::STATUS_ACTIVE . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::ContactGroup::ACTIVE}
@@ -5110,6 +5185,7 @@ paths:
           keySnake: contact_groups
           java: ContactGroups
           python: contact_group
+          csharp: ContactGroup
           object: contactGroup
       responses:
         '200':
@@ -5156,7 +5232,7 @@ paths:
                               ]
                             }
                           ]
-                        }'
+                        }'          
       requestBody:
         description: ContactGroups with an array of names in request body
         required: true
@@ -5259,6 +5335,7 @@ paths:
           keySnake: contact_groups
           java: ContactGroups
           python: contact_group
+          csharp: ContactGroup
           object: contactGroup
       parameters:
         - required: true
@@ -5300,9 +5377,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ContactGroups'
-            example: '{
-                        "ContactGroups":[
-                          {
+            example: '{  
+                        "ContactGroups":[  
+                          {  
                             "Name":"Suppliers"
                           }
                         ]
@@ -5343,6 +5420,7 @@ paths:
           key: contacts
           keyPascal: Contacts
           java: Contacts
+          csharp: Contact
           object: contact
       parameters:
         - required: true
@@ -5474,6 +5552,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="DRAFT"
+          x-example-csharp: Status==\"DRAFT\"
           x-example-java: Status==&quot;&apos; + CreditNote.StatusEnum.DRAFT + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\CreditNote::STATUS_DRAFT . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::CreditNote::DRAFT}
@@ -5599,7 +5678,7 @@ paths:
           default: "LocalDate.now()"
           java: "LocalDate.now()"
           node: "'2020-12-10'"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
         - contact:
@@ -5629,6 +5708,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -5636,6 +5716,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -5644,18 +5725,22 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          java: LineItems
           python: line_item
+          csharp: LineItem
           object: lineItem
         - creditNote:
           is_object: true
@@ -5672,7 +5757,7 @@ paths:
           ruby: XeroRuby::Accounting::CreditNote::ACCPAYCREDIT
           python_string: ACCPAYCREDIT
           java: com.xero.models.accounting.CreditNote.TypeEnum.ACCPAYCREDIT
-          csharp: CreditNote.xxx
+          csharp: CreditNote.TypeEnum.ACCPAYCREDIT
           object: creditNote
         - set_contact:
           is_variable: true
@@ -5711,6 +5796,7 @@ paths:
           keySnake: credit_notes
           java: CreditNotes
           python: credit_note
+          csharp: CreditNote
           object: creditNote
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -5835,16 +5921,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditNotes'
-            example: '{
-                        "CreditNotes":[
-                          {
+            example: '{  
+                        "CreditNotes":[  
+                          {  
                             "Type":"ACCPAYCREDIT",
-                            "Contact":{
+                            "Contact":{  
                               "ContactID":"430fa14a-f945-44d3-9f97-5df5e28441b8"
                             },
                             "Date":"2019-01-05",
-                            "LineItems":[
-                              {
+                            "LineItems":[  
+                              {  
                                 "Description":"Foobar",
                                 "Quantity":2.0,
                                 "UnitAmount":20.0,
@@ -5873,7 +5959,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -5904,6 +5990,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -5911,6 +5998,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -5919,18 +6007,22 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          java: LineItems
           python: line_item
+          csharp: LineItem
           object: lineItem
         - creditNote:
           is_object: true
@@ -5947,7 +6039,7 @@ paths:
           ruby: XeroRuby::Accounting::CreditNote::ACCPAYCREDIT
           python_string: ACCPAYCREDIT
           java: com.xero.models.accounting.CreditNote.TypeEnum.ACCPAYCREDIT
-          csharp: CreditNote.xxx
+          csharp: CreditNote.TypeEnum.ACCPAYCREDIT
           object: creditNote
         - set_contact:
           is_variable: true
@@ -5986,6 +6078,7 @@ paths:
           keySnake: credit_notes
           java: CreditNotes
           python: credit_note
+          csharp: CreditNote
           object: creditNote
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -6110,18 +6203,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreditNotes'
-            example: '{
-                       "CreditNotes":[
-                          {
+            example: '{  
+                       "CreditNotes":[  
+                          {  
                             "Type":"ACCPAYCREDIT",
-                            "Contact":{
+                            "Contact":{  
                               "ContactID":"430fa14a-f945-44d3-9f97-5df5e28441b8"
                             },
                             "Date":"2019-01-05",
                             "Status":"AUTHORISED",
                             "Reference": "HelloWorld",
-                            "LineItems":[
-                              {
+                            "LineItems":[  
+                              {  
                                 "Description":"Foobar",
                                 "Quantity":2.0,
                                 "UnitAmount":20.0,
@@ -6295,7 +6388,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -6326,6 +6419,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -6333,6 +6427,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -6341,18 +6436,22 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          java: LineItems
           python: line_item
+          csharp: LineItem
           object: lineItem
         - creditNote:
           is_object: true
@@ -6369,7 +6468,7 @@ paths:
           ruby: XeroRuby::Accounting::CreditNote::ACCPAYCREDIT
           python_string: ACCPAYCREDIT
           java: com.xero.models.accounting.CreditNote.TypeEnum.ACCPAYCREDIT
-          csharp: CreditNote.xxx
+          csharp: CreditNote.TypeEnum.ACCPAYCREDIT
           object: creditNote
         - status:
           nonString: true
@@ -6381,7 +6480,7 @@ paths:
           ruby: XeroRuby::Accounting::CreditNote::AUTHORISED
           python_string: AUTHORISED
           java: com.xero.models.accounting.CreditNote.StatusEnum.AUTHORISED
-          csharp: CreditNote.xxx
+          csharp: CreditNote.StatusEnum.AUTHORISED
           object: creditNote
         - reference:
           key: reference
@@ -6425,6 +6524,7 @@ paths:
           keySnake: credit_notes
           java: CreditNotes
           python: credit_note
+          csharp: CreditNote
           object: creditNote
       parameters:
         - required: true
@@ -6649,7 +6749,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Credit Note as binary data
+          description: Success - return response of attachment for Credit Note as binary data 
           content:
              application/octet-stream:
               schema:
@@ -6690,7 +6790,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Credit Note as binary data
+          description: Success - return response of attachment for Credit Note as binary data 
           content:
              application/octet-stream:
               schema:
@@ -6838,7 +6938,7 @@ paths:
              application/pdf:
               schema:
                 type: string
-                format: binary
+                format: binary    
   '/CreditNotes/{CreditNoteID}/Allocations':
     parameters:
       - $ref: '#/components/parameters/requiredHeader'
@@ -6861,7 +6961,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -6885,6 +6985,8 @@ paths:
           key: amount
           keyPascal: Amount
           default: 1.0
+          is_money: true
+          csharp: new decimal(1.0)
           object: allocation
         - date:
           is_variable: true
@@ -6912,6 +7014,7 @@ paths:
           key: allocations
           keyPascal: Allocations
           java: Allocations
+          csharp: Allocation
           object: allocation
       parameters:
         - required: true
@@ -7035,7 +7138,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord 
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -7067,6 +7171,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Code=="USD"
+          x-example-csharp: Code==\"USD\"
           x-example-php: Code==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\CurrencyCode::USD . &apos;&quot;
           x-ruby-param: Code==#{XeroRuby::Accounting::CurrencyCode::USD}
           schema:
@@ -7121,7 +7226,7 @@ paths:
           ruby: XeroRuby::Accounting::CurrencyCode::USD
           python: CurrencyCode.USD
           java: com.xero.models.accounting.CurrencyCode.USD
-          csharp: CurrencyCode.xxx
+          csharp: CurrencyCode.USD
           object: currency
         - description:
           is_last: true
@@ -7163,6 +7268,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="ACTIVE"
+          x-example-csharp: Status==\"ACTIVE\"
           x-example-java: Status==&quot;&apos; + Employee.StatusEnum.ACTIVE + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Employee::STATUS_ACTIVE . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::Employee::ACTIVE}
@@ -7180,7 +7286,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Employees'
+                $ref: '#/components/schemas/Employees' 
               example: ' {
                           "Id": "593cbccc-5cd2-4cd2-be5e-150f0843709e",
                           "Status": "OK",
@@ -7221,7 +7327,7 @@ paths:
                               "UpdatedDateUTC": "\/Date(1552324737990+0000)\/"
                             }
                           ]
-                        }'
+                        }'     
     put:
       security:
         - OAuth2: [accounting.settings]
@@ -7260,6 +7366,7 @@ paths:
           key: employees
           keyPascal: Employees
           java: Employees
+          csharp: Employee
           object: employee
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -7347,6 +7454,7 @@ paths:
           key: employees
           keyPascal: Employees
           java: Employees
+          csharp: Employee
           object: employee
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -7450,13 +7558,14 @@ paths:
       tags:
         - Accounting
       operationId: getExpenseClaims
-      summary: Retrieves expense claims
+      summary: Retrieves expense claims 
       parameters:
         - $ref: '#/components/parameters/ifModifiedSince'
         - in: query
           name: where
           description: Filter by an any element
           example: Status=="SUBMITTED"
+          x-example-csharp: Status==\"SUBMITTED\"
           x-example-java: Status==&quot;&apos; + ExpenseClaim.StatusEnum.SUBMITTED + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\ExpenseClaim::STATUS_SUBMITTED . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::ExpenseClaim::SUBMITTED}
@@ -7509,7 +7618,7 @@ paths:
       tags:
         - Accounting
       operationId: createExpenseClaims
-      summary: Creates expense claims
+      summary: Creates expense claims 
       x-hasAccountingValidationError: true
       x-node-requestBody: '{ expenseClaims: [{ status: ExpenseClaim.StatusEnum.SUBMITTED, user: { userID: "d1164823-0ac1-41ad-987b-b4e30fe0b273" }, receipts: [{ receiptID: "dc1c7f6d-0a4c-402f-acac-551d62ce5816", lineItems: [], contact: {}, user: {}, date: "2018-01-01" }]}]}'
       x-ruby-requestBody: 'expense_claims = { expense_claims: [{ status: XeroRuby::Accounting::ExpenseClaim::SUBMITTED, user: { user_id: "d1164823-0ac1-41ad-987b-b4e30fe0b273" }, receipts: [{ receipt_id: "dc1c7f6d-0a4c-402f-acac-551d62ce5816", line_items: [], contact: {}, user: {}, date: "2018-01-01" }]}]}'
@@ -7522,7 +7631,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -7583,7 +7692,7 @@ paths:
           ruby: XeroRuby::Accounting::ExpenseClaim::SUBMITTED
           python_string: SUBMITTED
           java: com.xero.models.accounting.ExpenseClaim.StatusEnum.SUBMITTED
-          csharp: ExpenseClaim.xxx
+          csharp: ExpenseClaim.StatusEnum.SUBMITTED
           object: expenseClaim
         - set_user:
           is_variable: true
@@ -7612,6 +7721,7 @@ paths:
           keySnake: expense_claims
           java: ExpenseClaims
           python: expense_claim
+          csharp: ExpenseClaim
           object: expenseClaim
       requestBody:
         required: true
@@ -7822,7 +7932,7 @@ paths:
       tags:
         - Accounting
       operationId: updateExpenseClaim
-      summary: Updates a specific expense claims
+      summary: Updates a specific expense claims 
       x-hasAccountingValidationError: true
       x-node-requestBody: '{ expenseClaims: [{ status: ExpenseClaim.StatusEnum.AUTHORISED, user: { userID: "00000000-0000-0000-0000-000000000000" }, receipts: [{ receiptID: "00000000-0000-0000-0000-000000000000", lineItems: [], contact: {}, date: "2020-01-01", user: {} }]}]}'
       x-ruby-requestBody: 'expense_claims = { expense_claims: [{ status: XeroRuby::Accounting::ExpenseClaim::AUTHORISED, user: { user_id: "00000000-0000-0000-0000-000000000000" }, receipts: [{ receipt_id: "00000000-0000-0000-0000-000000000000", line_items: [], contact: {}, date: "2020-01-01", user: {} }]}]}'
@@ -7835,7 +7945,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -7896,7 +8006,7 @@ paths:
           ruby: XeroRuby::Accounting::ExpenseClaim::SUBMITTED
           python_string: SUBMITTED
           java: com.xero.models.accounting.ExpenseClaim.StatusEnum.SUBMITTED
-          csharp: ExpenseClaim.xxx
+          csharp: ExpenseClaim.StatusEnum.SUBMITTED
           object: expenseClaim
         - set_user:
           is_variable: true
@@ -7925,6 +8035,7 @@ paths:
           keySnake: expense_claims
           java: ExpenseClaims
           python: expense_claim
+          csharp: ExpenseClaim
           object: expenseClaim
       parameters:
         - required: true
@@ -8094,7 +8205,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -8127,6 +8239,7 @@ paths:
           example: Status=="DRAFT"
           x-example-java: Status==&quot;&apos; + Invoice.StatusEnum.DRAFT + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Invoice::STATUS_DRAFT . &apos;&quot;
+          x-example-csharp: Status==\"DRAFT\"
           x-ruby-param: Status==#{XeroRuby::Accounting::Invoice::DRAFT}
           schema:
             type: string
@@ -8138,12 +8251,13 @@ paths:
             type: string
         - in: query
           name: IDs
-          description: Filter by a comma-separated list of InvoicesIDs.
+          description: Filter by a comma-separated list of InvoicesIDs. 
           style: form
           explode: false
           example: '&quot;00000000-0000-0000-0000-000000000000&quot;'
           x-example-java: Arrays.asList(UUID.fromString("00000000-0000-0000-0000-000000000000"))
           x-example-php: '&quot;00000000-0000-0000-0000-000000000000&quot;'
+          x-example-csharp: new List&lt;Guid&gt;{Guid.Parse("00000000-0000-0000-0000-000000000000")};
           schema:
             type: array
             items:
@@ -8151,24 +8265,26 @@ paths:
               format: uuid
         - in: query
           name: InvoiceNumbers
-          description: Filter by a comma-separated list of InvoiceNumbers.
+          description: Filter by a comma-separated list of InvoiceNumbers. 
           style: form
           explode: false
           example: '&quot;INV-001&quot;, &quot;INV-002&quot;'
           x-example-java: Arrays.asList("INV-001","INV-002")
           x-example-php: '&quot;INV-001&quot;, &quot;INV-002&quot;'
+          x-example-csharp: new List&lt;string&gt;{&quotINV-001&quot,&quotINV-002&quot};
           schema:
             type: array
             items:
               type: string
         - in: query
           name: ContactIDs
-          description: Filter by a comma-separated list of ContactIDs.
+          description: Filter by a comma-separated list of ContactIDs. 
           style: form
           explode: false
           example: '&quot;00000000-0000-0000-0000-000000000000&quot;'
           x-example-java: Arrays.asList(UUID.fromString("00000000-0000-0000-0000-000000000000"))
           x-example-php: '&quot;00000000-0000-0000-0000-000000000000&quot;'
+          x-example-csharp: new List&lt;Guid&gt;{Guid.Parse(&quot00000000-0000-0000-0000-000000000000&quot)};
           schema:
             type: array
             items:
@@ -8181,6 +8297,7 @@ paths:
           example: '&quot;DRAFT&quot;, &quot;SUBMITTED&quot;'
           x-example-java: Arrays.asList("DRAFT","SUBMITTED")
           x-example-php: '&quot;DRAFT&quot;, &quot;SUBMITTED&quot;'
+          x-example-csharp: new List&lt;string&gt;{&quotDRAFT&quot,&quotSUBMITTED&quot};
           schema:
             type: array
             items:
@@ -8364,7 +8481,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.of(2020, Month.OCTOBER, 10)"
-          csharp: "new DateTime('XXXX')"
+          csharp: "new DateTime(2020, 10, 10)"
           php: "new DateTime('2020-10-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-10-10T00:00:00Z')"
@@ -8374,9 +8491,10 @@ paths:
           keyPascal: Date
           keySnake: due_date_value
           java_datatype: LocalDate
+          csharp_datatype: DateTime
           default: "LocalDate.of(2020, Month.OCTOBER, 28)"
           java: "LocalDate.of(2020, Month.OCTOBER, 28)"
-          csharp: "new DateTime('XXXX')"
+          csharp: "new DateTime(2020, 10, 10)"
           php: "new DateTime('2020-10-28')"
           node: "'2020-10-28'"
           python: "dateutil.parser.parse('2020-10-28T00:00:00Z')"
@@ -8440,6 +8558,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -8447,6 +8566,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           key: accountCode
@@ -8461,18 +8581,22 @@ paths:
           keyPascal: Tracking
           default: lineItemTrackings
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
-          keyPascal: LineItem
+          keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          java: LineItems
           python: line_item
+          csharp: LineItem
           object: lineItem
         - invoice:
           is_object: true
@@ -8488,7 +8612,7 @@ paths:
           ruby: XeroRuby::Accounting::Invoice::ACCREC
           python_string: ACCREC
           java: com.xero.models.accounting.Invoice.TypeEnum.ACCREC
-          csharp: Invoice.xxx
+          csharp: Invoice.TypeEnum.ACCREC
           object: invoice
         - set_contact:
           is_variable: true
@@ -8509,7 +8633,7 @@ paths:
           is_variable: true
           nonString: true
           key: dueDate
-          keyPascal: Date
+          keyPascal: DueDate
           keySnake: due_date
           default: dueDateValue
           python: due_date_value
@@ -8537,9 +8661,9 @@ paths:
           php: XeroAPI\XeroPHP\Models\Accounting\Invoice::STATUS_DRAFT
           node: Invoice.StatusEnum.DRAFT
           ruby: XeroRuby::Accounting::Invoice::DRAFT
-          python_string: DRAFT
+          python_string: DRAFT 
           java: com.xero.models.accounting.Invoice.StatusEnum.DRAFT
-          csharp: Invoice.xxx
+          csharp: Invoice.StatusEnum.DRAFT
           object: invoice
         - invoices:
           is_object: true
@@ -8551,6 +8675,7 @@ paths:
           key: invoices
           keyPascal: Invoices
           java: Invoices
+          csharp: Invoice
           object: invoice
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -8738,7 +8863,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.of(2020, Month.OCTOBER, 10)"
-          csharp: "new DateTime('XXXX')"
+          csharp: "new DateTime(2020, 10, 10)"
           php: "new DateTime('2020-10-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-10-10T00:00:00Z')"
@@ -8750,7 +8875,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 28)"
           java: "LocalDate.of(2020, Month.OCTOBER, 28)"
-          csharp: "new DateTime('XXXX')"
+          csharp: "new DateTime(2020, 10, 10)"
           php: "new DateTime('2020-10-28')"
           node: "'2020-10-28'"
           python: "dateutil.parser.parse('2020-10-28T00:00:00Z')"
@@ -8781,6 +8906,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -8788,6 +8914,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -8796,18 +8923,22 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
-          keyPascal: LineItem
+          keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          java: LineItems
           python: line_item
+          csharp: LineItem
           object: lineItem
         - invoice:
           is_object: true
@@ -8823,7 +8954,7 @@ paths:
           ruby: XeroRuby::Accounting::Invoice::ACCREC
           python_string: ACCREC
           java: com.xero.models.accounting.Invoice.TypeEnum.ACCREC
-          csharp: Invoice.xxx
+          csharp: Invoice.TypeEnum.ACCREC
           object: invoice
         - set_contact:
           is_variable: true
@@ -8872,9 +9003,9 @@ paths:
           php: XeroAPI\XeroPHP\Models\Accounting\Invoice::STATUS_DRAFT
           node: Invoice.StatusEnum.DRAFT
           ruby: XeroRuby::Accounting::Invoice::DRAFT
-          python_string: DRAFT
+          python_string: DRAFT 
           java: com.xero.models.accounting.Invoice.StatusEnum.DRAFT
-          csharp: Invoice.xxx
+          csharp: Invoice.StatusEnum.DRAFT
           object: invoice
         - invoices:
           is_object: true
@@ -8886,6 +9017,7 @@ paths:
           key: invoices
           keyPascal: Invoices
           java: Invoices
+          csharp: Invoice
           object: invoice
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -9263,6 +9395,7 @@ paths:
           key: invoices
           keyPascal: Invoices
           java: Invoices
+          csharp: Invoice
           object: invoice
       parameters:
         - required: true
@@ -9508,7 +9641,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Invoice as binary data
+          description: Success - return response of attachment for Invoice as binary data 
           content:
              application/octet-stream:
               schema:
@@ -9549,7 +9682,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Invoice as binary data
+          description: Success - return response of attachment for Invoice as binary data 
           content:
              application/octet-stream:
               schema:
@@ -9801,7 +9934,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -9830,7 +9964,7 @@ paths:
       summary: Retrieves invoice reminder settings
       responses:
         '200':
-          description: Success - return response of Invoice Reminders
+          description: Success - return response of Invoice Reminders 
           content:
             application/json:
               schema:
@@ -9935,6 +10069,7 @@ paths:
           key: cOGSAccountCode
           keyPascal: CoGSAccountCode
           keySnake: cogs_account_code
+          keyCsharp: COGSAccountCode
           default: 500
           object: purchaseDetails
         - item:
@@ -9982,6 +10117,7 @@ paths:
           key: items
           keyPascal: Items
           java: Items
+          csharp: Item
           object: item
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -10081,6 +10217,7 @@ paths:
           key: items
           keyPascal: Items
           java: Items
+          csharp: Item
           object: item
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -10230,6 +10367,7 @@ paths:
           key: items
           keyPascal: Items
           java: Items
+          csharp: Item
           object: item
       parameters:
         - required: true
@@ -10362,7 +10500,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -10886,6 +11025,7 @@ paths:
           keySnake: linked_transactions
           java: LinkedTransactions
           python: linked_transaction
+          csharp: LinkedTransaction
           object: linkedTransaction
       parameters:
         - required: true
@@ -11003,6 +11143,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="DRAFT"
+          x-example-csharp: Status==\"DRAFT\"
           x-example-java: Status==&quot;&apos; + ManualJournal.StatusEnum.DRAFT + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\ManualJournal::STATUS_DRAFT . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::ManualJournal::DRAFT}
@@ -11087,7 +11228,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.of(2020, Month.OCTOBER, 10)"
-          csharp: "new DateTime('XXXX')"
+          csharp: "new DateTime(2020, 10, 10)"
           php: "new DateTime('2019-10-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -11106,6 +11247,7 @@ paths:
           keyPascal: LineAmount
           keySnake: line_amount
           default: 100.0
+          is_money: true
           object: credit
         - accountCode:
           key: accountCode
@@ -11136,6 +11278,7 @@ paths:
           keyPascal: LineAmount
           keySnake: line_amount
           default: -100.0
+          is_money: true
           object: debit
         - accountCode:
           key: accountCode
@@ -11197,6 +11340,7 @@ paths:
           java: ManualJournals
           php: manualJournals
           python: manual_journal
+          csharp: ManualJournal
           object: manualJournal
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -11315,7 +11459,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.of(2020, Month.OCTOBER, 10)"
-          csharp: "new DateTime('XXXX')"
+          csharp: "new DateTime(2020, 10, 10)"
           php: "new DateTime('2020-10-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -11334,6 +11478,7 @@ paths:
           keyPascal: LineAmount
           keySnake: line_amount
           default: 100.0
+          is_money: true
           object: credit
         - accountCode:
           key: accountCode
@@ -11364,6 +11509,7 @@ paths:
           keyPascal: LineAmount
           keySnake: line_amount
           default: -100.0
+          is_money: true
           object: debit
         - accountCode:
           key: accountCode
@@ -11406,7 +11552,7 @@ paths:
           is_last: true
           is_variable: true
           nonString: true
-          key: journalLines
+          key: manualJournalLines
           keyPascal: JournalLines
           keySnake: journal_lines
           default: manualJournalLines
@@ -11425,6 +11571,7 @@ paths:
           java: ManualJournals
           php: manualJournals
           python: manual_journal
+          csharp: ManualJournal
           object: manualJournal
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -11625,7 +11772,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.of(2020, Month.OCTOBER, 10)"
-          csharp: "new DateTime('XXXX')"
+          csharp: "new DateTime(2020, 10, 10)"
           php: "new DateTime('2020-10-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -11644,6 +11791,7 @@ paths:
           keyPascal: LineAmount
           keySnake: line_amount
           default: 100.0
+          is_money: true
           object: credit
         - accountCode:
           key: accountCode
@@ -11674,6 +11822,7 @@ paths:
           keyPascal: LineAmount
           keySnake: line_amount
           default: -100.0
+          is_money: true
           object: debit
         - accountCode:
           key: accountCode
@@ -11716,7 +11865,7 @@ paths:
           is_last: true
           is_variable: true
           nonString: true
-          key: journalLines
+          key: manualJournalLines
           keyPascal: JournalLines
           keySnake: journal_lines
           default: manualJournalLines
@@ -11735,6 +11884,7 @@ paths:
           java: ManualJournals
           php: manualJournals
           python: manual_journal
+          csharp: ManualJournal
           object: manualJournal
       parameters:
         - required: true
@@ -11895,7 +12045,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Manual Journal as binary data
+          description: Success - return response of attachment for Manual Journal as binary data 
           content:
              application/octet-stream:
               schema:
@@ -11936,7 +12086,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Manual Journal as binary data
+          description: Success - return response of attachment for Manual Journal as binary data 
           content:
              application/octet-stream:
               schema:
@@ -12111,7 +12261,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -12304,6 +12455,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="AUTHORISED"
+          x-example-csharp: Status==\"AUTHORISED\"
           x-example-java: Status==&quot;&apos; + Overpayment.StatusEnum.AUTHORISED + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Overpayment::STATUS_AUTHORISED . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::Overpayment::AUTHORISED}
@@ -12648,7 +12800,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -12673,6 +12825,7 @@ paths:
           key: amount
           keyPascal: Amount
           default: 1.0
+          is_money: true
           object: allocation
         - date:
           is_variable: true
@@ -12700,6 +12853,7 @@ paths:
           key: allocations
           keyPascal: Allocations
           java: Allocations
+          csharp: Allocation
           object: allocation
       parameters:
         - required: true
@@ -12825,7 +12979,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -12879,6 +13034,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="AUTHORISED"
+          x-example-csharp: Status==\"AUTHORISED\"
           x-example-java: Status==&quot;&apos; + Payment.StatusEnum.AUTHORISED + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Payment::STATUS_AUTHORISED . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::Payment::AUTHORISED}
@@ -13025,7 +13181,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-10-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-10-10T00:00:00Z')"
@@ -13047,6 +13203,7 @@ paths:
           keyPascal: Account
         - accountID:
           is_last: true
+          is_uuid: true
           key: accountID
           keyPascal: AccountID
           keySnake: account_id
@@ -13075,6 +13232,7 @@ paths:
           key: amount
           keyPascal: Amount
           default: 1.0
+          is_money: true
           object: payment
         - date:
           is_last: true
@@ -13095,6 +13253,7 @@ paths:
           key: payments
           keyPascal: Payments
           java: Payments
+          csharp: Payment
           object: payment
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -13211,7 +13370,7 @@ paths:
       tags:
         - Accounting
       operationId: createPayment
-      summary: Creates a single payment for invoice or credit notes
+      summary: Creates a single payment for invoice or credit notes  
       x-hasAccountingValidationError: true
       x-node-requestBody: '{ invoice: { invoiceID: "00000000-0000-0000-0000-000000000000", lineItems: [], contact: {}, type: Invoice.TypeEnum.ACCPAY }, account: { code: "970" }, date: "2019-03-12", amount: 1.0 }'
       x-ruby-requestBody: 'invoice = { invoice: { invoice_id: "00000000-0000-0000-0000-000000000000", line_items: [], contact: {}, type: XeroRuby::Accounting::Invoice::ACCPAY }, account: { code: "970" }, date: "2019-03-12", amount: 1.0 }'
@@ -13224,7 +13383,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-10-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-10-10T00:00:00Z')"
@@ -13246,6 +13405,7 @@ paths:
           keyPascal: Account
         - accountID:
           is_last: true
+          is_uuid: true
           key: accountID
           keyPascal: AccountID
           keySnake: account_id
@@ -13274,6 +13434,7 @@ paths:
           key: amount
           keyPascal: Amount
           default: 1.0
+          is_money: true
           object: payment
         - date:
           is_last: true
@@ -13294,6 +13455,7 @@ paths:
           key: payments
           keyPascal: Payments
           java: Payments
+          csharp: Payment
           object: payment
       responses:
         '200':
@@ -13637,9 +13799,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentDelete'
-              example: '{
-                          "Payments":[
-                            {
+              example: '{  
+                          "Payments":[  
+                            {  
                               "Status":"DELETED"
                             }
                           ]
@@ -13699,7 +13861,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -13814,6 +13977,7 @@ paths:
           key: paymentServices
           keyPascal: PaymentServices
           java: PaymentServices
+          csharp: PaymentService
           object: paymentService
       responses:
         '200':
@@ -13876,6 +14040,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="AUTHORISED"
+          x-example-csharp: Status==\"AUTHORISED\"
           x-example-java: Status==&quot;&apos; + Prepayment.StatusEnum.AUTHORISED + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Prepayment::STATUS_AUTHORISED . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::Prepayment::AUTHORISED}
@@ -14107,7 +14272,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.now()"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           node: "'2020-12-10'"
           php: "new DateTime('2020-12-10')"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -14139,6 +14304,7 @@ paths:
           key: amount
           keyPascal: Amount
           default: 1.0
+          is_money: true
           object: allocation
         - date:
           is_last: true
@@ -14159,6 +14325,7 @@ paths:
           key: allocations
           keyPascal: Allocations
           java: Allocations
+          csharp: Allocation
           object: allocation
       parameters:
         - required: true
@@ -14282,7 +14449,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -14339,13 +14507,13 @@ paths:
           schema:
             type: string
             enum:
-              - DRAFT
-              - SUBMITTED
-              - AUTHORISED
+              - DRAFT    
+              - SUBMITTED  
+              - AUTHORISED  
               - BILLED
               - DELETED
         - in: query
-          name: DateFrom
+          name: DateFrom 
           description: Filter by purchase order date (e.g. GET https://.../PurchaseOrders?DateFrom=2015-12-01&DateTo=2015-12-31
           example: "2019-12-01"
           schema:
@@ -14370,7 +14538,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Success - return response of type PurchaseOrder array of all PurchaseOrder
+          description: Success - return response of type PurchaseOrder array of all PurchaseOrder      
           content:
             application/json:
               schema:
@@ -14544,7 +14712,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-12-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -14575,6 +14743,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -14582,6 +14751,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -14590,18 +14760,22 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
-          keyPascal: LineItem
+          keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          java: LineItems
           python: line_item
+          csharp: LineItem
           object: lineItem
         - purchaseOrder:
           is_object: true
@@ -14645,12 +14819,13 @@ paths:
           keySnake: purchase_orders
           java: PurchaseOrders
           python: purchase_order
+          csharp: PurchaseOrder
           object: purchaseOrder
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
       responses:
         '200':
-          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder
+          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder          
           content:
             application/json:
               schema:
@@ -14809,7 +14984,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-12-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -14840,6 +15015,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -14847,6 +15023,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -14855,18 +15032,22 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
-          keyPascal: LineItem
+          keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
+          java: LineItems
           python: line_item
+          csharp: LineItem
           object: lineItem
         - purchaseOrder:
           is_object: true
@@ -14910,12 +15091,13 @@ paths:
           keySnake: purchase_orders
           java: PurchaseOrders
           python: purchase_order
+          csharp: PurchaseOrder
           object: purchaseOrder
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
       responses:
         '200':
-          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder
+          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder          
           content:
             application/json:
               schema:
@@ -15103,7 +15285,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder
+          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder          
           content:
             application/json:
               schema:
@@ -15267,6 +15449,7 @@ paths:
           keySnake: purchase_orders
           java: PurchaseOrders
           python: purchase_order
+          csharp: PurchaseOrder
           object: purchaseOrder
       parameters:
         - required: true
@@ -15279,7 +15462,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type PurchaseOrder array for updated PurchaseOrder
+          description: Success - return response of type PurchaseOrder array for updated PurchaseOrder          
           content:
             application/json:
               schema:
@@ -15419,7 +15602,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder
+          description: Success - return response of type PurchaseOrder array for specified PurchaseOrder          
           content:
             application/json:
               schema:
@@ -15604,7 +15787,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -15642,7 +15826,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type Attachments array of Purchase Orders
+          description: Success - return response of type Attachments array of Purchase Orders 
           x-isAttachment: true
           content:
             application/json:
@@ -15707,13 +15891,13 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Account as binary data
+          description: Success - return response of attachment for Account as binary data 
           content:
              application/octet-stream:
               schema:
@@ -15748,13 +15932,13 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Purchase Order as binary data
+          description: Success - return response of attachment for Purchase Order as binary data 
           content:
              application/octet-stream:
               schema:
@@ -15786,7 +15970,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -15847,7 +16031,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -16027,7 +16211,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-12-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -16058,6 +16242,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -16065,6 +16250,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -16073,19 +16259,23 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
-          keyPascal: LineItem
+          keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
-          object: lineItem
+          java: LineItems
           python: line_item
+          csharp: LineItem
+          object: lineItem
         - quote:
           is_object: true
           key: quote
@@ -16125,6 +16315,7 @@ paths:
           key: quotes
           keyPascal: Quotes
           java: Quotes
+          csharp: Quote
           object: quote
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -16135,24 +16326,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Quotes'
-              example: '{
+              example: '{ 
                         "SummarizeErrors":false,
                         "Id":"29571f5a-bf73-4bb6-9de5-86be44e6bf2e",
                         "Status":"OK",
                         "ProviderName":"provider-name",
                         "DateTimeUTC":"\/Date(1580607782916)\/",
-                        "Quotes":[
-                            {
+                        "Quotes":[ 
+                            { 
                               "QuoteID":"60031d53-6488-4321-9cbd-c1db6dbf9ba4",
                               "QuoteNumber":"QU-0008",
                               "Terms":"",
-                              "Contact":{
+                              "Contact":{ 
                                   "ContactID":"6a65f055-b0e0-471a-a933-d1ffdd89393f",
                                   "Name":"John Smith-82160",
                                   "EmailAddress":""
                               },
-                              "LineItems":[
-                                  {
+                              "LineItems":[ 
+                                  { 
                                     "LineItemID":"26995857-0eea-45fb-b46c-f8ea896ec46e",
                                     "AccountCode":"12775",
                                     "Description":"Foobar",
@@ -16161,7 +16352,7 @@ paths:
                                     "ItemCode":"",
                                     "Quantity":1.0000,
                                     "TaxAmount":0.00,
-                                    "Tracking":[
+                                    "Tracking":[ 
 
                                     ]
                                   }
@@ -16226,7 +16417,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-12-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -16257,6 +16448,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -16264,6 +16456,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -16272,19 +16465,23 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
-          keyPascal: LineItem
+          keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
-          object: lineItem
+          java: LineItems
           python: line_item
+          csharp: LineItem
+          object: lineItem
         - quote:
           is_object: true
           key: quote
@@ -16324,6 +16521,7 @@ paths:
           key: quotes
           keyPascal: Quotes
           java: Quotes
+          csharp: Quote
           object: quote
       parameters:
         - $ref: '#/components/parameters/summarizeErrors'
@@ -16334,24 +16532,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Quotes'
-              example: '{
+              example: '{ 
                         "SummarizeErrors":false,
                         "Id":"b425754f-0512-481d-827b-c8958db7667e",
                         "Status":"OK",
                         "ProviderName":"provider-name",
                         "DateTimeUTC":"\/Date(1580607783833)\/",
-                        "Quotes":[
-                            {
+                        "Quotes":[ 
+                            { 
                               "QuoteID":"fd53e0b7-4d24-4c20-be85-043a62ea5847",
                               "QuoteNumber":"QU-0009",
                               "Terms":"",
-                              "Contact":{
+                              "Contact":{ 
                                   "ContactID":"6a65f055-b0e0-471a-a933-d1ffdd89393f",
                                   "Name":"John Smith-82160",
                                   "EmailAddress":""
                               },
-                              "LineItems":[
-                                  {
+                              "LineItems":[ 
+                                  { 
                                     "LineItemID":"898c7fd6-0d94-4ac0-ace8-87e350a042de",
                                     "AccountCode":"12775",
                                     "Description":"Foobar",
@@ -16360,7 +16558,7 @@ paths:
                                     "ItemCode":"",
                                     "Quantity":1.0000,
                                     "TaxAmount":0.00,
-                                    "Tracking":[
+                                    "Tracking":[ 
 
                                     ]
                                   }
@@ -16431,27 +16629,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Quotes'
-              example: '{
+              example: '{ 
                         "SummarizeErrors":true,
                         "Id":"e3626c45-77f1-4ab0-ba9b-3593c7bcd25c",
                         "Status":"OK",
                         "ProviderName":"provider-name",
                         "DateTimeUTC":"\/Date(1580607864786)\/",
-                        "Quotes":[
-                            {
+                        "Quotes":[ 
+                            { 
                               "QuoteID":"1f90e77a-7b88-4462-874f-1aa675be8fef",
                               "QuoteNumber":"QU-0007",
                               "Reference":"MyQuote",
                               "Terms":"These are my terms",
-                              "Contact":{
+                              "Contact":{ 
                                   "ContactID":"4bc3ecb2-8e2a-4267-a171-0e0ce7e5ac2a",
                                   "Name":"ABC Limited",
                                   "EmailAddress":"john.smith@gmail.com",
                                   "FirstName":"John",
                                   "LastName":"Smith"
                               },
-                              "LineItems":[
-                                  {
+                              "LineItems":[ 
+                                  { 
                                     "LineItemID":"09b47d9f-f78d-4bab-b226-957f55bfb1b5",
                                     "AccountCode":"400",
                                     "Description":"Half day training - Microsoft Office",
@@ -16461,8 +16659,8 @@ paths:
                                     "Quantity":1.0000,
                                     "TaxAmount":0.00,
                                     "TaxType":"NONE",
-                                    "Tracking":[
-                                        {
+                                    "Tracking":[ 
+                                        { 
                                           "TrackingCategoryID":"9bd3f506-6d91-4625-81f0-0f9147f099f4",
                                           "TrackingOptionID":"d30e2a0d-ae6f-4806-88ca-d8ebdba2af73",
                                           "Name":"Avengers",
@@ -16509,7 +16707,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-12-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-12-03T00:00:00Z')"
@@ -16560,6 +16758,7 @@ paths:
           key: quotes
           keyPascal: Quotes
           java: Quotes
+          csharp: Quote
           object: quote
       parameters:
         - required: true
@@ -16577,25 +16776,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Quotes'
-              example: '{
+              example: '{ 
                         "SummarizeErrors":true,
                         "Id":"be4f43a7-ef02-497a-96c2-fc0bc047a82a",
                         "Status":"OK",
                         "ProviderName":"provider-name",
                         "DateTimeUTC":"\/Date(1580605644385)\/",
-                        "Quotes":[
-                            {
+                        "Quotes":[ 
+                            { 
                               "QuoteID":"8ce6b14c-ef87-4f45-93f0-853137c6d0e1",
                               "QuoteNumber":"QU-0008",
                               "Reference":"I am an update",
                               "Terms":"",
-                              "Contact":{
+                              "Contact":{ 
                                   "ContactID":"8ed7dd03-4e6a-4078-a807-c5309abfec52",
                                   "Name":"Orlena Greenville 35",
                                   "EmailAddress":""
                               },
-                              "LineItems":[
-                                  {
+                              "LineItems":[ 
+                                  { 
                                     "LineItemID":"be69f44e-9c72-4fcd-9152-0174867cce49",
                                     "AccountCode":"12775",
                                     "Description":"Foobar",
@@ -16694,7 +16893,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -16760,7 +16960,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -16811,13 +17011,13 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Quote as binary data
+          description: Success - return response of attachment for Quote as binary data 
           content:
              application/octet-stream:
               schema:
@@ -16852,13 +17052,13 @@ paths:
         - required: true
           in: header
           name: contentType
-          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf
+          description: The mime type of the attachment file you are retrieving i.e image/jpg, application/pdf 
           example: image/jpg
           schema:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Quote as binary data
+          description: Success - return response of attachment for Quote as binary data 
           content:
              application/octet-stream:
               schema:
@@ -16890,7 +17090,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -16951,7 +17151,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachment
+          description: Success - return response of type Attachments array of Attachment 
           x-isAttachment: true
           content:
             application/json:
@@ -16998,6 +17198,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="DRAFT"
+          x-example-csharp: Status==\"DRAFT\"
           x-example-java: Status==&quot;&apos; + Receipt.StatusEnum.DRAFT + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\Receipt::STATUS_DRAFT . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::Receipt::DRAFT}
@@ -17012,7 +17213,7 @@ paths:
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type Receipts array for all Receipt
+          description: Success - return response of type Receipts array for all Receipt   
           content:
             application/json:
               schema:
@@ -17114,6 +17315,7 @@ paths:
           key: quantity
           keyPascal: Quantity
           default: 1.0
+          is_money: true
           object: lineItem
         - unitAmount:
           nonString: true
@@ -17121,6 +17323,7 @@ paths:
           keyPascal: UnitAmount
           keySnake: unit_amount
           default: 20.0
+          is_money: true
           object: lineItem
         - accountCode:
           is_last: true
@@ -17129,19 +17332,23 @@ paths:
           keySnake: account_code
           default: "000"
           object: lineItem
-        - lineItems:
+        - line_items:
           is_list: true
           key: lineItems
-          keyPascal: LineItem
+          keyPascal: LineItems
           keySnake: line_items
+          csharp: LineItem
+          java: LineItem
         - add_lineitems:
           is_last: true
           is_list_add: true
           key: lineItems
           keyPascal: LineItems
           keySnake: line_items
-          object: lineItem
+          java: LineItems
           python: line_item
+          csharp: LineItem
+          object: lineItem
         - receipt:
           is_object: true
           key: receipt
@@ -17180,7 +17387,7 @@ paths:
           ruby: XeroRuby::Accounting::INCLUSIVE
           python: LineAmountTypes.INCLUSIVE
           java: com.xero.models.accounting.LineAmountTypes.INCLUSIVE
-          csharp: LineAmountTypes.xxx
+          csharp: LineAmountTypes.Exclusive
           object: receipt
         - status:
           is_last: true
@@ -17193,7 +17400,7 @@ paths:
           ruby: XeroRuby::Accounting::Receipt::DRAFT
           python_string: DRAFT
           java: com.xero.models.accounting.Receipt.StatusEnum.DRAFT
-          csharp: Receipt.xxx
+          csharp: Receipt.StatusEnum.DRAFT
           object: receipt
         - receipts:
           is_object: true
@@ -17205,12 +17412,13 @@ paths:
           key: receipts
           keyPascal: Receipts
           java: Receipts
+          csharp: Receipt
           object: receipt
       parameters:
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type Receipts array for newly created Receipt
+          description: Success - return response of type Receipts array for newly created Receipt   
           content:
             application/json:
               schema:
@@ -17375,7 +17583,7 @@ paths:
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type Receipts array for a specified Receipt
+          description: Success - return response of type Receipts array for a specified Receipt   
           content:
             application/json:
               schema:
@@ -17516,7 +17724,7 @@ paths:
           java_datatype: LocalDate
           default: "LocalDate.of(2020, Month.OCTOBER, 10)"
           java: "LocalDate.now()"
-          csharp: "new DateTime('XXXX')"
+          csharp: "DateTime.Now"
           php: "new DateTime('2020-12-10')"
           node: "'2020-10-10'"
           python: "dateutil.parser.parse('2020-10-10T00:00:00Z')"
@@ -17566,6 +17774,7 @@ paths:
           key: receipts
           keyPascal: Receipts
           java: Receipts
+          csharp: Receipt
           object: receipt
       parameters:
         - required: true
@@ -17579,7 +17788,7 @@ paths:
         - $ref: '#/components/parameters/unitdp'
       responses:
         '200':
-          description: Success - return response of type Receipts array for updated Receipt
+          description: Success - return response of type Receipts array for updated Receipt   
           content:
             application/json:
               schema:
@@ -17725,7 +17934,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type Attachments array of Attachments for a specified Receipt
+          description: Success - return response of type Attachments array of Attachments for a specified Receipt   
           x-isAttachment: true
           content:
             application/json:
@@ -17782,7 +17991,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Receipt as binary data
+          description: Success - return response of attachment for Receipt as binary data 
           content:
              application/octet-stream:
               schema:
@@ -17823,7 +18032,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Receipt as binary data
+          description: Success - return response of attachment for Receipt as binary data 
           content:
              application/octet-stream:
               schema:
@@ -17855,7 +18064,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array with updated Attachment for a specified Receipt
+          description: Success - return response of type Attachments array with updated Attachment for a specified Receipt   
           x-isAttachment: true
           content:
             application/json:
@@ -17912,7 +18121,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array with newly created Attachment for a specified Receipt
+          description: Success - return response of type Attachments array with newly created Attachment for a specified Receipt   
           x-isAttachment: true
           content:
             application/json:
@@ -17998,7 +18207,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -18051,6 +18261,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="DRAFT"
+          x-example-csharp: Status==\"DRAFT\"
           x-example-java: Status==&quot;&apos; + RepeatingInvoice.StatusEnum.DRAFT + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\RepeatingInvoice::STATUS_DRAFT . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::RepeatingInvoice::DRAFT}
@@ -18245,7 +18456,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Success - return response of type Attachments array with all Attachments for a specified Repeating Invoice
+          description: Success - return response of type Attachments array with all Attachments for a specified Repeating Invoice   
           x-isAttachment: true
           content:
             application/json:
@@ -18316,7 +18527,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Repeating Invoice as binary data
+          description: Success - return response of attachment for Repeating Invoice as binary data 
           content:
              application/octet-stream:
               schema:
@@ -18357,7 +18568,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of attachment for Repeating Invoice as binary data
+          description: Success - return response of attachment for Repeating Invoice as binary data 
           content:
              application/octet-stream:
               schema:
@@ -18389,7 +18600,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array with specified Attachment for a specified Repeating Invoice
+          description: Success - return response of type Attachments array with specified Attachment for a specified Repeating Invoice   
           x-isAttachment: true
           content:
             application/json:
@@ -18446,7 +18657,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Success - return response of type Attachments array with updated Attachment for a specified Repeating Invoice
+          description: Success - return response of type Attachments array with updated Attachment for a specified Repeating Invoice   
           x-isAttachment: true
           content:
             application/json:
@@ -18532,7 +18743,8 @@ paths:
           keySnake: history_records
           java: HistoryRecords
           python: history_record
-          object: historyRecord
+          csharp: HistoryRecord
+          object: historyRecord 
       parameters:
         - required: true
           in: path
@@ -21064,47 +21276,47 @@ paths:
             - YEAR
         - in: query
           name: trackingCategoryID
-          description: The trackingCategory 1 for the ProfitAndLoss report
+          description: The trackingCategory 1 for the ProfitAndLoss report 
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
         - in: query
           name: trackingCategoryID2
-          description: The trackingCategory 2 for the ProfitAndLoss report
+          description: The trackingCategory 2 for the ProfitAndLoss report 
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
         - in: query
           name: trackingOptionID
-          description: The tracking option 1 for the ProfitAndLoss report
+          description: The tracking option 1 for the ProfitAndLoss report 
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
         - in: query
           name: trackingOptionID2
-          description: The tracking option 2 for the ProfitAndLoss report
+          description: The tracking option 2 for the ProfitAndLoss report 
           example: "00000000-0000-0000-0000-000000000000"
           schema:
             type: string
         - in: query
           name: standardLayout
-          description: Return the standard layout for the ProfitAndLoss report
+          description: Return the standard layout for the ProfitAndLoss report 
           example: "true"
           schema:
             type: boolean
         - in: query
           name: paymentsOnly
-          description: Return cash only basis for the ProfitAndLoss report
+          description: Return cash only basis for the ProfitAndLoss report 
           example: "false"
           schema:
-            type: boolean
+            type: boolean     
       responses:
         '200':
           description: Success - return response of type ReportWithRows
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportWithRows'
+                $ref: '#/components/schemas/ReportWithRows'       
   '/Reports/TrialBalance':
     parameters:
       - $ref: '#/components/parameters/requiredHeader'
@@ -21125,7 +21337,7 @@ paths:
             format: date
         - in: query
           name: paymentsOnly
-          description: Return cash only basis for the Trial Balance report
+          description: Return cash only basis for the Trial Balance report 
           example: "true"
           schema:
             type: boolean
@@ -22253,7 +22465,7 @@ paths:
           ruby: XeroRuby::Accounting::AccountType::EXPENSE
           python: AccountType.EXPENSE
           java: com.xero.models.accounting.AccountType.EXPENSE
-          csharp: Account.ClassEnum.EXPENSE
+          csharp: AccountType.EXPENSE
           object: account
         - accounts:
           is_list: true
@@ -22401,6 +22613,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="ACTIVE"
+          x-example-csharp: Status==\"ACTIVE\"
           x-example-java: Status==&quot;&apos; + TaxRate.StatusEnum.ACTIVE + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\TaxRate::STATUS_ACTIVE . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::TaxRate::ACTIVE}
@@ -22544,7 +22757,7 @@ paths:
       tags:
         - Accounting
       operationId: createTaxRates
-      summary: Creates one or more tax rates
+      summary: Creates one or more tax rates      
       x-hasAccountingValidationError: true
       x-node-requestBody: '{ taxRates: [{ name: "CA State Tax", taxComponents: [{ name: "State Tax", rate: 2.25 }]}]}'
       x-ruby-requestBody: 'tax_rates = { tax_rates: [{ name: "CA State Tax", tax_components: [{ name: "State Tax", rate: 2.25 }]}]}'
@@ -22565,6 +22778,22 @@ paths:
           key: rate
           keyPascal: Rate
           default: 2.25
+          is_money: true
+          object: taxComponent      
+        - taxComponents:
+          is_list: true
+          key: taxComponent
+          keyPascal: TaxComponent
+          csharp: TaxComponent
+        - add_taxComponent:
+          is_last: true
+          is_list_add: true
+          key: taxComponents
+          keyPascal: TaxComponents
+          keySnake: tax_components
+          java: TaxComponents
+          python: tax_component
+          csharp: TaxComponent
           object: taxComponent
         - taxRate:
           is_object: true
@@ -22576,15 +22805,13 @@ paths:
           keyPascal: Name
           default: CA State Tax
           object: taxRate
-        - add_taxComponent:
-          is_last: true
-          is_array_add: true
-          key: taxRate
+        - set_taxComponents:
+          is_variable: true
+          nonString: true
+          key: taxComponents
           keyPascal: TaxComponents
-          keySnake: tax_components
-          java: TaxComponents
-          python: tax_component
-          object: taxComponent
+          object: taxRate
+          default: taxComponents
         - taxRates:
           is_object: true
           key: taxRates
@@ -22597,6 +22824,7 @@ paths:
           keySnake: tax_rates
           java: TaxRates
           python: tax_rate
+          csharp: TaxRate
           object: taxRate
       responses:
         '200':
@@ -22683,6 +22911,22 @@ paths:
           key: rate
           keyPascal: Rate
           default: 2.25
+          is_money: true
+          object: taxComponent
+        - taxComponents:
+          is_list: true
+          key: taxComponents
+          keyPascal: TaxComponents
+          csharp: TaxComponent
+        - add_taxComponent:
+          is_last: true
+          is_list_add: true
+          key: taxComponents
+          keyPascal: TaxComponents
+          keySnake: tax_components
+          java: TaxComponents
+          python: tax_component
+          csharp: TaxComponent
           object: taxComponent
         - taxRate:
           is_object: true
@@ -22694,15 +22938,13 @@ paths:
           keyPascal: Name
           default: CA State Tax
           object: taxRate
-        - add_taxComponent:
-          is_last: true
-          is_array_add: true
-          key: taxRate
+        - set_taxComponents:
+          is_variable: true
+          nonString: true
+          key: taxComponents
           keyPascal: TaxComponents
-          keySnake: tax_components
-          java: TaxComponents
-          python: tax_component
-          object: taxComponent
+          object: taxRate
+          default: taxComponents
         - taxRates:
           is_object: true
           key: taxRates
@@ -22715,6 +22957,7 @@ paths:
           keySnake: tax_rates
           java: TaxRates
           python: tax_rate
+          csharp: TaxRate
           object: taxRate
       responses:
         '200':
@@ -22790,6 +23033,7 @@ paths:
           name: where
           description: Filter by an any element
           example: Status=="ACTIVE"
+          x-example-csharp: Status==\"ACTIVE\"
           x-example-java: Status==&quot;&apos; + TrackingCategory.StatusEnum.ACTIVE + &apos;&quot;
           x-example-php: Status==&quot;&apos; . \XeroAPI\XeroPHP\Models\Accounting\TrackingCategory::STATUS_ACTIVE . &apos;&quot;
           x-ruby-param: Status==#{XeroRuby::Accounting::TrackingCategory::ACTIVE}
@@ -23314,7 +23558,7 @@ components:
     OAuth2:
       type: oauth2
       description: For more information
-      flows:
+      flows: 
         authorizationCode:
           authorizationUrl: 'https://login.xero.com/identity/connect/authorize'
           tokenUrl: 'https://identity.xero.com/connect/token'
@@ -23333,9 +23577,9 @@ components:
             accounting.contacts.read: Grant read-only access to contacts and contact groups
             accounting.attachments: Grant read-write access to attachments
             accounting.attachments.read: Grant read-only access to attachments
-            assets: Grant read-write access to assets
+            assets: Grant read-write access to assets 
             assets.read: Grant read-only access to fixed assets
-            bankfeeds: Grant read-write access to bankfeeds
+            bankfeeds: Grant read-write access to bankfeeds 
             files: Grant read-write access to files and folders
             files.read: Grant read-only access to files and folders
             payroll: Grant read-write access to payroll
@@ -23369,15 +23613,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/HistoryRecords'
-          example: '{
-                      "HistoryRecords": [
-                        {
+          example: '{  
+                      "HistoryRecords": [  
+                        {  
                           "Details": "Hello World"
                         }
                       ]
                     }'
   parameters:
-    requiredHeader:
+    requiredHeader: 
       in: header
       name: xero-tenant-id
       description: Xero identifier for Tenant
@@ -23425,7 +23669,7 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
     HistoryRecordCreated:
-      description: Success - return response of type HistoryRecords array of HistoryRecord objects
+      description: Success - return response of type HistoryRecords array of HistoryRecord objects 
       content:
         application/json:
           schema:
@@ -23478,11 +23722,11 @@ components:
         url: 'http://developer.xero.com/documentation/api/types'
       properties:
         AddressType:
-          description: define the type of address
+          description: define the type of address 
           type: string
           enum:
-          - POBOX
-          - STREET
+          - POBOX    
+          - STREET    
           - DELIVERY
         AddressLine1:
           description: max length = 500
@@ -23526,10 +23770,10 @@ components:
         url: 'http://developer.xero.com/documentation/api/types'
       properties:
         AddressType:
-          description: define the type of address
+          description: define the type of address 
           type: string
           enum:
-          - POBOX
+          - POBOX    
           - STREET
         AddressLine1:
           description: max length = 500
@@ -23607,7 +23851,7 @@ components:
         url: 'http://developer.xero.com/documentation/api/accounts/'
       properties:
         Code:
-          description:
+          description: 
             Customer defined alpha numeric account code e.g 200 or SALES (max
             length = 10)
           type: string
@@ -23673,7 +23917,7 @@ components:
             - LIABILITY
             - REVENUE
         SystemAccount:
-          description:
+          description: 
             If this is a system account then this element is returned. See
             System Account types. Note that non-system accounts may have this
             element set as either “” or null.
@@ -23723,7 +23967,7 @@ components:
         AddToWatchlist:
           description: Boolean – describes whether the account is shown in the watchlist widget on the dashboard
           type: boolean
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -23735,9 +23979,9 @@ components:
         - BANK
         - CURRENT
         - CURRLIAB
-        - DEPRECIATN
+        - DEPRECIATN  
         - DIRECTCOSTS
-        - EQUITY
+        - EQUITY  
         - EXPENSE
         - FIXED
         - INVENTORY
@@ -23806,13 +24050,13 @@ components:
           description: See Bank Transaction Types
           type: string
           enum:
-          - RECEIVE
-          - RECEIVE-OVERPAYMENT
-          - RECEIVE-PREPAYMENT
-          - SPEND
-          - SPEND-OVERPAYMENT
-          - SPEND-PREPAYMENT
-          - RECEIVE-TRANSFER
+          - RECEIVE 
+          - RECEIVE-OVERPAYMENT 
+          - RECEIVE-PREPAYMENT  
+          - SPEND 
+          - SPEND-OVERPAYMENT 
+          - SPEND-PREPAYMENT  
+          - RECEIVE-TRANSFER  
           - SPEND-TRANSFER
         Contact:
           $ref: '#/components/schemas/Contact'
@@ -23831,7 +24075,7 @@ components:
           type: string
           x-is-msdate: true
         Reference:
-          description:
+          description: 
             Reference for the transaction. Only supported for SPEND and RECEIVE
             transactions.
           type: string
@@ -23906,7 +24150,7 @@ components:
         StatusAttributeString:
           description: A string to indicate if a invoice status
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -24075,7 +24319,7 @@ components:
           x-is-msdate-time: true
           example: "/Date(1573755038314)/"
           readOnly: true
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -24100,15 +24344,15 @@ components:
         Account:
           $ref: '#/components/schemas/Account'
         Reference:
-          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero.
+          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero. 
           type: string
           maxLength: 255
         Particulars:
-          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero.
+          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero. 
           type: string
           maxLength: 12
         Code:
-          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero.
+          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero. 
           type: string
           maxLength: 12
         Details:
@@ -24169,6 +24413,11 @@ components:
           description: Booelan that tells you if the batch payment has been reconciled (read-only)
           readOnly: true
           type: string
+        ValidationErrors: 
+          description: Displays array of validation error messages from the API
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
       type: object
     BatchPaymentDetails:
       description: Bank details for use on a batch payment stored with each contact
@@ -24188,12 +24437,12 @@ components:
           type: string
           example: Hello World
         Code:
-          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero.
+          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero. 
           type: string
           maxLength: 12
           example: "ABC"
         Reference:
-          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero.
+          description: (NZ Only) Optional references for the batch payment transaction. It will also show with the batch payment transaction in the bank reconciliation Find & Match screen. Depending on your individual bank, the detail may also show on the bank statement you import into Xero. 
           type: string
           maxLength: 12
           example: "Foobar"
@@ -24262,7 +24511,7 @@ components:
         PaymentServiceType:
           description: This will always be CUSTOM for payment services created via the API.
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -24421,7 +24670,7 @@ components:
           x-is-money: true
         Balances:
           $ref: '#/components/schemas/Balances'
-        Attachments:
+        Attachments: 
           description: Displays array of attachments from the API
           type: array
           items:
@@ -24462,7 +24711,7 @@ components:
           type: number
           format: double
           x-is-money: true
-        Overdue:
+        Overdue:          
           type: number
           format: double
           x-is-money: true
@@ -24497,7 +24746,7 @@ components:
           type: number
           format: double
           readOnly: true
-          x-is-money: true
+          x-is-money: true 
     CISOrgSettings:
       type: object
       x-isObjectArray: true
@@ -24521,7 +24770,7 @@ components:
           type: number
           format: double
           readOnly: true
-          x-is-money: true
+          x-is-money: true 
     ContactPerson:
       externalDocs:
         url: 'http://developer.xero.com/documentation/api/contacts/'
@@ -24598,7 +24847,7 @@ components:
           description: See Credit Note Types
           type: string
           enum:
-          - ACCPAYCREDIT
+          - ACCPAYCREDIT  
           - ACCRECCREDIT
         Contact:
           $ref: '#/components/schemas/Contact'
@@ -24615,11 +24864,11 @@ components:
           description: See Credit Note Status Codes
           type: string
           enum:
-          - DRAFT
+          - DRAFT  
           - SUBMITTED
           - DELETED
           - AUTHORISED
-          - PAID
+          - PAID  
           - VOIDED
         LineAmountTypes:
           $ref: '#/components/schemas/LineAmountTypes'
@@ -24655,7 +24904,7 @@ components:
           type: number
           format: double
           readOnly: true
-          x-is-money: true
+          x-is-money: true 
         UpdatedDateUTC:
           description: UTC timestamp of last update to the credit note
           type: string
@@ -24702,14 +24951,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Allocation'
-        AppliedAmount:
+        AppliedAmount: 
           description: The amount of applied to an invoice
           type: number
-          format: double
+          format: double 
           example: 2.00
           x-is-money: true
         Payments:
-          description: See Payments
+          description: See Payments 
           type: array
           items:
             $ref: '#/components/schemas/Payment'
@@ -24730,12 +24979,12 @@ components:
           type: boolean
           default: "false"
           example: "false"
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        Warnings:
+        Warnings: 
           description: Displays array of warning messages from the API
           type: array
           items:
@@ -24767,13 +25016,13 @@ components:
           format: double
           x-is-money: true
         Date:
-          description:   the date the allocation is applied YYYY-MM-DD.
+          description:   the date the allocation is applied YYYY-MM-DD. 
           type: string
           x-is-msdate: true
         StatusAttributeString:
           description: A string to indicate if a invoice status
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -24806,7 +25055,7 @@ components:
       description: 3 letter alpha code for the currency – see list of currency codes
       type: string
       x-enum-varnames:
-        - AED
+        - AED 
         - AFN
         - ALL
         - AMD
@@ -24973,7 +25222,7 @@ components:
         - ZWD
         - EMPTY_CURRENCY
       enum:
-        - AED
+        - AED 
         - AFN
         - ALL
         - AMD
@@ -25138,7 +25387,7 @@ components:
         - ZMW
         - ZMK
         - ZWD
-        - ""
+        - "" 
     Employees:
       type: object
       x-isObjectArray: true
@@ -25182,7 +25431,7 @@ components:
           description: A string to indicate if a invoice status
           type: string
           example: ERROR
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -25208,7 +25457,7 @@ components:
           description: Current status of an expense claim – see status types
           type: string
           enum:
-          - SUBMITTED
+          - SUBMITTED  
           - AUTHORISED
           - PAID
           - VOIDED
@@ -25276,7 +25525,7 @@ components:
         url: 'https://developer.xero.com/documentation/api/history-and-notes'
       properties:
         Details:
-          description: details
+          description: details 
           type: string
         Changes:
           description: Name of branding theme
@@ -25380,7 +25629,7 @@ components:
           x-is-msdate: true
         PlannedPaymentDate:
           description: Shown on bills (Accounts Payable) when this has been set
-          type: string
+          type: string         
           x-is-msdate: true
         CISDeduction:
           description: CIS deduction for UK contractors
@@ -25393,7 +25642,7 @@ components:
           type: number
           format: double
           readOnly: true
-          x-is-money: true
+          x-is-money: true 
         SubTotal:
           description: Total of invoice excluding taxes
           readOnly: true
@@ -25491,7 +25740,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CreditNote'
-        Attachments:
+        Attachments: 
           description: Displays array of attachments from the API
           type: array
           items:
@@ -25504,12 +25753,12 @@ components:
         StatusAttributeString:
           description: A string to indicate if a invoice status
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        Warnings:
+        Warnings: 
           description: Displays array of warning messages from the API
           type: array
           items:
@@ -25624,8 +25873,8 @@ components:
           format: uuid
         StatusAttributeString:
           description: Status of object
-          type: string
-        ValidationErrors:
+          type: string  
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -25735,7 +25984,7 @@ components:
           type: string
           format: uuid
           example: 7be9db36-3598-4755-ba5c-c2dbc8c4a7a2
-        AccountID:
+        AccountID:  
           description: See Accounts
           type: string
           format: uuid
@@ -25754,7 +26003,7 @@ components:
         Description:
           description: The description from the source transaction line item. Only returned if populated.
           type: string
-          example: My business checking account
+          example: My business checking account 
         NetAmount:
           description: Net amount of journal line. This will be a positive value for a debit and negative for a credit
           type: number
@@ -25858,7 +26107,7 @@ components:
           enum:
           - ACCPAY
           - SPEND
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -25927,17 +26176,17 @@ components:
           description: A string to indicate if a invoice status
           type: string
           example: ERROR
-        Warnings:
+        Warnings: 
           description: Displays array of warning messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        Attachments:
+        Attachments: 
           description: Displays array of attachments from the API
           type: array
           items:
@@ -25994,7 +26243,7 @@ components:
         Actions:
           type: array
           items:
-            $ref: '#/components/schemas/Action'
+            $ref: '#/components/schemas/Action'    
     Action:
       externalDocs:
         url: 'http://developer.xero.com/documentation/api/organisation/'
@@ -26104,7 +26353,7 @@ components:
           enum:
           - PAYMENTS
           - INVOICE
-          - NONE
+          - NONE 
           - CASH
           - ACCRUAL
           - FLATRATECASH
@@ -26172,27 +26421,27 @@ components:
         ShortCode:
           description: A unique identifier for the organisation. Potential uses.
           type: string
-        Class:
-          description: Organisation Classes describe which plan the Xero organisation is on (e.g. DEMO, TRIAL, PREMIUM)
+        Class:  
+          description: Organisation Classes describe which plan the Xero organisation is on (e.g. DEMO, TRIAL, PREMIUM)  
+          type: string  
+          enum:  
+          - DEMO  
+          - TRIAL  
+          - STARTER  
+          - STANDARD  
+          - PREMIUM  
+          - PREMIUM_20  
+          - PREMIUM_50  
+          - PREMIUM_100  
+          - LEDGER  
+          - GST_CASHBOOK  
+          - NON_GST_CASHBOOK 
+        Edition:  
+          description: BUSINESS or PARTNER. Partner edition organisations are sold exclusively through accounting partners and have restricted functionality (e.g. no access to invoicing)  
           type: string
-          enum:
-          - DEMO
-          - TRIAL
-          - STARTER
-          - STANDARD
-          - PREMIUM
-          - PREMIUM_20
-          - PREMIUM_50
-          - PREMIUM_100
-          - LEDGER
-          - GST_CASHBOOK
-          - NON_GST_CASHBOOK
-        Edition:
-          description: BUSINESS or PARTNER. Partner edition organisations are sold exclusively through accounting partners and have restricted functionality (e.g. no access to invoicing)
-          type: string
-          enum:
-          - BUSINESS
-          - PARTNER
+          enum:  
+          - BUSINESS  
+          - PARTNER  
         LineOfBusiness:
           description: Description of business type as defined in Organisation settings
           type: string
@@ -26252,16 +26501,16 @@ components:
       - BS
       - BT
       - BW
-      - BY
-      - BZ
+      - BY 
+      - BZ 
       - CA
-      - CC
-      - CD
-      - CF
-      - CG
-      - CH
-      - CI
-      - CK
+      - CC 
+      - CD 
+      - CF 
+      - CG 
+      - CH 
+      - CI 
+      - CK 
       - CL
       - CM
       - CN
@@ -26583,9 +26832,9 @@ components:
     PaymentTermType:
       type: string
       enum:
-      - DAYSAFTERBILLDATE
-      - DAYSAFTERBILLMONTH
-      - OFCURRENTMONTH
+      - DAYSAFTERBILLDATE  
+      - DAYSAFTERBILLMONTH  
+      - OFCURRENTMONTH  
       - OFFOLLOWINGMONTH
     ExternalLink:
       externalDocs:
@@ -26632,7 +26881,7 @@ components:
           description: See Overpayment Types
           type: string
           enum:
-          - RECEIVE-OVERPAYMENT
+          - RECEIVE-OVERPAYMENT  
           - SPEND-OVERPAYMENT
           - AROVERPAYMENT
         Contact:
@@ -26700,10 +26949,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Allocation'
-        AppliedAmount:
+        AppliedAmount: 
           description: The amount of applied to an invoice
           type: number
-          format: double
+          format: double 
           example: 2.00
         Payments:
           description: See Payments
@@ -26740,7 +26989,7 @@ components:
           default: "DELETED"
       required:
         - Status
-      type: object
+      type: object 
     Payment:
       externalDocs:
         url: 'http://developer.xero.com/documentation/api/payments/'
@@ -26844,7 +27093,7 @@ components:
         StatusAttributeString:
           description: A string to indicate if a invoice status
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -26939,10 +27188,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Allocation'
-        AppliedAmount:
+        AppliedAmount: 
           description: The amount of applied to an invoice
           type: number
-          format: double
+          format: double 
           example: 2.00
         HasAttachments:
           description: boolean to indicate if a prepayment has an attachment
@@ -27005,9 +27254,9 @@ components:
           description: See Purchase Order Status Codes
           type: string
           enum:
-          - DRAFT
-          - SUBMITTED
-          - AUTHORISED
+          - DRAFT    
+          - SUBMITTED  
+          - AUTHORISED  
           - BILLED
           - DELETED
         SentToContact:
@@ -27079,17 +27328,17 @@ components:
         StatusAttributeString:
           description: A string to indicate if a invoice status
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        Warnings:
+        Warnings: 
           description: Displays array of warning messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        Attachments:
+        Attachments: 
           description: Displays array of attachments from the API
           type: array
           items:
@@ -27154,7 +27403,7 @@ components:
         CurrencyRate:
           description: The currency rate for a multicurrency quote
           type: number
-          format: double
+          format: double 
         SubTotal:
           description: Total of quote excluding taxes.
           readOnly: true
@@ -27204,7 +27453,7 @@ components:
         StatusAttributeString:
           description: A string to indicate if a invoice status
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
@@ -27218,7 +27467,7 @@ components:
       - INCLUSIVE
       - NOTAX
     QuoteStatusCodes:
-      description: The status of the quote.
+      description: The status of the quote. 
       type: string
       enum:
         - DRAFT
@@ -27305,17 +27554,17 @@ components:
           description: URL link to a source document – shown as “Go to [appName]” in the Xero app
           readOnly: true
           type: string
-        ValidationErrors:
+        ValidationErrors: 
           description: Displays array of validation error messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        Warnings:
+        Warnings: 
           description: Displays array of warning messages from the API
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        Attachments:
+        Attachments: 
           description: Displays array of attachments from the API
           type: array
           items:
@@ -27398,7 +27647,7 @@ components:
           type: boolean
           default: "false"
           example: "false"
-        Attachments:
+        Attachments: 
           description: Displays array of attachments from the API
           type: array
           items:
@@ -27549,67 +27798,67 @@ components:
             $ref: '#/components/schemas/TenNinetyNineContact'
     TenNinetyNineContact:
       properties:
-        Box1:
+        Box1: 
           description: Box 1 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box2:
+        Box2: 
           description: Box 2 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box3:
+        Box3: 
           description: Box 3 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box4:
+        Box4: 
           description: Box 4 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box5:
+        Box5: 
           description: Box 5 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box6:
+        Box6: 
           description: Box 6 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box7:
+        Box7: 
           description: Box 7 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box8:
+        Box8: 
           description: Box 8 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box9:
+        Box9: 
           description: Box 9 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box10:
+        Box10: 
           description: Box 10 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box11:
+        Box11: 
           description: Box 11 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box13:
+        Box13: 
           description: Box 13 on 1099 Form
           type: number
           format: double
           x-is-money: true
-        Box14:
+        Box14: 
           description: Box 14 on 1099 Form
           type: number
           format: double
@@ -27620,25 +27869,25 @@ components:
         FederalTaxIDType:
           description: Contact Fed Tax ID type
           type: string
-        City:
+        City: 
           description: Contact city on 1099 Form
           type: string
-        Zip:
+        Zip: 
           description: Contact zip on 1099 Form
           type: string
-        State:
+        State: 
           description: Contact State on 1099 Form
           type: string
-        Email:
+        Email: 
           description: Contact email on 1099 Form
           type: string
-        StreetAddress:
+        StreetAddress: 
           description: Contact address on 1099 Form
           type: string
-        TaxID:
+        TaxID: 
           description: Contact tax id on 1099 Form
           type: string
-        ContactId:
+        ContactId: 
           description: Contact contact id
           type: string
           format: uuid
@@ -27706,7 +27955,7 @@ components:
       - GSTONCAPIMPORTS
       - GSTONIMPORTS
       - NONE
-      - INPUT2
+      - INPUT2  
       - ZERORATED
       - OUTPUT2
       - CAPEXINPUT2
@@ -27772,7 +28021,7 @@ components:
       description: The date when the organisation starts using Xero
       type: object
       properties:
-        Month:
+        Month: 
           description: The month the organisation starts using Xero. Value is an integer between 1 and 12
           type: integer
           example: 1
@@ -27805,7 +28054,7 @@ components:
         CurrencyCode:
           description: The currency of the balance (Not required for base currency)
           type: string
-        CurrencyRate:
+        CurrencyRate: 
           description: (Optional) Exchange rate to base currency when money is spent or received. If not specified, XE rate for the day is applied
           type: number
           format: double
@@ -28040,7 +28289,7 @@ components:
           description: The Xero identifier for a tracking category e.g. 297c2dc5-cc47-4afd-8ec8-74990b8761e9
           type: string
           format: uuid
-        TrackingOptionID:
+        TrackingOptionID: 
           description: The Xero identifier for a tracking option e.g. dc54c220-0140-495a-b925-3246adc0075f
           type: string
           format: uuid
@@ -28107,7 +28356,7 @@ components:
         TrackingCategoryName:
           description: The default sales tracking category name for contacts
           type: string
-        TrackingOptionName:
+        TrackingOptionName: 
           description: The default purchase tracking category name for contacts
           type: string
       type: object
@@ -28185,26 +28434,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
-        BatchPaymentID:
+        BatchPaymentID: 
           description: Unique ID for batch payment object with validation error
           type: string
           format: uuid
-        BankTransactionID:
+        BankTransactionID: 
           type: string
           format: uuid
-        CreditNoteID:
+        CreditNoteID: 
           type: string
           format: uuid
-        ContactID:
+        ContactID: 
           type: string
           format: uuid
-        InvoiceID:
+        InvoiceID: 
           type: string
           format: uuid
-        ItemID:
+        ItemID: 
           type: string
           format: uuid
-        PurchaseOrderID:
+        PurchaseOrderID: 
           type: string
           format: uuid
       type: object
