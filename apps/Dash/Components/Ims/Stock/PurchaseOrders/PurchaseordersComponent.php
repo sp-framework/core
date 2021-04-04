@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Components\Ims\Stock\Purchaseorders;
+namespace Apps\Dash\Components\Ims\Stock\PurchaseOrders;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;

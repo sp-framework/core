@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Components\Ims\Stock\Purchaseorders\Install;
+namespace Apps\Dash\Components\Ims\Stock\PurchaseOrders\Install;
 
 use Apps\Dash\Components\Ims\Stock\Purchaseorders\PurchaseordersComponent;
 use Phalcon\Helper\Json;
