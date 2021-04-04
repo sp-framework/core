@@ -25,6 +25,12 @@ class RefreshUserTokenRestResponse extends BaseType
      * @var array Properties belonging to objects of this class.
      */
     private static $propertyTypes = [
+        'id_token' => [
+            'type' => 'string',
+            'repeatable' => false,
+            'attribute' => false,
+            'elementName' => 'id_token'
+        ],
         'access_token' => [
             'type' => 'string',
             'repeatable' => false,
@@ -48,6 +54,12 @@ class RefreshUserTokenRestResponse extends BaseType
             'repeatable' => false,
             'attribute' => false,
             'elementName' => 'refresh_token'
+        ],
+        'scope' => [
+            'type' => 'string',
+            'repeatable' => false,
+            'attribute' => false,
+            'elementName' => 'scope'
         ],
         'error' => [
             'type' => 'string',

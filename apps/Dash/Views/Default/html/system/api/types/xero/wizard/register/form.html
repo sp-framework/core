@@ -417,7 +417,7 @@
 /* globals PNotify */
 $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
 
-    $(this).attr('disabled', true);
+    // $(this).attr('disabled', true);
 
     $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', false);
 
@@ -425,12 +425,13 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
     postData['api_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("system/api/refreshEbayUserdata")}}', postData, function(data) {
+    $.post('{{links.url("system/api/checkXeroUserToken")}}', postData, function(data) {
         if ($('#security-token').length === 1) {
             $('#security-token').attr('name', data.tokenKey);
             $('#security-token').val(data.token);
         }
-
+        //eslint-disable-next-line
+        console.log(data);
         if (data.responseCode == '0') {
             $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
 

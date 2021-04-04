@@ -13,8 +13,6 @@ class Xero
 {
     const MIN_USER_TOKEN_TIME = 300;
 
-    const MAX_REFRESH_TOKEN_TIME = 864000;
-
     protected static $debug = false;
 
     protected $apiConfig;
@@ -170,32 +168,12 @@ class Xero
 
             $timeDiff = (int) $this->apiConfig['user_access_token_valid_until'] - time();
 
-            if ($timeDiff <= self::MIN_USER_TOKEN_TIME) {
+            if ($timeDiff <= self::MIN_USER_TOKEN_TIME) {//5mins
+
                 if ($this->apiConfig['refresh_token'] &&
                     $this->apiConfig['refresh_token'] !== ''
                 ) {
-                    $refreshTokenTimeDiff = (int) $this->apiConfig['refresh_token_valid_until'] - time();
-
-                    if ($refreshTokenTimeDiff > self::MAX_REFRESH_TOKEN_TIME) { //10 days
-                        $this->refreshUserToken();
-                    } else {
-                        die();
-                        //We have to send notification to refresh token to admin.
-                        $config = $this->apiConfig;
-
-                        $config['setup'] = '5';
-
-                        unset($config['ebayIds']);
-                        unset($config['bebayConfig']);
-
-                        $this->api->init();
-
-                        if ($this->api->updateApi($config)) {
-                            $this->packagesData->responseCode = 1;
-
-                            $this->packagesData->responseMessage = 'Note: Token will expire in less than 10 days. Please refresh token.';
-                        }
-                    }
+                    $this->refreshUserToken();
                 } else {
                     //refreshToken missing
                     $config = $this->apiConfig;
@@ -214,7 +192,7 @@ class Xero
                     }
                 }
             } else {
-                $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['refresh_token_valid_until']);
+                $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['user_access_token_valid_until']);
 
                 $this->packagesData->responseData = $responseData;
 
@@ -231,12 +209,10 @@ class Xero
 
         $request->refresh_token = $this->apiConfig['refresh_token'];
 
-        $request->scope = $this->apiConfig['credentials']['scopes'];
-
         try {
             $token = $this->useService('OAuth')->refreshUserToken($request);
 
-            $this->updateApi($token, 'eBayUser', true);
+            $this->updateApi($token, 'user', true);
         } catch (\Exception $e) {
             $this->packagesData->responseCode = 1;
 
@@ -261,19 +237,17 @@ class Xero
         $config = $this->apiConfig;
 
         if ($type === 'user') {
-            if (!$refresh) {
-                $config['setup'] = '4';
+            $config['setup'] = '4';
 
-                $config['user_id_token'] = $token->id_token;
+            $config['user_id_token'] = $token->id_token;
 
-                $config['user_access_token'] = $token->access_token;
+            $config['user_access_token'] = $token->access_token;
 
-                $config['user_access_token_valid_until'] = time() + $token->expires_in;
+            $config['user_access_token_valid_until'] = time() + $token->expires_in;
 
-                $config['refresh_token'] = $token->refresh_token;
+            $config['refresh_token'] = $token->refresh_token;
 
-                $config['auth_event_id'] = $this->getAuthEventId($token->access_token);
-            }
+            $config['auth_event_id'] = $this->getAuthEventId($token->access_token);
         } else if ($type === 'tenants') {
             $tokenArr = $token->toArray();
 
@@ -286,7 +260,12 @@ class Xero
 
         if ($this->api->updateApi($config)) {
             $newData = $this->api->packagesData->last;
-            $responseData['tenants'] = $newData['tenants'];
+            if ($type === 'user') {
+                $responseData = $newData;
+                $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['user_access_token_valid_until']);
+            } else if ($type === 'tenants') {
+                $responseData['tenants'] = $newData['tenants'];
+            }
 
             // Get updated config as original call via useService will use the old configuration.
             $this->api->init();

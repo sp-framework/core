@@ -176,6 +176,7 @@ class OAuthService
         if (!$request) {
             $request = new RefreshUserTokenRestRequest();
         }
+
         if (!isset($request->grant_type)) {
             $request->grant_type = 'refresh_token';
         }

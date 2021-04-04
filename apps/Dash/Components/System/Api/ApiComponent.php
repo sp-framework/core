@@ -259,8 +259,6 @@ class ApiComponent extends BaseComponent
         if ($this->request->isPost()) {
             $api = $this->api->useApi($this->postData(['api_id']));
 
-            $api->checkUserToken();
-
             $responseData = $api->packagesData->responseData;
 
             if (isset($this->postData()['get_user_data'])) {
@@ -296,13 +294,10 @@ class ApiComponent extends BaseComponent
         }
     }
 
-
     public function refreshEbayUserdataAction($api = null)
     {
         if (!$api) {
             $api = $this->api->useApi($this->postData(['api_id']));
-
-            $api->checkUserToken();
 
             $responseData = $api->packagesData->responseData;
         }
@@ -388,8 +383,6 @@ class ApiComponent extends BaseComponent
 
     protected function addXeroTokenAction()
     {
-        //     $this->view->responseCode = 0;
-        // return;
         $api = $this->api->useApi($this->request->get());
 
         if ($api) {
@@ -403,5 +396,71 @@ class ApiComponent extends BaseComponent
 
             $this->view->responseMessage = 'State received is incorrect.';
         }
+    }
+
+    public function checkXeroUserTokenAction()
+    {
+        if ($this->request->isPost()) {
+
+            $api = $this->api->useApi($this->postData(['api_id']));
+
+            $responseData = $api->packagesData->responseData;
+
+            if (isset($this->postData()['get_user_data'])) {
+                $responseData = array_merge($responseData, $this->refreshXeroUserdataAction($api));
+            }
+
+            $this->view->responseData = $responseData;
+
+            $this->view->responseCode = $api->packagesData->responseCode;
+
+            $this->view->responseMessage = $api->packagesData->responseMessage;
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function refreshXeroUserdataAction($api = null)
+    {
+        if (!$api) {
+            $api = $this->api->useApi($this->postData(['api_id']));
+
+            $responseData = $api->packagesData->responseData;
+        }
+
+        $identity = $api->useService('EbayIdentityApi');
+
+        $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\EbayIdentityApi\Operations\GetUserRestRequest;
+
+        $response = $identity->getUser($request);
+
+        $responseData['user_data'] = $response->toArray();
+
+        if (isset($responseData['user_data']['accountType']) &&
+            $responseData['user_data']['accountType'] === 'BUSINESS'
+        ) {
+            $trading = $api->useService('EbayTradingApi');
+
+            $request = new \Apps\Dash\Packages\System\Api\Apis\Ebay\EbayTradingApi\Operations\GetStoreRequest;
+
+            $response = $trading->getStore($request);
+
+            $responseArr = $response->toArray();
+
+            if (isset($responseArr['Store'])) {
+                $responseData['store_data']['name'] = $responseArr['Store']['Name'];
+                $responseData['store_data']['url'] = $responseArr['Store']['URL'];
+            }
+        }
+
+        $this->view->responseData = $responseData;
+
+        $this->view->responseCode = $api->packagesData->responseCode;
+
+        $this->view->responseMessage = $api->packagesData->responseMessage;
+
+        return $responseData;
     }
 }
