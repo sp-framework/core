@@ -102,6 +102,8 @@ class Ebay
             $serviceClass =
                 "Apps\\Dash\\Packages\\System\\Api\\Apis\\Ebay\\{$serviceName}\\Services\\{$serviceName}Service";
 
+            $this->mergeEbayConfigs();
+
             $this->apiConfig = BaseFunctions::arrayMergeDeep($this->apiConfig, $serviceRequestParams);
 
             return new $serviceClass($this->apiConfig);
@@ -190,11 +192,10 @@ class Ebay
                     if ($refreshTokenTimeDiff > self::MAX_REFRESH_TOKEN_TIME) { //10 days
                         $this->refreshUserToken();
                     } else {
-                        die();
                         //We have to send notification to refresh token to admin.
                         $config = $this->apiConfig;
 
-                        $config['setup'] = '5';
+                        $config['setup'] = '4';
 
                         unset($config['ebayIds']);
                         unset($config['bebayConfig']);

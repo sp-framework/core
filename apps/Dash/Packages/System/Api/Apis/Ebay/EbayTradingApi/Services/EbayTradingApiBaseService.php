@@ -27,7 +27,7 @@ class EbayTradingApiBaseService extends EbayXMLService
           'production' => 'https://api.ebay.com/ws/api.dll',
         ],
       ];
-        
+
     public function __construct(array $config)
     {
         parent::__construct($config);
