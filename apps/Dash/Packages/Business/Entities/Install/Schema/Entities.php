@@ -45,7 +45,7 @@ class Entities
                     ]
                 ),
                 new Column(
-                    'type',
+                    'entity_type',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 10,
@@ -59,6 +59,13 @@ class Entities
                         'notNull' => true,
                     ]
                 ),
+                new Column(
+                    'api_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

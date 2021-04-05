@@ -3,8 +3,9 @@
 namespace Apps\Dash\Components\Business\Entities;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
-use Apps\Dash\Packages\Business\Entities\Entities;
 use Apps\Dash\Packages\Business\ABNLookup\ABNLookup;
+use Apps\Dash\Packages\Business\Entities\Entities;
+use Apps\Dash\Packages\System\Api\Api;
 use System\Base\BaseComponent;
 
 class EntitiesComponent extends BaseComponent
@@ -16,6 +17,8 @@ class EntitiesComponent extends BaseComponent
     public function initialize()
     {
         $this->entities = $this->usePackage(Entities::class);
+
+        $this->apiPackage = $this->usePackage(Api::class);
     }
 
     public function searchABNAction()
@@ -67,6 +70,20 @@ class EntitiesComponent extends BaseComponent
                 if ($this->view->entity['logo']) {
                     $this->view->logoLink = $storages->getPublicLink($this->view->entity['logo'], 200);
                 }
+
+                $apis = $this->apiPackage->getApiByType('xero', false);
+
+                if (isset($entity['api_id']) &&
+                    ($entity['api_id'] !== '' && $entity['api_id'] != 0)
+                ) {
+                    $thisEntitiesApi = [$this->apiPackage->getById($entity['api_id'])];
+
+                    $this->view->apis = array_merge($apis, $thisEntitiesApi);
+                } else {
+                    $this->view->apis = $apis;
+                }
+            } else {
+                $this->view->apis = $this->apiPackage->getApiByType('xero', false);
             }
 
             //Check Geo Locations Dependencies
@@ -94,7 +111,7 @@ class EntitiesComponent extends BaseComponent
         if ($this->request->isPost()) {
             $replaceColumns =
                 [
-                    'type'   => ['html'  =>
+                    'entity_type'   => ['html'  =>
                         [
                             'IND' => 'Individual/Sole Trader',
                             'PRV' => 'Australian Private Company'
@@ -118,11 +135,11 @@ class EntitiesComponent extends BaseComponent
             $this->entities,
             'business/entities/view',
             null,
-            ['abn', 'name', 'type'],
+            ['abn', 'name', 'entity_type'],
             false,
             [],
             $controlActions,
-            [],
+            ['name'=>'Business Name','entity_type'=>'Entity Type'],
             $replaceColumns,
             'name'
         );

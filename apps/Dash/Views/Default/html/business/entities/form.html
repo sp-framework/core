@@ -39,6 +39,42 @@
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% if apis|length > 0 %}
+                    {% set tabsData =
+                        [
+                            'info'   :
+                            [
+                                'tabTitle'          : 'Info',
+                                'tabInclude'        : 'entities/form/info'
+                            ],
+                            'address'   :
+                            [
+                                'tabTitle'          : 'Address',
+                                'tabInclude'        : 'entities/form/address'
+                            ],
+                            'api'   :
+                            [
+                                'tabTitle'          : 'Api',
+                                'tabInclude'        : 'entities/form/api'
+                            ]
+                        ]
+                    %}
+                {% else %}
+                    {% set tabsData =
+                        [
+                            'info'   :
+                            [
+                                'tabTitle'          : 'Info',
+                                'tabInclude'        : 'entities/form/info'
+                            ],
+                            'address'   :
+                            [
+                                'tabTitle'          : 'Address',
+                                'tabInclude'        : 'entities/form/address'
+                            ]
+                        ]
+                    %}
+                {% endif %}
                 {{adminltetags.useTag('tabs',
                     [
                         'component'                     : component,
@@ -47,19 +83,7 @@
                         'sectionId'                     : 'main',
                         'tabsId'                        : 'tabs',
                         'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      :
-                            [
-                                'info'   :
-                                [
-                                    'tabTitle'          : 'Info',
-                                    'tabInclude'        : 'entities/form/info'
-                                ],
-                                'address'   :
-                                [
-                                    'tabTitle'          : 'Address',
-                                    'tabInclude'        : 'entities/form/address'
-                                ]
-                            ]
+                        'tabsData'                      : tabsData
                     ]
                 )}}
             </fieldset>
@@ -128,8 +152,8 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
                         $('#{{componentId}}-{{sectionId}}-name').val('');
                         $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-type').val(0);
-                        $('#{{componentId}}-{{sectionId}}-type').trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-entity_type').val(0);
+                        $('#{{componentId}}-{{sectionId}}-entity_type').trigger('change');
                         updateModalInfo(false);
                     }
                 });
@@ -201,8 +225,8 @@ dataCollectionSection =
                                     }
                                 }
 
-                                $('#{{componentId}}-{{sectionId}}-type').val(data.businessDetails.businessEntity202001.entityType.entityTypeCode);
-                                $('#{{componentId}}-{{sectionId}}-type').trigger('change');
+                                $('#{{componentId}}-{{sectionId}}-entity_type').val(data.businessDetails.businessEntity202001.entityType.entityTypeCode);
+                                $('#{{componentId}}-{{sectionId}}-entity_type').trigger('change');
 
                                 $('#{{componentId}}-{{sectionId}}-post_code').val(data.businessDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
                             }
@@ -269,10 +293,13 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-name_list'               : {
             placeholder : 'SELECT A BUSINESS NAME'
         },
-        '{{componentId}}-{{sectionId}}-type'                    : {
-            'placeholder' : 'SELECT BUSINESS ENTITY TYPE'
+        '{{componentId}}-{{sectionId}}-entity_type'             : {
+            'placeholder' : 'SELECT ENTITY TYPE'
         },
         '{{componentId}}-{{sectionId}}-address_id'              : { },
+        '{{componentId}}-{{sectionId}}-api_id'                  : {
+            placeholder : 'SELECT XERO API'
+        },
         '{{componentId}}-{{sectionId}}-form'                    : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {
@@ -283,7 +310,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-abn'                    : 'required',
                 '{{componentId}}-{{sectionId}}-name'                   : 'required',
                 '{{componentId}}-{{sectionId}}-name_list'              : 'required',
-                '{{componentId}}-{{sectionId}}-type'                   : 'required',
+                '{{componentId}}-{{sectionId}}-entity_type'            : 'required',
                 '{{componentId}}-{{sectionId}}-parent'                 : 'required',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'required',
                 '{{componentId}}-{{sectionId}}-city_name'              : 'required',
@@ -295,13 +322,13 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
                 '{{componentId}}-{{sectionId}}-name'                   : 'Please enter business name',
                 '{{componentId}}-{{sectionId}}-name_list'              : 'Please select business name',
-                '{{componentId}}-{{sectionId}}-type'                   : 'Please select business type',
+                '{{componentId}}-{{sectionId}}-entity_type'            : 'Please select entity type',
                 '{{componentId}}-{{sectionId}}-parent'                 : 'Please select parent business',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'Please enter street address',
                 '{{componentId}}-{{sectionId}}-city_name'              : 'Please enter city',
                 '{{componentId}}-{{sectionId}}-post_code'              : 'Please enter post code',
                 '{{componentId}}-{{sectionId}}-state_name'             : 'Please enter state',
-                '{{componentId}}-{{sectionId}}-country_name'           : 'Please enter country'
+                '{{componentId}}-{{sectionId}}-country_name'           : 'Please enter country',
             }
         }
     });

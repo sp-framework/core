@@ -3,7 +3,7 @@
     {% set entityLogo = entity['logo'] %}
     {% set entityName = entity['name'] %}
     {% set entityAbn = entity['abn'] %}
-    {% set entityType = entity['type'] %}
+    {% set entityType = entity['entity_type'] %}
 {% else %}
     {% set entityId = '' %}
     {% set entityLogo = '' %}
@@ -165,11 +165,11 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'type',
-                        'fieldLabel'                     : 'Business Type',
+                        'fieldId'                        : 'entity_type',
+                        'fieldLabel'                     : 'Entity Type',
                         'fieldType'                      : 'select2',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Business Type',
+                        'fieldHelpTooltipContent'        : 'Entity Type',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
