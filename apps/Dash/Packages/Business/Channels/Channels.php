@@ -189,6 +189,20 @@ class Channels extends BasePackage
 
         $this->initChannelType($channel);
 
+        if ($channel['channel_type'] === 'ebay') {
+            $apiPackage = $this->usePackage(Api::class);
+
+            $channelData = $this->getById($channel['channel_id']);
+
+            $api = $apiPackage->getById($channelData['api_id']);
+
+            $api['in_use'] = 0;
+
+            $api['used_by'] = '';
+
+            $apiPackage->update($api);
+        }
+
         if ($this->remove($channel['channel_id'])) {
 
             $this->init();
