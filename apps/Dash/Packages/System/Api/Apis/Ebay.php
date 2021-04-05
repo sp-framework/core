@@ -181,12 +181,15 @@ class Ebay
     {
         if (isset($this->apiConfig['user_access_token_valid_until'])) {
 
+            $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['refresh_token_valid_until']);
+
             $timeDiff = (int) $this->apiConfig['user_access_token_valid_until'] - time();
 
             if ($timeDiff <= self::MIN_USER_TOKEN_TIME) {
                 if ($this->apiConfig['refresh_token'] &&
                     $this->apiConfig['refresh_token'] !== ''
                 ) {
+
                     $refreshTokenTimeDiff = (int) $this->apiConfig['refresh_token_valid_until'] - time();
 
                     if ($refreshTokenTimeDiff > self::MAX_REFRESH_TOKEN_TIME) { //10 days
@@ -226,14 +229,12 @@ class Ebay
                     }
                 }
             } else {
-                $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['refresh_token_valid_until']);
-
-                $this->packagesData->responseData = $responseData;
-
                 $this->packagesData->responseMessage = 'Token is valid';
 
                 $this->packagesData->responseCode = 0;
             }
+
+            $this->packagesData->responseData = $responseData;
         }
     }
 

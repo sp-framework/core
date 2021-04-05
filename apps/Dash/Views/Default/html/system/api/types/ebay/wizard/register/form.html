@@ -445,13 +445,19 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
                 );
                 $('#{{componentId}}-{{sectionId}}-user-autho-data-footer').attr('hidden', false);
             }
-        } else {
             $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('disabled', false);
+        } else {
+            $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('disabled', true);
+            $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
+
+            var apiId = $('#{{componentId}}-{{sectionId}}-id').val();
+            $('#{{componentId}}-{{sectionId}}-refresh_token')[0].checked = true;
+            $('#{{componentId}}-{{sectionId}}-updateData').attr('href', '{{links.url("system/api/q/id/' + apiId + '")}}');
+            $('#{{componentId}}-{{sectionId}}-setup').val('2');
             PNotify.error({
                 title   : data.responseMessage,
             });
         }
-        $('#{{componentId}}-{{sectionId}}-check-user-autho').attr('disabled', false);
     }, 'json');
 });
 </script>

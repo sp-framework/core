@@ -165,6 +165,7 @@ class Xero
     public function checkUserToken()
     {
         if (isset($this->apiConfig['user_access_token_valid_until'])) {
+            $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['user_access_token_valid_until']);
 
             $timeDiff = (int) $this->apiConfig['user_access_token_valid_until'] - time();
 
@@ -192,14 +193,12 @@ class Xero
                     }
                 }
             } else {
-                $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['user_access_token_valid_until']);
-
-                $this->packagesData->responseData = $responseData;
-
                 $this->packagesData->responseMessage = 'Token is valid';
 
                 $this->packagesData->responseCode = 0;
             }
+
+            $this->packagesData->responseData = $responseData;
         }
     }
 
