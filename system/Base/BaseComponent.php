@@ -146,6 +146,8 @@ abstract class BaseComponent extends Controller
 
 	protected function setDefaultViewData()
 	{
+		$this->view->breadcrumb = '';
+
 		$this->view->widget = $this->widget;
 
 		$this->view->appName = $this->app['name'];
@@ -193,8 +195,6 @@ abstract class BaseComponent extends Controller
 		$this->view->responseCode = '0';
 
 		$this->view->responseMessage = 'Default Response Message';
-
-		$this->view->breadcrumb = '';
 	}
 
 	protected function sendJson()
