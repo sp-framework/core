@@ -196,8 +196,9 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
                             $this->servicesClass . '\\' . $this->contract['name'] . '\Operations\\' . ucfirst($method['operationId']) . 'RestResponse';
 
                         if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
+                            $operations[ucfirst($method['operationId'])]['params'] = [];
+
                             foreach ($method['parameters'] as $parameterKey => $parameter) {
-                                $operations[ucfirst($method['operationId'])]['params'] = [];
                                 if (isset($parameter['name'])) {
                                     $operations[ucfirst($method['operationId'])]['params'][$parameter['name']] = [];
                                     $operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['valid'] = [];
