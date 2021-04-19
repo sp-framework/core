@@ -16,7 +16,7 @@ class XeroRESTService extends BaseRESTService
         return [
             'debug'             => [
                 'valid'             => ['bool', 'array'],
-                'fn'                => 'Apps\Dash\Packages\System\Api\Apis\Ebay\EbayFunctions::applyDebug',
+                'fn'                => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroFunctions::applyDebug',
                 'default'           => false
             ],
             'authorization'     => [
@@ -26,7 +26,7 @@ class XeroRESTService extends BaseRESTService
             ],
             'tenantId'     => [
                 'valid'             => ['string'],
-                'default'           => self::$config['tenantId'],
+                'default'           => self::$config['tenant_id'],
             ],
             'compressResponse'  => [
                 'valid'             => ['bool'],
@@ -34,7 +34,7 @@ class XeroRESTService extends BaseRESTService
             ],
             'httpHandler'       => [
                 'valid'             => ['callable'],
-                'default'           => 'Apps\Dash\Packages\System\Api\Apis\Ebay\EbayFunctions::defaultHttpHandler'
+                'default'           => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroFunctions::defaultHttpHandler'
             ],
             'httpOptions'       => [
                 'valid'             => ['array'],
@@ -46,7 +46,7 @@ class XeroRESTService extends BaseRESTService
         ];
     }
 
-    protected function getUrl($name)
+    protected function getUrl()
     {
         return static::$endPoints['primary']['production'];
     }

@@ -31,6 +31,11 @@ abstract class BaseRESTService
     protected static $config;
 
     /**
+     * @var array Associative array for optionalHeaders
+     */
+    protected $optionalHeaders = [];
+
+    /**
      * @param array $config Configuration option values.
      */
     public function __construct(array $config)
@@ -74,6 +79,14 @@ abstract class BaseRESTService
         );
     }
 
+    public function setOptionalHeader(array $header)
+    {
+        $this->optionalHeaders = BaseFunctions::arrayMergeDeep(
+            $this->optionalHeaders,
+            $header
+        );
+    }
+
     /**
      * Sends an asynchronous API request.
      *
@@ -105,7 +118,11 @@ abstract class BaseRESTService
 
         $method = $operation['method'];
         $body = $this->buildRequestBody($requestValues);
-        $headers = $this->buildRequestHeaders($body);
+        if (count($this->optionalHeaders) > 0) {
+            $headers = array_merge($this->optionalHeaders, $this->buildRequestHeaders($body));
+        } else {
+            $headers = $this->buildRequestHeaders($body);
+        }
         $responseClass = $operation['responseClass'];
         $debug = $this->getConfig('debug');
         $httpHandler = $this->getConfig('httpHandler');
@@ -120,7 +137,7 @@ abstract class BaseRESTService
         return $httpHandler($request, $httpOptions)->then(
             function (ResponseInterface $res) use ($debug, $responseClass) {
                 $json = $res->getBody()->getContents();
-
+                // var_dump(json_decode($json, true));
                 if ($debug !== false) {
                     $this->debugResponse($json);
                 }

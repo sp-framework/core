@@ -1,41 +1,35 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
+namespace Apps\Dash\Packages\System\Api\Apis\Ebay\EbayDeveloperAnalyticsApi\Types;
 
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
-class Users extends BaseType
+class Rate extends BaseType
 {
     private static $propertyTypes = [
-        'Id' => [
+        'limit' => [
+          'type' => 'integer',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'limit',
+        ],
+        'remaining' => [
+          'type' => 'integer',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'remaining',
+        ],
+        'reset' => [
           'type' =>       'string',
           'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'Id',
+          'elementName' => 'reset',
         ],
-        'Status' => [
-          'type' =>       'string',
+        'timeWindow' => [
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'Status',
-        ],
-        'ProviderName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ProviderName',
-        ],
-        'DateTimeUTC' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'DateTimeUTC',
-        ],
-        'Users' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\User',
-          'repeatable' => true,
-          'attribute' => false,
-          'elementName' => 'Users',
+          'elementName' => 'timeWindow',
         ],
       ];
 

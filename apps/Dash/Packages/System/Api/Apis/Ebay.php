@@ -2,6 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis;
 
+use Apps\Dash\Packages\System\Api\Apis\Ebay\EbayDeveloperAnalyticsApi\Operations\GetRateLimitsRestRequest;
+use Apps\Dash\Packages\System\Api\Apis\Ebay\EbayIdentityApi\Operations\GetUserRestRequest;
+use Apps\Dash\Packages\System\Api\Apis\Ebay\EbayTradingApi\Operations\GetStoreRequest;
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\GetUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Ebay\OAuth\Types\RefreshUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
@@ -317,5 +320,53 @@ class Ebay
                 $this->packagesData->responseMessage = 'Error updating api after refresh_token';
             }
         }
+    }
+
+    public function getEbayUserdata()
+    {
+        $identity = $this->useService('EbayIdentityApi');
+
+        $request = new GetUserRestRequest;
+
+        $response = $identity->getUser($request);
+
+        $responseData['user_data'] = $response->toArray();
+
+        if (isset($responseData['user_data']['accountType']) &&
+            $responseData['user_data']['accountType'] === 'BUSINESS'
+        ) {
+            $trading = $this->useService('EbayTradingApi');
+
+            $request = new GetStoreRequest;
+
+            $response = $trading->getStore($request);
+
+            $responseArr = $response->toArray();
+
+            if (isset($responseArr['Store'])) {
+                $responseData['store_data']['name'] = $responseArr['Store']['Name'];
+                $responseData['store_data']['url'] = $responseArr['Store']['URL'];
+            }
+        }
+
+        return $responseData;
+    }
+
+    public function refreshEbayCallStats()
+    {
+        $callStatsApi = $this->useService('EbayDeveloperAnalyticsApi');
+
+        $request = new GetRateLimitsRestRequest;
+
+        $response = $callStatsApi->getRateLimits($request);
+
+        if ($response->getStatusCode() === 200) {
+
+            $this->api->setApiCallStats($this->apiConfig, $response->toArray());
+
+            return $this->api->getApiCallStats($this->apiConfig);
+        }
+
+        return [];
     }
 }

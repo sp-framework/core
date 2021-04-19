@@ -13,6 +13,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Accounts',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountsRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -84,6 +89,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Accounts/{AccountID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentByIdRestResponse',
           'params' => [
+            'AccountID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -96,6 +113,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentByFileNameRestResponse',
           'params' => [
+            'AccountID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -108,6 +137,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateAccountAttachmentByFileNameRestResponse',
           'params' => [
+            'AccountID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -121,6 +156,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateAccountAttachmentByFileNameRestResponse',
           'params' => [
+            'AccountID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -134,6 +175,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BatchPayments',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBatchPaymentsRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -145,7 +191,8 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'BatchPayments',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBatchPaymentRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'GetBatchPaymentHistory' => [
           'method' => 'GET',
@@ -177,31 +224,63 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'GET',
           'resource' => 'BankTransactions',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+          ],
         ],
         'CreateBankTransactions' => [
           'method' => 'PUT',
           'resource' => 'BankTransactions',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateBankTransactions' => [
           'method' => 'POST',
           'resource' => 'BankTransactions',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateBankTransactionsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'GetBankTransaction' => [
           'method' => 'GET',
           'resource' => 'BankTransactions/{BankTransactionID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'BankTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'UpdateBankTransaction' => [
           'method' => 'POST',
           'resource' => 'BankTransactions/{BankTransactionID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransactionRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'BankTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetBankTransactionAttachments' => [
           'method' => 'GET',
@@ -221,6 +300,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentByIdRestResponse',
           'params' => [
+            'BankTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -233,6 +324,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentByFileNameRestResponse',
           'params' => [
+            'BankTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -245,6 +348,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransactionAttachmentByFileNameRestResponse',
           'params' => [
+            'BankTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -258,6 +367,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionAttachmentByFileNameRestResponse',
           'params' => [
+            'BankTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -297,6 +412,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransfers',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransfersRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -342,6 +462,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransfers/{BankTransferID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentByIdRestResponse',
           'params' => [
+            'BankTransferID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -354,6 +486,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentByFileNameRestResponse',
           'params' => [
+            'BankTransferID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -366,6 +510,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransferAttachmentByFileNameRestResponse',
           'params' => [
+            'BankTransferID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -379,6 +529,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransferAttachmentByFileNameRestResponse',
           'params' => [
+            'BankTransferID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -464,6 +620,26 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Contacts',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactsRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'IDs' => [
+              'valid' => [
+          'array',
+              ],
+            ],
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
             'includeArchived' => [
               'valid' => [
           'boolean',
@@ -475,13 +651,15 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'Contacts',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateContacts' => [
           'method' => 'POST',
           'resource' => 'Contacts',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateContactsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'GetContactByContactNumber' => [
           'method' => 'GET',
@@ -540,6 +718,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Contacts/{ContactID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentByIdRestResponse',
           'params' => [
+            'ContactID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -552,6 +742,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentByFileNameRestResponse',
           'params' => [
+            'ContactID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -564,6 +766,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateContactAttachmentByFileNameRestResponse',
           'params' => [
+            'ContactID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -577,6 +785,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactAttachmentByFileNameRestResponse',
           'params' => [
+            'ContactID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -629,6 +843,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ContactGroups',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactGroupsRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -700,6 +919,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ContactGroups/{ContactGroupID}/Contacts/{ContactID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteContactGroupContactRestResponse',
           'params' => [
+            'ContactGroupID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'ContactID' => [
               'valid' => [
                 'string',
@@ -712,31 +937,63 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'GET',
           'resource' => 'CreditNotes',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNotesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+          ],
         ],
         'CreateCreditNotes' => [
           'method' => 'PUT',
           'resource' => 'CreditNotes',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNotesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateCreditNotes' => [
           'method' => 'POST',
           'resource' => 'CreditNotes',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateCreditNotesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'GetCreditNote' => [
           'method' => 'GET',
           'resource' => 'CreditNotes/{CreditNoteID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'CreditNoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'UpdateCreditNote' => [
           'method' => 'POST',
           'resource' => 'CreditNotes/{CreditNoteID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateCreditNoteRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'CreditNoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetCreditNoteAttachments' => [
           'method' => 'GET',
@@ -756,6 +1013,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentByIdRestResponse',
           'params' => [
+            'CreditNoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -768,6 +1037,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentByFileNameRestResponse',
           'params' => [
+            'CreditNoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -780,6 +1061,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateCreditNoteAttachmentByFileNameRestResponse',
           'params' => [
+            'CreditNoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -792,7 +1079,20 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteAttachmentByFileNameRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\includeOnline',
+          'params' => [
+            'CreditNoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetCreditNoteAsPdf' => [
           'method' => 'GET',
@@ -811,7 +1111,14 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'CreditNotes/{CreditNoteID}/Allocations',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteAllocationRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+            'CreditNoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetCreditNoteHistory' => [
           'method' => 'GET',
@@ -844,6 +1151,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Currencies',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCurrenciesRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -863,6 +1175,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Employees',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetEmployeesRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -874,13 +1191,15 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'Employees',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateEmployeesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateEmployees' => [
           'method' => 'POST',
           'resource' => 'Employees',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateEmployeesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'GetEmployee' => [
           'method' => 'GET',
@@ -900,6 +1219,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ExpenseClaims',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetExpenseClaimsRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -970,31 +1294,93 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'GET',
           'resource' => 'Invoices',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoicesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'IDs' => [
+              'valid' => [
+          'array',
+              ],
+            ],
+            'InvoiceNumbers' => [
+              'valid' => [
+          'array',
+              ],
+            ],
+            'ContactIDs' => [
+              'valid' => [
+          'array',
+              ],
+            ],
+            'Statuses' => [
+              'valid' => [
+          'array',
+              ],
+            ],
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+            'includeArchived' => [
+              'valid' => [
+          'boolean',
+              ],
+            ],
+            'createdByMyApp' => [
+              'valid' => [
+          'boolean',
+              ],
+            ],
+          ],
         ],
         'CreateInvoices' => [
           'method' => 'PUT',
           'resource' => 'Invoices',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoicesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateInvoices' => [
           'method' => 'POST',
           'resource' => 'Invoices',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateInvoicesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'GetInvoice' => [
           'method' => 'GET',
           'resource' => 'Invoices/{InvoiceID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'InvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'UpdateInvoice' => [
           'method' => 'POST',
           'resource' => 'Invoices/{InvoiceID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateInvoiceRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'InvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetInvoiceAsPdf' => [
           'method' => 'GET',
@@ -1027,6 +1413,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Invoices/{InvoiceID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentByIdRestResponse',
           'params' => [
+            'InvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1039,6 +1437,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentByFileNameRestResponse',
           'params' => [
+            'InvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1051,6 +1461,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateInvoiceAttachmentByFileNameRestResponse',
           'params' => [
+            'InvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -1063,7 +1479,20 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoiceAttachmentByFileNameRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\includeOnline',
+          'params' => [
+            'InvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetOnlineInvoice' => [
           'method' => 'GET',
@@ -1128,31 +1557,58 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'GET',
           'resource' => 'Items',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+          ],
         ],
         'CreateItems' => [
           'method' => 'PUT',
           'resource' => 'Items',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateItemsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateItems' => [
           'method' => 'POST',
           'resource' => 'Items',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateItemsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'GetItem' => [
           'method' => 'GET',
           'resource' => 'Items/{ItemID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'ItemID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'UpdateItem' => [
           'method' => 'POST',
           'resource' => 'Items/{ItemID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateItemRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'ItemID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'DeleteItem' => [
           'method' => 'DELETE',
@@ -1198,6 +1654,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Journals',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetJournalsRestResponse',
           'params' => [
+            'offset' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
             'paymentsOnly' => [
               'valid' => [
           'boolean',
@@ -1223,6 +1684,31 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'LinkedTransactions',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetLinkedTransactionsRestResponse',
           'params' => [
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+            'LinkedTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'SourceTransactionID' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'ContactID' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'Status' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'TargetTransactionID' => [
               'valid' => [
                 'string',
@@ -1281,6 +1767,16 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ManualJournals',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalsRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'page' => [
               'valid' => [
           'integer',
@@ -1292,13 +1788,15 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'ManualJournals',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateManualJournals' => [
           'method' => 'POST',
           'resource' => 'ManualJournals',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateManualJournalsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'GetManualJournal' => [
           'method' => 'GET',
@@ -1344,6 +1842,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentByIdRestResponse',
           'params' => [
+            'ManualJournalID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1356,6 +1866,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentByFileNameRestResponse',
           'params' => [
+            'ManualJournalID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1368,6 +1890,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateManualJournalAttachmentByFileNameRestResponse',
           'params' => [
+            'ManualJournalID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -1381,6 +1909,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalAttachmentByFileNameRestResponse',
           'params' => [
+            'ManualJournalID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -1446,7 +1980,23 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'GET',
           'resource' => 'Overpayments',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOverpaymentsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+          ],
         ],
         'GetOverpayment' => [
           'method' => 'GET',
@@ -1465,7 +2015,14 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'Overpayments/{OverpaymentID}/Allocations',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateOverpaymentAllocationsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+            'OverpaymentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetOverpaymentHistory' => [
           'method' => 'GET',
@@ -1498,6 +2055,16 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Payments',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentsRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'page' => [
               'valid' => [
           'integer',
@@ -1509,7 +2076,8 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'Payments',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'CreatePayment' => [
           'method' => 'POST',
@@ -1588,7 +2156,23 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'GET',
           'resource' => 'Prepayments',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPrepaymentsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+          ],
         ],
         'GetPrepayment' => [
           'method' => 'GET',
@@ -1607,7 +2191,14 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'Prepayments/{PrepaymentID}/Allocations',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePrepaymentAllocationsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+            'PrepaymentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetPrepaymentHistory' => [
           'method' => 'GET',
@@ -1640,6 +2231,26 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'PurchaseOrders',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrdersRestResponse',
           'params' => [
+            'Status' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'DateFrom' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'DateTo' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'page' => [
               'valid' => [
           'integer',
@@ -1651,13 +2262,15 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'PurchaseOrders',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrdersRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'UpdateOrCreatePurchaseOrders' => [
           'method' => 'POST',
           'resource' => 'PurchaseOrders',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreatePurchaseOrdersRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'GetPurchaseOrderAsPdf' => [
           'method' => 'GET',
@@ -1755,6 +2368,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentByIdRestResponse',
           'params' => [
+            'PurchaseOrderID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1767,6 +2392,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrder≠AttachmentByFileNameRestResponse',
           'params' => [
+            'PurchaseOrderID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1779,6 +2416,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdatePurchaseOrderAttachmentByFileNameRestResponse',
           'params' => [
+            'PurchaseOrderID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -1792,6 +2435,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrderAttachmentByFileNameRestResponse',
           'params' => [
+            'PurchaseOrderID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -1805,6 +2454,46 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Quotes',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuotesRestResponse',
           'params' => [
+            'DateFrom' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'DateTo' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'ExpiryDateFrom' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'ExpiryDateTo' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'ContactID' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'Status' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'page' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'QuoteNumber' => [
               'valid' => [
                 'string',
@@ -1816,13 +2505,15 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'PUT',
           'resource' => 'Quotes',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuotesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'UpdateOrCreateQuotes' => [
           'method' => 'POST',
           'resource' => 'Quotes',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateQuotesRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'params' => [
+          ],
         ],
         'GetQuote' => [
           'method' => 'GET',
@@ -1907,6 +2598,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Quotes/{QuoteID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentByIdRestResponse',
           'params' => [
+            'QuoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1919,6 +2622,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentByFileNameRestResponse',
           'params' => [
+            'QuoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -1931,6 +2646,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateQuoteAttachmentByFileNameRestResponse',
           'params' => [
+            'QuoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -1944,6 +2665,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuoteAttachmentByFileNameRestResponse',
           'params' => [
+            'QuoteID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -1956,25 +2683,51 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'method' => 'GET',
           'resource' => 'Receipts',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptsRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+          ],
         ],
         'CreateReceipt' => [
           'method' => 'PUT',
           'resource' => 'Receipts',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+          ],
         ],
         'GetReceipt' => [
           'method' => 'GET',
           'resource' => 'Receipts/{ReceiptID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'ReceiptID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'UpdateReceipt' => [
           'method' => 'POST',
           'resource' => 'Receipts/{ReceiptID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateReceiptRestResponse',
-          'params' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'params' => [
+            'ReceiptID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
         ],
         'GetReceiptAttachments' => [
           'method' => 'GET',
@@ -1994,6 +2747,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Receipts/{ReceiptID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentByIdRestResponse',
           'params' => [
+            'ReceiptID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -2006,6 +2771,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentByFileNameRestResponse',
           'params' => [
+            'ReceiptID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -2018,6 +2795,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateReceiptAttachmentByFileNameRestResponse',
           'params' => [
+            'ReceiptID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -2031,6 +2814,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptAttachmentByFileNameRestResponse',
           'params' => [
+            'ReceiptID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -2070,6 +2859,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'RepeatingInvoices',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoicesRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',
@@ -2108,6 +2902,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{AttachmentID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentByIdRestResponse',
           'params' => [
+            'RepeatingInvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'AttachmentID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -2120,6 +2926,18 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentByFileNameRestResponse',
           'params' => [
+            'RepeatingInvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'FileName' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'contentType' => [
               'valid' => [
               ],
@@ -2132,6 +2950,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateRepeatingInvoiceAttachmentByFileNameRestResponse',
           'params' => [
+            'RepeatingInvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -2145,6 +2969,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateRepeatingInvoiceAttachmentByFileNameRestResponse',
           'params' => [
+            'RepeatingInvoiceID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'FileName' => [
               'valid' => [
                 'string',
@@ -2196,6 +3026,22 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Reports/AgedPayablesByContact',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportAgedPayablesByContactRestResponse',
           'params' => [
+            'contactId' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'date' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'fromDate' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'toDate' => [
               'valid' => [
                 'string',
@@ -2208,6 +3054,22 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Reports/AgedReceivablesByContact',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportAgedReceivablesByContactRestResponse',
           'params' => [
+            'contactId' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+            'date' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'fromDate' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'toDate' => [
               'valid' => [
                 'string',
@@ -2220,6 +3082,36 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Reports/BalanceSheet',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBalanceSheetRestResponse',
           'params' => [
+            'date' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'periods' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+            'timeframe' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'trackingOptionID1' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'trackingOptionID2' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'standardLayout' => [
+              'valid' => [
+          'boolean',
+              ],
+            ],
             'paymentsOnly' => [
               'valid' => [
           'boolean',
@@ -2232,6 +3124,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Reports/BankSummary',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBankSummaryRestResponse',
           'params' => [
+            'fromDate' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'toDate' => [
               'valid' => [
                 'string',
@@ -2264,6 +3161,16 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Reports/BudgetSummary',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBudgetSummaryRestResponse',
           'params' => [
+            'date' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'period' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
             'timeframe' => [
               'valid' => [
           'integer',
@@ -2288,6 +3195,51 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Reports/ProfitAndLoss',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportProfitAndLossRestResponse',
           'params' => [
+            'fromDate' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'toDate' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'periods' => [
+              'valid' => [
+          'integer',
+              ],
+            ],
+            'timeframe' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'trackingCategoryID' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'trackingCategoryID2' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'trackingOptionID' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'trackingOptionID2' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'standardLayout' => [
+              'valid' => [
+          'boolean',
+              ],
+            ],
             'paymentsOnly' => [
               'valid' => [
           'boolean',
@@ -2300,6 +3252,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Reports/TrialBalance',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportTrialBalanceRestResponse',
           'params' => [
+            'date' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'paymentsOnly' => [
               'valid' => [
           'boolean',
@@ -2319,6 +3276,16 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'TaxRates',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTaxRatesRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'TaxType' => [
               'valid' => [
                 'string',
@@ -2345,6 +3312,16 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'TrackingCategories',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTrackingCategoriesRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
+            'order' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'includeArchived' => [
               'valid' => [
           'boolean',
@@ -2416,6 +3393,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'TrackingCategories/{TrackingCategoryID}/Options/{TrackingOptionID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateTrackingOptionsRestResponse',
           'params' => [
+            'TrackingCategoryID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'TrackingOptionID' => [
               'valid' => [
                 'string',
@@ -2429,6 +3412,12 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'TrackingCategories/{TrackingCategoryID}/Options/{TrackingOptionID}',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteTrackingOptionsRestResponse',
           'params' => [
+            'TrackingCategoryID' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
             'TrackingOptionID' => [
               'valid' => [
                 'string',
@@ -2442,6 +3431,11 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
           'resource' => 'Users',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetUsersRestResponse',
           'params' => [
+            'where' => [
+              'valid' => [
+                'string',
+              ],
+            ],
             'order' => [
               'valid' => [
                 'string',

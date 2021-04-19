@@ -5,6 +5,7 @@ namespace Apps\Dash\Packages\System\Api\Apis;
 use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\GetTenantsRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\GetUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\RefreshUserTokenRestRequest;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetUsersRestRequest;
 use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
 use Phalcon\Helper\Json;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
@@ -140,20 +141,24 @@ class Xero
 
             $this->updateApi($token, 'user');
 
+            $this->updateApi($this->getUserTenants(), 'tenants');
         } catch (\Exception $e) {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = $e->getMessage();
         }
+    }
 
+    protected function getUserTenants()
+    {
         $request = new GetTenantsRestRequest();
 
         try {
             $this->mergeXeroConfigs();
 
-            $token = $this->useService('OAuth')->getTenants($request);
+            $tenants = $this->useService('OAuth')->getTenants($request);
 
-            $this->updateApi($token, 'tenants');
+            return $tenants;
         } catch (\Exception $e) {
 
             $this->packagesData->responseCode = 1;
@@ -165,7 +170,8 @@ class Xero
     public function checkUserToken()
     {
         if (isset($this->apiConfig['user_access_token_valid_until'])) {
-            $responseData['user_access_token_valid_until'] = date('m/d/Y H:i:s', $this->apiConfig['user_access_token_valid_until']);
+            $responseData['user_access_token_valid_until'] =
+                date('m/d/Y H:i:s', $this->apiConfig['user_access_token_valid_until']);
 
             $timeDiff = (int) $this->apiConfig['user_access_token_valid_until'] - time();
 
@@ -180,9 +186,6 @@ class Xero
                     $config = $this->apiConfig;
 
                     $config['setup'] = '2';
-
-                    unset($config['ebayIds']);
-                    unset($config['bebayConfig']);
 
                     $this->api->init();
 
@@ -315,5 +318,38 @@ class Xero
         $responseData['apiConfig'] = $this->apiConfig;
 
         return $responseData;
+    }
+
+    public function refreshXeroCallStats()
+    {
+        $this->init();
+
+        $request = new GetUsersRestRequest;
+
+        $xeroService = $this->useService('XeroAccountingApi');
+
+        // $xeroService->setOptionalHeader(['if-modified-since' => '1615808940294']);
+
+        $response = $xeroService->getUsers($request);
+
+        $headers = $response->getHeaders();
+
+        $callData = [];
+        $callData['rateLimits'] = [];
+        $callData['rateLimits']['appMinLimit'] = 10000;
+        $callData['rateLimits']['appMinLimit-remaining'] = $headers['X-AppMinLimit-Remaining'][0];
+        $callData['rateLimits']['minLimit'] = 60;
+        $callData['rateLimits']['minLimit-remaining'] = $headers['X-MinLimit-Remaining'][0];
+        $callData['rateLimits']['dayLimit'] = 5000;
+        $callData['rateLimits']['dayLimit-remaining'] = $headers['X-DayLimit-Remaining'][0];
+
+        if (isset($headers['Retry-After'])) {
+            $retryAfter = (int) $headers['Retry-After'][0] + time();
+            $callData['rateLimits']['retry-after'] = date('m/d/Y H:i:s', $retryAfter);
+        }
+
+        $this->api->setApiCallStats($this->apiConfig, $callData);
+
+        return $this->api->getApiCallStats($this->apiConfig);
     }
 }
