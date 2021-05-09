@@ -8,7 +8,7 @@ class Purchase extends BaseType
 {
     private static $propertyTypes = [
         'UnitPrice' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'UnitPrice',

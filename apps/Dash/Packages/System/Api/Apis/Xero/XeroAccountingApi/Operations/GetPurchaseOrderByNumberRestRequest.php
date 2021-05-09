@@ -7,13 +7,13 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetPurchaseOrderByNumberRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'PurchaseOrderNumber' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PurchaseOrderNumber',
+        'PurchaseOrderNumber'   => [
+            'type'              => 'string',
+            'repeatable'        => false,
+            'attribute'         => false,
+            'elementName'       => 'PurchaseOrderNumber',
         ],
-      ];
+    ];
 
     public function __construct(array $values = [])
     {

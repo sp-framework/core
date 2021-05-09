@@ -44,19 +44,19 @@ class Overpayment extends BaseType
           'elementName' => 'LineItems',
         ],
         'SubTotal' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
@@ -80,13 +80,13 @@ class Overpayment extends BaseType
           'elementName' => 'OverpaymentID',
         ],
         'CurrencyRate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
         ],
         'RemainingCredit' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'RemainingCredit',
@@ -98,7 +98,7 @@ class Overpayment extends BaseType
           'elementName' => 'Allocations',
         ],
         'AppliedAmount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AppliedAmount',

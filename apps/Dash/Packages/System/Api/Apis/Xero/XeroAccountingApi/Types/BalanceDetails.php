@@ -8,7 +8,7 @@ class BalanceDetails extends BaseType
 {
     private static $propertyTypes = [
         'Balance' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Balance',
@@ -20,7 +20,7 @@ class BalanceDetails extends BaseType
           'elementName' => 'CurrencyCode',
         ],
         'CurrencyRate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',

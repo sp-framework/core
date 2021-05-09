@@ -20,7 +20,7 @@ class CISOrgSetting extends BaseType
           'elementName' => 'CISSubContractorEnabled',
         ],
         'Rate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Rate',

@@ -7,13 +7,37 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class PurchaseOrders extends BaseType
 {
     private static $propertyTypes = [
-        'PurchaseOrders' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PurchaseOrder',
-          'repeatable' => true,
-          'attribute' => false,
-          'elementName' => 'PurchaseOrders',
+        'Id'                => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'Id',
         ],
-      ];
+        'Status'            => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'Status',
+        ],
+        'ProviderName'      => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'ProviderName',
+        ],
+        'DateTimeUTC'       => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'DateTimeUTC',
+        ],
+        'PurchaseOrders'    => [
+            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PurchaseOrder',
+            'repeatable'    => true,
+            'attribute'     => false,
+            'elementName'   => 'PurchaseOrders',
+        ],
+    ];
 
     public function __construct(array $values = [])
     {

@@ -14,7 +14,7 @@ class TaxComponent extends BaseType
           'elementName' => 'Name',
         ],
         'Rate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Rate',

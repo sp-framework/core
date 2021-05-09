@@ -14,7 +14,7 @@ class CISSetting extends BaseType
           'elementName' => 'CISEnabled',
         ],
         'Rate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Rate',

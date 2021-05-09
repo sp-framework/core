@@ -32,7 +32,7 @@ class Allocation extends BaseType
           'elementName' => 'CreditNote',
         ],
         'Amount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Amount',

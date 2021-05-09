@@ -14,7 +14,7 @@ class ConversionBalances extends BaseType
           'elementName' => 'AccountCode',
         ],
         'Balance' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Balance',

@@ -4,24 +4,24 @@ namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations;
 
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
-class GetPurchaseOrder≠AttachmentByFileNameRestRequest extends BaseType
+class GetPurchaseOrderAttachmentByFileNameRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'PurchaseOrderID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PurchaseOrderID',
+        'PurchaseOrderID'       => [
+            'type'              => 'string',
+            'repeatable'        => false,
+            'attribute'         => false,
+            'elementName'       => 'PurchaseOrderID',
         ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
+        'FileName'              => [
+            'type'              => 'string',
+            'repeatable'        => false,
+            'attribute'         => false,
+            'elementName'       => 'FileName',
         ],
-        'contentType' => [
+        'contentType'           => [
         ],
-      ];
+    ];
 
     public function __construct(array $values = [])
     {

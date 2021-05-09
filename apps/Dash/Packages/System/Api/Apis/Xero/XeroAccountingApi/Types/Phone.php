@@ -7,31 +7,31 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class Phone extends BaseType
 {
     private static $propertyTypes = [
-        'PhoneType' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PhoneType',
+        'PhoneType'         => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'PhoneType',
         ],
-        'PhoneNumber' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PhoneNumber',
+        'PhoneNumber'       => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'PhoneNumber',
         ],
-        'PhoneAreaCode' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PhoneAreaCode',
+        'PhoneAreaCode'     => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'PhoneAreaCode',
         ],
-        'PhoneCountryCode' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PhoneCountryCode',
+        'PhoneCountryCode'  => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'PhoneCountryCode',
         ],
-      ];
+    ];
 
     public function __construct(array $values = [])
     {

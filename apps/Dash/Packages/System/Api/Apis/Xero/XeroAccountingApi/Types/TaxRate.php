@@ -68,13 +68,13 @@ class TaxRate extends BaseType
           'elementName' => 'CanApplyToRevenue',
         ],
         'DisplayTaxRate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'DisplayTaxRate',
         ],
         'EffectiveRate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'EffectiveRate',

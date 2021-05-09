@@ -8,7 +8,7 @@ class ManualJournalLine extends BaseType
 {
     private static $propertyTypes = [
         'LineAmount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'LineAmount',
@@ -44,7 +44,7 @@ class ManualJournalLine extends BaseType
           'elementName' => 'Tracking',
         ],
         'TaxAmount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TaxAmount',

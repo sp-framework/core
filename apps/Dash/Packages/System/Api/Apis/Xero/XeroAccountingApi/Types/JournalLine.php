@@ -44,19 +44,19 @@ class JournalLine extends BaseType
           'elementName' => 'Description',
         ],
         'NetAmount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'NetAmount',
         ],
         'GrossAmount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'GrossAmount',
         ],
         'TaxAmount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TaxAmount',

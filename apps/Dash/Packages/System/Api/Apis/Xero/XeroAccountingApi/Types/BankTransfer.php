@@ -20,7 +20,7 @@ class BankTransfer extends BaseType
           'elementName' => 'ToBankAccount',
         ],
         'Amount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Amount',
@@ -38,7 +38,7 @@ class BankTransfer extends BaseType
           'elementName' => 'BankTransferID',
         ],
         'CurrencyRate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',

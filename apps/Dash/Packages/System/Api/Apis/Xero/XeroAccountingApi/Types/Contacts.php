@@ -7,13 +7,13 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class Contacts extends BaseType
 {
     private static $propertyTypes = [
-        'Contacts' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contact',
-          'repeatable' => true,
-          'attribute' => false,
-          'elementName' => 'Contacts',
+        'Contacts'          => [
+            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contact',
+            'repeatable'    => true,
+            'attribute'     => false,
+            'elementName'   => 'Contacts',
         ],
-      ];
+    ];
 
     public function __construct(array $values = [])
     {

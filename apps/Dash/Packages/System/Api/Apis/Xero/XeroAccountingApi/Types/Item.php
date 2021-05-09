@@ -68,13 +68,13 @@ class Item extends BaseType
           'elementName' => 'IsTrackedAsInventory',
         ],
         'TotalCostPool' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalCostPool',
         ],
         'QuantityOnHand' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'QuantityOnHand',

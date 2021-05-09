@@ -62,13 +62,13 @@ class Payment extends BaseType
           'elementName' => 'Date',
         ],
         'CurrencyRate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
         ],
         'Amount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Amount',

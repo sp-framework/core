@@ -7,43 +7,43 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class Attachment extends BaseType
 {
     private static $propertyTypes = [
-        'AttachmentID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'AttachmentID',
+        'AttachmentID'      => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'AttachmentID',
         ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
+        'FileName'          => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'FileName',
         ],
-        'Url' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'Url',
+        'Url'               => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'Url',
         ],
-        'MimeType' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'MimeType',
+        'MimeType'          => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'MimeType',
         ],
-        'ContentLength' => [
-          'type' => 'integer',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ContentLength',
+        'ContentLength'     => [
+            'type'          => 'integer',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'ContentLength',
         ],
-        'IncludeOnline' => [
-          'type' => 'boolean',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'IncludeOnline',
+        'IncludeOnline'     => [
+            'type'          => 'boolean',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'IncludeOnline',
         ],
-      ];
+    ];
 
     public function __construct(array $values = [])
     {

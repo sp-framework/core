@@ -56,7 +56,7 @@ class BankTransaction extends BaseType
           'elementName' => 'CurrencyCode',
         ],
         'CurrencyRate' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
@@ -80,19 +80,19 @@ class BankTransaction extends BaseType
           'elementName' => 'LineAmountTypes',
         ],
         'SubTotal' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',

@@ -44,19 +44,19 @@ class ExpenseClaim extends BaseType
           'elementName' => 'UpdatedDateUTC',
         ],
         'Total' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
         ],
         'AmountDue' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AmountDue',
         ],
         'AmountPaid' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AmountPaid',

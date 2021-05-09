@@ -62,7 +62,7 @@ class BatchPayment extends BaseType
           'elementName' => 'Date',
         ],
         'Amount' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Amount',

@@ -7,13 +7,13 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class ValidationError extends BaseType
 {
     private static $propertyTypes = [
-        'Message' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'Message',
+        'Message'           => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'Message',
         ],
-      ];
+    ];
 
     public function __construct(array $values = [])
     {

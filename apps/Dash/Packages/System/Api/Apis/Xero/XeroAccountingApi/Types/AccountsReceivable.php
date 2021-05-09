@@ -8,13 +8,13 @@ class AccountsReceivable extends BaseType
 {
     private static $propertyTypes = [
         'Outstanding' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Outstanding',
         ],
         'Overdue' => [
-          'type' => 'number',
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Overdue',

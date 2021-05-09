@@ -7,3456 +7,3456 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Services\XeroAccou
 class XeroAccountingApiService extends XeroAccountingApiBaseService
 {
     protected static $operations =
-        [
+    [
         'GetAccounts' => [
-          'method' => 'GET',
-          'resource' => 'Accounts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Accounts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateAccount' => [
-          'method' => 'PUT',
-          'resource' => 'Accounts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateAccountRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Accounts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateAccountRestResponse',
+            'params' => [
+            ],
         ],
         'GetAccount' => [
-          'method' => 'GET',
-          'resource' => 'Accounts/{AccountID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Accounts/{AccountID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateAccount' => [
-          'method' => 'POST',
-          'resource' => 'Accounts/{AccountID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateAccountRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Accounts/{AccountID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateAccountRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'DeleteAccount' => [
-          'method' => 'DELETE',
-          'resource' => 'Accounts/{AccountID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteAccountRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'DELETE',
+            'resource' => 'Accounts/{AccountID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteAccountRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetAccountAttachments' => [
-          'method' => 'GET',
-          'resource' => 'Accounts/{AccountID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentsRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Accounts/{AccountID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentsRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetAccountAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'Accounts/{AccountID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentByIdRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Accounts/{AccountID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentByIdRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetAccountAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentByFileNameRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetAccountAttachmentByFileNameRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateAccountAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateAccountAttachmentByFileNameRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateAccountAttachmentByFileNameRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateAccountAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateAccountAttachmentByFileNameRestResponse',
-          'params' => [
-            'AccountID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Accounts/{AccountID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateAccountAttachmentByFileNameRestResponse',
+            'params' => [
+                'AccountID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetBatchPayments' => [
-          'method' => 'GET',
-          'resource' => 'BatchPayments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBatchPaymentsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'BatchPayments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBatchPaymentsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateBatchPayment' => [
-          'method' => 'PUT',
-          'resource' => 'BatchPayments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBatchPaymentRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'BatchPayments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBatchPaymentRestResponse',
+            'params' => [
+            ],
         ],
         'GetBatchPaymentHistory' => [
-          'method' => 'GET',
-          'resource' => 'BatchPayments/{BatchPaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBatchPaymentHistoryRestResponse',
-          'params' => [
-            'BatchPaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BatchPayments/{BatchPaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBatchPaymentHistoryRestResponse',
+            'params' => [
+                'BatchPaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateBatchPaymentHistoryRecord' => [
-          'method' => 'PUT',
-          'resource' => 'BatchPayments/{BatchPaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBatchPaymentHistoryRecordRestResponse',
-          'params' => [
-            'BatchPaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'BatchPayments/{BatchPaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBatchPaymentHistoryRecordRestResponse',
+            'params' => [
+                'BatchPaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBankTransactions' => [
-          'method' => 'GET',
-          'resource' => 'BankTransactions',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'BankTransactions',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'CreateBankTransactions' => [
-          'method' => 'PUT',
-          'resource' => 'BankTransactions',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionsRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'BankTransactions',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionsRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateBankTransactions' => [
-          'method' => 'POST',
-          'resource' => 'BankTransactions',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateBankTransactionsRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'BankTransactions',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateBankTransactionsRestResponse',
+            'params' => [
+            ],
         ],
         'GetBankTransaction' => [
-          'method' => 'GET',
-          'resource' => 'BankTransactions/{BankTransactionID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransactions/{BankTransactionID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateBankTransaction' => [
-          'method' => 'POST',
-          'resource' => 'BankTransactions/{BankTransactionID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransactionRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'BankTransactions/{BankTransactionID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransactionRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBankTransactionAttachments' => [
-          'method' => 'GET',
-          'resource' => 'BankTransactions/{BankTransactionID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentsRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransactions/{BankTransactionID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentsRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBankTransactionAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentByIdRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentByIdRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetBankTransactionAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentByFileNameRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionAttachmentByFileNameRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateBankTransactionAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransactionAttachmentByFileNameRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransactionAttachmentByFileNameRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateBankTransactionAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionAttachmentByFileNameRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'BankTransactions/{BankTransactionID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionAttachmentByFileNameRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetBankTransactionsHistory' => [
-          'method' => 'GET',
-          'resource' => 'BankTransactions/{BankTransactionID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionsHistoryRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransactions/{BankTransactionID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransactionsHistoryRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateBankTransactionHistoryRecord' => [
-          'method' => 'PUT',
-          'resource' => 'BankTransactions/{BankTransactionID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionHistoryRecordRestResponse',
-          'params' => [
-            'BankTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'BankTransactions/{BankTransactionID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransactionHistoryRecordRestResponse',
+            'params' => [
+                'BankTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBankTransfers' => [
-          'method' => 'GET',
-          'resource' => 'BankTransfers',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransfersRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'BankTransfers',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransfersRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateBankTransfer' => [
-          'method' => 'PUT',
-          'resource' => 'BankTransfers',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransferRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'BankTransfers',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransferRestResponse',
+            'params' => [
+            ],
         ],
         'GetBankTransfer' => [
-          'method' => 'GET',
-          'resource' => 'BankTransfers/{BankTransferID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransfers/{BankTransferID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBankTransferAttachments' => [
-          'method' => 'GET',
-          'resource' => 'BankTransfers/{BankTransferID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentsRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransfers/{BankTransferID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentsRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBankTransferAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'BankTransfers/{BankTransferID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentByIdRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransfers/{BankTransferID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentByIdRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetBankTransferAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentByFileNameRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferAttachmentByFileNameRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateBankTransferAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransferAttachmentByFileNameRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateBankTransferAttachmentByFileNameRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateBankTransferAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransferAttachmentByFileNameRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'BankTransfers/{BankTransferID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransferAttachmentByFileNameRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetBankTransferHistory' => [
-          'method' => 'GET',
-          'resource' => 'BankTransfers/{BankTransferID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferHistoryRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BankTransfers/{BankTransferID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBankTransferHistoryRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateBankTransferHistoryRecord' => [
-          'method' => 'PUT',
-          'resource' => 'BankTransfers/{BankTransferID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransferHistoryRecordRestResponse',
-          'params' => [
-            'BankTransferID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'BankTransfers/{BankTransferID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBankTransferHistoryRecordRestResponse',
+            'params' => [
+                'BankTransferID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBrandingThemes' => [
-          'method' => 'GET',
-          'resource' => 'BrandingThemes',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBrandingThemesRestResponse',
-          'params' => [
-          ],
+            'method' => 'GET',
+            'resource' => 'BrandingThemes',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBrandingThemesRestResponse',
+            'params' => [
+            ],
         ],
         'GetBrandingTheme' => [
-          'method' => 'GET',
-          'resource' => 'BrandingThemes/{BrandingThemeID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBrandingThemeRestResponse',
-          'params' => [
-            'BrandingThemeID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BrandingThemes/{BrandingThemeID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBrandingThemeRestResponse',
+            'params' => [
+                'BrandingThemeID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetBrandingThemePaymentServices' => [
-          'method' => 'GET',
-          'resource' => 'BrandingThemes/{BrandingThemeID}/PaymentServices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBrandingThemePaymentServicesRestResponse',
-          'params' => [
-            'BrandingThemeID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'BrandingThemes/{BrandingThemeID}/PaymentServices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetBrandingThemePaymentServicesRestResponse',
+            'params' => [
+                'BrandingThemeID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateBrandingThemePaymentServices' => [
-          'method' => 'POST',
-          'resource' => 'BrandingThemes/{BrandingThemeID}/PaymentServices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBrandingThemePaymentServicesRestResponse',
-          'params' => [
-            'BrandingThemeID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'BrandingThemes/{BrandingThemeID}/PaymentServices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateBrandingThemePaymentServicesRestResponse',
+            'params' => [
+                'BrandingThemeID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetContacts' => [
-          'method' => 'GET',
-          'resource' => 'Contacts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Contacts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'IDs' => [
+                    'valid' => [
+                        'array',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'includeArchived' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'IDs' => [
-              'valid' => [
-          'array',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-            'includeArchived' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-          ],
         ],
         'CreateContacts' => [
-          'method' => 'PUT',
-          'resource' => 'Contacts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactsRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Contacts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactsRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateContacts' => [
-          'method' => 'POST',
-          'resource' => 'Contacts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateContactsRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'Contacts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateContactsRestResponse',
+            'params' => [
+            ],
         ],
         'GetContactByContactNumber' => [
-          'method' => 'GET',
-          'resource' => 'Contacts/{ContactNumber}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactByContactNumberRestResponse',
-          'params' => [
-            'ContactNumber' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Contacts/{ContactNumber}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactByContactNumberRestResponse',
+            'params' => [
+                'ContactNumber' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetContact' => [
-          'method' => 'GET',
-          'resource' => 'Contacts/{ContactID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Contacts/{ContactID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateContact' => [
-          'method' => 'POST',
-          'resource' => 'Contacts/{ContactID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateContactRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Contacts/{ContactID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateContactRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetContactAttachments' => [
-          'method' => 'GET',
-          'resource' => 'Contacts/{ContactID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentsRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Contacts/{ContactID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentsRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetContactAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'Contacts/{ContactID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentByIdRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Contacts/{ContactID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentByIdRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetContactAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentByFileNameRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentByFileNameRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateContactAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateContactAttachmentByFileNameRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateContactAttachmentByFileNameRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateContactAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactAttachmentByFileNameRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Contacts/{ContactID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactAttachmentByFileNameRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetContactCISSettings' => [
-          'method' => 'GET',
-          'resource' => 'Contacts/{ContactID}/CISSettings',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactCISSettingsRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Contacts/{ContactID}/CISSettings',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactCISSettingsRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetContactHistory' => [
-          'method' => 'GET',
-          'resource' => 'Contacts/{ContactID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactHistoryRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Contacts/{ContactID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactHistoryRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateContactHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Contacts/{ContactID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactHistoryRestResponse',
-          'params' => [
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Contacts/{ContactID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactHistoryRestResponse',
+            'params' => [
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetContactGroups' => [
-          'method' => 'GET',
-          'resource' => 'ContactGroups',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactGroupsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'ContactGroups',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactGroupsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateContactGroup' => [
-          'method' => 'PUT',
-          'resource' => 'ContactGroups',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactGroupRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'ContactGroups',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactGroupRestResponse',
+            'params' => [
+            ],
         ],
         'GetContactGroup' => [
-          'method' => 'GET',
-          'resource' => 'ContactGroups/{ContactGroupID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactGroupRestResponse',
-          'params' => [
-            'ContactGroupID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ContactGroups/{ContactGroupID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactGroupRestResponse',
+            'params' => [
+                'ContactGroupID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateContactGroup' => [
-          'method' => 'POST',
-          'resource' => 'ContactGroups/{ContactGroupID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateContactGroupRestResponse',
-          'params' => [
-            'ContactGroupID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'ContactGroups/{ContactGroupID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateContactGroupRestResponse',
+            'params' => [
+                'ContactGroupID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateContactGroupContacts' => [
-          'method' => 'PUT',
-          'resource' => 'ContactGroups/{ContactGroupID}/Contacts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactGroupContactsRestResponse',
-          'params' => [
-            'ContactGroupID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'ContactGroups/{ContactGroupID}/Contacts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateContactGroupContactsRestResponse',
+            'params' => [
+                'ContactGroupID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'DeleteContactGroupContacts' => [
-          'method' => 'DELETE',
-          'resource' => 'ContactGroups/{ContactGroupID}/Contacts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteContactGroupContactsRestResponse',
-          'params' => [
-            'ContactGroupID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'DELETE',
+            'resource' => 'ContactGroups/{ContactGroupID}/Contacts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteContactGroupContactsRestResponse',
+            'params' => [
+                'ContactGroupID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'DeleteContactGroupContact' => [
-          'method' => 'DELETE',
-          'resource' => 'ContactGroups/{ContactGroupID}/Contacts/{ContactID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteContactGroupContactRestResponse',
-          'params' => [
-            'ContactGroupID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'DELETE',
+            'resource' => 'ContactGroups/{ContactGroupID}/Contacts/{ContactID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteContactGroupContactRestResponse',
+            'params' => [
+                'ContactGroupID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetCreditNotes' => [
-          'method' => 'GET',
-          'resource' => 'CreditNotes',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNotesRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'CreditNotes',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNotesRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'CreateCreditNotes' => [
-          'method' => 'PUT',
-          'resource' => 'CreditNotes',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNotesRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'CreditNotes',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNotesRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateCreditNotes' => [
-          'method' => 'POST',
-          'resource' => 'CreditNotes',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateCreditNotesRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'CreditNotes',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateCreditNotesRestResponse',
+            'params' => [
+            ],
         ],
         'GetCreditNote' => [
-          'method' => 'GET',
-          'resource' => 'CreditNotes/{CreditNoteID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'CreditNotes/{CreditNoteID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateCreditNote' => [
-          'method' => 'POST',
-          'resource' => 'CreditNotes/{CreditNoteID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateCreditNoteRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'CreditNotes/{CreditNoteID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateCreditNoteRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetCreditNoteAttachments' => [
-          'method' => 'GET',
-          'resource' => 'CreditNotes/{CreditNoteID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentsRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'CreditNotes/{CreditNoteID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentsRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetCreditNoteAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentByIdRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentByIdRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetCreditNoteAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentByFileNameRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAttachmentByFileNameRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateCreditNoteAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateCreditNoteAttachmentByFileNameRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateCreditNoteAttachmentByFileNameRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateCreditNoteAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteAttachmentByFileNameRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'CreditNotes/{CreditNoteID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteAttachmentByFileNameRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetCreditNoteAsPdf' => [
-          'method' => 'GET',
-          'resource' => 'CreditNotes/{CreditNoteID}/pdf',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAsPdfRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'CreditNotes/{CreditNoteID}/pdf',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteAsPdfRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateCreditNoteAllocation' => [
-          'method' => 'PUT',
-          'resource' => 'CreditNotes/{CreditNoteID}/Allocations',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteAllocationRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'CreditNotes/{CreditNoteID}/Allocations',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteAllocationRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetCreditNoteHistory' => [
-          'method' => 'GET',
-          'resource' => 'CreditNotes/{CreditNoteID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteHistoryRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'CreditNotes/{CreditNoteID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCreditNoteHistoryRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateCreditNoteHistory' => [
-          'method' => 'PUT',
-          'resource' => 'CreditNotes/{CreditNoteID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteHistoryRestResponse',
-          'params' => [
-            'CreditNoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'CreditNotes/{CreditNoteID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCreditNoteHistoryRestResponse',
+            'params' => [
+                'CreditNoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetCurrencies' => [
-          'method' => 'GET',
-          'resource' => 'Currencies',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCurrenciesRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Currencies',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetCurrenciesRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateCurrency' => [
-          'method' => 'PUT',
-          'resource' => 'Currencies',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCurrencyRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Currencies',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateCurrencyRestResponse',
+            'params' => [
+            ],
         ],
         'GetEmployees' => [
-          'method' => 'GET',
-          'resource' => 'Employees',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetEmployeesRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Employees',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetEmployeesRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateEmployees' => [
-          'method' => 'PUT',
-          'resource' => 'Employees',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateEmployeesRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Employees',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateEmployeesRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateEmployees' => [
-          'method' => 'POST',
-          'resource' => 'Employees',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateEmployeesRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'Employees',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateEmployeesRestResponse',
+            'params' => [
+            ],
         ],
         'GetEmployee' => [
-          'method' => 'GET',
-          'resource' => 'Employees/{EmployeeID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetEmployeeRestResponse',
-          'params' => [
-            'EmployeeID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Employees/{EmployeeID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetEmployeeRestResponse',
+            'params' => [
+                'EmployeeID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetExpenseClaims' => [
-          'method' => 'GET',
-          'resource' => 'ExpenseClaims',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetExpenseClaimsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'ExpenseClaims',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetExpenseClaimsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateExpenseClaims' => [
-          'method' => 'PUT',
-          'resource' => 'ExpenseClaims',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateExpenseClaimsRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'ExpenseClaims',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateExpenseClaimsRestResponse',
+            'params' => [
+            ],
         ],
         'GetExpenseClaim' => [
-          'method' => 'GET',
-          'resource' => 'ExpenseClaims/{ExpenseClaimID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetExpenseClaimRestResponse',
-          'params' => [
-            'ExpenseClaimID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ExpenseClaims/{ExpenseClaimID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetExpenseClaimRestResponse',
+            'params' => [
+                'ExpenseClaimID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateExpenseClaim' => [
-          'method' => 'POST',
-          'resource' => 'ExpenseClaims/{ExpenseClaimID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateExpenseClaimRestResponse',
-          'params' => [
-            'ExpenseClaimID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'ExpenseClaims/{ExpenseClaimID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateExpenseClaimRestResponse',
+            'params' => [
+                'ExpenseClaimID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetExpenseClaimHistory' => [
-          'method' => 'GET',
-          'resource' => 'ExpenseClaims/{ExpenseClaimID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetExpenseClaimHistoryRestResponse',
-          'params' => [
-            'ExpenseClaimID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ExpenseClaims/{ExpenseClaimID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetExpenseClaimHistoryRestResponse',
+            'params' => [
+                'ExpenseClaimID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateExpenseClaimHistory' => [
-          'method' => 'PUT',
-          'resource' => 'ExpenseClaims/{ExpenseClaimID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateExpenseClaimHistoryRestResponse',
-          'params' => [
-            'ExpenseClaimID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'ExpenseClaims/{ExpenseClaimID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateExpenseClaimHistoryRestResponse',
+            'params' => [
+                'ExpenseClaimID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetInvoices' => [
-          'method' => 'GET',
-          'resource' => 'Invoices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoicesRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Invoices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoicesRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'IDs' => [
+                    'valid' => [
+                        'array',
+                    ],
+                ],
+                'InvoiceNumbers' => [
+                    'valid' => [
+                        'array',
+                    ],
+                ],
+                'ContactIDs' => [
+                    'valid' => [
+                        'array',
+                    ],
+                ],
+                'Statuses' => [
+                    'valid' => [
+                        'array',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'includeArchived' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
+                'createdByMyApp' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'IDs' => [
-              'valid' => [
-          'array',
-              ],
-            ],
-            'InvoiceNumbers' => [
-              'valid' => [
-          'array',
-              ],
-            ],
-            'ContactIDs' => [
-              'valid' => [
-          'array',
-              ],
-            ],
-            'Statuses' => [
-              'valid' => [
-          'array',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-            'includeArchived' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-            'createdByMyApp' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-          ],
         ],
         'CreateInvoices' => [
-          'method' => 'PUT',
-          'resource' => 'Invoices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoicesRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Invoices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoicesRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateInvoices' => [
-          'method' => 'POST',
-          'resource' => 'Invoices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateInvoicesRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'Invoices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateInvoicesRestResponse',
+            'params' => [
+            ],
         ],
         'GetInvoice' => [
-          'method' => 'GET',
-          'resource' => 'Invoices/{InvoiceID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Invoices/{InvoiceID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateInvoice' => [
-          'method' => 'POST',
-          'resource' => 'Invoices/{InvoiceID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateInvoiceRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Invoices/{InvoiceID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateInvoiceRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetInvoiceAsPdf' => [
-          'method' => 'GET',
-          'resource' => 'Invoices/{InvoiceID}/pdf',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAsPdfRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Invoices/{InvoiceID}/pdf',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAsPdfRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetInvoiceAttachments' => [
-          'method' => 'GET',
-          'resource' => 'Invoices/{InvoiceID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentsRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Invoices/{InvoiceID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentsRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetInvoiceAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'Invoices/{InvoiceID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentByIdRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Invoices/{InvoiceID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentByIdRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetInvoiceAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentByFileNameRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceAttachmentByFileNameRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateInvoiceAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateInvoiceAttachmentByFileNameRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateInvoiceAttachmentByFileNameRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateInvoiceAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoiceAttachmentByFileNameRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Invoices/{InvoiceID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoiceAttachmentByFileNameRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetOnlineInvoice' => [
-          'method' => 'GET',
-          'resource' => 'Invoices/{InvoiceID}/OnlineInvoice',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOnlineInvoiceRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Invoices/{InvoiceID}/OnlineInvoice',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOnlineInvoiceRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'EmailInvoice' => [
-          'method' => 'POST',
-          'resource' => 'Invoices/{InvoiceID}/Email',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\EmailInvoiceRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Invoices/{InvoiceID}/Email',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\EmailInvoiceRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetInvoiceHistory' => [
-          'method' => 'GET',
-          'resource' => 'Invoices/{InvoiceID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceHistoryRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Invoices/{InvoiceID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceHistoryRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateInvoiceHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Invoices/{InvoiceID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoiceHistoryRestResponse',
-          'params' => [
-            'InvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Invoices/{InvoiceID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateInvoiceHistoryRestResponse',
+            'params' => [
+                'InvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetInvoiceReminders' => [
-          'method' => 'GET',
-          'resource' => 'InvoiceReminders/Settings',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceRemindersRestResponse',
-          'params' => [
-          ],
+            'method' => 'GET',
+            'resource' => 'InvoiceReminders/Settings',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetInvoiceRemindersRestResponse',
+            'params' => [
+            ],
         ],
         'GetItems' => [
-          'method' => 'GET',
-          'resource' => 'Items',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Items',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateItems' => [
-          'method' => 'PUT',
-          'resource' => 'Items',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateItemsRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Items',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateItemsRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateItems' => [
-          'method' => 'POST',
-          'resource' => 'Items',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateItemsRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'Items',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateItemsRestResponse',
+            'params' => [
+            ],
         ],
         'GetItem' => [
-          'method' => 'GET',
-          'resource' => 'Items/{ItemID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemRestResponse',
-          'params' => [
-            'ItemID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Items/{ItemID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemRestResponse',
+            'params' => [
+                'ItemID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateItem' => [
-          'method' => 'POST',
-          'resource' => 'Items/{ItemID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateItemRestResponse',
-          'params' => [
-            'ItemID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Items/{ItemID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateItemRestResponse',
+            'params' => [
+                'ItemID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'DeleteItem' => [
-          'method' => 'DELETE',
-          'resource' => 'Items/{ItemID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteItemRestResponse',
-          'params' => [
-            'ItemID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'DELETE',
+            'resource' => 'Items/{ItemID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteItemRestResponse',
+            'params' => [
+                'ItemID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetItemHistory' => [
-          'method' => 'GET',
-          'resource' => 'Items/{ItemID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemHistoryRestResponse',
-          'params' => [
-            'ItemID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Items/{ItemID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemHistoryRestResponse',
+            'params' => [
+                'ItemID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateItemHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Items/{ItemID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateItemHistoryRestResponse',
-          'params' => [
-            'ItemID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Items/{ItemID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateItemHistoryRestResponse',
+            'params' => [
+                'ItemID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetJournals' => [
-          'method' => 'GET',
-          'resource' => 'Journals',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetJournalsRestResponse',
-          'params' => [
-            'offset' => [
-              'valid' => [
-          'integer',
-              ],
+            'method' => 'GET',
+            'resource' => 'Journals',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetJournalsRestResponse',
+            'params' => [
+                'offset' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'paymentsOnly' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
             ],
-            'paymentsOnly' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-          ],
         ],
         'GetJournal' => [
-          'method' => 'GET',
-          'resource' => 'Journals/{JournalID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetJournalRestResponse',
-          'params' => [
-            'JournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Journals/{JournalID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetJournalRestResponse',
+            'params' => [
+                'JournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetLinkedTransactions' => [
-          'method' => 'GET',
-          'resource' => 'LinkedTransactions',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetLinkedTransactionsRestResponse',
-          'params' => [
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
+            'method' => 'GET',
+            'resource' => 'LinkedTransactions',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetLinkedTransactionsRestResponse',
+            'params' => [
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'LinkedTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'SourceTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'Status' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'TargetTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'LinkedTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'SourceTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'Status' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'TargetTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateLinkedTransaction' => [
-          'method' => 'PUT',
-          'resource' => 'LinkedTransactions',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateLinkedTransactionRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'LinkedTransactions',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateLinkedTransactionRestResponse',
+            'params' => [
+            ],
         ],
         'GetLinkedTransaction' => [
-          'method' => 'GET',
-          'resource' => 'LinkedTransactions/{LinkedTransactionID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetLinkedTransactionRestResponse',
-          'params' => [
-            'LinkedTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'LinkedTransactions/{LinkedTransactionID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetLinkedTransactionRestResponse',
+            'params' => [
+                'LinkedTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateLinkedTransaction' => [
-          'method' => 'POST',
-          'resource' => 'LinkedTransactions/{LinkedTransactionID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateLinkedTransactionRestResponse',
-          'params' => [
-            'LinkedTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'LinkedTransactions/{LinkedTransactionID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateLinkedTransactionRestResponse',
+            'params' => [
+                'LinkedTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'DeleteLinkedTransaction' => [
-          'method' => 'DELETE',
-          'resource' => 'LinkedTransactions/{LinkedTransactionID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteLinkedTransactionRestResponse',
-          'params' => [
-            'LinkedTransactionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'DELETE',
+            'resource' => 'LinkedTransactions/{LinkedTransactionID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteLinkedTransactionRestResponse',
+            'params' => [
+                'LinkedTransactionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetManualJournals' => [
-          'method' => 'GET',
-          'resource' => 'ManualJournals',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'ManualJournals',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'CreateManualJournals' => [
-          'method' => 'PUT',
-          'resource' => 'ManualJournals',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalsRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'ManualJournals',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalsRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateManualJournals' => [
-          'method' => 'POST',
-          'resource' => 'ManualJournals',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateManualJournalsRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'ManualJournals',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateManualJournalsRestResponse',
+            'params' => [
+            ],
         ],
         'GetManualJournal' => [
-          'method' => 'GET',
-          'resource' => 'ManualJournals/{ManualJournalID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ManualJournals/{ManualJournalID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateManualJournal' => [
-          'method' => 'POST',
-          'resource' => 'ManualJournals/{ManualJournalID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateManualJournalRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'ManualJournals/{ManualJournalID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateManualJournalRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetManualJournalAttachments' => [
-          'method' => 'GET',
-          'resource' => 'ManualJournals/{ManualJournalID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentsRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ManualJournals/{ManualJournalID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentsRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetManualJournalAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentByIdRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentByIdRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetManualJournalAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentByFileNameRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalAttachmentByFileNameRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateManualJournalAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateManualJournalAttachmentByFileNameRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateManualJournalAttachmentByFileNameRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateManualJournalAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalAttachmentByFileNameRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'ManualJournals/{ManualJournalID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalAttachmentByFileNameRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetManualJournalsHistory' => [
-          'method' => 'GET',
-          'resource' => 'ManualJournals/{ManualJournalID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalsHistoryRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'ManualJournals/{ManualJournalID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetManualJournalsHistoryRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateManualJournalHistoryRecord' => [
-          'method' => 'PUT',
-          'resource' => 'ManualJournals/{ManualJournalID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalHistoryRecordRestResponse',
-          'params' => [
-            'ManualJournalID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'ManualJournals/{ManualJournalID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateManualJournalHistoryRecordRestResponse',
+            'params' => [
+                'ManualJournalID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetOrganisations' => [
-          'method' => 'GET',
-          'resource' => 'Organisation',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOrganisationsRestResponse',
-          'params' => [
-          ],
+            'method' => 'GET',
+            'resource' => 'Organisation',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOrganisationsRestResponse',
+            'params' => [
+            ],
         ],
         'GetOrganisationActions' => [
-          'method' => 'GET',
-          'resource' => 'Organisation/Actions',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOrganisationActionsRestResponse',
-          'params' => [
-          ],
+            'method' => 'GET',
+            'resource' => 'Organisation/Actions',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOrganisationActionsRestResponse',
+            'params' => [
+            ],
         ],
         'GetOrganisationCISSettings' => [
-          'method' => 'GET',
-          'resource' => 'Organisation/{OrganisationID}/CISSettings',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOrganisationCISSettingsRestResponse',
-          'params' => [
-            'OrganisationID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Organisation/{OrganisationID}/CISSettings',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOrganisationCISSettingsRestResponse',
+            'params' => [
+                'OrganisationID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetOverpayments' => [
-          'method' => 'GET',
-          'resource' => 'Overpayments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOverpaymentsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Overpayments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOverpaymentsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'GetOverpayment' => [
-          'method' => 'GET',
-          'resource' => 'Overpayments/{OverpaymentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOverpaymentRestResponse',
-          'params' => [
-            'OverpaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Overpayments/{OverpaymentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOverpaymentRestResponse',
+            'params' => [
+                'OverpaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateOverpaymentAllocations' => [
-          'method' => 'PUT',
-          'resource' => 'Overpayments/{OverpaymentID}/Allocations',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateOverpaymentAllocationsRestResponse',
-          'params' => [
-            'OverpaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Overpayments/{OverpaymentID}/Allocations',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateOverpaymentAllocationsRestResponse',
+            'params' => [
+                'OverpaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetOverpaymentHistory' => [
-          'method' => 'GET',
-          'resource' => 'Overpayments/{OverpaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOverpaymentHistoryRestResponse',
-          'params' => [
-            'OverpaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Overpayments/{OverpaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetOverpaymentHistoryRestResponse',
+            'params' => [
+                'OverpaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateOverpaymentHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Overpayments/{OverpaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateOverpaymentHistoryRestResponse',
-          'params' => [
-            'OverpaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Overpayments/{OverpaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateOverpaymentHistoryRestResponse',
+            'params' => [
+                'OverpaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPayments' => [
-          'method' => 'GET',
-          'resource' => 'Payments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Payments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'CreatePayments' => [
-          'method' => 'PUT',
-          'resource' => 'Payments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentsRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Payments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentsRestResponse',
+            'params' => [
+            ],
         ],
         'CreatePayment' => [
-          'method' => 'POST',
-          'resource' => 'Payments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'Payments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentRestResponse',
+            'params' => [
+            ],
         ],
         'GetPayment' => [
-          'method' => 'GET',
-          'resource' => 'Payments/{PaymentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentRestResponse',
-          'params' => [
-            'PaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Payments/{PaymentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentRestResponse',
+            'params' => [
+                'PaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'DeletePayment' => [
-          'method' => 'POST',
-          'resource' => 'Payments/{PaymentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeletePaymentRestResponse',
-          'params' => [
-            'PaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Payments/{PaymentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeletePaymentRestResponse',
+            'params' => [
+                'PaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPaymentHistory' => [
-          'method' => 'GET',
-          'resource' => 'Payments/{PaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentHistoryRestResponse',
-          'params' => [
-            'PaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Payments/{PaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentHistoryRestResponse',
+            'params' => [
+                'PaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreatePaymentHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Payments/{PaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentHistoryRestResponse',
-          'params' => [
-            'PaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Payments/{PaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentHistoryRestResponse',
+            'params' => [
+                'PaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPaymentServices' => [
-          'method' => 'GET',
-          'resource' => 'PaymentServices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentServicesRestResponse',
-          'params' => [
-          ],
+            'method' => 'GET',
+            'resource' => 'PaymentServices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPaymentServicesRestResponse',
+            'params' => [
+            ],
         ],
         'CreatePaymentService' => [
-          'method' => 'PUT',
-          'resource' => 'PaymentServices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentServiceRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'PaymentServices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePaymentServiceRestResponse',
+            'params' => [
+            ],
         ],
         'GetPrepayments' => [
-          'method' => 'GET',
-          'resource' => 'Prepayments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPrepaymentsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Prepayments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPrepaymentsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'GetPrepayment' => [
-          'method' => 'GET',
-          'resource' => 'Prepayments/{PrepaymentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPrepaymentRestResponse',
-          'params' => [
-            'PrepaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Prepayments/{PrepaymentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPrepaymentRestResponse',
+            'params' => [
+                'PrepaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreatePrepaymentAllocations' => [
-          'method' => 'PUT',
-          'resource' => 'Prepayments/{PrepaymentID}/Allocations',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePrepaymentAllocationsRestResponse',
-          'params' => [
-            'PrepaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Prepayments/{PrepaymentID}/Allocations',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePrepaymentAllocationsRestResponse',
+            'params' => [
+                'PrepaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPrepaymentHistory' => [
-          'method' => 'GET',
-          'resource' => 'Prepayments/{PrepaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPrepaymentHistoryRestResponse',
-          'params' => [
-            'PrepaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Prepayments/{PrepaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPrepaymentHistoryRestResponse',
+            'params' => [
+                'PrepaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreatePrepaymentHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Prepayments/{PrepaymentID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePrepaymentHistoryRestResponse',
-          'params' => [
-            'PrepaymentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Prepayments/{PrepaymentID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePrepaymentHistoryRestResponse',
+            'params' => [
+                'PrepaymentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPurchaseOrders' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrdersRestResponse',
-          'params' => [
-            'Status' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrdersRestResponse',
+            'params' => [
+                'Status' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'DateFrom' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'DateTo' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'DateFrom' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'DateTo' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'CreatePurchaseOrders' => [
-          'method' => 'PUT',
-          'resource' => 'PurchaseOrders',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrdersRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'PurchaseOrders',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrdersRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreatePurchaseOrders' => [
-          'method' => 'POST',
-          'resource' => 'PurchaseOrders',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreatePurchaseOrdersRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'PurchaseOrders',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreatePurchaseOrdersRestResponse',
+            'params' => [
+            ],
         ],
         'GetPurchaseOrderAsPdf' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/pdf',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAsPdfRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/pdf',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAsPdfRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPurchaseOrder' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdatePurchaseOrder' => [
-          'method' => 'POST',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdatePurchaseOrderRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdatePurchaseOrderRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPurchaseOrderByNumber' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders/{PurchaseOrderNumber}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderByNumberRestResponse',
-          'params' => [
-            'PurchaseOrderNumber' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders/{PurchaseOrderNumber}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderByNumberRestResponse',
+            'params' => [
+                'PurchaseOrderNumber' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPurchaseOrderHistory' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderHistoryRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderHistoryRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreatePurchaseOrderHistory' => [
-          'method' => 'PUT',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrderHistoryRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrderHistoryRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPurchaseOrderAttachments' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentsRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentsRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetPurchaseOrderAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentByIdRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentByIdRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetPurchaseOrder≠AttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrder≠AttachmentByFileNameRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrder≠AttachmentByFileNameRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdatePurchaseOrderAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdatePurchaseOrderAttachmentByFileNameRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdatePurchaseOrderAttachmentByFileNameRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreatePurchaseOrderAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrderAttachmentByFileNameRestResponse',
-          'params' => [
-            'PurchaseOrderID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'PurchaseOrders/{PurchaseOrderID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreatePurchaseOrderAttachmentByFileNameRestResponse',
+            'params' => [
+                'PurchaseOrderID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetQuotes' => [
-          'method' => 'GET',
-          'resource' => 'Quotes',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuotesRestResponse',
-          'params' => [
-            'DateFrom' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Quotes',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuotesRestResponse',
+            'params' => [
+                'DateFrom' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'DateTo' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'ExpiryDateFrom' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'ExpiryDateTo' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'ContactID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'Status' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'page' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'QuoteNumber' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'DateTo' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'ExpiryDateFrom' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'ExpiryDateTo' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'ContactID' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'Status' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'page' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'QuoteNumber' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateQuotes' => [
-          'method' => 'PUT',
-          'resource' => 'Quotes',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuotesRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Quotes',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuotesRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateOrCreateQuotes' => [
-          'method' => 'POST',
-          'resource' => 'Quotes',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateQuotesRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'Quotes',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateOrCreateQuotesRestResponse',
+            'params' => [
+            ],
         ],
         'GetQuote' => [
-          'method' => 'GET',
-          'resource' => 'Quotes/{QuoteID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Quotes/{QuoteID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateQuote' => [
-          'method' => 'POST',
-          'resource' => 'Quotes/{QuoteID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateQuoteRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Quotes/{QuoteID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateQuoteRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetQuoteHistory' => [
-          'method' => 'GET',
-          'resource' => 'Quotes/{QuoteID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteHistoryRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Quotes/{QuoteID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteHistoryRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateQuoteHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Quotes/{QuoteID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuoteHistoryRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Quotes/{QuoteID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuoteHistoryRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetQuoteAsPdf' => [
-          'method' => 'GET',
-          'resource' => 'Quotes/{QuoteID}/pdf',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAsPdfRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Quotes/{QuoteID}/pdf',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAsPdfRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetQuoteAttachments' => [
-          'method' => 'GET',
-          'resource' => 'Quotes/{QuoteID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentsRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Quotes/{QuoteID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentsRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetQuoteAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'Quotes/{QuoteID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentByIdRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Quotes/{QuoteID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentByIdRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetQuoteAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentByFileNameRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetQuoteAttachmentByFileNameRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateQuoteAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateQuoteAttachmentByFileNameRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateQuoteAttachmentByFileNameRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateQuoteAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuoteAttachmentByFileNameRestResponse',
-          'params' => [
-            'QuoteID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Quotes/{QuoteID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateQuoteAttachmentByFileNameRestResponse',
+            'params' => [
+                'QuoteID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetReceipts' => [
-          'method' => 'GET',
-          'resource' => 'Receipts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptsRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Receipts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptsRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateReceipt' => [
-          'method' => 'PUT',
-          'resource' => 'Receipts',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'Receipts',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptRestResponse',
+            'params' => [
+            ],
         ],
         'GetReceipt' => [
-          'method' => 'GET',
-          'resource' => 'Receipts/{ReceiptID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Receipts/{ReceiptID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateReceipt' => [
-          'method' => 'POST',
-          'resource' => 'Receipts/{ReceiptID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateReceiptRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Receipts/{ReceiptID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateReceiptRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetReceiptAttachments' => [
-          'method' => 'GET',
-          'resource' => 'Receipts/{ReceiptID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentsRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Receipts/{ReceiptID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentsRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetReceiptAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'Receipts/{ReceiptID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentByIdRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Receipts/{ReceiptID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentByIdRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetReceiptAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentByFileNameRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptAttachmentByFileNameRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateReceiptAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateReceiptAttachmentByFileNameRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateReceiptAttachmentByFileNameRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateReceiptAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptAttachmentByFileNameRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Receipts/{ReceiptID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptAttachmentByFileNameRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetReceiptHistory' => [
-          'method' => 'GET',
-          'resource' => 'Receipts/{ReceiptID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptHistoryRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Receipts/{ReceiptID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReceiptHistoryRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateReceiptHistory' => [
-          'method' => 'PUT',
-          'resource' => 'Receipts/{ReceiptID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptHistoryRestResponse',
-          'params' => [
-            'ReceiptID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'Receipts/{ReceiptID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateReceiptHistoryRestResponse',
+            'params' => [
+                'ReceiptID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetRepeatingInvoices' => [
-          'method' => 'GET',
-          'resource' => 'RepeatingInvoices',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoicesRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'RepeatingInvoices',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoicesRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'GetRepeatingInvoice' => [
-          'method' => 'GET',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetRepeatingInvoiceAttachments' => [
-          'method' => 'GET',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentsRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentsRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetRepeatingInvoiceAttachmentById' => [
-          'method' => 'GET',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{AttachmentID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentByIdRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{AttachmentID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentByIdRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'AttachmentID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'AttachmentID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetRepeatingInvoiceAttachmentByFileName' => [
-          'method' => 'GET',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentByFileNameRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceAttachmentByFileNameRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'contentType' => [
+                    'valid' => [
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-            'contentType' => [
-              'valid' => [
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'UpdateRepeatingInvoiceAttachmentByFileName' => [
-          'method' => 'POST',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateRepeatingInvoiceAttachmentByFileNameRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateRepeatingInvoiceAttachmentByFileNameRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'CreateRepeatingInvoiceAttachmentByFileName' => [
-          'method' => 'PUT',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateRepeatingInvoiceAttachmentByFileNameRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/Attachments/{FileName}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateRepeatingInvoiceAttachmentByFileNameRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'FileName' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'FileName' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetRepeatingInvoiceHistory' => [
-          'method' => 'GET',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceHistoryRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetRepeatingInvoiceHistoryRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateRepeatingInvoiceHistory' => [
-          'method' => 'PUT',
-          'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/History',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateRepeatingInvoiceHistoryRestResponse',
-          'params' => [
-            'RepeatingInvoiceID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'RepeatingInvoices/{RepeatingInvoiceID}/History',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateRepeatingInvoiceHistoryRestResponse',
+            'params' => [
+                'RepeatingInvoiceID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetReportTenNinetyNine' => [
-          'method' => 'GET',
-          'resource' => 'Reports/TenNinetyNine',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportTenNinetyNineRestResponse',
-          'params' => [
-            'reportYear' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Reports/TenNinetyNine',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportTenNinetyNineRestResponse',
+            'params' => [
+                'reportYear' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-          ],
         ],
         'GetReportAgedPayablesByContact' => [
-          'method' => 'GET',
-          'resource' => 'Reports/AgedPayablesByContact',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportAgedPayablesByContactRestResponse',
-          'params' => [
-            'contactId' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Reports/AgedPayablesByContact',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportAgedPayablesByContactRestResponse',
+            'params' => [
+                'contactId' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'date' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'fromDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'toDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'date' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'fromDate' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'toDate' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'GetReportAgedReceivablesByContact' => [
-          'method' => 'GET',
-          'resource' => 'Reports/AgedReceivablesByContact',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportAgedReceivablesByContactRestResponse',
-          'params' => [
-            'contactId' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Reports/AgedReceivablesByContact',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportAgedReceivablesByContactRestResponse',
+            'params' => [
+                'contactId' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'date' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'fromDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'toDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'date' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'fromDate' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'toDate' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'GetReportBalanceSheet' => [
-          'method' => 'GET',
-          'resource' => 'Reports/BalanceSheet',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBalanceSheetRestResponse',
-          'params' => [
-            'date' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Reports/BalanceSheet',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBalanceSheetRestResponse',
+            'params' => [
+                'date' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'periods' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'timeframe' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'trackingOptionID1' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'trackingOptionID2' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'standardLayout' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
+                'paymentsOnly' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
             ],
-            'periods' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-            'timeframe' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'trackingOptionID1' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'trackingOptionID2' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'standardLayout' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-            'paymentsOnly' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-          ],
         ],
         'GetReportBankSummary' => [
-          'method' => 'GET',
-          'resource' => 'Reports/BankSummary',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBankSummaryRestResponse',
-          'params' => [
-            'fromDate' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Reports/BankSummary',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBankSummaryRestResponse',
+            'params' => [
+                'fromDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'toDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'toDate' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'GetReportBASorGSTList' => [
-          'method' => 'GET',
-          'resource' => 'Reports',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBASorGSTListRestResponse',
-          'params' => [
-          ],
+            'method' => 'GET',
+            'resource' => 'Reports',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBASorGSTListRestResponse',
+            'params' => [
+            ],
         ],
         'GetReportBASorGST' => [
-          'method' => 'GET',
-          'resource' => 'Reports/{ReportID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBASorGSTRestResponse',
-          'params' => [
-            'ReportID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Reports/{ReportID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBASorGSTRestResponse',
+            'params' => [
+                'ReportID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'GetReportBudgetSummary' => [
-          'method' => 'GET',
-          'resource' => 'Reports/BudgetSummary',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBudgetSummaryRestResponse',
-          'params' => [
-            'date' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Reports/BudgetSummary',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportBudgetSummaryRestResponse',
+            'params' => [
+                'date' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'period' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'timeframe' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
             ],
-            'period' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-            'timeframe' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-          ],
         ],
         'GetReportExecutiveSummary' => [
-          'method' => 'GET',
-          'resource' => 'Reports/ExecutiveSummary',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportExecutiveSummaryRestResponse',
-          'params' => [
-            'date' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Reports/ExecutiveSummary',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportExecutiveSummaryRestResponse',
+            'params' => [
+                'date' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-          ],
         ],
         'GetReportProfitAndLoss' => [
-          'method' => 'GET',
-          'resource' => 'Reports/ProfitAndLoss',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportProfitAndLossRestResponse',
-          'params' => [
-            'fromDate' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Reports/ProfitAndLoss',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportProfitAndLossRestResponse',
+            'params' => [
+                'fromDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'toDate' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'periods' => [
+                    'valid' => [
+                        'integer',
+                    ],
+                ],
+                'timeframe' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'trackingCategoryID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'trackingCategoryID2' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'trackingOptionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'trackingOptionID2' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'standardLayout' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
+                'paymentsOnly' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
             ],
-            'toDate' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'periods' => [
-              'valid' => [
-          'integer',
-              ],
-            ],
-            'timeframe' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'trackingCategoryID' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'trackingCategoryID2' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'trackingOptionID' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'trackingOptionID2' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'standardLayout' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-            'paymentsOnly' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-          ],
         ],
         'GetReportTrialBalance' => [
-          'method' => 'GET',
-          'resource' => 'Reports/TrialBalance',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportTrialBalanceRestResponse',
-          'params' => [
-            'date' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Reports/TrialBalance',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetReportTrialBalanceRestResponse',
+            'params' => [
+                'date' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'paymentsOnly' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
             ],
-            'paymentsOnly' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-          ],
         ],
         'PostSetup' => [
-          'method' => 'POST',
-          'resource' => 'Setup',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\PostSetupRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'Setup',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\PostSetupRestResponse',
+            'params' => [
+            ],
         ],
         'GetTaxRates' => [
-          'method' => 'GET',
-          'resource' => 'TaxRates',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTaxRatesRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'TaxRates',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTaxRatesRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'TaxType' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'TaxType' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'CreateTaxRates' => [
-          'method' => 'PUT',
-          'resource' => 'TaxRates',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateTaxRatesRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'TaxRates',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateTaxRatesRestResponse',
+            'params' => [
+            ],
         ],
         'UpdateTaxRate' => [
-          'method' => 'POST',
-          'resource' => 'TaxRates',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateTaxRateRestResponse',
-          'params' => [
-          ],
+            'method' => 'POST',
+            'resource' => 'TaxRates',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateTaxRateRestResponse',
+            'params' => [
+            ],
         ],
         'GetTrackingCategories' => [
-          'method' => 'GET',
-          'resource' => 'TrackingCategories',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTrackingCategoriesRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'TrackingCategories',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTrackingCategoriesRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'includeArchived' => [
+                    'valid' => [
+                        'boolean',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-            'includeArchived' => [
-              'valid' => [
-          'boolean',
-              ],
-            ],
-          ],
         ],
         'CreateTrackingCategory' => [
-          'method' => 'PUT',
-          'resource' => 'TrackingCategories',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateTrackingCategoryRestResponse',
-          'params' => [
-          ],
+            'method' => 'PUT',
+            'resource' => 'TrackingCategories',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateTrackingCategoryRestResponse',
+            'params' => [
+            ],
         ],
         'GetTrackingCategory' => [
-          'method' => 'GET',
-          'resource' => 'TrackingCategories/{TrackingCategoryID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTrackingCategoryRestResponse',
-          'params' => [
-            'TrackingCategoryID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'TrackingCategories/{TrackingCategoryID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetTrackingCategoryRestResponse',
+            'params' => [
+                'TrackingCategoryID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateTrackingCategory' => [
-          'method' => 'POST',
-          'resource' => 'TrackingCategories/{TrackingCategoryID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateTrackingCategoryRestResponse',
-          'params' => [
-            'TrackingCategoryID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'TrackingCategories/{TrackingCategoryID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateTrackingCategoryRestResponse',
+            'params' => [
+                'TrackingCategoryID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'DeleteTrackingCategory' => [
-          'method' => 'DELETE',
-          'resource' => 'TrackingCategories/{TrackingCategoryID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteTrackingCategoryRestResponse',
-          'params' => [
-            'TrackingCategoryID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'DELETE',
+            'resource' => 'TrackingCategories/{TrackingCategoryID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteTrackingCategoryRestResponse',
+            'params' => [
+                'TrackingCategoryID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'CreateTrackingOptions' => [
-          'method' => 'PUT',
-          'resource' => 'TrackingCategories/{TrackingCategoryID}/Options',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateTrackingOptionsRestResponse',
-          'params' => [
-            'TrackingCategoryID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'PUT',
+            'resource' => 'TrackingCategories/{TrackingCategoryID}/Options',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\CreateTrackingOptionsRestResponse',
+            'params' => [
+                'TrackingCategoryID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
         'UpdateTrackingOptions' => [
-          'method' => 'POST',
-          'resource' => 'TrackingCategories/{TrackingCategoryID}/Options/{TrackingOptionID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateTrackingOptionsRestResponse',
-          'params' => [
-            'TrackingCategoryID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'POST',
+            'resource' => 'TrackingCategories/{TrackingCategoryID}/Options/{TrackingOptionID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\UpdateTrackingOptionsRestResponse',
+            'params' => [
+                'TrackingCategoryID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'TrackingOptionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'TrackingOptionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'DeleteTrackingOptions' => [
-          'method' => 'DELETE',
-          'resource' => 'TrackingCategories/{TrackingCategoryID}/Options/{TrackingOptionID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteTrackingOptionsRestResponse',
-          'params' => [
-            'TrackingCategoryID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'DELETE',
+            'resource' => 'TrackingCategories/{TrackingCategoryID}/Options/{TrackingOptionID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\DeleteTrackingOptionsRestResponse',
+            'params' => [
+                'TrackingCategoryID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
+                'TrackingOptionID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-            'TrackingOptionID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
-            ],
-          ],
         ],
         'GetUsers' => [
-          'method' => 'GET',
-          'resource' => 'Users',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetUsersRestResponse',
-          'params' => [
-            'where' => [
-              'valid' => [
-                'string',
-              ],
+            'method' => 'GET',
+            'resource' => 'Users',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetUsersRestResponse',
+            'params' => [
+                'where' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
+                'order' => [
+                    'valid' => [
+                        'string',
+                    ],
+                ],
             ],
-            'order' => [
-              'valid' => [
-                'string',
-              ],
-            ],
-          ],
         ],
         'GetUser' => [
-          'method' => 'GET',
-          'resource' => 'Users/{UserID}',
-          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetUserRestResponse',
-          'params' => [
-            'UserID' => [
-              'valid' => [
-                'string',
-              ],
-              'required' => true,
+            'method' => 'GET',
+            'resource' => 'Users/{UserID}',
+            'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetUserRestResponse',
+            'params' => [
+                'UserID' => [
+                    'valid' => [
+                        'string',
+                    ],
+                    'required' => true,
+                ],
             ],
-          ],
         ],
-      ];
+    ];
 
     public function __construct(array $config = [])
     {

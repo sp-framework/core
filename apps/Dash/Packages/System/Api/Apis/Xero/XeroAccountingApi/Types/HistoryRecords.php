@@ -7,13 +7,37 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class HistoryRecords extends BaseType
 {
     private static $propertyTypes = [
-        'HistoryRecords' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\HistoryRecord',
-          'repeatable' => true,
-          'attribute' => false,
-          'elementName' => 'HistoryRecords',
+        'Id'                => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'Id',
         ],
-      ];
+        'Status'            => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'Status',
+        ],
+        'ProviderName'      => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'ProviderName',
+        ],
+        'DateTimeUTC'       => [
+            'type'          => 'string',
+            'repeatable'    => false,
+            'attribute'     => false,
+            'elementName'   => 'DateTimeUTC',
+        ],
+        'HistoryRecords'    => [
+            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\HistoryRecord',
+            'repeatable'    => true,
+            'attribute'     => false,
+            'elementName'   => 'HistoryRecords',
+        ],
+    ];
 
     public function __construct(array $values = [])
     {

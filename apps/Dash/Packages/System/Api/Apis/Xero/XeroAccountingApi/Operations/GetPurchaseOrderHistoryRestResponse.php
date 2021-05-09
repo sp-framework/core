@@ -5,25 +5,23 @@ namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations;
 use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
 use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
-
-class GetPurchaseOrderHistoryRestResponse extends BaseType
+class GetPurchaseOrderHistoryRestResponse extends \Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\HistoryRecords
 {
     use StatusCodeTrait;
     use HttpHeadersTrait;
 
     private static $propertyTypes = [
-        'errors' => [
-            'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
-            'repeatable' => true,
-            'attribute' => false,
-            'elementName' => 'errors'
+        'errors'            => [
+            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
+            'repeatable'    => true,
+            'attribute'     => false,
+            'elementName'   => 'errors'
         ],
-        'warnings' => [
-            'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
-            'repeatable' => true,
-            'attribute' => false,
-            'elementName' => 'warnings'
+        'warnings'          => [
+            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
+            'repeatable'    => true,
+            'attribute'     => false,
+            'elementName'   => 'warnings'
         ]
     ];
 

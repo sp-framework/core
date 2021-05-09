@@ -7,31 +7,31 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class LineItemTracking extends BaseType
 {
     private static $propertyTypes = [
-        'TrackingCategoryID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'TrackingCategoryID',
+        'TrackingCategoryID'        => [
+            'type'                  => 'string',
+            'repeatable'            => false,
+            'attribute'             => false,
+            'elementName'           => 'TrackingCategoryID',
         ],
-        'TrackingOptionID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'TrackingOptionID',
+        'TrackingOptionID'          => [
+            'type'                  => 'string',
+            'repeatable'            => false,
+            'attribute'             => false,
+            'elementName'           => 'TrackingOptionID',
         ],
-        'Name' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'Name',
+        'Name'                      => [
+            'type'                  => 'string',
+            'repeatable'            => false,
+            'attribute'             => false,
+            'elementName'           => 'Name',
         ],
-        'Option' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'Option',
+        'Option'                    => [
+            'type'                  => 'string',
+            'repeatable'            => false,
+            'attribute'             => false,
+            'elementName'           => 'Option',
         ],
-      ];
+    ];
 
     public function __construct(array $values = [])
     {

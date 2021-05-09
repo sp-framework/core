@@ -11,17 +11,17 @@ class GetPurchaseOrderRestResponse extends \Apps\Dash\Packages\System\Api\Apis\X
     use HttpHeadersTrait;
 
     private static $propertyTypes = [
-        'errors' => [
-            'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
-            'repeatable' => true,
-            'attribute' => false,
-            'elementName' => 'errors'
+        'errors'            => [
+            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
+            'repeatable'    => true,
+            'attribute'     => false,
+            'elementName'   => 'errors'
         ],
-        'warnings' => [
-            'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
-            'repeatable' => true,
-            'attribute' => false,
-            'elementName' => 'warnings'
+        'warnings'          => [
+            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Error',
+            'repeatable'    => true,
+            'attribute'     => false,
+            'elementName'   => 'warnings'
         ]
     ];
 
