@@ -23,7 +23,7 @@
                 'buttonType'            : 'button',
                 'buttons'               :
                     {
-                        'add-business' : {
+                        'add-purchase-order' : {
                             'title'                   : 'Add New Purchase Order',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
@@ -31,6 +31,13 @@
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
                             'url'                     : links.url('ims/stock/purchaseorders/q/id/0')
+                        },
+                        'sync-purchase-order' : {
+                            'title'                   : 'Sync with xero',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'sync',
+                            'position'                : 'right'
                         }
                     }
             },
@@ -47,3 +54,24 @@
         'dtZeroRecords'         : 'No purchase orders data available. Add purchase order by clicking the Add new purchase order button.'
     ]
 )}}
+<script>
+$('#{{componentId}}-listing-sync-purchase-order').click(function(e) {
+    e.preventDefault();
+
+    $(this).children('i').addClass('fa-spin');
+
+    window.dataCollection['{{componentId}}']['{{componentId}}-listing']['datatable'].rows().clear().draw();
+    $('.dataTables_empty').last().html('<i class="fas fa-cog fa-spin"></i> Loading...');
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post('{{links.url("ims/stock/purchaseorders/syncWithXero")}}', postData, function(data) {
+        if ($('#security-token').length === 1) {
+            $('#security-token').attr('name', data.tokenKey);
+            $('#security-token').val(data.token);
+        }
+    }, 'json');
+    // window.dataCollection['{{componentId}}']['{{componentId}}-listing']['BazContentSectionWithListing']._filterRunAjax();
+});
+</script>

@@ -53,6 +53,10 @@ class PurchaseordersComponent extends BaseComponent
 						'id'	=> '3',
 						'name' 	=> 'DELIVERED',
 					],
+					'4'		=> [
+						'id'	=> '4',
+						'name' 	=> 'BILLED',
+					],
 					'5'		=> [
 						'id'	=> '5',
 						'name' 	=> 'COMPLETE'
@@ -119,6 +123,7 @@ class PurchaseordersComponent extends BaseComponent
 			if (!$this->checkCSRF()) {
 				return;
 			}
+
 			$this->purchaseOrdersPackage->addPurchaseOrder($this->postData());
 
 			$this->view->responseCode = $this->purchaseOrdersPackage->packagesData->responseCode;
@@ -141,6 +146,7 @@ class PurchaseordersComponent extends BaseComponent
 			if (!$this->checkCSRF()) {
 				return;
 			}
+
 			$this->purchaseOrdersPackage->updatePurchaseOrder($this->postData());
 
 			$this->view->responseCode = $this->purchaseOrdersPackage->packagesData->responseCode;
@@ -160,8 +166,31 @@ class PurchaseordersComponent extends BaseComponent
 	public function removeAction()
 	{
 		if ($this->request->isPost()) {
+			if (!$this->checkCSRF()) {
+				return;
+			}
 
 			$this->purchaseOrdersPackage->removePurchaseOrder($this->postData());
+
+			$this->view->responseCode = $this->purchaseOrdersPackage->packagesData->responseCode;
+
+			$this->view->responseMessage = $this->purchaseOrdersPackage->packagesData->responseMessage;
+
+		} else {
+			$this->view->responseCode = 1;
+
+			$this->view->responseMessage = 'Method Not Allowed';
+		}
+	}
+
+	public function syncWithXeroAction()
+	{
+		if ($this->request->isPost()) {
+			// if (!$this->checkCSRF()) {
+			// 	return;
+			// }
+
+			$this->purchaseOrdersPackage->syncWithXero();
 
 			$this->view->responseCode = $this->purchaseOrdersPackage->packagesData->responseCode;
 
