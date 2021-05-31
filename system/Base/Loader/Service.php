@@ -43,8 +43,6 @@ class Service
 			self::$mode = true;
 		}
 
-		$files = include(self::$base . 'system/Base/Loader/Files.php');
-
 		self::$loader = new Loader();
 
 		self::$loader->registerNamespaces($this->getNamespaces());
@@ -57,28 +55,36 @@ class Service
 	protected function getNamespaces()
 	{
 		if (self::$mode) {
-			$dev = include(self::$base . 'system/Base/Loader/Dev.php');
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Namespaces.php'),
-					$dev['namespaces']
+					include(self::$base . 'system/Base/Loader/ThirdParty/Namespaces.php'),
+					include(self::$base . 'system/Base/Loader/Dev/Namespaces.php')
 				);
 		} else {
-			return include(self::$base . 'system/Base/Loader/Namespaces.php');
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Namespaces.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Namespaces.php')
+				);
 		}
 	}
 
 	protected function getFiles()
 	{
 		if (self::$mode) {
-			$dev = include(self::$base . 'system/Base/Loader/Dev.php');
 			return
 				array_merge(
 					include(self::$base . 'system/Base/Loader/Files.php'),
-					$dev['files']
+					include(self::$base . 'system/Base/Loader/ThirdParty/Files.php'),
+					include(self::$base . 'system/Base/Loader/Dev/Files.php')
 				);
 		} else {
-			return include(self::$base . 'system/Base/Loader/Files.php');
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Files.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Files.php')
+				);
 		}
 	}
 
