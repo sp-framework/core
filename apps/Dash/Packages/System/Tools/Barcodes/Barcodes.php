@@ -16,8 +16,6 @@ class Barcodes extends BasePackage
 
     public function init()
     {
-        include (__DIR__ . '/vendor/autoload.php');
-
         $this->barcodesPackage = $this->modules->packages->getNamePackage('Barcodes');
 
         if ($this->barcodesPackage) {

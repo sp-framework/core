@@ -19,8 +19,6 @@ class Qrcodes extends BasePackage
 
     public function init()
     {
-        include (__DIR__ . '/vendor/autoload.php');
-
         $this->qrcodesPackage = $this->modules->packages->getNamePackage('Qrcodes');
 
         if ($this->qrcodesPackage) {
