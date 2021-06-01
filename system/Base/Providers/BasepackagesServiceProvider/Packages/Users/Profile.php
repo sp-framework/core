@@ -155,10 +155,9 @@ class Profile extends BasePackage
                 $dirContents = $this->localContent->listContents($avatarDir.'/'.$avatarPropertyValue, true);
 
                 $files = [];
-
                 foreach ($dirContents as $content) {
-                    if ($content['type'] === 'file') {
-                        array_push($files, $content['basename']);
+                    if ($content instanceof \League\Flysystem\FileAttributes) {
+                        array_push($files, base_path($content->path()));
                     }
                 }
 
@@ -166,10 +165,7 @@ class Profile extends BasePackage
 
                 $counterFileNames[$avatarPropertyValue] = $fileName;
 
-                $avatarImageArr[$avatarPropertyValue] =
-                    imagecreatefrompng(
-                        base_path($avatarDir . $avatarPropertyValue . '/' . $fileName)
-                    );
+                $avatarImageArr[$avatarPropertyValue] = imagecreatefrompng($fileName);
             }
         } else {
             $regenerateUsingFile = str_replace('.png', '', $regenerateUsingFile);

@@ -27,6 +27,7 @@ if (!window.dataCollection) {
     dataCollection.env.breadcrumb = '{{breadcrumb}}';
     //Paths
     dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
+    dataCollection.env.appRoute = "{{apps.getAppInfo()['route']}}";
     dataCollection.env.jsPath =
         dataCollection.env.rootPath +
         "{{apps.getAppInfo()['app_type']}}" + '/' +

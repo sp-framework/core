@@ -215,7 +215,7 @@ class Croppie
                             'componentName'                 => $this->params['componentName'],
                             'componentId'                   => $this->params['componentId'],
                             'sectionId'                     => $this->params['sectionId'],
-                            'fieldId'                       => $this->params['fieldId'],
+                            'fieldId'                       => $this->params['fieldId'] . '-label',
                             'fieldLabel'                    => $this->fieldParams['fieldCroppieLabel'],
                             'fieldType'                     => 'html',
                             'fieldHelp'                     => true,
@@ -522,12 +522,15 @@ class Croppie
                                 performUpload(formData);
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").off();
-                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").on("croppieSaved", function() {
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").on("croppieSaved", function(e) {
                                     $("#' . $this->compSecId . '-croppie-avatar-refresh").attr("hidden", true);
                                     $("#' . $this->compSecId . '-croppie-avatar-save").attr("hidden", true);
                                     $("#' . $this->compSecId . '-croppie-avatar-female").attr("hidden", true);
                                     $("#' . $this->compSecId . '-croppie-avatar-male").attr("hidden", true);
                                     $("#' . $this->compSecId . '-croppie-upload").attr("hidden", true);
+
+                                    $("#profile-portrait").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
+                                        "/system/storages/q/uuid/" + e.uuid + "/w/30");
                                 });
                             }
 
@@ -615,9 +618,13 @@ class Croppie
                                             $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").val(data.storageData.uuid);
                                             $("#' . $this->compSecId . '-croppie-remove").attr("hidden", false);
                                             $("#' . $this->compSecId . '-croppie-upload").attr("hidden", true);
-                                            $("#' . $this->compSecId . '-croppie-avatar-male").attr("hidden", true);
-                                            $("#' . $this->compSecId . '-croppie-avatar-female").attr("hidden", true);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").trigger("croppieSaved");
+                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '")
+                                            .trigger(
+                                                {
+                                                    "type"      : "croppieSaved",
+                                                    "uuid"      : data.storageData.uuid
+                                                }
+                                            );
                                         } else {
                                             PNotify.error(data.responseMessage);
                                             croppieReset();
@@ -630,7 +637,8 @@ class Croppie
 
                             initCroppie();
                         }
-                    }
+                    },
+                    "' . $this->compSecId . '-' . $this->params['fieldId'] . '-label"               : { }
                 });
             </script>';
     }
