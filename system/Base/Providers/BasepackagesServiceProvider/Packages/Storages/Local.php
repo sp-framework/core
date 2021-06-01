@@ -191,7 +191,7 @@ class Local extends BasePackage
     protected function storeImage()
     {
         if ($this->directory && !is_dir($this->imagesPath . $this->directory)) {
-            $this->imageStorage->createDir($this->directory);
+            $this->imageStorage->createDirectory($this->directory);
         }
 
         $this->moveImageToLocationAsUUID();
@@ -202,7 +202,7 @@ class Local extends BasePackage
     protected function storeFile()
     {
         if ($this->directory && !is_dir($this->dataPath . $this->directory)) {
-            $this->fileStorage->createDir($this->directory);
+            $this->fileStorage->createDirectory($this->directory);
         }
 
         $this->moveFileToLocationAsUUID();
@@ -312,7 +312,7 @@ class Local extends BasePackage
     {
         $imageFile = '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsImagesPath . '/' . $file['uuid_location'] . $file['uuid'];
 
-        if (!$this->localContent->has($imageFile)) {
+        if (!$this->localContent->fileExists($imageFile)) {
 
             $this->logger->log->info('File with UUID is in database, but not at location ' . $imageFile);
 
@@ -341,7 +341,7 @@ class Local extends BasePackage
         $sizedImage =
             '/' . $this->storage['permission'] . '/' . $this->storage['id'] . '/' . $this->settingsCachePath . '/' . $file['uuid_location'] . $file['uuid'] . '/' . $this->width . $imageFormat;
 
-        if ($this->localContent->has($sizedImage) && !isset($this->getData['quality'])) {
+        if ($this->localContent->fileExists($sizedImage) && !isset($this->getData['quality'])) {
 
             return $sizedImage;
 
@@ -349,7 +349,7 @@ class Local extends BasePackage
             $image->resize($this->width, null, Enum::WIDTH);
 
             //Put empty content that will be overridden on image save
-            $this->localContent->put($sizedImage, '');
+            $this->localContent->write($sizedImage, '');
 
             if (isset($this->getData['quality'])) {
                 $this->settingsDefaultImageQuality = $this->getData['quality'];
@@ -577,7 +577,7 @@ class Local extends BasePackage
 
     protected function removeFileFromLocation($location)
     {
-        if ($this->localContent->has($location)) {
+        if ($this->localContent->fileExists($location)) {
             $fileDeleted = $this->localContent->delete($location);
         } else {
             $fileDeleted = false;
@@ -590,7 +590,7 @@ class Local extends BasePackage
 
     protected function removeFileCache($location)
     {
-        if ($this->localContent->has($location)) {
+        if ($this->localContent->fileExists($location)) {
             $cacheFiles = $this->localContent->listContents($location, true);
             if ($cacheFiles && count($cacheFiles) > 0) {
                 foreach ($cacheFiles as $key => $file) {

@@ -78,7 +78,8 @@ try {
 				'Class: ' . $trace['function'] . ' - Function: ' . $trace['function'];
 		}
 
-		echo 	'<style type="text/css">
+		echo
+			'<style type="text/css">
 				.tg  {border-collapse:collapse;border-spacing:0;width:100%;}
 				.tg td{border-color:black;border-style:solid;border-width:1px;font-family:Arial, sans-serif;font-size:14px;
 				  overflow:hidden;padding:10px 5px;word-break:normal;}

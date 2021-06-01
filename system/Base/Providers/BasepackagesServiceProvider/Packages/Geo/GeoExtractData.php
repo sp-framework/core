@@ -31,10 +31,10 @@ class GeoExtractData extends BasePackage
         }
 
         foreach ($countries as $key => $value) {
-            $this->localContent->put($sourceFilePath . $key . '.json', JSON::encode($value));
+            $this->localContent->write($sourceFilePath . $key . '.json', JSON::encode($value));
         }
 
-        $this->localContent->put($sourceFilePath . 'AllCountries.json', JSON::encode($countriesArr));
+        $this->localContent->write($sourceFilePath . 'AllCountries.json', JSON::encode($countriesArr));
 
         $this->packagesData->responseMessage = 'Data Extracted Successfully!';
 
