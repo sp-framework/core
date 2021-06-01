@@ -51,7 +51,7 @@ abstract class TypeEanUpcBase implements TypeInterface
             $code = '0' . $code;
             ++$length;
         }
-
+        
         if ($this->upce) {
             // convert UPC-A to UPC-E
             $tmp = substr($code, 4, 3);

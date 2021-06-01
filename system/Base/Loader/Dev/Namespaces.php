@@ -2,5 +2,5 @@
 
 return
     [
-            'Symfony\\Component\\VarDumper'       => '../../vendor/symfony/var-dumper/'
+            'Symfony\\Component\\VarDumper'       => '../vendor/symfony/var-dumper/'
     ];
