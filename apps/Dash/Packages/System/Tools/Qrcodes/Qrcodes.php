@@ -2,8 +2,11 @@
 
 namespace Apps\Dash\Packages\System\Tools\Qrcodes;
 
-use Endroid\QrCode\ErrorCorrectionLevel;
-use Endroid\QrCode\LabelAlignment;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\Label\Font\Font;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\QrCode;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
@@ -46,8 +49,8 @@ class Qrcodes extends BasePackage
 
         $data = $this->extractRGB($data);
 
-        $this->qrcodesSettings['foregroundColor'] = $data['foregroundColor'];
-        $this->qrcodesSettings['backgroundColor'] = $data['backgroundColor'];
+        $this->qrcodesSettings['codeForegroundColor'] = $data['codeForegroundColor'];
+        $this->qrcodesSettings['codeBackgroundColor'] = $data['codeBackgroundColor'];
         if ($data['showLogo'] == '0') {
             $this->qrcodesSettings['showLogo'] = false;
         } else if ($data['showLogo'] == '1') {
@@ -68,6 +71,7 @@ class Qrcodes extends BasePackage
         }
         $this->qrcodesSettings['defaultLabelAlignment'] = $data['defaultLabelAlignment'];
         $this->qrcodesSettings['labelFontSize'] = $data['labelFontSize'];
+        $this->qrcodesSettings['labelColor'] = $data['labelColor'];
         $this->qrcodesSettings['labelText'] = $data['labelText'];
 
         $this->qrcodesPackage['settings'] = Json::encode($this->qrcodesSettings);
@@ -82,106 +86,79 @@ class Qrcodes extends BasePackage
 
     public function generateQrcode(string $text, $settings = [])
     {
-        $this->qrcode = new QrCode($text);
-
-        $this->getQrcodesSettings();
-
-        $settings = $this->extractRGB($settings);
-
-        if (isset($settings['defaultSize'])) {
-            $this->qrcode->setSize($settings['defaultSize']);
+        if (count($settings) === 0) {
+            $this->getQrcodesSettings();
         } else {
-            $this->qrcode->setSize($this->qrcodesSettings['defaultSize']);
+            $this->qrcodesSettings = array_merge($this->qrcodesSettings, $settings);
         }
 
-        if (isset($settings['defaultMargin'])) {
-            $this->qrcode->setMargin($settings['defaultMargin']);
-        } else {
-            $this->qrcode->setMargin($this->qrcodesSettings['defaultMargin']);
-        }
+        $this->qrcodesSettings = $this->extractRGB($this->qrcodesSettings);
 
-        if (isset($settings['defaultWriter'])) {
-            $this->qrcode->setWriterByName($settings['defaultWriter']);
-        } else {
-            $this->qrcode->setWriterByName($this->qrcodesSettings['defaultWriter']);
-        }
+        $qrCode = QrCode::create($text);
+        $qrCode->setSize($this->qrcodesSettings['defaultSize']);
+        $qrCode->setMargin($this->qrcodesSettings['defaultMargin']);
+        $qrCode->setEncoding(new Encoding($this->qrcodesSettings['defaultEncoding']));
+        $ecl = '\Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevel' . ucfirst(strtolower($this->qrcodesSettings['defaultECL']));
+        $qrCode->setErrorCorrectionLevel(new $ecl());
+        $qrCode->setForegroundColor(
+            new Color(
+                $this->qrcodesSettings['codeForegroundColor']['r'],
+                $this->qrcodesSettings['codeForegroundColor']['g'],
+                $this->qrcodesSettings['codeForegroundColor']['b'],
+                $this->qrcodesSettings['codeForegroundColor']['a']
+            )
+        );
+        $qrCode->setBackgroundColor(
+            new Color(
+                $this->qrcodesSettings['codeBackgroundColor']['r'],
+                $this->qrcodesSettings['codeBackgroundColor']['g'],
+                $this->qrcodesSettings['codeBackgroundColor']['b'],
+                $this->qrcodesSettings['codeBackgroundColor']['a']
+            )
+        );
 
-        if (isset($settings['defaultEncoding'])) {
-            $this->qrcode->setEncoding($settings['defaultEncoding']);
-        } else {
-            $this->qrcode->setEncoding($this->qrcodesSettings['defaultEncoding']);
-        }
+        if ($this->qrcodesSettings['showLogo'] === 'true') {
+            if ($this->qrcodesSettings['logo'] !== '') {
+                $logoPath = $this->basepackages->storages->getPublicLink($this->qrcodesSettings['logo'], $this->qrcodesSettings['logoWidth']);
 
-        if (!isset($settings['defaultECL'])) {
-            $settings['defaultECL'] = $this->qrcodesSettings['defaultECL'];
-        }
-
-        $this->qrcode->setErrorCorrectionLevel(ErrorCorrectionLevel::{$settings['defaultECL']}());
-
-        if (isset($settings['foregroundColor'])) {
-            $this->qrcode->setForegroundColor($settings['foregroundColor']);
-        } else {
-            $this->qrcode->setForegroundColor($this->qrcodesSettings['foregroundColor']);
-        }
-
-        if (isset($settings['backgroundColor'])) {
-            $this->qrcode->setBackgroundColor($settings['backgroundColor']);
-        } else {
-            $this->qrcode->setBackgroundColor($this->qrcodesSettings['backgroundColor']);
-        }
-
-        if (!isset($settings['showLabel'])) {
-            $settings['showLabel'] = $this->qrcodesSettings['showLabel'];
-        }
-        if ($settings['showLabel'] === 'true') {
-            if (!isset($settings['labelText'])) {
-                $settings['labelText'] = $this->qrcodesSettings['labelText'];
-            }
-
-            if (!isset($settings['labelFontSize'])) {
-                $settings['labelFontSize'] = $this->qrcodesSettings['labelFontSize'];
-            }
-
-            if (!isset($settings['defaultLabelAlignment'])) {
-                $settings['defaultLabelAlignment'] = $this->qrcodesSettings['defaultLabelAlignment'];
-            }
-
-            $this->qrcode->setLabel(
-                $settings['labelText'],
-                $settings['labelFontSize'],
-                null,
-                $settings['defaultLabelAlignment']
-            );
-        }
-
-        if (!isset($settings['showLogo'])) {
-            $settings['showLogo'] = $this->qrcodesSettings['showLogo'];
-        }
-        if ($settings['showLogo'] === 'true') {
-            if (!isset($settings['logoWidth'])) {
-                $settings['logoWidth'] = $this->qrcodesSettings['logoWidth'];
-            }
-            $this->qrcode->setLogoSize($settings['logoWidth']);
-
-            if (!isset($settings['logo'])) {
-                $settings['logo'] = $this->qrcodesSettings['logo'];
-            }
-            if ($settings['logo'] !== '') {
-                $path = $this->basepackages->storages->getPublicLink($settings['logo'], $settings['logoWidth']);
-
-                $this->qrcode->setLogoPath(base_path('public' . $path));
+                $logoPath = base_path('public' . $path);
             } else {
-                $this->qrcode->setLogoPath(base_path('public/dash/default/images/baz/logo/justlogo110x110.png'));
+                $logoPath = base_path('public/dash/default/images/baz/logo/justlogo110x110.png');
             }
+
+            $logo = Logo::create($logoPath);
+            $logo->setResizeToWidth($this->qrcodesSettings['logoWidth']);
+        } else {
+            $logo = null;
         }
 
-        // var_dump($this->qrcode);die();
+        if ($this->qrcodesSettings['showLabel'] === 'true') {
+            $label = Label::create($this->qrcodesSettings['labelText']);
+            $alignment = '\Endroid\QrCode\Label\Alignment\LabelAlignment' . ucfirst(strtolower($this->qrcodesSettings['defaultLabelAlignment']));
+            $label->setAlignment(new $alignment());
+            $label->setFont(new Font(base_path('system/ThirdParty/vendor/endroid/qr-code/assets/noto_sans.otf'), $this->qrcodesSettings['labelFontSize']));
+            $label->setTextColor(
+                new Color(
+                    $this->qrcodesSettings['labelColor']['r'],
+                    $this->qrcodesSettings['labelColor']['g'],
+                    $this->qrcodesSettings['labelColor']['b'],
+                    $this->qrcodesSettings['labelColor']['a']
+                )
+            );
+        } else {
+            $label = null;
+        }
+
+        $writerClass = '\Endroid\QrCode\Writer\\' . ucfirst(strtolower($this->qrcodesSettings['defaultWriter']) . 'Writer');
+
+        $writer = new $writerClass();
+
         try {
-            $generatedQrcode = $this->qrcode->writeDataUri();
+            $generatedQrcode = $writer->write($qrCode, $logo, $label);
 
-            $this->packagesData->qrcode = $generatedQrcode;
+            $this->packagesData->qrcode = $generatedQrcode->getDataUri();
 
-            return $generatedQrcode;
+            return $generatedQrcode->getDataUri();
         } catch (\Exception $e) {
             if ($e->getMessage() !== '') {
                 $this->packagesData->responseCode = 1;
@@ -197,60 +174,88 @@ class Qrcodes extends BasePackage
 
     protected function extractRGB($settings)
     {
-        if (isset($settings['foregroundColor'])) {
-            if (is_string($settings['foregroundColor'])) {
-                $settings['foregroundColor'] = rtrim($settings['foregroundColor'], ')');
-                $settings['foregroundColor'] = str_replace(' ', '', $settings['foregroundColor']);
-                $settings['foregroundColor'] = explode(',', $settings['foregroundColor']);
-                if (strpos($settings['foregroundColor'][0], 'a')) {
-                    $settings['foregroundColor'][0] = ltrim($settings['foregroundColor'][0], 'rgba(');
-                    if ($settings['foregroundColor'][3] == 0) {
-                        $settings['foregroundColor'][3] = '1';
+        if (isset($settings['codeForegroundColor'])) {
+            if (is_string($settings['codeForegroundColor'])) {
+                $settings['codeForegroundColor'] = rtrim($settings['codeForegroundColor'], ')');
+                $settings['codeForegroundColor'] = str_replace(' ', '', $settings['codeForegroundColor']);
+                $settings['codeForegroundColor'] = explode(',', $settings['codeForegroundColor']);
+                if (strpos($settings['codeForegroundColor'][0], 'a')) {
+                    $settings['codeForegroundColor'][0] = ltrim($settings['codeForegroundColor'][0], 'rgba(');
+                    if ($settings['codeForegroundColor'][3] == 0) {
+                        $settings['codeForegroundColor'][3] = '1';
                     }
                 } else {
-                    $settings['foregroundColor'][0] = ltrim($settings['foregroundColor'][0], 'rgb(');
-                    $settings['foregroundColor'][3] = '1';
+                    $settings['codeForegroundColor'][0] = ltrim($settings['codeForegroundColor'][0], 'rgb(');
+                    $settings['codeForegroundColor'][3] = '1';
                 }
-                $settings['foregroundColor']['r'] = $settings['foregroundColor'][0];
-                $settings['foregroundColor']['g'] = $settings['foregroundColor'][1];
-                $settings['foregroundColor']['b'] = $settings['foregroundColor'][2];
-                $settings['foregroundColor']['a'] = $settings['foregroundColor'][3];
+                $settings['codeForegroundColor']['r'] = $settings['codeForegroundColor'][0];
+                $settings['codeForegroundColor']['g'] = $settings['codeForegroundColor'][1];
+                $settings['codeForegroundColor']['b'] = $settings['codeForegroundColor'][2];
+                $settings['codeForegroundColor']['a'] = $settings['codeForegroundColor'][3];
 
-                unset($settings['foregroundColor'][0]);
-                unset($settings['foregroundColor'][1]);
-                unset($settings['foregroundColor'][2]);
-                unset($settings['foregroundColor'][3]);
+                unset($settings['codeForegroundColor'][0]);
+                unset($settings['codeForegroundColor'][1]);
+                unset($settings['codeForegroundColor'][2]);
+                unset($settings['codeForegroundColor'][3]);
             }
         } else {
-            $settings['foregroundColor'] = $this->qrcodesSettings['foregroundColor'];
+            $settings['codeForegroundColor'] = $this->qrcodesSettings['codeForegroundColor'];
         }
 
-        if (isset($settings['backgroundColor'])) {
-            if (is_string($settings['backgroundColor'])) {
-                $settings['backgroundColor'] = rtrim($settings['backgroundColor'], ')');
-                $settings['backgroundColor'] = str_replace(' ', '', $settings['backgroundColor']);
-                $settings['backgroundColor'] = explode(',', $settings['backgroundColor']);
-                if (strpos($settings['backgroundColor'][0], 'a')) {
-                    $settings['backgroundColor'][0] = ltrim($settings['backgroundColor'][0], 'rgba(');
-                    if ($settings['backgroundColor'][3] == '0') {
-                        $settings['backgroundColor'][3] = '127';
+        if (isset($settings['codeBackgroundColor'])) {
+            if (is_string($settings['codeBackgroundColor'])) {
+                $settings['codeBackgroundColor'] = rtrim($settings['codeBackgroundColor'], ')');
+                $settings['codeBackgroundColor'] = str_replace(' ', '', $settings['codeBackgroundColor']);
+                $settings['codeBackgroundColor'] = explode(',', $settings['codeBackgroundColor']);
+                if (strpos($settings['codeBackgroundColor'][0], 'a')) {
+                    $settings['codeBackgroundColor'][0] = ltrim($settings['codeBackgroundColor'][0], 'rgba(');
+                    if ($settings['codeBackgroundColor'][3] == '0') {
+                        $settings['codeBackgroundColor'][3] = '127';
                     }
                 } else {
-                    $settings['backgroundColor'][0] = ltrim($settings['backgroundColor'][0], 'rgb(');
-                    $settings['backgroundColor'][3] = '1';
+                    $settings['codeBackgroundColor'][0] = ltrim($settings['codeBackgroundColor'][0], 'rgb(');
+                    $settings['codeBackgroundColor'][3] = '1';
                 }
-                $settings['backgroundColor']['r'] = $settings['backgroundColor'][0];
-                $settings['backgroundColor']['g'] = $settings['backgroundColor'][1];
-                $settings['backgroundColor']['b'] = $settings['backgroundColor'][2];
-                $settings['backgroundColor']['a'] = $settings['backgroundColor'][3];
+                $settings['codeBackgroundColor']['r'] = $settings['codeBackgroundColor'][0];
+                $settings['codeBackgroundColor']['g'] = $settings['codeBackgroundColor'][1];
+                $settings['codeBackgroundColor']['b'] = $settings['codeBackgroundColor'][2];
+                $settings['codeBackgroundColor']['a'] = $settings['codeBackgroundColor'][3];
 
-                unset($settings['backgroundColor'][0]);
-                unset($settings['backgroundColor'][1]);
-                unset($settings['backgroundColor'][2]);
-                unset($settings['backgroundColor'][3]);
+                unset($settings['codeBackgroundColor'][0]);
+                unset($settings['codeBackgroundColor'][1]);
+                unset($settings['codeBackgroundColor'][2]);
+                unset($settings['codeBackgroundColor'][3]);
             }
         } else {
-            $settings['backgroundColor'] = $this->qrcodesSettings['backgroundColor'];
+            $settings['codeBackgroundColor'] = $this->qrcodesSettings['codeBackgroundColor'];
+        }
+
+        if (isset($settings['labelColor'])) {
+            if (is_string($settings['labelColor'])) {
+                $settings['labelColor'] = rtrim($settings['labelColor'], ')');
+                $settings['labelColor'] = str_replace(' ', '', $settings['labelColor']);
+                $settings['labelColor'] = explode(',', $settings['labelColor']);
+                if (strpos($settings['labelColor'][0], 'a')) {
+                    $settings['labelColor'][0] = ltrim($settings['labelColor'][0], 'rgba(');
+                    if ($settings['labelColor'][3] == 0) {
+                        $settings['labelColor'][3] = '1';
+                    }
+                } else {
+                    $settings['labelColor'][0] = ltrim($settings['labelColor'][0], 'rgb(');
+                    $settings['labelColor'][3] = '1';
+                }
+                $settings['labelColor']['r'] = $settings['labelColor'][0];
+                $settings['labelColor']['g'] = $settings['labelColor'][1];
+                $settings['labelColor']['b'] = $settings['labelColor'][2];
+                $settings['labelColor']['a'] = $settings['labelColor'][3];
+
+                unset($settings['labelColor'][0]);
+                unset($settings['labelColor'][1]);
+                unset($settings['labelColor'][2]);
+                unset($settings['labelColor'][3]);
+            }
+        } else {
+            $settings['labelColor'] = $this->qrcodesSettings['labelColor'];
         }
 
         return $settings;

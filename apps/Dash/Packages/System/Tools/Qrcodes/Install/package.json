@@ -43,27 +43,27 @@
         },
         "defaultWriter"         : "png",
         "availableECLs"         : {
-            "LOW"               : "LOW",
-            "MEDIUM"            : "MEDIUM",
-            "QUARTILE"          : "QUARTILE",
-            "HIGH"              : "HIGH"
+            "low"               : "LOW",
+            "medium"            : "MEDIUM",
+            "quartile"          : "QUARTILE",
+            "high"              : "HIGH"
         },
-        "defaultECL"            : "LOW",
-        "defaultSize"           : 190,
+        "defaultECL"            : "low",
+        "defaultSize"           : 200,
         "defaultMargin"         : 5,
-        "foregroundColor"       : {
+        "codeForegroundColor"   : {
             "r" : 0,
             "g" : 0,
             "b" : 0,
             "a" : 1
         },
-        "backgroundColor"       : {
+        "codeBackgroundColor"   : {
             "r" : 255,
             "g" : 255,
             "b" : 255,
             "a" : 0
         },
-        "showLabel"             : true,
+        "showLabel"             : false,
         "labelAlignments"       : {
             "left"      : "LEFT",
             "center"    : "CENTER",
@@ -72,7 +72,13 @@
         "defaultLabelAlignment" : "center",
         "labelFontSize"         : "16",
         "labelText"             : "SCAN THE CODE",
-        "showLogo"              : true,
+        "labelColor"            : {
+            "r" : 0,
+            "g" : 0,
+            "b" : 0,
+            "a" : 1
+        },
+        "showLogo"              : false,
         "logo"                  : "",
         "logoWidth"             : 30
     }

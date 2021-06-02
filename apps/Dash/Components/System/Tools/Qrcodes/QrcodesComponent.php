@@ -42,9 +42,9 @@ class QrcodesComponent extends BaseComponent
             $this->view->storages = [];
         }
 
-        $this->qrcodesSettings['foregroundColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['foregroundColor']) . ')';
-
-        $this->qrcodesSettings['backgroundColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['backgroundColor']) . ')';
+        $this->qrcodesSettings['codeForegroundColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['codeForegroundColor']) . ')';
+        $this->qrcodesSettings['codeBackgroundColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['codeBackgroundColor']) . ')';
+        $this->qrcodesSettings['labelColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['labelColor']) . ')';
 
         $this->view->qrcodesSettings = $this->qrcodesSettings;
     }

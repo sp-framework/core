@@ -240,7 +240,7 @@
                                 'componentName'                         : componentName,
                                 'componentId'                           : componentId,
                                 'sectionId'                             : sectionId,
-                                'fieldId'                               : 'foregroundColor',
+                                'fieldId'                               : 'codeForegroundColor',
                                 'fieldLabel'                            : 'Code Color',
                                 'fieldType'                             : 'colorpicker',
                                 'fieldColorpickerPreAddonColorSquare'   : true,
@@ -253,7 +253,7 @@
                                 'fieldBazPostOnUpdate'                  : true,
                                 'fieldDataInputMinLength'               : 1,
                                 'fieldDataInputMaxLength'               : 10,
-                                'fieldValue'                            : qrcodesSettings['foregroundColor']
+                                'fieldValue'                            : qrcodesSettings['codeForegroundColor']
                             ]
                         )}}
                     </div>
@@ -264,7 +264,7 @@
                                 'componentName'                         : componentName,
                                 'componentId'                           : componentId,
                                 'sectionId'                             : sectionId,
-                                'fieldId'                               : 'backgroundColor',
+                                'fieldId'                               : 'codeBackgroundColor',
                                 'fieldLabel'                            : 'Code Background Color',
                                 'fieldType'                             : 'colorpicker',
                                 'fieldColorpickerPreAddonColorSquare'   : true,
@@ -277,7 +277,7 @@
                                 'fieldBazPostOnUpdate'                  : true,
                                 'fieldDataInputMinLength'               : 1,
                                 'fieldDataInputMaxLength'               : 10,
-                                'fieldValue'                            : qrcodesSettings['backgroundColor']
+                                'fieldValue'                            : qrcodesSettings['codeBackgroundColor']
                             ]
                         )}}
                     </div>
@@ -369,6 +369,30 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'labelColor',
+                                'fieldLabel'                            : 'Label Color',
+                                'fieldType'                             : 'colorpicker',
+                                'fieldColorpickerPreAddonColorSquare'   : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Color of the qrcode',
+                                'fieldRequired'                         : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataInputMinLength'               : 1,
+                                'fieldDataInputMaxLength'               : 10,
+                                'fieldValue'                            : qrcodesSettings['labelColor']
+                            ]
+                        )}}
+                    </div>
                     <div class="col">
                         {{adminltetags.useTag('fields',
                             [
@@ -499,11 +523,11 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-validateResult'                          : { },
         '{{componentId}}-{{sectionId}}-defaultSize'                             : { },
         '{{componentId}}-{{sectionId}}-defaultMargin'                           : { },
-        '{{componentId}}-{{sectionId}}-foregroundColor'                         : {
+        '{{componentId}}-{{sectionId}}-codeForegroundColor'                     : {
             'format'    : 'rgb',
             'useAlpha'  : false
         },
-        '{{componentId}}-{{sectionId}}-backgroundColor'                         : {
+        '{{componentId}}-{{sectionId}}-codeBackgroundColor'                     : {
             'format'    : 'rgb',
             'useAlpha'  : false
         },
@@ -513,6 +537,10 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-labelFontSize'                           : { },
         '{{componentId}}-{{sectionId}}-labelText'                               : { },
+        '{{componentId}}-{{sectionId}}-labelColor'                              : {
+            'format'    : 'rgb',
+            'useAlpha'  : false
+        },
         '{{componentId}}-{{sectionId}}-test-qrcode-text'                        : {
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-test-qrcode-text').keyup(function() {
@@ -541,12 +569,13 @@ dataCollectionSection =
                     postData['defaultECL'] = $('#{{componentId}}-{{sectionId}}-defaultECL').select2('data')[0].id;
                     postData['defaultSize'] = $('#{{componentId}}-{{sectionId}}-defaultSize').val();
                     postData['defaultMargin'] = $('#{{componentId}}-{{sectionId}}-defaultMargin').val();
-                    postData['foregroundColor'] = $('#{{componentId}}-{{sectionId}}-foregroundColor').val();
-                    postData['backgroundColor'] = $('#{{componentId}}-{{sectionId}}-backgroundColor').val();
+                    postData['codeForegroundColor'] = $('#{{componentId}}-{{sectionId}}-codeForegroundColor').val();
+                    postData['codeBackgroundColor'] = $('#{{componentId}}-{{sectionId}}-codeBackgroundColor').val();
                     postData['showLabel'] = $('#{{componentId}}-{{sectionId}}-showLabel')[0].checked;
                     postData['defaultLabelAlignment'] = $('#{{componentId}}-{{sectionId}}-defaultLabelAlignment').select2('data')[0].id;
                     postData['labelFontSize'] = $('#{{componentId}}-{{sectionId}}-labelFontSize').val();
                     postData['labelText'] = $('#{{componentId}}-{{sectionId}}-labelText').val();
+                    postData['labelColor'] = $('#{{componentId}}-{{sectionId}}-labelColor').val();
 
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
