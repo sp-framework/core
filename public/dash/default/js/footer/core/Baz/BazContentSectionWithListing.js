@@ -449,31 +449,20 @@
                     var selectedFilter = $('#' + sectionId + '-filter-filters option:selected');
 
                     Swal.fire({
-                        title                       : '<i class="fa fa-fw fa-question-circle text-danger mr-2" style="font-size: 1.25rem;position: relative;top: 3px;">' +
-                                                      '</i> <h5 class="text-danger"> Delete Filter ' + selectedFilter.data()['name'] + '?</span>',
-                        width                       : '100%',
+                        title                       : '<span class="text-danger"> Delete Filter ' + selectedFilter.data()['name'] + '?</span>',
+                        icon                        : 'question',
                         background                  : 'rgba(0,0,0,.8)',
                         backdrop                    : 'rgba(0,0,0,.6)',
                         buttonsStyling              : false,
                         confirmButtonText           : 'Delete',
                         customClass                 : {
-                            'container'                 : 'rounded-0 animated fadeIn',
                             'confirmButton'             : 'btn btn-danger text-uppercase',
                             'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                        },
-                        showClass                   : {
-                            'popup'                     : 'swal2-noanimation',
-                            'backdrop'                  : 'swal2-noanimation'
-                        },
-                        hideClass                   : {
-                            'popup'                     : '',
-                            'backdrop'                  : ''
                         },
                         showCancelButton            : true,
                         keydownListenerCapture      : true,
                         allowOutsideClick           : true,
                         allowEscapeKey              : true,
-                        allowEnterKey               : false,
                         didOpen                     : function() {
                             swalSound.play();
                         }
@@ -627,34 +616,22 @@
                     $.post(url, postData, function(data) {
                         if (data.responseCode === 0) {
                             Swal.fire({
-                                title                       : '<i class="fa fa-fw fa-question-circle text-danger mr-2" style="font-size: 1.25rem;position: relative;top: 3px;">' +
-                                                              '</i> <h5 class="text-danger"> Filter ' +
-                                                              data.defaultFilter[0].name + ' is already set as default. ' +
-                                                              'Make this filter default instead?</h5>',
-                                width                       : '100%',
+                                title                       : '<span class="text-danger"> Filter ' + data.defaultFilter[0].name + ' is already set as default. ' +
+                                                              'Make this filter default instead?</span>',
+                                icon                        : 'question',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
                                 buttonsStyling              : false,
                                 confirmButtonText           : 'Yes',
                                 cancelButtonText            : 'No',
                                 customClass                 : {
-                                    'container'                 : 'rounded-0 animated fadeIn',
                                     'confirmButton'             : 'btn btn-info text-uppercase',
                                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                                },
-                                showClass                   : {
-                                    'popup'                     : 'swal2-noanimation',
-                                    'backdrop'                  : 'swal2-noanimation'
-                                },
-                                hideClass                   : {
-                                    'popup'                     : '',
-                                    'backdrop'                  : ''
                                 },
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
                                 allowOutsideClick           : false,
                                 allowEscapeKey              : false,
-                                allowEnterKey               : false,
                                 didOpen                     : function() {
                                     swalSound.play();
                                 }
@@ -1357,24 +1334,13 @@
                         var switchOffText = name + ' disabled';
                         if (checked) {
                             Swal.fire({
-                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
-                                                              ' <span style="font-size:40px;" class="text-danger"> Disable ' +
-                                                               name + '?</span>',
-                                width                       : '100%',
+                                title                       : '<span class="text-danger"> Disable ' + name + '?</span>',
+                                icon                        : 'question',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
                                 customClass                 : {
-                                    'container'                 : 'rounded-0 animated fadeIn',
                                     'confirmButton'             : 'btn btn-danger text-uppercase',
                                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                                },
-                                showClass                   : {
-                                    'popup'                     : 'swal2-noanimation',
-                                    'backdrop'                  : 'swal2-noanimation'
-                                },
-                                hideClass                   : {
-                                    'popup'                     : '',
-                                    'backdrop'                  : ''
                                 },
                                 buttonsStyling              : false,
                                 confirmButtonText           : 'Disable',
@@ -1382,7 +1348,6 @@
                                 keydownListenerCapture      : true,
                                 allowOutsideClick           : false,
                                 allowEscapeKey              : false,
-                                allowEnterKey               : false,
                                 onOpen                      : function() {
                                     swalSound.play();
                                 }
@@ -1461,35 +1426,24 @@
                                                 $(this).children('input').data('columnid') + ' changed';
                         if (!checked) {
                             Swal.fire({
-                                title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2"></i>' +
-                                                                ' <span style="font-size:40px;" class="text-danger"> Change ' +
+                                title                       : '<span class="text-danger"> Change ' +
                                                                 $(this).parents('td').siblings('.data-' +
-                                                                    $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
+                                                                $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
                                                                 $(this).children('input').data('columnid') +
                                                                 '?</span>',
-                                width                       : '100%',
+                                icon                        : 'question',
                                 background                  : 'rgba(0,0,0,.8)',
                                 backdrop                    : 'rgba(0,0,0,.6)',
                                 buttonsStyling              : false,
                                 confirmButtonText           : 'Change',
                                 customClass                 : {
-                                    'container'                 : 'rounded-0 animated fadeIn',
                                     'confirmButton'             : 'btn btn-danger text-uppercase',
                                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                                },
-                                showClass                   : {
-                                    'popup'                     : 'swal2-noanimation',
-                                    'backdrop'                  : 'swal2-noanimation'
-                                },
-                                hideClass                   : {
-                                    'popup'                     : '',
-                                    'backdrop'                  : ''
                                 },
                                 showCancelButton            : true,
                                 keydownListenerCapture      : true,
                                 allowOutsideClick           : false,
                                 allowEscapeKey              : false,
-                                allowEnterKey               : false,
                                 onOpen                      : function() {
                                     swalSound.play();
                                 }
@@ -1571,32 +1525,20 @@
                         }
                         dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
                         Swal.fire({
-                            title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
-                                                          '</i> <span style="font-size:40px;" class="text-danger"> Delete ' +
-                                                          deleteText + '?</span>',
-                            width                       : '100%',
+                            title                       : '<span class="text-danger"> Delete ' + deleteText + '?</span>',
+                            icon                        : 'question',
                             background                  : 'rgba(0,0,0,.8)',
                             backdrop                    : 'rgba(0,0,0,.6)',
                             buttonsStyling              : false,
                             confirmButtonText           : 'Delete',
                             customClass                 : {
-                                'container'                 : 'rounded-0 animated fadeIn',
                                 'confirmButton'             : 'btn btn-danger text-uppercase',
                                 'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                            },
-                            showClass                   : {
-                                'popup'                     : 'swal2-noanimation',
-                                'backdrop'                  : 'swal2-noanimation'
-                            },
-                            hideClass                   : {
-                                'popup'                     : '',
-                                'backdrop'                  : ''
                             },
                             showCancelButton            : true,
                             keydownListenerCapture      : true,
                             allowOutsideClick           : false,
                             allowEscapeKey              : false,
-                            allowEnterKey               : false,
                             didOpen                      : function() {
                                 swalSound.play();
                             }
