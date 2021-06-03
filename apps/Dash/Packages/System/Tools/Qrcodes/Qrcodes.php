@@ -89,7 +89,7 @@ class Qrcodes extends BasePackage
         if (count($settings) === 0) {
             $this->getQrcodesSettings();
         } else {
-            $this->qrcodesSettings = array_merge($this->qrcodesSettings, $settings);
+            $this->qrcodesSettings = array_merge($this->getQrcodesSettings(), $settings);
         }
 
         $this->qrcodesSettings = $this->extractRGB($this->qrcodesSettings);

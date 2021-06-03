@@ -30,6 +30,10 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $remember_token;
 
+    public $two_fa_status;
+
+    public $two_fa_secret;
+
     public function initialize()
     {
         //

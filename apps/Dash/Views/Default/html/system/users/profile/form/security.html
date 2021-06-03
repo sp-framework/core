@@ -107,8 +107,121 @@
         )}}
     </div>
 </div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'twofa',
+                'fieldLabel'                            : 'Two Factor Authentication',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : false,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : 'Two Factor Authentication (2FA) is an extended method of authentication which uses an authenticator app like Google Authenticator or Authy.'
+            ]
+        )}}
+    </div>
+</div>
+{% if account['two_fa_status'] == '1' %}
+    {% set disableHidden = false %}
+    {% set enableHidden = true %}
+{% else %}
+    {% set disableHidden = true %}
+    {% set enableHidden = false %}
+{% endif %}
+<div class="row">
+    <div class="col text-center">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                 : component,
+                'componentName'             : componentName,
+                'componentId'               : componentId,
+                'sectionId'                 : sectionId,
+                'buttonType'                : 'button',
+                'buttons'                   :
+                    {
+                        'enable-twofa-button' : {
+                            'title'                   : 'Enable Two Factor Authentication',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'hidden'                  : enableHidden
+                        },
+                        'disable-twofa-button' : {
+                            'title'                   : 'Disable Two Factor Authentication',
+                            'size'                    : 'sm',
+                            'type'                    : 'danger',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'hidden'                  : disableHidden
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+<br>
+<div id="twofa-details" class="row vdivide" hidden>
+    <div class="col-md-3 d-flex justify-content-center">
+        <div id="twofa-qrcode"></div>
+    </div>
+    <div class="col">
+        <div id="twofa-instructions">
+            <h5>INSTRUCTIONS:</h5>
+            <ul>
+                <li>Scan the shown QR Code on your authenticator app.</li>
+                <li>If, for any reason, you cannot scan the QR Code, you can type in this secret code manually. <br>Secret Code: <span class="font-weight-bold" id="twofa-secret"></span></li>
+                <li>Once successfully added into your app, enter the generated code from the app and click verify.</li>
+            </ul>
+        </div>
+        <div id="twofa-verification">
+            <h5>VERIFICATION:</h5>
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                             : component,
+                    'componentName'                         : componentName,
+                    'componentId'                           : componentId,
+                    'sectionId'                             : sectionId,
+                    'fieldId'                               : 'verification',
+                    'fieldLabel'                            : 'Generated Code',
+                    'fieldType'                             : 'input',
+                    'fieldGroupPostAddonButtons'          :
+                        [
+                            'verify'   : [
+                                'title'                   : 'Verify',
+                                'icon'                    : 'cog fa-spin',
+                                'iconHidden'              : true,
+                                'noMargin'                : true,
+                                'disabled'                : true,
+                                'buttonAdditionalClass'   : 'rounded-0 text-white',
+                                'position'                : 'right'
+                            ]
+                        ],
+                    'fieldInputTypeTextFilter'              : 'positiveInt',
+                    'fieldHelp'                             : true,
+                    'fieldHelpTooltipContent'               : 'Code generated via the authenticator app.',
+                    'fieldBazScan'                          : false,
+                    'fieldBazPostOnCreate'                  : false,
+                    'fieldBazPostOnUpdate'                  : false,
+                    'fieldBazJstreeSearch'                  : false,
+                    'fieldDataInputMinLength'               : 6,
+                    'fieldDataInputMaxLength'               : 6
+                ]
+            )}}
+        </div>
+    </div>
+</div>
 <script>
-/* global PNotify */
+/* global PNotify Swal */
 var pwresetUrl, pwresetData;
 
 $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
@@ -136,5 +249,153 @@ $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
             $("#security-token").val(response.token);
         }
     }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-enable-twofa-button').click(function(e) {
+    e.preventDefault();
+
+    $(this).attr('disabled', true);
+    $(this).children('i').attr('hidden', false);
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    var url = '{{links.url("system/users/profile/enabletwofa")}}';
+
+    $.post(url, postData, function(data) {
+        if (data.responseCode === 0) {
+            $('#twofa-qrcode').empty().append(
+                '<img src="' + data.qrcode + '" />'
+            );
+            $('#twofa-details').attr('hidden', false);
+            $('#twofa-secret').empty().append(data.secret);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-button').html(
+                '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> REGENERATE TWO FACTOR AUTHENTICATION QR CODE'
+            );
+        } else {
+            PNotify.error({
+                'title' : data.responseMessage
+            });
+        }
+
+        if (data.tokenKey && data.token) {
+            $('#security-token').attr('name', data.tokenKey);
+            $('#security-token').val(data.token);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-enable-twofa-button').children('i').attr('hidden', true);
+
+    }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-verification').on('input propertychange', function() {
+    if ($(this).val().length === 6) {
+        $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', false);
+    } else {
+        $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', true);
+    }
+});
+
+$('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
+    e.preventDefault();
+
+    $(this).attr('disabled', true);
+    $(this).children('i').attr('hidden', false);
+
+    var postData = { };
+    postData[$('#security-token').attr('name')] = $('#security-token').val();
+    postData['code'] = $('#{{componentId}}-{{sectionId}}-verification').val().trim();
+
+    var url = '{{links.url("system/users/profile/verifytwofa")}}';
+
+    $.post(url, postData, function(data) {
+        if (data.responseCode === 0) {
+            PNotify.success({
+                'title' : data.responseMessage
+            });
+
+            $('#{{componentId}}-{{sectionId}}-verification').val('');
+            $('#twofa-qrcode').empty();
+            $('#twofa-secret').empty();
+            $('#twofa-details').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('hidden', true);
+            $('#{{componentId}}-{{sectionId}}-disable-twofa-button').attr('hidden', false);
+            $('#{{componentId}}-{{sectionId}}-enable-twofa-button').html(
+                '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> ENABLE TWO FACTOR AUTHENTICATION'
+            );
+        } else {
+            PNotify.error({
+                'title' : data.responseMessage
+            });
+        }
+
+        if (data.tokenKey && data.token) {
+            $('#security-token').attr('name', data.tokenKey);
+            $('#security-token').val(data.token);
+        }
+
+        $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', false);
+        $('#{{componentId}}-{{sectionId}}-verify').children('i').attr('hidden', true);
+
+    }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-disable-twofa-button').click(function(e) {
+    e.preventDefault();
+
+    Swal.fire({
+        title                       : '<span class="text-danger">Disable 2FA Authentication?</span>',
+        icon                        : 'question',
+        width                       : '100%',
+        background                  : 'rgba(0,0,0,.8)',
+        backdrop                    : 'rgba(0,0,0,.6)',
+        buttonsStyling              : false,
+        confirmButtonText           : 'Disable',
+        customClass                 : {
+            'confirmButton'             : 'btn btn-danger text-uppercase',
+            'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            'inputLabel'                : 'text-white',
+            'input'                     : 'text-white'
+        },
+        showCancelButton            : true,
+        keydownListenerCapture      : true,
+        allowOutsideClick           : false,
+        allowEscapeKey              : false,
+        input                       : 'text',
+        inputLabel                  : 'GENERATED CODE',
+        didOpen                     : function() {
+            window.dataCollection.env.sounds.swalSound.play();
+        }
+    }).then((result) => {
+        if (result.isConfirmed === true &&
+            result.value !== ''
+        ) {
+            var postData = { };
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
+            postData['code'] = result.value;
+
+            var url = '{{links.url("system/users/profile/disabletwofa")}}';
+
+            $.post(url, postData, function(data) {
+                if (data.responseCode === 0) {
+                    $('#{{componentId}}-{{sectionId}}-disable-twofa-button').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('hidden', false);
+                    PNotify.success({
+                        'title' : data.responseMessage
+                    });
+                } else {
+                    PNotify.error({
+                        'title' : data.responseMessage
+                    });
+                }
+
+                if (data.tokenKey && data.token) {
+                    $('#security-token').attr('name', data.tokenKey);
+                    $('#security-token').val(data.token);
+                }
+            }, 'json');
+        }
+    });
 });
 </script>

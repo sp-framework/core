@@ -83,10 +83,73 @@ class ProfileComponent extends BaseComponent
             $this->view->responseMessage = 'Method Not Allowed';
         }
     }
+
+    public function enableTwoFaAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->auth->enableTwoFa()) {
+                $this->view->provisionUrl = $this->auth->packagesData->provisionUrl;
+
+                $this->view->qrcode = $this->auth->packagesData->qrcode;
+
+                $this->view->secret = $this->auth->packagesData->secret;
+            } else {
+                $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            }
+
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function verifyTwoFaAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->auth->enableVerifyTwoFa($this->postData()['code']);
+
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function disableTwoFaAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->auth->disableTwoFa($this->postData()['code']);
+
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
     public function generateAvatarAction()
     {
         if ($this->request->isPost()) {
-
             if (!$this->checkCSRF()) {
                 return;
             }

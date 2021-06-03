@@ -2,6 +2,9 @@
 
 namespace System\Base\Providers\AccessServiceProvider;
 
+use Apps\Dash\Packages\System\Tools\Qrcodes\Qrcodes;
+use OTPHP\TOTP;
+use ParagonIE\ConstantTime\Base32;
 use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Confirmation;
 use Phalcon\Validation\Validator\PresenceOf;
@@ -179,7 +182,7 @@ class Auth
         }
     }
 
-    public function attempt($data, $remember = false)
+    public function attempt($data)
     {
         $validate = $this->validateData($data, 'auth');
 
@@ -190,7 +193,28 @@ class Auth
 
             return false;
         }
+
         if (!$this->checkAccount($data)) {
+            return false;
+        }
+
+        if ($this->account['two_fa_status'] == '1' &&
+            !isset($data['code'])
+        ) {
+            $this->packagesData->responseCode = 2;
+
+            $this->packagesData->responseMessage = '2FA Code Required';
+
+            return false;
+        }
+
+        if (($this->account['two_fa_status'] == '1' && isset($data['code'])) &&
+            !$this->verifyTwoFa($data['code'])
+        ) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error: Username/Password/2FA Code incorrect!';
+
             return false;
         }
 
@@ -591,5 +615,127 @@ class Auth
         $this->packagesData->redirectUrl = $this->links->url('/');
 
         return true;
+    }
+
+    public function enableTwoFa()
+    {
+        try {
+            $totp = TOTP::create($this->updateTwoFaSecret());
+
+            $totp->setLabel($this->account['email']);
+
+            $totp->setIssuer('Bazaari');
+
+            $qrCodesPackage = new Qrcodes();
+
+            $this->packagesData->provisionUrl = $totp->getProvisioningUri();
+
+            $this->packagesData->qrcode =
+                $qrCodesPackage->generateQrCode(
+                    $totp->getProvisioningUri(),
+                    [
+                        'showLabel'     => 'true',
+                        'labelFontSize' => '8',
+                        'labelText'     => $totp->getSecret(),
+                        'labelColor'    =>
+                        [
+                            'r'         => '0',
+                            'g'         => '0',
+                            'b'         => '0',
+                            'a'         => '0'
+                        ]
+                    ]
+                );
+
+            $this->packagesData->secret = $totp->getSecret();
+
+            $this->packagesData->responseCode = 0;
+
+            return true;
+        } catch (\Exception $e) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = $e->getMessage();
+
+            return false;
+        }
+    }
+
+    public function enableVerifyTwoFa(int $code)
+    {
+        if ($this->account['two_fa_status'] &&
+            $this->account['two_fa_status'] == '1'
+        ) {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = "2FA already enabled! Contact Administrator.";
+
+            return false;
+        }
+
+        if ($this->verifyTwoFa($code)) {
+            unset($this->account['profile']);
+
+            $this->account['two_fa_status'] = '1';
+
+            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
+
+            $this->accounts->update($this->account);
+        }
+    }
+
+    public function disableTwoFa(int $code)
+    {
+        $totp = TOTP::create($this->account['two_fa_secret']);
+
+        if ($totp->verify($code)) {
+            $this->account['two_fa_status'] = null;
+
+            $this->account['two_fa_secret'] = null;
+
+            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
+
+            $this->accounts->update($this->account);
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = "2FA disabled.";
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = "2FA disable failed.";
+        }
+    }
+
+    public function verifyTwoFa(int $code)
+    {
+        $totp = TOTP::create($this->account['two_fa_secret']);
+
+        if ($totp->verify($code)) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = "2FA verification success.";
+
+            return true;
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = "2FA verification failed.";
+
+            return false;
+        }
+    }
+
+    protected function updateTwoFaSecret()
+    {
+        unset($this->account['profile']);
+
+        $this->account['two_fa_secret'] = trim(Base32::encodeUpper(random_bytes(16)), '=');
+
+        $this->account['session_ids'] = Json::encode($this->account['session_ids']);
+
+        $this->accounts->update($this->account);
+
+        return $this->account['two_fa_secret'];
     }
 }

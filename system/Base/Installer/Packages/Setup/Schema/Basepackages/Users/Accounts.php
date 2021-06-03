@@ -62,8 +62,7 @@ class Accounts
                     new Column(
                         'permissions',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
+                            'type'    => Column::TYPE_TEXT,
                             'notNull' => true,
                         ]
                     ),
@@ -85,8 +84,7 @@ class Accounts
                     new Column(
                         'session_ids',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 4096,
+                            'type'    => Column::TYPE_TEXT,
                             'notNull' => false,
                         ]
                     ),
@@ -98,12 +96,21 @@ class Accounts
                         ]
                     ),
                     new Column(
-                        'remember_token',
+                        'two_fa_status',
                         [
-                            'type'    => Column::TYPE_TEXT,
+                            'type'    => Column::TYPE_TINYINTEGER,
                             'notNull' => false,
                         ]
-                    )
+                    ),
+                    new Column(
+                        'two_fa_secret',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 1024,
+                            'notNull' => false
+                        ]
+                    ),
+
                 ],
                 'indexes' => [
                     new Index(

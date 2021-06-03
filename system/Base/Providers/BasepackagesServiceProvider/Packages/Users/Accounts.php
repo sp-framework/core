@@ -99,6 +99,11 @@ class Accounts extends BasePackage
             $data['session_id'] = null;
         }
 
+        if (isset($data['disable_two_fa']) && $data['disable_two_fa'] === '1') {
+            $data['two_fa_status'] = null;
+            $data['two_fa_secret'] = null;
+        }
+
         if ($this->update($data)) {
 
             if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {

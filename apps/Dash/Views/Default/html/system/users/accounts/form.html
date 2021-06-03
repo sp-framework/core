@@ -209,7 +209,7 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'force_pwreset',
-                        'fieldLabel'                     : 'Force Account Change Password',
+                        'fieldLabel'                     : 'Force Change Password',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Force use to change password at next login.',
                         'fieldRequired'                  : false,
@@ -232,9 +232,31 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'force_logout',
-                        'fieldLabel'                     : 'Force logout account',
+                        'fieldLabel'                     : 'Force logout',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Destroys all account sessions.',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'danger',
+                        'fieldCheckboxLabel'             : '',
+                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'disable_two_fa',
+                        'fieldLabel'                     : 'Disable 2FA',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Disable Two Factor Authentication. Note: Will force logout user.',
                         'fieldRequired'                  : false,
                         'fieldType'                      : 'checkbox',
                         'fieldCheckboxType'              : 'danger',
@@ -378,6 +400,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-email_new_password'          : { },
         '{{componentId}}-{{sectionId}}-force_pwreset'               : { },
         '{{componentId}}-{{sectionId}}-force_logout'                : { },
+        '{{componentId}}-{{sectionId}}-disable_two_fa'              : { },
         '{{componentId}}-{{sectionId}}-can_login'                   : {
             'afterInit'     : function () {
                 //CanLogin
