@@ -194,7 +194,7 @@ abstract class BaseComponent extends Controller
 	{
 		$this->view->responseCode = '0';
 
-		$this->view->responseMessage = 'Default Response Message';
+		$this->view->responseMessage = 'OK';
 	}
 
 	protected function sendJson()

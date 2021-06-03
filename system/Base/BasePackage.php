@@ -543,7 +543,18 @@ abstract class BasePackage extends Controller
 	{
 		$this->packagesData->responseCode = 0;
 
-		$this->packagesData->responseMessage = 'Default Response Message';
+		$this->packagesData->responseMessage = 'OK';
+	}
+
+	protected function setPackageResponse(int $code, string $message, array $data = null)
+	{
+		$this->packagesData->responseCode = $code;
+
+		$this->packagesData->responseMessage = $message;
+
+		if (isset($data)) {
+			$this->packagesData->responseData = $data;
+		}
 	}
 
 	protected function getIdParams(int $id)
