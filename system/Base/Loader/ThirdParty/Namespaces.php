@@ -19,4 +19,9 @@ return
         'DASPRiD\\Enum'                                 => '../system/ThirdParty/vendor/dasprid/enum/src',
         'BaconQrCode'                                   => '../system/ThirdParty/vendor/bacon/bacon-qr-code/src',
         'Assert'                                        => '../system/ThirdParty/vendor/beberlei/assert/lib/Assert/',
+        'Carbon'                                        => '../system/ThirdParty/vendor/nesbot/carbon/src/Carbon',
+        'Symfony\\Polyfill\\Php80'                      => '../system/ThirdParty/vendor/symfony/polyfill-php80',
+        'Symfony\\Polyfill\\Mbstring'                   => '../system/ThirdParty/vendor/symfony/polyfill-mbstring',
+        'Symfony\\Contracts\\Translation'               => '../system/ThirdParty/vendor/symfony/translation-contracts',
+        'Symfony\\Component\\Translation'               => '../system/ThirdParty/vendor/symfony/translation',
     ];

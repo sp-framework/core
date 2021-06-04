@@ -47,6 +47,8 @@ class Service
 
 		self::$loader->registerNamespaces($this->getNamespaces());
 
+		self::$loader->registerClasses($this->getClasses());
+
 		self::$loader->registerFiles($this->getFiles());
 
 		self::$loader->register();
@@ -70,6 +72,24 @@ class Service
 		}
 	}
 
+	protected function getClasses()
+	{
+		if (self::$mode) {
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Classes.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Classes.php'),
+					include(self::$base . 'system/Base/Loader/Dev/Classes.php')
+				);
+		} else {
+			return
+				array_merge(
+					include(self::$base . 'system/Base/Loader/Classes.php'),
+					include(self::$base . 'system/Base/Loader/ThirdParty/Classes.php')
+				);
+		}
+	}
+
 	protected function getFiles()
 	{
 		if (self::$mode) {
@@ -89,6 +109,11 @@ class Service
 	}
 
 	public function addNamespaces(array $namespaces = [])
+	{
+		//
+	}
+
+	public function addClasses(array $classes = [])
 	{
 		//
 	}

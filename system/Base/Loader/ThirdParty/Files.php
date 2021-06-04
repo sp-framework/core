@@ -11,4 +11,8 @@ return
         '../system/ThirdParty/vendor/thecodingmachine/safe/generated/strings.php',
         '../system/ThirdParty/vendor/thecodingmachine/safe/generated/url.php',
         '../system/ThirdParty/vendor/guzzlehttp/guzzle/src/functions_include.php',
+        '../system/ThirdParty/vendor/symfony/polyfill-mbstring/bootstrap.php',
+        '../system/ThirdParty/vendor/symfony/polyfill-php80/bootstrap.php',
+        '../system/ThirdParty/vendor/symfony/deprecation-contracts/function.php',
+        '../system/ThirdParty/vendor/symfony/translation/Resources/functions.php',
     ];
