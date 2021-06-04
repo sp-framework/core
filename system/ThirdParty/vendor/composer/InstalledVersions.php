@@ -32,7 +32,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '8ca42d3a5ee32ab5e9df348563d42b555f20e64b',
+    'reference' => 'd5802b316ffcb0999c6746aeac5e23409ce6037f',
     'name' => '__root__',
   ),
   'versions' => 
@@ -44,7 +44,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '8ca42d3a5ee32ab5e9df348563d42b555f20e64b',
+      'reference' => 'd5802b316ffcb0999c6746aeac5e23409ce6037f',
     ),
     'bacon/bacon-qr-code' => 
     array (
@@ -136,6 +136,15 @@ private static $installed = array (
       ),
       'reference' => '3b9dff8aaf7323590c1d2e443db701eb1f9aa0d3',
     ),
+    'nesbot/carbon' => 
+    array (
+      'pretty_version' => '2.48.1',
+      'version' => '2.48.1.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '8d1f50f1436fb4b05e7127360483dd9c6e73da16',
+    ),
     'paragonie/constant_time_encoding' => 
     array (
       'pretty_version' => 'v2.4.0',
@@ -212,6 +221,58 @@ private static $installed = array (
       array (
       ),
       'reference' => 'f44cce5a9db4b8da410215d992110482c931232f',
+    ),
+    'symfony/deprecation-contracts' => 
+    array (
+      'pretty_version' => 'v2.4.0',
+      'version' => '2.4.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '5f38c8804a9e97d23e0c8d63341088cd8a22d627',
+    ),
+    'symfony/polyfill-mbstring' => 
+    array (
+      'pretty_version' => 'v1.23.0',
+      'version' => '1.23.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '2df51500adbaebdc4c38dea4c89a2e131c45c8a1',
+    ),
+    'symfony/polyfill-php80' => 
+    array (
+      'pretty_version' => 'v1.23.0',
+      'version' => '1.23.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'eca0bf41ed421bed1b57c4958bab16aa86b757d0',
+    ),
+    'symfony/translation' => 
+    array (
+      'pretty_version' => 'v5.3.0',
+      'version' => '5.3.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '251de0d921c42ef0a81494d8f37405421deefdf6',
+    ),
+    'symfony/translation-contracts' => 
+    array (
+      'pretty_version' => 'v2.4.0',
+      'version' => '2.4.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '95c812666f3e91db75385749fe219c5e494c7f95',
+    ),
+    'symfony/translation-implementation' => 
+    array (
+      'provided' => 
+      array (
+        0 => '2.3',
+      ),
     ),
     'thecodingmachine/safe' => 
     array (
