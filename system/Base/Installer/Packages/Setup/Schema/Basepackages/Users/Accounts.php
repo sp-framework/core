@@ -96,6 +96,13 @@ class Accounts
                         ]
                     ),
                     new Column(
+                        'remember_token',
+                        [
+                            'type'    => Column::TYPE_TEXT,
+                            'notNull' => false,
+                        ]
+                    ),
+                    new Column(
                         'two_fa_status',
                         [
                             'type'    => Column::TYPE_TINYINTEGER,

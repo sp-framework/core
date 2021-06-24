@@ -146,14 +146,18 @@ class Auth
 
     protected function clearAccountRememberToken($cookieKey)
     {
-        if ($this->account['remember_identifier']) {
-            $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
+        if (isset($this->account['remember_identifier'])) {
+            if (!is_array($this->account['remember_identifier'])) {
+                $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
+            }
             unset($this->account['remember_identifier'][$cookieKey]);
             $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
         }
 
-        if ($this->account['remember_token']) {
-            $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
+        if (isset($this->account['remember_token'])) {
+            if (!is_array($this->account['remember_token'])) {
+                $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
+            }
             unset($this->account['remember_token'][$cookieKey]);
             $this->account['remember_token'] = Json::encode($this->account['remember_token']);
         }
@@ -352,13 +356,13 @@ class Auth
     {
         $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
 
-        if ($this->account['remember_token']) {
+        if (isset($this->account['remember_token'])) {
             $accountToken = Json::decode($this->account['remember_token'], true)[$cookieKey];
         } else {
             $accountToken = '';
         }
 
-        if ($this->account['remember_identifier']) {
+        if (isset($this->account['remember_identifier'])) {
             $accountIdentifier = Json::decode($this->account['remember_identifier'], true)[$cookieKey];
         } else {
             $accountIdentifier = '';
@@ -418,7 +422,7 @@ class Auth
 
         $this->cookies->send();
 
-        if ($this->account['remember_identifier'] && $this->account['remember_identifier'] !== '') {
+        if (isset($this->account['remember_identifier']) && $this->account['remember_identifier'] !== '') {
             $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
         } else {
             $this->account['remember_identifier'] = [];
@@ -426,7 +430,7 @@ class Auth
         $this->account['remember_identifier'][$cookieKey] = $identifier;
         $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
 
-        if ($this->account['remember_token'] && $this->account['remember_token'] !== '') {
+        if (isset($this->account['remember_token']) && $this->account['remember_token'] !== '') {
             $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
         } else {
             $this->account['remember_token'] = [];
