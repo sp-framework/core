@@ -2,6 +2,7 @@
 
 namespace System\Base;
 
+use League\Flysystem\StorageAttributes;
 use Phalcon\Helper\Arr;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\Model\Transaction\Manager;
@@ -828,15 +829,17 @@ abstract class BasePackage extends Controller
 		$installedFiles['files'] = [];
 
 		if ($directory) {
-			$contents = $this->localContent->listContents($directory, $sub);
+			$installedFiles['files'] =
+				$this->localContent->listContents($directory, $sub)
+				->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
+				->map(fn (StorageAttributes $attributes) => $attributes->path())
+				->toArray();
 
-			foreach ($contents as $contentKey => $content) {
-				if ($content['type'] === 'dir') {
-					array_push($installedFiles['dir'], $content['path']);
-				} else if ($content['type'] === 'file') {
-					array_push($installedFiles['files'], $content['path']);
-				}
-			}
+			$installedFiles['dirs'] =
+				$this->localContent->listContents($directory, $sub)
+				->filter(fn (StorageAttributes $attributes) => $attributes->isDir())
+				->map(fn (StorageAttributes $attributes) => $attributes->path())
+				->toArray();
 
 			return $installedFiles;
 		} else {

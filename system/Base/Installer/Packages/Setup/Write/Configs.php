@@ -104,7 +104,7 @@ return
 		]
 	];';
 
-		$this->container['localContent']->put('/system/Configs/Base.php', $baseContent);
+		$this->container['localContent']->write('/system/Configs/Base.php', $baseContent);
 
 		$this->coreJson['settings']['debug'] = $debug;
 		$this->coreJson['settings']['db']['host'] = $this->postData['host'];

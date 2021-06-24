@@ -2,33 +2,30 @@
 
 namespace System\Base\Installer\Packages;
 
+use League\Flysystem\StorageAttributes;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
-use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
-use System\Base\Installer\Packages\Setup\Register\App\Type as RegisterAppType;
 use System\Base\Installer\Packages\Setup\Register\App as RegisterApp;
-use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
+use System\Base\Installer\Packages\Setup\Register\App\Type as RegisterAppType;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Address\Type as RegisterAddressType;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRootAdminRole;
+use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
+use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
 use System\Base\Installer\Packages\Setup\Register\Modules\Middleware as RegisterMiddleware;
 use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPackage;
 use System\Base\Installer\Packages\Setup\Register\Modules\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
-use System\Base\Installer\Packages\Setup\Schema\Core;
-use System\Base\Installer\Packages\Setup\Schema\Apps\Types as AppsTypes;
 use System\Base\Installer\Packages\Setup\Schema\Apps;
-use System\Base\Installer\Packages\Setup\Schema\Domains;
-use System\Base\Installer\Packages\Setup\Schema\Cache;
-use System\Base\Installer\Packages\Setup\Schema\Logs;
+use System\Base\Installer\Packages\Setup\Schema\Apps\Types as AppsTypes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Book as AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Types as AddressTypes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
@@ -43,6 +40,10 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLo
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Profiles;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Roles;
+use System\Base\Installer\Packages\Setup\Schema\Cache;
+use System\Base\Installer\Packages\Setup\Schema\Core;
+use System\Base\Installer\Packages\Setup\Schema\Domains;
+use System\Base\Installer\Packages\Setup\Schema\Logs;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Components;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Middlewares;
 use System\Base\Installer\Packages\Setup\Schema\Modules\Packages;
@@ -173,9 +174,12 @@ class Setup
 
 	public function registerCore(array $baseConfig)
 	{
-		$installedFiles = $this->getInstalledFiles('system/');
+		$installedFiles = [];
 
-		array_push($installedFiles['files'], 'index.php', 'core.json');
+		$installedFiles =
+			array_merge_recursive($this->getInstalledFiles('system/Base', true), $this->getInstalledFiles('system/Configs', true));
+
+		array_push($installedFiles['files'], 'index.php', 'core.json', 'system/bootstrap.php');
 
 		(new RegisterCore())->register($installedFiles, $baseConfig, $this->db);
 	}
@@ -201,18 +205,22 @@ class Setup
 	{
 		if ($type === 'components') {
 
-			$adminComponents = $this->localContent->listContents('apps/Dash/Components/', true);
+			$adminComponents = $this->getInstalledFiles('apps/Dash/Components/', true);
 
-			foreach ($adminComponents as $adminComponentKey => $adminComponent) {
-				if ($adminComponent['basename'] === 'component.json') {
+			if (!$adminComponents || count($adminComponents) === 0) {
+				return false;
+			}
+
+			foreach ($adminComponents['files'] as $adminComponentKey => $adminComponent) {
+				if (strpos($adminComponent, 'component.json')) {
 					$jsonFile =
 						json_decode(
-							$this->localContent->read($adminComponent['path']),
+							$this->localContent->read($adminComponent),
 							true
 						);
 
 					if (!$jsonFile) {
-						throw new \Exception('Problem reading component.json at location ' . $adminComponent['path']);
+						throw new \Exception('Problem reading component.json at location ' . $adminComponent);
 					}
 
 					if ($jsonFile['menu']) {
@@ -226,82 +234,47 @@ class Setup
 			}
 		} else if ($type === 'packages') {
 
-			$adminPackages = $this->localContent->listContents('apps/Dash/Packages/', true);
+			$adminPackages = $this->getInstalledFiles('apps/Dash/Packages/', true);
 
-			foreach ($adminPackages as $adminPackageKey => $adminPackage) {
-				if ($adminPackage['basename'] === 'package.json') {
-					if ($adminPackage['path'] !==
-						'apps/Dash/Packages/Barebone/Data/apps/Barebone/Packages/Home/Install/package.json'
-					) {
-						$jsonFile =
-							json_decode(
-								$this->localContent->read($adminPackage['path']),
-								true
-							);
-
-						if (!$jsonFile) {
-							throw new \Exception('Problem reading package.json at location ' . $adminPackage['path']);
-						}
-
-						$this->registerAdminPackage($jsonFile);
-					}
-				}
+			if (!$adminPackages || count($adminPackages) === 0) {
+				return false;
 			}
 
-			$commonPackages = $this->localContent->listContents('apps/Ecom/Common/Packages/', true);
-
-			foreach ($commonPackages as $commonPackageKey => $commonPackage) {
-				if ($commonPackage['basename'] === 'package.json') {
+			foreach ($adminPackages['files'] as $adminPackageKey => $adminPackage) {
+				if (strpos($adminPackage, 'package.json')) {
 					$jsonFile =
 						json_decode(
-							$this->localContent->read($commonPackage['path']),
+							$this->localContent->read($adminPackage),
 							true
 						);
 
 					if (!$jsonFile) {
-						throw new \Exception('Problem reading package.json at location ' . $commonPackage['path']);
+						throw new \Exception('Problem reading package.json at location ' . $adminPackage);
 					}
 
-					$this->registerCommonPackage($jsonFile);
+					$this->registerAdminPackage($jsonFile);
 				}
 			}
 		} else if ($type === 'middlewares') {
 
-			$adminMiddlewares = $this->localContent->listContents('apps/Dash/Middlewares/', true);
+			$adminMiddlewares = $this->getInstalledFiles('apps/Dash/Middlewares/', true);
 
-			foreach ($adminMiddlewares as $adminMiddlewareKey => $adminMiddleware) {
-				if ($adminMiddleware['basename'] === 'middleware.json') {
+			foreach ($adminMiddlewares['files'] as $adminMiddlewareKey => $adminMiddleware) {
+				if (strpos($adminMiddleware, 'middleware.json')) {
 					$jsonFile =
 						json_decode(
-							$this->localContent->read($adminMiddleware['path']),
+							$this->localContent->read($adminMiddleware),
 							true
 						);
 
 					if (!$jsonFile) {
-						throw new \Exception('Problem reading middleware.json at location ' . $adminMiddleware['path']);
+						throw new \Exception('Problem reading middleware.json at location ' . $adminMiddleware);
 					}
 
 					$this->registerAdminMiddleware($jsonFile);
 				}
 			}
 
-			$commonMiddlewares = $this->localContent->listContents('apps/Ecom/Common/Middlewares/', true);
-
-			foreach ($commonMiddlewares as $commonMiddlewareKey => $commonMiddleware) {
-				if ($commonMiddleware['basename'] === 'middleware.json') {
-					$jsonFile =
-						json_decode(
-							$this->localContent->read($commonMiddleware['path']),
-							true
-						);
-
-					if (!$jsonFile) {
-						throw new \Exception('Problem reading middleware.json at location ' . $commonMiddleware['path']);
-					}
-
-					$this->registerCommonMiddleware($jsonFile);
-				}
-			}
 		} else if ($type === 'views') {
 			$jsonFile =
 				json_decode(
@@ -319,7 +292,7 @@ class Setup
 
 	protected function registerAdminComponent(array $componentFile, $menuId)
 	{
-		$installedFiles = $this->getInstalledFiles('apps/Dash/Components/' . $componentFile['name']);
+		$installedFiles = $this->getInstalledFiles('apps/Dash/Components/' . $componentFile['name'], true);
 
 		return (new RegisterComponent())->register($this->db, $componentFile, $installedFiles, $menuId);
 	}
@@ -343,22 +316,22 @@ class Setup
 
 	protected function registerAdminPackage(array $packageFile)
 	{
-		$installedFiles = $this->getInstalledFiles('apps/Dash/Packages/' . $packageFile['name']);
+		$installedFiles = $this->getInstalledFiles('apps/Dash/Packages/' . $packageFile['name'], true);
 
 		return (new RegisterPackage())->register($this->db, $packageFile, $installedFiles);
 	}
 
 	public function registerAdminMiddleware(array $middlewareFile)
 	{
-		$installedFiles = $this->getInstalledFiles('apps/Dash/Middlewares/' . $middlewareFile['name']);
+		$installedFiles = $this->getInstalledFiles('apps/Dash/Middlewares/' . $middlewareFile['name'], true);
 
 		return (new RegisterMiddleware())->register($this->db, $middlewareFile, $installedFiles);
 	}
 
 	protected function registerAdminView(array $viewFile)
 	{
-		$appInstalledFiles = $this->getInstalledFiles('apps/Dash/Views/');
-		$publicInstalledFiles = $this->getInstalledFiles('public/dash/');
+		$appInstalledFiles = $this->getInstalledFiles('apps/Dash/Views/', true);
+		$publicInstalledFiles = $this->getInstalledFiles('public/dash/', true);
 
 		$installedFiles = array_merge($appInstalledFiles, $publicInstalledFiles);
 
@@ -419,19 +392,21 @@ class Setup
 	protected function getInstalledFiles($directory = null, $sub = true)
 	{
 		$installedFiles = [];
-		$installedFiles['dir'] = [];
+		$installedFiles['dirs'] = [];
 		$installedFiles['files'] = [];
 
 		if ($directory) {
-			$contents = $this->localContent->listContents($directory, $sub);
+			$installedFiles['files'] =
+				$this->localContent->listContents($directory, $sub)
+				->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
+				->map(fn (StorageAttributes $attributes) => $attributes->path())
+				->toArray();
 
-			foreach ($contents as $contentKey => $content) {
-				if ($content['type'] === 'dir') {
-					array_push($installedFiles['dir'], $content['path']);
-				} else if ($content['type'] === 'file') {
-					array_push($installedFiles['files'], $content['path']);
-				}
-			}
+			$installedFiles['dirs'] =
+				$this->localContent->listContents($directory, $sub)
+				->filter(fn (StorageAttributes $attributes) => $attributes->isDir())
+				->map(fn (StorageAttributes $attributes) => $attributes->path())
+				->toArray();
 
 			return $installedFiles;
 		} else {
