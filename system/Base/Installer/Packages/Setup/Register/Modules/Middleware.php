@@ -8,6 +8,14 @@ class Middleware
 {
 	public function register($db, $middlewareFile, $installedFiles)
 	{
+		if ($middlewareFile['name'] === 'Auth') {
+			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 1]]);
+		} else if ($middlewareFile['name'] === 'Acl') {
+			$apps = Json::encode(['1' => ['enabled' => true, 'sequence' => 2]]);
+		} else {
+			$apps = Json::encode(['1' => ['enabled' => false, 'sequence' => 0]]);
+		}
+
 		return $db->insertAsDict(
 			'modules_middlewares',
 			[
@@ -24,8 +32,7 @@ class Middleware
 					isset($middlewareFile['settings']) ?
 					Json::encode($middlewareFile['settings']) :
 					null,
-				'apps'					=>
-					Json::encode(['1' => ['enabled' => false, 'sequence' => 0]]),
+				'apps'					=> $apps,
 				'installed'				=> 1,
 				'files'					=> Json::encode($installedFiles),
 				'updated_by'			=> 0
