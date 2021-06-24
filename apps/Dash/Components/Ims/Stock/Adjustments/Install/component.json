@@ -1,13 +1,13 @@
 {
-	"route"			: "devtools/api/contracts",
-	"name"			: "Contracts",
-	"description"	: "Contracts generate API code using openapi standard",
+	"route"			: "ims/stock/adjustments",
+	"name"			: "Stock Adjustments",
+	"description"	: "Adjust Stocks via this component",
 	"app_type"      : "dash",
-	"category"      : "system",
-	"sub_category"  : "devtools",
+	"category"      : "business",
+	"sub_category"  : "ims",
 	"version"		: "0.0.1",
-	"repo"			: "https://.../dash-component-system-devtools-api-contracts",
-	"class"			: "Apps\\Dash\\Components\\Devtools\\Api\\Contracts\\ContractsComponent",
+	"repo"			: "https://.../dash-component-business-ims-stock-adjustments",
+	"class"			: "Apps\\Dash\\Components\\Ims\\Stock\\Adjustments\\AdjustmentsComponent",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",
@@ -18,9 +18,9 @@
 		"packages"		:
 		[
 			{
-				"name"      : "Contracts",
+				"name"      : "adjustments",
 				"version"   : "0.0.1",
-				"repo"      : "https://.../dash-package-system-devtools-api-contracts"
+				"repo"      : "https://.../dash-package-business-ims-stock-adjustments"
 			}
 		],
 		"middlewares"	: [],
