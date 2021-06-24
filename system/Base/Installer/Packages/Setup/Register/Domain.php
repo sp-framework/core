@@ -17,7 +17,9 @@ class Domain
 				'allowed'			=> true,
 				'view'				=> '1',
 				'email_service'		=> 0,
-				'storage'			=> 0
+				'storage'			=> 0,
+				'publicStorage'		=> 1,
+				'privateStorage'	=> 2
 			]
 		];
 

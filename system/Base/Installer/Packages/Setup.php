@@ -13,6 +13,7 @@ use System\Base\Installer\Packages\Setup\Register\App\Type as RegisterAppType;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Address\Type as RegisterAddressType;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Storages\Storages as RegisterStorages;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
@@ -382,6 +383,11 @@ class Setup
 	public function registerCountries()
 	{
 		return (new RegisterCountries())->register($this->db, $this->localContent);
+	}
+
+	public function registerStorages()
+	{
+		return (new RegisterStorages())->register($this->db);
 	}
 
 	protected function registerAddressTypes()
