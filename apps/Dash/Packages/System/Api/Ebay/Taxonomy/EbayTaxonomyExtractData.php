@@ -133,14 +133,14 @@ class EbayTaxonomyExtractData extends BasePackage
         $taxonomy['categoryTreeId'] = $this->taxonomies['categoryTreeId'];
         $taxonomy['categoryTreeVersion'] = $this->taxonomies['categoryTreeVersion'];
 
-        $this->localContent->put($this->versionFilePath, Json::encode($taxonomy));
+        $this->localContent->write($this->versionFilePath, Json::encode($taxonomy));
 
         return $taxonomy;
     }
 
     protected function writeTaxonomyFile()
     {
-        $this->localContent->put($this->taxonomyFilePath, Json::encode($this->taxonomies));
+        $this->localContent->write($this->taxonomyFilePath, Json::encode($this->taxonomies));
     }
 
     protected function writeRootTaxonomyFiles($update, $version)
@@ -148,7 +148,7 @@ class EbayTaxonomyExtractData extends BasePackage
         foreach ($this->taxonomies['rootCategoryNode']['childCategoryTreeNodes'] as $rootCategoryKey => $rootCategory) {
             $rootCategory['category'] = array_merge($rootCategory['category'], $version);
 
-            $this->localContent->put(
+            $this->localContent->write(
                 $this->dataPath . $rootCategory['category']['categoryId'] . '.json',
                 Json::encode($rootCategory)
             );

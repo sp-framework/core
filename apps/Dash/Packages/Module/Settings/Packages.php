@@ -21,7 +21,7 @@ class Packages
 
 			$this->localContent->setPathPrefix('packages/Admin/Install/' . $thisPackage['name'] . '/');
 
-			if ($this->localContent->has('settings.html')) {
+			if ($this->localContent->fileExists('settings.html')) {
 				$this->packagesData->packageSettingsFileContent =
 					$this->localContent->read('settings.html');
 			} else {

@@ -21,7 +21,7 @@ class Components
 
 			$this->localContent->setPathPrefix('components/Admin/Install/' . $thisComponent['name'] . '/');
 
-			if ($this->localContent->has('settings.html')) {
+			if ($this->localContent->fileExists('settings.html')) {
 				$this->packagesData->componentSettingsFileContent =
 					$this->localContent->read('settings.html');
 			} else {

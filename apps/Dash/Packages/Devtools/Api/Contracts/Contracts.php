@@ -142,7 +142,7 @@ class Contracts extends BasePackage
 
                 $body = $response->getBody();
 
-                $this->localContent->put($data['filename'], $body);
+                $this->localContent->write($data['filename'], $body);
 
             } else {
 
@@ -161,7 +161,7 @@ class Contracts extends BasePackage
                 $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.yaml');
             }
 
-            $this->localContent->put($data['filename'], $data['content']);
+            $this->localContent->write($data['filename'], $data['content']);
         }
 
         if ($this->add($data)) {
@@ -258,20 +258,20 @@ class Contracts extends BasePackage
     {
         $this->getServicesDirectory($this->contract['api_type']);
 
-        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'])) {
-            $this->localContent->createDir($this->servicesDirectory . $this->contract['name']);
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'])) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name']);
         }
-        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Services')) {
-            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Services');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Services')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Services');
         }
-        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Enums')) {
-            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Enums');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Enums')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Enums');
         }
-        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Types')) {
-            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Types');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Types')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Types');
         }
-        if (!$this->localContent->has($this->servicesDirectory . $this->contract['name'] . '/Operations')) {
-            $this->localContent->createDir($this->servicesDirectory . $this->contract['name'] . '/Operations');
+        if (!$this->localContent->fileExists($this->servicesDirectory . $this->contract['name'] . '/Operations')) {
+            $this->localContent->createDirectory($this->servicesDirectory . $this->contract['name'] . '/Operations');
         }
     }
 }

@@ -144,7 +144,7 @@ class ' . $this->enum['contract_name'] . 'Enum
 
     protected function writeEnumFile($file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->servicesDirectory .
             $this->enum['contract_name'] .
             '/Enums/' .

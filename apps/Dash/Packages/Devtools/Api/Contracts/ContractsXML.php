@@ -356,7 +356,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     public function writeBaseServicesFileContent($file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->ebayServicesDirectory .
             $this->contract['name'] .
             '/Services/' .
@@ -368,7 +368,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     public function writeServicesFileContent($file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->ebayServicesDirectory .
             $this->contract['name'] .
             '/Services/' .
@@ -491,7 +491,7 @@ class ' . $typeKey . ' extends BaseType
 
     protected function writeTypesFileContent($filename, $file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->ebayServicesDirectory .
             $this->contract['name'] .
             '/Types/' .
@@ -607,7 +607,7 @@ class ' . $operationId . ' extends ' . $extends . '
 
     protected function writeOperationsRequestFileContent($filename, $file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->ebayServicesDirectory .
             $this->contract['name'] .
             '/Operations/' .
@@ -642,7 +642,7 @@ class ' . $operationId . ' extends ' . $extends . '
 
     protected function writeOperationsResponseFileContent($filename, $file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->ebayServicesDirectory .
             $this->contract['name'] .
             '/Operations/' .

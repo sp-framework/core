@@ -29,7 +29,7 @@ class Pdo
 	}
 }';
 
-		$localContent->put(
+		$localContent->write(
 			'/system/Base/Providers/DatabaseServiceProvider/Pdo.php',
 			$databaseServiceProvider
 		);

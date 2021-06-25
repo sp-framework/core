@@ -61,7 +61,7 @@ class Acl extends BaseMiddleware
         if ($this->account && $this->account['override_role'] === '1') {
             $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
-            if ($this->localContent->has($aclFileDir . $this->accountEmail . $this->account['id'])) {
+            if ($this->localContent->fileExists($aclFileDir . $this->accountEmail . $this->account['id'])) {
 
                 $this->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
             } else {
@@ -85,7 +85,7 @@ class Acl extends BaseMiddleware
                 }
 
                 if ($this->config->cache->enabled) {
-                    $this->localContent->put($aclFileDir . $this->accountEmail . $this->account['id'], serialize($this->acl));
+                    $this->localContent->write($aclFileDir . $this->accountEmail . $this->account['id'], serialize($this->acl));
                 }
             }
 
@@ -97,7 +97,7 @@ class Acl extends BaseMiddleware
 
             $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
 
-            if ($this->localContent->has($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action)) {
+            if ($this->localContent->fileExists($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action)) {
 
                 $this->acl = unserialize($this->localContent->read($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action));
 
@@ -125,7 +125,7 @@ class Acl extends BaseMiddleware
                 }
 
                 if ($this->config->cache->enabled) {
-                    $this->localContent->put($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->acl));
+                    $this->localContent->write($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->acl));
                 }
             }
             // var_dump($this->roleName, $this->controllerRoute, $this->action);

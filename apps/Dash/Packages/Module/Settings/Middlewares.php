@@ -21,7 +21,7 @@ class Middlewares
 
 		$this->localContent->setPathPrefix('middlewares/Admin/Install/' . $thisMiddleware['name'] . '/');
 
-		if ($this->localContent->has('settings.html')) {
+		if ($this->localContent->fileExists('settings.html')) {
 			$this->packagesData->middlewareSettingsFileContent =
 				$this->localContent->read('settings.html');
 		} else {

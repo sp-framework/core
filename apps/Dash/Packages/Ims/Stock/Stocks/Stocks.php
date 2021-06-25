@@ -120,7 +120,7 @@ class Stocks extends BasePackage
                 } else if ($response->getHeaderLine('content-type') === 'application/wsdl+xml') {
                     $body = $response->getBody();
 
-                    $this->localContent->put($data['filename'], $body);
+                    $this->localContent->write($data['filename'], $body);
 
                 } else {
                     $this->packagesData->responseCode = 1;
@@ -142,7 +142,7 @@ class Stocks extends BasePackage
 
             $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.json');
 
-            $this->localContent->put($data['filename'], $data['content']);
+            $this->localContent->write($data['filename'], $data['content']);
         }
 
         if ($this->add($data)) {
@@ -221,20 +221,20 @@ class Stocks extends BasePackage
 
     protected function createServiceDirectories()
     {
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'])) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name']);
+        if (!$this->localContent->fileExists($this->ebayServicesDirectory . $this->contract['name'])) {
+            $this->localContent->createDirectory($this->ebayServicesDirectory . $this->contract['name']);
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Services')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Services');
+        if (!$this->localContent->fileExists($this->ebayServicesDirectory . $this->contract['name'] . '/Services')) {
+            $this->localContent->createDirectory($this->ebayServicesDirectory . $this->contract['name'] . '/Services');
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Enums')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Enums');
+        if (!$this->localContent->fileExists($this->ebayServicesDirectory . $this->contract['name'] . '/Enums')) {
+            $this->localContent->createDirectory($this->ebayServicesDirectory . $this->contract['name'] . '/Enums');
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Types')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Types');
+        if (!$this->localContent->fileExists($this->ebayServicesDirectory . $this->contract['name'] . '/Types')) {
+            $this->localContent->createDirectory($this->ebayServicesDirectory . $this->contract['name'] . '/Types');
         }
-        if (!$this->localContent->has($this->ebayServicesDirectory . $this->contract['name'] . '/Operations')) {
-            $this->localContent->createDir($this->ebayServicesDirectory . $this->contract['name'] . '/Operations');
+        if (!$this->localContent->fileExists($this->ebayServicesDirectory . $this->contract['name'] . '/Operations')) {
+            $this->localContent->createDirectory($this->ebayServicesDirectory . $this->contract['name'] . '/Operations');
         }
     }
 }

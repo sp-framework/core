@@ -392,7 +392,7 @@ class Api extends BasePackage
 
     protected function initApiCallStats(array $data)
     {
-        if ($this->localContent->has('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
+        if ($this->localContent->fileExists('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
             $callStats =
                 Json::decode($this->localContent->read('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json'), true);
         }
@@ -401,14 +401,14 @@ class Api extends BasePackage
             $callStats[$data['api_id']] = [];
         }
 
-        $this->localContent->put('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json', Json::encode($callStats));
+        $this->localContent->write('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json', Json::encode($callStats));
     }
 
     protected function removeApiCallStats(array $data)
     {
         $callStats = [];
 
-        if ($this->localContent->has('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
+        if ($this->localContent->fileExists('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
             $callStats =
                 Json::decode($this->localContent->read('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json'), true);
         }
@@ -417,12 +417,12 @@ class Api extends BasePackage
             unset($callStats[$data['api_id']]);
         }
 
-        $this->localContent->put('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json', Json::encode($callStats));
+        $this->localContent->write('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json', Json::encode($callStats));
     }
 
     public function getApiCallStats(array $data)
     {
-        if ($this->localContent->has('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
+        if ($this->localContent->fileExists('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
             $callStats =
                 Json::decode($this->localContent->read('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json'), true);
         }
@@ -436,7 +436,7 @@ class Api extends BasePackage
 
     public function setApiCallStats($data, array $callData)
     {
-        if ($this->localContent->has('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
+        if ($this->localContent->fileExists('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json')) {
             $callStats =
                 Json::decode($this->localContent->read('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json'), true);
         }
@@ -445,6 +445,6 @@ class Api extends BasePackage
 
         $callStats[$data['api_id']]['rateLimits'] = $callData['rateLimits'];
 
-        $this->localContent->put('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json', Json::encode($callStats));
+        $this->localContent->write('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json', Json::encode($callStats));
     }
 }

@@ -327,7 +327,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     public function writeBaseServicesFileContent($file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->servicesDirectory .
             $this->contract['name'] .
             '/Services/' .
@@ -339,7 +339,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     public function writeServicesFileContent($file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->servicesDirectory .
             $this->contract['name'] .
             '/Services/' .
@@ -351,7 +351,7 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     protected function writeTypesFileContent($filename, $file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->servicesDirectory .
             $this->contract['name'] .
             '/Types/' .
@@ -546,7 +546,7 @@ class ' . $operationId . 'RestRequest extends BaseType
 
     protected function writeOperationsRequestFileContent($filename, $file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->servicesDirectory .
             $this->contract['name'] .
             '/Operations/' .
@@ -638,7 +638,7 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
 
     protected function writeOperationsResponseFileContent($filename, $file)
     {
-        $this->localContent->put(
+        $this->localContent->write(
             $this->servicesDirectory .
             $this->contract['name'] .
             '/Operations/' .
