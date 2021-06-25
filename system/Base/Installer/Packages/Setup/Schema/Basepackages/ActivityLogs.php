@@ -28,10 +28,18 @@ class ActivityLogs
                         ]
                     ),
                     new Column(
-                        'package_id',
+                        'account_id',
                         [
                             'type'    => Column::TYPE_INTEGER,
-                            'notNull' => false
+                            'notNull' => true
+                        ]
+                    ),
+                    new Column(
+                        'created_at',
+                        [
+                            'type'    => Column::TYPE_TIMESTAMP,
+                            'notNull' => true,
+                            'default' => 'CURRENT_TIMESTAMP'
                         ]
                     ),
                     new Column(
@@ -39,7 +47,7 @@ class ActivityLogs
                         [
                             'type'    => Column::TYPE_VARCHAR,
                             'size'    => 100,
-                            'notNull' => false
+                            'notNull' => true
                         ]
                     ),
                     new Column(//Source Row Id
@@ -50,10 +58,10 @@ class ActivityLogs
                         ]
                     ),
                     new Column(
-                        'activity_logs',
+                        'logs',
                         [
                             'type'    => Column::TYPE_MEDIUMTEXT,
-                            'notNull' => false,
+                            'notNull' => true,
                         ]
                     ),
                 ]

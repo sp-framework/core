@@ -10,6 +10,7 @@ use Phalcon\Paginator\Adapter\Model;
 use Phalcon\Paginator\Adapter\NativeArray;
 use Phalcon\Paginator\Exception;
 use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 abstract class BasePackage extends Controller
@@ -845,5 +846,23 @@ abstract class BasePackage extends Controller
 		} else {
 			return null;
 		}
+	}
+
+	protected function addActivityLog(array $data, $oldData = null)
+	{
+		$activityLogsPacakage = new ActivityLogs();
+
+		if (!$oldData) {
+			$data['id'] = $this->packagesData->last['id'];
+		}
+
+		return $activityLogsPacakage->addLog($this->packageName, $data, $oldData);
+	}
+
+	public function getActivityLogs(int $id, $newFirst = true)
+	{
+		$activityLogsPacakage = new ActivityLogs();
+
+		return $activityLogsPacakage->getLogs($this->packageName, $id, $newFirst);
 	}
 }

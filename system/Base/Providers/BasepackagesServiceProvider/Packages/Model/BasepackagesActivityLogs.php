@@ -10,11 +10,13 @@ class BasepackagesActivityLogs extends BaseModel
 
     public $activity_type;
 
-    public $package_id;
+    public $account_id;
+
+    public $created_at;
 
     public $package_name;
 
     public $package_row_id;
 
-    public $activity_logs;
+    public $logs;
 }

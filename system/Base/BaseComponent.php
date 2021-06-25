@@ -131,7 +131,7 @@ abstract class BaseComponent extends Controller
 	protected function checkCSRF()
 	{
 		if ($this->request->isPost() || $this->request->isPut() || $this->request->isDelete()) {
-			if (!$this->security->checkToken()) {
+			if (!$this->security->checkToken(null, null, false)) {
 				$this->view->responseCode = 2;
 
 				$this->view->responseMessage = 'CSRF Token Error! Please restart form';

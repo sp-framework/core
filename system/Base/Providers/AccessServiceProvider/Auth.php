@@ -26,7 +26,7 @@ class Auth
 
     protected $accounts;
 
-    protected $account;
+    protected $account = null;
 
     protected $app;
 
