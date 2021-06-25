@@ -27,6 +27,7 @@ use System\Base\Installer\Packages\Setup\Register\Modules\Repository as Register
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Apps;
 use System\Base\Installer\Packages\Setup\Schema\Apps\Types as AppsTypes;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Book as AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Types as AddressTypes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
@@ -161,6 +162,7 @@ class Setup
 		$this->registerAddressTypes();
 		$this->db->createTable('basepackages_storages', $dbName, (new Storages)->columns());
 		$this->db->createTable('basepackages_storages_local', $dbName, (new StoragesLocal)->columns());
+		$this->db->createTable('basepackages_activity_logs', $dbName, (new ActivityLogs)->columns());
 	}
 
 	public function registerRepository()
