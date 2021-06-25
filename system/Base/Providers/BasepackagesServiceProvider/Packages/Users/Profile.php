@@ -54,9 +54,23 @@ class Profile extends BasePackage
             if ($profile['contact_address_id'] && $profile['contact_address_id'] !== '') {
                 $address = $this->basepackages->addressbook->getById($profile['contact_address_id']);
 
-                unset($address['id']);
+                if ($address) {
+                    unset($address['id']);
+                    unset($address['name']);
 
-                $profile = array_merge($profile, $address);
+                    $profile = array_merge($profile, $address);
+                } else {
+                    $profile['contact_address_id'] = '';
+                    $profile['street_address'] = '';
+                    $profile['street_address_2'] = '';
+                    $profile['city_id'] = '';
+                    $profile['city_name'] = '';
+                    $profile['post_code'] = '';
+                    $profile['state_id'] = '';
+                    $profile['state_name'] = '';
+                    $profile['country_id'] = '';
+                    $profile['country_name'] = '';
+                }
             } else {
                 $profile['street_address'] = '';
                 $profile['street_address_2'] = '';
