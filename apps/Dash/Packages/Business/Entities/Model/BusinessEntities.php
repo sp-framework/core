@@ -12,7 +12,7 @@ class BusinessEntities extends BaseModel
 
     public $abn;
 
-    public $name;
+    public $business_name;
 
     public $entity_type;
 

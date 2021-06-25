@@ -18,6 +18,8 @@ class Entities extends BasePackage
     {
         $data['package_name'] = $this->packageName;
 
+        $data['name'] = $data['business_name'];
+
         $this->basepackages->addressbook->addAddress($data);
 
         $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
@@ -33,7 +35,7 @@ class Entities extends BasePackage
 
                 $api['in_use'] = 1;
 
-                $api['used_by'] = 'Entity (' . $data['name'] . ')';
+                $api['used_by'] = 'Entity (' . $data['business_name'] . ')';
 
                 $apiPackage->update($api);
             }
@@ -41,7 +43,7 @@ class Entities extends BasePackage
 
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' business entity.';
+            $this->packagesData->responseMessage = 'Added ' . $data['business_name'] . ' business entity.';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -52,6 +54,8 @@ class Entities extends BasePackage
     public function updateEntity(array $data)
     {
         $data['package_name'] = $this->packageName;
+
+        $data['name'] = $data['business_name'];
 
         $this->basepackages->addressbook->mergeAndUpdate($data);
 
@@ -66,14 +70,14 @@ class Entities extends BasePackage
 
                 $api['in_use'] = 1;
 
-                $api['used_by'] = 'Entity (' . $data['name'] . ')';
+                $api['used_by'] = 'Entity (' . $data['business_name'] . ')';
 
                 $apiPackage->update($api);
             }
 
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' business entity.';
+            $this->packagesData->responseMessage = 'Updated ' . $data['business_name'] . ' business entity.';
         } else {
             $this->packagesData->responseCode = 1;
 

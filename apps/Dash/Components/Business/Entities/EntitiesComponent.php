@@ -58,6 +58,7 @@ class EntitiesComponent extends BaseComponent
                 $address = $this->basepackages->addressbook->getById($entity['address_id']);
 
                 unset($address['id']);
+                unset($address['name']);
 
                 $entity = array_merge($entity, $address);
 
@@ -135,13 +136,13 @@ class EntitiesComponent extends BaseComponent
             $this->entities,
             'business/entities/view',
             null,
-            ['abn', 'name', 'entity_type'],
+            ['abn', 'business_name', 'entity_type'],
             false,
             [],
             $controlActions,
-            ['name'=>'Business Name','entity_type'=>'Entity Type'],
+            [],
             $replaceColumns,
-            'name'
+            'business_name'
         );
 
         $this->view->pick('entities/list');

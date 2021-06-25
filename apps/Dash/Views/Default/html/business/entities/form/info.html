@@ -1,13 +1,13 @@
 {% if entity['id'] is defined %}
     {% set entityId = entity['id'] %}
     {% set entityLogo = entity['logo'] %}
-    {% set entityName = entity['name'] %}
+    {% set entityBusinessName = entity['business_name'] %}
     {% set entityAbn = entity['abn'] %}
     {% set entityType = entity['entity_type'] %}
 {% else %}
     {% set entityId = '' %}
     {% set entityLogo = '' %}
-    {% set entityName = '' %}
+    {% set entityBusinessName = '' %}
     {% set entityAbn = '' %}
     {% set entityType = '' %}
 {% endif %}
@@ -111,11 +111,11 @@
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
-                        'fieldId'                               : 'name_list',
+                        'fieldId'                               : 'business_name_list',
                         'fieldLabel'                            : 'Business Name',
                         'fieldType'                             : 'select2',
                         'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Business Names List',
+                        'fieldHelpTooltipContent'               : 'Business Names List: Select a Business Name from the list below.',
                         'fieldRequired'                         : true,
                         'fieldDisabled'                         : true,
                         'fieldHidden'                           : true,
@@ -140,7 +140,7 @@
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
-                        'fieldId'                               : 'name',
+                        'fieldId'                               : 'business_name',
                         'fieldLabel'                            : 'Business Name',
                         'fieldType'                             : 'input',
                         'fieldHelp'                             : true,
@@ -152,7 +152,7 @@
                         'fieldBazJstreeSearch'                  : true,
                         'fieldDataInputMinLength'               : 1,
                         'fieldDataInputMaxLength'               : 100,
-                        'fieldValue'                            : entityName
+                        'fieldValue'                            : entityBusinessName
                     ]
                 )}}
             </div>

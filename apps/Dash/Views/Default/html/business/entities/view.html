@@ -1,17 +1,12 @@
 {% if entity['id'] is defined %}
     {% set entityId = entity['id'] %}
-    {% set title = 'Entity (' ~ entity['name'] ~ ')' %}
+    {% set title = 'Entity (' ~ entity['business_name'] ~ ')' %}
 {% else %}
     {% set entityId = '' %}
     {% set title = 'New Entity' %}
 {% endif %}
 {% set dataDependencies =
     [
-        [
-            'componentName'      : 'Api',
-            'componentVar'       : apis,
-            'componentRoute'     : 'system/api'
-        ],
         [
             'componentName'      : 'Geo Locations (Countries)',
             'componentVar'       : geo,

@@ -37,10 +37,10 @@ class Entities
                     ]
                 ),
                 new Column(
-                    'name',
+                    'business_name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
+                        'size'    => 512,
                         'notNull' => true,
                     ]
                 ),
