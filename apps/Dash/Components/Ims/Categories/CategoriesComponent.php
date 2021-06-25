@@ -56,7 +56,7 @@ class CategoriesComponent extends BaseComponent
 
                 $storages = $this->basepackages->storages;
 
-                if ($category['image'] !== '') {
+                if ($category['image'] && $category['image'] !== '') {
                     $this->view->imageLink = $storages->getPublicLink($category['image'], 200);
                 }
 
