@@ -35,7 +35,7 @@ class Package extends BasePackage
                     // $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns(), $dropTables);
                     // $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns(), $dropTables);
                     $this->createTable('system_api_xero', '', (new SystemApiXero)->columns(), $dropTables);
-                    // $this->createTable('system_api', '', (new SystemApi)->columns(), $dropTables);
+                    $this->createTable('system_api', '', (new SystemApi)->columns(), $dropTables);
                 } catch (\Exception $e) {
                     var_dump($e);die();
                 }
@@ -43,7 +43,7 @@ class Package extends BasePackage
                 // $this->createTable('system_api_generic', '', (new SystemApiGeneric)->columns());
                 // $this->createTable('system_api_ebay', '', (new SystemApiEbay)->columns());
                 $this->createTable('system_api_xero', '', (new SystemApiEbay)->columns());
-                // $this->createTable('system_api', '', (new SystemApi)->columns());
+                $this->createTable('system_api', '', (new SystemApi)->columns());
             }
 
             // $this->registerPackage();
