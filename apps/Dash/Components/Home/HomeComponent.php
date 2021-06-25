@@ -2,14 +2,13 @@
 
 namespace Apps\Dash\Components\Home;
 
-// use Apps\Dash\Components\Hrms\Designations\Install\Component as EmployeesDesignationsComponent;
-// use Apps\Dash\Components\Hrms\Skills\Install\Component as SkillsComponent;
-// use Apps\Dash\Components\Ims\Brands\Install\Component as BrandsComponent;
-// use Apps\Dash\Components\Ims\Categories\Install\Component as CategoriesComponent;
-// use Apps\Dash\Components\Ims\Products\Install\Component as ProductsComponent;
-// use Apps\Dash\Components\Ims\Specifications\Install\Component as SpecificationsComponent;
-// use Apps\Dash\Components\Ims\Suppliers\Install\Component as SuppliersComponent;
-// use Apps\Dash\Components\Storages\Install\Component as StoragesComponent;
+use Apps\Dash\Components\Hrms\Designations\Install\Component as EmployeesDesignationsComponent;
+use Apps\Dash\Components\Hrms\Skills\Install\Component as SkillsComponent;
+use Apps\Dash\Components\Ims\Brands\Install\Component as BrandsComponent;
+use Apps\Dash\Components\Ims\Categories\Install\Component as CategoriesComponent;
+use Apps\Dash\Components\Ims\Products\Install\Component as ProductsComponent;
+use Apps\Dash\Components\Ims\Specifications\Install\Component as SpecificationsComponent;
+use Apps\Dash\Components\Ims\Suppliers\Install\Component as SuppliersComponent;
 use Apps\Dash\Components\Devtools\Api\Contracts\Install\Component as ContractsComponent;
 use Apps\Dash\Components\Devtools\Api\Enums\Install\Component as EnumsComponent;
 use Apps\Dash\Components\Ims\Stock\Purchaseorders\Install\Component as PurchaseOrdersComponent;
@@ -49,15 +48,184 @@ class HomeComponent extends BaseComponent
     public function viewAction()
     {
         // $this->resetTemp();return;
+
+        // $this->reset();return;
+
+        // $this->testScripts();
+    }
+
+    protected function resetTemp()
+    {
+        // $taxonomyComponent = new TaxonomyComponent();
+        // $taxonomyComponent->installComponent();
+        // $taxonomyPackage = new TaxonomyPackage();
+        // $taxonomyPackage->installPackage(true);
+        //
+        // $contractsComponent = new ContractsComponent();
+        // $contractsComponent->installComponent();
+        // $contractsPackage = new ContractsPackage();
+        // $contractsPackage->installPackage(true);
+        // $enumComponent = new EnumsComponent();
+        // $enumComponent->installComponent();
+        // $enumPackage = new EnumsPackage();
+        // $enumPackage->installPackage(true);
+        //
+        // $productsPackage = new ProductsPackage();
+        // $productsPackage->installPackage(true);
+        //
+        // $categoriesPackage = new CategoriesPackage();
+        // $categoriesPackage->installPackage(true);
+        //
+        // $vendorsPackage = new VendorsPackage();
+        // $vendorsPackage->installPackage(true);
+        //
+        // $locationsPackage = new LocationsPackage();
+        // $locationsPackage->installPackage(true);
+        //
+        // $employeesPackage = new EmployeesPackage();
+        // $employeesPackage->installPackage(true);
+        //
+        // $purchaseOrdersComponent = new PurchaseOrdersComponent();
+        // $purchaseOrdersComponent->installComponent();
+        // $purchaseOrdersPackage = new PurchaseOrdersPackage();
+        // $purchaseOrdersPackage->installPackage(true);
+        //
+        // $apiPackage = new ApiPackage();
+        // $apiPackage->installPackage(true);
+    }
+
+    protected function reset()
+    {
+        // For Installing Brands
+        // $brandsComponent = new BrandsComponent();
+        // $brandsComponent->installComponent();
+        // For Installing Brands Package
+        $brandsPackage = new BrandsPackage();
+        $brandsPackage->installPackage(true);
+
+        // For Installing Categories
+        // $categoriesComponent = new CategoriesComponent();
+        // $categoriesComponent->installComponent();
+        // For Installing Categories Package
+        $categoriesPackage = new CategoriesPackage();
+        $categoriesPackage->installPackage(true);
+
+        // For Installing Specifications
+        // $specificationComponent = new SpecificationsComponent();
+        // $specificationComponent->installComponent();
+        // For Installing Specifications Package
+        $specificationPackage = new SpecificationsPackage();
+        $specificationPackage->installPackage(true);
+
+        // For Installing Suppliers
+        // $suppliersComponent = new SuppliersComponent();
+        // $suppliersComponent->installComponent();
+        // For Installing Suppliers Package
+        $suppliersPackage = new SuppliersPackage();
+        $suppliersPackage->installPackage(true);
+
+        // For Installing Products
+        // $productsComponent = new ProductsComponent();
+        // $productsComponent->installComponent();
+        // For Installing Products Package
+        $productsPackage = new ProductsPackage();
+        $productsPackage->installPackage(true);
+
+        // For Installing Entities
+        $businessesPackage = new EntitiesPackage();
+        $businessesPackage->installPackage(true);
+
+        // For Installing Locations
+        $locationsPackage = new LocationsPackage();
+        $locationsPackage->installPackage(true);
+
+        // For Installing Channels
+        $channelsPackage = new ChannelsPackage();
+        $channelsPackage->installPackage(true);
+
+        // For Installing Contacts
+        $contactsPackage = new ContactsPackage();
+        $contactsPackage->installPackage(true);
+
+        // For Installing Vendors
+        $vendorsPackage = new VendorsPackage();
+        $vendorsPackage->installPackage(true);
+
+        // For Installing Skills
+        // $skillsComponent = new SkillsComponent();
+        // $skillsComponent->installComponent();
+        $skillsPackage = new SkillsPackage();
+        $skillsPackage->installPackage(true);
+
+        // For Installing Employees
+        $employeesPackage = new EmployeesPackage();
+        $employeesPackage->installPackage(true);
+
+        // For Installing Employees Statuses
+        $employeesStatusesPackage = new EmployeesStatusesPackage();
+        $employeesStatusesPackage->installPackage(true);
+        $this->addStatuses();
+
+        // For Installing Designations
+        // $employeesDesignationsComponent = new EmployeesDesignationsComponent();
+        // $employeesDesignationsComponent->installComponent();
+        $employeesDesignationsPackage = new EmployeesDesignationsPackage();
+        $employeesDesignationsPackage->installPackage(true);
+        $this->addDesignations();
+
+        // For Installing Api (component installation works)
+        // $apiComponent = new ApiComponent();
+        // $apiComponent->installComponent();
+        // For Installing Api Package
+        $apiPackage = new ApiPackage();
+        $apiPackage->installPackage(true);
+
+        // $taxonomyComponent = new TaxonomyComponent();
+        // $taxonomyComponent->installComponent();
+        $taxonomyPackage = new TaxonomyPackage();
+        $taxonomyPackage->installPackage(true);
+
+        // For Installing API Generator Dev Tools (component installation works)
+        // $contractsComponent = new ContractsComponent();
+        // $contractsComponent->installComponent();
+        $contractsPackage = new ContractsPackage();
+        $contractsPackage->installPackage(true);
+        // $enumComponent = new EnumsComponent();
+        // $enumComponent->installComponent();
+        $enumPackage = new EnumsPackage();
+        $enumPackage->installPackage(true);
+
+        // $purchaseOrdersComponent = new PurchaseOrdersComponent();
+        // $purchaseOrdersComponent->installComponent();
+        $purchaseOrdersPackage = new PurchaseOrdersPackage();
+        $purchaseOrdersPackage->installPackage(true);
+    }
+
+    protected function addStatuses()
+    {
+        $pkg = $this->usePackage(HrmsStatuses::class);
+
+        $pkg->addStatus(['name' => 'Active']);
+        $pkg->addStatus(['name' => 'Inactive']);
+    }
+
+    protected function addDesignations()
+    {
+        $pkg = $this->usePackage(HrmsDesignations::class);
+
+        $pkg->addDesignation(['name' => 'Administrators']);
+        $pkg->addDesignation(['name' => 'Managers']);
+    }
+
+    protected function testScripts()
+    {
         // $parser = new \Phalcon\Security\JWT\Token\Parser();
 
         // $tokenObject = $parser->parse("eyJhbGciOiJSUzI1NiIsImtpZCI6IjFDQUY4RTY2NzcyRDZEQzAyOEQ2NzI2RkQwMjYxNTgxNTcwRUZDMTkiLCJ0eXAiOiJKV1QiLCJ4NXQiOiJISy1PWm5jdGJjQW8xbkp2MENZVmdWY09fQmsifQ.eyJuYmYiOjE2MTYxNTY3NDAsImV4cCI6MTYxNjE1ODU0MCwiaXNzIjoiaHR0cHM6Ly9pZGVudGl0eS54ZXJvLmNvbSIsImF1ZCI6Imh0dHBzOi8vaWRlbnRpdHkueGVyby5jb20vcmVzb3VyY2VzIiwiY2xpZW50X2lkIjoiODRBQ0ZBRTRCREFGNDM3MkJFMTlBQTQ2Njg0QTkyNzIiLCJzdWIiOiIyMTYzNTc4ZmJmZTg1NDMwOGVjZmYzMmVmODUwNGU4MyIsImF1dGhfdGltZSI6MTYxNjE1NjY1NSwieGVyb191c2VyaWQiOiI0YTY2ZTdhNi1lMGNhLTQ3Y2UtOWZlZS04OGU3YWZiY2UxZDYiLCJnbG9iYWxfc2Vzc2lvbl9pZCI6IjI4M2Q3Y2Y0Y2I1YjQzN2FiYTJjODE5Mzg2YzY1NzJjIiwianRpIjoiZTRlZTJiYTlkNjAyNjhjNjdiMjg4MTBiYThjMzU1NGIiLCJhdXRoZW50aWNhdGlvbl9ldmVudF9pZCI6ImJjZjQ1MzQwLTVhMjctNDQwYS1iMmZlLTg1NTAxOWQxNmQ2MCIsInNjb3BlIjpbImVtYWlsIiwicHJvZmlsZSIsIm9wZW5pZCIsImFjY291bnRpbmcucmVwb3J0cy5yZWFkIiwiZmlsZXMiLCJwYXlyb2xsLmVtcGxveWVlcyIsInBheXJvbGwucGF5cnVucyIsInBheXJvbGwucGF5c2xpcCIsInBheXJvbGwudGltZXNoZWV0cyIsInByb2plY3RzIiwiYWNjb3VudGluZy5zZXR0aW5ncyIsImFjY291bnRpbmcuYXR0YWNobWVudHMiLCJhY2NvdW50aW5nLnRyYW5zYWN0aW9ucyIsImFjY291bnRpbmcuam91cm5hbHMucmVhZCIsImFzc2V0cyIsImFjY291bnRpbmcuY29udGFjdHMiLCJwYXlyb2xsLnNldHRpbmdzIiwib2ZmbGluZV9hY2Nlc3MiXX0.INuzO7I6_82EOnT1Kj4N4TzZFrxx4T7X8_z94p5jVg0TYufbDfIt8Xqld09gtj8SfOWIN4iQdkG5TTzakZ86JgNNg6Azca-K6mcGZVwBIw4iaNGkimt3THHJpBsL8SJYMWec_tor47yhvr6s7jJ7t_WIx6rLO5IG11upGfkvK9QC-nDLwrBLgVu5RVVKeBN3hCHpo9eDaRPnE5jIuKY98eYr9HtEFxMos2XPB2c_MO8p9YmO_DWZ1F44-wmkJc265iGcuaHebDax67noXmpV4KbdWFOgb4scCxTgIru-uUMLTh0dHLgeWwAOBHlJcMFBTEwgY9roz_bJrlnC_N4Axw");
 
         // var_dump($tokenObject->getClaims());
         // var_dump($tokenObject->getClaims()->get('authentication_event_id'));
-       // $this->reset();
 
-        return false;
 
         $apiPackage = $this->usePackage(Api::class);
 
@@ -82,7 +250,7 @@ class HomeComponent extends BaseComponent
 
         // $response = $taxonomy->getCategoryTree($request);
 
-        // $this->localContent->put('private/0/Api/Ebay/Taxonomy/Taxonomy.json', Json::encode($response->toArray()));
+        // $this->localContent->write('private/0/Api/Ebay/Taxonomy/Taxonomy.json', Json::encode($response->toArray()));
 
         // $categories = $this->localContent->read('private/0/Api/Ebay/Taxonomy/Taxonomy.json');
 
@@ -97,7 +265,7 @@ class HomeComponent extends BaseComponent
 
         // $response = $taxonomy->getCategorySubtree($request);
 
-        // $this->localContent->put('private/0/Api/Ebay/Taxonomy/Vehicles.json', Json::encode($response->toArray()));
+        // $this->localContent->write('private/0/Api/Ebay/Taxonomy/Vehicles.json', Json::encode($response->toArray()));
 
         // $categoriesJson = $this->localContent->read('private/0/Api/Ebay/Taxonomy/Taxonomy.json');
 
@@ -106,7 +274,7 @@ class HomeComponent extends BaseComponent
         // $taxonomy = [];
         // $taxonomy['categoryTreeId'] = $categories['categoryTreeId'];
         // $taxonomy['categoryTreeVersion'] = $categories['categoryTreeVersion'];
-        // $this->localContent->put('private/0/Api/Ebay/Taxonomy/Version.json', Json::encode($taxonomy));
+        // $this->localContent->write('private/0/Api/Ebay/Taxonomy/Version.json', Json::encode($taxonomy));
         // dump($categories);
         // $taxonomy = [];
         // foreach ($categories['rootCategoryNode']['childCategoryTreeNodes'] as $rootCategoryKey => $rootCategory) {
@@ -114,7 +282,7 @@ class HomeComponent extends BaseComponent
 
         //     $rootCategoryArr[$rootCategory['category']['categoryId']] = $rootCategory;
 
-        //     $this->localContent->put(
+        //     $this->localContent->write(
         //         'private/0/Api/Ebay/Taxonomy/' . $rootCategory['category']['categoryId'] . '.json', Json::encode($rootCategoryArr)
         //     );
         // }
@@ -145,145 +313,5 @@ class HomeComponent extends BaseComponent
 
         var_dump($response->toArray());
         return false;
-    }
-
-    protected function resetTemp()
-    {
-        // $taxonomyComponent = new TaxonomyComponent();
-        // $taxonomyComponent->installComponent();
-        // $taxonomyPackage = new TaxonomyPackage();
-        // $taxonomyPackage->installPackage(true);
-        // $contractsComponent = new ContractsComponent();
-        // $contractsComponent->installComponent();
-        // $contractsPackage = new ContractsPackage();
-        // $contractsPackage->installPackage(true);
-        // $enumComponent = new EnumsComponent();
-        // $enumComponent->installComponent();
-        // $enumPackage = new EnumsPackage();
-        // $enumPackage->installPackage(true);
-        // $productsPackage = new ProductsPackage();
-        // $productsPackage->installPackage(true);
-        // $categoriesPackage = new CategoriesPackage();
-        // $categoriesPackage->installPackage(true);
-        // $vendorsPackage = new VendorsPackage();
-        // $vendorsPackage->installPackage(true);
-
-        // $locationsPackage = new LocationsPackage();
-        // $locationsPackage->installPackage(true);
-        // $purchaseOrdersComponent = new PurchaseOrdersComponent();
-        // $purchaseOrdersComponent->installComponent();
-        // $employeesPackage = new EmployeesPackage();
-        // $employeesPackage->installPackage(true);
-        // $purchaseOrdersPackage = new PurchaseOrdersPackage();
-        // $purchaseOrdersPackage->installPackage(true);
-        // $apiPackage = new ApiPackage();
-        // $apiPackage->installPackage(true);
-    }
-
-    protected function reset()
-    {
-        // For Installing Brands
-        // $brandsComponent = new BrandsComponent();
-        // $brandsComponent->installComponent();
-        // For Installing Brands Package
-        $brandsPackage = new BrandsPackage();
-        $brandsPackage->installPackage(true);
-        // For Installing Categories
-        // $categoriesComponent = new CategoriesComponent();
-        // $categoriesComponent->installComponent();
-        // For Installing Categories Package
-        $categoriesPackage = new CategoriesPackage();
-        $categoriesPackage->installPackage(true);
-        // For Installing Specifications
-        // $specificationComponent = new SpecificationsComponent();
-        // $specificationComponent->installComponent();
-        // For Installing Specifications Package
-        $specificationPackage = new SpecificationsPackage();
-        $specificationPackage->installPackage(true);
-        // For Installing Suppliers
-        // $suppliersComponent = new SuppliersComponent();
-        // $suppliersComponent->installComponent();
-        // For Installing Suppliers Package
-        // $suppliersPackage = new SuppliersPackage();
-        // $suppliersPackage->installPackage(true);
-        // For Installing Products
-        // $productsComponent = new ProductsComponent();
-        // $productsComponent->installComponent();
-        // For Installing Products Package
-        $productsPackage = new ProductsPackage();
-        $productsPackage->installPackage(true);
-
-        // For Installing Entities
-        $businessesPackage = new EntitiesPackage();
-        $businessesPackage->installPackage(true);
-
-        // For Installing Locations
-        $locationsPackage = new LocationsPackage();
-        $locationsPackage->installPackage(true);
-
-        // For Installing Channels
-        $channelsPackage = new ChannelsPackage();
-        $channelsPackage->installPackage(true);
-
-        // For Installing Contacts
-        $contactsPackage = new ContactsPackage();
-        $contactsPackage->installPackage(true);
-        // For Installing Vendors
-        $vendorsPackage = new VendorsPackage();
-        $vendorsPackage->installPackage(true);
-
-        // For Installing Skills
-        // $skillsComponent = new SkillsComponent();
-        // $skillsComponent->installComponent();
-        $skillsPackage = new SkillsPackage();
-        $skillsPackage->installPackage(true);
-
-        // For Installing Employees
-        $employeesPackage = new EmployeesPackage();
-        $employeesPackage->installPackage(true);
-
-        // For Installing Employees Statuses
-        $employeesStatusesPackage = new EmployeesStatusesPackage();
-        $employeesStatusesPackage->installPackage(true);
-        $this->addStatuses();
-
-        // For Installing Designations
-        // $employeesDesignationsComponent = new EmployeesDesignationsComponent();
-        // $employeesDesignationsComponent->installComponent();
-        $employeesDesignationsPackage = new EmployeesDesignationsPackage();
-        $employeesDesignationsPackage->installPackage(true);
-        $this->addDesignations();
-
-        // For Installing Api (component installation works)
-        $apiComponent = new ApiComponent();
-        $apiComponent->installComponent();
-        // For Installing Api Package
-        $apiPackage = new ApiPackage();
-        $apiPackage->installPackage(true);
-        // For Installing API Generator Dev Tools (component installation works)
-        // $contractsComponent = new ContractsComponent();
-        // $contractsComponent->installComponent();
-        // $contractsPackage = new ContractsPackage();
-        // $contractsPackage->installPackage(true);
-        // $enumComponent = new EnumsComponent();
-        // $enumComponent->installComponent();
-        // $enumPackage = new EnumsPackage();
-        // $enumPackage->installPackage(true);
-    }
-
-    protected function addStatuses()
-    {
-        $pkg = $this->usePackage(HrmsStatuses::class);
-
-        $pkg->addStatus(['name' => 'Active']);
-        $pkg->addStatus(['name' => 'Inactive']);
-    }
-
-    protected function addDesignations()
-    {
-        $pkg = $this->usePackage(HrmsDesignations::class);
-
-        $pkg->addDesignation(['name' => 'Administrators']);
-        $pkg->addDesignation(['name' => 'Managers']);
     }
 }
