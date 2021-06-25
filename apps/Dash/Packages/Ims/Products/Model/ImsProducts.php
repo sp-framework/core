@@ -8,11 +8,13 @@ class ImsProducts extends BaseModel
 {
     public $id;
 
-    // public $code_mpn;
+    public $code_mpn;
 
-    // public $code_sku;
+    public $code_sku;
 
-    // public $code_upc;
+    public $code_ean;
+
+    public $code_ean_barcode;
 
     public $title;
 

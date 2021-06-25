@@ -28,37 +28,37 @@ class Products
                         'notNull' => true,
                     ]
                 ),
-                // new Column(
-                //     'code_mpn',
-                //     [
-                //         'type'    => Column::TYPE_VARCHAR,
-                //         'size'    => 50,
-                //         'notNull' => true,
-                //     ]
-                // ),
-                // new Column(
-                //     'code_sku',
-                //     [
-                //         'type'    => Column::TYPE_VARCHAR,
-                //         'size'    => 50,
-                //         'notNull' => true,
-                //     ]
-                // ),
-                // new Column(
-                //     'code_ean',
-                //     [
-                //         'type'    => Column::TYPE_VARCHAR,
-                //         'size'    => 13,
-                //         'notNull' => false,
-                //     ]
-                // ),
-                // new Column(
-                //     'code_ean_barcode',
-                //     [
-                //         'type'    => Column::TYPE_TEXT,
-                //         'notNull' => false,
-                //     ]
-                // ),
+                new Column(
+                    'code_mpn',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'code_sku',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'code_ean',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 13,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'code_ean_barcode',
+                    [
+                        'type'    => Column::TYPE_TEXT,
+                        'notNull' => false,
+                    ]
+                ),
                 new Column(
                     'title',
                     [
