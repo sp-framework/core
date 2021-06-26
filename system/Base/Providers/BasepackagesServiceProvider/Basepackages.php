@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider;
 
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Book as Addressbook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Types as Addresstypes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
@@ -48,6 +49,8 @@ class Basepackages
 	protected $addressbook;
 
 	protected $addresstypes;
+
+	protected $activityLogs;
 
 	public function __construct()
 	{
@@ -160,5 +163,12 @@ class Basepackages
 		$this->addresstypes = (new Addresstypes())->init();
 
 		return $this->addresstypes;
+	}
+
+	protected function initActivityLogs()
+	{
+		$this->activityLogs = (new ActivityLogs())->init();
+
+		return $this->activityLogs;
 	}
 }

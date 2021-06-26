@@ -850,19 +850,15 @@ abstract class BasePackage extends Controller
 
 	protected function addActivityLog(array $data, $oldData = null)
 	{
-		$activityLogsPacakage = new ActivityLogs();
-
 		if (!$oldData) {
 			$data['id'] = $this->packagesData->last['id'];
 		}
 
-		return $activityLogsPacakage->addLog($this->packageName, $data, $oldData);
+		return $this->basepackages->activityLogs->addLog($this->packageName, $data, $oldData);
 	}
 
 	public function getActivityLogs(int $id, $newFirst = true)
 	{
-		$activityLogsPacakage = new ActivityLogs();
-
-		return $activityLogsPacakage->getLogs($this->packageName, $id, $newFirst);
+		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst);
 	}
 }
