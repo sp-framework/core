@@ -29541,3 +29541,15 @@ a.disabled {
   color: #fff;
   background-color: #3498DB;
 }
+
+/* timeline */
+.timeline > div > .fa,
+.timeline > div > .fas,
+.timeline > div > .far,
+.timeline > div > .fab,
+.timeline > div > .fal,
+.timeline > div > .fad,
+.timeline > div > .svg-inline--fa,
+.timeline > div > .ion {
+  font-size: 14px;
+}

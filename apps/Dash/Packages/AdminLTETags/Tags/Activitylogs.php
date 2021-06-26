@@ -45,9 +45,20 @@ class Activitylogs extends AdminLTETags
             $logContent = '<dl class="row">';
 
             foreach ($logs['logs'] as $logKey => $log) {
-                $logContent .=
-                    '<dt class="col-md-4 text-uppercase">' . $logKey . '</dt>
-                    <dd class="col-md-8">: ' . $log . '</dd>';
+                if (!in_array($logKey, $this->params['disableKeys'])) {
+                    if (array_key_exists($logKey, $this->params['replaceValues'])) {
+                        $log = $this->params['replaceValues'][$logKey][$log];
+                    }
+                    if (array_key_exists($logKey, $this->params['replaceKeys'])) {
+                        $logKey = $this->params['replaceKeys'][$logKey];
+                    }
+
+                    $logKey = str_replace('_', ' ', $logKey);
+
+                    $logContent .=
+                        '<dt class="col-md-4 text-uppercase">' . $logKey . '</dt>
+                        <dd class="col-md-8">: ' . $log . '</dd>';
+                }
             }
 
             $logContent .= '</dl>';
