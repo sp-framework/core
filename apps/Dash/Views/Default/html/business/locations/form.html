@@ -36,6 +36,70 @@
             ]
         )}}
     </div>
+    {% set tabsData =
+        [
+            'info'   :
+            [
+                'tabTitle'          : 'Info',
+                'tabInclude'        : 'locations/form/info'
+            ],
+            'contacts'   :
+            [
+                'tabTitle'          : 'Contacts',
+                'tabInclude'        : 'locations/form/contacts'
+            ],
+            'address'   :
+            [
+                'tabTitle'          : 'Address',
+                'tabInclude'        : 'locations/form/address'
+            ]
+        ]
+    %}
+    {% if location['activityLogs'] and location['activityLogs']|length > 0 %}
+        {% set tabsData =
+            array_merge(
+                tabsData,
+                [
+                    'activitylogs' :
+                    [
+                        'tabTitle' : 'Activity Logs',
+                        'tabInclude' : '../common/activitylogs',
+                        'tabIncludeParams':
+                        [
+                            'activityLogs'                      : location['activityLogs'],
+                            'replaceKeys'                       :
+                            {
+                                'primary_contact_employee_id'   : 'primary_contact_employee',
+                                'secondary_contact_employee_id' : 'secondary_contact_employee',
+                                'city_name'                     : 'city',
+                                'state_name'                    : 'state',
+                                'country_name'                  : 'country'
+                            },
+                            'replaceValues'                     :
+                            {
+                                'inbound_shipping'              :
+                                {
+                                    '1'                         : 'Enable',
+                                    '0'                         : 'Disable'
+                                },
+                                'outbound_shipping'             :
+                                {
+                                    '1'                         : 'Enable',
+                                    '0'                         : 'Disable'
+                                },
+                                'can_stock'                     :
+                                {
+                                    '1'                         : 'Enable',
+                                    '0'                         : 'Disable'
+                                }
+                            },
+                            'disableKeys'                       : ['address_id', 'city_id', 'state_id', 'country_id']
+                        ]
+                    ]
+                ]
+            )
+        %}
+    {% endif %}
     <div class="col">
         <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -47,24 +111,7 @@
                         'sectionId'                     : 'main',
                         'tabsId'                        : 'tabs',
                         'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      :
-                            [
-                                'info'   :
-                                [
-                                    'tabTitle'          : 'Info',
-                                    'tabInclude'        : 'locations/form/info'
-                                ],
-                                'contacts'   :
-                                [
-                                    'tabTitle'          : 'Contacts',
-                                    'tabInclude'        : 'locations/form/contacts'
-                                ],
-                                'address'   :
-                                [
-                                    'tabTitle'          : 'Address',
-                                    'tabInclude'        : 'locations/form/address'
-                                ]
-                            ]
+                        'tabsData'                      : tabsData
                     ]
                 )}}
             </fieldset>

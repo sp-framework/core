@@ -22,6 +22,7 @@ class Locations extends BasePackage
         $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
 
         if ($this->add($data)) {
+            $this->addActivityLog($data);
 
             $this->packagesData->responseCode = 0;
 
@@ -35,11 +36,17 @@ class Locations extends BasePackage
 
     public function updateLocation(array $data)
     {
+        $location = $this->getById($data['id']);
+
         $data['package_name'] = $this->packageName;
+
+        $oldAddress = $this->basepackages->addressbook->getById($data['address_id']);
 
         $this->basepackages->addressbook->mergeAndUpdate($data);
 
         if ($this->update($data)) {
+            $this->addActivityLog($data, $location, $oldAddress);
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' location.';
@@ -117,5 +124,14 @@ class Locations extends BasePackage
             );
 
         return $filter;
+    }
+
+    protected function addActivityLog(array $data, $oldData = null, $oldAddress = null)
+    {
+        if ($oldData && $oldAddress) {
+            $oldData = array_merge($oldData, $oldAddress);
+        }
+
+        parent::addActivityLog($data, $oldData);
     }
 }

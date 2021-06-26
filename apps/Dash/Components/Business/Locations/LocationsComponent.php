@@ -29,6 +29,8 @@ class LocationsComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $location = $this->locations->getById($this->getData()['id']);
 
+                $location['activityLogs'] = $this->locations->getActivityLogs($this->getData()['id']);
+
                 $address = $this->basepackages->addressbook->getById($location['address_id']);
 
                 unset($address['id']);
