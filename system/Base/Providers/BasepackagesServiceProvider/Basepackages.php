@@ -23,7 +23,7 @@ class Basepackages
 
 	protected $roles;
 
-	protected $profiles;
+	protected $profile;
 
 	protected $email;
 
