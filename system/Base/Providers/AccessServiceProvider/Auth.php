@@ -205,7 +205,7 @@ class Auth
         if ($this->account['two_fa_status'] == '1' &&
             !isset($data['code'])
         ) {
-            $this->packagesData->responseCode = 2;
+            $this->packagesData->responseCode = 3;
 
             $this->packagesData->responseMessage = '2FA Code Required';
 

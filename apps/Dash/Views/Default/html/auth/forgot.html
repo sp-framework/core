@@ -155,6 +155,8 @@ $(document).ready(function(){
                                     failed();
                                 } else if (data.responseCode == '2') {
                                     $('.login-box-msg').text(data.responseMessage);
+                                } else if (data.responseCode == '3') {
+                                    $('.login-box-msg').text(data.responseMessage);
                                     twoFa();
                                 }
 
