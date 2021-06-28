@@ -28,13 +28,17 @@ trait DynamicTable {
 
         if (count($columnsForTable) > 0) {
             $columnsForTable = array_merge($columnsForTable, ['id']);
+        }
+        if (count($columnsForFilter) > 0) {
             $columnsForFilter = array_merge($columnsForFilter, ['id']);
+        } else {
+            $withFilter = false;//Disable filter if no columns are defined.
         }
 
         if ($this->request->isGet()) {
 
             $table = [];
-            $table['columns'] = $package->getModelsColumnMap($columnsForTable);
+            $table['columns'] = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable));
             if ($dtReplaceColumnsTitle && count($dtReplaceColumnsTitle) > 0) {
                 foreach ($dtReplaceColumnsTitle as $dtReplaceColumnsTitleKey => $dtReplaceColumnsTitleValue) {
                     $table['columns'][$dtReplaceColumnsTitleKey]['name'] = $dtReplaceColumnsTitleValue;
@@ -169,5 +173,15 @@ trait DynamicTable {
                     ]
                 );
         }
+    }
+
+    protected function removeEscapeFromName(array $columns)
+    {
+        foreach ($columns as $key => &$column) {
+            $column = str_replace('[', '', $column);
+            $column = str_replace(']', '', $column);
+        }
+
+        return $columns;
     }
 }
