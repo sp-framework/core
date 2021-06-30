@@ -1,0 +1,13 @@
+{% if packageName is not defined %}
+    {% set packageName = null %}
+{% endif %}
+{{adminltetags.useTag('notes',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'sectionId'                     : 'main',
+        'notes'                         : notes,
+        'packageName'                   : packageName
+    ]
+)}}

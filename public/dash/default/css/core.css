@@ -29550,6 +29550,7 @@ a.disabled {
 .timeline > div > .fal,
 .timeline > div > .fad,
 .timeline > div > .svg-inline--fa,
-.timeline > div > .ion {
+.timeline > div > .ion,
+.timeline > div > .timeline-item > .timeline-header {
   font-size: 14px;
 }

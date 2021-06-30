@@ -13,6 +13,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Settings;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
@@ -51,6 +53,10 @@ class Basepackages
 	protected $addresstypes;
 
 	protected $activityLogs;
+
+	protected $notes;
+
+	protected $settings;
 
 	public function __construct()
 	{
@@ -170,5 +176,19 @@ class Basepackages
 		$this->activityLogs = (new ActivityLogs())->init();
 
 		return $this->activityLogs;
+	}
+
+	protected function initNotes()
+	{
+		$this->notes = (new Notes())->init();
+
+		return $this->notes;
+	}
+
+	protected function initSettings()
+	{
+		$this->notes = (new Settings())->init();
+
+		return $this->notes;
 	}
 }
