@@ -477,7 +477,7 @@ var BazContentFields = function() {
                 ['viewHTML', 'formatting', 'historyUndo', 'historyRedo'],
                 ['fontfamily', 'fontsize', 'superscript', 'subscript'],
                 ['strong', 'em', 'del', 'lineheight', 'preformatted', 'specialChars'],
-                ['foreColor', 'backColor', 'link', 'image'],
+                ['foreColor', 'backColor'],
                 ['justifyFull'],
                 ['unorderedList'],
                 ['table', 'horizontalRule'],
@@ -487,6 +487,10 @@ var BazContentFields = function() {
                 table: {
                     rows: 4,
                     columns: 4
+                },
+                resizimg: {
+                    minSize: 64,
+                    step: 16,
                 }
             }
         }, options);

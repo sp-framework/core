@@ -2036,6 +2036,13 @@ span.flatpickr-day {
 .trumbowyg-box {
     margin-top: 0 !important;
 }
+.trumbowyg-box,
+.trumbowyg-editor {
+  min-height: 150px;
+}
+.trumbowyg-editor {
+  resize:  block;
+}
 /*!
  * animate.css -http://daneden.me/animate
  * Version - 3.7.0

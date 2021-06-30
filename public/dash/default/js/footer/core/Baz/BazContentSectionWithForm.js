@@ -249,10 +249,30 @@
 
                 $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').click(function(e) {
                     e.preventDefault();
+
+                    var mainButton = this;
+
                     if (that._validateForm()) {
                         $(this).children('i').attr('hidden', false);
                         $(this).attr('disabled', true);
-                        that._runAjax(this, $(this).attr('actionurl'), $.param(that._sectionToObj()));
+                        // if ($('.dz-clickable').length > 0) {
+                        //     $('.dz-clickable').each(function(index, dzButton) {
+                        //         var dzButtonId = $(dzButton)[0].id;
+                        //         var extractedButtonId = dzButtonId.replace("-dropzone-upload", "");
+
+                        //         if (dataCollection[componentId][sectionId][extractedButtonId]["dropzone"].files.length > 0) {
+                        //             dataCollection[componentId][sectionId][extractedButtonId].save();
+
+                        //             dataCollection[componentId][sectionId][extractedButtonId]["dropzone"].on("queuecomplete", function() {
+                        //                 that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                        //             });
+                        //         } else {
+                        //             that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                        //         }
+                        //     });
+                        // } else {
+                            that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                        // }
                     }
                 });
             }

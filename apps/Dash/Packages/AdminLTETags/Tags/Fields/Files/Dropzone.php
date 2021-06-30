@@ -78,6 +78,16 @@ class Dropzone
             true :
             false;
 
+        $this->fieldParams['fieldBazPostOnCreate'] =
+            isset($this->params['fieldBazPostOnCreate']) && $this->params['fieldBazPostOnCreate'] === true ?
+            true :
+            false;
+
+        $this->fieldParams['fieldBazPostOnUpdate'] =
+            isset($this->params['fieldBazPostOnUpdate']) && $this->params['fieldBazPostOnUpdate'] === true ?
+            true :
+            false;
+
         $this->fieldParams['sortable'] =
             isset($this->params['sortable']) ?
             $this->params['sortable'] :
@@ -114,6 +124,8 @@ class Dropzone
             $this->fieldParams['allowedFileMimeType'] =
                 Json::encode($this->params['storage']['allowed_file_mime_types']);
         } else {
+            $this->params['allowedUploads'] = 'files';
+
             $this->fieldParams['allowedImageMimeType'] =
                 Json::encode($this->params['storage']['allowed_image_mime_types']);
 
@@ -191,7 +203,7 @@ class Dropzone
                                 'buttons'                       => $dropzoneButtons
                             ]
                         ) .
-                        '<span id="' . $this->compSecId . '-croppie-save-warning" class="text-danger" hidden>Save/Cancel Image</span>
+                        '<span id="' . $this->compSecId . '-dropzone-save-warning" class="dropzone-save-warning text-danger" hidden>Save/Cancel Image</span>
                     </div>
                 </div>
                 <div class="row pb-2">
@@ -239,28 +251,28 @@ class Dropzone
                                     </div>';
 
                                 foreach ($this->params['attachments'] as $attachmentKey => $attachment) {
-                                    if ($attachment['type'] === 'app/pdf') {
+                                    if ($attachment['type'] === 'application/pdf') {
                                         $src = $this->links->images('/general/pdf.png');
                                         $alt = 'pdf';
                                     } else if ($attachment['type'] === 'text/plain') {
                                         $src = $this->links->images('/general/file.png');
                                         $alt = 'file';
-                                    } else if ($attachment['type'] === 'app/msword' ||
-                                               $attachment['type'] === 'app/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                                    } else if ($attachment['type'] === 'application/msword' ||
+                                               $attachment['type'] === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                                               ) {
                                         $src = $this->links->images('/general/file.png');
                                         $alt = 'file';
-                                    } else if ($attachment['type'] === 'app/vnd.ms-excel' ||
-                                               $attachment['type'] === 'app/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                                    } else if ($attachment['type'] === 'application/vnd.ms-excel' ||
+                                               $attachment['type'] === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
                                               ) {
                                         $src = $this->links->images('/general/excel.png');
                                         $alt = 'excel';
-                                    } else if ($attachment['type'] === 'app/vnd.ms-powerpoint' ||
-                                               $attachment['type'] === 'app/vnd.openxmlformats-officedocument.presentationml.presentation'
+                                    } else if ($attachment['type'] === 'application/vnd.ms-powerpoint' ||
+                                               $attachment['type'] === 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
                                               ) {
                                         $src = $this->links->images('/general/powerpoint.png');
                                         $alt = 'powerpoint';
-                                    } else if ($attachment['type'] === 'app/zip') {
+                                    } else if ($attachment['type'] === 'application/zip') {
                                         $src = $this->links->images('/general/zip.png');
                                         $alt = 'zip';
                                     } else if ($attachment['type'] === 'text/csv') {
@@ -425,20 +437,6 @@ class Dropzone
                                 );
                             }
 
-                            // function renewToken() {
-                            //     var tokenName = $("#security-token").attr("name");
-                            //     var token = $("#security-token").val();
-                            //     var postData = { };
-                            //     postData[tokenName] = token;
-                            //     $.ajaxSetup({"async": true});
-                            //     $.post("' . $this->links->url('system/storages/getnewtoken') . '", postData, function(response) {
-                            //         if (response.tokenKey && response.token) {
-                            //             $("#security-token").attr("name", response.tokenKey);
-                            //             $("#security-token").val(response.token);
-                            //         }
-                            //     }, "json");
-                            // }
-
                             function initEvents() {
                                 fieldId["dropzone"].on("addedfile", function(file) {
                                     registerSaveCancel();
@@ -447,28 +445,28 @@ class Dropzone
                                     var indexOfFile = fileMimeTypes.indexOf(file.type);
                                     var indexOfImage = imageMimeTypes.indexOf(file.type);
 
-                                    if (file.type === "app/pdf") {
+                                    if (file.type === "application/pdf") {
                                         src = "' . $this->links->images('/general/pdf.png') . '";
                                         alt = "pdf";
                                     } else if (file.type === "text/plain") {
                                         src = "' . $this->links->images('/general/file.png') . '";
                                         alt = "file";
-                                    } else if (file.type === "app/msword" ||
-                                               file.type === "app/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                    } else if (file.type === "application/msword" ||
+                                               file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                                     ) {
                                         src = "' . $this->links->images('/general/file.png') . '";
                                         alt = "file";
-                                    } else if (file.type === "app/vnd.ms-excel" ||
-                                               file.type === "app/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    } else if (file.type === "application/vnd.ms-excel" ||
+                                               file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                     ) {
                                         src = "' . $this->links->images('/general/excel.png') . '";
                                         alt = "excel";
-                                    } else if (file.type === "app/vnd.ms-powerpoint" ||
-                                               file.type === "app/vnd.openxmlformats-officedocument.presentationml.presentation"
+                                    } else if (file.type === "application/vnd.ms-powerpoint" ||
+                                               file.type === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
                                     ) {
                                         src = "' . $this->links->images('/general/powerpoint.png') . '";
                                         alt = "powerpoint";
-                                    } else if (file.type === "app/zip") {
+                                    } else if (file.type === "application/zip") {
                                         src = "' . $this->links->images('/general/zip.png') . '";
                                         alt = "zip";
                                     } else if (file.type === "text/csv") {
@@ -508,7 +506,6 @@ class Dropzone
                                     } else {
                                         initDropzone();
                                     }
-                                    // renewToken();
                                 });
 
                                 fieldId["dropzone"].on("success", function(file, response) {
@@ -534,28 +531,28 @@ class Dropzone
                                             var indexOfFile = fileMimeTypes.indexOf(file.type);
                                             var indexOfImage = imageMimeTypes.indexOf(file.type);
 
-                                            if (file.type === "app/pdf") {
+                                            if (file.type === "application/pdf") {
                                                 src = "' . $this->links->images('/general/pdf.png') . '";
                                                 alt = "pdf";
                                             } else if (file.type === "text/plain") {
                                                 src = "' . $this->links->images('/general/file.png') . '";
                                                 alt = "file";
-                                            } else if (file.type === "app/msword" ||
-                                                       file.type === "app/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                            } else if (file.type === "application/msword" ||
+                                                       file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                                             ) {
                                                 src = "' . $this->links->images('/general/file.png') . '";
                                                 alt = "file";
-                                            } else if (file.type === "app/vnd.ms-excel" ||
-                                                       file.type === "app/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                            } else if (file.type === "application/vnd.ms-excel" ||
+                                                       file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                             ) {
                                                 src = "' . $this->links->images('/general/excel.png') . '";
                                                 alt = "excel";
-                                            } else if (file.type === "app/vnd.ms-powerpoint" ||
-                                                       file.type === "app/vnd.openxmlformats-officedocument.presentationml.presentation"
+                                            } else if (file.type === "application/vnd.ms-powerpoint" ||
+                                                       file.type === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
                                             ) {
                                                 src = "' . $this->links->images('/general/powerpoint.png') . '";
                                                 alt = "powerpoint";
-                                            } else if (file.type === "app/zip") {
+                                            } else if (file.type === "application/zip") {
                                                 src = "' . $this->links->images('/general/zip.png') . '";
                                                 alt = "zip";
                                             } else if (file.type === "text/csv") {
@@ -713,41 +710,46 @@ class Dropzone
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", false);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").off();
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").click(function() {
-                                    var tokenName = $("#security-token").attr("name");
-                                    var token = $("#security-token").val();
-
-                                    if (fieldId["dropzone"].files.length > 0) {
-                                        fieldId["dropzone"].options.params = {
-                                            "directory"     : "' . strtolower($this->params['componentName']) . '",
-                                            "storagetype"   : "' . $this->params['storage']['permission'] . '"
-                                        };
-
-                                        if ("' . $this->params['storage']['permission'] . '" === "public") {
-                                            fieldId["dropzone"].options.params["getpubliclinks"] =
-                                                "' . $this->fieldParams['thumbnailSize'] . ',' . $this->fieldParams['lightboxSize'] . '";
-                                        }
-
-                                        fieldId["dropzone"].options.params[tokenName] = token;
-
-                                        fieldId["dropzone"].enqueueFiles(
-                                            fieldId["dropzone"].getFilesWithStatus(Dropzone.ADDED)
-                                        );
-                                    } else if (deleteUUIDs.length > 0) {
-                                        processDeleteUUIDs();
-                                    }
+                                    fieldId["save"]();
                                 });
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", false);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").off();
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").click(function() {
-                                    fieldId["dropzone"].removeAllFiles(true);
-
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
-                                    $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
-
-                                    deleteUUIDs = [];
-                                    registerDeleteButtons();
+                                    fieldId["cancel"]();
                                 });
+                            }
+
+                            fieldId["save"] = function() {
+                                if (fieldId["dropzone"].files.length > 0) {
+                                    fieldId["dropzone"].options.params = {
+                                        "directory"     : "' . strtolower($this->params['componentName']) . '",
+                                        "storagetype"   : "' . $this->params['storage']['permission'] . '"
+                                    };
+
+                                    if ("' . $this->params['storage']['permission'] . '" === "public") {
+                                        fieldId["dropzone"].options.params["getpubliclinks"] =
+                                            "' . $this->fieldParams['thumbnailSize'] . ',' . $this->fieldParams['lightboxSize'] . '";
+                                    }
+
+                                    fieldId["dropzone"].options.params[$("#security-token").attr("name")] = $("#security-token").val();
+
+                                    fieldId["dropzone"].enqueueFiles(
+                                        fieldId["dropzone"].getFilesWithStatus(Dropzone.ADDED)
+                                    );
+                                } else if (deleteUUIDs.length > 0) {
+                                    processDeleteUUIDs();
+                                }
+                            }
+
+                            fieldId["cancel"] = function() {
+                                fieldId["dropzone"].removeAllFiles(true);
+
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
+
+                                deleteUUIDs = [];
+                                registerDeleteButtons();
                             }
 
                             function processDeleteUUIDs() {
@@ -831,6 +833,22 @@ class Dropzone
                                         "fieldId"   : "' . $this->params['fieldId'] . '"
                                     }
                                 );
+                            }
+
+                            fieldId["reset"] = function() {
+                                deleteUUIDs = [];
+                                problemWithUpload = false;
+                                delete window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["data"]["' . $this->params['fieldId'] . '"];
+
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments li").remove();
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments .no-data").attr("hidden", false);
+
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
+                                $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
+
+                                fieldId["dropzone"].removeAllFiles(true);
+
+                                collectData();
                             }
                         }
                     }
