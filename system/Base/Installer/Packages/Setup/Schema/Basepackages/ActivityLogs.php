@@ -58,7 +58,7 @@ class ActivityLogs
                         ]
                     ),
                     new Column(
-                        'logs',
+                        'log',
                         [
                             'type'    => Column::TYPE_MEDIUMTEXT,
                             'notNull' => true,

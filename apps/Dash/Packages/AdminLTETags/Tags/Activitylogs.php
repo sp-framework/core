@@ -4,6 +4,7 @@ namespace Apps\Dash\Packages\AdminLTETags\Tags;
 
 use Apps\Dash\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 
 class Activitylogs extends AdminLTETags
 {
@@ -26,6 +27,10 @@ class Activitylogs extends AdminLTETags
 
     protected function generateContent()
     {
+        if (!isset($this->params['activityLogs'])) {
+            throw new \Exception('Error: activityLogs (array) missing');
+        }
+
         $this->content .=
             '<div class="row">
                 <div class="col">
@@ -35,16 +40,20 @@ class Activitylogs extends AdminLTETags
             if ($logs['activity_type'] === '1') {
                 $icon = 'plus';
                 $bg = 'primary';
-                $title = $logs['account_full_name'] . ' (' . $logs['account_email'] . ')';
             } else if ($logs['activity_type'] === '2') {
                 $icon = 'edit';
                 $bg = 'warning';
-                $title = $logs['account_full_name'] . ' (' . $logs['account_email'] . ')';
+            }
+
+            if (isset($logs['account_id']) && $logs['account_id'] == 0) {
+                $title = '<span><i class="fas fa-fw fa-robot"></i> ' . $logs['account_full_name'] . ' </span>';
+            } else {
+                $title = '<span><i class="fas fa-fw fa-user"></i> ' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
             }
 
             $logContent = '<dl class="row">';
 
-            foreach ($logs['logs'] as $logKey => $log) {
+            foreach ($logs['log'] as $logKey => $log) {
                 if (!in_array($logKey, $this->params['disableKeys'])) {
                     if (array_key_exists($logKey, $this->params['replaceValues'])) {
                         $log = $this->params['replaceValues'][$logKey][$log];
@@ -54,6 +63,14 @@ class Activitylogs extends AdminLTETags
                     }
 
                     $logKey = str_replace('_', ' ', $logKey);
+
+                    if (is_array($log)) {
+                        $log = Json::encode($log);
+
+                        if ($log === '[]') {
+                            $log = '';
+                        }
+                    }
 
                     $logContent .=
                         '<dt class="col-md-4 text-uppercase">' . $logKey . '</dt>
@@ -68,7 +85,7 @@ class Activitylogs extends AdminLTETags
                     <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '"></i>
                     <div class="timeline-item">
                         <span class="time"><i class="fas fa-clock"></i> ' . $logs['created_at'] .'</span>
-                        <h3 class="timeline-header">' .  $title . '</h3>
+                        <h6 class="timeline-header text-secondary">' .  $title . '</h6>
                         <div class="timeline-body">' . $logContent . '</div>
                         <div class="timeline-footer"></div>
                     </div>

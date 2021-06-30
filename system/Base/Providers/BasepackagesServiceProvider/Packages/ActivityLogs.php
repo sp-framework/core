@@ -60,7 +60,7 @@ class ActivityLogs extends BasePackage
 
         $log['package_row_id'] = $dataId;
 
-        $log['logs'] = Json::encode($data);
+        $log['log'] = Json::encode($data);
 
         if ($this->add($log)) {
             $this->packagesData->responseCode = 0;
@@ -86,26 +86,31 @@ class ActivityLogs extends BasePackage
             ]
         );
 
-        if (count($logsArr) > 0) {
+        if ($logsArr && count($logsArr) > 0) {
             foreach ($logsArr as $key => &$log) {
                 unset($log['id']);
                 unset($log['package_name']);
                 unset($log['package_row_id']);
 
-                $account = $this->basepackages->accounts->getById($log['account_id']);
-                $log['account_email'] = $account['email'];
+                if ($log['account_id'] != 0) {
+                    $account = $this->basepackages->accounts->getById($log['account_id']);
+                    $log['account_email'] = $account['email'];
 
-                $profile = $this->basepackages->profile->profile($log['account_id']);
-                $log['account_full_name'] = $profile['full_name'];
+                    $profile = $this->basepackages->profile->getProfile($log['account_id']);
+                    $log['account_full_name'] = $profile['full_name'];
 
-                unset($log['account_id']);
+                    unset($log['account_id']);
+                } else {
+                    $log['account_email'] = 'N/A';
+                    $log['account_full_name'] = 'System';
+                }
 
-                if ($log['logs'] !== '') {
-                    $log['logs'] = Json::decode($log['logs'], true);
+                if ($log['log'] !== '') {
+                    $log['log'] = Json::decode($log['log'], true);
                 }
             }
 
-            if ($newFirst) {
+            if ($newFirst && count($logsArr) > 1) {
                 return array_reverse($logsArr);
             }
 
