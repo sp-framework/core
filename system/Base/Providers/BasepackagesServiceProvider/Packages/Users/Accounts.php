@@ -39,9 +39,13 @@ class Accounts extends BasePackage
             $newAccount = $this->add($data);
 
             if ($newAccount) {
-                $this->packagesData->responseCode = 0;
 
-                $this->packagesData->responseMessage = 'Account added';
+                $id = $this->packagesData->last['id'];
+
+                $data['id'] = $id;
+                $this->basepackages->profile->addProfile($data);
+
+                $this->updateRoleAccounts($data['role_id'], $id);
 
                 if ($data['email_new_password'] === '1') {
                     if ($this->emailNewPassword($data['email'], $password) !== true) {
@@ -51,9 +55,9 @@ class Accounts extends BasePackage
                     }
                 }
 
-                $id = $this->packagesData->last['id'];
+                $this->packagesData->responseCode = 0;
 
-                $this->updateRoleAccounts($data['role_id'], $id);
+                $this->packagesData->responseMessage = 'Account added';
 
                 return true;
             }
@@ -96,7 +100,7 @@ class Accounts extends BasePackage
         }
 
         if (isset($data['force_logout']) && $data['force_logout'] === '1') {
-            $data['session_id'] = null;
+            $data['session_ids'] = null;
         }
 
         if (isset($data['disable_two_fa']) && $data['disable_two_fa'] === '1') {
@@ -114,6 +118,8 @@ class Accounts extends BasePackage
                 }
             }
 
+            $this->basepackages->profile->updateProfileViaAccount($data);
+
             $this->updateRoleAccounts($data['role_id'], $data['id'], $account['role_id']);
 
             $this->packagesData->responseCode = 0;
@@ -130,7 +136,8 @@ class Accounts extends BasePackage
     {
         $account = $this->getById($data['id']);
 
-                $this->removeRoleAccount($account['role_id'], $account['id']);
+        $this->removeRoleAccount($account['role_id'], $account['id']);
+
         if (isset($data['id']) && $data['id'] != 1) {
 
             if ($this->remove($data['id'])) {
@@ -304,7 +311,8 @@ class Accounts extends BasePackage
     public function generateViewData(int $uid = null)
     {
         if (isset($this->domains->getDomain()['apps'][$this->app['id']]['email_service']) &&
-            $this->domains->getDomain()['apps'][$this->app['id']]['email_service'] !== ''
+            $this->domains->getDomain()['apps'][$this->app['id']]['email_service'] !== '' &&
+            $this->domains->getDomain()['apps'][$this->app['id']]['email_service'] !== 0
         ) {
             $this->packagesData->canEmail = true;
         } else {
@@ -393,6 +401,8 @@ class Accounts extends BasePackage
                 $this->packagesData->acls = Json::encode($acls);
 
                 $account['permissions'] = Json::encode($permissions);
+
+                $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
 

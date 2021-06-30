@@ -7,10 +7,14 @@
     {% set accountId = account['id'] %}
     {% set accountEmail = account['email'] %}
     {% set accountRole = account['role_id'] %}
+    {% set accountFirstName = account['profile']['first_name'] %}
+    {% set accountLastName = account['profile']['last_name'] %}
 {% else %}
     {% set accountId = '' %}
     {% set accountEmail = '' %}
     {% set accountRole = 0 %}
+    {% set accountFirstName = '' %}
+    {% set accountLastName = '' %}
 {% endif %}
 {% if account['override_role'] is defined and account['override_role'] == '1' %}
     {% set override = true %}
@@ -29,10 +33,10 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'id',
-                        'fieldLabel'                     : 'Account ID',
+                        'fieldLabel'                     : 'ID',
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Account ID',
+                        'fieldHelpTooltipContent'        : 'ID',
                         'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : false,
@@ -53,7 +57,7 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'email',
-                        'fieldLabel'                     : 'Email',
+                        'fieldLabel'                     : 'Account ID (Email)',
                         'fieldType'                      : 'input',
                         'fieldInputType'                 : 'email',
                         'fieldHelp'                      : true,
@@ -76,7 +80,7 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'role_id',
-                        'fieldLabel'                     : 'Select Role',
+                        'fieldLabel'                     : 'Account Role',
                         'fieldType'                      : 'select2',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select a role for this account.',
@@ -112,6 +116,54 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'first_name',
+                        'fieldLabel'                     : 'First Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'First Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : accountFirstName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'last_name',
+                        'fieldLabel'                     : 'Last Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Last Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : accountLastName
                     ]
                 )}}
             </div>
@@ -224,50 +276,54 @@
                     ]
                 )}}
             </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'force_logout',
-                        'fieldLabel'                     : 'Force logout',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Destroys all account sessions.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'danger',
-                        'fieldCheckboxLabel'             : '',
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'disable_two_fa',
-                        'fieldLabel'                     : 'Disable 2FA',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Disable Two Factor Authentication. Note: Will force logout user.',
-                        'fieldRequired'                  : false,
-                        'fieldType'                      : 'checkbox',
-                        'fieldCheckboxType'              : 'danger',
-                        'fieldCheckboxLabel'             : '',
-                        'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldBazScan'                   : true
-                    ]
-                )}}
-            </div>
+            {% if account['id'] is defined %}
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'force_logout',
+                            'fieldLabel'                     : 'Force logout',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Destroys all account sessions.',
+                            'fieldRequired'                  : false,
+                            'fieldType'                      : 'checkbox',
+                            'fieldCheckboxType'              : 'danger',
+                            'fieldCheckboxLabel'             : '',
+                            'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                            'fieldBazPostOnCreate'           : true,
+                            'fieldBazPostOnUpdate'           : true,
+                            'fieldBazScan'                   : true
+                        ]
+                    )}}
+                </div>
+                {% if account['two_fa_status'] !== null and account['two_fa_status'] !== 0 %}
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                      : component,
+                                'componentName'                  : componentName,
+                                'componentId'                    : componentId,
+                                'sectionId'                      : sectionId,
+                                'fieldId'                        : 'disable_two_fa',
+                                'fieldLabel'                     : 'Disable 2FA',
+                                'fieldHelp'                      : true,
+                                'fieldHelpTooltipContent'        : 'Disable Two Factor Authentication. Note: Will force logout user.',
+                                'fieldRequired'                  : false,
+                                'fieldType'                      : 'checkbox',
+                                'fieldCheckboxType'              : 'danger',
+                                'fieldCheckboxLabel'             : '',
+                                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                                'fieldBazPostOnCreate'           : true,
+                                'fieldBazPostOnUpdate'           : true,
+                                'fieldBazScan'                   : true
+                            ]
+                        )}}
+                    </div>
+                {% endif %}
+            {% endif %}
         </div>
         <div class="row" id="account-permissions" hidden>
             <div class="col">
@@ -397,6 +453,11 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                          : { },
         '{{componentId}}-{{sectionId}}-email'                       : { },
+        '{{componentId}}-{{sectionId}}-role_id'                     : {
+            'placeholder'   : 'SELECT ACCOUNT ROLE'
+        },
+        '{{componentId}}-{{sectionId}}-first_name'                  : { },
+        '{{componentId}}-{{sectionId}}-last_name'                   : { },
         '{{componentId}}-{{sectionId}}-email_new_password'          : { },
         '{{componentId}}-{{sectionId}}-force_pwreset'               : { },
         '{{componentId}}-{{sectionId}}-force_logout'                : { },
@@ -421,9 +482,6 @@ dataCollectionSection =
                     }
                 }
             }
-        },
-        '{{componentId}}-{{sectionId}}-role_id'                     : {
-            'placeholder'   : 'SELECT ROLE'
         },
         '{{componentId}}-{{sectionId}}-override_role'   : {
             'afterInit' : function () {

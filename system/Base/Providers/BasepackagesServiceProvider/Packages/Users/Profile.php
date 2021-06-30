@@ -26,13 +26,13 @@ class Profile extends BasePackage
     public function profile(int $accountId)
     {
         if (!$this->profile) {
-            $this->getProfile($accountId);
+            $this->profile = $this->setProfile($this->getProfile($accountId));
         }
 
         return $this->profile;
     }
 
-    protected function getProfile(int $accountId)
+    public function getProfile(int $accountId)
     {
         $profile =
             $this->getByParams(
@@ -45,33 +45,28 @@ class Profile extends BasePackage
             ]
         );
 
-        if (count($profile) === 1) {
+        if ($profile && count($profile) === 1) {
             $profile = $profile[0];
 
-            $profile['role'] =
-                $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+            return $profile;
+        }
+    }
 
-            if ($profile['contact_address_id'] && $profile['contact_address_id'] !== '') {
-                $address = $this->basepackages->addressbook->getById($profile['contact_address_id']);
+    protected function setProfile($profile)
+    {
+        $profile['role'] =
+            $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
 
-                if ($address) {
-                    unset($address['id']);
-                    unset($address['name']);
+        if ($profile['contact_address_id'] && $profile['contact_address_id'] !== '') {
+            $address = $this->basepackages->addressbook->getById($profile['contact_address_id']);
 
-                    $profile = array_merge($profile, $address);
-                } else {
-                    $profile['contact_address_id'] = '';
-                    $profile['street_address'] = '';
-                    $profile['street_address_2'] = '';
-                    $profile['city_id'] = '';
-                    $profile['city_name'] = '';
-                    $profile['post_code'] = '';
-                    $profile['state_id'] = '';
-                    $profile['state_name'] = '';
-                    $profile['country_id'] = '';
-                    $profile['country_name'] = '';
-                }
+            if ($address) {
+                unset($address['id']);
+                unset($address['name']);
+
+                $profile = array_merge($profile, $address);
             } else {
+                $profile['contact_address_id'] = '';
                 $profile['street_address'] = '';
                 $profile['street_address_2'] = '';
                 $profile['city_id'] = '';
@@ -82,9 +77,70 @@ class Profile extends BasePackage
                 $profile['country_id'] = '';
                 $profile['country_name'] = '';
             }
+        } else {
+            $profile['street_address'] = '';
+            $profile['street_address_2'] = '';
+            $profile['city_id'] = '';
+            $profile['city_name'] = '';
+            $profile['post_code'] = '';
+            $profile['state_id'] = '';
+            $profile['state_name'] = '';
+            $profile['country_id'] = '';
+            $profile['country_name'] = '';
         }
 
-        $this->profile = $profile;
+        return $profile;
+    }
+
+    public function addProfile(array $data)
+    {
+        $accountId = $data['id'];
+        unset($data['id']);
+
+        $data['account_id'] = $accountId;
+        $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        $data['contact_phone'] = '0';
+        $data['contact_mobile'] = '0';
+
+        if ($this->add($data)) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Profile updated';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error updating profile.';
+        }
+    }
+
+    public function updateProfileViaAccount(array $data)
+    {
+        $profile = $this->getProfile($data['id']);
+
+        unset($data['id']);
+
+        $profile = array_merge($profile, $data);
+
+        if (isset($data['first_name']) && isset($data['last_name'])) {
+            $profile['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
+        }
+
+        if ($profile['contact_phone'] === '') {
+            $profile['contact_phone'] = 0;
+        }
+        if ($profile['contact_mobile'] === '') {
+            $profile['contact_mobile'] = 0;
+        }
+
+        if ($this->update($profile)) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Profile updated';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error updating profile.';
+        }
     }
 
     public function updateProfile(array $data)
@@ -93,7 +149,7 @@ class Profile extends BasePackage
             return;
         }
 
-        $profile = $this->getById($this->auth->account()['id']);
+        $profile = $this->getProfile($this->auth->account()['id']);
 
         $profile = array_merge($profile, $data);
 
@@ -130,7 +186,7 @@ class Profile extends BasePackage
             $profile['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
         }
 
-        $portrait = $this->getById($this->auth->account()['id'])['portrait'];
+        $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
 
         if ($this->update($profile)) {
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);
