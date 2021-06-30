@@ -7,7 +7,6 @@ private/*
 /vendor/*
 .backups
 .downloads
-composer.json
 composer.lock
 var/*
 *Html_compiled*
