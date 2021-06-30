@@ -64,7 +64,7 @@ trait DynamicTable {
                     $filtersArr = $this->basepackages->filters->getFiltersForComponent($componentId);
                 }
 
-                $table['filterColumns'] = $package->getModelsColumnMap($columnsForFilter);
+                $table['filterColumns'] = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter));
                 foreach ($filtersArr as $key => $filter) {
                     $table['filters'][$filter['id']] = $filter;
                     $table['filters'][$filter['id']]['data']['name'] = $filter['name'];
