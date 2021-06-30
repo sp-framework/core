@@ -242,15 +242,15 @@ class Accounts extends BasePackage
 
     protected function emailNewPassword($email, $password)
     {
-        if ($this->email->setup()) {
-            $emailSettings = $this->email->getEmailSettings();
+        if ($this->basepackages->email->setup()) {
+            $emailSettings = $this->basepackages->email->getEmailSettings();
 
-            $this->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
-            $this->email->setRecipientTo($email, $email);
-            $this->email->setSubject('OTP for ' . $this->domains->getDomain()['name']);
-            $this->email->setBody($password);
+            $this->basepackages->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
+            $this->basepackages->email->setRecipientTo($email, $email);
+            $this->basepackages->email->setSubject('OTP for ' . $this->domains->getDomain()['name']);
+            $this->basepackages->email->setBody($password);
 
-            return $this->email->sendNewEmail();
+            return $this->basepackages->email->sendNewEmail();
         } else {
             return false;
         }
