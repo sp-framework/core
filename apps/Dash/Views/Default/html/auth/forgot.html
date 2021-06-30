@@ -36,7 +36,7 @@ BazCore.header({
                             <button id="{{componentId}}-form-forgot" type="button" class="btn btn-info float-right">
                                 <i class="fa fa-cog fa-spin login-spinner" hidden></i>
                                 <span class="sr-only">Loading...</span>
-                                <span class="text-uppercase">Send Email</span>
+                                <span class="text-uppercase">Reset</span>
                             </button>
                         </div>
                     </div>
@@ -214,7 +214,7 @@ $(document).ready(function(){
     }
 
     function success(redirectUrl = null) {
-        // $('.login-spinner').attr('hidden', true);
+        $('.login-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('text-danger').addClass('text-success font-weight-bold');
 
         if ($('#{{componentId}}-form-auth').length > 0) {

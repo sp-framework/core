@@ -236,7 +236,7 @@ class Auth
         if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
             $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
         } else {
-            $this->packagesData->redirectUrl = $this->links->url('/');
+            $this->packagesData->redirectUrl = $this->links->url('home');
         }
 
         if ($this->secTools->passwordNeedsRehash($this->account['password'])) {
@@ -620,7 +620,11 @@ class Auth
             $this->packagesData->responseMessage = 'Authenticated. Password changed. Redirecting...';
         }
 
-        $this->packagesData->redirectUrl = $this->links->url('/');
+        if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
+            $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
+        } else {
+            $this->packagesData->redirectUrl = $this->links->url('home');
+        }
 
         return true;
     }
