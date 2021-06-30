@@ -1,3 +1,8 @@
+{% if vendor['id'] is defined %}
+    {% set vendorNotes = vendor['notes'] %}
+{% else %}
+    {% set vendorNotes = [] %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -39,6 +44,90 @@
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% set tabsData =
+                    [
+                        'info'   :
+                        [
+                            'tabTitle'          : 'Info',
+                            'tabInclude'        : 'vendors/form/info'
+                        ],
+                        'contacts'   :
+                        [
+                            'tabTitle'          : 'Contacts',
+                            'tabInclude'        : 'vendors/form/contacts'
+                        ],
+                        'addresses'   :
+                        [
+                            'tabTitle'          : 'Addresses',
+                            'tabInclude'        : 'vendors/form/addresses'
+                        ],
+                        'notes'   :
+                        [
+                            'tabTitle'          : 'Notes',
+                            'tabInclude'        : '../../common/notes',
+                            'tabIncludeParams':
+                            [
+                                'notes'         : vendorNotes,
+                                'packageName'   : 'vendors'
+                            ]
+                        ]
+                    ]
+                %}
+                {% if vendor is defined and vendor['activityLogs'] is defined and vendor['activityLogs']|length > 0 %}
+                    {% set tabsData =
+                        array_merge(
+                            tabsData,
+                            [
+                                'activitylogs' :
+                                [
+                                    'tabTitle'                              : 'Activity Logs',
+                                    'tabInclude'                            : '../../common/activitylogs',
+                                    'tabIncludeParams':
+                                    [
+                                        'activityLogs'                      : vendor['activityLogs'],
+                                        'replaceKeys'                       :
+                                        {
+                                            'primary_contact_employee_id'   : 'primary_contact_employee',
+                                            'secondary_contact_employee_id' : 'secondary_contact_employee',
+                                            'city_name'                     : 'city',
+                                            'state_name'                    : 'state',
+                                            'country_name'                  : 'country'
+                                        },
+                                        'replaceValues'                     :
+                                        {
+                                            'is_manufacturer'               :
+                                            {
+                                                '1'                         : 'Yes',
+                                                '0'                         : 'No'
+                                            },
+                                            'is_supplier'                   :
+                                            {
+                                                '1'                         : 'Yes',
+                                                '0'                         : 'No'
+                                            },
+                                            'does_dropship'                 :
+                                            {
+                                                '1'                         : 'Yes',
+                                                '0'                         : 'No'
+                                            },
+                                            'does_jobwork'                  :
+                                            {
+                                                '1'                         : 'Yes',
+                                                '0'                         : 'No'
+                                            },
+                                            'is_service_provider'           :
+                                            {
+                                                '1'                         : 'Yes',
+                                                '0'                         : 'No'
+                                            }
+                                        },
+                                        'disableKeys'                       : ['address_id', 'city_id', 'state_id', 'country_id']
+                                    ]
+                                ]
+                            ]
+                        )
+                    %}
+                {% endif %}
                 {{adminltetags.useTag('tabs',
                     [
                         'component'                     : component,
@@ -47,33 +136,7 @@
                         'sectionId'                     : 'main',
                         'tabsId'                        : 'tabs',
                         'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      :
-                            [
-                                'info'   :
-                                [
-                                    'tabTitle'          : 'Info',
-                                    'tabInclude'        : 'vendors/form/info',
-                                    'tabIncludeParams'  : ['vendor': vendor]
-                                ],
-                                'contacts'   :
-                                [
-                                    'tabTitle'          : 'Contacts',
-                                    'tabInclude'        : 'vendors/form/contacts',
-                                    'tabIncludeParams'  : ['vendor': vendor]
-                                ],
-                                'addresses'   :
-                                [
-                                    'tabTitle'          : 'Addresses',
-                                    'tabInclude'        : 'vendors/form/addresses',
-                                    'tabIncludeParams'  : ['vendor': vendor]
-                                ],
-                                'notes'   :
-                                [
-                                    'tabTitle'          : 'Notes',
-                                    'tabInclude'        : 'vendors/form/notes',
-                                    'tabIncludeParams'  : ['vendor': vendor]
-                                ]
-                            ]
+                        'tabsData'                      : tabsData
                     ]
                 )}}
             </fieldset>
@@ -134,13 +197,13 @@ dataCollectionSection =
                     } else {
                         $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-name_list').val(null).trigger('change');
-                        $('#{{componentId}}-{{sectionId}}-name_list').empty().trigger('change');
-                        $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-name').val('');
-                        $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-business_name_list').parent('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-business_name_list').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-business_name_list').val(null).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-business_name_list').empty().trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-business_name').parent('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-business_name').val('');
+                        $('#{{componentId}}-{{sectionId}}-business_name').attr('disabled', false);
                         updateModalInfo(false);
                     }
                 });
@@ -181,34 +244,34 @@ dataCollectionSection =
 
 
                                 if (data.vendorDetails.businessEntity202001.businessName) {
-                                    $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').addClass('d-none');
-                                    $('#{{componentId}}-{{sectionId}}-name').attr('disabled', true);
-                                    $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').removeClass('d-none');
-                                    $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', false);
-                                    $('#{{componentId}}-{{sectionId}}-name').val('');
+                                    $('#{{componentId}}-{{sectionId}}-business_name').parent('.form-group').addClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-business_name').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').parent('.form-group').removeClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').attr('disabled', false);
+                                    $('#{{componentId}}-{{sectionId}}-business_name').val('');
                                     var newOption;
                                     newOption = new Option(data.vendorDetails.businessEntity202001.mainName.organisationName, 0, false, false);
-                                    $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
                                     $.each(data.vendorDetails.businessEntity202001.businessName, function(index, businessName) {
                                         newOption = new Option(businessName.organisationName, index + 1, false, false);
-                                        $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
+                                        $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
                                     });
-                                    $('#{{componentId}}-{{sectionId}}-name_list').on('select2:select', function(e) {
-                                        $('#{{componentId}}-{{sectionId}}-name').val('');
-                                        $('#{{componentId}}-{{sectionId}}-name').val(e.params.data.text);
-                                        $('#{{componentId}}-{{sectionId}}-name').attr('value', e.params.data.text);
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').on('select2:select', function(e) {
+                                        $('#{{componentId}}-{{sectionId}}-business_name').val('');
+                                        $('#{{componentId}}-{{sectionId}}-business_name').val(e.params.data.text);
+                                        $('#{{componentId}}-{{sectionId}}-business_name').attr('value', e.params.data.text);
                                     });
                                 } else {
-                                    $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').addClass('d-none');
-                                    $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', true);
-                                    $('#{{componentId}}-{{sectionId}}-name_list').val(null).trigger('change');
-                                    $('#{{componentId}}-{{sectionId}}-name_list').empty().trigger('change');
-                                    $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
-                                    $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').parent('.form-group').addClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').attr('disabled', true);
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').val(null).trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-business_name_list').empty().trigger('change');
+                                    $('#{{componentId}}-{{sectionId}}-business_name').parent('.form-group').removeClass('d-none');
+                                    $('#{{componentId}}-{{sectionId}}-business_name').attr('disabled', false);
                                     if (data.vendorDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
-                                        $('#{{componentId}}-{{sectionId}}-name').val(data.vendorDetails.businessEntity202001.mainName.organisationName);
+                                        $('#{{componentId}}-{{sectionId}}-business_name').val(data.vendorDetails.businessEntity202001.mainName.organisationName);
                                     } else {
-                                        $('#{{componentId}}-{{sectionId}}-name').val(data.vendorDetails.businessEntity202001.mainTradingName.organisationName);
+                                        $('#{{componentId}}-{{sectionId}}-business_name').val(data.vendorDetails.businessEntity202001.mainTradingName.organisationName);
                                     }
                                 }
 
@@ -276,8 +339,8 @@ dataCollectionSection =
                 }
             }
         },
-        '{{componentId}}-{{sectionId}}-name'                    : { },
-        '{{componentId}}-{{sectionId}}-name_list'               : {
+        '{{componentId}}-{{sectionId}}-business_name'           : { },
+        '{{componentId}}-{{sectionId}}-business_name_list'      : {
             placeholder : 'SELECT A BUSINESS NAME'
         },
         '{{componentId}}-{{sectionId}}-type'                    : { },
@@ -341,12 +404,12 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-internal_notes'          : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
-                '{{componentId}}-{{sectionId}}-abn'                    : 'required',
-                '{{componentId}}-{{sectionId}}-name'                   : 'required'
+                '{{componentId}}-{{sectionId}}-abn'             : 'required',
+                '{{componentId}}-{{sectionId}}-business_name'   : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
-                '{{componentId}}-{{sectionId}}-name'                   : 'Please enter supplier name'
+                '{{componentId}}-{{sectionId}}-abn'             : 'Please enter abn',
+                '{{componentId}}-{{sectionId}}-business_name'   : 'Please enter vendor business name'
             }
         }
     });

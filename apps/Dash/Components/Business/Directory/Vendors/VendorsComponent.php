@@ -19,6 +19,8 @@ class VendorsComponent extends BaseComponent
     public function initialize()
     {
         $this->vendors = $this->usePackage(Vendors::class);
+
+        $this->notes = $this->basepackages->notes;
     }
 
     public function searchABNAction()
@@ -54,6 +56,10 @@ class VendorsComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
 
                 $vendor = $this->vendors->getById($this->getData()['id']);
+
+                $vendor['activityLogs'] = $this->vendors->getActivityLogs($this->getData()['id']);
+
+                $vendor['notes'] = $this->notes->getNotes('vendors', $this->getData()['id']);
 
                 if ($vendor['address_ids'] && $vendor['address_ids'] !== '') {
                     $vendor['address_ids'] = Json::decode($vendor['address_ids'], true);
@@ -170,13 +176,13 @@ class VendorsComponent extends BaseComponent
             $this->vendors,
             'business/directory/vendors/view',
             null,
-            ['abn', 'name', 'is_manufacturer', 'is_supplier', 'does_dropship', 'is_service_provider', 'does_jobwork'],
+            ['abn', 'business_name', 'is_manufacturer', 'is_supplier', 'does_dropship', 'is_service_provider', 'does_jobwork'],
             true,
-            ['abn', 'name', 'is_manufacturer', 'is_supplier', 'does_dropship', 'is_service_provider', 'does_jobwork'],
+            ['abn', 'business_name', 'is_manufacturer', 'is_supplier', 'does_dropship', 'is_service_provider', 'does_jobwork'],
             $controlActions,
             [],
             $replaceColumns,
-            'name'
+            'business_name'
         );
 
         $this->view->pick('vendors/list');
@@ -293,6 +299,26 @@ class VendorsComponent extends BaseComponent
 
                 $this->view->responseMessage = 'vendor id missing';
             }
+        }
+    }
+
+    public function addNoteAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->vendors->addNote($this->postData());
+
+            $this->view->responseCode = $this->vendors->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->vendors->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
         }
     }
 }

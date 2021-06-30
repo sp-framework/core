@@ -2,7 +2,7 @@
     {% set vendorId = vendor['id'] %}
     {% set vendorLogo = vendor['logo'] %}
     {% set vendorAbn = vendor['abn'] %}
-    {% set vendorName = vendor['name'] %}
+    {% set vendorBusinessName = vendor['business_name'] %}
     {% set vendorIsManufacturer = vendor['is_manufacturer'] %}
     {% set vendorIsSupplier = vendor['is_supplier'] %}
     {% set vendorDoesDropship = vendor['does_dropship'] %}
@@ -13,7 +13,7 @@
     {% set vendorId = '' %}
     {% set vendorLogo = '' %}
     {% set vendorAbn = '' %}
-    {% set vendorName = '' %}
+    {% set vendorBusinessName = '' %}
     {% set vendorIsManufacturer = '' %}
     {% set vendorIsSupplier = '' %}
     {% set vendorDoesDropship = '' %}
@@ -119,11 +119,11 @@
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
-                        'fieldId'                               : 'name_list',
+                        'fieldId'                               : 'business_name_list',
                         'fieldLabel'                            : 'Business Name',
                         'fieldType'                             : 'select2',
                         'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Business Names List',
+                        'fieldHelpTooltipContent'               : 'Business Names List: Select a Business Name from the list below.',
                         'fieldRequired'                         : true,
                         'fieldDisabled'                         : true,
                         'fieldHidden'                           : true,
@@ -148,7 +148,7 @@
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
-                        'fieldId'                               : 'name',
+                        'fieldId'                               : 'business_name',
                         'fieldLabel'                            : 'Business Name',
                         'fieldType'                             : 'input',
                         'fieldHelp'                             : true,
@@ -160,7 +160,7 @@
                         'fieldBazJstreeSearch'                  : true,
                         'fieldDataInputMinLength'               : 1,
                         'fieldDataInputMaxLength'               : 200,
-                        'fieldValue'                            : vendorName
+                        'fieldValue'                            : vendorBusinessName
                     ]
                 )}}
             </div>

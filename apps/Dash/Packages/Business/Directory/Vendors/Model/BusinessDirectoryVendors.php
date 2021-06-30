@@ -12,7 +12,7 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $abn;
 
-    public $name;
+    public $business_name;
 
     public $is_manufacturer;
 
@@ -31,6 +31,4 @@ class BusinessDirectoryVendors extends BaseModel
     public $contact_ids;
 
     public $address_ids;
-
-    public $internal_notes;
 }

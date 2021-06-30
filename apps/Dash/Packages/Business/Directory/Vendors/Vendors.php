@@ -27,9 +27,15 @@ class Vendors extends BasePackage
         if ($this->add($data)) {
             $this->basepackages->storages->changeOrphanStatus($data['logo']);
 
+            $data['id'] = $this->packagesData->last['id'];
+
+            $this->basepackages->notes->addNote($this->packageName, $data);
+
+            $this->addActivityLog($data);
+
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' vendor';
+            $this->packagesData->responseMessage = 'Added ' . $data['business_name'] . ' vendor';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -39,6 +45,8 @@ class Vendors extends BasePackage
 
     public function updateVendor(array $data)
     {
+        $vendor = $this->getById($data['id']);
+
         $data = $this->addBrands($data);
 
         $data = $this->updateContacts($data);
@@ -52,14 +60,16 @@ class Vendors extends BasePackage
             }
         }
 
-        $vendor = $this->getById($data['id']);
-
         if ($this->update($data)) {
             $this->basepackages->storages->changeOrphanStatus($data['logo'], $vendor['logo']);
 
+            $this->basepackages->notes->addNote($this->packageName, $data);
+
+            $this->addActivityLog($data, $vendor);
+
             $this->packagesData->responseCode = 0;
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' vendor';
+            $this->packagesData->responseMessage = 'Updated ' . $data['business_name'] . ' vendor';
         } else {
             $this->packagesData->responseCode = 1;
 
@@ -266,7 +276,7 @@ class Vendors extends BasePackage
                     if (is_array($addressType) && count($addressType) > 0) {
                         foreach ($addressType as $addressKey => $address) {
 
-                            $address['name'] = $data['name'];
+                            $address['name'] = $data['business_name'];
                             $address['address_type'] = $addressTypeKey;
                             $address['package_name'] = $this->packageName;
 
@@ -306,9 +316,9 @@ class Vendors extends BasePackage
         $searchVendors =
             $this->getByParams(
                 [
-                    'conditions'    => 'name LIKE :aName:',
-                    'bind'          => [
-                        'aName'     => '%' . $nameQueryString . '%'
+                    'conditions'            => 'business_name LIKE :aBusinessName:',
+                    'bind'                  => [
+                        'aBusinessName'     => '%' . $nameQueryString . '%'
                     ]
                 ]
             );
@@ -318,7 +328,7 @@ class Vendors extends BasePackage
 
             foreach ($searchVendors as $vendorKey => $vendorValue) {
                 $vendors[$vendorKey]['id'] = $vendorValue['id'];
-                $vendors[$vendorKey]['name'] = $vendorValue['name'];
+                $vendors[$vendorKey]['name'] = $vendorValue['business_name'];
             }
 
             $this->packagesData->responseCode = 0;

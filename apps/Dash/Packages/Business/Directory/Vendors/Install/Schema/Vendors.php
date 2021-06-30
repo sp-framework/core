@@ -37,7 +37,7 @@ class Vendors
                     ]
                 ),
                 new Column(
-                    'name',
+                    'business_name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 200,
@@ -109,15 +109,7 @@ class Vendors
                         'size'    => 100,
                         'notNull' => false,
                     ]
-                ),
-                new Column(
-                    'internal_notes',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
-                        'notNull' => false,
-                    ]
-                ),
+                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
