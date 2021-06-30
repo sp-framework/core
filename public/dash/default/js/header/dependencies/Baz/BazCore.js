@@ -123,11 +123,15 @@ var BazCore = function() {
 
     //Breadcrumb
     function bazUpdateBreadcrumb() {
+        //eslint-disable-next-line
+        // console.log(dataCollection.env.breadcrumb);
         if (dataCollection.env.breadcrumb) {
             var mainBreadcrumb, titleBreadcrumbArr;
             var breadcrumbArr = dataCollection.env.breadcrumb.split('/');
 
-            if (breadcrumbArr.length > 1) {
+            //eslint-disable-next-line
+            // console.log(breadcrumbArr);
+            // if (breadcrumbArr.length > 1) {
                 var titleText = breadcrumbArr.pop();
                 $('#content-header-breadcrumb ol.breadcrumb').empty();
                 titleBreadcrumbArr = [];
@@ -139,12 +143,12 @@ var BazCore = function() {
                     titleBreadcrumbArr.join('');
                 $('#content-header-breadcrumb ol.breadcrumb').append(mainBreadcrumb);
                 $('#content-header-breadcrumb ol.breadcrumb').append('<li class="breadcrumb-item text-uppercase font-weight-bolder">' + titleText + '</li>');
-            } else {
-                $('#content-header-breadcrumb ol.breadcrumb').empty().append(
-                    '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' +
-                    '<li class="breadcrumb-item text-uppercase">Home</li>'
-                );
-            }
+            // } else {
+            //     $('#content-header-breadcrumb ol.breadcrumb').empty().append(
+            //         '<li class="breadcrumb-item"><i class="fa fa-home" style="position: relative;top: 4px;"></i></li>' +
+            //         '<li class="breadcrumb-item text-uppercase">Home</li>'
+            //     );
+            // }
         } else {
             $('#content-header-breadcrumb ol.breadcrumb').empty().append(
                 '<li class="breadcrumb-item"><i class="fas fa-fw fa-home" style="position: relative;top: 4px;"></i></li>' +

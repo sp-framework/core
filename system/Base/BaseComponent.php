@@ -185,8 +185,12 @@ abstract class BaseComponent extends Controller
 
 		$this->view->viewName = $this->views['name'];
 
-		if ($this->app && $this->componentRoute) {
-			$this->view->breadcrumb = $this->componentRoute;
+		if ($this->app && isset($this->componentRoute)) {
+			if ($this->componentRoute === '') {
+				$this->view->breadcrumb = 'home';
+			} else {
+				$this->view->breadcrumb = $this->componentRoute;
+			}
 		}
 	}
 
@@ -231,7 +235,12 @@ abstract class BaseComponent extends Controller
 
 	protected function buildHeaderBreadcrumb()
 	{
-		if ($this->app && $this->componentRoute) {
+
+		if ($this->app && isset($this->componentRoute)) {
+			if ($this->componentRoute === '') {
+				$this->componentRoute = 'home';
+			}
+
 			$this->response->setHeader(
 				'breadcrumb',
 				$this->componentRoute
@@ -550,7 +559,7 @@ abstract class BaseComponent extends Controller
 			$this->view->storages = [];
 		}
 
-		if (!isset($this->domain['apps'][$this->app['id']][$storageType . 'Storage'])) {
+		if (!isset($this->domains->domain['apps'][$this->app['id']][$storageType . 'Storage'])) {
 			$this->view->storages = [];
 		}
 	}
