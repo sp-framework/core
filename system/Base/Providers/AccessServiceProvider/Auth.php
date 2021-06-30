@@ -629,6 +629,36 @@ class Auth
         return true;
     }
 
+    public function checkPwStrength(string $pass)
+    {
+        $checkingTool = new \ZxcvbnPhp\Zxcvbn();
+
+        $result = $checkingTool->passwordStrength($pass);
+
+        if ($result && is_array($result) && isset($result['score'])) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseData = $result['score'];
+
+            $this->packagesData->responseMessage = 'Checking Password Strength Success';
+
+            return true;
+        }
+
+        $this->packagesData->responseCode = 1;
+
+        $this->packagesData->responseMessage = 'Error Checking Password Strength';
+    }
+
+    public function generateNewPassword()
+    {
+        $this->packagesData->responseCode = 0;
+
+        $this->packagesData->responseData = $this->secTools->random->base62(12);;
+
+        $this->packagesData->responseMessage = 'Password Generate Successfully';
+    }
+
     public function enableTwoFa()
     {
         try {

@@ -58,6 +58,22 @@
                         'fieldBazPostOnUpdate'                  : false
                     ]
                 )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'strength-meter',
+                        'fieldLabel'                            : false,
+                        'fieldHidden'                           : false,
+                        'fieldType'                             : 'html',
+                        'fieldRequired'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false
+                    ]
+                )}}
             </div>
         </div>
         <div class="row">
@@ -84,6 +100,33 @@
     </div>
 </div>
 <div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'generated_password',
+                'fieldLabel'                            : false,
+                'fieldPlaceholder'                      : 'Generated password',
+                'fieldType'                             : 'input',
+                'fieldGroupPreAddonButtons'             :
+                    {
+                        'generate_password_button'      : {
+                            'title'                     : 'Generate Random Password',
+                            'icon'                      : 'cog fa-spin',
+                            'iconHidden'                : true,
+                            'noMargin'                  : true,
+                            'buttonAdditionalClass'     : 'rounded-0'
+                        }
+                    },
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : false,
+                'fieldBazPostOnUpdate'                  : false
+            ]
+        )}}
+    </div>
     <div class="col">
         {{adminltetags.useTag('buttons',
             [
@@ -222,7 +265,36 @@
 </div>
 <script>
 /* global PNotify Swal */
-var pwresetUrl, pwresetData;
+var pwresetUrl, pwresetData, generatePwUrl, generatePwData;
+
+$('#{{componentId}}-{{sectionId}}-strength-meter').strengthMeter({
+    "url" : '{{links.url("system/users/profile/checkPwStrength")}}'
+});
+
+$('#{{componentId}}-{{sectionId}}-generate_password_button').click(function(e) {
+    e.preventDefault();
+
+    generatePwUrl = '{{links.url("system/users/profile/generatePw")}}';
+
+    generatePwData = { };
+    generatePwData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post(generatePwUrl, generatePwData, function(response) {
+        if (response.responseCode == 0) {
+            if (response.responseData) {
+                $('#{{componentId}}-{{sectionId}}-generated_password').val(response.responseData);
+                $('#{{componentId}}-{{sectionId}}-new_password').val(response.responseData).trigger('change');
+                $('#{{componentId}}-{{sectionId}}-confirm_password').val(response.responseData);
+            }
+        } else {
+            PNotify.error(response.responseMessage);
+        }
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+});
 
 $('#{{componentId}}-{{sectionId}}-pwreset-button').click(function(e) {
     e.preventDefault();

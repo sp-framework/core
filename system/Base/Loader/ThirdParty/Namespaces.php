@@ -3,6 +3,7 @@
 return
     [
         'Zxing'                                         => '../system/ThirdParty/vendor/khanamiryan/qrcode-detector-decoder/lib',
+        'ZxcvbnPhp'                                     => '../system/ThirdParty/vendor/bjeavons/zxcvbn-php/src',
         'Safe'                                          => '../system/ThirdParty/vendor/thecodingmachine/generated',
         'Psr\\Http\\Message'                            => '../system/ThirdParty/vendor/psr/http-message/src/',
         'Psr\\Http\\Client'                             => '../system/ThirdParty/vendor/psr/http-client/src/',

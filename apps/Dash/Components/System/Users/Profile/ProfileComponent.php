@@ -49,6 +49,50 @@ class ProfileComponent extends BaseComponent
         }
     }
 
+    public function checkPwStrengthAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->auth->checkPwStrength($this->postData()['pass'])) {
+                $this->view->responseData = $this->auth->packagesData->responseData;
+            }
+
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
+    public function generatePwAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->auth->generateNewPassword();
+
+            $this->view->responseData = $this->auth->packagesData->responseData;
+
+            $this->view->responseCode = $this->auth->packagesData->responseCode;
+
+            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
+        }
+    }
+
     public function pwresetAction()
     {
         if ($this->request->isPost()) {
