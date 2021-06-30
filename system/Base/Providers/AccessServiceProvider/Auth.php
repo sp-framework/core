@@ -233,7 +233,11 @@ class Auth
             return true;
         }
 
-        $this->packagesData->redirectUrl = $this->links->url('/');
+        if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
+            $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
+        } else {
+            $this->packagesData->redirectUrl = $this->links->url('/');
+        }
 
         if ($this->secTools->passwordNeedsRehash($this->account['password'])) {
 

@@ -27,6 +27,7 @@ class MiddlewaresServiceProvider extends Injectable
                     //If there is a redirect or null returned from process
                     if ($mw && $mw instanceof \Phalcon\Http\Response) {
                         if ($mw->getHeaders()->toArray()['Status'] === '302 Found') {
+                            $notFound = true;
                             break;
                         }
                     }
@@ -36,6 +37,12 @@ class MiddlewaresServiceProvider extends Injectable
                     }
                 }
             }
+
+            if (isset($notFound) && $notFound) {
+                return false;
+            }
+
+            return true;
         }
     }
 }

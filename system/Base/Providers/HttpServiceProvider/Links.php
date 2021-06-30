@@ -42,21 +42,26 @@ class Links
 		);
 	}
 
-	public function url($link = null)
+	public function url($link = null, $excludeApp = null)
 	{
 		if ($link) {
 			if ($link === '/') {
 				return '/';
 			}
 
-			if (isset($this->domain['exclusive_to_default_app']) &&
-				$this->domain['exclusive_to_default_app'] == 1
+			$link = ltrim($link, '/');
+
+			if ((isset($this->domain['exclusive_to_default_app']) &&
+				$this->domain['exclusive_to_default_app'] == 1) ||
+				$excludeApp
 			) {
 				return $this->url->getStatic('/' . $link);
 			}
+
 			return $this->url->getStatic(
 				strtolower($this->app['route']) . '/' . $link
 			);
+
 		} else {
 			return $this->url->getStatic('/');
 		}

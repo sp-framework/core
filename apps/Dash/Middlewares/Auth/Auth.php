@@ -52,11 +52,13 @@ class Auth extends BaseMiddleware
 
             //Authenticated
             if (!$this->auth->check()) {
+                $this->session->set('redirectUrl', $this->request->getUri());
                 return $this->response->redirect($appRoute . '/auth');
             }
 
             return true;
         }
+
         return false;
     }
 }
