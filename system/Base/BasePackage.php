@@ -140,7 +140,14 @@ abstract class BasePackage extends Controller
 
 			$this->model = $this->modelToUse::find($parameters);
 
-			return $this->getDbData($parameters, $enableCache, 'params');
+			$data = $this->getDbData($parameters, $enableCache, 'params');
+
+			if ($data) {
+				return $data;
+			} else {
+				return false;
+				// throw new IdNotFoundException('Not Found', 1);
+			}
 		}
 
 		throw new \Exception('getByParams needs parameter condition to be set.');
@@ -851,7 +858,9 @@ abstract class BasePackage extends Controller
 	protected function addActivityLog(array $data, $oldData = null)
 	{
 		if (!$oldData) {
-			$data['id'] = $this->packagesData->last['id'];
+			if (!isset($data['id'])) {
+				$data['id'] = $this->packagesData->last['id'];
+			}
 		}
 
 		return $this->basepackages->activityLogs->addLog($this->packageName, $data, $oldData);
@@ -860,5 +869,21 @@ abstract class BasePackage extends Controller
 	public function getActivityLogs(int $id, $newFirst = true)
 	{
 		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst);
+	}
+
+	protected function useStorage($storageType)
+	{
+		$storages = $this->basepackages->storages->getAppStorages();
+
+		if ($storages && isset($storages[$storageType])) {//Assign type of storage for uploads
+			$this->packagesData->storages = $storages;
+			$this->packagesData->storage = $storages[$storageType];
+		} else {
+			$this->packagesData->storages = [];
+		}
+
+		if (!isset($this->domains->domain['apps'][$this->init()->app['id']][$storageType . 'Storage'])) {
+			$this->packagesData->storages = [];
+		}
 	}
 }
