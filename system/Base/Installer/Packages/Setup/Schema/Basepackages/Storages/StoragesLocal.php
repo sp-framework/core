@@ -60,6 +60,13 @@ class StoragesLocal
                         ]
                     ),
                     new Column(
+                        'size',
+                        [
+                            'type'      => Column::TYPE_INTEGER,
+                            'notNull'   => true
+                        ]
+                    ),
+                    new Column(
                         'type',
                         [
                             'type'    => Column::TYPE_VARCHAR,

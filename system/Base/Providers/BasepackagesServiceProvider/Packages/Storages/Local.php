@@ -33,6 +33,8 @@ class Local extends BasePackage
 
     protected $fileName;
 
+    protected $fileSize;
+
     protected $directory;
 
     protected $sizes;
@@ -136,15 +138,17 @@ class Local extends BasePackage
             $this->fileName =
                 isset($this->request->getPost()['fileName']) ?
                 $this->request->getPost()['fileName'] :
-                $file->getName();
+                $this->file->getName();
 
-            $this->mimeType = $file->getRealType();
+            $this->fileSize = $this->file->getSize();
+
+            $this->mimeType = $this->file->getRealType();
 
             $this->generateUUID();
 
             if (in_array($this->mimeType, $this->imageMimeTypes)) {
                 if (isset($this->storage['max_image_file_size']) &&
-                    $file->getSize() > $this->storage['max_image_file_size']
+                    $this->fileSize > $this->storage['max_image_file_size']
                 ) {
                     $this->packagesData->responseCode = 1;
 
@@ -157,7 +161,7 @@ class Local extends BasePackage
 
             } else if (in_array($this->mimeType, $this->fileMimeTypes)) {
                 if (isset($this->storage['max_data_file_size']) &&
-                    $file->getSize() > $this->storage['max_data_file_size']
+                    $this->fileSize > $this->storage['max_data_file_size']
                 ) {
                     $this->packagesData->responseCode = 1;
 
@@ -235,6 +239,7 @@ class Local extends BasePackage
                 'uuid'                  => $this->uuid,
                 'uuid_location'         => $this->directory . '/',
                 'org_file_name'         => $this->fileName,
+                'size'                  => $this->fileSize,
                 'type'                  => $this->mimeType,
                 'orphan'                => 1,
                 'created_by'            => $this->auth->account()['id'] ?? 0,

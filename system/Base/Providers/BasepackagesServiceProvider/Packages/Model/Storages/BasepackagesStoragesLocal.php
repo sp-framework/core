@@ -18,6 +18,8 @@ class BasepackagesStoragesLocal extends BaseModel
 
     public $org_file_name;
 
+    public $size;
+
     public $type;
 
     public $status;
