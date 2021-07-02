@@ -37,14 +37,6 @@ class Components
 						]
 					),
 					new Column(
-						'alias',
-						[
-							'type'    => Column::TYPE_VARCHAR,
-							'size'    => 50,
-							'notNull' => false,
-						]
-					),
-					new Column(
 						'description',
 						[
 							'type'    => Column::TYPE_VARCHAR,

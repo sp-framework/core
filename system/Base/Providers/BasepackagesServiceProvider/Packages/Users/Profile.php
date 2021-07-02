@@ -149,6 +149,12 @@ class Profile extends BasePackage
             return;
         }
 
+        if (isset($data['subscriptions']) && $data['subscriptions'] !== '') {
+            $data['subscriptions'] = Json::decode($data['subscriptions'], true);
+            $this->modules->packages->updateNotificationSubscriptions($data['subscriptions']);
+            unset($data['subscriptions']);
+        }
+
         $profile = $this->getProfile($this->auth->account()['id']);
 
         $profile = array_merge($profile, $data);
@@ -287,6 +293,132 @@ class Profile extends BasePackage
         }
 
         $this->packagesData->avatarName = $gender . '_' . implode('_', $counterFileNames) . '.png';
+
+        return true;
+    }
+
+    public function generateViewData()
+    {
+        $account = $this->auth->account();
+
+        if ($account['can_login'] && !is_array($account['can_login']) && $account['can_login'] !== '') {
+            $account['can_login'] = Json::decode($account['can_login'], true);
+        }
+
+        if (isset($this->domains->getDomain()['apps'][$this->app['id']]['email_service']) &&
+            $this->domains->getDomain()['apps'][$this->app['id']]['email_service'] !== '' &&
+            $this->domains->getDomain()['apps'][$this->app['id']]['email_service'] !== 0
+        ) {
+            $this->packagesData->canEmail = true;
+        } else {
+            $this->packagesData->canEmail = false;
+        }
+
+        $notifications = [];
+
+        $appsArr = $this->apps->apps;
+
+        foreach ($appsArr as $appKey => $app) {
+            if ($account['can_login'][$app['route']]) {
+                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+
+                if (count($packagesArr) > 0) {
+                    $packages[$app['id']] =
+                        [
+                            'title' => strtoupper($app['name']),
+                            'id' => strtoupper($app['id'])
+                        ];
+
+                    foreach ($packagesArr as $key => $package) {
+                        if ($package['class']) {
+                            $reflector = $this->annotations->get($package['class']);
+                            $methods = $reflector->getMethodsAnnotations();
+
+                            if ($methods) {
+                                $packages[$app['id']]['childs'][$key]['id'] = $package['id'];
+                                $packages[$app['id']]['childs'][$key]['title'] = $package['display_name'];
+                            }
+                        }
+                    }
+
+                    if (!isset($packages[$app['id']]['childs'])) {
+                        unset($packages[$app['id']]);
+                    }
+                }
+            }
+        }
+
+        $this->packagesData->packages = $packages;
+
+        $notifications = [];
+
+        foreach ($appsArr as $appKey => $app) {
+            if ($account['can_login'][$app['route']]) {
+
+                $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
+
+                foreach ($packagesArr as $key => $package) {
+                    if ($package['class'] && $package['class'] !== '') {
+                        if ($package['notification_subscriptions'] &&
+                            !is_array($package['notification_subscriptions']) &&
+                            $package['notification_subscriptions'] !== ''
+                        ) {
+                            $package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
+                        }
+
+                        $reflector = $this->annotations->get($package['class']);
+                        $methods = $reflector->getMethodsAnnotations();
+
+                        if ($methods) {
+                            foreach ($methods as $annotation) {
+                                $notification_action = $annotation->getAll('notification')[0]->getArguments();
+                                $notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
+                                if (count($notification_allowed_methods) > 0) {
+                                    $notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
+                                }
+                                $subscriptions[$notification_action['name']] = $notification_action['name'];
+
+                                if (count($notification_allowed_methods) > 0) {
+                                    foreach ($notification_allowed_methods as $allowedMethodKey => $allowedMethod) {
+                                        $subscriptions[$allowedMethod] = $allowedMethod;
+                                    }
+                                }
+
+                                if (isset($package['notification_subscriptions'][$app['id']])) {
+                                    foreach ($subscriptions as $subscriptionKey => $subscriptionValue) {
+                                        if (isset($package['notification_subscriptions'][$app['id']][$subscriptionValue])) {
+                                            if ($subscriptionValue === 'email' || $subscriptionValue === 'sms') {
+                                                if (isset($package['notification_subscriptions'][$app['id']][$subscriptionValue][$account['id']])) {
+                                                    $notifications[$app['id']][$package['id']][$subscriptionValue] = 1;
+                                                } else {
+                                                    $notifications[$app['id']][$package['id']][$subscriptionValue] = 0;
+                                                }
+                                            } else {
+                                                if (in_array($account['id'], $package['notification_subscriptions'][$app['id']][$subscriptionValue])) {
+                                                    $notifications[$app['id']][$package['id']][$subscriptionValue] = 1;
+                                                } else {
+                                                    $notifications[$app['id']][$package['id']][$subscriptionValue] = 0;
+                                                }
+                                            }
+                                        } else {
+                                            $notifications[$app['id']][$package['id']][$subscriptionValue] = 0;
+                                        }
+                                    }
+                                } else {
+                                    foreach ($subscriptions as $subscriptionKey => $subscriptionValue) {
+                                        $notifications[$app['id']][$package['id']][$subscriptionValue] = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->packagesData->subscriptions = Json::encode($subscriptions);
+
+        $this->packagesData->notifications = Json::encode($notifications);
 
         return true;
     }

@@ -38,6 +38,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Settings;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
@@ -167,6 +168,7 @@ class Setup
 		$this->db->createTable('basepackages_activity_logs', $dbName, (new ActivityLogs)->columns());
 		$this->db->createTable('basepackages_notes', $dbName, (new Notes)->columns());
 		$this->db->createTable('basepackages_settings', $dbName, (new Settings)->columns());
+		$this->db->createTable('basepackages_notifications', $dbName, (new Notifications)->columns());
 	}
 
 	public function registerRepository()

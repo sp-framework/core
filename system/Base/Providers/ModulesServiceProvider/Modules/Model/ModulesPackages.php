@@ -39,4 +39,6 @@ class ModulesPackages extends BaseModel
     public $updated_by;
 
     public $updated_on;
+
+    public $notification_subscriptions;
 }

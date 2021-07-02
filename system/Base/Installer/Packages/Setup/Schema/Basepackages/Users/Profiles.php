@@ -129,6 +129,13 @@ class Profiles
                             'size'    => 2048,
                             'notNull' => false,
                         ]
+                    ),
+                    new Column(
+                        'settings',
+                        [
+                            'type'    => Column::TYPE_TEXT,
+                            'notNull' => false,
+                        ]
                     )
                 ],
                 'options' => [

@@ -886,4 +886,33 @@ abstract class BasePackage extends Controller
 			$this->packagesData->storages = [];
 		}
 	}
+
+	protected function addResponse($responseCode, $responseMessage, $responseData = null, $addToNotification = true, $addToLog = true)
+	{
+		$this->packagesData->responseCode = $responseCode;
+
+		$this->packagesData->responseMessage = $responseMessage;
+
+		if ($responseData) {
+			$this->packagesData->responseData = $responseData;
+		}
+
+		if ($addToNotification) {
+			$this->addToNotification($responseCode, $responseMessage);
+		}
+
+		if ($addToLog) {
+			$this->addToLog($responseCode, $responseMessage);
+		}
+	}
+
+	protected function addToNotification($responseCode, $responseMessage)
+	{
+		//
+	}
+
+	protected function addToLog($responseCode, $responseMessage)
+	{
+		//
+	}
 }

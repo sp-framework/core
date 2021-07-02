@@ -85,6 +85,14 @@ class Packages
 						]
 					),
 					new Column(
+						'class',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 2048,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'settings',
 						[
 							'type'    => Column::TYPE_TEXT,
@@ -143,7 +151,14 @@ class Packages
 							'notNull' => true,
 							'default' => 'CURRENT_TIMESTAMP',
 						]
-					)
+					),
+					new Column(
+						'notification_subscriptions',
+						[
+							'type'    => Column::TYPE_TEXT,
+							'notNull' => false,
+						]
+					),
 				]
 			];
 	}
