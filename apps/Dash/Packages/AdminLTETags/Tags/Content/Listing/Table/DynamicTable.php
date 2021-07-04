@@ -190,6 +190,11 @@ class DynamicTable
             $this->params["dtColReorder"] :
             false;
 
+        $this->dtParams["dtOrder"] =
+            isset($this->params["dtOrder"]) ?
+            $this->escaper->escapeJs(Json::encode($this->params["dtOrder"])) :
+            $this->escaper->escapeJs(Json::encode([]));
+
         $this->dtParams["dtStateSave"] =
             isset($this->params["dtStateSave"]) ?
             $this->params["dtStateSave"] :
@@ -291,6 +296,7 @@ class DynamicTable
                                         "showHideColumnsButtonType"         : "' . $this->dtParams["dtShowHideColumnsButtonType"] . '",
                                         "showHideExportButton"              : "' . $this->dtParams["dtShowHideExportButton"] . '",
                                         "colReorder"                        : "' . $this->dtParams["dtColReorder"] . '",
+                                        "order"                             : JSON.parse("' . $this->dtParams["dtOrder"] . '"),
                                         "stateSave"                         : "' . $this->dtParams["dtStateSave"] . '",
                                         "fixedHeader"                       : "' . $this->dtParams["dtFixedHeader"] . '",
                                         "searching"                         : "' . $this->dtParams["dtSearching"] . '",
@@ -332,64 +338,11 @@ class DynamicTable
             $rowData = [];
 
             foreach ($columns as $columnKey => $column) {
-                if (isset($this->params['dtReplaceColumns'])) {
+                if (isset($this->params['dtReplaceColumns']) && is_array($this->params['dtReplaceColumns'])) {
                     foreach ($this->params['dtReplaceColumns'] as $replaceColumnKey => $replaceColumn) {
                         if ($replaceColumnKey === $columnKey) {
                             foreach ($replaceColumn as $replaceValueKey => $replaceValue) {
-                                if ($replaceValueKey === 'customSwitch') {
-                                    if ($column == 1) {
-                                        $checked = 'checked';
-                                    }
-                                    if (isset($replaceValue[0]['switchType']) &&
-                                        isset($replaceValue[1]['switchType'])
-                                    ) {
-                                        $offSwitchType = 'custom-switch-off-' . $replaceValue[0]['switchType'];
-                                        $onSwitchType = 'custom-switch-on-' . $replaceValue[1]['switchType'];
-                                    }
-
-                                    $customswitch =
-                                        '<div class="form-group">' .
-                                            '<div class="custom-control custom-switch ' . $offSwitchType . ' ' . $onSwitchType . '">
-                                                <input type="checkbox" class="custom-control-input" id="' . $this->params['componentId'] . '-sections-listing-datatable-' . $columnKey . '-' . $rowId . '" data-switchactionurl="' . $replaceValue['actionUrl'] . '" data-switchactionincludecolumnsdata="' . $replaceValue['actionIncludeColumnsData'] . '" data-notificationtextfromcolumn="' . $this->dtParams['dtNotificationTextFromColumn'] . '" data-columnid="' . $columnKey . '" ' . $checked . '>
-                                                <label class="custom-control-label" for="' . $this->params['componentId'] . '-sections-listing-datatable-' . $columnKey . '-' . $rowId . '"></label>
-                                            </div>
-                                        </div>';
-
-                                    $column = $customswitch;
-                                } else if ($replaceValueKey === 'radioButtons') {
-                                    $radiobuttons =
-                                        '<div class="btn-group btn-group-toggle" data-toggle="buttons" role="group" aria-label="' . $columnKey . ' group">';
-
-                                    foreach ($replaceValue as $valueKey => $value) {
-                                        if (is_array($value)) {
-                                            if ($valueKey == $column) {
-                                                $focusActive = 'focus active';
-                                                $checked = 'checked';
-                                            } else {
-                                                $focusActive = '';
-                                                $checked = '';
-                                            }
-
-                                            if (isset($value['buttonSize'])) {
-                                                $buttonSize = $value['buttonSize'];
-                                            } else {
-                                                $buttonSize = 'sm';
-                                            }
-
-                                            if (isset($value['buttonType'])) {
-                                                $buttonType = $value['buttonType'];
-                                            } else {
-                                                $buttonType = 'primary';
-                                            }
-
-                                            $radiobuttons .=
-                                                '<label class="btn btn-' . $buttonSize . ' btn-outline-' . $buttonType . ' ' . $focusActive . '" style="cursor: pointer;">
-                                                <input type="radio" name="' . $columnKey . '-options" id="' . $this->params['componentId'] . '-sections-listing-datatable-' . $columnKey . '-' . $rowId . '-' . $valueKey . '" autocomplete="off" ' . $checked . ' data-radiobuttonsactionurl="' . $replaceValue['actionUrl'] . '" data-radiobuttonsactionincludecolumnsdata="' . $replaceValue['actionIncludeColumnsData'] . '" data-notificationtextfromcolumn="' . $this->dtParams['dtNotificationTextFromColumn'] . '" data-columnid="' . $columnKey . '" data-value="' . $valueKey . '">' . $value['buttonTitle'] . '</label>';
-                                        }
-                                    }
-                                    $radiobuttons .= '</div>';
-                                    $column = $radiobuttons;
-                                } else if ($replaceValueKey === 'html') {
+                                if ($replaceValueKey === 'html') {
                                     foreach ($replaceValue as $valueKey => $value) {
                                         if ($valueKey == $column) {
                                             $column = $value;

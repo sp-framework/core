@@ -6,14 +6,14 @@ class PackagesData
 {
 	public $packagesData = [];
 
-	public function __set($key, $value)
-	{
-		$this->packagesData[$key] = $value;
-	}
-
 	public function getAllData()
 	{
 		return ['packagesData' => $this->packagesData];
+	}
+
+	public function __set($key, $value)
+	{
+		$this->packagesData[$key] = $value;
 	}
 
 	public function __get($key)
@@ -23,5 +23,10 @@ class PackagesData
 		} else {
 			throw new \Exception('PackagesData key "' . $key . '" does not exists!');
 		}
+	}
+
+	public function __isset($key)
+	{
+		return array_key_exists($key, $this->packagesData);
 	}
 }

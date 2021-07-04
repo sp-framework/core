@@ -1,5 +1,5 @@
 /* exported BazCore */
-/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile */
+/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile BazHelpers */
 /*
 * @title                    : BazCore
 * @description              : Baz Core Lib
@@ -102,6 +102,10 @@ var BazCore = function() {
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();
         openMenu();
+
+        if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
+            initNotifications();
+        }
         // $(document).ready(function() {
         //     getNewToken();
         // });
@@ -157,6 +161,7 @@ var BazCore = function() {
         }
     }
 
+    //Menu
     function openMenu() {
         var currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + dataCollection.env.currentRoute + '"].nav-link');
 
@@ -185,6 +190,83 @@ var BazCore = function() {
         } else {
             $(currentActiveLocation).addClass('active');
         }
+    }
+
+    //Notifications
+    function getNotifications() {
+        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post(url, postData, function(response) {
+            if (response.responseCode == 0 && response.responseData) {
+                if (!Number.isInteger(response.responseData.count)) {
+                    parseInt(response.responseData.count);
+                }
+
+                if (response.responseData.count === window.dataCollection.env.notifications) {
+                    return;
+                } else if (response.responseData.count < window.dataCollection.env.notifications) {
+                    window.dataCollection.env.notifications = response.responseData.count;
+                    updateCounter();
+                    return;
+                }
+
+                window.dataCollection.env.notifications = response.responseData.count;
+                updateCounter();
+
+                if (response.responseData.count > 0) {
+                    window.dataCollection.env.sounds.notificationSound.play();
+                }
+                //eslint-disable-next-line
+                console.log(response.responseData.count);
+            }
+
+            function updateCounter() {
+                if (response.responseData.count === 0) {
+                    $('#notifications-button-counter').html('');
+                } else if (response.responseData.count < 10) {
+                    $('#notifications-button-counter').css({'right': '10px'});
+                    $('#notifications-button-counter').html(response.responseData.count);
+                    shakeBell();
+                } else if (response.responseData.count < 99) {
+                    $('#notifications-button-counter').css({'right': '5px'});
+                    $('#notifications-button-counter').html(response.responseData.count);
+                    shakeBell();
+                } else if (response.responseData.count > 99) {
+                    $('#notifications-button-counter').css({'right': 0});
+                    $('#notifications-button-counter').html('99+');
+                    shakeBell();
+                }
+            }
+
+            function shakeBell() {
+                $('#notifications-button').addClass('animated tada');
+
+                setTimeout(function() {
+                    $('#notifications-button').removeClass('animated tada');
+                }, 10000);
+            }
+
+            if (response.tokenKey && response.token) {
+                $("#security-token").attr("name", response.tokenKey);
+                $("#security-token").val(response.token);
+            }
+        }, 'json');
+    }
+
+    function initNotifications() {
+        $(document).ready(function() {
+            getNotifications();
+        });
+
+        BazHelpers.interval(
+            async() => {
+                BazCore.getNotifications();
+            },
+            100000
+        );
     }
 
     //PageParser
@@ -241,6 +323,9 @@ var BazCore = function() {
         }
         BazCore.bazContent = function(options) {
             bazContent(_extends(BazCore.defaults, options));
+        }
+        BazCore.getNotifications = function(options) {
+            getNotifications(_extends(BazCore.defaults, options));
         }
     }
 

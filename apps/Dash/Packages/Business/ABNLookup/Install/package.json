@@ -7,5 +7,6 @@
     "sub_category"  : "tools",
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-tools-abnlookup",
+    "class"         : "Apps\\Dash\\Packages\\Business\\ABNLookup\\ABNLookup",
     "settings"      : { }
 }

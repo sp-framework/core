@@ -228,6 +228,11 @@ class Button
                 'data-actiontarget="' . $button['actionTarget'] . '"' :
                 '';
 
+            $this->buttonParams['successNotify'] =
+                isset($button['successNotify']) && $button['successNotify'] == true ?
+                'data-successnotify="true"' :
+                '';
+
             $this->buttonParams['additionalClass'] =
                 isset($button['buttonAdditionalClass']) ?
                 $button['buttonAdditionalClass'] :
@@ -275,6 +280,7 @@ class Button
                 $this->buttonParams['addSuccessRedirectUrl'] . ' ' .
                 $this->buttonParams['updateSuccessRedirectUrl'] . ' ' .
                 $this->buttonParams['actionTarget'] . ' ' .
+                $this->buttonParams['successNotify'] . ' ' .
             ' id="' . $this->buttonParams['id'] . '" ' .
             'data-toggle="tooltip" data-html="true" data-placement="' .
                 $this->buttonParams['tooltipPosition']. '" title="' .

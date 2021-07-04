@@ -4,6 +4,7 @@ namespace System\Base;
 
 use League\Flysystem\StorageAttributes;
 use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
 use Phalcon\Mvc\Model\Transaction\Manager;
 use Phalcon\Paginator\Adapter\Model;
@@ -245,10 +246,10 @@ abstract class BasePackage extends Controller
 
 					foreach ($valueArr as $valueKey => $valueValue) {
 						$conditions .=
-							' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1] . ':';
+							' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
 
 						$bind[
-							'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1]
+							'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
 						] = $valueValue;
 
 						if (Arr::lastKey($valueArr) !== $valueKey) {
@@ -264,10 +265,10 @@ abstract class BasePackage extends Controller
 						foreach ($valueArr as $valueKey => $valueValue) {
 							$conditions .=
 								$conditionArr[1] . ' ' . $sign .
-								' :baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1] . ':';
+								' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
 
 							$bind[
-								'baz_' . $conditionKey . '_' . $valueKey . '_' . $conditionArr[1]
+								'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
 							] = $valueValue;
 
 							if (Arr::lastKey($valueArr) !== $valueKey) {
@@ -275,11 +276,12 @@ abstract class BasePackage extends Controller
 							}
 						}
 					} else {
+
 						$conditions .=
-							$conditionArr[1] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . $conditionArr[1] . ':';
+							$conditionArr[1] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
 
 						$bind[
-							'baz_' . $conditionKey . '_' . $conditionArr[1]
+							'baz_' . $conditionKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
 						] = $valueArr[0];
 					}
 				}
@@ -299,6 +301,18 @@ abstract class BasePackage extends Controller
 					$params,
 					[
 						'conditions'	=> '',
+					]
+				);
+		}
+
+		if (isset($this->request->getPost()['order']) &&
+			$this->request->getPost()['order'] !== ''
+		) {
+			$params =
+				array_merge(
+					$params,
+					[
+						'order'	=> $this->request->getPost()['order']
 					]
 				);
 		}
@@ -553,17 +567,6 @@ abstract class BasePackage extends Controller
 		$this->packagesData->responseCode = 0;
 
 		$this->packagesData->responseMessage = 'OK';
-	}
-
-	protected function setPackageResponse(int $code, string $message, array $data = null)
-	{
-		$this->packagesData->responseCode = $code;
-
-		$this->packagesData->responseMessage = $message;
-
-		if (isset($data)) {
-			$this->packagesData->responseData = $data;
-		}
 	}
 
 	protected function getIdParams(int $id)
@@ -887,18 +890,18 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function addResponse($responseCode, $responseMessage, $responseData = null, $addToNotification = true, $addToLog = true)
+	protected function addResponse($responseMessage, $responseCode = 0, $responseData = null, $addToLog = true)
 	{
-		$this->packagesData->responseCode = $responseCode;
-
 		$this->packagesData->responseMessage = $responseMessage;
 
-		if ($responseData) {
-			$this->packagesData->responseData = $responseData;
-		}
+		$this->packagesData->responseCode = $responseCode;
 
-		if ($addToNotification) {
-			$this->addToNotification($responseCode, $responseMessage);
+		if ($responseData && is_array($responseData)) {
+			$this->packagesData->responseData = $responseData;
+		} else {
+			if (isset($this->packagesData->last)) {
+				$this->packagesData->responseData = ['id' => $this->packagesData->last['id']];
+			}
 		}
 
 		if ($addToLog) {
@@ -906,13 +909,49 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function addToNotification($responseCode, $responseMessage)
+	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null)
 	{
-		//
+		$package = $this->checkPackage($this->packageName);
+
+		if ($package) {
+			if (isset($this->packagesData->last)) {
+				$packageRowId = $this->packagesData->last['id'];
+			} else {
+				$packageRowId = null;
+			}
+
+			if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
+				$package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
+
+				if (count($package['notification_subscriptions']) === 0) {
+					return;
+				}
+
+				foreach ($package['notification_subscriptions'] as $appId => $subscriptions) {
+					if (isset($subscriptions[$subscriptionType]) &&
+						is_array($subscriptions[$subscriptionType]) &&
+						count($subscriptions[$subscriptionType]) > 0
+					) {
+						foreach ($subscriptions[$subscriptionType] as $key => $aId) {
+							$this->basepackages->notifications->addNotification(
+								$messageTitle,
+								$messageDetails,
+								$appId,
+								$aId,
+								$this->auth->account()['id'],
+								$package['name'],
+								$packageRowId,
+								0
+							);
+						}
+					}
+				}
+			}
+		}
 	}
 
-	protected function addToLog($responseCode, $responseMessage)
+	protected function addToLog($code, $message, $debug = true)
 	{
-		//
+		//Only if debug is enabled.
 	}
 }

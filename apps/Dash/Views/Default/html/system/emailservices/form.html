@@ -242,7 +242,7 @@
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Host username',
-                        'fieldRequired'                  : false,
+                        'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
@@ -266,7 +266,7 @@
                         'fieldInputType'                 : 'password',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Host password',
-                        'fieldRequired'                  : false,
+                        'fieldRequired'                  : true,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
@@ -484,6 +484,7 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-test_email_address'      : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-host'                    : 'required',

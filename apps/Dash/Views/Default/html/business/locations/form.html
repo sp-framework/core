@@ -55,7 +55,7 @@
             ]
         ]
     %}
-    {% if location['activityLogs'] and location['activityLogs']|length > 0 %}
+    {% if location is defined and location['activityLogs'] is defined and location['activityLogs']|length > 0 %}
         {% set tabsData =
             array_merge(
                 tabsData,
@@ -79,18 +79,18 @@
                             {
                                 'inbound_shipping'              :
                                 {
-                                    '1'                         : 'Enable',
-                                    '0'                         : 'Disable'
+                                    '1'                         : 'Yes',
+                                    '0'                         : 'No'
                                 },
                                 'outbound_shipping'             :
                                 {
-                                    '1'                         : 'Enable',
-                                    '0'                         : 'Disable'
+                                    '1'                         : 'Yes',
+                                    '0'                         : 'No'
                                 },
                                 'can_stock'                     :
                                 {
-                                    '1'                         : 'Enable',
-                                    '0'                         : 'Disable'
+                                    '1'                         : 'Yes',
+                                    '0'                         : 'No'
                                 }
                             },
                             'disableKeys'                       : ['address_id', 'city_id', 'state_id', 'country_id']

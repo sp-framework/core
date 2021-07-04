@@ -134,7 +134,7 @@ abstract class BaseComponent extends Controller
 			if (!$this->security->checkToken(null, null, false)) {
 				$this->view->responseCode = 2;
 
-				$this->view->responseMessage = 'CSRF Token Error! Please restart form';
+				$this->view->responseMessage = 'CSRF Token Error! Please refresh page.';
 
 				$this->sendJson();
 
@@ -643,6 +643,17 @@ abstract class BaseComponent extends Controller
 			return $installedFiles;
 		} else {
 			return null;
+		}
+	}
+
+	protected function addResponse($responseMessage, $responseCode = 0, $responseData = null)
+	{
+		$this->view->responseMessage = $responseMessage;
+
+		$this->view->responseCode = $responseCode;
+
+		if ($responseData && is_array($responseData)) {
+			$this->view->responseData = $responseData;
 		}
 	}
 }

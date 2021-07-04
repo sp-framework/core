@@ -101,6 +101,11 @@ class SectionWithFormButtons
             $this->params['formButtons']['actionTarget'] :
             'mainContent';
 
+        $this->buttonParams['successNotify'] =
+            isset($this->params['formButtons']['successNotify']) ?
+            $this->params['formButtons']['successNotify'] :
+            false;
+
         $this->buttonParams['updateButtonId'] =
             isset($this->params['formButtons']['updateButtonId']) ?
             $this->params['formButtons']['updateButtonId'] :
@@ -127,6 +132,7 @@ class SectionWithFormButtons
                             'buttonAdditionalClass' => 'mr-1 ml-1',
                             'action'                => 'post',
                             'actionTarget'          => $this->buttonParams['actionTarget'],
+                            'successNotify'         => $this->buttonParams['successNotify'],
                             'actionUrl'             => $this->buttonParams['addActionUrl'],
                             'successRedirectUrl'    => $this->buttonParams['addSuccessRedirectUrl'],
                         ]
@@ -150,6 +156,7 @@ class SectionWithFormButtons
                             'buttonAdditionalClass' => 'mr-1 ml-1',
                             'action'                => 'post',
                             'actionTarget'          => $this->buttonParams['actionTarget'],
+                            'successNotify'         => $this->buttonParams['successNotify'],
                             'actionUrl'             => $this->buttonParams['updateActionUrl'],
                             'successRedirectUrl'    => $this->buttonParams['updateSuccessRedirectUrl'],
                         ]

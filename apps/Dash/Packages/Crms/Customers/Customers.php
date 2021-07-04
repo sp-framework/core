@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\Customers;
+namespace Apps\Dash\Packages\Crms\Customers;
 
 use Apps\Dash\Packages\Customers\Model\Customers as CustomersModel;
 use Phalcon\Helper\Json;

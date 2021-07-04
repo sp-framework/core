@@ -21,16 +21,32 @@ class Notifications
                         ]
                     ),
                     new Column(
-                        'notification_type',
+                        'package_name',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
-                            'notNull' => true
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 100,
+                            'notNull' => false
+                        ]
+                    ),
+                    new Column(//Source Row Id
+                        'package_row_id',
+                        [
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => false
                         ]
                     ),
                     new Column(
-                        'notification',
+                        'notification_type',
                         [
-                            'type'    => Column::TYPE_TEXT,
+                            'type'    => Column::TYPE_TINYINTEGER,
+                            'notNull' => true,
+                            'default' => '0'
+                        ]
+                    ),
+                    new Column(
+                        'app_id',
+                        [
+                            'type'    => Column::TYPE_TINYINTEGER,
                             'notNull' => true
                         ]
                     ),
@@ -38,8 +54,38 @@ class Notifications
                         'account_id',
                         [
                             'type'    => Column::TYPE_INTEGER,
+                            'notNull' => true
+                        ]
+                    ),
+                    new Column(
+                        'created_by',
+                        [
+                            'type'    => Column::TYPE_INTEGER,
+                            'notNull' => true
+                        ]
+                    ),
+                    new Column(
+                        'created_at',
+                        [
+                            'type'    => Column::TYPE_TIMESTAMP,
                             'notNull' => true,
-                            'default' => '0'
+                            'default' => 'CURRENT_TIMESTAMP'
+                        ]
+                    ),
+                    new Column(
+                        'notification_title',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 1024,
+                            'notNull' => true
+                        ]
+                    ),
+                    new Column(
+                        'notification_details',
+                        [
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 4096,
+                            'notNull' => false
                         ]
                     ),
                     new Column(
@@ -56,14 +102,6 @@ class Notifications
                             'type'    => Column::TYPE_TINYINTEGER,
                             'notNull' => true,
                             'default' => '0'
-                        ]
-                    ),
-                    new Column(
-                        'created_at',
-                        [
-                            'type'    => Column::TYPE_TIMESTAMP,
-                            'notNull' => true,
-                            'default' => 'CURRENT_TIMESTAMP'
                         ]
                     )
                 ]

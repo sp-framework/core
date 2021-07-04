@@ -15,6 +15,9 @@ class Contacts extends BasePackage
 
     public $contacts;
 
+    /**
+     * @notification(name=add)
+     */
     public function addContact(array $data)
     {
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
@@ -36,6 +39,9 @@ class Contacts extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     */
     public function updateContact(array $data)
     {
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
@@ -66,6 +72,9 @@ class Contacts extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=remove)
+     */
     public function removeContact(array $data)
     {
         $contact = $this->getById($data['id']);

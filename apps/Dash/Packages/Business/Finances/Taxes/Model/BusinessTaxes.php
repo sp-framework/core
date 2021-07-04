@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model;
+namespace Apps\Dash\Packages\Business\Finances\Taxes\Model;
 
 use System\Base\BaseModel;
 
-class Filters extends BaseModel
+class BusinessTaxes extends BaseModel
 {
     public $id;
 

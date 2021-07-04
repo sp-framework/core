@@ -1,6 +1,6 @@
 {% if purchaseOrder['id'] is defined %}
     {% set purchaseOrderId = purchaseOrder['id'] %}
-    {% set title = 'Purchase Order Id: (' ~ purchaseOrder['id'] ~ ')' %}
+    {% set title = 'Purchase Order Id: ' ~ purchaseOrder['id'] %}
 {% else %}
     {% set purchaseOrderId = '' %}
     {% set title = 'New Purchase Order' %}

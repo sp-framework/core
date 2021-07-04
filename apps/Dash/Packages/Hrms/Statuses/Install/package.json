@@ -7,5 +7,6 @@
     "sub_category"  : "hrms",
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-hrms-statuses",
+    "class"         : "Apps\\Dash\\Packages\\Hrms\\Statuses\\HrmsStatuses",
     "settings"      : { }
 }

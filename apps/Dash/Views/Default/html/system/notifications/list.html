@@ -1,0 +1,213 @@
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'bell',
+        'cardTitle'             : componentName,
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize'],
+        'dtFilter'              : true,
+        'dtFilters'             : table['filters'],
+        'dtFilterColumns'       : table['filterColumns'],
+        'dtFixedHeader'         : true,
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtOrder'               : [[0, 'desc']],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtSelect'              : true,
+        'dtSelectStyle'         : 'multiple',
+        'dtSelectAll'           : true,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 6,
+        'dtTableCompact'        : true,
+        'dtPrimaryButtons'      :
+            {
+                'componentId'                       : componentId,
+                'sectionId'                         : 'listing',
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownSplitButtonsSplit'         : true,
+                'splitMainButtonId'                 : 'add-vendor',
+                'splitMainButtonTitle'              : 'Add Vendor',
+                'splitMainButtonAdditionalClass'    : 'contentAjaxLink',
+                'splitMainButtonUrl'                : links.url('business/directory/vendors/q/id/0'),
+                'splitMainButtonIcon'               : 'plus',
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'                           :
+                    {
+                        'via-token' : {
+                            'title'                   : 'Add Via Token',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('business/directory/vendors/q/type/viatoken/id/0')
+                        }
+                    }
+            },
+        'dtZeroRecords'         : 'No notess data available. Notes are added by user or system.'
+    ]
+)}}
+<script>
+/* Swal PNotify */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    initMarkReadArchive();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    initMarkReadArchive();
+}
+
+function initMarkReadArchive() {
+    $('.rowMarkRead').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+            var thisButton = this;
+            var url = $(this).attr('href');
+            //eslint-disable-next-line
+            console.log(url);
+            // var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).text();
+            // var dataToSend = { };
+            // //CSRF Token
+            // if ($('#security-token').length === 1) {
+            //     dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            // }
+            // dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
+            // Swal.fire({
+            //     title                       : '<span class="text-danger"> Delete ' + deleteText + '?</span>',
+            //     icon                        : 'question',
+            //     background                  : 'rgba(0,0,0,.8)',
+            //     backdrop                    : 'rgba(0,0,0,.6)',
+            //     buttonsStyling              : false,
+            //     confirmButtonText           : 'Delete',
+            //     customClass                 : {
+            //         'confirmButton'             : 'btn btn-danger text-uppercase',
+            //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            //     },
+            //     showCancelButton            : true,
+            //     keydownListenerCapture      : true,
+            //     allowOutsideClick           : false,
+            //     allowEscapeKey              : false,
+            //     didOpen                      : function() {
+            //         swalSound.play();
+            //     }
+            // }).then((result) => {
+            //     if (result.value) {
+            //         if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
+            //             dataToSend.confirm = '1';
+            //         }
+            //         $.ajax({
+            //             url         : url,
+            //             method      : 'post',
+            //             dataType    : 'json',
+            //             data        : dataToSend,
+            //             success     : function(data) {
+            //                 if (data.responseCode === 0) {
+            //                     // PNotify.success({
+            //                     //     title           : data.responseMessage
+            //                     // });
+            //                     // remove row on success
+            //                     // thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
+            //                     that._filterRunAjax(
+            //                         1,
+            //                         datatableOptions.paginationCounters.limit,
+            //                         query
+            //                     );
+            //                 } else {
+            //                     PNotify.error({
+            //                         title           : data.responseMessage,
+            //                     });
+            //                 }
+            //                 // pnotifySound.play();
+            //                 if ($('#security-token').length === 1) {
+            //                     $('#security-token').attr('name', data.tokenKey);
+            //                     $('#security-token').val(data.token);
+            //                 }
+            //             }
+            //         });
+            //     }
+            // });
+        });
+    });
+
+    $('.rowArchive').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+            var thisButton = this;
+            var url = $(this).attr('href');
+            //eslint-disable-next-line
+            console.log(url);
+            // var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).text();
+            // var dataToSend = { };
+            // //CSRF Token
+            // if ($('#security-token').length === 1) {
+            //     dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            // }
+            // dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
+            // Swal.fire({
+            //     title                       : '<span class="text-danger"> Delete ' + deleteText + '?</span>',
+            //     icon                        : 'question',
+            //     background                  : 'rgba(0,0,0,.8)',
+            //     backdrop                    : 'rgba(0,0,0,.6)',
+            //     buttonsStyling              : false,
+            //     confirmButtonText           : 'Delete',
+            //     customClass                 : {
+            //         'confirmButton'             : 'btn btn-danger text-uppercase',
+            //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+            //     },
+            //     showCancelButton            : true,
+            //     keydownListenerCapture      : true,
+            //     allowOutsideClick           : false,
+            //     allowEscapeKey              : false,
+            //     didOpen                      : function() {
+            //         swalSound.play();
+            //     }
+            // }).then((result) => {
+            //     if (result.value) {
+            //         if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
+            //             dataToSend.confirm = '1';
+            //         }
+            //         $.ajax({
+            //             url         : url,
+            //             method      : 'post',
+            //             dataType    : 'json',
+            //             data        : dataToSend,
+            //             success     : function(data) {
+            //                 if (data.responseCode === 0) {
+            //                     // PNotify.success({
+            //                     //     title           : data.responseMessage
+            //                     // });
+            //                     // remove row on success
+            //                     // thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
+            //                     that._filterRunAjax(
+            //                         1,
+            //                         datatableOptions.paginationCounters.limit,
+            //                         query
+            //                     );
+            //                 } else {
+            //                     PNotify.error({
+            //                         title           : data.responseMessage,
+            //                     });
+            //                 }
+            //                 // pnotifySound.play();
+            //                 if ($('#security-token').length === 1) {
+            //                     $('#security-token').attr('name', data.tokenKey);
+            //                     $('#security-token').val(data.token);
+            //                 }
+            //             }
+            //         });
+            //     }
+            // });
+        });
+    });
+}
+</script>

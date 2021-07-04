@@ -8,7 +8,10 @@
         </ul>
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button"><i class="fas fa-th-large"></i></a>
+                <a id="notifications-button" class="nav-link contentAjaxLink" href="{{links.url('system/notifications')}}" role="button">
+                    <i class="far fa-fw fa-bell"></i>
+                    <span id="notifications-button-counter" class="badge badge-info navbar-badge"></span>
+                </a>
             </li>
             <li id="profile-dropdown" class="nav-item dropdown">
                 {% if auth.account() %}
@@ -29,6 +32,11 @@
                         </a>
                     </div>
                 {% endif %}
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                    <i class="fas fa-th-large"></i>
+                </a>
             </li>
         </ul>
     </div>

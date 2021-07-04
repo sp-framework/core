@@ -1,11 +1,12 @@
 {
     "name"          : "Vendors",
-    "displayName"   : "Business Directory Vendors Package",
+    "displayName"   : "Business Vendors",
     "description"   : "Package for Business Directory Vendors component",
     "app_type"      : "dash",
     "category"      : "business",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-admin-vendors",
+    "class"         : "Apps\\Dash\\Packages\\Business\\Directory\\Vendors\\Vendors",
     "settings"      : { }
 }

@@ -14,6 +14,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Settings;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
@@ -57,6 +58,8 @@ class Basepackages
 	protected $notes;
 
 	protected $settings;
+
+	protected $notifications;
 
 	public function __construct()
 	{
@@ -187,8 +190,15 @@ class Basepackages
 
 	protected function initSettings()
 	{
-		$this->notes = (new Settings())->init();
+		$this->settings = (new Settings())->init();
 
-		return $this->notes;
+		return $this->settings;
+	}
+
+	protected function initNotifications()
+	{
+		$this->notifications = (new Notifications())->init();
+
+		return $this->notifications;
 	}
 }

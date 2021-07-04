@@ -19,6 +19,7 @@ class Package
 				'sub_category'			=> $packageFile['sub_category'],
 				'version'				=> $packageFile['version'],
 				'repo'					=> $packageFile['repo'],
+				'class'					=> $packageFile['class'],
 				'settings'				=>
 					isset($packageFile['settings']) ?
 					Json::encode($packageFile['settings']) :

@@ -7,7 +7,7 @@
 	"sub_category"  : "ims",
 	"version"		: "0.0.1",
 	"repo"			: "https://.../dash-component-business-ims-stock-takes",
-	"class"			: "Apps\\Dash\\Components\\Ims\\Stock\\Takes\\AdjustmentsComponent",
+	"class"			: "Apps\\Dash\\Components\\Ims\\Stock\\Takes\\TakesComponent",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

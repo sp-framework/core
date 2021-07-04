@@ -7,7 +7,7 @@
 	"sub_category"  : "ims",
 	"version"		: "0.0.1",
 	"repo"			: "https://.../dash-component-business-ims-stock-purchaseorders",
-	"class"			: "Apps\\Dash\\Components\\Ims\\Stock\\PurchaseOrders\\PurchaseordersComponent",
+	"class"			: "Apps\\Dash\\Components\\Ims\\Stock\\Purchaseorders\\PurchaseordersComponent",
 	"dependencies"	: {
 		"core"			: {
 			"name"		: "Core",

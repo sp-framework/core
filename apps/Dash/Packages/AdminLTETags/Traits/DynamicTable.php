@@ -15,13 +15,12 @@ trait DynamicTable {
         array $columnsForFilter = [],
         array $controlActions = null,
         array $dtReplaceColumnsTitle = null,
-        array $dtReplaceColumns = null,
+        $dtReplaceColumns = null,
         string $dtNotificationTextFromColumn = null,
         array $dtAdditionControlButtons = null,
         bool $dtAdditionControlButtonsBeforeControlButtons = false,
         int $componentId = null
-    )
-    {
+    ) {
         if (gettype($package) === 'string') {
             $package = $this->usePackage($package);
         }
@@ -45,7 +44,6 @@ trait DynamicTable {
                 }
             }
             $table['postUrl'] = $this->links->url($postUrl);
-            // $table['postUrlParams'] = $postUrlParams;
 
             $table['component'] = $this->component;
 
@@ -98,7 +96,11 @@ trait DynamicTable {
                     }
                 }
             } else {
-                $table['postUrlParams'] = [];
+                if ($postUrlParams) {
+                    $table['postUrlParams'] = $postUrlParams;
+                } else {
+                    $table['postUrlParams'] = [];
+                }
                 $table['filters'] = [];
                 $table['filterColumns'] = [];
             }
@@ -106,15 +108,33 @@ trait DynamicTable {
             $this->view->table = $table;
 
         } else if ($this->request->isPost()) {
+            //Making sure what we set is what is received.
+            if (isset($this->postData()['conditions'])) {
+                if ($this->postData()['conditions'] !== $postUrlParams['conditions']) {
+                    $this->addResponse('Conditions don\'t Match!', 1);
+                    return;
+                }
+            }
 
-            $pagedData =
-                $package->getPaged(
-                    [
-                        'columns' => $columnsForTable
-                    ]
-                );
+            if (is_callable($dtReplaceColumns)) {
+                $pagedData = $package->getPaged();
 
-            $rows = $pagedData->getItems();
+                $rows = $pagedData->getItems();
+
+                $rows = $this->extractColumnsForTable($columnsForTable, $dtReplaceColumns($rows));//Call & extract columnsTable
+
+                $dtReplaceColumns = null;//Remove function before its passed to Table
+            } else {
+                $pagedData =
+                    $package->getPaged(
+                        [
+                            'columns' => $columnsForTable
+                        ]
+                    );
+
+                $rows = $pagedData->getItems();
+            }
+
 
             if ($controlActions) {
                 // add control action to each row
@@ -183,5 +203,24 @@ trait DynamicTable {
         }
 
         return $columns;
+    }
+
+    protected function extractColumnsForTable($columnsForTable, $rows)
+    {
+        if (!$columnsForTable) {
+            return $rows;
+        }
+
+        $columnsForTable = $this->removeEscapeFromName($columnsForTable);
+
+        foreach ($rows as $key => $value) {
+            foreach ($value as $columnKey => $columnValue) {
+                if (!in_array($columnKey, $columnsForTable)) {
+                    unset($rows[$key][$columnKey]);
+                }
+            }
+        }
+
+        return $rows;
     }
 }

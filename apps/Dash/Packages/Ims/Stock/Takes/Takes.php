@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\Devtools\Api\Contracts;
+namespace Apps\Dash\Packages\Ims\Stock\Takes;
 
 use Apps\Dash\Packages\Devtools\Api\Contracts\ContractsOAPI;
 use Apps\Dash\Packages\Devtools\Api\Contracts\ContractsXML;
@@ -10,7 +10,7 @@ use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
 use System\Base\BasePackage;
 
-class Contracts extends BasePackage
+class Takes extends BasePackage
 {
     protected $modelToUse = DevtoolsApiContracts::class;
 

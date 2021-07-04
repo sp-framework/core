@@ -7,6 +7,7 @@
     "sub_category"  : "admin",
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-system-admin-tools-barcodes",
+    "class"         : "Apps\\Dash\\Packages\\System\\Tools\\Barcodes\\Barcodes",
     "settings"      : {
         "availableCodes"        : {
             "C128"              : "C128",

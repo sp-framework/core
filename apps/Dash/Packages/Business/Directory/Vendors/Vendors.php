@@ -16,6 +16,9 @@ class Vendors extends BasePackage
 
     public $vendors;
 
+    /**
+     * @notification(name=add)
+     */
     public function addVendor(array $data)
     {
         $data = $this->addBrands($data);
@@ -33,16 +36,17 @@ class Vendors extends BasePackage
 
             $this->addActivityLog($data);
 
-            $this->packagesData->responseCode = 0;
+            $this->addResponse('Added new vendor ' . $data['business_name']);
 
-            $this->packagesData->responseMessage = 'Added ' . $data['business_name'] . ' vendor';
+            $this->addToNotification('add', 'Added new vendor ' . $data['business_name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new vendor.';
+            $this->addResponse('Error adding new vendor.', 1);
         }
     }
 
+    /**
+     * @notification(name=update)
+     */
     public function updateVendor(array $data)
     {
         $vendor = $this->getById($data['id']);
@@ -67,16 +71,19 @@ class Vendors extends BasePackage
 
             $this->addActivityLog($data, $vendor);
 
-            $this->packagesData->responseCode = 0;
+            $this->addResponse('Updated vendor ' . $data['business_name']);
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['business_name'] . ' vendor';
+            $this->addToNotification('update', 'Updated vendor ' . $data['business_name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating vendor.';
+            $this->addResponse('Error adding new vendor.', 1);
         }
     }
 
+    /**
+     * @notification(name=remove)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function removeVendor(array $data)
     {
         $vendor = $this->getById($data['id']);
@@ -86,13 +93,11 @@ class Vendors extends BasePackage
         if ($this->remove($data['id'])) {
             $this->basepackages->storages->changeOrphanStatus(null, $vendor['logo']);
 
-            $this->packagesData->responseCode = 0;
+            $this->addResponse('Removed vendor ' . $vendor['business_name']);
 
-            $this->packagesData->responseMessage = 'Removed vendor';
+            $this->addToNotification('remove', 'Removed vendor ' . $vendor['business_name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing vendor.';
+            $this->addResponse('Error removing new vendor.', 1);
         }
     }
 

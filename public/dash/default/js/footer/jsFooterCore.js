@@ -3440,9 +3440,12 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     'dataType'      : 'json',
                     'success'       : function(data) {
                                         if (data.responseCode == '0') {
-                                            PNotify.success({
-                                                title   : data.responseMessage,
-                                            });
+                                            if ($(thisButtonId).data('successnotify') === true) {
+                                                PNotify.success({
+                                                    title   : data.responseMessage,
+                                                });
+                                            }
+
                                             if ($(thisButtonId).data('actiontarget') === 'mainContent') {
                                                 BazContentLoader.loadAjax($(thisButtonId), {
                                                     ajaxBefore                      : function () {
@@ -4977,7 +4980,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
             datatableOptions,
             swalSound;
         var listColumns = { };
-        var query;
+        var filter, query;
 
         var BazContentSectionWithListing = function () {
             function BazContentSectionWithListing(element, settings) {
@@ -5010,10 +5013,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 if ($(this._element).is('.sectionWithListingFilter')) {
                     this._buildListingFilters(options);
+                    filter = true;
                 }
 
                 if ($(this._element).is('.sectionWithListingDatatable')) {
                     this._buildListingDatatable(options);
+                    query = thisOptions.listOptions.postParams;
+                    filter = false;
                 }
             };
 
@@ -5984,6 +5990,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     columns         : listColumns[thisOptions.listOptions.tableName],
                     rowId           : 'id',
                     colReorder      : datatableOptions.colReorder,
+                    order           : datatableOptions.order,
                     stateSave       : datatableOptions.stateSave,
                     fixedHeader     : datatableOptions.fixedHeader,
                     searching       : datatableOptions.searching,
@@ -6066,18 +6073,23 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     dataType    : 'json',
                     data        : postData,
                     success     : function(data) {
+                        // if ($('#security-token').length === 1) {
+                        //     $('#security-token').attr('name', data.tokenKey);
+                        //     $('#security-token').val(data.token);
+                        // }
+                        if (data.responseCode != 0) {
+                            PNotify.error({
+                                title   : data.responseMessage
+                            });
+                        }
                         $('#listing-data-loader').hide();
                         $('#listing-primary-buttons').attr('hidden', false);
                         $('#listing-secondary-buttons').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
                         $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
-                        }
                         $('body').trigger(
                             {
-                                'type'     :'sectionWithListingLoaded'
+                                'type'     : 'sectionWithListingLoaded'
                             }
                         );
                     }
@@ -6456,7 +6468,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         e.preventDefault();
                         var thisButton = this;
                         var url = $(this).attr('href');
-                        var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).html();
+                        var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).text();
                         var dataToSend = { };
                         //CSRF Token
                         if ($('#security-token').length === 1) {
@@ -6493,17 +6505,22 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                     data        : dataToSend,
                                     success     : function(data) {
                                         if (data.responseCode === 0) {
-                                            PNotify.success({
-                                                title           : data.responseMessage
-                                            });
+                                            // PNotify.success({
+                                            //     title           : data.responseMessage
+                                            // });
                                             // remove row on success
-                                            thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
+                                            // thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
+                                            that._filterRunAjax(
+                                                1,
+                                                datatableOptions.paginationCounters.limit,
+                                                query
+                                            );
                                         } else {
                                             PNotify.error({
                                                 title           : data.responseMessage,
                                             });
                                         }
-                                        pnotifySound.play();
+                                        // pnotifySound.play();
                                         if ($('#security-token').length === 1) {
                                             $('#security-token').attr('name', data.tokenKey);
                                             $('#security-token').val(data.token);
@@ -6514,6 +6531,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         });
                     });
                 });
+                $('body').trigger(
+                    {
+                        'type'     : 'sectionWithListingEventsRegistered'
+                    }
+                );
             }
 
             _proto._updateCounters = function() {
@@ -6527,7 +6549,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 if (datatableOptions.paginationCounters.current === datatableOptions.paginationCounters.last) {
                     counters.end = datatableOptions.paginationCounters.filtered_items;
                 }
-                if (query) {
+                if (query && filter) {
                     $('#' + sectionId + '-table_info').empty().html(
                         "Showing " + counters.start + " to " + counters.end +
                         " of " + counters.filtered_total + " filtered entries (Total entries: " + counters.total + ")"
@@ -6539,14 +6561,22 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
             }
 
-            _proto._filterRunAjax = function(page, limit, conditions) {
+            _proto._filterRunAjax = function(page, limit, filterQuery) {
                 thisOptions['datatable'].rows().clear().draw();
                 $('.dataTables_empty').last().html('<i class="fas fa-cog fa-spin"></i> Loading...');
-                that._runDatatableAjax({
-                    'page'          : page,
-                    'limit'         : limit,
-                    'conditions'    : conditions
-                }, true);
+
+                var postData = { };
+                postData['page'] = page;
+                postData['limit'] = limit;
+
+                if (filterQuery.conditions || filterQuery.order) {
+                    postData['conditions'] = filterQuery.conditions;
+                    postData['order'] = filterQuery.order;
+                } else {
+                    postData['conditions'] = filterQuery;
+                }
+
+                that._runDatatableAjax(postData, true);
             }
 
             _proto._drawCallback = function() {
@@ -6554,7 +6584,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     datatableOptions.paginationCounters.filtered_items > 20 &&
                     (datatableOptions.paginationCounters.filtered_items !== datatableOptions.paginationCounters.limit)
                 ) {
-
                     if (datatableOptions.paginationCounters.current !== datatableOptions.paginationCounters.first) {
                         $('.paginate_button.previous').removeClass('disabled');
                         $('.paginate_button.previous').click(function() {

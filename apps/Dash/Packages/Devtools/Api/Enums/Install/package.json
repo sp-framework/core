@@ -7,5 +7,6 @@
     "category"      : "system",
     "sub_category"  : "devtools",
     "repo"          : "https://.../dash-package-system-devtools-api-enums",
+    "class"         : "Apps\\Dash\\Packages\\Devtools\\Api\\Enums\\Enums",
     "settings"      : { }
 }

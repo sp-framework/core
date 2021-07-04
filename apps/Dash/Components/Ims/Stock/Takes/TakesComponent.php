@@ -7,7 +7,7 @@ use Apps\Dash\Packages\Devtools\Api\Contracts\Contracts;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
-class ContractsComponent extends BaseComponent
+class TakesComponent extends BaseComponent
 {
 	use DynamicTable;
 

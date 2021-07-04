@@ -39,40 +39,29 @@
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-                {% if apis|length > 0 %}
-                    {% set tabsData =
+                {% set tabsData =
+                    [
+                        'info'   :
                         [
-                            'info'   :
-                            [
-                                'tabTitle'          : 'Info',
-                                'tabInclude'        : 'entities/form/info'
-                            ],
-                            'address'   :
-                            [
-                                'tabTitle'          : 'Address',
-                                'tabInclude'        : 'entities/form/address'
-                            ],
+                            'tabTitle'          : 'Info',
+                            'tabInclude'        : 'entities/form/info'
+                        ],
+                        'address'   :
+                        [
+                            'tabTitle'          : 'Address',
+                            'tabInclude'        : 'entities/form/address'
+                        ]
+                    ]
+                %}
+                {% if apis|length > 0 %}
+                    {% set tabsData = array_merge(tabsData,
+                        [
                             'api'   :
                             [
                                 'tabTitle'          : 'Api',
                                 'tabInclude'        : 'entities/form/api'
                             ]
-                        ]
-                    %}
-                {% else %}
-                    {% set tabsData =
-                        [
-                            'info'   :
-                            [
-                                'tabTitle'          : 'Info',
-                                'tabInclude'        : 'entities/form/info'
-                            ],
-                            'address'   :
-                            [
-                                'tabTitle'          : 'Address',
-                                'tabInclude'        : 'entities/form/address'
-                            ]
-                        ]
+                        ])
                     %}
                 {% endif %}
                 {{adminltetags.useTag('tabs',
@@ -308,8 +297,8 @@ dataCollectionSection =
             },
             rules: {
                 '{{componentId}}-{{sectionId}}-abn'                    : 'required',
-                '{{componentId}}-{{sectionId}}-business_name'                   : 'required',
-                '{{componentId}}-{{sectionId}}-business_name_list'              : 'required',
+                '{{componentId}}-{{sectionId}}-business_name'          : 'required',
+                '{{componentId}}-{{sectionId}}-business_name_list'     : 'required',
                 '{{componentId}}-{{sectionId}}-entity_type'            : 'required',
                 '{{componentId}}-{{sectionId}}-parent'                 : 'required',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'required',
@@ -320,8 +309,8 @@ dataCollectionSection =
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
-                '{{componentId}}-{{sectionId}}-business_name'                   : 'Please enter business name',
-                '{{componentId}}-{{sectionId}}-business_name_list'              : 'Please select business name',
+                '{{componentId}}-{{sectionId}}-business_name'          : 'Please enter business name',
+                '{{componentId}}-{{sectionId}}-business_name_list'     : 'Please select business name',
                 '{{componentId}}-{{sectionId}}-entity_type'            : 'Please select entity type',
                 '{{componentId}}-{{sectionId}}-parent'                 : 'Please select parent business',
                 '{{componentId}}-{{sectionId}}-street_address'         : 'Please enter street address',

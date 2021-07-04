@@ -285,9 +285,12 @@
                     'dataType'      : 'json',
                     'success'       : function(data) {
                                         if (data.responseCode == '0') {
-                                            PNotify.success({
-                                                title   : data.responseMessage,
-                                            });
+                                            if ($(thisButtonId).data('successnotify') === true) {
+                                                PNotify.success({
+                                                    title   : data.responseMessage,
+                                                });
+                                            }
+
                                             if ($(thisButtonId).data('actiontarget') === 'mainContent') {
                                                 BazContentLoader.loadAjax($(thisButtonId), {
                                                     ajaxBefore                      : function () {

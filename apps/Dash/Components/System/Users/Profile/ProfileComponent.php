@@ -22,6 +22,18 @@ class ProfileComponent extends BaseComponent
             return;
         }
 
+        $profile = $this->profile->generateViewData();
+
+        if ($profile) {
+            $this->view->packages = $this->profile->packagesData->packages;
+
+            $this->view->subscriptions = $this->profile->packagesData->subscriptions;
+
+            $this->view->notifications = $this->profile->packagesData->notifications;
+
+            $this->view->canEmail = $this->profile->packagesData->canEmail;
+        }
+
         $this->useStorage('private');
     }
 
