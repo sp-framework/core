@@ -334,25 +334,25 @@ $('#{{componentId}}-{{sectionId}}-enable-twofa-button').click(function(e) {
 
     var url = '{{links.url("system/users/profile/enabletwofa")}}';
 
-    $.post(url, postData, function(data) {
-        if (data.responseCode === 0) {
+    $.post(url, postData, function(response) {
+        if (response.responseCode === 0) {
             $('#twofa-qrcode').empty().append(
-                '<img src="' + data.qrcode + '" />'
+                '<img src="' + response.qrcode + '" />'
             );
             $('#twofa-details').attr('hidden', false);
-            $('#twofa-secret').empty().append(data.secret);
+            $('#twofa-secret').empty().append(response.secret);
             $('#{{componentId}}-{{sectionId}}-enable-twofa-button').html(
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> REGENERATE TWO FACTOR AUTHENTICATION QR CODE'
             );
         } else {
             PNotify.error({
-                'title' : data.responseMessage
+                'title' : response.responseMessage
             });
         }
 
-        if (data.tokenKey && data.token) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
         $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('disabled', false);
@@ -381,10 +381,10 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
 
     var url = '{{links.url("system/users/profile/verifytwofa")}}';
 
-    $.post(url, postData, function(data) {
-        if (data.responseCode === 0) {
+    $.post(url, postData, function(response) {
+        if (response.responseCode === 0) {
             PNotify.success({
-                'title' : data.responseMessage
+                'title' : response.responseMessage
             });
 
             $('#{{componentId}}-{{sectionId}}-verification').val('');
@@ -398,13 +398,13 @@ $('#{{componentId}}-{{sectionId}}-verify').click(function(e) {
             );
         } else {
             PNotify.error({
-                'title' : data.responseMessage
+                'title' : response.responseMessage
             });
         }
 
-        if (data.tokenKey && data.token) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
         $('#{{componentId}}-{{sectionId}}-verify').attr('disabled', false);
@@ -449,22 +449,22 @@ $('#{{componentId}}-{{sectionId}}-disable-twofa-button').click(function(e) {
 
             var url = '{{links.url("system/users/profile/disabletwofa")}}';
 
-            $.post(url, postData, function(data) {
-                if (data.responseCode === 0) {
+            $.post(url, postData, function(response) {
+                if (response.responseCode === 0) {
                     $('#{{componentId}}-{{sectionId}}-disable-twofa-button').attr('hidden', true);
                     $('#{{componentId}}-{{sectionId}}-enable-twofa-button').attr('hidden', false);
                     PNotify.success({
-                        'title' : data.responseMessage
+                        'title' : response.responseMessage
                     });
                 } else {
                     PNotify.error({
-                        'title' : data.responseMessage
+                        'title' : response.responseMessage
                     });
                 }
 
-                if (data.tokenKey && data.token) {
-                    $('#security-token').attr('name', data.tokenKey);
-                    $('#security-token').val(data.token);
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
                 }
             }, 'json');
         }

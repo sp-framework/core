@@ -66,10 +66,10 @@ $('#{{componentId}}-listing-sync-purchase-order').click(function(e) {
     var postData = { };
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("ims/stock/purchaseorders/syncWithXero")}}', postData, function(data) {
-        if ($('#security-token').length === 1) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+    $.post('{{links.url("ims/stock/purchaseorders/syncWithXero")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
     }, 'json');
     // window.dataCollection['{{componentId}}']['{{componentId}}-listing']['BazContentSectionWithListing']._filterRunAjax();

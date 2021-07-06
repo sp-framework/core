@@ -209,20 +209,21 @@ dataCollectionSection =
                     postData['class'] = $('#{{componentId}}-{{sectionId}}-html-tag-class').val();
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    $.post('{{links.url("devtools/api/enums/extract")}}', postData, function(data) {
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                    $.post('{{links.url("devtools/api/enums/extract")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
+
                         $('#{{componentId}}-{{sectionId}}-extract').attr('hidden', true);
 
-                        if (data.responseCode == '0') {
-                            $('#{{componentId}}-{{sectionId}}-enums').val(data.responseData);
+                        if (response.responseCode == '0') {
+                            $('#{{componentId}}-{{sectionId}}-enums').val(response.responseData);
                             $('#{{componentId}}-{{sectionId}}-extract-modal').modal('hide');
                         } else {
                             $('#{{componentId}}-{{sectionId}}-extract').attr('disabled', false);
                             PNotify.error({
-                                title   : data.responseMessage,
+                                title   : response.responseMessage,
                             });
                         }
                     }, 'json');

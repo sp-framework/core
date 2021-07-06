@@ -112,6 +112,12 @@ var BazContentLoader = function() {
                 return false; //also return false
             });
         });
+
+        $('body').trigger(
+            {
+                'type'     : 'bazContentLoaderInitComplete'
+            }
+        );
     }
 
     function loadAjax(element, options, popped) {
@@ -203,7 +209,7 @@ var BazContentLoader = function() {
 
                     $('body').trigger('bazContentLoaderAjaxComplete');
 
-                    if ($('#security-token').length === 1) {
+                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
                         $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
                         $('#security-token').val(xhr.getResponseHeader('token'));
                     }
@@ -274,7 +280,7 @@ var BazContentLoader = function() {
                     // Trigger Modal Complete
                     $('body').trigger('bazContentLoaderModalComplete');
 
-                    if ($('#security-token').length === 1) {
+                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
                         $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
                         $('#security-token').val(xhr.getResponseHeader('token'));
                     }

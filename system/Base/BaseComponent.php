@@ -35,6 +35,10 @@ abstract class BaseComponent extends Controller
 
 	protected $assetsCollections = [];
 
+	protected $tokenKey = null;
+
+	protected $token = null;
+
 	protected function onConstruct()
 	{
 		$this->domain = $this->domains->getDomain();
@@ -44,7 +48,7 @@ abstract class BaseComponent extends Controller
 			return;
 		}
 
-		$this->setDefaultViewResponse();
+		$this->addResponse('Ok');//Default Response
 
 		$this->views = $this->modules->views->getViewInfo();
 
@@ -194,13 +198,6 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function setDefaultViewResponse()
-	{
-		$this->view->responseCode = '0';
-
-		$this->view->responseMessage = 'OK';
-	}
-
 	protected function sendJson()
 	{
 		$this->view->disable();
@@ -219,18 +216,24 @@ abstract class BaseComponent extends Controller
 	{
 		$this->buildHeaderBreadcrumb();
 
-		$this->getNewTokenAction();
+		if ((isset($this->getData()['id']) ||
+			(isset($this->getData()['csrf']) && $this->getData()['csrf'] == true)) ||
+			((isset($this->postData()['csrf']) && $this->postData()['csrf'] == true))
+		) {
+			$this->getNewToken();
+		}
 
-		if (!$this->request->isPost() || !$this->isJson())
+		if ($this->request->isPost() && $this->isJson()) {
+			return $this->sendJson();
+		}
+
 		if ($this->app) {
 			$this->view->menus =
 				$this->basepackages->menus->buildMenusForApp($this->app['id']);
 		}
 
-		if ($this->request->isAjax()) {
-			$this->response->setHeader('tokenKey', $this->security->getTokenKey());
-			$this->response->setHeader('token', $this->security->getToken());
-		}
+		$this->response->setHeader('tokenKey', $this->tokenKey);
+		$this->response->setHeader('token', $this->token);
 	}
 
 	protected function buildHeaderBreadcrumb()
@@ -248,15 +251,13 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	public function getNewTokenAction()
+	protected function getNewToken()
 	{
-		if ($this->request->isPost() && $this->isJson()) {
-			$this->view->tokenKey = $this->security->getTokenKey();
+		$this->tokenKey = $this->security->getTokenKey();
 
-			$this->view->token = $this->security->getToken();
+		$this->token = $this->security->getToken();
 
-			return $this->sendJson();
-		}
+		// $this->logger->log->debug('----------' . $this->componentName . '----------' . $this->tokenKey . ':' . $this->token . '----------');
 	}
 
 	protected function getURI()
@@ -353,7 +354,7 @@ abstract class BaseComponent extends Controller
 		if ($level === 1) {
 			$disableLevel =
 				[
-					View::LEVEL_ACTION_VIEW 		=> true,
+					View::LEVEL_ACTION_VIEW	=> true
 				];
 		} else if ($level === 3) {
 			$disableLevel =

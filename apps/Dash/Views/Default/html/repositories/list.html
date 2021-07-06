@@ -95,55 +95,59 @@ function initSync(val) {
         $('#modules-loader').attr('hidden', false);
         $('#modules-data').attr('hidden', true);
 
-        var repoId = $('#repositories-options-repositories option:selected').val();
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['repoId'] = $('#repositories-options-repositories option:selected').val();
+
         var filterId = $('#filter-options-filter option:selected').val();
-        $.post(
-            'repositories/sync',
-            {'repoId' : repoId},
-            function(data) {
-                if (data.responseCode === 0) {
-                    $('#modules-data').empty().load("{{links.url('modules/q/filter/')}}" + filterId);
 
-                    $('#modules-data').attr('hidden', false);
-                    $('#modules-loader').attr('hidden', true);
-                    $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
+        $.post('repositories/sync', postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+            if (response.responseCode == 0) {
+                $('#modules-data').empty().load("{{links.url('modules/q/filter/')}}" + filterId);
 
-                    var text, registerCounter, updateCounter;
+                $('#modules-data').attr('hidden', false);
+                $('#modules-loader').attr('hidden', true);
+                $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
 
-                    registerCounter = data.counter.register;
-                    updateCounter = data.counter.update;
+                var text, registerCounter, updateCounter;
 
-                    if (registerCounter > 0 || updateCounter > 0) {
-                        if (registerCounter !== 0 && updateCounter === 0) {
-                            text =
-                                'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
-                        } else if (registerCounter === 0 && updateCounter !== 0) {
-                            text =
-                                'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
-                        } else if (registerCounter !== 0 && updateCounter !== 0) {
-                            text =
-                                'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
-                        }
-                    } else {
-                        text = 'Sync Complete.<br>No new modules or updates available.';
+                registerCounter = response.counter.register;
+                updateCounter = response.counter.update;
+
+                if (registerCounter > 0 || updateCounter > 0) {
+                    if (registerCounter !== 0 && updateCounter === 0) {
+                        text =
+                            'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
+                    } else if (registerCounter === 0 && updateCounter !== 0) {
+                        text =
+                            'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
+                    } else if (registerCounter !== 0 && updateCounter !== 0) {
+                        text =
+                            'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
                     }
-                    PNotify.info({
-                        text        : text,
+                } else {
+                    text = 'Sync Complete.<br>No new modules or updates available.';
+                }
+                PNotify.info({
+                    text        : text,
+                    textTrusted : true
+                });
+
+                initModuleButtons();
+            } else {
+                PNotify.error({
+                        text        : response.responseMessage,
                         textTrusted : true
                     });
-
-                    initModuleButtons();
-                } else {
-                    PNotify.error({
-                            text        : data.responseMessage,
-                            textTrusted : true
-                        });
-                    $('#modules-data').attr('hidden', false);
-                    $('#modules-loader').attr('hidden', true);
-                    $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
-                }
+                $('#modules-data').attr('hidden', false);
+                $('#modules-loader').attr('hidden', true);
+                $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
             }
-        );
+        });
     });
 }
 
@@ -188,23 +192,22 @@ $('#repositories-options-delete').click(function() {
     }).then((result) => {
         if (result.isConfirmed) {
             var postData = { };
-            if ($('#security-token').length === 1) {
-                postData[$('#security-token').attr('name')] = $('#security-token').val();
-            }
+            postData[$('#security-token').attr('name')] = $('#security-token').val();
             postData['id'] = repoId;
+
             $.post('repositories/remove', postData,
-                    function(data) {
-                        if (data && data.responseCode === 0) {
+                    function(response) {
+                        if (response.responseCode == 0) {
                             $('#repositories-options-repositories').find('[data-value="' + repoId + '"]').remove();
                         } else {
                             PNotify.error({
-                                text        : data.responseMessage,
+                                text        : response.responseMessage,
                                 textTrusted : true
                             });
                         }
-                        if (data.tokenKey && data.token) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     },
                     'json'

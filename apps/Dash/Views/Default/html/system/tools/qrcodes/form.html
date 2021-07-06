@@ -581,20 +581,20 @@ dataCollectionSection =
 
                     var url = '{{links.url("system/tools/qrcodes/testqrcode")}}';
 
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             $('#qrcode-image').append(
-                                '<img src="' + data.qrcode + '" />'
+                                '<img src="' + response.qrcode + '" />'
                             );
                         } else {
                             PNotify.error({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                         }
 
-                        if (data.tokenKey && data.token) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                         $('#{{componentId}}-{{sectionId}}-test-qrcode-text-testbutton').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-test-qrcode-text-testbutton').children('i').attr('hidden', true);

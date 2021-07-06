@@ -283,11 +283,11 @@
                     'data'          : dataToSubmit,
                     'method'        : 'post',
                     'dataType'      : 'json',
-                    'success'       : function(data) {
-                                        if (data.responseCode == '0') {
+                    'success'       : function(response) {
+                                        if (response.responseCode == '0') {
                                             if ($(thisButtonId).data('successnotify') === true) {
                                                 PNotify.success({
-                                                    title   : data.responseMessage,
+                                                    title   : response.responseMessage,
                                                 });
                                             }
 
@@ -311,7 +311,7 @@
                                                 $(thisButtonId).parent().siblings('.card-body').empty().append(
                                                     '<div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>'
                                                     );
-                                                $(thisButtonId).parent().siblings('.card-body').load($(thisButtonId).attr('href'),data);
+                                                $(thisButtonId).parent().siblings('.card-body').load($(thisButtonId).attr('href'), response);
                                                 $(thisButtonId).attr('disabled', false);
                                             } else if (!$(thisButtonId).data('actiontarget') || $(thisButtonId).data('actiontarget') === '') {
                                                 $(thisButtonId).attr('disabled', false);
@@ -319,12 +319,12 @@
                                         } else {
                                             $(thisButtonId).attr('disabled', false);
                                             PNotify.error({
-                                                title   : data.responseMessage
+                                                title   : response.responseMessage
                                             });
                                             dataCollection[componentId][sectionId]['dataToSubmit'] = { };
-                                            if ($('#security-token').length === 1) {
-                                                $('#security-token').attr('name', data.tokenKey);
-                                                $('#security-token').val(data.token);
+                                            if (response.tokenKey && response.token) {
+                                                $('#security-token').attr('name', response.tokenKey);
+                                                $('#security-token').val(response.token);
                                             }
                                         }
                                         $(thisButtonId).children('i').attr('hidden', true);
@@ -508,11 +508,8 @@
                         dataCollection[componentId][sectionId]['dataToSubmit'][stripComponentId] = dataToSubmit;
                     });
                 }
-                //CSRF TOKEN
-                if ($('#security-token').length === 1) {
-                    dataCollection[componentId][sectionId]['dataToSubmit'][$('#security-token').attr('name')] =
-                        $('#security-token').val();
-                }
+                dataCollection[componentId][sectionId]['dataToSubmit'][$('#security-token').attr('name')] = $('#security-token').val();
+
                 return dataCollection[componentId][sectionId]['dataToSubmit'];
             };
 

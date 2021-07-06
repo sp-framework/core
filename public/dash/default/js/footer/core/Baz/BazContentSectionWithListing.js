@@ -213,22 +213,22 @@
                         var url = $(this).attr('href');
 
                         // //Update Filter
-                        $.post(url, postData, function(data) {
-                            if (data.responseCode === 0) {
+                        $.post(url, postData, function(response) {
+                            if (response.responseCode === 0) {
                                 PNotify.success({
-                                    'title' : data.responseMessage
+                                    'title' : response.responseMessage
                                 });
-                                if (data.filters) {
-                                    redoFiltersOptions(query, sectionId, data);
+                                if (response.filters) {
+                                    redoFiltersOptions(query, sectionId, response);
                                 }
                             } else {
                                 PNotify.error({
-                                    'title' : data.responseMessage
+                                    'title' : response.responseMessage
                                 });
                             }
-                            if ($('#security-token').length === 1) {
-                                $('#security-token').attr('name', data.tokenKey);
-                                $('#security-token').val(data.token);
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
                             }
                             $('#' + sectionId + '-filter-sharing-rids').empty().trigger('select2:change');
                             $('#' + sectionId + '-filter-sharing-eids').empty().trigger('select2:change');
@@ -256,6 +256,11 @@
                             query = $(filter).data()['conditions'];
                             defaultFilter = filter;
                             return false;
+                        } else if ($(filter).data()['account_id'] == 0 &&
+                                   $(filter).data()['is_default'] == 1
+                        ) {
+                            query = $(filter).data()['conditions'];
+                            defaultFilter = filter;
                         }
                     });
 
@@ -305,24 +310,24 @@
 
                     var url = $(this).attr('href');
 
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             PNotify.success({
-                                'title'     : data.responseMessage
+                                'title'     : response.responseMessage
                             });
-                            if (data.filters) {
-                                redoFiltersOptions('', sectionId, data);
+                            if (response.filters) {
+                                redoFiltersOptions('', sectionId, response);
                             }
                             resetFilters();
                             toggleFilterButtons(sectionId + '-filter');
                         } else {
                             PNotify.error({
-                                'title'     : data.responseMessage
+                                'title'     : response.responseMessage
                             });
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
 
@@ -488,13 +493,13 @@
 
                                 var url = $(this).attr('href');
 
-                                $.post(url, postData, function(data) {
-                                    if (data.responseCode === 0) {
+                                $.post(url, postData, function(response) {
+                                    if (response.responseCode === 0) {
                                         PNotify.success({
                                             'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
                                         });
-                                        if (data.filters) {
-                                            redoFiltersOptions('', sectionId, data);
+                                        if (response.filters) {
+                                            redoFiltersOptions('', sectionId, response);
                                         }
                                         resetFilters();
                                     } else {
@@ -502,9 +507,9 @@
                                             'title'     : 'Cannot delete filter.'
                                         });
                                     }
-                                    if ($('#security-token').length === 1) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $('#security-token').attr('name', response.tokenKey);
+                                        $('#security-token').val(response.token);
                                     }
                                 }, 'json');
                             }
@@ -616,10 +621,10 @@
 
                     var url = $(this).data('href');
 
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             Swal.fire({
-                                title                       : '<span class="text-danger"> Filter ' + data.defaultFilter[0].name + ' is already set as default. ' +
+                                title                       : '<span class="text-danger"> Filter ' + response.defaultFilter[0].name + ' is already set as default. ' +
                                                               'Make this filter default instead?</span>',
                                 icon                        : 'question',
                                 background                  : 'rgba(0,0,0,.8)',
@@ -644,9 +649,9 @@
                                 }
                             });
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
 
@@ -747,22 +752,22 @@
                     // }
 
                     //Update Filter
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             PNotify.success({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
-                            if (data.filters) {
-                                redoFiltersOptions(query, sectionId, data);
+                            if (response.filters) {
+                                redoFiltersOptions(query, sectionId, response);
                             }
                         } else {
                             PNotify.error({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
 
@@ -1130,28 +1135,28 @@
                     method      : 'post',
                     dataType    : 'json',
                     data        : postData,
-                    success     : function(data) {
-                        // if ($('#security-token').length === 1) {
-                        //     $('#security-token').attr('name', data.tokenKey);
-                        //     $('#security-token').val(data.token);
-                        // }
-                        if (data.responseCode != 0) {
+                    success     : function(response) {
+                        if (response.responseCode != 0) {
                             PNotify.error({
-                                title   : data.responseMessage
+                                title   : response.responseMessage
                             });
                         }
                         $('#listing-data-loader').hide();
                         $('#listing-primary-buttons').attr('hidden', false);
                         $('#listing-secondary-buttons').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
-                        $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
+                        $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
                         $('body').trigger(
                             {
                                 'type'     : 'sectionWithListingLoaded'
                             }
                         );
                     }
-                }).done(function() {
+                }).done(function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
                     that._tableInit(reDraw);
                     that._registerEvents();
                 });
@@ -1383,8 +1388,8 @@
                                 method      : 'post',
                                 data        : dataToSubmit,
                                 dataType    : 'json',
-                                success     : function(data) {
-                                    if (data.responseCode === 0) {
+                                success     : function(response) {
+                                    if (response.responseCode === 0) {
                                         PNotify.success({
                                             title           : notificationText,
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -1400,9 +1405,9 @@
                                         document.getElementById(rowSwitchInputId).checked = false;
                                     }
                                     pnotifySound.play();
-                                    if ($('#security-token').length === 1) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $('#security-token').attr('name', response.tokenKey);
+                                        $('#security-token').val(response.token);
                                     }
                                 }
                             });
@@ -1486,8 +1491,8 @@
                                 method      : 'post',
                                 data        : dataToSubmit,
                                 dataType    : 'json',
-                                success     : function(data) {
-                                    if (data.responseCode === 1) {
+                                success     : function(response) {
+                                    if (response.responseCode === 1) {
                                         PNotify.removeAll()
                                         PNotify.success({
                                             title           : notificationText,
@@ -1510,9 +1515,9 @@
                                         $(currentCheckedLabel).addClass('focus active');
                                     }
                                     pnotifySound.play();
-                                    if ($('#security-token').length === 1) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $('#security-token').attr('name', response.tokenKey);
+                                        $('#security-token').val(response.token);
                                     }
                                 }
                             });
@@ -1522,16 +1527,13 @@
 
                 // Deleting Row (element .rowRemove)
                 $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {
+                    $(rowRemove).off();
                     $(rowRemove).click(function(e) {
                         e.preventDefault();
                         var thisButton = this;
                         var url = $(this).attr('href');
                         var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).text();
                         var dataToSend = { };
-                        //CSRF Token
-                        if ($('#security-token').length === 1) {
-                            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-                        }
                         dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
                         Swal.fire({
                             title                       : '<span class="text-danger"> Delete ' + deleteText + '?</span>',
@@ -1556,33 +1558,31 @@
                                 if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
                                     dataToSend.confirm = '1';
                                 }
+                                dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+
                                 $.ajax({
                                     url         : url,
                                     method      : 'post',
                                     dataType    : 'json',
                                     data        : dataToSend,
-                                    success     : function(data) {
-                                        if (data.responseCode === 0) {
-                                            // PNotify.success({
-                                            //     title           : data.responseMessage
-                                            // });
-                                            // remove row on success
-                                            // thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
-                                            that._filterRunAjax(
-                                                1,
-                                                datatableOptions.paginationCounters.limit,
-                                                query
-                                            );
-                                        } else {
+                                    success     : function(response) {
+                                        if (response.tokenKey && response.token) {
+                                            $('#security-token').attr('name', response.tokenKey);
+                                            $('#security-token').val(response.token);
+                                        }
+                                        if (response.responseCode != 0) {
                                             PNotify.error({
-                                                title           : data.responseMessage,
+                                                title           : response.responseMessage,
                                             });
                                         }
-                                        // pnotifySound.play();
-                                        if ($('#security-token').length === 1) {
-                                            $('#security-token').attr('name', data.tokenKey);
-                                            $('#security-token').val(data.token);
-                                        }
+                                    }
+                                }).done(function(response) {
+                                    if (response.responseCode === 0) {
+                                        that._filterRunAjax(
+                                            datatableOptions.paginationCounters.current,
+                                            datatableOptions.paginationCounters.limit,
+                                            query
+                                        );
                                     }
                                 });
                             }
@@ -1619,7 +1619,17 @@
                 }
             }
 
-            _proto._filterRunAjax = function(page, limit, filterQuery) {
+            _proto._filterRunAjax = function(page = null, limit = null, filterQuery = null) {
+                if (!page) {
+                    page = datatableOptions.paginationCounters.current;
+                }
+                if (!limit) {
+                    limit = datatableOptions.paginationCounters.limit;
+                }
+                if (!filterQuery) {
+                    filterQuery = query;
+                }
+
                 thisOptions['datatable'].rows().clear().draw();
                 $('.dataTables_empty').last().html('<i class="fas fa-cog fa-spin"></i> Loading...');
 

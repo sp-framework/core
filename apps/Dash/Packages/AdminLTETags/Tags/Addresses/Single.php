@@ -634,16 +634,16 @@ class Single
                                         body: formdata
                                     };
 
-                                    const response = await fetch(url, requestOptions);
+                                    const responseData = await fetch(url, requestOptions);
 
-                                    const data = await response.json();
+                                    const response = await responseData.json();
 
-                                    if (data.tokenKey && data.token) {
-                                        $("#security-token").attr("name", data.tokenKey);
-                                        $("#security-token").val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
                                     }
-                                    if (data.cities) {
-                                        return data.cities;
+                                    if (response.cities) {
+                                        return response.cities;
                                     } else {
                                         return [];
                                     }
@@ -760,16 +760,16 @@ class Single
                                         body: formdata
                                     };
 
-                                    const response = await fetch(url, requestOptions);
+                                    const responseData = await fetch(url, requestOptions);
 
-                                    const data = await response.json();
+                                    const response = await responseData.json();
 
-                                    if (data.tokenKey && data.token) {
-                                        $("#security-token").attr("name", data.tokenKey);
-                                        $("#security-token").val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
                                     }
-                                    if (data.states) {
-                                        return data.states;
+                                    if (response.states) {
+                                        return response.states;
                                     } else {
                                         return [];
                                     }
@@ -863,17 +863,17 @@ class Single
                                         body: formdata
                                     };
 
-                                    const response = await fetch(url, requestOptions);
+                                    const responseData = await fetch(url, requestOptions);
 
-                                    const data = await response.json();
+                                    const response = await responseData.json();
 
-                                    if (data.tokenKey && data.token) {
-                                        $("#security-token").attr("name", data.tokenKey);
-                                        $("#security-token").val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $("#security-token").attr("name", response.tokenKey);
+                                        $("#security-token").val(response.token);
                                     }
 
-                                    if (data.countries) {
-                                        return data.countries;
+                                    if (response.countries) {
+                                        return response.countries;
                                     } else {
                                         return [];
                                     }

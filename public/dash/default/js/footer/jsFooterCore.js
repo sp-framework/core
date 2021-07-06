@@ -3438,11 +3438,11 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     'data'          : dataToSubmit,
                     'method'        : 'post',
                     'dataType'      : 'json',
-                    'success'       : function(data) {
-                                        if (data.responseCode == '0') {
+                    'success'       : function(response) {
+                                        if (response.responseCode == '0') {
                                             if ($(thisButtonId).data('successnotify') === true) {
                                                 PNotify.success({
-                                                    title   : data.responseMessage,
+                                                    title   : response.responseMessage,
                                                 });
                                             }
 
@@ -3466,7 +3466,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                                 $(thisButtonId).parent().siblings('.card-body').empty().append(
                                                     '<div class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>'
                                                     );
-                                                $(thisButtonId).parent().siblings('.card-body').load($(thisButtonId).attr('href'),data);
+                                                $(thisButtonId).parent().siblings('.card-body').load($(thisButtonId).attr('href'), response);
                                                 $(thisButtonId).attr('disabled', false);
                                             } else if (!$(thisButtonId).data('actiontarget') || $(thisButtonId).data('actiontarget') === '') {
                                                 $(thisButtonId).attr('disabled', false);
@@ -3474,12 +3474,12 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                                         } else {
                                             $(thisButtonId).attr('disabled', false);
                                             PNotify.error({
-                                                title   : data.responseMessage
+                                                title   : response.responseMessage
                                             });
                                             dataCollection[componentId][sectionId]['dataToSubmit'] = { };
-                                            if ($('#security-token').length === 1) {
-                                                $('#security-token').attr('name', data.tokenKey);
-                                                $('#security-token').val(data.token);
+                                            if (response.tokenKey && response.token) {
+                                                $('#security-token').attr('name', response.tokenKey);
+                                                $('#security-token').val(response.token);
                                             }
                                         }
                                         $(thisButtonId).children('i').attr('hidden', true);
@@ -3663,11 +3663,8 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                         dataCollection[componentId][sectionId]['dataToSubmit'][stripComponentId] = dataToSubmit;
                     });
                 }
-                //CSRF TOKEN
-                if ($('#security-token').length === 1) {
-                    dataCollection[componentId][sectionId]['dataToSubmit'][$('#security-token').attr('name')] =
-                        $('#security-token').val();
-                }
+                dataCollection[componentId][sectionId]['dataToSubmit'][$('#security-token').attr('name')] = $('#security-token').val();
+
                 return dataCollection[componentId][sectionId]['dataToSubmit'];
             };
 
@@ -5155,22 +5152,22 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         var url = $(this).attr('href');
 
                         // //Update Filter
-                        $.post(url, postData, function(data) {
-                            if (data.responseCode === 0) {
+                        $.post(url, postData, function(response) {
+                            if (response.responseCode === 0) {
                                 PNotify.success({
-                                    'title' : data.responseMessage
+                                    'title' : response.responseMessage
                                 });
-                                if (data.filters) {
-                                    redoFiltersOptions(query, sectionId, data);
+                                if (response.filters) {
+                                    redoFiltersOptions(query, sectionId, response);
                                 }
                             } else {
                                 PNotify.error({
-                                    'title' : data.responseMessage
+                                    'title' : response.responseMessage
                                 });
                             }
-                            if ($('#security-token').length === 1) {
-                                $('#security-token').attr('name', data.tokenKey);
-                                $('#security-token').val(data.token);
+                            if (response.tokenKey && response.token) {
+                                $('#security-token').attr('name', response.tokenKey);
+                                $('#security-token').val(response.token);
                             }
                             $('#' + sectionId + '-filter-sharing-rids').empty().trigger('select2:change');
                             $('#' + sectionId + '-filter-sharing-eids').empty().trigger('select2:change');
@@ -5198,6 +5195,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                             query = $(filter).data()['conditions'];
                             defaultFilter = filter;
                             return false;
+                        } else if ($(filter).data()['account_id'] == 0 &&
+                                   $(filter).data()['is_default'] == 1
+                        ) {
+                            query = $(filter).data()['conditions'];
+                            defaultFilter = filter;
                         }
                     });
 
@@ -5247,24 +5249,24 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     var url = $(this).attr('href');
 
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             PNotify.success({
-                                'title'     : data.responseMessage
+                                'title'     : response.responseMessage
                             });
-                            if (data.filters) {
-                                redoFiltersOptions('', sectionId, data);
+                            if (response.filters) {
+                                redoFiltersOptions('', sectionId, response);
                             }
                             resetFilters();
                             toggleFilterButtons(sectionId + '-filter');
                         } else {
                             PNotify.error({
-                                'title'     : data.responseMessage
+                                'title'     : response.responseMessage
                             });
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
 
@@ -5430,13 +5432,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                                 var url = $(this).attr('href');
 
-                                $.post(url, postData, function(data) {
-                                    if (data.responseCode === 0) {
+                                $.post(url, postData, function(response) {
+                                    if (response.responseCode === 0) {
                                         PNotify.success({
                                             'title'     : selectedFilter.data()['name'] + ' deleted successfully.'
                                         });
-                                        if (data.filters) {
-                                            redoFiltersOptions('', sectionId, data);
+                                        if (response.filters) {
+                                            redoFiltersOptions('', sectionId, response);
                                         }
                                         resetFilters();
                                     } else {
@@ -5444,9 +5446,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                             'title'     : 'Cannot delete filter.'
                                         });
                                     }
-                                    if ($('#security-token').length === 1) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $('#security-token').attr('name', response.tokenKey);
+                                        $('#security-token').val(response.token);
                                     }
                                 }, 'json');
                             }
@@ -5558,10 +5560,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     var url = $(this).data('href');
 
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             Swal.fire({
-                                title                       : '<span class="text-danger"> Filter ' + data.defaultFilter[0].name + ' is already set as default. ' +
+                                title                       : '<span class="text-danger"> Filter ' + response.defaultFilter[0].name + ' is already set as default. ' +
                                                               'Make this filter default instead?</span>',
                                 icon                        : 'question',
                                 background                  : 'rgba(0,0,0,.8)',
@@ -5586,9 +5588,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 }
                             });
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
 
@@ -5689,22 +5691,22 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     // }
 
                     //Update Filter
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             PNotify.success({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
-                            if (data.filters) {
-                                redoFiltersOptions(query, sectionId, data);
+                            if (response.filters) {
+                                redoFiltersOptions(query, sectionId, response);
                             }
                         } else {
                             PNotify.error({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
 
@@ -6072,28 +6074,28 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     method      : 'post',
                     dataType    : 'json',
                     data        : postData,
-                    success     : function(data) {
-                        // if ($('#security-token').length === 1) {
-                        //     $('#security-token').attr('name', data.tokenKey);
-                        //     $('#security-token').val(data.token);
-                        // }
-                        if (data.responseCode != 0) {
+                    success     : function(response) {
+                        if (response.responseCode != 0) {
                             PNotify.error({
-                                title   : data.responseMessage
+                                title   : response.responseMessage
                             });
                         }
                         $('#listing-data-loader').hide();
                         $('#listing-primary-buttons').attr('hidden', false);
                         $('#listing-secondary-buttons').attr('hidden', false);
                         $('#listing-filters').attr('hidden', false);
-                        $.extend(thisOptions.listOptions.datatable, JSON.parse(data.rows));
+                        $.extend(thisOptions.listOptions.datatable, JSON.parse(response.rows));
                         $('body').trigger(
                             {
                                 'type'     : 'sectionWithListingLoaded'
                             }
                         );
                     }
-                }).done(function() {
+                }).done(function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
                     that._tableInit(reDraw);
                     that._registerEvents();
                 });
@@ -6325,8 +6327,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 method      : 'post',
                                 data        : dataToSubmit,
                                 dataType    : 'json',
-                                success     : function(data) {
-                                    if (data.responseCode === 0) {
+                                success     : function(response) {
+                                    if (response.responseCode === 0) {
                                         PNotify.success({
                                             title           : notificationText,
                                             cornerClass     : 'ui-pnotify-sharp'
@@ -6342,9 +6344,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         document.getElementById(rowSwitchInputId).checked = false;
                                     }
                                     pnotifySound.play();
-                                    if ($('#security-token').length === 1) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $('#security-token').attr('name', response.tokenKey);
+                                        $('#security-token').val(response.token);
                                     }
                                 }
                             });
@@ -6428,8 +6430,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 method      : 'post',
                                 data        : dataToSubmit,
                                 dataType    : 'json',
-                                success     : function(data) {
-                                    if (data.responseCode === 1) {
+                                success     : function(response) {
+                                    if (response.responseCode === 1) {
                                         PNotify.removeAll()
                                         PNotify.success({
                                             title           : notificationText,
@@ -6452,9 +6454,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                         $(currentCheckedLabel).addClass('focus active');
                                     }
                                     pnotifySound.play();
-                                    if ($('#security-token').length === 1) {
-                                        $('#security-token').attr('name', data.tokenKey);
-                                        $('#security-token').val(data.token);
+                                    if (response.tokenKey && response.token) {
+                                        $('#security-token').attr('name', response.tokenKey);
+                                        $('#security-token').val(response.token);
                                     }
                                 }
                             });
@@ -6464,16 +6466,13 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                 // Deleting Row (element .rowRemove)
                 $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {
+                    $(rowRemove).off();
                     $(rowRemove).click(function(e) {
                         e.preventDefault();
                         var thisButton = this;
                         var url = $(this).attr('href');
                         var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).text();
                         var dataToSend = { };
-                        //CSRF Token
-                        if ($('#security-token').length === 1) {
-                            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-                        }
                         dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
                         Swal.fire({
                             title                       : '<span class="text-danger"> Delete ' + deleteText + '?</span>',
@@ -6498,33 +6497,31 @@ Object.defineProperty(exports, '__esModule', { value: true });
                                 if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
                                     dataToSend.confirm = '1';
                                 }
+                                dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+
                                 $.ajax({
                                     url         : url,
                                     method      : 'post',
                                     dataType    : 'json',
                                     data        : dataToSend,
-                                    success     : function(data) {
-                                        if (data.responseCode === 0) {
-                                            // PNotify.success({
-                                            //     title           : data.responseMessage
-                                            // });
-                                            // remove row on success
-                                            // thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
-                                            that._filterRunAjax(
-                                                1,
-                                                datatableOptions.paginationCounters.limit,
-                                                query
-                                            );
-                                        } else {
+                                    success     : function(response) {
+                                        if (response.tokenKey && response.token) {
+                                            $('#security-token').attr('name', response.tokenKey);
+                                            $('#security-token').val(response.token);
+                                        }
+                                        if (response.responseCode != 0) {
                                             PNotify.error({
-                                                title           : data.responseMessage,
+                                                title           : response.responseMessage,
                                             });
                                         }
-                                        // pnotifySound.play();
-                                        if ($('#security-token').length === 1) {
-                                            $('#security-token').attr('name', data.tokenKey);
-                                            $('#security-token').val(data.token);
-                                        }
+                                    }
+                                }).done(function(response) {
+                                    if (response.responseCode === 0) {
+                                        that._filterRunAjax(
+                                            datatableOptions.paginationCounters.current,
+                                            datatableOptions.paginationCounters.limit,
+                                            query
+                                        );
                                     }
                                 });
                             }
@@ -6561,7 +6558,17 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 }
             }
 
-            _proto._filterRunAjax = function(page, limit, filterQuery) {
+            _proto._filterRunAjax = function(page = null, limit = null, filterQuery = null) {
+                if (!page) {
+                    page = datatableOptions.paginationCounters.current;
+                }
+                if (!limit) {
+                    limit = datatableOptions.paginationCounters.limit;
+                }
+                if (!filterQuery) {
+                    filterQuery = query;
+                }
+
                 thisOptions['datatable'].rows().clear().draw();
                 $('.dataTables_empty').last().html('<i class="fas fa-cog fa-spin"></i> Loading...');
 
@@ -7803,19 +7810,19 @@ var BazContentSectionWithWizard = function() {
     }
 
     function doAjax(formUrl, formComponentId, formSectionId, step, lastStep) {
-        $.post(formUrl, $.param(dataCollection[formComponentId][formSectionId].dataToSubmit), function(data) {
+        $.post(formUrl, $.param(dataCollection[formComponentId][formSectionId].dataToSubmit), function(response) {
             var success = false;
 
-            if (data.responseCode == 0) {
-                if (data.responseData) {
-                    wizardOptions['steps'][step]['responseData'] = data.responseData;
+            if (response.responseCode == 0) {
+                if (response.responseData) {
+                    wizardOptions['steps'][step]['responseData'] = response.responseData;
                 }
                 wizardOptions['steps'][step]['submitted'] = true;
                 success = true;
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-danger').addClass('bg-success');
             } else {
                 PNotify.error({
-                    title   : data.responseMessage,
+                    title   : response.responseMessage,
                 });
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-success').addClass('bg-danger');
             }
@@ -7829,9 +7836,9 @@ var BazContentSectionWithWizard = function() {
             } else if (!lastStep && success === true) {
                 goNext();
             }
-            if ($('#security-token').length === 1) {
-                $('#security-token').attr('name', data.tokenKey);
-                $('#security-token').val(data.token);
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
             }
         }, 'json');
     }

@@ -23,17 +23,29 @@ class EntitiesComponent extends BaseComponent
 
     public function searchABNAction()
     {
-        if ($this->postData()['abn']) {
-            $abn = $this->usePackage(ABNLookup::class);
+        if ($this->request->isPost()) {
 
-            $findDetails = $abn->lookupABN($this->postData()['abn']);
-
-            if ($findDetails) {
-                $this->view->businessDetails = $abn->packagesData->businessDetails;
+            if (!$this->checkCSRF()) {
+                return;
             }
-            $this->view->responseCode = $abn->packagesData->responseCode;
 
-            $this->view->responseMessage = $abn->packagesData->responseMessage;
+            if ($this->postData()['abn']) {
+                $abn = $this->usePackage(ABNLookup::class);
+
+                $findDetails = $abn->lookupABN($this->postData()['abn']);
+
+                if ($findDetails) {
+                    $this->view->businessDetails = $abn->packagesData->businessDetails;
+                }
+
+                $this->view->responseCode = $abn->packagesData->responseCode;
+
+                $this->view->responseMessage = $abn->packagesData->responseMessage;
+            }
+        } else {
+            $this->view->responseCode = 1;
+
+            $this->view->responseMessage = 'Method Not Allowed';
         }
     }
 

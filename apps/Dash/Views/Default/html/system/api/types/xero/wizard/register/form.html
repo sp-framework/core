@@ -441,20 +441,20 @@ $('#{{componentId}}-{{sectionId}}-check-autho').click(function() {
     postData['api_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("system/api/checkXeroAutho")}}', postData, function(data) {
-        if ($('#security-token').length === 1) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+    $.post('{{links.url("system/api/checkXeroAutho")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
-        if (data.responseCode == '0') {
+        if (response.responseCode == '0') {
             $('#{{componentId}}-{{sectionId}}-check-autho').children().attr('hidden', true);
 
-            if (data.responseData) {
+            if (response.responseData) {
                 var authoData =
                     '<tr>' +
                         '<td>User Authorization Token Valid Till</td>' +
-                        '<td>' + data.responseData.user_access_token_valid_until + '</td>' +
+                        '<td>' + response.responseData.user_access_token_valid_until + '</td>' +
                     '</tr>';
 
                 $('#{{componentId}}-{{sectionId}}-autho-data tbody').empty().append(authoData);
@@ -475,7 +475,7 @@ $('#{{componentId}}-{{sectionId}}-check-autho').click(function() {
             $('#{{componentId}}-{{sectionId}}-setup').val('2');
             $('#{{componentId}}-{{sectionId}}-check-autho').attr('disabled', false);
             PNotify.error({
-                title   : data.responseMessage,
+                title   : response.responseMessage,
             });
         }
     }, 'json');
@@ -505,52 +505,52 @@ $('#{{componentId}}-{{sectionId}}-check-call-stats').click(function() {
     postData['api_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("system/api/checkXeroCallStats")}}', postData, function(data) {
-        if ($('#security-token').length === 1) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+    $.post('{{links.url("system/api/checkXeroCallStats")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
-        if (data.responseCode == '0') {
+        if (response.responseCode == '0') {
             $('#{{componentId}}-{{sectionId}}-check-call-stats').children().attr('hidden', true);
 
-            if (data.responseData) {
+            if (response.responseData) {
                 var callData =
                     '<tr>' +
                         '<td>Stats Retrieved at</td>' +
-                        '<td>' + data.responseData.timestamp.date + '</td>' +
+                        '<td>' + response.responseData.timestamp.date + '</td>' +
                     '</tr>';
 
-                    if (data.responseData.callData) {
+                    if (response.responseData.callData) {
                         callData +=
                             '<tr>' +
                                 '<td>Application Calls Per Minute Limits</td>' +
                                 '<td>' +
-                                data.responseData.callData.appMinLimit + ' / ' +
-                                data.responseData.callData['appMinLimit-remaining'] +
+                                response.responseData.callData.appMinLimit + ' / ' +
+                                response.responseData.callData['appMinLimit-remaining'] +
                                 '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Calls Per Minute Limits</td>' +
                                 '<td>' +
-                                data.responseData.callData.minLimit + ' / ' +
-                                data.responseData.callData['minLimit-remaining'] +
+                                response.responseData.callData.minLimit + ' / ' +
+                                response.responseData.callData['minLimit-remaining'] +
                                 '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Calls Per Day Limits</td>' +
                                 '<td>' +
-                                data.responseData.callData.dayLimit + ' / ' +
-                                data.responseData.callData['dayLimit-remaining'] +
+                                response.responseData.callData.dayLimit + ' / ' +
+                                response.responseData.callData['dayLimit-remaining'] +
                                 '</td>' +
                             '</tr>';
 
-                        if (data.responseData.callData['retry-after']) {
+                        if (response.responseData.callData['retry-after']) {
                             callData +=
                                 '<tr class="text-danger">' +
                                     '<td>API Calls Limit Reached. Please try after: </td>' +
                                     '<td>' +
-                                    data.responseData.callData['retry-after'] +
+                                    response.responseData.callData['retry-after'] +
                                     '</td>' +
                                 '</tr>';
                         }
@@ -573,7 +573,7 @@ $('#{{componentId}}-{{sectionId}}-check-call-stats').click(function() {
             $('#{{componentId}}-{{sectionId}}-updateData').attr('href', '{{links.url("system/api/q/id/' + apiId + '")}}');
             $('#{{componentId}}-{{sectionId}}-setup').val('2');
             PNotify.error({
-                title   : data.responseMessage,
+                title   : response.responseMessage,
             });
         }
     }, 'json');

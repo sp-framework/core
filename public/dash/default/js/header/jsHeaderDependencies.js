@@ -127,6 +127,12 @@ var BazContentLoader = function() {
                 return false; //also return false
             });
         });
+
+        $('body').trigger(
+            {
+                'type'     : 'bazContentLoaderInitComplete'
+            }
+        );
     }
 
     function loadAjax(element, options, popped) {
@@ -218,7 +224,7 @@ var BazContentLoader = function() {
 
                     $('body').trigger('bazContentLoaderAjaxComplete');
 
-                    if ($('#security-token').length === 1) {
+                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
                         $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
                         $('#security-token').val(xhr.getResponseHeader('token'));
                     }
@@ -289,7 +295,7 @@ var BazContentLoader = function() {
                     // Trigger Modal Complete
                     $('body').trigger('bazContentLoaderModalComplete');
 
-                    if ($('#security-token').length === 1) {
+                    if (xhr.getResponseHeader('tokenKey') && xhr.getResponseHeader('token')) {
                         $('#security-token').attr('name', xhr.getResponseHeader('tokenKey'));
                         $('#security-token').val(xhr.getResponseHeader('token'));
                     }
@@ -470,21 +476,12 @@ var BazCore = function() {
         openMenu();
 
         if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
-            initNotifications();
+            setTimeout(function() {
+                initNotifications();
+            }, 5000);
         }
-        // $(document).ready(function() {
-        //     getNewToken();
-        // });
     }
 
-    // function getNewToken() {
-    //     $.post("/getnewtoken", { }, function(response) {
-    //         if (response.tokenKey && response.token) {
-    //             $("#security-token").attr("name", response.tokenKey);
-    //             $("#security-token").val(response.token);
-    //         }
-    //     }, "json");
-    // }
     // Tooltips
     function toolTipsAndPopovers() {
         $('[data-toggle="tooltip"]').tooltip({container:'body'});
@@ -559,34 +556,37 @@ var BazCore = function() {
     }
 
     //Notifications
-    function getNotifications() {
+    function getNotificationsCount() {
         var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();
 
         $.post(url, postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
             if (response.responseCode == 0 && response.responseData) {
                 if (!Number.isInteger(response.responseData.count)) {
                     parseInt(response.responseData.count);
                 }
 
-                if (response.responseData.count === window.dataCollection.env.notifications) {
+                if (response.responseData.count === window.dataCollection.env.notifications.count) {
                     return;
-                } else if (response.responseData.count < window.dataCollection.env.notifications) {
-                    window.dataCollection.env.notifications = response.responseData.count;
+                } else if (response.responseData.count < window.dataCollection.env.notifications.count) {
+                    window.dataCollection.env.notifications.count = response.responseData.count;
                     updateCounter();
                     return;
                 }
 
-                window.dataCollection.env.notifications = response.responseData.count;
+                window.dataCollection.env.notifications.count = response.responseData.count;
                 updateCounter();
 
-                if (response.responseData.count > 0) {
+                if (response.responseData.count > 0 && !response.responseData.mute) {
                     window.dataCollection.env.sounds.notificationSound.play();
                 }
-                //eslint-disable-next-line
-                console.log(response.responseData.count);
             }
 
             function updateCounter() {
@@ -614,22 +614,17 @@ var BazCore = function() {
                     $('#notifications-button').removeClass('animated tada');
                 }, 10000);
             }
-
-            if (response.tokenKey && response.token) {
-                $("#security-token").attr("name", response.tokenKey);
-                $("#security-token").val(response.token);
-            }
         }, 'json');
     }
 
     function initNotifications() {
         $(document).ready(function() {
-            getNotifications();
+            getNotificationsCount();
         });
 
         BazHelpers.interval(
             async() => {
-                BazCore.getNotifications();
+                BazCore.getNotificationsCount();
             },
             100000
         );
@@ -690,8 +685,8 @@ var BazCore = function() {
         BazCore.bazContent = function(options) {
             bazContent(_extends(BazCore.defaults, options));
         }
-        BazCore.getNotifications = function(options) {
-            getNotifications(_extends(BazCore.defaults, options));
+        BazCore.getNotificationsCount = function(options) {
+            getNotificationsCount(_extends(BazCore.defaults, options));
         }
     }
 

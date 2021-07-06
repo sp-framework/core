@@ -416,19 +416,19 @@ var BazContentSectionWithWizard = function() {
     }
 
     function doAjax(formUrl, formComponentId, formSectionId, step, lastStep) {
-        $.post(formUrl, $.param(dataCollection[formComponentId][formSectionId].dataToSubmit), function(data) {
+        $.post(formUrl, $.param(dataCollection[formComponentId][formSectionId].dataToSubmit), function(response) {
             var success = false;
 
-            if (data.responseCode == 0) {
-                if (data.responseData) {
-                    wizardOptions['steps'][step]['responseData'] = data.responseData;
+            if (response.responseCode == 0) {
+                if (response.responseData) {
+                    wizardOptions['steps'][step]['responseData'] = response.responseData;
                 }
                 wizardOptions['steps'][step]['submitted'] = true;
                 success = true;
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-danger').addClass('bg-success');
             } else {
                 PNotify.error({
-                    title   : data.responseMessage,
+                    title   : response.responseMessage,
                 });
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-success').addClass('bg-danger');
             }
@@ -442,9 +442,9 @@ var BazContentSectionWithWizard = function() {
             } else if (!lastStep && success === true) {
                 goNext();
             }
-            if ($('#security-token').length === 1) {
-                $('#security-token').attr('name', data.tokenKey);
-                $('#security-token').val(data.token);
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
             }
         }, 'json');
     }

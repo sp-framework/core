@@ -1,3 +1,18 @@
+{% if auth.account()['profile']['settings']['notifications']['mute'] is defined %}
+    {% if auth.account()['profile']['settings']['notifications']['mute'] == true %}
+        {% set muteEnabled = true %}
+        {% set unmuteEnabled = false %}
+    {% elseif auth.account()['profile']['settings']['notifications']['mute'] == false %}
+        {% set muteEnabled = false %}
+        {% set unmuteEnabled = true %}
+    {% else %}
+        {% set muteEnabled = false %}
+        {% set unmuteEnabled = true %}
+    {% endif %}
+{% else %}
+    {% set muteEnabled = false %}
+    {% set unmuteEnabled = true %}
+{% endif %}
 {{adminltetags.useTag('content',
     [
         'component'             : table['component'],
@@ -32,24 +47,37 @@
         'dtTableCompact'        : true,
         'dtPrimaryButtons'      :
             {
-                'componentId'                       : componentId,
-                'sectionId'                         : 'listing',
-                'buttonType'                        : 'DropdownSplitButtons',
-                'dropdownSplitButtonsSplit'         : true,
-                'splitMainButtonId'                 : 'add-vendor',
-                'splitMainButtonTitle'              : 'Add Vendor',
-                'splitMainButtonAdditionalClass'    : 'contentAjaxLink',
-                'splitMainButtonUrl'                : links.url('business/directory/vendors/q/id/0'),
-                'splitMainButtonIcon'               : 'plus',
-                'buttonPosition'                    : 'right',
-                'dropdownAlign'                     : 'right',
-                'buttons'                           :
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
                     {
-                        'via-token' : {
-                            'title'                   : 'Add Via Token',
+                        'subscriptions' : {
+                            'title'                   : 'Manage Subscriptions',
+                            'size'                    : 'sm',
                             'type'                    : 'primary',
-                            'additionalClass'         : 'contentAjaxLink',
-                            'url'                     : links.url('business/directory/vendors/q/type/viatoken/id/0')
+                            'icon'                    : 'cog',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'position'                : 'right',
+                            'url'                     : links.url('system/users/profile')
+                        },
+                        'mute' : {
+                            'title'                   : 'mute',
+                            'size'                    : 'sm',
+                            'type'                    : 'warning',
+                            'icon'                    : 'bell-slash',
+                            'position'                : 'right',
+                            'hidden'                  : muteEnabled,
+                            'url'                     : links.url('system/notifications/changestate')
+                        },
+                        'unmute' : {
+                            'title'                   : 'unmute',
+                            'size'                    : 'sm',
+                            'type'                    : 'success',
+                            'icon'                    : 'bell',
+                            'position'                : 'right',
+                            'hidden'                  : unmuteEnabled,
+                            'url'                     : links.url('system/notifications/changestate')
                         }
                     }
             },
@@ -57,84 +85,49 @@
     ]
 )}}
 <script>
-/* Swal PNotify */
+/* globals Swal PNotify BazContentLoader BazCore */
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
-    initMarkReadArchive();
+    initFuncs();
+    BazContentLoader.init();
 }
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
-    initMarkReadArchive();
+    initFuncs();
+    BazContentLoader.init();
 }
 
-function initMarkReadArchive() {
+function initFuncs() {
     $('.rowMarkRead').each(function(index,row) {
         $(row).off();
         $(row).click(function(e) {
             e.preventDefault();
+
             var thisButton = this;
             var url = $(this).attr('href');
-            //eslint-disable-next-line
-            console.log(url);
-            // var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).text();
-            // var dataToSend = { };
-            // //CSRF Token
-            // if ($('#security-token').length === 1) {
-            //     dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-            // }
-            // dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
-            // Swal.fire({
-            //     title                       : '<span class="text-danger"> Delete ' + deleteText + '?</span>',
-            //     icon                        : 'question',
-            //     background                  : 'rgba(0,0,0,.8)',
-            //     backdrop                    : 'rgba(0,0,0,.6)',
-            //     buttonsStyling              : false,
-            //     confirmButtonText           : 'Delete',
-            //     customClass                 : {
-            //         'confirmButton'             : 'btn btn-danger text-uppercase',
-            //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-            //     },
-            //     showCancelButton            : true,
-            //     keydownListenerCapture      : true,
-            //     allowOutsideClick           : false,
-            //     allowEscapeKey              : false,
-            //     didOpen                      : function() {
-            //         swalSound.play();
-            //     }
-            // }).then((result) => {
-            //     if (result.value) {
-            //         if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
-            //             dataToSend.confirm = '1';
-            //         }
-            //         $.ajax({
-            //             url         : url,
-            //             method      : 'post',
-            //             dataType    : 'json',
-            //             data        : dataToSend,
-            //             success     : function(data) {
-            //                 if (data.responseCode === 0) {
-            //                     // PNotify.success({
-            //                     //     title           : data.responseMessage
-            //                     // });
-            //                     // remove row on success
-            //                     // thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
-            //                     that._filterRunAjax(
-            //                         1,
-            //                         datatableOptions.paginationCounters.limit,
-            //                         query
-            //                     );
-            //                 } else {
-            //                     PNotify.error({
-            //                         title           : data.responseMessage,
-            //                     });
-            //                 }
-            //                 // pnotifySound.play();
-            //                 if ($('#security-token').length === 1) {
-            //                     $('#security-token').attr('name', data.tokenKey);
-            //                     $('#security-token').val(data.token);
-            //                 }
-            //             }
-            //         });
-            //     }
-            // });
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                        BazCore.getNotificationsCount();
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
         });
     });
 
@@ -142,72 +135,97 @@ function initMarkReadArchive() {
         $(row).off();
         $(row).click(function(e) {
             e.preventDefault();
+
             var thisButton = this;
             var url = $(this).attr('href');
-            //eslint-disable-next-line
-            console.log(url);
-            // var deleteText = $(this).parents('td').siblings('.data-' + $(this).data('notificationtextfromcolumn')).text();
-            // var dataToSend = { };
-            // //CSRF Token
-            // if ($('#security-token').length === 1) {
-            //     dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
-            // }
-            // dataToSend.id = thisOptions['datatable'].row($(thisButton).parents('tr')).id();
-            // Swal.fire({
-            //     title                       : '<span class="text-danger"> Delete ' + deleteText + '?</span>',
-            //     icon                        : 'question',
-            //     background                  : 'rgba(0,0,0,.8)',
-            //     backdrop                    : 'rgba(0,0,0,.6)',
-            //     buttonsStyling              : false,
-            //     confirmButtonText           : 'Delete',
-            //     customClass                 : {
-            //         'confirmButton'             : 'btn btn-danger text-uppercase',
-            //         'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-            //     },
-            //     showCancelButton            : true,
-            //     keydownListenerCapture      : true,
-            //     allowOutsideClick           : false,
-            //     allowEscapeKey              : false,
-            //     didOpen                      : function() {
-            //         swalSound.play();
-            //     }
-            // }).then((result) => {
-            //     if (result.value) {
-            //         if (datatableOptions.sendConfirmRemove === 'true' || datatableOptions.sendConfirmRemove === '1') {
-            //             dataToSend.confirm = '1';
-            //         }
-            //         $.ajax({
-            //             url         : url,
-            //             method      : 'post',
-            //             dataType    : 'json',
-            //             data        : dataToSend,
-            //             success     : function(data) {
-            //                 if (data.responseCode === 0) {
-            //                     // PNotify.success({
-            //                     //     title           : data.responseMessage
-            //                     // });
-            //                     // remove row on success
-            //                     // thisOptions['datatable'].row($(thisButton).parents('tr')).remove().draw();
-            //                     that._filterRunAjax(
-            //                         1,
-            //                         datatableOptions.paginationCounters.limit,
-            //                         query
-            //                     );
-            //                 } else {
-            //                     PNotify.error({
-            //                         title           : data.responseMessage,
-            //                     });
-            //                 }
-            //                 // pnotifySound.play();
-            //                 if ($('#security-token').length === 1) {
-            //                     $('#security-token').attr('name', data.tokenKey);
-            //                     $('#security-token').val(data.token);
-            //                 }
-            //             }
-            //         });
-            //     }
-            // });
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                        BazCore.getNotificationsCount();
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
         });
     });
+
+    $('.rowAccess').each(function(index,row) {
+        $(this).addClass('contentAjaxLink');
+    });
 }
+
+$('#{{componentId}}-listing-mute').click(function(e) {
+    e.preventDefault();
+
+    var thisButton = this;
+    var url = $(this).attr('href');
+
+    var dataToSend = { };
+    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+    dataToSend['changestate'] = 1;
+
+    $.post(url, dataToSend, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            $(thisButton).attr('hidden', true);
+            $('#{{componentId}}-listing-unmute').attr('hidden', false);
+            $('#notifications-button').children('i').removeClass('fa-bell').addClass('fa-bell-slash');
+        } else {
+            PNotify.error({
+                title           : response.responseMessage,
+            });
+        }
+    }, 'json');
+});
+
+$('#{{componentId}}-listing-unmute').click(function(e) {
+    e.preventDefault();
+
+    var thisButton = this;
+    var url = $(this).attr('href');
+
+    var dataToSend = { };
+    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+    dataToSend['changestate'] = 0;
+
+    $.post(url, dataToSend, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
+        }
+
+        if (response.responseCode == 0) {
+            $(thisButton).attr('hidden', true);
+            $('#{{componentId}}-listing-mute').attr('hidden', false);
+            $('#notifications-button').children('i').removeClass('fa-bell-slash').addClass('fa-bell');
+            BazCore.getNotificationsCount();
+        } else {
+            PNotify.error({
+                title           : response.responseMessage,
+            });
+        }
+    }, 'json');
+});
+
 </script>

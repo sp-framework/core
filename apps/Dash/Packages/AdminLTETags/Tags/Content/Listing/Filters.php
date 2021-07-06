@@ -654,14 +654,14 @@ class Filters extends AdminLTETags
                                             search: params.term
                                         }
                                     },
-                                    processResults: function(data) {
-                                        if (data.tokenKey && data.token) {
-                                            $("#security-token").attr("name", data.tokenKey);
-                                            $("#security-token").val(data.token);
+                                    processResults: function(response) {
+                                        if (response.tokenKey && response.token) {
+                                            $("#security-token").attr("name", response.tokenKey);
+                                            $("#security-token").val(response.token);
                                         }
-                                        if (data.roles) {
+                                        if (response.roles) {
                                             var rolesData = [];
-                                            for (var item of data.roles) {
+                                            for (var item of response.roles) {
                                                 rolesData.push({
                                                     "id"    : item["id"],
                                                     "text"  : item["name"]
@@ -692,14 +692,14 @@ class Filters extends AdminLTETags
                                             search: params.term
                                         }
                                     },
-                                    processResults: function(data) {
-                                        if (data.tokenKey && data.token) {
-                                            $("#security-token").attr("name", data.tokenKey);
-                                            $("#security-token").val(data.token);
+                                    processResults: function(response) {
+                                        if (response.tokenKey && response.token) {
+                                            $("#security-token").attr("name", response.tokenKey);
+                                            $("#security-token").val(response.token);
                                         }
-                                        if (data.employees) {
+                                        if (response.employees) {
                                             var employeesData = [];
-                                            for (var item of data.employees) {
+                                            for (var item of response.employees) {
                                                 employeesData.push({
                                                     "id"    : item["id"],
                                                     "text"  : item["full_name"]
@@ -730,14 +730,14 @@ class Filters extends AdminLTETags
                                             search: params.term
                                         }
                                     },
-                                    processResults: function(data) {
-                                        if (data.tokenKey && data.token) {
-                                            $("#security-token").attr("name", data.tokenKey);
-                                            $("#security-token").val(data.token);
+                                    processResults: function(response) {
+                                        if (response.tokenKey && response.token) {
+                                            $("#security-token").attr("name", response.tokenKey);
+                                            $("#security-token").val(response.token);
                                         }
-                                        if (data.accounts) {
+                                        if (response.accounts) {
                                             var accountsData = [];
-                                            for (var item of data.accounts) {
+                                            for (var item of response.accounts) {
                                                 accountsData.push({
                                                     "id"    : item["id"],
                                                     "text"  : item["email"]

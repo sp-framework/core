@@ -151,30 +151,32 @@ dataCollectionSection =
                     e.preventDefault();
                     $(this).attr('disabled', true);
                     $(this).children('i').attr('hidden', false);
+
                     var postData = { };
                     postData['abn'] = $('#{{componentId}}-{{sectionId}}-abn').val();
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    $.post('{{links.url("business/entities/searchABN")}}', postData, function(data) {
+                    $.post('{{links.url("business/entities/searchABN")}}', postData, function(response) {
                         $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-abn-search').children('i').attr('hidden', true);
 
-                        if (data.tokenKey && data.token) {
-                            $("#security-token").attr("name", data.tokenKey);
-                            $("#security-token").val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
                         }
 
-                        if (data.responseCode === 0) {
-                            if (data.businessDetails.exception) {
+                        if (response.responseCode === 0) {
+                            if (response.businessDetails.exception) {
                                 PNotify.error({
-                                    text : data.businessDetails.exception.exceptionDescription
+                                    text : response.businessDetails.exception.exceptionDescription
                                 });
                                 return;
                             }
-                            if (data.businessDetails.businessEntity202001.entityStatus.entityStatusCode === 'Cancelled') {
+                            if (response.businessDetails.businessEntity202001.entityStatus.entityStatusCode === 'Cancelled') {
                                 PNotify.notice({
                                     textTrusted : true,
                                     text : 'Details for ABN: ' + $('#{{componentId}}-{{sectionId}}-abn').val() + ' found.' +
-                                           '<br>Status: ' + data.businessDetails.businessEntity202001.entityStatus.entityStatusCode
+                                           '<br>Status: ' + response.businessDetails.businessEntity202001.entityStatus.entityStatusCode
                                 });
                             } else {
                                 PNotify.success({
@@ -182,16 +184,16 @@ dataCollectionSection =
                                 });
 
 
-                                if (data.businessDetails.businessEntity202001.businessName) {
+                                if (response.businessDetails.businessEntity202001.businessName) {
                                     $('#{{componentId}}-{{sectionId}}-business_name').parent('.form-group').addClass('d-none');
                                     $('#{{componentId}}-{{sectionId}}-business_name').attr('disabled', true);
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').parent('.form-group').removeClass('d-none');
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').attr('disabled', false);
                                     $('#{{componentId}}-{{sectionId}}-business_name').val('');
                                     var newOption;
-                                    newOption = new Option(data.businessDetails.businessEntity202001.mainName.organisationName, 0, false, false);
+                                    newOption = new Option(response.businessDetails.businessEntity202001.mainName.organisationName, 0, false, false);
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
-                                    $.each(data.businessDetails.businessEntity202001.businessName, function(index, businessName) {
+                                    $.each(response.businessDetails.businessEntity202001.businessName, function(index, businessName) {
                                         newOption = new Option(businessName.organisationName, index + 1, false, false);
                                         $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
                                     });
@@ -207,21 +209,21 @@ dataCollectionSection =
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').empty().trigger('change');
                                     $('#{{componentId}}-{{sectionId}}-business_name').parent('.form-group').removeClass('d-none');
                                     $('#{{componentId}}-{{sectionId}}-business_name').attr('disabled', false);
-                                    if (data.businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
-                                        $('#{{componentId}}-{{sectionId}}-business_name').val(data.businessDetails.businessEntity202001.mainName.organisationName);
+                                    if (response.businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                                        $('#{{componentId}}-{{sectionId}}-business_name').val(response.businessDetails.businessEntity202001.mainName.organisationName);
                                     } else {
-                                        $('#{{componentId}}-{{sectionId}}-business_name').val(data.businessDetails.businessEntity202001.mainTradingName.organisationName);
+                                        $('#{{componentId}}-{{sectionId}}-business_name').val(response.businessDetails.businessEntity202001.mainTradingName.organisationName);
                                     }
                                 }
 
-                                $('#{{componentId}}-{{sectionId}}-entity_type').val(data.businessDetails.businessEntity202001.entityType.entityTypeCode);
+                                $('#{{componentId}}-{{sectionId}}-entity_type').val(response.businessDetails.businessEntity202001.entityType.entityTypeCode);
                                 $('#{{componentId}}-{{sectionId}}-entity_type').trigger('change');
 
-                                $('#{{componentId}}-{{sectionId}}-post_code').val(data.businessDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                                $('#{{componentId}}-{{sectionId}}-post_code').val(response.businessDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
                             }
 
                             $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', false);
-                            updateModalInfo(data.businessDetails);
+                            updateModalInfo(response.businessDetails);
                         }
                     }, 'json');
                 });

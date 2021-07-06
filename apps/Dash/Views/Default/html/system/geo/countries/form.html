@@ -489,25 +489,25 @@ dataCollectionSection =
                     postData['country_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
                     postData['country_iso3'] = $('#{{componentId}}-{{sectionId}}-iso3').val();
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode == 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode == 0) {
                             PNotify.success({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-install-country').attr('hidden', true);
                             $('#{{componentId}}-{{sectionId}}-install-country').siblings().removeClass('d-none');
 
                         } else {
                             PNotify.error({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-install-country').removeClass('disabled');
                             $('#{{componentId}}-{{sectionId}}-install-country').children().attr('hidden', true);
 
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
                 });

@@ -455,20 +455,20 @@ dataCollectionSection =
 
                     var url = '{{links.url("system/tools/barcodes/testbarcode")}}';
 
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode === 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode === 0) {
                             if (postData['generatorName'] === 'HTML' ||
                                 postData['generatorName'] === 'SVG'
                             ) {
-                                $('#barcode-image').append(data.barcode);
+                                $('#barcode-image').append(response.barcode);
                             } else if (postData['generatorName'] === 'PNG' ||
                                        postData['generatorName'] === 'JPG'
                             ) {
                                 var imgSrc;
                                 if (postData['generatorName'] === 'PNG') {
-                                    imgSrc = 'data:image/png;charset=utf-8;base64, ' + data.barcode;
+                                    imgSrc = 'data:image/png;charset=utf-8;base64, ' + response.barcode;
                                 } else if (postData['generatorName'] === 'JPG') {
-                                    imgSrc = 'data:image/jpeg;charset=utf-8;base64, ' + data.barcode;
+                                    imgSrc = 'data:image/jpeg;charset=utf-8;base64, ' + response.barcode;
                                 }
                                 $('#barcode-image').append(
                                     '<img src="' + imgSrc + '" />'
@@ -476,13 +476,13 @@ dataCollectionSection =
                             }
                         } else {
                             PNotify.error({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                         }
 
-                        if (data.tokenKey && data.token) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                         $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-test-barcode-text-testbutton').children('i').attr('hidden', true);

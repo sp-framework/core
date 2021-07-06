@@ -60,19 +60,19 @@ $('#{{componentId}}-{{sectionId}}-begin-user-autho').click(function(e) {
     postData['api_id'] = registerFormId;
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("system/api/getEbayUserTokenUrl")}}', postData, function(data) {
-        if ($('#security-token').length === 1) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+    $.post('{{links.url("system/api/getEbayUserTokenUrl")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
-        if (data.responseCode == '0') {
-            window.open(data.responseData);
+        if (response.responseCode == '0') {
+            window.open(response.responseData);
             $('body').off('ebay-api-success');
-            $('body').on('ebay-api-success', function(e, data) {
-                if ($('#security-token').length === 1) {
-                    $('#security-token').attr('name', data.tokenKey);
-                    $('#security-token').val(data.token);
+            $('body').on('ebay-api-success', function(e, response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
                 }
                 // $('#{{componentId}}-{{sectionId}}-begin-user-autho').attr('disabled', true);
                 $('#{{componentId}}-{{sectionId}}-begin-user-autho').removeClass('btn-primary').addClass('btn-success');
@@ -84,10 +84,10 @@ $('#{{componentId}}-{{sectionId}}-begin-user-autho').click(function(e) {
                 );
             });
             $('body').off('ebay-api-error');
-            $('body').on('ebay-api-error', function(e, data) {
-                if ($('#security-token').length === 1) {
-                    $('#security-token').attr('name', data.tokenKey);
-                    $('#security-token').val(data.token);
+            $('body').on('ebay-api-error', function(e, response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
                 }
                 $('#{{componentId}}-{{sectionId}}-begin-user-autho').attr('hidden', false);
                 $('#{{componentId}}-{{sectionId}}-begin-user-autho').attr('disabled', false);
@@ -99,7 +99,7 @@ $('#{{componentId}}-{{sectionId}}-begin-user-autho').click(function(e) {
             });
         } else {
             PNotify.error({
-                title   : data.responseMessage,
+                title   : response.responseMessage,
             });
         }
     }, 'json');

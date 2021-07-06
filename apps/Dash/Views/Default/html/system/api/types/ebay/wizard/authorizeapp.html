@@ -47,16 +47,16 @@ $('#{{componentId}}-{{sectionId}}-begin-app-autho').click(function(e) {
     postData['api_id'] = registerFormId;
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("system/api/getEbayAppToken")}}', postData, function(data) {
-        if ($('#security-token').length === 1) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+    $.post('{{links.url("system/api/getEbayAppToken")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
         $('#{{componentId}}-{{sectionId}}-begin-app-autho').children().attr('hidden', true);
-        if (data.responseCode == '0') {
+        if (response.responseCode == '0') {
             PNotify.success({
-                title   : data.responseMessage,
+                title   : response.responseMessage,
             });
             $('#{{componentId}}-{{sectionId}}-next').attr('disabled', false);
             $('#{{componentId}}-{{sectionId}}-begin-app-autho').removeClass('btn-primary').addClass('btn-success');
@@ -65,7 +65,7 @@ $('#{{componentId}}-{{sectionId}}-begin-app-autho').click(function(e) {
             );
         } else {
             PNotify.error({
-                title   : data.responseMessage,
+                title   : response.responseMessage,
             });
             $('#{{componentId}}-{{sectionId}}-begin-app-autho').html(
                 '<i class="fas fa-fw fa-cog fa-spin" hidden="hidden"></i> AUTHORIZATION ERROR! TRY AGAIN?'

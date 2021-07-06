@@ -36,7 +36,7 @@ if (!dataCollectionSection["data"]) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-manufacturer'                : {
-            placeholder : 'SELECT/CREATE MANUFACTURER',
+            placeholder     : 'SELECT/CREATE MANUFACTURER',
             'tags'          : true,
             'ajax'          : {
                 url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
@@ -47,14 +47,14 @@ dataCollectionSection =
                         search: params.term
                     }
                 },
-                processResults: function(data) {
-                    if (data.tokenKey && data.token) {
-                        $('#security-token').attr('name', data.tokenKey);
-                        $('#security-token').val(data.token);
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
                     }
-                    if (data.vendors) {
+                    if (response.vendors) {
                         var vendorsData = [];
-                        for (var item of data.vendors) {
+                        for (var item of response.vendors) {
                             vendorsData.push({
                                 'id' : item['id'],
                                 'text' : item['name']
@@ -99,14 +99,14 @@ dataCollectionSection =
                         search: params.term
                     }
                 },
-                processResults: function(data) {
-                    if (data.tokenKey && data.token) {
-                        $('#security-token').attr('name', data.tokenKey);
-                        $('#security-token').val(data.token);
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
                     }
-                    if (data.brands) {
+                    if (response.brands) {
                         var brandsData = [];
-                        for (var item of data.brands) {
+                        for (var item of response.brands) {
                             brandsData.push({
                                 'id' : item['id'],
                                 'text' : item['name']
@@ -174,16 +174,16 @@ dataCollectionSection =
                                     body: formdata
                                 };
 
-                                const response = await fetch(url, requestOptions);
+                                const responseData = await fetch(url, requestOptions);
 
-                                const data = await response.json();
+                                const response = await responseData.json();
 
-                                if (data.tokenKey && data.token) {
-                                    $('#security-token').attr('name', data.tokenKey);
-                                    $('#security-token').val(data.token);
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
                                 }
-                                if (data.categories) {
-                                    return data.categories;
+                                if (response.categories) {
+                                    return response.categories;
                                 } else {
                                     return [];
                                 }
@@ -286,16 +286,16 @@ dataCollectionSection =
                                     body: formdata
                                 };
 
-                                const response = await fetch(url, requestOptions);
+                                const responseData = await fetch(url, requestOptions);
 
-                                const data = await response.json();
+                                const response = await responseData.json();
 
-                                if (data.tokenKey && data.token) {
-                                    $('#security-token').attr('name', data.tokenKey);
-                                    $('#security-token').val(data.token);
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
                                 }
-                                if (data.taxonomy) {
-                                    return data.taxonomy;
+                                if (response.taxonomy) {
+                                    return response.taxonomy;
                                 } else {
                                     return [];
                                 }
@@ -586,17 +586,17 @@ dataCollectionSection =
                                     body: formdata
                                 };
 
-                                const response = await fetch(url, requestOptions);
+                                const responseData = await fetch(url, requestOptions);
 
-                                const data = await response.json();
+                                const response = await responseData.json();
 
-                                if (data.tokenKey && data.token) {
-                                    $('#security-token').attr('name', data.tokenKey);
-                                    $('#security-token').val(data.token);
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
                                 }
 
-                                if (data.specifications) {
-                                    return data.specifications;
+                                if (response.specifications) {
+                                    return response.specifications;
                                 } else {
                                     return [];
                                 }
@@ -691,16 +691,16 @@ dataCollectionSection =
                                     body: formdata
                                 };
 
-                                const response = await fetch(url, requestOptions);
+                                const responseData = await fetch(url, requestOptions);
 
-                                const data = await response.json();
+                                const response = await responseData.json();
 
-                                if (data.tokenKey && data.token) {
-                                    $('#security-token').attr('name', data.tokenKey);
-                                    $('#security-token').val(data.token);
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
                                 }
-                                if (data.specifications) {
-                                    return data.specifications;
+                                if (response.specifications) {
+                                    return response.specifications;
                                 } else {
                                     return [];
                                 }

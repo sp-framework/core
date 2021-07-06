@@ -185,25 +185,25 @@ dataCollectionSection =
                     postData['taxonomy_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    $.post(url, postData, function(data) {
-                        if (data.responseCode == 0) {
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode == 0) {
                             PNotify.success({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-install-taxonomy').attr('hidden', true);
                             $('#{{componentId}}-{{sectionId}}-install-taxonomy').siblings().removeClass('d-none');
 
                         } else {
                             PNotify.error({
-                                'title' : data.responseMessage
+                                'title' : response.responseMessage
                             });
                             $('#{{componentId}}-{{sectionId}}-install-taxonomy').removeClass('disabled');
                             $('#{{componentId}}-{{sectionId}}-install-taxonomy').children().attr('hidden', true);
 
                         }
-                        if ($('#security-token').length === 1) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
                     }, 'json');
                 });

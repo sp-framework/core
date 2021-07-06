@@ -379,36 +379,36 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
 
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("system/api/checkEbayUserToken")}}', postData, function(data) {
-        if ($('#security-token').length === 1) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+    $.post('{{links.url("system/api/checkEbayUserToken")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
-        if (data.responseCode == '0') {
+        if (response.responseCode == '0') {
             $('#{{componentId}}-{{sectionId}}-check-user-autho').children().attr('hidden', true);
 
-            if (data.responseData) {
+            if (response.responseData) {
                 var authoData =
                     '<tr>' +
                         '<td>User Authorization Token Valid Till</td>' +
-                        '<td>' + data.responseData.user_access_token_valid_until + '</td>' +
+                        '<td>' + response.responseData.user_access_token_valid_until + '</td>' +
                     '</tr>';
 
-                    if (data.responseData.user_data) {
+                    if (response.responseData.user_data) {
                         var contactFirstName, contactLastName, storeName, storeUrl;
                         var userTypeData = { };
 
-                        if (data.responseData.user_data.accountType === 'BUSINESS') {
-                            userTypeData = data.responseData.user_data.businessAccount;
+                        if (response.responseData.user_data.accountType === 'BUSINESS') {
+                            userTypeData = response.responseData.user_data.businessAccount;
                             contactFirstName = userTypeData.primaryContact.firstName;
                             contactLastName = userTypeData.primaryContact.lastName;
-                            if (data.responseData.store_data) {
-                                storeName = data.responseData.store_data.name;
-                                storeUrl = data.responseData.store_data.url;
+                            if (response.responseData.store_data) {
+                                storeName = response.responseData.store_data.name;
+                                storeUrl = response.responseData.store_data.url;
                             }
-                        } else if (data.responseData.user_data.accountType === 'INDIVIDUAL') {
-                            userTypeData = data.responseData.user_data.individualAccount;
+                        } else if (response.responseData.user_data.accountType === 'INDIVIDUAL') {
+                            userTypeData = response.responseData.user_data.individualAccount;
                             contactFirstName = userTypeData.firstName;
                             contactLastName = userTypeData.lastName;
                         }
@@ -416,26 +416,26 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
                         authoData +=
                             '<tr>' +
                                 '<td>Username</td>' +
-                                '<td>' + data.responseData.user_data.username + '</td>' +
+                                '<td>' + response.responseData.user_data.username + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Account Type</td>' +
-                                '<td>' + data.responseData.user_data.accountType + '</td>' +
+                                '<td>' + response.responseData.user_data.accountType + '</td>' +
                             '</tr>' +
                             '<tr>' +
                                 '<td>Registration Marketplace ID</td>' +
-                                '<td>' + data.responseData.user_data.registrationMarketplaceId + '</td>' +
+                                '<td>' + response.responseData.user_data.registrationMarketplaceId + '</td>' +
                             '</tr>';
 
-                            if (data.responseData.user_data.status) {
+                            if (response.responseData.user_data.status) {
                                 authoData +=
                                     '<tr>' +
                                         '<td>Status</td>' +
-                                        '<td>' + data.responseData.user_data.status + '</td>' +
+                                        '<td>' + response.responseData.user_data.status + '</td>' +
                                     '</tr>';
                             }
 
-                            if (data.responseData.store_data) {
+                            if (response.responseData.store_data) {
                                 authoData +=
                                     '<tr>' +
                                         '<td>Store Name</td>' +
@@ -503,7 +503,7 @@ $('#{{componentId}}-{{sectionId}}-check-user-autho').click(function() {
             $('#{{componentId}}-{{sectionId}}-updateData').attr('href', '{{links.url("system/api/q/id/' + apiId + '")}}');
             $('#{{componentId}}-{{sectionId}}-setup').val('2');
             PNotify.error({
-                title   : data.responseMessage,
+                title   : response.responseMessage,
             });
         }
     }, 'json');
@@ -538,32 +538,32 @@ $('#{{componentId}}-{{sectionId}}-check-call-stats').click(function() {
 
     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-    $.post('{{links.url("system/api/checkEbayCallStats")}}', postData, function(data) {
-        if ($('#security-token').length === 1) {
-            $('#security-token').attr('name', data.tokenKey);
-            $('#security-token').val(data.token);
+    $.post('{{links.url("system/api/checkEbayCallStats")}}', postData, function(response) {
+        if (response.tokenKey && response.token) {
+            $('#security-token').attr('name', response.tokenKey);
+            $('#security-token').val(response.token);
         }
 
-        if (data.responseCode == '0') {
+        if (response.responseCode == '0') {
             $('#{{componentId}}-{{sectionId}}-check-call-stats').children().attr('hidden', true);
 
-            if (data.responseData) {
+            if (response.responseData) {
                 var callData =
                     '<tr>' +
                         '<td>Stats Retrieved at</td>' +
-                        '<td>' + data.responseData.timestamp.date + '</td>' +
+                        '<td>' + response.responseData.timestamp.date + '</td>' +
                     '</tr>';
 
-                    if (data.responseData.callData) {
-                        for (var categories in data.responseData.callData) {
-                            for (var category in data.responseData.callData[categories]) {
+                    if (response.responseData.callData) {
+                        for (var categories in response.responseData.callData) {
+                            for (var category in response.responseData.callData[categories]) {
                                 callData +=
                                     '<tr>' +
                                         '<td>' + category + ' (' + categories + ')</td>' +
                                         '<td>' +
-                                        data.responseData.callData[categories][category][0]['limit'] + ' / ' +
-                                        data.responseData.callData[categories][category][0]['remaining'] + ' / ' +
-                                        data.responseData.callData[categories][category][0]['reset'] +
+                                        response.responseData.callData[categories][category][0]['limit'] + ' / ' +
+                                        response.responseData.callData[categories][category][0]['remaining'] + ' / ' +
+                                        response.responseData.callData[categories][category][0]['reset'] +
                                         '</td>' +
                                     '</tr>';
                             }
@@ -587,7 +587,7 @@ $('#{{componentId}}-{{sectionId}}-check-call-stats').click(function() {
             $('#{{componentId}}-{{sectionId}}-updateData').attr('href', '{{links.url("system/api/q/id/' + apiId + '")}}');
             $('#{{componentId}}-{{sectionId}}-setup').val('2');
             PNotify.error({
-                title   : data.responseMessage,
+                title   : response.responseMessage,
             });
         }
     }, 'json');

@@ -464,16 +464,16 @@ dataCollectionSection =
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     postData['vendorId'] = vendorId;
 
-                    $.post('{{links.url("business/directory/vendors/searchvendorid")}}', postData, function(data) {
-                        if (data.tokenKey && data.token) {
-                            $('#security-token').attr('name', data.tokenKey);
-                            $('#security-token').val(data.token);
+                    $.post('{{links.url("business/directory/vendors/searchvendorid")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
                         }
 
-                        if (data.vendor['address_ids']['2'].length === 0 ||
-                            data.vendor['contact_ids'].length === 0
+                        if (response.vendor['address_ids']['2'].length === 0 ||
+                            response.vendor['contact_ids'].length === 0
                         ) {
-                            if (data.vendor['address_ids']['2'].length === 0) {
+                            if (response.vendor['address_ids']['2'].length === 0) {
                                 $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').parents('.form-group').removeClass('d-none');
                                 $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').append(
                                     '<div class="callout callout-danger">' +
@@ -485,7 +485,7 @@ dataCollectionSection =
                                 );
                             }
 
-                            if (data.vendor['contact_ids'].length === 0) {
+                            if (response.vendor['contact_ids'].length === 0) {
                                 $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').parents('.form-group').removeClass('d-none');
                                 $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').append(
                                     '<div class="callout callout-danger">' +
@@ -504,7 +504,7 @@ dataCollectionSection =
 
                         var addressHtml = '';
 
-                        $(data.vendor['address_ids']['2']).each(function(index, address) {
+                        $(response.vendor['address_ids']['2']).each(function(index, address) {
                             var checked, addressContent;
 
                             if (address.is_primary == 1) {
@@ -550,7 +550,7 @@ dataCollectionSection =
 
                         var contactHtml = '';
 
-                        $(data.vendor['contact_ids']).each(function(index, contact) {
+                        $(response.vendor['contact_ids']).each(function(index, contact) {
                             var contactChecked, contactContent;
 
                             if (index == 0) {

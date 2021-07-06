@@ -413,20 +413,14 @@ class Croppie
                                 $("#' . $this->compSecId . '-croppie-avatar-female").attr("hidden", false);
                                 $("#' . $this->compSecId . '-croppie-avatar-refresh").attr("hidden", true);
                                 $("#' . $this->compSecId . '-croppie-avatar-save").attr("hidden", true);
-
+                                updateProfileThumbnail(true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").val("");
                                 oldImage = false;
                                 deleteUUIDs = [];
-
-                                $.post("' . $this->links->url("system/storages/getnewtoken") . '", { }, function(response) {
-                                    if (response.tokenKey && response.token) {
-                                        $("#security-token").attr("name", response.tokenKey);
-                                        $("#security-token").val(response.token);
-                                    }
-                                }, "json");
                             }
 
-                            $("#' . $this->compSecId . '-croppie-remove").click(function () {
+                            $("#' . $this->compSecId . '-croppie-remove").click(function (e) {
+                                e.preventDefault();
                                 croppieReset();
                             });
 
@@ -562,13 +556,13 @@ class Croppie
                                                     "storagetype"      : "' . $this->params['storageType'] . '"
                                                 },
                                             dataType: "json"
-                                        }).done(function (data) {
-                                            if (data.tokenKey && data.token) {
-                                                $("#security-token").attr("name", data.tokenKey);
-                                                $("#security-token").val(data.token);
+                                        }).done(function (response) {
+                                            if (response.tokenKey && response.token) {
+                                                $("#security-token").attr("name", response.tokenKey);
+                                                $("#security-token").val(response.token);
                                             }
 
-                                            if (data && data.responseCode === 0) {
+                                            if (response && response.responseCode === 0) {
                                                 //
                                             }
                                         });
@@ -600,15 +594,15 @@ class Croppie
                                     dataType    : "json",
                                     processData : false,
                                     contentType : false,
-                                }).done(function (data) {
-                                    if (data) {
-                                        if (data.tokenKey && data.token) {
-                                            $("#security-token").attr("name", data.tokenKey);
-                                            $("#security-token").val(data.token);
+                                }).done(function (response) {
+                                    if (response) {
+                                        if (response.tokenKey && response.token) {
+                                            $("#security-token").attr("name", response.tokenKey);
+                                            $("#security-token").val(response.token);
                                         }
-                                        if (data.responseCode == 0) {
-                                            uploadUUIDs.push(data.storageData.uuid);
-                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").val(data.storageData.uuid);
+                                        if (response.responseCode == 0) {
+                                            uploadUUIDs.push(response.storageData.uuid);
+                                            $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").val(response.storageData.uuid);
                                             $("#' . $this->compSecId . '-croppie-remove").attr("hidden", false);
                                             $("#' . $this->compSecId . '-croppie-avatar-male").attr("hidden", true);
                                             $("#' . $this->compSecId . '-croppie-avatar-female").attr("hidden", true);
@@ -617,11 +611,11 @@ class Croppie
                                             .trigger(
                                                 {
                                                     "type"      : "croppieSaved",
-                                                    "uuid"      : data.storageData.uuid
+                                                    "uuid"      : response.storageData.uuid
                                                 }
                                             );
                                         } else {
-                                            PNotify.error(data.responseMessage);
+                                            PNotify.error(response.responseMessage);
                                             croppieReset();
                                         }
                                     } else {
@@ -630,7 +624,13 @@ class Croppie
                                 });
                             }
 
-                            function updateProfileThumbnail() {
+                            function updateProfileThumbnail(remove = false) {
+                                if (remove) {
+                                    $("#profile-portrait").children("i").attr("hidden", false);
+                                    $("#profile-portrait").children("img").attr("src", "");
+                                    $("#profile-portrait").children("img").attr("hidden", true);
+                                }
+
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").off();
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").on("croppieSaved", function(e) {
                                     $("#' . $this->compSecId . '-croppie-avatar-refresh").attr("hidden", true);
@@ -639,8 +639,10 @@ class Croppie
                                     $("#' . $this->compSecId . '-croppie-avatar-male").attr("hidden", true);
                                     $("#' . $this->compSecId . '-croppie-upload").attr("hidden", true);
 
-                                    $("#profile-portrait").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
+                                    $("#profile-portrait").children("i").attr("hidden", true);
+                                    $("#profile-portrait").children("img").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
                                         "/system/storages/q/uuid/" + e.uuid + "/w/30");
+                                    $("#profile-portrait").children("img").attr("hidden", false);
                                 });
                             }
 

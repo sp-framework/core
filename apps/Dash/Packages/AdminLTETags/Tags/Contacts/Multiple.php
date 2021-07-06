@@ -300,16 +300,16 @@ class Multiple
                                                 body: formdata
                                             };
 
-                                            const response = await fetch(url, requestOptions);
+                                            const responseData = await fetch(url, requestOptions);
 
-                                            const data = await response.json();
+                                            const response = await responseData.json();
 
-                                            if (data.tokenKey && data.token) {
-                                                $("#security-token").attr("name", data.tokenKey);
-                                                $("#security-token").val(data.token);
+                                            if (response.tokenKey && response.token) {
+                                                $("#security-token").attr("name", response.tokenKey);
+                                                $("#security-token").val(response.token);
                                             }
-                                            if (data.contacts) {
-                                                return data.contacts;
+                                            if (response.contacts) {
+                                                return response.contacts;
                                             } else {
                                                 return [];
                                             }
@@ -366,11 +366,11 @@ class Multiple
                                         postData["id"] = feedback.selection.value.id;
                                         postData[$("#security-token").attr("name")] = $("#security-token").val();
 
-                                        $.post(url, postData, function(data) {
-                                            toggleContactFields(data);
-                                            if (data.tokenKey && data.token) {
-                                                $("#security-token").attr("name", data.tokenKey);
-                                                $("#security-token").val(data.token);
+                                        $.post(url, postData, function(response) {
+                                            toggleContactFields(response);
+                                            if (response.tokenKey && response.token) {
+                                                $("#security-token").attr("name", response.tokenKey);
+                                                $("#security-token").val(response.token);
                                             }
                                         }, "json");
                                     }

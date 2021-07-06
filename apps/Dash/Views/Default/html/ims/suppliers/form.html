@@ -139,27 +139,27 @@ dataCollectionSection =
                     var postData = { };
                     postData['abn'] = $('#{{componentId}}-{{sectionId}}-abn').val();
 
-                    $.post('{{links.url("ims/suppliers/searchABN")}}', postData, function(data) {
+                    $.post('{{links.url("ims/suppliers/searchABN")}}', postData, function(response) {
                         $('#{{componentId}}-{{sectionId}}-abn-search').attr('disabled', false);
                         $('#{{componentId}}-{{sectionId}}-abn-search').children('i').attr('hidden', true);
 
-                        if (data.tokenKey && data.token) {
-                            $("#security-token").attr("name", data.tokenKey);
-                            $("#security-token").val(data.token);
+                        if (response.tokenKey && response.token) {
+                            $("#security-token").attr("name", response.tokenKey);
+                            $("#security-token").val(response.token);
                         }
 
-                        if (data.responseCode === 0) {
-                            if (data.supplierDetails.exception) {
+                        if (response.responseCode === 0) {
+                            if (response.supplierDetails.exception) {
                                 PNotify.error({
-                                    text : data.supplierDetails.exception.exceptionDescription
+                                    text : response.supplierDetails.exception.exceptionDescription
                                 });
                                 return;
                             }
-                            if (data.supplierDetails.businessEntity202001.entityStatus.entityStatusCode === 'Cancelled') {
+                            if (response.supplierDetails.businessEntity202001.entityStatus.entityStatusCode === 'Cancelled') {
                                 PNotify.notice({
                                     textTrusted : true,
                                     text : 'Details for ABN: ' + $('#{{componentId}}-{{sectionId}}-abn').val() + ' found.' +
-                                           '<br>Status: ' + data.supplierDetails.businessEntity202001.entityStatus.entityStatusCode
+                                           '<br>Status: ' + response.supplierDetails.businessEntity202001.entityStatus.entityStatusCode
                                 });
                             } else {
                                 PNotify.success({
@@ -167,23 +167,23 @@ dataCollectionSection =
                                 });
 
 
-                                if (data.supplierDetails.businessEntity202001.businessName) {
+                                if (response.supplierDetails.businessEntity202001.businessName) {
                                     $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').addClass('d-none');
                                     $('#{{componentId}}-{{sectionId}}-name').attr('disabled', true);
                                     $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').removeClass('d-none');
                                     $('#{{componentId}}-{{sectionId}}-name_list').attr('disabled', false);
                                     $('#{{componentId}}-{{sectionId}}-name').val('');
                                     var newOption;
-                                    newOption = new Option(data.supplierDetails.businessEntity202001.mainName.organisationName, 0, false, false);
+                                    newOption = new Option(response.supplierDetails.businessEntity202001.mainName.organisationName, 0, false, false);
                                     $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
-                                    $.each(data.supplierDetails.businessEntity202001.businessName, function(index, businessName) {
+                                    $.each(response.supplierDetails.businessEntity202001.businessName, function(index, businessName) {
                                         newOption = new Option(businessName.organisationName, index + 1, false, false);
                                         $('#{{componentId}}-{{sectionId}}-name_list').append(newOption).trigger('change');
                                     });
                                     $('#{{componentId}}-{{sectionId}}-name_list').on('select2:select', function(e) {
                                         $('#{{componentId}}-{{sectionId}}-name').val('');
-                                        $('#{{componentId}}-{{sectionId}}-name').val(e.params.data.text);
-                                        $('#{{componentId}}-{{sectionId}}-name').attr('value', e.params.data.text);
+                                        $('#{{componentId}}-{{sectionId}}-name').val(e.params.response.text);
+                                        $('#{{componentId}}-{{sectionId}}-name').attr('value', e.params.response.text);
                                     });
                                 } else {
                                     $('#{{componentId}}-{{sectionId}}-name_list').parent('.form-group').addClass('d-none');
@@ -192,21 +192,21 @@ dataCollectionSection =
                                     $('#{{componentId}}-{{sectionId}}-name_list').empty().trigger('change');
                                     $('#{{componentId}}-{{sectionId}}-name').parent('.form-group').removeClass('d-none');
                                     $('#{{componentId}}-{{sectionId}}-name').attr('disabled', false);
-                                    if (data.supplierDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
-                                        $('#{{componentId}}-{{sectionId}}-name').val(data.supplierDetails.businessEntity202001.mainName.organisationName);
+                                    if (response.supplierDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                                        $('#{{componentId}}-{{sectionId}}-name').val(response.supplierDetails.businessEntity202001.mainName.organisationName);
                                     } else {
-                                        $('#{{componentId}}-{{sectionId}}-name').val(data.supplierDetails.businessEntity202001.mainTradingName.organisationName);
+                                        $('#{{componentId}}-{{sectionId}}-name').val(response.supplierDetails.businessEntity202001.mainTradingName.organisationName);
                                     }
                                 }
 
-                                $('#{{componentId}}-{{sectionId}}-type').val(data.supplierDetails.businessEntity202001.entityType.entityTypeCode);
+                                $('#{{componentId}}-{{sectionId}}-type').val(response.supplierDetails.businessEntity202001.entityType.entityTypeCode);
                                 $('#{{componentId}}-{{sectionId}}-type').trigger('change');
 
-                                $('#{{componentId}}-{{sectionId}}-post_code').val(data.supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
+                                $('#{{componentId}}-{{sectionId}}-post_code').val(response.supplierDetails.businessEntity202001.mainBusinessPhysicalAddress.postcode);
                             }
 
                             $('#{{componentId}}-{{sectionId}}-abn-info').attr('disabled', false);
-                            updateModalInfo(data.supplierDetails);
+                            updateModalInfo(response.supplierDetails);
                         }
                     }, 'json');
                 });
@@ -282,14 +282,14 @@ dataCollectionSection =
                         search: params.term
                     }
                 },
-                processResults: function(data) {
-                    if (data.tokenKey && data.token) {
-                        $('#security-token').attr('name', data.tokenKey);
-                        $('#security-token').val(data.token);
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
                     }
-                    if (data.brands) {
+                    if (response.brands) {
                         var brandsData = [];
-                        for (var item of data.brands) {
+                        for (var item of response.brands) {
                             brandsData.push({
                                 'id' : item['id'],
                                 'text' : item['name']

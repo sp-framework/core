@@ -176,28 +176,28 @@ $(document).ready(function(){
                                     $('.login-box-msg').text('Error! Please contact administrator.');
                                     failed();
                                 },
-            success         : function(data) {
-                                if (data.responseCode == '0') {
-                                    $('.login-box-msg').text(data.responseMessage);
-                                    if (data.redirectUrl) {
-                                        success(data.redirectUrl);
+            success         : function(response) {
+                                if (response.responseCode == '0') {
+                                    $('.login-box-msg').text(response.responseMessage);
+                                    if (response.redirectUrl) {
+                                        success(response.redirectUrl);
                                     } else {
                                         success();
                                     }
-                                } else if (data.responseCode == '1') {
-                                    $('.login-box-msg').text(data.responseMessage);
+                                } else if (response.responseCode == '1') {
+                                    $('.login-box-msg').text(response.responseMessage);
                                     failed();
-                                } else if (data.responseCode == '2') {
-                                    $('.login-box-msg').text(data.responseMessage);
+                                } else if (response.responseCode == '2') {
+                                    $('.login-box-msg').text(response.responseMessage);
                                     failed();
-                                } else if (data.responseCode == '3') {
-                                    $('.login-box-msg').text(data.responseMessage);
+                                } else if (response.responseCode == '3') {
+                                    $('.login-box-msg').text(response.responseMessage);
                                     twoFa();
                                 }
 
-                                if (data.tokenKey && data.token) {
-                                    $('#security-token').attr('name', data.tokenKey);
-                                    $('#security-token').val(data.token);
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
                                 }
                             }
         });
