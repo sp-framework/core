@@ -625,11 +625,19 @@ class Croppie
                             }
 
                             function updateProfileThumbnail(remove = false) {
-                                if (remove) {
-                                    $("#profile-portrait").children("i").attr("hidden", false);
-                                    $("#profile-portrait").children("img").attr("src", "");
-                                    $("#profile-portrait").children("img").attr("hidden", true);
-                                }
+                                $("body").off("sectionWithFormDataUpdated");
+                                $("body").on("sectionWithFormDataUpdated", function() {
+                                    if (remove) {
+                                        $("#profile-portrait").children("i").attr("hidden", false);
+                                        $("#profile-portrait").children("img").attr("src", "");
+                                        $("#profile-portrait").children("img").attr("hidden", true);
+                                    } else {
+                                        $("#profile-portrait").children("i").attr("hidden", true);
+                                        $("#profile-portrait").children("img").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
+                                            "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/30");
+                                        $("#profile-portrait").children("img").attr("hidden", false);
+                                    }
+                                });
 
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").off();
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '").on("croppieSaved", function(e) {
@@ -639,10 +647,6 @@ class Croppie
                                     $("#' . $this->compSecId . '-croppie-avatar-male").attr("hidden", true);
                                     $("#' . $this->compSecId . '-croppie-upload").attr("hidden", true);
 
-                                    $("#profile-portrait").children("i").attr("hidden", true);
-                                    $("#profile-portrait").children("img").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
-                                        "/system/storages/q/uuid/" + e.uuid + "/w/30");
-                                    $("#profile-portrait").children("img").attr("hidden", false);
                                 });
                             }
 

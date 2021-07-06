@@ -247,6 +247,17 @@
                     $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
                 }
 
+                $('#' + sectionId + ' .card-footer button.closeForm, #' + sectionId + ' .card-footer button.cancelForm').click(function(e) {
+                    e.preventDefault();
+
+                    if ($(this).is('.closeForm')) {
+                        $('body').trigger('sectionWithFormCloseForm');
+                    }
+                    if ($(this).is('.cancelForm')) {
+                        $('body').trigger('sectionWithFormCancelForm');
+                    }
+                });
+
                 $('#' + sectionId + ' .card-footer button.addData, #' + sectionId + ' .card-footer button.updateData').click(function(e) {
                     e.preventDefault();
 
@@ -315,6 +326,13 @@
                                                 $(thisButtonId).attr('disabled', false);
                                             } else if (!$(thisButtonId).data('actiontarget') || $(thisButtonId).data('actiontarget') === '') {
                                                 $(thisButtonId).attr('disabled', false);
+                                            }
+
+                                            if ($(thisButtonId).is('.addData')) {
+                                                $('body').trigger('sectionWithFormDataAdded');
+                                            }
+                                            if ($(thisButtonId).is('.updateData')) {
+                                                $('body').trigger('sectionWithFormDataUpdated');
                                             }
                                         } else {
                                             $(thisButtonId).attr('disabled', false);
