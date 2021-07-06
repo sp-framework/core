@@ -221,6 +221,9 @@ abstract class BaseComponent extends Controller
 			((isset($this->postData()['csrf']) && $this->postData()['csrf'] == true))
 		) {
 			$this->getNewToken();
+
+			$this->response->setHeader('tokenKey', $this->tokenKey);
+			$this->response->setHeader('token', $this->token);
 		}
 
 		if ($this->request->isPost() && $this->isJson()) {
@@ -231,9 +234,6 @@ abstract class BaseComponent extends Controller
 			$this->view->menus =
 				$this->basepackages->menus->buildMenusForApp($this->app['id']);
 		}
-
-		$this->response->setHeader('tokenKey', $this->tokenKey);
-		$this->response->setHeader('token', $this->token);
 	}
 
 	protected function buildHeaderBreadcrumb()
@@ -379,23 +379,25 @@ abstract class BaseComponent extends Controller
 
 	protected function buildGetQueryParamsArr()
 	{
-		$arr = Arr::chunk($this->dispatcher->getParams(), 2);
+		if ($this->request->isGet()) {
+			$arr = Arr::chunk($this->dispatcher->getParams(), 2);
 
-		foreach ($arr as $value) {
-			if (isset($value[1])) {
-				$this->getQueryArr[$value[0]] = $value[1];
-			} else {
-				$this->getQueryArr[$value[0]] = 0; //Value not set, so default to 0
+			foreach ($arr as $value) {
+				if (isset($value[1])) {
+					$this->getQueryArr[$value[0]] = $value[1];
+				} else {
+					$this->getQueryArr[$value[0]] = 0; //Value not set, so default to 0
+				}
 			}
-		}
 
-		// getQuery - /admin/setup/q/id/2/filter/4/search//layout/0
-		// Will Result to
-		// array (size=4)
-		//   'id' => string '2' (length=1)
-		//   'filter' => string '4' (length=1)
-		//   'search' => string '' (length=0)
-		//   'layout' => string '0' (length=1)
+			// getQuery - /admin/setup/q/id/2/filter/4/search//layout/0
+			// Will Result to
+			// array (size=4)
+			//   'id' => string '2' (length=1)
+			//   'filter' => string '4' (length=1)
+			//   'search' => string '' (length=0)
+			//   'layout' => string '0' (length=1)
+		}
 	}
 
 	protected function getData()
