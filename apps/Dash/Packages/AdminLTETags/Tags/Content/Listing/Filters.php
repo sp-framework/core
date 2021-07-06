@@ -95,6 +95,82 @@ class Filters extends AdminLTETags
                 </div><div class="row mb-2">';
         }
 
+        if (!isset($this->params['dtFilterButtons']) ||
+            (isset($this->params['dtFilterButtons']) &&
+             !is_array($this->params['dtFilterButtons'])) ||
+             (is_array($this->params['dtFilterButtons']) &&
+              count($this->params['dtFilterButtons']) === 0)
+        ) {
+            $filterButtonsArr = ['edit', 'delete', 'share', 'add', 'clone', 'reset'];
+        } else {
+            $filterButtonsArr = $this->params['dtFilterButtons'];
+        }
+
+        $filterButtons =
+            [
+                'edit'   => [
+                    'title'                   => false,
+                    'type'                    => 'warning',
+                    'icon'                    => 'edit',
+                    'noMargin'                => true,
+                    'disabled'                => true,
+                    'buttonAdditionalClass'   => 'rounded-0 text-white',
+                    'position'                => 'right'
+                ],
+                'delete'   => [
+                    'title'                   => false,
+                    'type'                    => 'danger',
+                    'icon'                    => 'trash',
+                    'noMargin'                => true,
+                    'disabled'                => true,
+                    'buttonAdditionalClass'   => 'rounded-0',
+                    'position'                => 'right',
+                    'url'                     => $this->links->url('system/filters/remove')
+                ],
+                'share'   => [
+                    'title'                   => false,
+                    'type'                    => 'primary',
+                    'tooltipTitle'            => 'Share Selected Saved Filter',
+                    'icon'                    => 'share-alt',
+                    'noMargin'                => true,
+                    'disabled'                => true,
+                    'hidden'                  => $sharedHidden,
+                    'buttonAdditionalClass'   => 'rounded-0',
+                    'position'                => 'right'
+                ],
+                'add'   => [
+                    'title'                   => false,
+                    'type'                    => 'success',
+                    'icon'                    => 'plus',
+                    'noMargin'                => true,
+                    'buttonAdditionalClass'   => 'rounded-0 ml-1',
+                    'position'                => 'right'
+                ],
+                'clone'   => [
+                    'title'                   => false,
+                    'type'                    => 'info',
+                    'icon'                    => 'copy',
+                    'noMargin'                => true,
+                    'buttonAdditionalClass'   => 'rounded-0 text-white',
+                    'position'                => 'right',
+                    'url'                     => $this->links->url('system/filters/add')
+                ],
+                'reset' => [
+                    'title'                   => false,
+                    'noMargin'                => true,
+                    'icon'                    => 'undo',
+                    'type'                    => 'primary',
+                    'buttonAdditionalClass'   => 'rounded-0 ml-1',
+                    'tooltipTitle'            => 'Reset Filters',
+                ]
+            ];
+
+        $allowedFilterButtons = [];
+
+        foreach ($filterButtonsArr as $filterButtonKey => $filterButton) {
+            $allowedFilterButtons[$filterButton] = $filterButtons[$filterButton];
+        }
+
         $this->content .=
             '<div class="col" id="listing-filters" hidden>
                 <form autocomplete="off">' .
@@ -108,64 +184,7 @@ class Filters extends AdminLTETags
                             'fieldType'                           => 'input',
                             'fieldAdditionalClass'                => 'mb-1',
                             'fieldGroupPreAddonIcon'              => 'filter',
-                            'fieldGroupPostAddonButtons'          =>
-                                [
-                                    'edit'   => [
-                                        'title'                   => false,
-                                        'type'                    => 'warning',
-                                        'icon'                    => 'edit',
-                                        'noMargin'                => true,
-                                        'disabled'                => true,
-                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
-                                        'position'                => 'right'
-                                    ],
-                                    'delete'   => [
-                                        'title'                   => false,
-                                        'type'                    => 'danger',
-                                        'icon'                    => 'trash',
-                                        'noMargin'                => true,
-                                        'disabled'                => true,
-                                        'buttonAdditionalClass'   => 'rounded-0',
-                                        'position'                => 'right',
-                                        'url'                     => $this->links->url('system/filters/remove')
-                                    ],
-                                    'share'   => [
-                                        'title'                   => false,
-                                        'type'                    => 'primary',
-                                        'tooltipTitle'            => 'Share Selected Saved Filter',
-                                        'icon'                    => 'share-alt',
-                                        'noMargin'                => true,
-                                        'disabled'                => true,
-                                        'hidden'                  => $sharedHidden,
-                                        'buttonAdditionalClass'   => 'rounded-0',
-                                        'position'                => 'right'
-                                    ],
-                                    'add'   => [
-                                        'title'                   => false,
-                                        'type'                    => 'success',
-                                        'icon'                    => 'plus',
-                                        'noMargin'                => true,
-                                        'buttonAdditionalClass'   => 'rounded-0 ml-1',
-                                        'position'                => 'right'
-                                    ],
-                                    'clone'   => [
-                                        'title'                   => false,
-                                        'type'                    => 'info',
-                                        'icon'                    => 'copy',
-                                        'noMargin'                => true,
-                                        'buttonAdditionalClass'   => 'rounded-0 text-white',
-                                        'position'                => 'right',
-                                        'url'                     => $this->links->url('system/filters/add')
-                                    ],
-                                    'reset' => [
-                                        'title'                   => false,
-                                        'noMargin'                => true,
-                                        'icon'                    => 'undo',
-                                        'type'                    => 'primary',
-                                        'buttonAdditionalClass'   => 'rounded-0 ml-1',
-                                        'tooltipTitle'            => 'Reset Filters',
-                                    ]
-                                ],
+                            'fieldGroupPostAddonButtons'          => $allowedFilterButtons,
                             'fieldInputType'                      => 'select',
                             'fieldHelp'                           => false,
                             'fieldDataSelectOptions'              => $filters,
