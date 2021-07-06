@@ -19,6 +19,9 @@ class NotificationsComponent extends BaseComponent
     public function fetchNewNotificationsCountAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
             $this->notifications->fetchNewNotificationsCount();
 
             $this->addResponse(
@@ -31,13 +34,29 @@ class NotificationsComponent extends BaseComponent
         }
     }
 
+    public function changeStateAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+            $this->notifications->changeNotificationState($this->postData());
+
+            $this->addResponse(
+                $this->notifications->packagesData->responseMessage,
+                $this->notifications->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
     public function markReadAction()
     {
         if ($this->request->isPost()) {
-            // if (!$this->checkCSRF()) {
-            //     return;
-            // }
-
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->notifications->markRead($this->postData());
 
@@ -53,10 +72,9 @@ class NotificationsComponent extends BaseComponent
     public function markArchiveAction()
     {
         if ($this->request->isPost()) {
-            // if (!$this->checkCSRF()) {
-            //     return;
-            // }
-
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->notifications->markArchive($this->postData());
 
@@ -77,6 +95,10 @@ class NotificationsComponent extends BaseComponent
                     '-:app_id:equals:' . $this->apps->getAppInfo()['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:0&and:archive:equals:0&',
                 'order'         => 'id desc'
             ];
+
+        if ($this->request->isPost()) {
+            $this->postData()['order'] = 'id desc';
+        }
 
         $replaceColumns =
             function ($dataArr) {
@@ -113,7 +135,7 @@ class NotificationsComponent extends BaseComponent
                 return;
             }
 
-            $this->notes->removeNotifications($this->postData());
+            $this->notifications->removeNotification($this->postData());
 
             $this->addResponse(
                 $this->notifications->packagesData->responseMessage,
@@ -128,7 +150,7 @@ class NotificationsComponent extends BaseComponent
     {
         foreach ($dataArr as $dataKey => &$data) {
             $data = $this->generateUserInfo($dataKey, $data);
-            $data = $this->generateAccessButton($dataKey, $data);
+            $data = $this->generateLinkButton($dataKey, $data);
             $data = $this->generateReadButton($dataKey, $data);
             $data = $this->generateArchiveButton($dataKey, $data);
             $data = $this->generateRemoveButton($dataKey, $data);
@@ -161,7 +183,7 @@ class NotificationsComponent extends BaseComponent
         return $data;
     }
 
-    protected function generateAccessButton($rowId, $data)
+    protected function generateLinkButton($rowId, $data)
     {
         if ($data['package_row_id']) {
             if (array_key_exists($data['package_name'], $this->packageLinks())) {
@@ -177,12 +199,14 @@ class NotificationsComponent extends BaseComponent
 
     protected function generateReadButton($rowId, $data)
     {
-        if ($data['read'] == 0) {
+        if ($data['read'] == 0 && $data['archive'] == 0) {
             $data['read'] =
                 '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-markread-' . $rowId . '" href="' . $this->links->url('system/notifications/markRead/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-info btn-xs rowMarkRead text-uppercase">
                     <i class="mr-1 fas fa-fw fa-xs fa-eye"></i>
                     <span class="text-xs"> Mark Read</span>
                 </a>';
+        } else {
+            $data['read'] = '';
         }
 
         return $data;
@@ -196,6 +220,8 @@ class NotificationsComponent extends BaseComponent
                     <i class="mr-1 fas fa-fw fa-xs fa-save"></i>
                     <span class="text-xs"> Archive</span>
                 </a>';
+        } else {
+            $data['archive'] = '';
         }
 
         return $data;
@@ -203,13 +229,11 @@ class NotificationsComponent extends BaseComponent
 
     protected function generateRemoveButton($rowId, $data)
     {
-        if ($data['archive'] == 0) {
-            $data['read'] .=
-                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-remove-__control-' . $rowId . '" href="' . $this->links->url('system/notifications/remove/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-danger btn-xs rowRemove text-uppercase" data-notificationtextfromcolumn="notification_title">
-                    <i class="mr-1 fas fa-fw fa-xs fa-trash"></i>
-                    <span class="text-xs"> Remove</span>
-                </a>';
-        }
+        $data['read'] .=
+            '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-remove-__control-' . $rowId . '" href="' . $this->links->url('system/notifications/remove/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-danger btn-xs rowRemove text-uppercase" data-notificationtextfromcolumn="notification_title">
+                <i class="mr-1 fas fa-fw fa-xs fa-trash"></i>
+                <span class="text-xs"> Remove</span>
+            </a>';
 
         return $data;
     }

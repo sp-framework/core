@@ -84,72 +84,73 @@ class Filters extends BasePackage
             $myFilters = [];
 
             //Make System Filters above all
-            $filtersArr = msort($filtersArr, 'filter_type');
+            if ($filtersArr) {
+                $filtersArr = msort($filtersArr, 'filter_type');
 
-            foreach ($filtersArr as $filterKey => $filter) {
-                $filter['shared'] = '0';
+                foreach ($filtersArr as $filterKey => $filter) {
+                    $filter['shared'] = '0';
 
-                $filter['url'] = $this->links->url($component['route']) . '/q/filter/' . $filter['id'];
+                    $filter['url'] = $this->links->url($component['route']) . '/q/filter/' . $filter['id'];
 
-                if ($filter['filter_type'] == 1 &&
-                    $filter['account_id'] == $account['id']
-                ) {
-                    array_push($myFilters, $filter['id']);
+                    if ($filter['filter_type'] == 1 &&
+                        $filter['account_id'] == $account['id']
+                    ) {
+                        array_push($myFilters, $filter['id']);
 
-                    if ($filter['shared_ids']) {//Im Sharing
+                        if ($filter['shared_ids']) {//Im Sharing
 
-                        $filter['shared_ids'] = Json::decode($filter['shared_ids'], true);
+                            $filter['shared_ids'] = Json::decode($filter['shared_ids'], true);
 
-                        //Role Ids
-                        if (isset($filter['shared_ids']['rids']) &&
-                            count($filter['shared_ids']['rids']) > 0
-                        ) {
-                            foreach ($filter['shared_ids']['rids'] as $sharingRidKey => $sharingRid) {
-                                $role = $this->roles->getById($sharingRid);
-                                if ($role) {
-                                    $filter['shared_ids']['rids'][$sharingRidKey] =
-                                    [
-                                        'id'    => $sharingRid,
-                                        'name'  => $role['name']
-                                    ];
-                                }
-                            }
-                        }
-
-                        //Account Ids
-                        if (isset($filter['shared_ids']['aids']) &&
-                            count($filter['shared_ids']['aids']) > 0
-                        ) {
-                            foreach ($filter['shared_ids']['aids'] as $sharingAidKey => $sharingAid) {
-                                $sharingAccount = $this->accounts->getById($sharingAid);
-
-                                if ($sharingAccount) {
-                                    $filter['shared_ids']['aids'][$sharingAidKey] =
-                                    [
-                                        'id'    => $sharingAid,
-                                        'name'  => $sharingAccount['email']
-                                    ];
-                                }
-
-                                if ($employeesPackage) {
-                                    $employee = $employeesPackage->searchByAccountId($sharingAid);
-
-                                    if ($employee) {
-                                        $filter['shared_ids']['eids'][$sharingAidKey] =
-                                            [
-                                                'id'    => $sharingAid,
-                                                'name'  => $employee['full_name']
-                                            ];
+                            //Role Ids
+                            if (isset($filter['shared_ids']['rids']) &&
+                                count($filter['shared_ids']['rids']) > 0
+                            ) {
+                                foreach ($filter['shared_ids']['rids'] as $sharingRidKey => $sharingRid) {
+                                    $role = $this->roles->getById($sharingRid);
+                                    if ($role) {
+                                        $filter['shared_ids']['rids'][$sharingRidKey] =
+                                        [
+                                            'id'    => $sharingRid,
+                                            'name'  => $role['name']
+                                        ];
                                     }
                                 }
                             }
+
+                            //Account Ids
+                            if (isset($filter['shared_ids']['aids']) &&
+                                count($filter['shared_ids']['aids']) > 0
+                            ) {
+                                foreach ($filter['shared_ids']['aids'] as $sharingAidKey => $sharingAid) {
+                                    $sharingAccount = $this->accounts->getById($sharingAid);
+
+                                    if ($sharingAccount) {
+                                        $filter['shared_ids']['aids'][$sharingAidKey] =
+                                        [
+                                            'id'    => $sharingAid,
+                                            'name'  => $sharingAccount['email']
+                                        ];
+                                    }
+
+                                    if ($employeesPackage) {
+                                        $employee = $employeesPackage->searchByAccountId($sharingAid);
+
+                                        if ($employee) {
+                                            $filter['shared_ids']['eids'][$sharingAidKey] =
+                                                [
+                                                    'id'    => $sharingAid,
+                                                    'name'  => $employee['full_name']
+                                                ];
+                                        }
+                                    }
+                                }
+                            }
+
+                            $filter['shared_ids'] = $this->escaper->escapeHtml(Json::encode($filter['shared_ids']));
                         }
-
-                        $filter['shared_ids'] = $this->escaper->escapeHtml(Json::encode($filter['shared_ids']));
                     }
+                    $filters[$filter['id']] = $filter;
                 }
-
-                $filters[$filter['id']] = $filter;
             }
 
             $sharedFiltersArr =
@@ -278,6 +279,12 @@ class Filters extends BasePackage
     {
         $component = $this->modules->components->getById($componentId);
 
+        if ($component && $component['route'] === 'system/notifications') {
+            $this->addFilterForNotifications($component);
+
+            return;
+        }
+
         $this->addFilter(
             [
                 'name'              => 'Show All ' . $component['name'],
@@ -289,6 +296,49 @@ class Filters extends BasePackage
                 'account_id'        => 0
             ]
         );
+    }
+
+    protected function addFilterForNotifications($component)
+    {
+        $conditions =
+            [
+                'all_unread'=> '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:0&and:archive:equals:0&',
+                'read'      => '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:1&and:archive:equals:0&',
+                'archive'   => '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:0&and:archive:equals:1&'
+            ];
+
+        foreach ($conditions as $conditionKey => $condition) {
+            $filterCondition =
+                [
+                    'conditions'    => 'conditions = :conditions:',
+                    'bind'          =>
+                        [
+                            'conditions'   => $condition
+                        ]
+                ];
+            $filter = $this->getByParams($filterCondition);
+            if (!$filter) {
+                if ($conditionKey === 'all_unread') {
+                    $name = 'Show All Unread ' . $component['name'];
+                } else if ($conditionKey === 'read') {
+                    $name = 'Show All Read ' . $component['name'];
+                } else if ($conditionKey === 'archive') {
+                    $name = 'Show All Archived ' . $component['name'];
+                }
+
+                $this->addFilter(
+                    [
+                        'name'              => $name,
+                        'conditions'        => $condition,
+                        'component_id'      => $component['id'],
+                        'filter_type'       => 0,//System
+                        'is_default'        => 1,
+                        'auto_generated'    => 1,
+                        'account_id'        => 0
+                    ]
+                );
+            }
+        }
     }
 
     public function addFilter(array $data)

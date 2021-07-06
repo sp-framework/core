@@ -7,19 +7,15 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a id="notifications-button" class="nav-link contentAjaxLink" href="{{links.url('system/notifications')}}" role="button">
-                    <i class="far fa-fw fa-bell"></i>
-                    <span id="notifications-button-counter" class="badge badge-info navbar-badge"></span>
-                </a>
-            </li>
             <li id="profile-dropdown" class="nav-item dropdown">
                 {% if auth.account() %}
-                    {% set profile = basepackages.profile.profile(auth.account()['id']) %}
-                    <a class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
+                    {% set profile = auth.account()['profile'] %}
+                    <a id="profile-portrait" class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
                         {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
-                            <img id="profile-portrait" src="{{links.url('system/storages/q/uuid/' ~ profile['portrait'] ~ '/w/30')}}" class="rounded-sm" style="position:relative;top: -5px;" alt="User Image">
+                            <img src="{{links.url('system/storages/q/uuid/' ~ profile['portrait'] ~ '/w/30')}}" class="rounded-sm" style="position:relative;top: -5px;" alt="User Image">
+                            <i class="far fa-user" hidden></i>
                         {% else %}
+                            <img src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" class="rounded-sm" style="position:relative;top: -5px;" alt="User Image" hidden>
                             <i class="far fa-user"></i>
                         {% endif %}
                     </a>
@@ -34,6 +30,23 @@
                 {% endif %}
             </li>
             <li class="nav-item">
+                {% if auth.account()['profile']['settings']['notifications']['mute'] is defined %}
+                    {% if auth.account()['profile']['settings']['notifications']['mute'] == true %}
+                        {% set notificationIcon = 'bell-slash' %}
+                    {% elseif auth.account()['profile']['settings']['notifications']['mute'] == false %}
+                        {% set notificationIcon = 'bell' %}
+                    {% else %}
+                        {% set notificationIcon = 'bell' %}
+                    {% endif %}
+                {% else %}
+                    {% set notificationIcon = 'bell' %}
+                {% endif %}
+                <a id="notifications-button" class="nav-link contentAjaxLink" href="{{links.url('system/notifications')}}" role="button">
+                    <i class="far fa-fw fa-{{notificationIcon}}"></i>
+                    <span id="notifications-button-counter" class="badge badge-info navbar-badge"></span>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
                     <i class="fas fa-th-large"></i>
                 </a>
@@ -42,6 +55,7 @@
     </div>
 </nav>
 <script>
+/* globals BazCore */
 $('#logout').click(function(e) {
     e.preventDefault();
     var url = $(this).attr('href');
@@ -52,8 +66,19 @@ $('#logout').click(function(e) {
     postData[tokenKey] = token;
     $.post(url, postData, function(data) {
         if (data.responseCode == '0') {
-            window.location = '/';
+            if (data.redirectUrl) {
+                window.location = data.redirectUrl;
+            } else {
+                window.location = '/';
+            }
         }
     }, 'json');
+});
+
+$('body').on('bazContentLoaderInitComplete', function() {
+    $('#notifications-button').click(function(e) {
+        e.preventDefault();
+        BazCore.getNotificationsCount();
+    });
 });
 </script>

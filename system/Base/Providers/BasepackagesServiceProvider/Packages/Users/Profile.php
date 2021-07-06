@@ -23,8 +23,12 @@ class Profile extends BasePackage
 
     public $profile;
 
-    public function profile(int $accountId)
+    public function profile(int $accountId = null)
     {
+        if (!$accountId) {
+            $accountId = $this->auth->account()['id'];
+        }
+
         if (!$this->profile) {
             $this->profile = $this->setProfile($this->getProfile($accountId));
         }
@@ -47,6 +51,15 @@ class Profile extends BasePackage
 
         if ($profile && count($profile) === 1) {
             $profile = $profile[0];
+
+            if ($profile['settings'] &&
+                !is_array($profile['settings']) &&
+                $profile['settings'] !== ''
+            ) {
+                $profile['settings'] = Json::decode($profile['settings'], true);
+            } else {
+                $profile['settings'] = [];
+            }
 
             return $profile;
         }
@@ -132,6 +145,10 @@ class Profile extends BasePackage
             $profile['contact_mobile'] = 0;
         }
 
+        if (is_array($profile['settings'])) {
+            $profile['settings'] = Json::encode($profile['settings']);
+        }
+
         if ($this->update($profile)) {
             $this->packagesData->responseCode = 0;
 
@@ -193,6 +210,10 @@ class Profile extends BasePackage
         }
 
         $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
+
+        if (is_array($profile['settings'])) {
+            $profile['settings'] = Json::encode($profile['settings']);
+        }
 
         if ($this->update($profile)) {
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);
