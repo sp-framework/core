@@ -104,8 +104,8 @@ abstract class BasePackage extends Controller
 			if ($data) {
 				return $data;
 			} else {
-				return false;
-				// throw new IdNotFoundException('Not Found', 1);
+				// return false;
+				throw new IdNotFoundException('Not Found', 1);
 			}
 		}
 
