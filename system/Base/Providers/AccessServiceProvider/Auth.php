@@ -115,6 +115,8 @@ class Auth
             $this->session->remove($this->key);
         }
 
+        $this->packagesData->redirectUrl = $this->links->url('auth');
+
         $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->app['name']);
 
         return true;
@@ -323,7 +325,7 @@ class Auth
 
             $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
 
-            $this->logger->log->debug($data['account'] . ' is not in DB. App: ' . $this->app['name']);
+            $this->logger->log->debug($data['user'] . ' is not in DB. App: ' . $this->app['name']);
 
             return false;
         }

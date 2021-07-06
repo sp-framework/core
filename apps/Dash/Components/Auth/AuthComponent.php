@@ -68,6 +68,8 @@ class AuthComponent extends BaseComponent
     public function logoutAction()
     {
         if ($this->auth->logout()) {
+            $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
+
             $this->view->responseCode = 0;
         }
     }
