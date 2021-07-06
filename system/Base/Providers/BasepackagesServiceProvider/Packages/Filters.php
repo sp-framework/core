@@ -320,10 +320,13 @@ class Filters extends BasePackage
             if (!$filter) {
                 if ($conditionKey === 'all_unread') {
                     $name = 'Show All Unread ' . $component['name'];
+                    $default = 1;
                 } else if ($conditionKey === 'read') {
                     $name = 'Show All Read ' . $component['name'];
+                    $default = 0;
                 } else if ($conditionKey === 'archive') {
                     $name = 'Show All Archived ' . $component['name'];
+                    $default = 0;
                 }
 
                 $this->addFilter(
@@ -332,7 +335,7 @@ class Filters extends BasePackage
                         'conditions'        => $condition,
                         'component_id'      => $component['id'],
                         'filter_type'       => 0,//System
-                        'is_default'        => 1,
+                        'is_default'        => $default,
                         'auto_generated'    => 1,
                         'account_id'        => 0
                     ]
