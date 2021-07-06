@@ -91,6 +91,11 @@ class Auth
             try {
                 $this->setUserFromSession();
             } catch (\Exception $e) {
+                if ($this->getKey()) {//Remove Stale sessionIds from session cache storage
+                    if ($this->session->has($this->key)) {
+                        $this->session->remove($this->key);
+                    }
+                }
                 return;
             }
         }
