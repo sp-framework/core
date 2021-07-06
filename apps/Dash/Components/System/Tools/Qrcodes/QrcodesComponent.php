@@ -47,6 +47,8 @@ class QrcodesComponent extends BaseComponent
         $this->qrcodesSettings['labelColor'] = 'rgb(' . implode(',', $this->qrcodesSettings['labelColor']) . ')';
 
         $this->view->qrcodesSettings = $this->qrcodesSettings;
+
+        $this->getNewToken();
     }
 
     /**

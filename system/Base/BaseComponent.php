@@ -221,10 +221,10 @@ abstract class BaseComponent extends Controller
 			((isset($this->postData()['csrf']) && $this->postData()['csrf'] == true))
 		) {
 			$this->getNewToken();
-
-			$this->response->setHeader('tokenKey', $this->tokenKey);
-			$this->response->setHeader('token', $this->token);
 		}
+
+		$this->response->setHeader('tokenKey', $this->tokenKey);
+		$this->response->setHeader('token', $this->token);
 
 		if ($this->request->isPost() && $this->isJson()) {
 			return $this->sendJson();
@@ -238,7 +238,6 @@ abstract class BaseComponent extends Controller
 
 	protected function buildHeaderBreadcrumb()
 	{
-
 		if ($this->app && isset($this->componentRoute)) {
 			if ($this->componentRoute === '') {
 				$this->componentRoute = 'home';

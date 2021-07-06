@@ -34,6 +34,8 @@ class ProfileComponent extends BaseComponent
             $this->view->canEmail = $this->profile->packagesData->canEmail;
         }
 
+        $this->getNewToken();
+
         $this->useStorage('private');
     }
 

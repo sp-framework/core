@@ -27,6 +27,8 @@ class BarcodesComponent extends BaseComponent
     public function viewAction()
     {
         $this->view->barcodesSettings = $this->barcodesSettings;
+
+        $this->getNewToken();
     }
 
     /**
