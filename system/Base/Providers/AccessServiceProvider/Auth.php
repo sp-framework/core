@@ -110,11 +110,8 @@ class Auth
             try {
                 $this->setUserFromSession();
             } catch (\Exception $e) {
-                if ($this->getKey()) {//Remove Stale sessionIds from session cache storage
-                    if ($this->session->has($this->key)) {
-                        $this->session->remove($this->key);
-                    }
-                }
+                $this->sessionTools->clearSession($this->session->getId());
+
                 return;
             }
         }
@@ -140,32 +137,6 @@ class Auth
         $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->app['name']);
 
         return true;
-    }
-
-    protected function clearAccountSessionId()
-    {
-        if ($this->account['session_ids']) {
-            if (!is_array($this->account['session_ids'])) {
-                $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
-            }
-            $sessionIdKey = array_search($this->session->getId(), $this->account['session_ids']);
-        }
-
-        if (isset($sessionIdKey) && $sessionIdKey !== false) {
-            if (count($this->account['session_ids']) === 1) {
-                $this->account['session_ids'] = null;
-            } else {
-                unset($this->account['session_ids'][$sessionIdKey]);
-
-                $this->account['session_ids'] = Json::encode($this->account['session_ids']);
-            }
-        } else {
-            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
-        }
-
-        $this->sessionTools->clearSession($this->session->getId());
-
-        $this->accounts->update($this->account);
     }
 
     protected function clearAccountRememberToken()
@@ -204,12 +175,33 @@ class Auth
         if ($this->cookies->has($this->cookieKey)) {
             $this->cookies->delete($this->cookieKey);
         }
-
-        if ($this->session->has('_PHCOOKIE_' . $this->cookieKey)) {
-            $this->session->remove('_PHCOOKIE_' . $this->cookieKey);
-        }
     }
 
+    protected function clearAccountSessionId()
+    {
+        if ($this->account['session_ids']) {
+            if (!is_array($this->account['session_ids'])) {
+                $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
+            }
+            $sessionIdKey = array_search($this->session->getId(), $this->account['session_ids'][$this->getKey()]);
+        }
+
+        if (isset($sessionIdKey) && $sessionIdKey !== false) {
+            if (count($this->account['session_ids'][$this->getKey()]) === 1) {
+                $this->account['session_ids'][$this->getKey()] = [];
+            } else {
+                unset($this->account['session_ids'][$this->getKey()][$sessionIdKey]);
+
+                $this->account['session_ids'] = Json::encode($this->account['session_ids']);
+            }
+        } else {
+            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
+        }
+
+        $this->sessionTools->removeSessionKey($this->getKey());
+
+        $this->accounts->update($this->account);
+    }
 
     public function attempt($data)
     {
@@ -361,12 +353,19 @@ class Auth
         if ($this->setUserSession()) {
             if ($this->account['session_ids']) {
                 $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
-                if (!in_array($this->session->getId(), $this->account['session_ids'])) {
-                    array_push($this->account['session_ids'], $this->session->getId());
+
+                if (isset($this->account['session_ids'][$this->getKey()])) {
+                    if (!in_array($this->session->getId(), $this->account['session_ids'][$this->getKey()])) {
+                        array_push($this->account['session_ids'][$this->getKey()], $this->session->getId());
+                    }
+                } else {
+                    $this->account['session_ids'][$this->getKey()] = [];
+                    array_push($this->account['session_ids'][$this->getKey()], $this->session->getId());
                 }
             } else {
                 $this->account['session_ids'] = [];
-                array_push($this->account['session_ids'], $this->session->getId());
+                $this->account['session_ids'][$this->getKey()] = [];
+                array_push($this->account['session_ids'][$this->getKey()], $this->session->getId());
             }
 
             $this->account['session_ids'] = Json::encode($this->account['session_ids']);
@@ -379,9 +378,6 @@ class Auth
         }
 
         $this->setRememberToken();
-        // if (isset($data['remember']) && $data['remember'] === 'true') {
-        //     $this->setRememberToken();
-        // }
     }
 
     public function checkRecaller()
@@ -539,7 +535,7 @@ class Auth
         } else if ($this->account['session_ids']) {
             $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
 
-            if (!in_array($this->session->getId(), $this->account['session_ids'])) {
+            if (!in_array($this->session->getId(), $this->account['session_ids'][$this->getKey()])) {
                 $this->logger->log->debug($this->account['email'] . ' session id ' . $this->session->getId() . ' not present in DB.');
 
                 $this->sessionTools->clearSession($this->session->getId());

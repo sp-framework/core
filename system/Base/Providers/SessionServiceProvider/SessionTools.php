@@ -28,6 +28,11 @@ class SessionTools
         $this->session->destroy($sessionId);
     }
 
+    public function removeSessionKey(string $sessionKey)
+    {
+        $this->session->remove($sessionKey);
+    }
+
     public function clearSessions()
     {
         //Housecall for cleaning sessions that dont exists in the account['session_id']
