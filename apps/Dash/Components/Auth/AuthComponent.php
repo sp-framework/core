@@ -8,6 +8,17 @@ class AuthComponent extends BaseComponent
 {
     public function viewAction()
     {
+        $this->view->setLayout('auth');
+
+        if (isset($this->session->needAgentAuth) && $this->session->needAgentAuth === true) {
+
+            $this->setNeedAuthHeader();
+
+            $this->view->pick('auth/agent');
+
+            return;
+        }
+
         $domain = $this->domains->getDomain();
 
         if ($this->auth->check()) {
@@ -19,8 +30,6 @@ class AuthComponent extends BaseComponent
                 return $this->response->redirect('/' . strtolower($this->app['route']));
             }
         }
-
-        $this->view->setLayout('auth');
 
         if (isset($this->getData()['pwreset']) && $this->getData()['pwreset'] === 'true') {
 
@@ -34,12 +43,17 @@ class AuthComponent extends BaseComponent
             return;
         }
 
-        $this->response->setHeader('NEED_AUTH', '1');
-        $this->response->setHeader('REDIRECT_URL', '/' . strtolower($this->app['route'] . '/auth'));
+        $this->setNeedAuthHeader();
 
         if ($this->request->isAjax()) {
             $this->view->disable();
         }
+    }
+
+    protected function setNeedAuthHeader()
+    {
+        $this->response->setHeader('NEED_AUTH', '1');
+        $this->response->setHeader('REDIRECT_URL', '/' . strtolower($this->app['route'] . '/auth'));
     }
 
     public function loginAction()
@@ -51,17 +65,13 @@ class AuthComponent extends BaseComponent
 
             $auth = $this->auth->attempt($this->postData());
 
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
 
             if ($auth) {
                 $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
             }
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -70,7 +80,7 @@ class AuthComponent extends BaseComponent
         if ($this->auth->logout()) {
             $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
 
-            $this->view->responseCode = 0;
+            $this->addResponse('Ok');
         }
     }
 
@@ -83,13 +93,9 @@ class AuthComponent extends BaseComponent
 
             $this->auth->forgotPassword($this->postData());
 
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -102,17 +108,43 @@ class AuthComponent extends BaseComponent
 
             $pwreset = $this->auth->resetPassword($this->postData());
 
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
+            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
 
             if ($pwreset) {
                 $this->view->redirectUrl = $this->auth->packagesData->redirectUrl;
             }
         } else {
-            $this->view->responseCode = 1;
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
 
-            $this->view->responseMessage = 'Method Not Allowed';
+    public function sendVerificationAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->auth->sendVerificationEmail();
+
+            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function verifyAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->auth->verifyVerficationCode($this->postData());
+
+            $this->addResponse($this->auth->packagesData->responseMessage, $this->auth->packagesData->responseCode);
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }

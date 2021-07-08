@@ -26,6 +26,12 @@ class SessionTools
     public function clearSession(string $sessionId)
     {
         $this->session->destroy($sessionId);
+
+        $this->session->getAdapter()->destroy($sessionId);
+
+        $this->session->start();
+
+        $this->session->regenerateId();
     }
 
     public function clearSessions()

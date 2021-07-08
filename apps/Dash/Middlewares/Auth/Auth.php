@@ -18,7 +18,7 @@ class Auth extends BaseMiddleware
             $appRoute = '/' . strtolower($this->app['route']);
         }
 
-        $givenRoute = rtrim(explode('/q/', $this->request->getUri())[0], '/');
+        $givenRoute = strtolower(rtrim(explode('/q/', $this->request->getUri())[0], '/'));
 
         $guestAccess =
         [
@@ -26,7 +26,9 @@ class Auth extends BaseMiddleware
             $appRoute . '/auth/login',
             $appRoute . '/auth/logout',
             $appRoute . '/auth/forgot',
-            $appRoute . '/auth/pwreset'
+            $appRoute . '/auth/pwreset',
+            $appRoute . '/auth/sendverification',
+            $appRoute . '/auth/verify'
         ];
 
         if (!in_array($givenRoute, $guestAccess)) {
@@ -34,25 +36,39 @@ class Auth extends BaseMiddleware
             if ($this->auth->hasUserInSession()) {
                 try {
                     $this->auth->setUserFromSession();
+
+                    if (!$this->auth->hasRecaller()) {
+                        $this->session->set('redirectUrl', $this->request->getUri());
+                        return $this->response->redirect($appRoute . '/auth');
+                    }
+
+                    $this->auth->checkRecaller();
                 } catch (\Exception $e) {
-                    // throw $e;
                     $this->auth->logout();
+
+                    return false;
                 }
             }
 
-            //Authenticate via Cookie
-            if ($this->auth->hasRecaller()) {
-                try {
-                    $this->auth->setUserFromCookie();
-                } catch (\Exception $e) {
-                    // throw $e;
-                    $this->auth->logout();
-                }
-            }
+            // Authenticate via Cookie
+            // var_dump($this->auth->hasRecaller());
+            //     } catch (\Exception $e) {
+            //         // throw $e;
+            //         $this->auth->logout();
+
+            //         return false;
+            //     }
+            // }
 
             //Authenticated
             if (!$this->auth->check()) {
                 $this->session->set('redirectUrl', $this->request->getUri());
+                return $this->response->redirect($appRoute . '/auth');
+            }
+
+            //Browser Auth
+            if (!$this->auth->checkAgent()) {
+                $this->session->set('needAgentAuth', true);
                 return $this->response->redirect($appRoute . '/auth');
             }
 

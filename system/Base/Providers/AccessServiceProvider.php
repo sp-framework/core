@@ -14,6 +14,7 @@ class AccessServiceProvider implements ServiceProviderInterface
         $container->setShared(
             'auth',
             function () use ($container) {
+                $request = $container->getShared('request');
                 $config = $container->getShared('config');
                 $session = $container->getShared('session');
                 $sessionTools = $container->getShared('sessionTools');
@@ -25,9 +26,12 @@ class AccessServiceProvider implements ServiceProviderInterface
                 $links = $container->getShared('links');
                 $accounts = $container->getShared('basepackages')->accounts;
                 $profile = $container->getShared('basepackages')->profile;
+                $email = $container->getShared('basepackages')->email;
+                $domains = $container->getShared('domains');
 
                 return (
                     new Auth(
+                        $request,
                         $config,
                         $session,
                         $sessionTools,
@@ -38,7 +42,9 @@ class AccessServiceProvider implements ServiceProviderInterface
                         $logger,
                         $links,
                         $accounts,
-                        $profile
+                        $profile,
+                        $email,
+                        $domains
                     ))->init();
             }
         );

@@ -34,6 +34,8 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $two_fa_secret;
 
+    public $agents;
+
     public function initialize()
     {
         //

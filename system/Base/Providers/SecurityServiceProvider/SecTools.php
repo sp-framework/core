@@ -2,18 +2,23 @@
 
 namespace System\Base\Providers\SecurityServiceProvider;
 
+use Phalcon\Helper\Json;
 use Phalcon\Security as PhalconSecurity;
 
 class SecTools
 {
+    protected $core;
+
     public $security;
 
     public $random;
 
     public $crypt;
 
-    public function __construct($security, $random, $crypt)
+    public function __construct($core, $security, $random, $crypt)
     {
+        $this->core = $core;
+
         $this->security = $security;
 
         $this->random = $random;
@@ -23,13 +28,23 @@ class SecTools
 
     public function init()
     {
+        if ($this->crypt->getKey() === '') {
+            $this->crypt->setKey($this->getSigKey());
+        }
+
         return $this;
     }
 
-    public function hashPassword(string $password, $workFactor = null)
+    public function hashPassword(string $password, int $workFactor = null, int $defaultHash = 0)
     {
         if ($workFactor) {
             $this->security->setWorkFactor($workFactor);
+        } else {
+            $this->security->setWorkFactor($this->getSecWorkFactor());
+        }
+
+        if ($defaultHash) {
+            $this->security->setDefaultHash($defaultHash);
         }
 
         try {
@@ -53,5 +68,32 @@ class SecTools
                 'cost' => $this->security->getWorkFactor()
             ]
         );
+    }
+
+    public function getSigKey()
+    {
+        if (!is_array($this->core->core['settings'])) {
+            $this->core->core['settings'] = Json::decode($this->core->core['settings'], true);
+        }
+
+        return $this->core->core['settings']['sigKey'];
+    }
+
+    public function getCookiesSig()
+    {
+        if (!is_array($this->core->core['settings'])) {
+            $this->core->core['settings'] = Json::decode($this->core->core['settings'], true);
+        }
+
+        return $this->core->core['settings']['cookiesSig'];
+    }
+
+    public function getSecWorkFactor()
+    {
+        if (!is_array($this->core->core['settings'])) {
+            $this->core->core['settings'] = Json::decode($this->core->core['settings'], true);
+        }
+
+        return $this->core->core['settings']['security']['passwordWorkFactor'];
     }
 }

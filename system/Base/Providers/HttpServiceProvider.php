@@ -33,10 +33,8 @@ class HttpServiceProvider implements ServiceProviderInterface
             'cookies',
             function () use ($container) {
                 $response = $container->getShared('response');
-                $crypt = $container->getShared('crypt');
-                $random = $container->getShared('random');
-                $core = $container->getShared('core');
-                return (new Cookies($response, $crypt, $random, $core))->init();
+                $secTools = $container->getShared('secTools');
+                return (new Cookies($response, $secTools))->init();
             }
         );
 

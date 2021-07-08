@@ -4,6 +4,10 @@ BazCore.header({
     loadHeaderAt : 'login'
 });
 </script>
+<div class="pace-loading-text ml-1 fixed-top text-orange" hidden>
+    <span>Loading... </span>
+    <span></span>
+</div>
 <div id="{{componentId}}" class="login-box">
     <div class="card m-0">
         <div class="card-body login-card-body">
@@ -11,31 +15,40 @@ BazCore.header({
                 <img src="{{links.images('/baz/logo/fulllogo168x30.png')}}" data-rjs="3" alt="Bazaari Logo">
             </div>
             <div id="{{componentId}}-regular" hidden>
-                <p class="login-box-msg text-sm font-weight-bold">Forgot Password</p>
+                <p class="login-box-msg text-sm text-danger font-weight-bold text-uppercase">New browser/location detected</p>
+                <p class="text-sm text-info">Our system has detected that you are trying to login from a browser/location that the system is unaware of. Please verify that it is you who is trying to login to the system.</p>
                 <div id="{{componentId}}-form">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'componentId'                           : componentId,
-                            'sectionId'                             : 'form',
-                            'fieldId'                               : 'user',
-                            'fieldLabel'                            : false,
-                            'fieldType'                             : 'input',
-                            'fieldInputType'                        : 'text',
-                            'fieldPlaceholder'                      : 'Username',
-                            'fieldBazScan'                          : true,
-                            'fieldGroupPostAddonIcon'               : 'user'
-                        ]
-                    )}}
-                    <div class="row mt-2">
-                        <div class="col mt-2">
-                            <a class="text-info" href="{{links.url('auth')}}">
-                                <span>Back to login</span>
-                            </a>
-                        </div>
-                        <div class="col">
-                            <button id="{{componentId}}-form-forgot" type="button" class="btn btn-info float-right">
+                    <div class="row">
+                        <div class="col text-center">
+                            <button id="{{componentId}}-form-send-verification" type="button" class="btn btn-info">
                                 <i class="fa fa-cog fa-spin login-spinner" hidden></i>
-                                <span class="text-uppercase">Reset</span>
+                                <span class="text-uppercase">Send Verification Code</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            {{adminltetags.useTag('fields',
+                                [
+                                    'componentId'                           : componentId,
+                                    'sectionId'                             : 'form',
+                                    'fieldId'                               : 'verification-code',
+                                    'fieldLabel'                            : false,
+                                    'fieldType'                             : 'input',
+                                    'fieldHidden'                           : true,
+                                    'fieldInputType'                        : 'text',
+                                    'fieldPlaceholder'                      : 'Verification Code',
+                                    'fieldBazScan'                          : true,
+                                    'fieldGroupPostAddonIcon'               : 'lock'
+                                ]
+                            )}}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button id="{{componentId}}-form-verify" type="button" class="btn btn-info float-right" hidden>
+                                <i class="fa fa-cog fa-spin login-spinner" hidden></i>
+                                <span class="text-uppercase">Verify</span>
                             </button>
                         </div>
                     </div>

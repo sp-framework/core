@@ -117,7 +117,13 @@ class Accounts
                             'notNull' => false
                         ]
                     ),
-
+                    new Column(
+                        'agents',
+                        [
+                            'type'    => Column::TYPE_TEXT,
+                            'notNull' => false
+                        ]
+                    )
                 ],
                 'indexes' => [
                     new Index(

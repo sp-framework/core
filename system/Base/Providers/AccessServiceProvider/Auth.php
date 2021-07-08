@@ -16,6 +16,8 @@ class Auth
 
     protected $separator = '|';
 
+    protected $request;
+
     protected $config;
 
     protected $session;
@@ -23,6 +25,8 @@ class Auth
     protected $sessionTools;
 
     protected $cookies;
+
+    protected $cookieKey;
 
     protected $accounts;
 
@@ -40,9 +44,14 @@ class Auth
 
     protected $profile;
 
+    protected $email;
+
+    protected $domains;
+
     public $packagesData;
 
     public function __construct(
+        $request,
         $config,
         $session,
         $sessionTools,
@@ -53,8 +62,12 @@ class Auth
         $logger,
         $links,
         $accounts,
-        $profile
+        $profile,
+        $email,
+        $domains
     ) {
+        $this->request = $request;
+
         $this->config = $config;
 
         $this->session = $session;
@@ -77,11 +90,17 @@ class Auth
 
         $this->profile = $profile;
 
+        $this->email = $email;
+
+        $this->domains = $domains;
+
         $this->packagesData = new PackagesData;
     }
 
     public function init()
     {
+        $this->cookieKey = 'remember_' . $this->getKey();
+
         return $this;
     }
 
@@ -100,20 +119,16 @@ class Auth
             }
         }
 
-        $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
+        $this->clearAccountRememberToken($this->cookieKey);
 
-        if ($this->account) {
-            $this->clearAccountSessionId();
+        $this->clearAccountSessionId();
 
-            $this->clearAccountRememberToken($cookieKey);
+        if ($this->cookies->has($this->cookieKey)) {
+            $this->cookies->delete($this->cookieKey);
         }
 
-        if ($this->cookies->has($cookieKey)) {
-            $this->cookies->delete($cookieKey);
-        }
-
-        if ($this->session->has('_PHCOOKIE_' . $cookieKey)) {
-            $this->session->remove('_PHCOOKIE_' . $cookieKey);
+        if ($this->session->has('_PHCOOKIE_' . $this->cookieKey)) {
+            $this->session->remove('_PHCOOKIE_' . $this->cookieKey);
         }
 
         if ($this->session->has($this->key)) {
@@ -144,6 +159,8 @@ class Auth
 
                 $this->account['session_ids'] = Json::encode($this->account['session_ids']);
             }
+        } else {
+            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
         }
 
         $this->sessionTools->clearSession($this->session->getId());
@@ -151,21 +168,21 @@ class Auth
         $this->accounts->update($this->account);
     }
 
-    protected function clearAccountRememberToken($cookieKey)
+    protected function clearAccountRememberToken()
     {
         if (isset($this->account['remember_identifier'])) {
-            if (!is_array($this->account['remember_identifier'])) {
+            if ($this->account['remember_identifier'] && !is_array($this->account['remember_identifier'])) {
                 $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
             }
-            unset($this->account['remember_identifier'][$cookieKey]);
+            unset($this->account['remember_identifier'][$this->cookieKey][$this->session->getId()]);
             $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
         }
 
         if (isset($this->account['remember_token'])) {
-            if (!is_array($this->account['remember_token'])) {
+            if ($this->account['remember_token'] && !is_array($this->account['remember_token'])) {
                 $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
             }
-            unset($this->account['remember_token'][$cookieKey]);
+            unset($this->account['remember_token'][$this->cookieKey][$this->session->getId()]);
             $this->account['remember_token'] = Json::encode($this->account['remember_token']);
         }
 
@@ -173,7 +190,7 @@ class Auth
 
         //Set cookies to 1 second so browser removes them.
         $this->cookies->set(
-            $cookieKey,
+            $this->cookieKey,
             '0',
             1,
             '/',
@@ -181,17 +198,18 @@ class Auth
             null,
             true
         );
-        $this->cookies->get($cookieKey)->setOptions(['samesite'=>'strict']);
+        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
         $this->cookies->send();
 
-        if ($this->cookies->has($cookieKey)) {
-            $this->cookies->delete($cookieKey);
+        if ($this->cookies->has($this->cookieKey)) {
+            $this->cookies->delete($this->cookieKey);
         }
 
-        if ($this->session->has('_PHCOOKIE_' . $cookieKey)) {
-            $this->session->remove('_PHCOOKIE_' . $cookieKey);
+        if ($this->session->has('_PHCOOKIE_' . $this->cookieKey)) {
+            $this->session->remove('_PHCOOKIE_' . $this->cookieKey);
         }
     }
+
 
     public function attempt($data)
     {
@@ -343,7 +361,9 @@ class Auth
         if ($this->setUserSession()) {
             if ($this->account['session_ids']) {
                 $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
-                array_push($this->account['session_ids'], $this->session->getId());
+                if (!in_array($this->session->getId(), $this->account['session_ids'])) {
+                    array_push($this->account['session_ids'], $this->session->getId());
+                }
             } else {
                 $this->account['session_ids'] = [];
                 array_push($this->account['session_ids'], $this->session->getId());
@@ -358,41 +378,52 @@ class Auth
             $this->accounts->update($this->account);
         }
 
-        if (isset($data['remember']) && $data['remember'] === 'true') {
-            $this->setRememberToken();
-        }
+        $this->setRememberToken();
+        // if (isset($data['remember']) && $data['remember'] === 'true') {
+        //     $this->setRememberToken();
+        // }
     }
 
-    public function setUserFromCookie()
+    public function checkRecaller()
     {
-        $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
+        if (!$this->account) {
+            return false;
+        }
 
         if (isset($this->account['remember_token'])) {
-            $accountToken = Json::decode($this->account['remember_token'], true)[$cookieKey];
+            if (!is_array($this->account['remember_token'])) {
+                $accountToken = Json::decode($this->account['remember_token'], true)[$this->cookieKey][$this->session->getId()];
+            } else {
+                $accountToken = $this->account['remember_token'][$this->cookieKey][$this->session->getId()];
+            }
         } else {
-            $accountToken = '';
+            $accountToken = null;
         }
 
         if (isset($this->account['remember_identifier'])) {
-            $accountIdentifier = Json::decode($this->account['remember_identifier'], true)[$cookieKey];
+            if (!is_array($this->account['remember_identifier'])) {
+                $accountIdentifier = Json::decode($this->account['remember_identifier'], true)[$this->cookieKey][$this->session->getId()];
+            } else {
+                $accountIdentifier = $this->account['remember_identifier'][$this->cookieKey][$this->session->getId()];
+            }
         } else {
-            $accountIdentifier = '';
+            $accountIdentifier = null;
         }
 
-        list($identifier, $token) = explode($this->separator, $this->cookies->get($cookieKey)->getValue());
+        list($identifier, $token) = explode($this->separator, $this->cookies->get($this->cookieKey)->getValue());
 
         if ($accountIdentifier !== $identifier) {
 
-            $this->cookies->delete($cookieKey);
+            $this->cookies->delete($this->cookieKey);
 
             return;
         }
 
         if (!$this->secTools->checkPassword($token, $accountToken)) {
 
-            $this->clearAccountRememberToken($cookieKey);
+            $this->clearAccountRememberToken($this->cookieKey);
 
-            $this->cookies->delete($cookieKey);
+            $this->cookies->delete($this->cookieKey);
 
             $this->logger->log->debug(
                 'Cannot set account : ' . $this->account['email'] . ' via cookie for app: ' . $this->app['name']
@@ -406,21 +437,15 @@ class Auth
 
     public function hasRecaller()
     {
-        if ($this->account) {
-            return $this->cookies->has('remember_' . $this->account['id'] . '_' . $this->getKey());
-        }
-
-        return false;
+        return $this->cookies->has($this->cookieKey);
     }
 
     protected function setRememberToken()
     {
-        $cookieKey = 'remember_' . $this->account['id'] . '_' . $this->getKey();
-
         list($identifier, $token) = $this->recallerGenerate();
 
         $this->cookies->set(
-            $cookieKey,
+            $this->cookieKey,
             $identifier . $this->separator . $token,
             time() + 86400,
             '/',
@@ -429,7 +454,7 @@ class Auth
             true
         );
 
-        $this->cookies->get($cookieKey)->setOptions(['samesite'=>'strict']);
+        $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
 
         $this->cookies->send();
 
@@ -438,7 +463,7 @@ class Auth
         } else {
             $this->account['remember_identifier'] = [];
         }
-        $this->account['remember_identifier'][$cookieKey] = $identifier;
+        $this->account['remember_identifier'][$this->cookieKey][$this->session->getId()] = $identifier;
         $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
 
         if (isset($this->account['remember_token']) && $this->account['remember_token'] !== '') {
@@ -447,7 +472,9 @@ class Auth
             $this->account['remember_token'] = [];
         }
 
-        $this->account['remember_token'][$cookieKey] = $this->secTools->hashPassword($token, $this->config->security->cookiesWorkFactor);
+        $this->account['remember_token'][$this->cookieKey][$this->session->getId()] =
+            $this->secTools->hashPassword($token, $this->config->security->cookiesWorkFactor);
+
         $this->account['remember_token'] = Json::encode($this->account['remember_token']);
 
         $this->accounts->update($this->account);
@@ -465,6 +492,13 @@ class Auth
 
     public function check()
     {
+        if (!$this->account) {
+
+            $this->sessionTools->clearSession($this->session->getId());
+
+            return false;
+        }
+
         return $this->hasUserInSession();
     }
 
@@ -495,6 +529,12 @@ class Auth
             return false;
         }
 
+        if (!$this->account) {
+            $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
+
+            throw new \Exception('User not found in session');
+        }
+
         if (!$this->account['session_ids']) {
             $this->logger->log->debug($this->account['email'] . ' session null, perhaps was forced logged out by Administrator.');
 
@@ -509,12 +549,6 @@ class Auth
 
                 throw new \Exception('User session deleted in DB by administrator via force logout.');
             }
-        }
-
-        if (!$this->account) {
-            $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
-
-            throw new \Exception('User not found in session');
         }
 
         $this->setAccountProfile();
@@ -786,5 +820,217 @@ class Auth
         $this->accounts->update($this->account);
 
         return $this->account['two_fa_secret'];
+    }
+
+    public function checkAgent()
+    {
+        $clientAddress = $this->request->getClientAddress();
+        $userAgent = $this->request->getUserAgent();
+        $sessionId = $this->session->getId();
+
+        if ($this->account['agents'] && $this->account['agents'] !== '') {
+            if (!is_array($this->account['agents'])) {
+                $this->account['agents'] = Json::decode($this->account['agents'], true);
+            }
+
+            if (isset($this->account['agents']['locations']) && count($this->account['agents']['locations']) > 0) {
+                foreach ($this->account['agents']['locations'] as $locationKey => &$location) {
+                    if ($location['clientAddress'] === $clientAddress &&
+                        $location['userAgent'] === $userAgent &&
+                        $location['session'] === $sessionId &&
+                        $location['verified'] == true
+                    ) {
+                        return true;
+                    } else if ($location['session'] === $sessionId &&
+                               $location['verified'] == true
+                    ) {
+                        $this->logger->log->emergency('Same session being used by another browser! Probably session hijack!');
+
+                        $this->account['force_logout'] = '1';
+
+                        $this->account['agents'] = null;
+
+                        $this->accounts->update($this->account);
+
+                        $this->logout();
+
+                        return false;
+                    } else if ($location['clientAddress'] === $clientAddress &&
+                        $location['userAgent'] === $userAgent &&
+                        $location['verified'] == true &&
+                        $location['session'] !== $sessionId
+                    ) {
+                        //As we are already authenticated and the session is in the session_ids, we check and update our sessionid and allow access.
+                        if (!is_array($this->account['session_ids'])) {
+                            $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
+                        }
+
+                        if (in_array($sessionId, $this->account['session_ids'])) {
+                            $location['session'] = $sessionId;
+
+                            $this->account['agents'] = Json::encode($this->account['agents']);
+
+                            $this->accounts->update($this->account);
+
+                            return true;
+                        }
+                    } else if ($location['clientAddress'] === $clientAddress &&
+                        $location['userAgent'] === $userAgent &&
+                        $location['verified'] == false &&
+                        $location['session'] === $sessionId
+                    ) {
+                        return true;
+                    }
+                }
+
+                array_push($this->account['agents']['locations'],
+                    [
+                        'clientAddress' => $clientAddress,
+                        'userAgent'     => $userAgent,
+                        'session'       => $sessionId,
+                        'verified'      => false
+                    ]
+                );
+
+                $this->account['agents'] = Json::encode($this->account['agents']);
+
+                $this->accounts->update($this->account);
+            }
+        } else {
+            $agents = [];
+            $agents['verificationCode'] = null;
+            $agents['locations'][] =
+                [
+                    'clientAddress' => $clientAddress,
+                    'userAgent'     => $userAgent,
+                    'session'       => $sessionId,
+                    'verified'      => false
+                ];
+
+            $this->account['agents'] = Json::encode($agents);
+
+            $this->accounts->update($this->account);
+        }
+
+        //If Email is not configured, we cannot send new passcodes.
+        if (!$this->email->setup()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function sendVerificationEmail()
+    {
+        if (!$this->account) {
+            $this->setUserFromSession();
+        }
+
+        if ($this->account) {
+            $code = $this->secTools->random->base62(12);
+
+            if ($this->account['agents'] && $this->account['agents'] !== '') {
+                $this->account['agents'] = Json::decode($this->account['agents'], true);
+            }
+
+            $this->account['agents']['verificationCode'] = $code;
+
+            $this->account['agents'] = Json::encode($this->account['agents']);
+
+            $this->accounts->update($this->account);
+
+            if ($this->emailVerificationCode($code)) {
+
+                $this->logger->log->info('New verification code requested for account ' . $this->account['email'] . ' via authentication agent. New code was emailed to the account.');
+
+                $this->packagesData->responseMessage = 'Email Sent!';
+
+                $this->packagesData->responseCode = 0;
+
+                return;
+            }
+
+            $this->packagesData->responseMessage = 'Error Sending Email! Please contact administrator.';
+
+            $this->packagesData->responseCode = 1;
+
+            return;
+        }
+
+        $this->packagesData->responseMessage = 'Please contact administrator.';
+
+        $this->packagesData->responseCode = 1;
+    }
+
+    protected function emailVerificationCode($verificationCode)
+    {
+        if ($this->email->setup()) {
+            $emailSettings = $this->email->getEmailSettings();
+
+            $this->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
+            $this->email->setRecipientTo($this->account['email'], $this->account['email']);
+            $this->email->setSubject('Verification Code for ' . $this->domains->getDomain()['name']);
+            $this->email->setBody($verificationCode);
+
+            return $this->email->sendNewEmail();
+        } else {
+            return false;
+        }
+    }
+
+    public function verifyVerficationCode(array $data)
+    {
+        if (!$this->account) {
+            $this->setUserFromSession();
+        }
+
+        if ($this->account) {
+            $clientAddress = $this->request->getClientAddress();
+            $userAgent = $this->request->getUserAgent();
+            $sessionId = $this->session->getId();
+
+            if ($this->account['agents'] && $this->account['agents'] !== '') {
+                $this->account['agents'] = Json::decode($this->account['agents'], true);
+            }
+
+            if ($this->account['agents']['verificationCode'] === $data['code']) {
+                $this->account['agents']['verificationCode'] = null;
+
+                foreach ($this->account['agents']['locations'] as $locationKey => &$location) {
+                    if ($location['clientAddress'] === $clientAddress &&
+                        $location['userAgent'] === $userAgent &&
+                        $location['session'] === $sessionId &&
+                        $location['verified'] == false
+                    ) {
+                        $location['verified'] = true;
+                        break;
+                    }
+                }
+
+                $this->account['agents'] = Json::encode($this->account['agents']);
+
+                $this->accounts->update($this->account);
+
+                $this->packagesData->responseCode = 0;
+
+                $this->packagesData->responseMessage = 'Authenticated. Redirecting...';
+
+                if ($this->session->redirectUrl && $this->session->redirectUrl !== '/') {
+                    $this->packagesData->redirectUrl = $this->links->url($this->session->redirectUrl, true);
+                } else {
+                    $this->packagesData->redirectUrl = $this->links->url('home');
+                }
+            } else {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Incorrect verification code. Try again.';
+            }
+
+            return;
+        }
+
+        $this->packagesData->responseMessage = 'Please contact administrator.';
+
+        $this->packagesData->responseCode = 1;
     }
 }

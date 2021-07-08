@@ -9,46 +9,20 @@ class Cookies
 {
     protected $response;
 
-    protected $crypt;
-
-    protected $core;
-
-    protected $random;
+    protected $secTools;
 
     protected $cookies;
 
-    public function __construct($response, $crypt, $random, $core)
+    public function __construct($response, $secTools)
     {
         $this->response = $response;
 
-        $this->crypt = $crypt;
-
-        $this->random = $random;
-
-        $this->core = $core;
+        $this->secTools = $secTools;
     }
 
     public function init()
     {
-        $coreSettings = Json::decode($this->core->core[0]['settings'], true);
-
-        if (isset($coreSettings['sigKey']) &&
-            isset($coreSettings['sigText']) &&
-            isset($coreSettings['cookiesSig'])
-        ) {
-            $sigKey = $coreSettings['sigKey'];
-            $sigText = $coreSettings['sigText'];
-            $cookiesSig = $coreSettings['cookiesSig'];
-        } else {
-            $coreSettings['sigKey'] = $sigKey = $this->random->base58();
-            $coreSettings['sigText'] = $sigText = $this->random->base58(32);
-            $coreSettings['cookiesSig'] = $cookiesSig = $this->crypt->encryptBase64($sigText, $sigKey);
-            $coreData = $this->core->core[0];
-            $coreData['settings'] = Json::encode($coreSettings);
-            $this->core->update($coreData);
-        }
-
-        $this->cookies = new PhalconCookies(true, $cookiesSig);
+        $this->cookies = new PhalconCookies(true, $this->secTools->getCookiesSig());
 
         $this->response->setCookies($this->cookies);
 
