@@ -493,9 +493,6 @@ class Auth
     public function check()
     {
         if (!$this->account) {
-
-            $this->sessionTools->clearSession($this->session->getId());
-
             return false;
         }
 

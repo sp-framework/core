@@ -50,16 +50,6 @@ class Auth extends BaseMiddleware
                 }
             }
 
-            // Authenticate via Cookie
-            // var_dump($this->auth->hasRecaller());
-            //     } catch (\Exception $e) {
-            //         // throw $e;
-            //         $this->auth->logout();
-
-            //         return false;
-            //     }
-            // }
-
             //Authenticated
             if (!$this->auth->check()) {
                 $this->session->set('redirectUrl', $this->request->getUri());

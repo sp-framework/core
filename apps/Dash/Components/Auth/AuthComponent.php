@@ -16,6 +16,8 @@ class AuthComponent extends BaseComponent
 
             $this->view->pick('auth/agent');
 
+            $this->session->needAgentAuth = false;
+
             return;
         }
 
