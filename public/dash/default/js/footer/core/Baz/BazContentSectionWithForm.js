@@ -146,6 +146,10 @@
 
                 // Grab Fields from Tabs Note: attr "jstree-search" is used to populate tree
                 $('#' + sectionId + '-form .nav-tabs li a').each(function() {
+                    if ($(this).data('jstree') == false) {
+                        return;
+                    }
+
                     var tabId = $(this).attr('href').replace('#', '');
                     tabIds.push(tabId);
                     var tabName = $(this).html().toUpperCase();
@@ -213,9 +217,9 @@
                 // Init jstree selection process
                 $(formJsTreeSelector).on('select_node.jstree', function() {
                     var selfId = $(this).jstree('get_selected',true)[0];
-                    if (selfId.parent === '#') {
+                    // if (selfId.parent === '#') {
                         $(formJsTreeSelector).jstree('open_node', selfId);
-                    } else {
+                    // } else {
                         $(tabIds).each(function(index,tabId) {
                             var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
 
@@ -234,7 +238,7 @@
                         setTimeout(function() {
                             $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
                         }, 2000);
-                    }
+                    // }
                 });
             }
 

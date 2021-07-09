@@ -157,15 +157,20 @@ var BazContentSectionWithWizard = function() {
     }
 
     function hideHeaderFooter() {
-        $('#' + sectionId + '-data .card-header').each(function(){
-            if (!$(this).parents().hasClass('accordion')) {
-                $(this).attr('hidden', true);
-            }
-        });
-        $('#' + sectionId + '-data .card-footer').each(function(){
-            if (!$(this).parents().hasClass('accordion')) {
-                $(this).attr('hidden', true);
-            }
+        $('#' + sectionId + '-data').children().each(function(index, child) {
+            $('#' + child.id + ' .card-header').each(function() {
+                if (!$(this).parents().hasClass('accordion')) {
+                    $(this).attr('hidden', true);
+                }
+                if ($(this).children('ul').hasClass('nav-tabs')) {
+                    $(this).attr('hidden', false);
+                }
+            });
+            $('#' + child.id + ' .card-footer').each(function() {
+                if (!$(this).parents().hasClass('accordion')) {
+                    $(this).attr('hidden', true);
+                }
+            });
         });
     }
 
@@ -275,14 +280,15 @@ var BazContentSectionWithWizard = function() {
 
         // Next Button
         $('#' + sectionId + '-next').click(function() {
+            $(this).children('i').attr('hidden', false);
+            $(this).attr('disabled', true);
             // Validate form & extract data on successful validation
             if (steps[wizardOptions['currentStep']]['validate']) {
                 $('#' + steps[wizardOptions['currentStep']]['sectionId']).BazContentSectionWithForm({
                     'task'      : 'validateForm'
                 });
 
-                // Extract data
-                if (dataCollection[componentId][sectionId]['formValidator'].numberOfInvalids() === 0) {
+                if (dataCollection[steps[wizardOptions['currentStep']]['componentId']][steps[wizardOptions['currentStep']]['sectionId']]['formValidator'].numberOfInvalids() === 0) {
                     $('#' + steps[wizardOptions['currentStep']]['sectionId']).BazContentSectionWithForm({
                         'task'      : 'sectionToObj'
                     });
@@ -330,6 +336,9 @@ var BazContentSectionWithWizard = function() {
                     } else {
                         goNext();
                     }
+                } else {
+                    $('#' + sectionId + '-next').children('i').attr('hidden', true);
+                    $('#' + sectionId + '-next').attr('disabled', false);
                 }
             } else {
                 goNext();
@@ -345,7 +354,13 @@ var BazContentSectionWithWizard = function() {
                 if (!success) {
                     return;
                 }
+                hideHeaderFooter();
+                $('#' + sectionId + '-next').children('i').attr('hidden', true);
+                $('#' + sectionId + '-next').attr('disabled', false);
             });
+        } else {
+            $('#' + sectionId + '-next').children('i').attr('hidden', true);
+            $('#' + sectionId + '-next').attr('disabled', false);
         }
 
         var nextStep = wizardOptions['currentStep'] + 1;

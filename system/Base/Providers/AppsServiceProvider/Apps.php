@@ -138,7 +138,6 @@ class Apps extends BasePackage
 		} else {
 			return false;
 		}
-
 	}
 
 	public function getDefaultApp()
@@ -168,9 +167,7 @@ class Apps extends BasePackage
 		}
 
 		if ($this->getRouteApp($data['route'])) {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'App route ' . strtolower($data['route']) . ' is used by another app. Please use different route.';
+			$this->addResponse('App route ' . strtolower($data['route']) . ' is used by another app. Please use different route.', 1, []);
 
 			return false;
 		}
@@ -181,59 +178,52 @@ class Apps extends BasePackage
 		$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
 
 		if ($this->add($data)) {
-			$this->packagesData->responseCode = 0;
-
-			$this->packagesData->responseMessage = 'Added ' . $data['name'] . ' app';
+			$this->addResponse('Added ' . $data['name'] . ' app', 0, null, true);
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error adding new app.';
+			$this->addResponse('Error adding new app.', 1, []);
 		}
 	}
 
 	public function updateApp(array $data)
 	{
-		if (isset($data['modules']) && $data['modules'] == true) {
-			$app = $this->getById($data['id']);
+		$app = $this->getById($data['id']);
 
-			$data = array_merge($app, $data);
-		}
+		$app = array_merge($app, $data);
 
-		if (!$this->checkType($data)) {
+		if (!$this->checkType($app)) {
 			return;
 		}
 
-		if (!isset($data['modules'])) {
-			$data['can_login_role_ids'] = Json::decode($data['can_login_role_ids'], true);
-			$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
-		}
+		if (isset($app['can_login_role_ids'])) {
+			$app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
 
-		if (isset($data['modules']) && $data['modules'] == true) {
-			if ($data['components']) {
-				$this->modules->components->updateComponents($data);
-			}
-
-			if ($data['menus']) {
-				$this->basepackages->menus->updateMenus($data);
-			}
-
-			if ($data['views']) {
-				$this->modules->views->updateViews($data);
-			}
-
-			if ($data['middlewares']) {
-				$this->modules->middlewares->updateMiddlewares($data);
+			if (isset($app['can_login_role_ids']['data'])) {
+				$app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']['data']);
+			} else {
+				$app['can_login_role_ids'] = Json::encode($app['can_login_role_ids']);
 			}
 		}
 
-		if ($this->update($data)) {
-			$this->packagesData->responseCode = 0;
+		if (isset($app['components'])) {
+			$this->modules->components->updateComponents($app);
+		}
 
-			$this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' app';
+		if (isset($app['menus'])) {
+			$this->basepackages->menus->updateMenus($app);
+		}
+
+		if (isset($app['views'])) {
+			$this->modules->views->updateViews($app);
+		}
+
+		if (isset($app['middlewares'])) {
+			$this->modules->middlewares->updateMiddlewares($app);
+		}
+
+		if ($this->update($app)) {
+			$this->addResponse('Updated ' . $app['name'] . ' app');
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error updating app.';
+			$this->addResponse('Error updating app.', 1);
 		}
 	}
 
@@ -243,9 +233,7 @@ class Apps extends BasePackage
 
 		foreach ($typesArr as $key => $type) {
 			if (strtolower($data['route']) === $type['app_type']) {
-				$this->packagesData->responseCode = 1;
-
-				$this->packagesData->responseMessage = 'App route ' . strtolower($data['route']) . ' is reserved. Please use different route.';
+				$this->addResponse('App route ' . strtolower($data['route']) . ' is reserved. Please use different route.', 1);
 
 				return false;
 			}
@@ -257,9 +245,7 @@ class Apps extends BasePackage
 	public function removeApp(array $data)
 	{
 		if ($data['id'] == 1) {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Cannot remove Admin App. Error removing app.';
+			$this->addResponse('Cannot remove Admin App. Error removing app.', 1);
 
 			return false;
 		}
@@ -268,13 +254,12 @@ class Apps extends BasePackage
 
 		//Check relations before removing.
 		if ($this->remove($data['id'])) {
-			$this->packagesData->responseCode = 0;
 
-			$this->packagesData->responseMessage = 'Removed app';
+			$this->domains->removeAppFromApps($data['id']);
+
+			$this->addResponse('Removed App ' . $app['name']);
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error removing app.';
+			$this->addResponse('Error removing app.', 1);
 		}
 	}
 

@@ -648,13 +648,13 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function addResponse($responseMessage, $responseCode = 0, $responseData = null)
+	protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null)
 	{
 		$this->view->responseMessage = $responseMessage;
 
 		$this->view->responseCode = $responseCode;
 
-		if ($responseData && is_array($responseData)) {
+		if ($responseData !== null) {
 			$this->view->responseData = $responseData;
 		}
 	}

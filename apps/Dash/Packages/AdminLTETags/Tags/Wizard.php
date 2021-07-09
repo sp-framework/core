@@ -21,6 +21,16 @@ class Wizard extends AdminLTETags
 
         $this->compSecId = $this->params['componentId'] . '-' . $this->params['sectionId'];
 
+        $this->wizardParams['componentId'] =
+            isset($this->params['wizardComponentId']) ?
+            $this->params['wizardComponentId'] :
+            $this->params['componentId'];
+
+        $this->wizardParams['sectionId'] =
+            isset($this->params['wizardSectionId']) ?
+            $this->params['wizardSectionId'] :
+            $this->compSecId;
+
         $this->generateContent();
 
         return $this->content;
@@ -208,19 +218,21 @@ class Wizard extends AdminLTETags
                 dataCollectionSection =
                     dataCollectionComponent["' . $this->compSecId . '"];
             }
-            if (!dataCollectionSection["' . $this->compSecId . '-form"]) {
-                dataCollectionSectionForm =
-                    dataCollectionSection["' . $this->compSecId . '-form"] = { };
-            } else {
-                dataCollectionSectionForm =
-                    dataCollectionSection["' . $this->compSecId . '-form"];
-            }
+            // if (!dataCollectionSection["' . $this->compSecId . '-form"]) {
+            //     dataCollectionSectionForm =
+            //         dataCollectionSection["' . $this->compSecId . '-form"] = { };
+            // } else {
+            //     dataCollectionSectionForm =
+            //         dataCollectionSection["' . $this->compSecId . '-form"];
+            // }
 
             dataCollectionSection =
                 $.extend(dataCollectionSection, {
                     "showReview"                    : "' . $this->params['wizardShowReview'] . '",
                     "startAtStep"                   : "' . $this->params['wizardStartAtStep'] . '",
                     "canCancel"                     : "'. $this->params['wizardCanCancel'] .'",
+                    "componentId"                   : "'. $this->wizardParams['componentId'] .'",
+                    "sectionId"                     : "'. $this->wizardParams['sectionId'] .'",
                     "steps"                         : JSON.parse("' . $this->escaper->escapeJs(Json::encode($this->params["wizardSteps"])) . '"),
                 });
             </script>';

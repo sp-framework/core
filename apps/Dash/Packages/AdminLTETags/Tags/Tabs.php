@@ -184,6 +184,18 @@ class Tabs extends AdminLTETags
         $content = '';
 
         foreach ($this->params['tabsData'] as $tabTitleKey => $tabTitle) {
+
+            if (isset($tabTitle['tabDataAttributes']) &&
+                is_array($tabTitle['tabDataAttributes'])
+            ) {
+                $tabDataAttributes = '';
+                foreach ($tabTitle['tabDataAttributes'] as $attrKey => $attrValue) {
+                    $tabDataAttributes .= 'data-' . $attrKey . '="' . $attrValue . '" ';
+                }
+            } else {
+                $tabDataAttributes = '';
+            }
+
             $title =
                 isset($tabTitle['tabTitle']) ?
                 $tabTitle['tabTitle'] :
@@ -209,7 +221,7 @@ class Tabs extends AdminLTETags
                 $content .= '<li class="nav-item">';
             }
             $content .=
-                '<a class="nav-link text-uppercase ' . $active . '" data-toggle="pill" href="#' . $this->tabsParams['tabsId'] . '-' . $tabTitleKey . '" role="tab" aria-controls="' . $this->tabsParams['tabsId'] . '-' . $tabTitleKey . '" ' . $aria . '>' . $title . '</a>';
+                '<a class="nav-link text-uppercase ' . $active . '" data-toggle="pill" href="#' . $this->tabsParams['tabsId'] . '-' . $tabTitleKey . '" role="tab" aria-controls="' . $this->tabsParams['tabsId'] . '-' . $tabTitleKey . '" ' . $aria . ' ' . $tabDataAttributes . '>' . $title . '</a>';
             if ($horizontal) {
                 $content .= '</li>';
             }

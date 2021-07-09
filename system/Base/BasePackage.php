@@ -403,6 +403,8 @@ abstract class BasePackage extends Controller
 	public function add(array $data)
 	{
 		if ($data) {
+			$data = $this->jsonData($data);
+
 			${$this->packageName} = new $this->modelToUse();
 
 			${$this->packageName}->assign($data);
@@ -439,6 +441,9 @@ abstract class BasePackage extends Controller
 	public function update(array $data)
 	{
 		if ($data) {
+
+			$data = $this->jsonData($data);
+
 			${$this->packageName} = $this->modelToUse::findFirstById($data['id']);
 
 			if (!${$this->packageName}) {
@@ -479,6 +484,17 @@ abstract class BasePackage extends Controller
 		} else {
 			throw new \Exception('Data array missing. Cannot update!');
 		}
+	}
+
+	protected function jsonData(array $data)
+	{
+		foreach ($data as $dataKey => $dataValue) {
+			if (is_array($dataValue)) {
+				$data[$dataKey] = Json::encode($dataValue);
+			}
+		}
+
+		return $data;
 	}
 
 	public function remove(int $id)
@@ -890,17 +906,21 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function addResponse($responseMessage, $responseCode = 0, $responseData = null, $addToLog = true)
+	protected function addResponse($responseMessage, int $responseCode = 0, $responseData = null, bool $inclLastData = false, bool $addToLog = true)
 	{
 		$this->packagesData->responseMessage = $responseMessage;
 
 		$this->packagesData->responseCode = $responseCode;
 
-		if ($responseData && is_array($responseData)) {
+		if ($responseData !== null && is_array($responseData)) {
 			$this->packagesData->responseData = $responseData;
 		} else {
 			if (isset($this->packagesData->last)) {
-				$this->packagesData->responseData = ['id' => $this->packagesData->last['id']];
+				if ($inclLastData) {
+					$this->packagesData->responseData = $this->packagesData->last;
+				} else {
+					$this->packagesData->responseData = ['id' => $this->packagesData->last['id']];
+				}
 			}
 		}
 

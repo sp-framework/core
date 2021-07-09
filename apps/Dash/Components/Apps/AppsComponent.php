@@ -19,13 +19,10 @@ class AppsComponent extends BaseComponent
 
         $this->view->types = $typesArr;
 
-        if (isset($this->getData()['modules']) && isset($this->getData()['id'])) {
+        if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $app = $this->apps->getById($this->getData()['id']);
-
                 $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
-
-                $this->view->app = $app;
 
                 $components = [];
                 $views = [];
@@ -79,8 +76,6 @@ class AppsComponent extends BaseComponent
 
                 $this->view->components = msort($components, 'name');
                 $this->view->views = msort($views, 'name');
-                // $this->view->components = $components;
-                // $this->view->views = $views;
                 $this->view->mandatoryComponents = $mandatoryComponents;
                 $this->view->mandatoryViews = $mandatoryViews;
 
@@ -90,23 +85,19 @@ class AppsComponent extends BaseComponent
                             $app['app_type'],
                             $app['id']
                         ), 'sequence');
-            }
-
-            $this->view->modules = true;
-
-            $this->view->pick('apps/view');
-
-            return;
-        }
-
-        if (isset($this->getData()['id'])) {
-
-            if ($this->getData()['id'] != 0) {
-                $app = $this->apps->getById($this->getData()['id']);
-
-                $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
 
                 $this->view->app = $app;
+
+                if (isset($this->getData()['modules'])) {
+
+                    $this->view->modules = true;
+
+                    $this->disableViewLevel();
+
+                    $this->view->pick('apps/wizard/modules');
+
+                    return;
+                }
             }
 
             $this->view->roles = $this->basepackages->roles->init()->roles;
@@ -131,19 +122,6 @@ class AppsComponent extends BaseComponent
                 ]
             ];
 
-        $dtAdditionControlButtons =
-            [
-                'includeId'  => true,
-                // 'includeQ'   => true, //Only true when not adding /q/ in link below.
-                'buttons'    => [
-                    'modules'    => [
-                        'title'     => 'modules',
-                        'icon'      => 'th',
-                        'link'      => 'apps/q/modules/true'
-                    ]
-                ]
-            ];
-
         $replaceColumns = ['app_type'  => ['html' => $types]];
 
         $this->generateDTContent(
@@ -157,7 +135,7 @@ class AppsComponent extends BaseComponent
             null,
             $replaceColumns,
             'name',
-            $dtAdditionControlButtons
+            null
         );
 
         $this->view->pick('apps/list');
@@ -176,14 +154,13 @@ class AppsComponent extends BaseComponent
 
             $this->apps->addApp($this->postData());
 
-            $this->view->responseCode = $this->apps->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->apps->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode,
+                $this->apps->packagesData->responseData
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -200,14 +177,12 @@ class AppsComponent extends BaseComponent
 
             $this->apps->updateApp($this->postData());
 
-            $this->view->responseCode = $this->apps->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->apps->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -220,14 +195,12 @@ class AppsComponent extends BaseComponent
 
             $this->apps->removeApp($this->postData());
 
-            $this->view->responseCode = $this->apps->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->apps->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->apps->packagesData->responseMessage,
+                $this->apps->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }

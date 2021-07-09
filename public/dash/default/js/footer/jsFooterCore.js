@@ -3301,6 +3301,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
 
                 // Grab Fields from Tabs Note: attr "jstree-search" is used to populate tree
                 $('#' + sectionId + '-form .nav-tabs li a').each(function() {
+                    if ($(this).data('jstree') == false) {
+                        return;
+                    }
+
                     var tabId = $(this).attr('href').replace('#', '');
                     tabIds.push(tabId);
                     var tabName = $(this).html().toUpperCase();
@@ -3368,9 +3372,9 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                 // Init jstree selection process
                 $(formJsTreeSelector).on('select_node.jstree', function() {
                     var selfId = $(this).jstree('get_selected',true)[0];
-                    if (selfId.parent === '#') {
+                    // if (selfId.parent === '#') {
                         $(formJsTreeSelector).jstree('open_node', selfId);
-                    } else {
+                    // } else {
                         $(tabIds).each(function(index,tabId) {
                             var tab = $('#' + sectionId + '-form').find('[href="#' + tabId + '"]');
 
@@ -3389,7 +3393,7 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                         setTimeout(function() {
                             $('#' + selfId.data.jstreeid).parent().removeClass('bg-info disabled animated fadeIn');
                         }, 2000);
-                    }
+                    // }
                 });
             }
 
@@ -7569,15 +7573,20 @@ var BazContentSectionWithWizard = function() {
     }
 
     function hideHeaderFooter() {
-        $('#' + sectionId + '-data .card-header').each(function(){
-            if (!$(this).parents().hasClass('accordion')) {
-                $(this).attr('hidden', true);
-            }
-        });
-        $('#' + sectionId + '-data .card-footer').each(function(){
-            if (!$(this).parents().hasClass('accordion')) {
-                $(this).attr('hidden', true);
-            }
+        $('#' + sectionId + '-data').children().each(function(index, child) {
+            $('#' + child.id + ' .card-header').each(function() {
+                if (!$(this).parents().hasClass('accordion')) {
+                    $(this).attr('hidden', true);
+                }
+                if ($(this).children('ul').hasClass('nav-tabs')) {
+                    $(this).attr('hidden', false);
+                }
+            });
+            $('#' + child.id + ' .card-footer').each(function() {
+                if (!$(this).parents().hasClass('accordion')) {
+                    $(this).attr('hidden', true);
+                }
+            });
         });
     }
 
@@ -7687,14 +7696,15 @@ var BazContentSectionWithWizard = function() {
 
         // Next Button
         $('#' + sectionId + '-next').click(function() {
+            $(this).children('i').attr('hidden', false);
+            $(this).attr('disabled', true);
             // Validate form & extract data on successful validation
             if (steps[wizardOptions['currentStep']]['validate']) {
                 $('#' + steps[wizardOptions['currentStep']]['sectionId']).BazContentSectionWithForm({
                     'task'      : 'validateForm'
                 });
 
-                // Extract data
-                if (dataCollection[componentId][sectionId]['formValidator'].numberOfInvalids() === 0) {
+                if (dataCollection[steps[wizardOptions['currentStep']]['componentId']][steps[wizardOptions['currentStep']]['sectionId']]['formValidator'].numberOfInvalids() === 0) {
                     $('#' + steps[wizardOptions['currentStep']]['sectionId']).BazContentSectionWithForm({
                         'task'      : 'sectionToObj'
                     });
@@ -7742,6 +7752,9 @@ var BazContentSectionWithWizard = function() {
                     } else {
                         goNext();
                     }
+                } else {
+                    $('#' + sectionId + '-next').children('i').attr('hidden', true);
+                    $('#' + sectionId + '-next').attr('disabled', false);
                 }
             } else {
                 goNext();
@@ -7757,7 +7770,13 @@ var BazContentSectionWithWizard = function() {
                 if (!success) {
                     return;
                 }
+                hideHeaderFooter();
+                $('#' + sectionId + '-next').children('i').attr('hidden', true);
+                $('#' + sectionId + '-next').attr('disabled', false);
             });
+        } else {
+            $('#' + sectionId + '-next').children('i').attr('hidden', true);
+            $('#' + sectionId + '-next').attr('disabled', false);
         }
 
         var nextStep = wizardOptions['currentStep'] + 1;

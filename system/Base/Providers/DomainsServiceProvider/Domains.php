@@ -146,4 +146,21 @@ class Domains extends BasePackage
 		}
 		return false;
 	}
+
+	public function removeAppFromApps(int $id)
+	{
+		foreach ($this->domains as $domainkey => $domain) {
+			if (!is_array($domain['apps'])) {
+				$domain['apps'] = Json::decode($domain['apps'], true);
+			}
+
+			if (isset($domain['apps'][$id])) {
+				unset($domain['apps'][$id]);
+			}
+
+			$domain['apps'] = Json::encode($domain['apps']);
+
+			$this->update($domain);
+		}
+	}
 }

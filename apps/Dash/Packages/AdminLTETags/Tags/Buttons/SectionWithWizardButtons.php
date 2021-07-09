@@ -75,7 +75,6 @@ class SectionWithWizardButtons
                         'previous'    => [
                             'title'                 => 'Previous',
                             'position'              => 'left',
-                            'icon'                  => 'angle-left',
                             'size'                  => 'xs',
                             'hidden'                => true
                         ],
@@ -92,23 +91,25 @@ class SectionWithWizardButtons
                         'next' => [
                             'title'                 => 'Next',
                             'position'              => 'right',
-                            'icon'                  => 'angle-right',
+                            'icon'                  => 'cog fa-spin',
+                            'iconHidden'            => true,
                             'size'                  => 'xs',
-                            'iconPosition'          => 'after',
                             'hidden'                => true
                         ],
                         'submit' => [
                             'title'                 => 'Submit',
                             'position'              => 'right',
+                            'icon'                  => 'cog fa-spin',
+                            'iconHidden'            => true,
                             'size'                  => 'xs',
-                            'iconPosition'          => 'after',
                             'hidden'                => true
                         ],
                         'done' => [
                             'title'                 => 'Done',
                             'position'              => 'right',
                             'size'                  => 'xs',
-                            'iconPosition'          => 'after',
+                            'icon'                  => 'cog fa-spin',
+                            'iconHidden'            => true,
                             'hidden'                => true,
                             'url'                   => $this->links->url($this->buttonParams['wizardDoneUrl']),
                             'buttonAdditionalClass' => 'contentAjaxLink'
