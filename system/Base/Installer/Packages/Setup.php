@@ -373,7 +373,7 @@ class Setup
 
 	public function registerAdminAccount($adminRoleId, $workFactor = 12)
 	{
-		$password = $this->container['secTools']->hashPassword($this->postData['pass'], $workFactor);
+		$password = $this->container['security']->hash($this->postData['pass'], $workFactor);
 
 		return (new RegisterRootAdminAccount())->register($this->db, $this->postData['email'], $password, $adminRoleId);
 	}

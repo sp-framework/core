@@ -39,11 +39,13 @@
 			"title"		: "devtools",
 			"icon"		: "code",
 			"childs"	: {
-				"title"		: "api",
-				"childs"	: {
-					"contracts"		: {
-						"title"		: "contracts",
-						"link"		: "devtools/api/contracts"
+				"api"	: {
+					"title"     : "Api",
+					"childs"	: {
+						"contracts"		: {
+							"title"		: "contracts",
+							"link"		: "devtools/api/contracts"
+						}
 					}
 				}
 			}

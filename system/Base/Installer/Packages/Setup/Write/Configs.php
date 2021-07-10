@@ -124,7 +124,7 @@ return
 		for ($workFactor = 4; $workFactor <= 16 ; $workFactor ++) {
 			$timeStart = $this->microtimeFloat();
 
-			$this->container['secTools']->hashPassword(rand(), $workFactor);
+			$this->container['security']->hash(rand(), $workFactor);
 
 			$timeEnd = $this->microtimeFloat();
 

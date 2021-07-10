@@ -31,8 +31,9 @@ class Core extends BasePackage
 			$this->core['settings']['sigKey'] = $sigKey = $this->random->base58();
 			$this->core['settings']['sigText'] = $sigText = $this->random->base58(32);
 			$this->core['settings']['cookiesSig'] = $cookiesSig = $this->crypt->encryptBase64($sigText, $sigKey);
-			$coreData['settings'] = Json::encode($this->core['settings']);
-			$this->update($coreData);
+			$this->core['settings'] = Json::encode($this->core['settings']);
+
+			$this->update($this->core);
 		}
 
 		return $this;

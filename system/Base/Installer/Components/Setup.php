@@ -7,9 +7,6 @@ use Phalcon\Helper\Json;
 use Phalcon\Mvc\View\Simple;
 use System\Base\Installer\Packages\Setup as SetupPackage;
 use System\Base\Providers\ContentServiceProvider\Local\Content as LocalContent;
-use System\Base\Providers\SecurityServiceProvider\Crypt;
-use System\Base\Providers\SecurityServiceProvider\Random;
-use System\Base\Providers\SecurityServiceProvider\SecTools;
 use System\Base\Providers\SecurityServiceProvider\Security;
 use System\Base\Providers\ValidationServiceProvider\Validation;
 
@@ -58,30 +55,6 @@ Class Setup
 			'security',
 			function () {
 				return (new Security())->init();
-			}
-		);
-
-		$container->setShared(
-			'crypt',
-			function () {
-				return (new Crypt())->init();
-			}
-		);
-
-		$container->setShared(
-			'random',
-			function () {
-				return (new Random())->init();
-			}
-		);
-
-		$container->setShared(
-			'secTools',
-			function () use ($container) {
-				$security = $container->getShared('security');
-				$random = $container->getShared('random');
-				$crypt = $container->getShared('crypt');
-				return (new SecTools($security, $random, $crypt))->init();
 			}
 		);
 

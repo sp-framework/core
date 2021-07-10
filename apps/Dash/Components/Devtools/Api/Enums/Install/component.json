@@ -39,11 +39,13 @@
 			"title"		: "devtools",
 			"icon"		: "code",
 			"childs"	: {
-				"title"		: "api",
-				"childs"	: {
-					"enums"		: {
-						"title"		: "enums",
-						"link"		: "devtools/api/enums"
+				"api"	: {
+					"title"     : "Api",
+					"childs"	: {
+						"enums"		: {
+							"title"		: "enums",
+							"link"		: "devtools/api/enums"
+						}
 					}
 				}
 			}
