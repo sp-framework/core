@@ -1,6 +1,6 @@
 {
     "name"          : "HrmsStatuses",
-    "displayName"   : "Hrms Statuses Package",
+    "display_name"   : "Hrms Statuses Package",
     "description"   : "Package for Hrms Statuses component",
     "app_type"      : "dash",
     "category"      : "business",

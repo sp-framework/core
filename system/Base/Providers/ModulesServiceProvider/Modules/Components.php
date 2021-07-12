@@ -234,7 +234,7 @@ class Components extends BasePackage
 					}
 				}
 
-				$component['dependencies'] = Json::encode($component['dependencies']);
+				$component['dependencies'] = Json::encode($component['dependencies'], JSON_UNESCAPED_SLASHES);
 
 			} else if ($status === false) {
 				$component['apps'][$data['id']]['enabled'] = false;

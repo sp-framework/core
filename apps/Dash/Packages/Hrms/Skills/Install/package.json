@@ -1,6 +1,6 @@
 {
     "name"          : "Skills",
-    "displayName"   : "Admin Skills Package",
+    "display_name"   : "Admin Skills Package",
     "description"   : "Package for Skills component",
     "app_type"      : "dash",
     "category"      : "business",

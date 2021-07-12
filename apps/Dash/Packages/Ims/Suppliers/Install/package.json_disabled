@@ -1,6 +1,6 @@
 {
     "name"          : "Suppliers",
-    "displayName"   : "Admin Suppliers Package",
+    "display_name"   : "Admin Suppliers Package",
     "description"   : "Package for Suppliers component",
     "app_type"      : "dash",
     "category"      : "business",

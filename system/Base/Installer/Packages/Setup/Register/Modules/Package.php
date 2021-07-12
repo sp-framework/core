@@ -12,7 +12,7 @@ class Package
 			'modules_packages',
 			[
 				'name' 					=> $packageFile['name'],
-				'display_name'			=> $packageFile['displayName'],
+				'display_name'			=> $packageFile['display_name'],
 				'description' 			=> $packageFile['description'],
 				'app_type'		 		=> $packageFile['app_type'],
 				'category'				=> $packageFile['category'],

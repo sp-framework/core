@@ -142,7 +142,11 @@
                     </td>
                 {% endif %}
                 <td>
-                    {{module['name']}}
+                    {% if moduleType === 'view' %}
+                        {{module['display_name']}}
+                    {% else %}
+                        {{module['name']}}
+                    {% endif %}
                 </td>
                 <td class="text-truncate" style="max-width: 20rem;">
                     {{module['description']}}

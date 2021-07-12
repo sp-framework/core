@@ -212,12 +212,12 @@ class Apps extends BasePackage
 			$this->basepackages->menus->updateMenus($app);
 		}
 
-		if (isset($app['views'])) {
-			$this->modules->views->updateViews($app);
-		}
-
 		if (isset($app['middlewares'])) {
 			$this->modules->middlewares->updateMiddlewares($app);
+		}
+
+		if (isset($app['views'])) {
+			$this->modules->views->updateViews($app);
 		}
 
 		if ($this->update($app)) {

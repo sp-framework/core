@@ -1,65 +1,77 @@
 {
-    "route"         : "system/users/accounts",
-    "name"          : "Accounts",
-    "description"   : "List accounts via this component",
-    "app_type"      : "dash",
-    "category"      : "system",
-    "sub_category"  : "admin",
-    "version"       : "0.0.1",
-    "repo"          : "https://.../dash-component-system-admin-accounts",
-    "class"         : "Apps\\Dash\\Components\\System\\Users\\Accounts\\AccountsComponent",
-    "dependencies"  : {
-        "core"          : {
-            "name"      : "Core",
-            "version"   : "0.0.1",
-            "repo"      : "https://.../core"
+    "route": "system/users/accounts",
+    "name": "Accounts",
+    "description": "List accounts via this component",
+    "app_type": "dash",
+    "category": "system",
+    "sub_category": "admin",
+    "version": "0.0.1",
+    "repo": "https://.../dash-component-system-admin-accounts",
+    "class": "Apps\\Dash\\Components\\System\\Users\\Accounts\\AccountsComponent",
+    "dependencies":
+    {
+        "core":
+        {
+            "name": "Core",
+            "version": "0.0.1",
+            "repo": "https://.../core"
         },
-        "components"    : [],
-        "packages"      : [],
-        "middlewares"   :
+        "components":
+        [],
+        "packages":
+        [],
+        "middlewares":
         [
             {
-                "name"      : "Auth",
-                "version"   : "0.0.1",
-                "repo"      : "https://.../dash-middleware-system-tools-auth"
+                "name": "Auth",
+                "version": "0.0.1",
+                "repo": "https://.../dash-middleware-system-tools-auth"
             },
             {
-                "name"      : "Acl",
-                "version"   : "0.0.1",
-                "repo"      : "https://.../dash-middleware-system-tools-acl"
+                "name": "Acl",
+                "version": "0.0.1",
+                "repo": "https://.../dash-middleware-system-tools-acl"
             }
         ],
-        "views"         :
+        "views":
         [
             {
-                "name"      : "Default",
-                "version"   : "0.0.1",
-                "repo"      : "https://.../dash-view-default"
+                "name": "Default",
+                "version": "0.0.1",
+                "repo": "https://.../dash-view-default"
             }
         ]
     },
-    "menu"              : {
-        "seq"           : 6,
-        "system"      : {
-            "icon"      : "cogs",
-            "title"     : "system",
-            "childs"    : {
-                "users"      : {
-                    "title"     : "users",
-                    "icon"      : "users",
-                    "childs"    : {
-                        "accounts"   : {
-                            "title"     : "Accounts",
-                            "link"      : "system/users/accounts"
+    "menu":
+    {
+        "seq": 6,
+        "system":
+        {
+            "icon": "cogs",
+            "title": "system",
+            "childs":
+            {
+                "users":
+                {
+                    "title": "users",
+                    "icon": "users",
+                    "childs":
+                    {
+                        "accounts":
+                        {
+                            "title": "Accounts",
+                            "link": "system/users/accounts"
                         }
                     }
                 }
             }
         }
     },
-    "settings"          : {
-        "mandatory"     : {
-            "admin"     : true
+    "settings":
+    {
+        "mandatory":
+        {
+            "admin": true
         }
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Apps\Ecom\Admin\Packages\Module\Settings;
 
+use Phalcon\Helper\Json;
+
 class Components
 {
 	public function get($getData)
@@ -17,7 +19,7 @@ class Components
 			$this->packagesData->component = $thisComponent;
 
 			$this->packagesData->settings =
-				$thisComponent['settings'] ?? json_decode($thisComponent['settings'], true);
+				$thisComponent['settings'] ?? Json::decode($thisComponent['settings'], true);
 
 			$this->localContent->setPathPrefix('components/Admin/Install/' . $thisComponent['name'] . '/');
 
@@ -34,7 +36,6 @@ class Components
 
 	public function update()
 	{
-
 			$thisComponent =
 				$this->components
 					->getById($postData['id'])
@@ -49,7 +50,7 @@ class Components
 				return $this->packagesData;
 			}
 
-			$postData['settings'] = isset($postData['settings']) ? json_encode($postData['settings']) : null;
+			$postData['settings'] = isset($postData['settings']) ? Json::encode($postData['settings'], JSON_UNESCAPED_SLASHES) : null;
 
 			$update = $this->components->update($postData);
 

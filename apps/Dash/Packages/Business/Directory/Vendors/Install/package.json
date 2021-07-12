@@ -1,6 +1,6 @@
 {
     "name"          : "Vendors",
-    "displayName"   : "Business Vendors",
+    "display_name"   : "Business Vendors",
     "description"   : "Package for Business Directory Vendors component",
     "app_type"      : "dash",
     "category"      : "business",

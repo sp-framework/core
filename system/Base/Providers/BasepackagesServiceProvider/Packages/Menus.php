@@ -23,23 +23,24 @@ class Menus extends BasePackage
 
     public function buildMenusForApp($appId)
     {
-        $menus = $this->getMenusForApp($appId);
-
         $cachedMenu = $this->cacheTools->getCache('menus');
 
         if ($cachedMenu) {
             return $cachedMenu;
         }
 
-        $buildMenu = [];
+        $menus = $this->getMenusForApp($appId);
 
+        $buildMenu = [];
+        // var_dump($menus);
         foreach (msort($menus, 'sequence') as $key => $menu) {
             $menu = Json::decode($menu['menu'], true);
+
             if ($menu) {
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
             }
         }
-
+        // dump($buildMenu);die();
         $this->cacheTools->setCache('menus_' . $appId, $buildMenu);
 
         return $buildMenu;
@@ -88,8 +89,15 @@ class Menus extends BasePackage
 
                 $menu['apps'] = Json::encode($menu['apps']);
 
+                $menu['menu'] = Json::decode($menu['menu'], true);
+                $menu['menu'] = Json::encode($menu['menu'], JSON_UNESCAPED_SLASHES);
+
                 $this->update($menu);
             }
+        }
+
+        if ($this->cacheTools->getCache('menus')) {
+            $this->cacheTools->deleteCache('menus');
         }
 
         $this->basepackages->menus->init(true);

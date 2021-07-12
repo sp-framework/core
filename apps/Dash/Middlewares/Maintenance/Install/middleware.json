@@ -1,12 +1,12 @@
 {
-    "name"          : "Maintenance",
-    "displayName"   : "Maintenance Mode",
-    "description"   : "This middleware is used when you want to perform any maintenance on this app. It blocks every connection to this app.",
-    "version"       : "0.0.1",
-    "app_type"      : "dash",
-    "category"      : "system",
-    "sub_category"  : "tools",
-    "repo"          : "https://.../dash-middleware-system-tools-maintenance",
-    "class"         : "Apps\\Dash\\Middlewares\\Maintenance",
-    "settings"      : { }
+    "name": "Maintenance",
+    "display_name": "Maintenance Mode",
+    "description": "This middleware is used when you want to perform any maintenance on this app. It blocks every connection to this app.",
+    "app_type": "dash",
+    "category": "system",
+    "sub_category": "tools",
+    "version": "0.0.1",
+    "repo": "https://.../dash-middleware-system-tools-maintenance",
+    "class": "Apps\\Dash\\Middlewares\\Maintenance\\Maintenance",
+    "settings": "[]"
 }

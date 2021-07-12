@@ -1,6 +1,6 @@
 {
     "name"          : "Contacts",
-    "displayName"   : "Business Contacts",
+    "display_name"   : "Business Contacts",
     "description"   : "Package for Business Directory Contacts component",
     "app_type"      : "dash",
     "category"      : "business",

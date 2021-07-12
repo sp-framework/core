@@ -1,6 +1,6 @@
 {
     "name"          : "AdminLTETags",
-    "displayName"   : "AdminLTE HTML Helper Tags",
+    "display_name"   : "AdminLTE HTML Helper Tags",
     "description"   : "Package to generate AdminLTE framework html tags",
     "app_type"      : "dash",
     "category"      : "system",

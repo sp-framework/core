@@ -144,7 +144,6 @@ class Tree extends AdminLTETags
                 $this->content .= '</ul></li>';
 
         } else if ($this->treeMode === 'select2') {
-
             if (isset($items['value'])) {
                 $this->content .=
                     '<optgroup label="' . $items['value'] . '">';
@@ -281,78 +280,79 @@ class Tree extends AdminLTETags
                 $selectType = '2';
             }
 
-            foreach ($items as $itemKey => $itemValue) {
-                // var_dump($itemKey, $itemValue);
-                // $hasKeyValue = '';
-                // $hasValue = '';
-                // $hasValueText = '';
+            if (is_array($items)) {
+                foreach ($items as $itemKey => $itemValue) {
+                    // $hasKeyValue = '';
+                    // $hasValue = '';
+                    // $hasValueText = '';
 
-                if (isset($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']) &&
-                    isset($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'])
-                ) {
-                    $key = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']];
-                    $value = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']];
-                // }
-                // if ($itemKey === $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']) {
-
-                //     $hasKeyValue = $itemValue;
-                // } else if ($itemKey === $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']) {
-
-                //     $hasValue = $itemValue;
-
-                //     $hasValueText = $itemValue;
-                // } else {
-                    // $hasKeyValue = $itemKey;
-                    // $hasValue = $itemValue;
-                    // $hasValueText = $itemValue;
-                }
-                // var_dump($itemValue['data']);
-                if (isset($itemValue['data'])) {
-                    $dataAttr = '';
-                    foreach ($itemValue['data'] as $dataKey => $dataValue) {
-                        $dataAttr .= 'data-' . $dataKey . '="' . $dataValue . '" ';
-                    }
-                } else {
-                    $dataAttr = '';
-                }
-                // if (isset($itemValue['dataType'])) {
-                //     $dataType = 'data-datatype="' . $itemValue['dataType'] . '"';
-                // } else {
-                //     $dataType = '';
-                // }
-
-                // if (isset($itemValue['numeric'])) {
-                //     $numeric = 'data-numeric="' . $itemValue['numeric'] . '"';
-                // } else {
-                //     $numeric = '';
-                // }
-                // var_dump($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']);
-
-                if (is_array($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) &&
-                    count($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) > 0
-                ) {
-                    if (in_array($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'])) {
-                        $this->content .=
-                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
-                    } else {
-                        $this->content .=
-                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
-                    }
-
-                    // foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'] as $selectArrKey => $selectArrValue) {
-                    //     if ($key == $selectArrValue) {
-                        // } else {
-                        //     $this->content .=
-                        //         '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
-                    //     }
+                    if (isset($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']) &&
+                        isset($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue'])
+                    ) {
+                        $key = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']];
+                        $value = $itemValue[$this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']];
                     // }
-                } else {
-                    if ($key == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
-                        $this->content .=
-                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
+                    // if ($itemKey === $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsKey']) {
+
+                    //     $hasKeyValue = $itemValue;
+                    // } else if ($itemKey === $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsValue']) {
+
+                    //     $hasValue = $itemValue;
+
+                    //     $hasValueText = $itemValue;
+                    // } else {
+                        // $hasKeyValue = $itemKey;
+                        // $hasValue = $itemValue;
+                        // $hasValueText = $itemValue;
+                    }
+                    // var_dump($itemValue['data']);
+                    if (isset($itemValue['data'])) {
+                        $dataAttr = '';
+                        foreach ($itemValue['data'] as $dataKey => $dataValue) {
+                            $dataAttr .= 'data-' . $dataKey . '="' . $dataValue . '" ';
+                        }
                     } else {
-                        $this->content .=
-                            '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
+                        $dataAttr = '';
+                    }
+                    // if (isset($itemValue['dataType'])) {
+                    //     $dataType = 'data-datatype="' . $itemValue['dataType'] . '"';
+                    // } else {
+                    //     $dataType = '';
+                    // }
+
+                    // if (isset($itemValue['numeric'])) {
+                    //     $numeric = 'data-numeric="' . $itemValue['numeric'] . '"';
+                    // } else {
+                    //     $numeric = '';
+                    // }
+                    // var_dump($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']);
+
+                    if (is_array($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) &&
+                        count($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) > 0
+                    ) {
+                        if (in_array($key, $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'])) {
+                            $this->content .=
+                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
+                        } else {
+                            $this->content .=
+                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
+                        }
+
+                        // foreach ($this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected'] as $selectArrKey => $selectArrValue) {
+                        //     if ($key == $selectArrValue) {
+                            // } else {
+                            //     $this->content .=
+                            //         '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
+                        //     }
+                        // }
+                    } else {
+                        if ($key == $this->fieldParams['fieldDataSelect' . $selectType . 'OptionsSelected']) {
+                            $this->content .=
+                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '" selected>' . $value . '</option>';
+                        } else {
+                            $this->content .=
+                                '<option ' . $dataAttr . ' data-value="' . $key . '" value="' . $key . '">' . $value . '</option>';
+                        }
                     }
                 }
             }

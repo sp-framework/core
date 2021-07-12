@@ -33,7 +33,7 @@ class Packages
 						[
 							'type'    => Column::TYPE_VARCHAR,
 							'size'    => 50,
-							'notNull' => false,
+							'notNull' => true,
 						]
 					),
 					new Column(

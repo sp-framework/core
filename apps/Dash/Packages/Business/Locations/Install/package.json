@@ -1,6 +1,6 @@
 {
     "name"          : "Locations",
-    "displayName"   : "Business Locations",
+    "display_name"   : "Business Locations",
     "description"   : "Package for managing business locations via locations component",
     "app_type"      : "dash",
     "category"      : "business",

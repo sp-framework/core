@@ -1,6 +1,6 @@
 {
     "name"          : "Takes",
-    "displayName"   : "Takes",
+    "display_name"   : "Takes",
     "description"   : "Package for Stock Takes component",
     "app_type"      : "dash",
     "category"      : "business",

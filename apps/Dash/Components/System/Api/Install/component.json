@@ -1,54 +1,65 @@
 {
-    "route"         : "system/api",
-    "name"          : "Api",
-    "description"   : "List Api's via this component",
-    "app_type"      : "dash",
-    "category"      : "system",
-    "sub_category"  : "admin",
-    "version"       : "0.0.1",
-    "repo"          : "https://.../dash-component-system-admin-api",
-    "class"         : "Apps\\Dash\\Components\\System\\Api\\ApiComponent",
-    "dependencies"  : {
-        "core"          : {
-            "name"      : "Core",
-            "version"   : "0.0.1",
-            "repo"      : "https://.../core"
+    "route": "system/api",
+    "name": "Api",
+    "description": "List Api's via this component",
+    "app_type": "dash",
+    "category": "system",
+    "sub_category": "admin",
+    "version": "0.0.1",
+    "repo": "https://.../dash-component-system-admin-api",
+    "class": "Apps\\Dash\\Components\\System\\Api\\ApiComponent",
+    "dependencies":
+    {
+        "core":
+        {
+            "name": "Core",
+            "version": "0.0.1",
+            "repo": "https://.../core"
         },
-        "components"    : [],
-        "packages"      : [
-            {
-                "name"      : "Api",
-                "version"   : "0.0.1",
-                "repo"      : "https://.../dash-package-system-admin-api"
-            }
-        ],
-        "middlewares"   : [],
-        "views"         :
+        "components":
+        [],
+        "packages":
         [
             {
-                "name"      : "Default",
-                "version"   : "0.0.1",
-                "repo"      : "https://.../dash-view-default"
+                "name": "Api",
+                "version": "0.0.1",
+                "repo": "https://.../dash-package-system-admin-api"
+            }
+        ],
+        "middlewares":
+        [],
+        "views":
+        [
+            {
+                "name": "Default",
+                "version": "0.0.1",
+                "repo": "https://.../dash-view-default"
             }
         ]
     },
-    "menu"              : {
-        "seq"           : 6,
-        "system"      : {
-            "icon"      : "cogs",
-            "title"     : "system",
-            "childs"    : {
-                "api" : {
-                    "title"     : "api",
-                    "icon"      : "exchange-alt",
-                    "link"      : "system/api"
+    "menu":
+    {
+        "seq": 6,
+        "system":
+        {
+            "icon": "cogs",
+            "title": "system",
+            "childs":
+            {
+                "api":
+                {
+                    "title": "api",
+                    "icon": "exchange-alt",
+                    "link": "system\\/api"
                 }
             }
         }
     },
-    "settings"          : {
-        "mandatory"     : {
-            "admin"     : true
+    "settings":
+    {
+        "mandatory":
+        {
+            "admin": true
         }
     }
 }

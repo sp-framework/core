@@ -1,6 +1,6 @@
 {
     "name"          : "Stocks",
-    "displayName"   : "Stocks",
+    "display_name"   : "Stocks",
     "description"   : "Package for Stocks component",
     "app_type"      : "dash",
     "category"      : "business",

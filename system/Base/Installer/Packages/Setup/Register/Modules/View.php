@@ -12,6 +12,7 @@ class View
 			'modules_views',
 			[
 				'name' 					=> $viewFile['name'],
+				'display_name' 			=> $viewFile['display_name'],
 				'description' 			=> $viewFile['description'],
 				'app_type' 				=> $viewFile['app_type'],
 				'category'  			=> $viewFile['category'],

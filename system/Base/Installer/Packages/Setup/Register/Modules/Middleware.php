@@ -20,7 +20,7 @@ class Middleware
 			'modules_middlewares',
 			[
 				'name' 					=> $middlewareFile['name'],
-				'display_name' 			=> $middlewareFile['displayName'],
+				'display_name' 			=> $middlewareFile['display_name'],
 				'description' 			=> $middlewareFile['description'],
 				'app_type' 				=> $middlewareFile['app_type'],
 				'category'  			=> $middlewareFile['category'],

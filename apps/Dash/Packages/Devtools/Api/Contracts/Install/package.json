@@ -1,6 +1,6 @@
 {
     "name"          : "Contracts",
-    "displayName"   : "Contracts",
+    "display_name"   : "Contracts",
     "description"   : "Package for Contracts component",
     "version"       : "0.0.1",
     "app_type"      : "dash",

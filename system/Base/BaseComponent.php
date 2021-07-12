@@ -433,7 +433,7 @@ abstract class BaseComponent extends Controller
 		$this->tag::setDocType(Tag::XHTML5);
 
 		if (isset($this->viewSettings['head']['title'])) {
-			Tag::setTitle($this->viewSettings['head']['title']);
+			Tag::setTitle($this->viewSettings['head']['title'] . ' - ' . ucfirst($this->app['name']));
 		} else {
 			Tag::setTitle(ucfirst($this->app['name']));
 		}

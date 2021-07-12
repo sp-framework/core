@@ -29,6 +29,14 @@ class Views
 						]
 					),
 					new Column(
+						'display_name',
+						[
+							'type'    => Column::TYPE_VARCHAR,
+							'size'    => 50,
+							'notNull' => true,
+						]
+					),
+					new Column(
 						'description',
 						[
 							'type'    => Column::TYPE_VARCHAR,

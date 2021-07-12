@@ -1,6 +1,6 @@
 {
     "name"          : "Entities",
-    "displayName"   : "Business Entities",
+    "display_name"   : "Business Entities",
     "description"   : "Package to register business entity information via entities component",
     "app_type"      : "dash",
     "category"      : "business",

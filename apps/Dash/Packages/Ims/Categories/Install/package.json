@@ -1,6 +1,6 @@
 {
     "name"          : "Categories",
-    "displayName"   : "Admin Categories Package",
+    "display_name"   : "Admin Categories Package",
     "description"   : "Package for Categories component",
     "app_type"      : "dash",
     "category"      : "business",

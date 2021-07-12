@@ -1,6 +1,6 @@
 {
     "name"          : "Qrcodes",
-    "displayName"   : "Qrcodes Package",
+    "display_name"   : "Qrcodes Package",
     "description"   : "Package for generating and validating Qrcodes",
     "app_type"      : "dash",
     "category"      : "system",

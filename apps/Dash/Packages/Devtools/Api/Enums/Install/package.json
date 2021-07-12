@@ -1,6 +1,6 @@
 {
     "name"          : "Enums",
-    "displayName"   : "Enums",
+    "display_name"   : "Enums",
     "description"   : "Package for Enums component",
     "version"       : "0.0.1",
     "app_type"      : "dash",
