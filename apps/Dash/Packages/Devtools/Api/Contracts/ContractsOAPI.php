@@ -39,6 +39,8 @@ class ContractsOAPI
         } else if ($this->contract['api_type'] === 'xero') {
             $const = '
     const HDR_XERO_TENANT_ID = \'xero-tenant-id\';';
+        } else if ($this->contract['api_type'] === 'gitea') {
+            $const = '';
         }
 
         $file .=
@@ -74,7 +76,19 @@ class ContractsOAPI
 
         return $headers;
     }';
+        } else if ($this->contract['api_type'] === 'gitea') {
+            $headers =
+'    protected function getGiteaHeaders()
+    {
+        $headers = [];
+
+        // Add required headers first.
+        $headers[self::HDR_AUTHORIZATION] = \'token \' . $this->getConfig(\'user_access_token\');
+
+        return $headers;
+    }';
         }
+
         $file .= '
 
     const HDR_AUTHORIZATION = \'Authorization\';
@@ -98,6 +112,9 @@ class ContractsOAPI
         } else if ($this->contract['api_type'] === 'xero') {
             $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroRESTService';
             $baseRestService = 'XeroRESTService';
+        } else if ($this->contract['api_type'] === 'gitea') {
+            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Gitea\GiteaRESTService';
+            $baseRestService = 'GiteaRESTService';
         }
 
         return '<?php
@@ -327,38 +344,50 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
 
     public function writeBaseServicesFileContent($file)
     {
-        $this->localContent->write(
-            $this->servicesDirectory .
-            $this->contract['name'] .
-            '/Services/' .
-            $this->contract['name'] .
-            'BaseService.php',
-            $file
-        );
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                $this->contract['name'] .
+                '/Services/' .
+                $this->contract['name'] .
+                'BaseService.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            throw $exception;
+        }
     }
 
     public function writeServicesFileContent($file)
     {
-        $this->localContent->write(
-            $this->servicesDirectory .
-            $this->contract['name'] .
-            '/Services/' .
-            $this->contract['name'] .
-            'Service.php',
-            $file
-        );
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                $this->contract['name'] .
+                '/Services/' .
+                $this->contract['name'] .
+                'Service.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            throw $exception;
+        }
     }
 
     protected function writeTypesFileContent($filename, $file)
     {
-        $this->localContent->write(
-            $this->servicesDirectory .
-            $this->contract['name'] .
-            '/Types/' .
-            $filename .
-            '.php',
-            $file
-        );
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                $this->contract['name'] .
+                '/Types/' .
+                $filename .
+                '.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            throw $exception;
+        }
     }
 
     public function buildTypesFile()
@@ -440,8 +469,14 @@ class ' . $typeKey . ' extends BaseType
             $itemArr = explode('/', $item['items']['$ref']);
         } else if (isset($item['$ref'])) {
             $itemArr = explode('/', $item['$ref']);
-        } else {
+        } else if (isset($item['items']['type']) && is_string($item['items']['type'])) {
+            return $item['items']['type'];
+        } else if (is_string($item)) {
             $itemArr = explode('/', $item);
+        } else if (isset($item['properties']['data']['items']['$ref'])) {
+            $itemArr = explode('/', $item['properties']['data']['items']['$ref']);
+        } else if (isset($item['additionalProperties']['type']) && is_string($item['additionalProperties']['type'])) {
+            return $item['additionalProperties']['type'];
         }
 
         return 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\\' . Arr::last($itemArr);
@@ -546,14 +581,18 @@ class ' . $operationId . 'RestRequest extends BaseType
 
     protected function writeOperationsRequestFileContent($filename, $file)
     {
-        $this->localContent->write(
-            $this->servicesDirectory .
-            $this->contract['name'] .
-            '/Operations/' .
-            $filename .
-            '.php',
-            $file
-        );
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                $this->contract['name'] .
+                '/Operations/' .
+                $filename .
+                '.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            throw $exception;
+        }
     }
 
     protected function buildOperationsResponseFileContent()
@@ -638,13 +677,18 @@ class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
 
     protected function writeOperationsResponseFileContent($filename, $file)
     {
-        $this->localContent->write(
-            $this->servicesDirectory .
-            $this->contract['name'] .
-            '/Operations/' .
-            $filename .
-            '.php',
-            $file
-        );
+        try {
+            $this->localContent->write(
+                $this->servicesDirectory .
+                $this->contract['name'] .
+                '/Operations/' .
+                $filename .
+                '.php',
+                $file
+            );
+        } catch (\League\Flysystem\FilesystemException | \League\Flysystem\UnableToWriteFile $exception) {
+            var_dump($exception);die();
+            throw $exception;
+        }
     }
 }

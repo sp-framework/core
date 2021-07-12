@@ -15,10 +15,10 @@ class Repository
 				'site_url'				=> 'https://repo.bazaari.com.au/',
 				'branch'				=> 'master',
 				'repo_provider'			=> 1,
-				'auth_token'			=> 0,
-				'username'				=> '',
+				'auth_token'			=> 2,
+				'username'				=> 'bcust',
 				'password'				=> '',
-				'token'					=> ''
+				'token'					=> '4bfbfa9b98358693d6057b1e056a5f422f78a2c0'
 			]
 		);
 
@@ -31,10 +31,10 @@ class Repository
 				'site_url'				=> 'https://repo.bazaari.com.au/',
 				'branch'				=> 'master',
 				'repo_provider'			=> 1,
-				'auth_token'			=> 0,
-				'username'				=> '',
+				'auth_token'			=> 2,
+				'username'				=> 'bcust',
 				'password'				=> '',
-				'token'					=> ''
+				'token'					=> '4bfbfa9b98358693d6057b1e056a5f422f78a2c0'
 			]
 		);
 	}

@@ -61,6 +61,10 @@ class ContractsComponent extends BaseComponent
 					[
 						'id'	=> 'xero',
 						'name'	=> 'Xero'
+					],
+					[
+						'id'	=> 'gitea',
+						'name'	=> 'Gitea'
 					]
 				];
 

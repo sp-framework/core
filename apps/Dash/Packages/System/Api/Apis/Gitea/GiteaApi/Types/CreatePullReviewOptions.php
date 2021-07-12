@@ -1,0 +1,48 @@
+<?php
+
+namespace Apps\Dash\Packages\System\Api\Apis\Gitea\GiteaApi\Types;
+
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+
+class CreatePullReviewOptions extends BaseType
+{
+    private static $propertyTypes = [
+        'body' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'body',
+        ],
+        'comments' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Gitea\GiteaApi\Types\CreatePullReviewComment',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'comments',
+        ],
+        'commit_id' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'commit_id',
+        ],
+        'event' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Gitea\GiteaApi\Types\ReviewStateType',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'event',
+        ],
+      ];
+
+    public function __construct(array $values = [])
+    {
+        list($parentValues, $childValues) = self::getParentValues(self::$propertyTypes, $values);
+
+        parent::__construct($parentValues);
+
+        if (!array_key_exists(__CLASS__, self::$properties)) {
+            self::$properties[__CLASS__] = array_merge(self::$properties[get_parent_class()], self::$propertyTypes);
+        }
+
+        $this->setValues(__CLASS__, $childValues);
+    }
+}
