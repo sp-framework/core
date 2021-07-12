@@ -1,3 +1,3 @@
-# core
+# Bazaari Core (SP)
 
-Core Repository of Hello World Framework
+Bazaari Core v3 Codename - SP
