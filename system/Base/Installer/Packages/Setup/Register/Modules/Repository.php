@@ -16,9 +16,9 @@ class Repository
 				'branch'				=> 'master',
 				'repo_provider'			=> 1,
 				'auth_token'			=> 2,
-				'username'				=> 'bcust',
+				'username'				=> '',
 				'password'				=> '',
-				'token'					=> '4bfbfa9b98358693d6057b1e056a5f422f78a2c0'
+				'token'					=> ''
 			]
 		);
 
@@ -32,10 +32,11 @@ class Repository
 				'branch'				=> 'master',
 				'repo_provider'			=> 1,
 				'auth_token'			=> 2,
-				'username'				=> 'bcust',
+				'username'				=> '',
 				'password'				=> '',
-				'token'					=> '4bfbfa9b98358693d6057b1e056a5f422f78a2c0'
+				'token'					=> ''
 			]
 		);
 	}
 }
+// 4bfbfa9b98358693d6057b1e056a5f422f78a2c0

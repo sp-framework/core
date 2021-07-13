@@ -22,6 +22,8 @@ class Repositories extends BasePackage
 
 	public function addRepository(array $data)
 	{
+		$data = $this->encryptPassToken($data);
+
 		$add = $this->add($data);
 
 		if ($add) {
@@ -37,6 +39,8 @@ class Repositories extends BasePackage
 
 	public function updateRepository(array $data)
 	{
+		$data = $this->encryptPassToken($data);
+
 		$update = $this->update($data);
 
 		if ($update) {
@@ -63,5 +67,16 @@ class Repositories extends BasePackage
 
 			$this->packagesData->responseMessage = 'Error Removing Repository';
 		}
+	}
+
+	protected function encryptPassToken(array $data)
+	{
+		if ($data['auth_token'] == 1) {
+			$data['password'] = $this->crypt->encryptBase64($data['password'], $this->secTools->getSigKey());
+		} else if ($data['auth_token'] == 2) {
+			$data['token'] = $this->crypt->encryptBase64($data['token'], $this->secTools->getSigKey());
+		}
+
+		return $data;
 	}
 }

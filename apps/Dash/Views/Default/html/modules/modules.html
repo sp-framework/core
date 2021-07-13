@@ -1,9 +1,9 @@
 <div class="row vdivide">
-    <div id="filter" class="col">
-        {% include 'modules/filter' with ['filters': filters] %}
-    </div>
     <div id="repo" class="col">
         {% include 'repositories/list.html' %}
+    </div>
+    <div id="filter" class="col">
+        {% include 'modules/filter' with ['filters': filters] %}
     </div>
 </div>
 <hr>
@@ -13,11 +13,18 @@
     <div class="row">
         <div id="modules-data" class="col">
             <h5 class="text-center">
-                Select filter or sync with remote repository
+                Select repository and click sync with remote repository or Select filter
             </h5>
         </div>
     </div>
 {% endif %}
+<div class="row m-2" id="repository-sync" hidden>
+    <div class="col text-center">
+        <div class="fa-2x">
+            <i class="fa fa-cog fa-spin"></i> Syncing...
+        </div>
+    </div>
+</div>
 <div class="row m-2" id="modules-loader" hidden>
     <div class="col">
         <div class="fa-2x">

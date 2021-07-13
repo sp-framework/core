@@ -20,8 +20,6 @@ class Manager extends BasePackage
 
     protected $core;
 
-    protected $apps;
-
     protected $packages;
 
     protected $middlewares;
@@ -30,10 +28,27 @@ class Manager extends BasePackage
 
     public function syncRemoteWithLocal($id)
     {
-        $this->repository = $this->modules->repositories->getById($id);
+        $repository = $this->modules->repositories->getById($id);
 
+        if ($repository['auth_token'] == 1 && (!$repository['password'] || $repository['password']=== '')) {
+
+            $this->addResponse('Password missing, cannot sync', 1);
+
+            return;
+        } else if ($repository['auth_token'] == 2 && (!$repository['token'] || $repository['token'] === '')) {
+
+            $this->addResponse('Token missing, cannot sync', 1);
+
+            return;
+        }
+
+        $repository = $this->decryptPassToken($repository);
+
+        $this->repository = $repository;
+
+        var_dump($this->getModulesData(null, true));
         //populate localModules so that we can compare with remoteModules
-        $this->getModulesData(null, true);
+        // $this->getModulesData(null, true);
 
         if ($this->getRemoteModules() === true && $this->updateRemoteModulesToDB() === true) {
 
@@ -62,8 +77,7 @@ class Manager extends BasePackage
 
     public function getLocalModules($filter = null, $inclCore = false, $getFresh = false)
     {
-        $this->packagesData->appInfo =
-            $this->apps->getAppInfo();
+        $this->packagesData->appInfo = $this->app;
 
         if ($getFresh) {
             $this->core = $this->modules->core->init(true)->core;
@@ -778,5 +792,16 @@ class Manager extends BasePackage
                 return true;
             }
         }
+    }
+
+    protected function decryptPassToken(array $data)
+    {
+        if ($data['auth_token'] == 1) {
+            $data['password'] = $this->crypt->decryptBase64($data['password'], $this->secTools->getSigKey());
+        } else if ($data['auth_token'] == 2) {
+            $data['token'] = $this->crypt->decryptBase64($data['token'], $this->secTools->getSigKey());
+        }
+
+        return $data;
     }
 }

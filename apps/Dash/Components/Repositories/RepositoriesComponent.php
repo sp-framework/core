@@ -31,14 +31,12 @@ class RepositoriesComponent extends BaseComponent
             }
             $this->modules->repositories->addRepository($this->postData());
 
-            $this->view->responseCode = $this->modules->repositories->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->modules->repositories->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->modules->repositories->packagesData->responseMessage,
+                $this->modules->repositories->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -53,14 +51,12 @@ class RepositoriesComponent extends BaseComponent
             }
             $this->modules->repositories->updateRepository($this->postData());
 
-            $this->view->responseCode = $this->modules->repositories->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->modules->repositories->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->modules->repositories->packagesData->responseMessage,
+                $this->modules->repositories->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -75,61 +71,64 @@ class RepositoriesComponent extends BaseComponent
             }
             $this->modules->repositories->removeRepository($this->postData());
 
-            $this->view->responseCode = $this->modules->repositories->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->modules->repositories->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->modules->repositories->packagesData->responseMessage,
+                $this->modules->repositories->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
     public function syncAction()
     {
-        if (isset($this->postData()['repoId'])) {
-
-            $synced = $this->modules->manager->syncRemoteWithLocal($this->postData()['repoId']);
-
-            if ($synced === true) {
-
-                $this->view->counter = $this->modules->manager->packagesData->counter;
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
             }
 
-            $this->view->responseCode = $this->modules->manager->packagesData->responseCode;
+            if (isset($this->postData()['repoId'])) {
+                $counter = null;
 
-            $this->view->responseMessage = $this->modules->manager->packagesData->responseMessage;
+                if ($this->modules->manager->syncRemoteWithLocal($this->postData()['repoId'])) {
+                    $counter = $this->modules->manager->packagesData->counter;
+                }
 
-            return $this->sendJson();
+                $this->addResponse(
+                    $this->modules->manager->packagesData->responseMessage,
+                    $this->modules->manager->packagesData->responseCode,
+                    $counter
+                );
 
-            // if ($modulesData === true) {
+                return $this->sendJson();
 
-            //     $this->view->responseCode = $this->modules->manager->packagesData->responseCode;
+                // if ($modulesData === true) {
 
-            //     $this->view->responseMessage = $this->modules->manager->packagesData->responseMessage;
+                //     $this->view->responseCode = $this->modules->manager->packagesData->responseCode;
 
-            //     // $this->view->modulesData = $this->modules->manager->packagesData->modulesData;
+                //     $this->view->responseMessage = $this->modules->manager->packagesData->responseMessage;
 
-            //     $this->view->counter = $this->modules->manager->packagesData->counter;
+                //     // $this->view->modulesData = $this->modules->manager->packagesData->modulesData;
 
-            //     // $this->view->thisApp = $this->modules->manager->packagesData->appInfo;
+                //     $this->view->counter = $this->modules->manager->packagesData->counter;
 
-            //     $this->setDefaultViewData();
+                //     // $this->view->thisApp = $this->modules->manager->packagesData->appInfo;
 
-            //     // $this->view->pick('../modules/modulesdata');
-            // } else {
+                //     $this->setDefaultViewData();
 
-            //     $this->view->responseCode = $modulesData->packagesData->responseCode;
+                //     // $this->view->pick('../modules/modulesdata');
+                // } else {
 
-            //     $this->view->responseMessage = $modulesData->packagesData->responseMessage;
+                //     $this->view->responseCode = $modulesData->packagesData->responseCode;
 
-            //     return $this->sendJson();
-            // }
+                //     $this->view->responseMessage = $modulesData->packagesData->responseMessage;
+
+                //     return $this->sendJson();
+            } else {
+                $this->addResponse('Repo id not provided', 1);
+            }
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }

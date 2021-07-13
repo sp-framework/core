@@ -10,6 +10,19 @@
     {% set repositoryUsername = repository['username'] %}
     {% set repositoryPassword = repository['password'] %}
     {% set repositoryToken = repository['token'] %}
+    {% if repository['id'] == '1' or repository['id'] == '2' %}
+        {% set repoproviderhidden = 'hidden' %}
+        {% set repobranchhidden = 'hidden' %}
+        {% set authtokenhidden = 'hidden' %}
+        {% set usernameHidden = true %}
+        {% set passwordHidden = true %}
+    {% else %}
+        {% set repoproviderhidden = '' %}
+        {% set repobranchhidden = '' %}
+        {% set authtokenhidden = '' %}
+        {% set usernameHidden = false %}
+        {% set passwordHidden = false %}
+    {% endif %}
 {% else %}
     {% set repositoryId = '' %}
     {% set repositoryName = '' %}
@@ -22,6 +35,11 @@
     {% set repositoryUsername = '' %}
     {% set repositoryPassword = '' %}
     {% set repositoryToken = '' %}
+    {% set repoproviderhidden = '' %}
+    {% set repobranchhidden = '' %}
+    {% set authtokenhidden = '' %}
+    {% set usernameHidden = false %}
+    {% set passwordHidden = false %}
 {% endif %}
 {% if repositoryAuthToken == '0' %}
     {% set authDisabled = true %}
@@ -33,6 +51,7 @@
     {% set authDisabled = true %}
     {% set tokenDisabled = false %}
 {% endif %}
+
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
@@ -109,7 +128,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-3" {{repoproviderhidden}}>
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -192,7 +211,7 @@
                             ]
                         )}}
                     </div>
-                    <div class="col">
+                    <div class="col" {{repobranchhidden}}>
                         {{adminltetags.useTag('fields',
                             [
                                 'component'                      : component,
@@ -219,7 +238,7 @@
         </div>
         <hr>
         <div class="row">
-            <div class="col">
+            <div class="col" {{authtokenhidden}}>
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -273,6 +292,7 @@
                                 'fieldLabel'                     : 'Username',
                                 'fieldType'                      : 'input',
                                 'fieldRequired'                  : true,
+                                'fieldHidden'                    : usernameHidden,
                                 'fieldHelp'                      : true,
                                 'fieldHelpTooltipContent'        : 'Username',
                                 'fieldBazPostOnCreate'           : true,
@@ -299,6 +319,7 @@
                                 'fieldHelp'                      : true,
                                 'fieldHelpTooltipContent'        : 'Password',
                                 'fieldRequired'                  : true,
+                                'fieldHidden'                    : passwordHidden,
                                 'fieldBazScan'                   : true,
                                 'fieldBazPostOnCreate'           : true,
                                 'fieldBazPostOnUpdate'           : true,

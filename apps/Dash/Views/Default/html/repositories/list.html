@@ -69,7 +69,7 @@ initSync();
 function changeRepoButtons(val = '0') {
     var url = "{{links.url('repositories/q/id/')}}" + val;
 
-    if (val == '1') {
+    if (val == '1' || val == '2') {
         $('#repositories-options-sync').attr('disabled', false);
         $('#repositories-options-delete').attr('disabled', true);
         $('#repositories-options-edit').removeClass('disabled');
@@ -77,7 +77,7 @@ function changeRepoButtons(val = '0') {
     } else if (val == '0') {
         $('#repositories-options-sync, #repositories-options-delete').attr('disabled', true);
         $('#repositories-options-edit').addClass('disabled');
-    } else if (val != '1') {
+    } else if (val != '1' || val != '2') {
         $('#repositories-options-sync, #repositories-options-delete').attr('disabled', false);
         $('#repositories-options-edit').removeClass('disabled');
         $('#repositories-options-edit').attr('href', url);
@@ -92,7 +92,8 @@ function initSync(val) {
     $('#repositories-options-sync').click(function() {
         $('#repositories-options-sync, #repositories-options-delete, #repositories-options-add').attr('disabled', true);
         $('#repositories-options-edit').addClass('disabled');
-        $('#modules-loader').attr('hidden', false);
+        $('#modules-loader').attr('hidden', true);
+        $('#repository-sync').attr('hidden', false);
         $('#modules-data').attr('hidden', true);
 
         var postData = { };
@@ -100,44 +101,48 @@ function initSync(val) {
         postData['repoId'] = $('#repositories-options-repositories option:selected').val();
 
         var filterId = $('#filter-options-filter option:selected').val();
-
-        $.post('repositories/sync', postData, function(response) {
+        //eslint-disable-next-line
+        console.log(filterId);
+        $.post('{{links.url("repositories/sync")}}', postData, function(response) {
             if (response.tokenKey && response.token) {
                 $('#security-token').attr('name', response.tokenKey);
                 $('#security-token').val(response.token);
             }
             if (response.responseCode == 0) {
-                $('#modules-data').empty().load("{{links.url('modules/q/filter/')}}" + filterId);
+                //eslint-disable-next-line
+                console.log(response);
+        //         $('#modules-data').empty().load("{{links.url('modules/q/filter/')}}" + filterId);
 
-                $('#modules-data').attr('hidden', false);
-                $('#modules-loader').attr('hidden', true);
-                $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
+        //         $('#modules-data').attr('hidden', false);
+        //         $('#modules-loader').attr('hidden', true);
+        //         $('#repository-sync').attr('hidden', true);
+        //         $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
 
-                var text, registerCounter, updateCounter;
+        //         var text, registerCounter, updateCounter;
 
-                registerCounter = response.counter.register;
-                updateCounter = response.counter.update;
+        //         registerCounter = response.counter.register;
+        //         updateCounter = response.counter.update;
 
-                if (registerCounter > 0 || updateCounter > 0) {
-                    if (registerCounter !== 0 && updateCounter === 0) {
-                        text =
-                            'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
-                    } else if (registerCounter === 0 && updateCounter !== 0) {
-                        text =
-                            'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
-                    } else if (registerCounter !== 0 && updateCounter !== 0) {
-                        text =
-                            'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
-                    }
-                } else {
-                    text = 'Sync Complete.<br>No new modules or updates available.';
-                }
-                PNotify.info({
-                    text        : text,
-                    textTrusted : true
-                });
+        //         if (registerCounter > 0 || updateCounter > 0) {
+        //             if (registerCounter !== 0 && updateCounter === 0) {
+        //                 text =
+        //                     'Sync Complete.<br>' + registerCounter + ' new modules available.<br> No updates available.';
+        //             } else if (registerCounter === 0 && updateCounter !== 0) {
+        //                 text =
+        //                     'Sync Complete.<br>' + updateCounter + ' new updates available.<br> No new modules available.';
+        //             } else if (registerCounter !== 0 && updateCounter !== 0) {
+        //                 text =
+        //                     'Sync Complete.<br>' + updateCounter + ' new updates available.<br>' + registerCounter + ' new modules available.';
+        //             }
+        //         } else {
+        //             text = 'Sync Complete.<br>No new modules or updates available.';
+        //         }
+        //         PNotify.info({
+        //             text        : text,
+        //             textTrusted : true
+        //         });
 
-                initModuleButtons();
+        //         initModuleButtons();
             } else {
                 PNotify.error({
                         text        : response.responseMessage,
@@ -145,6 +150,7 @@ function initSync(val) {
                     });
                 $('#modules-data').attr('hidden', false);
                 $('#modules-loader').attr('hidden', true);
+                $('#repository-sync').attr('hidden', true);
                 $('#repositories-options-sync, #repositories-options-edit, #repositories-options-delete, #repositories-options-add').attr('disabled', false);
             }
         });
@@ -163,30 +169,20 @@ $('#repositories-options-delete').click(function() {
         title                       : '<i class="fa text-danger fa-lg fa-question-circle m-2">' +
                                       '</i> <span style="font-size:40px;" class="text-danger"> Delete Repo ' +
                                       repoName + '?</span>',
-        width                       : '100%',
+        icon                        : 'question',
         background                  : 'rgba(0,0,0,.8)',
         backdrop                    : 'rgba(0,0,0,.6)',
         buttonsStyling              : false,
         confirmButtonText           : 'Delete',
         customClass                 : {
-            'container'                 : 'rounded-0 animated fadeIn',
             'confirmButton'             : 'btn btn-danger text-uppercase',
             'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-        },
-        showClass                   : {
-            'popup'                     : 'swal2-noanimation',
-            'backdrop'                  : 'swal2-noanimation'
-        },
-        hideClass                   : {
-            'popup'                     : '',
-            'backdrop'                  : ''
         },
         showCancelButton            : true,
         keydownListenerCapture      : true,
         allowOutsideClick           : false,
         allowEscapeKey              : false,
-        allowEnterKey               : false,
-        didOpen                      : function() {
+        didOpen                     : function() {
             window.dataCollection.env.sounds.swalSound.play();
         }
     }).then((result) => {
@@ -195,7 +191,7 @@ $('#repositories-options-delete').click(function() {
             postData[$('#security-token').attr('name')] = $('#security-token').val();
             postData['id'] = repoId;
 
-            $.post('repositories/remove', postData,
+            $.post('{{links.url("repositories/remove")}}', postData,
                     function(response) {
                         if (response.responseCode == 0) {
                             $('#repositories-options-repositories').find('[data-value="' + repoId + '"]').remove();
