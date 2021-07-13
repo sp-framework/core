@@ -132,6 +132,8 @@ class Auth
             $this->session->remove($this->key);
         }
 
+        $this->session->redirectUrl = '/';
+
         $this->packagesData->redirectUrl = $this->links->url('auth');
 
         $this->logger->log->debug($this->account['email'] . ' logged out successfully from app: ' . $this->app['name']);
