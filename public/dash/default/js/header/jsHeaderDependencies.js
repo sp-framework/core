@@ -626,7 +626,7 @@ var BazCore = function() {
             async() => {
                 BazCore.getNotificationsCount();
             },
-            100000
+            500000
         );
     }
 
