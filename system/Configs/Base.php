@@ -7,8 +7,8 @@ return
 		[
 			"host" 				=> "localhost",
 			"dbname" 			=> "sp",
-			"username" 			=> "guru",
-			"password" 			=> "123",
+			"username" 			=> "sp",
+			"password" 			=> "",
 			"port" 				=> "3306",
 			"charset" 	 	    => "utf8mb4"
 		],
