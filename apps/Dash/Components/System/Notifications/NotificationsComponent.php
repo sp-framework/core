@@ -58,7 +58,11 @@ class NotificationsComponent extends BaseComponent
                 return;
             }
 
-            $this->notifications->markRead($this->postData());
+            if (isset($this->postData()['bulk'])) {
+                $this->notifications->bulk($this->postData());
+            } else {
+                $this->notifications->markRead($this->postData());
+            }
 
             $this->addResponse(
                 $this->notifications->packagesData->responseMessage,
@@ -76,7 +80,11 @@ class NotificationsComponent extends BaseComponent
                 return;
             }
 
-            $this->notifications->markArchive($this->postData());
+            if (isset($this->postData()['bulk'])) {
+                $this->notifications->bulk($this->postData());
+            } else {
+                $this->notifications->markArchive($this->postData());
+            }
 
             $this->addResponse(
                 $this->notifications->packagesData->responseMessage,
@@ -135,7 +143,11 @@ class NotificationsComponent extends BaseComponent
                 return;
             }
 
-            $this->notifications->removeNotification($this->postData());
+            if (isset($this->postData()['bulk'])) {
+                $this->notifications->bulk($this->postData());
+            } else {
+                $this->notifications->removeNotification($this->postData());
+            }
 
             $this->addResponse(
                 $this->notifications->packagesData->responseMessage,

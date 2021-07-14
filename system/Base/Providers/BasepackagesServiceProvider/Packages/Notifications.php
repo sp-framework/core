@@ -154,6 +154,36 @@ class Notifications extends BasePackage
         return $notificationsArr;
     }
 
+    public function bulk(array $data) {
+        if (isset($data['task'])) {
+            if ((!isset($data['ids']) || !is_array($data['ids'])) ||
+                (isset($data['ids']) && is_array($data['ids']) && count($data['ids']) === 0)
+            ) {
+                $this->addResponse('Ids not set', 1);
+
+                return;
+            }
+
+            foreach ($data['ids'] as $key => $id) {
+                if ($data['task'] === 'read') {
+                    $readData = [];
+                    $readData['id'] = $id;
+                    $this->markRead($readData);
+                } else if ($data['task'] === 'archive') {
+                    $archiveData = [];
+                    $archiveData['id'] = $id;
+                    $this->markArchive($archiveData);
+                } else if ($data['task'] === 'remove') {
+                    $removeData = [];
+                    $removeData['id'] = $id;
+                    $this->removeNotification($removeData);
+                }
+            }
+        } else {
+            $this->addResponse('Task Missing', 1);
+        }
+    }
+
     public function markRead(array $data)
     {
         $notification = $this->getByParams(

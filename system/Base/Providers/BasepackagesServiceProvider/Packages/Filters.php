@@ -304,7 +304,7 @@ class Filters extends BasePackage
             [
                 'all_unread'=> '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:0&and:archive:equals:0&',
                 'read'      => '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:1&and:archive:equals:0&',
-                'archive'   => '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:0&and:archive:equals:1&'
+                'archive'   => '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:archive:equals:1&'
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
