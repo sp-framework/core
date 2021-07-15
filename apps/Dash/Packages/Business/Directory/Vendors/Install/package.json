@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-admin-vendors",
     "class"         : "Apps\\Dash\\Packages\\Business\\Directory\\Vendors\\Vendors",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"business/directory/vendors"}
 }

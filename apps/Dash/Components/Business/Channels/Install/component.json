@@ -1,6 +1,6 @@
 {
     "route"         : "business/channels",
-    "name"          : "Channels",
+    "name"          : "Business Channels",
     "description"   : "List channels via this component",
     "app_type"      : "dash",
     "category"      : "business",

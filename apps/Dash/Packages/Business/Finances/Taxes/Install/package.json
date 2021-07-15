@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-admin-taxes",
     "class"         : "Apps\\Dash\\Packages\\Business\\Finances\\Taxes\\Taxes",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"business/finances/taxes"}
 }

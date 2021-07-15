@@ -1,6 +1,6 @@
 {
     "route"         : "business/directory/vendors",
-    "name"          : "Vendors",
+    "name"          : "Business Vendors",
     "description"   : "List business vendors via this component",
     "app_type"      : "dash",
     "category"      : "business",

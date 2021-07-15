@@ -1,6 +1,6 @@
 {
     "route"         : "suppliers",
-    "name"          : "Suppliers",
+    "name"          : "IMS Suppliers",
     "description"   : "Manage dash suppliers via this component",
     "app_type"      : "dash",
     "category"      : "business",

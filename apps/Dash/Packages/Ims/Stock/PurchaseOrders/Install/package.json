@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-ims-stock-purchaseorders",
     "class"         : "Apps\\Dash\\Packages\\Ims\\Stock\\PurchaseOrders\\PurchaseOrders",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"ims/stock/purchaseorders"}
 }

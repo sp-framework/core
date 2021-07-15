@@ -1,6 +1,6 @@
 {
     "route"         : "system/users/profile",
-    "name"          : "Profile",
+    "name"          : "User Profile",
     "description"   : "Users manage their profile via this component",
     "app_type"      : "dash",
     "category"      : "system",

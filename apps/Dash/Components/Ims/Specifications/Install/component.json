@@ -1,6 +1,6 @@
 {
     "route"         : "ims/specifications",
-    "name"          : "Specifications",
+    "name"          : "IMS Specifications",
     "description"   : "Manage dash specifications via this component",
     "app_type"      : "dash",
     "category"      : "business",

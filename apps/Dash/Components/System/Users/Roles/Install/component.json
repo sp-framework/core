@@ -1,6 +1,6 @@
 {
     "route"         : "system/users/roles",
-    "name"          : "Roles",
+    "name"          : "User Roles",
     "description"   : "Manage user roles via this component",
     "app_type"      : "dash",
     "category"      : "system",

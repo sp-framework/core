@@ -1,12 +1,12 @@
 {
-    "name"          : "Channels",
-    "display_name"   : "Business Channels",
-    "description"   : "Package to register different selling channels via channels component",
-    "app_type"      : "dash",
-    "category"      : "business",
-    "sub_category"  : "admin",
-    "version"       : "0.0.1",
-    "repo"          : "https://.../dash-package-business-admin-channels",
-    "class"         : "Apps\\Dash\\Packages\\Business\\Channels\\Channels",
-    "settings"      : { }
+    "name": "Channels",
+    "display_name": "Business Channels",
+    "description": "Package to register different selling channels via channels component",
+    "app_type": "dash",
+    "category": "business",
+    "sub_category": "admin",
+    "version": "0.0.1",
+    "repo": "https://.../dash-package-business-admin-channels",
+    "class": "Apps\\Dash\\Packages\\Business\\Channels\\Channels",
+    "settings": {"componentRoute":"business/channels"}
 }

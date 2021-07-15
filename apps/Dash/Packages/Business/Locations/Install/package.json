@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-admin-locations",
     "class"         : "Apps\\Dash\\Packages\\Business\\Locations\\Locations",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"business/locations"}
 }

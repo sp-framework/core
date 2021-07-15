@@ -1,6 +1,6 @@
 {
-    "route"         : "users/customers",
-    "name"          : "Customers",
+    "route"         : "crms/customers",
+    "name"          : "CRMS Customers",
     "description"   : "Manage customers via this component",
     "app_type"      : "dash",
     "category"      : "business",

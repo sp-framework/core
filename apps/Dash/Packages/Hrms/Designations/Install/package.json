@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-hrms-designations",
     "class"         : "Apps\\Dash\\Packages\\Hrms\\Designations\\HrmsDesignations",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"hrms/designations"}
 }

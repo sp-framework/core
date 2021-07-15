@@ -1,6 +1,6 @@
 {
     "route"         : "business/entities",
-    "name"          : "Entities",
+    "name"          : "Business Entities",
     "description"   : "List entities via this component",
     "app_type"      : "dash",
     "category"      : "business",

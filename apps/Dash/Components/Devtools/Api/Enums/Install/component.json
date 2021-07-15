@@ -1,6 +1,6 @@
 {
 	"route"			: "devtools/api/enums",
-	"name"			: "Enums",
+	"name"			: "Devtools Enums",
 	"description"	: "Enums generate enums constants for a contract",
 	"app_type"      : "dash",
 	"category"      : "system",

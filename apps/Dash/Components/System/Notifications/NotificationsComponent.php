@@ -3,6 +3,7 @@
 namespace Apps\Dash\Components\System\Notifications;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class NotificationsComponent extends BaseComponent
@@ -104,10 +105,6 @@ class NotificationsComponent extends BaseComponent
                 'order'         => 'id desc'
             ];
 
-        if ($this->request->isPost()) {
-            $this->postData()['order'] = 'id desc';
-        }
-
         $replaceColumns =
             function ($dataArr) {
                 if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
@@ -173,11 +170,18 @@ class NotificationsComponent extends BaseComponent
 
     protected function packageLinks()
     {
-        //This list will grow as packages grow
-        return
-            [
-                'Vendors' => 'business/directory/vendors'
-            ];
+        $routeLinks = [];
+
+        foreach ($this->modules->packages->packages as $packageKey => $package) {
+            if ($package['settings'] && $package['settings'] !== '' && $package['settings'] !== '[]') {
+                $package['settings'] = Json::decode($package['settings'], true);
+                if (isset($package['settings']['componentRoute'])) {
+                    $routeLinks[$package['name']] = $package['settings']['componentRoute'];
+                }
+            }
+        }
+
+        return $routeLinks;
     }
 
     protected function generateUserInfo($rowId, $data)

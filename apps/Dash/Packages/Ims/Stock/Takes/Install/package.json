@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-ims-stock-takes",
     "class"         : "Apps\\Dash\\Packages\\Ims\\Stock\\Takes\\Takes",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"ims/stocks/takes"}
 }

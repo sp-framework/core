@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-ims-brands",
     "class"         : "Apps\\Dash\\Packages\\Ims\\Brands\\Brands",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"ims/brands"}
 }

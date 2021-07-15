@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-hrms-employees",
     "class"         : "Apps\\Dash\\Packages\\Hrms\\Employees\\Employees",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"hrms/employees"}
 }

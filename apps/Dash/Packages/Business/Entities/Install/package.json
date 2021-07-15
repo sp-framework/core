@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-admin-entities",
     "class"         : "Apps\\Dash\\Packages\\Business\\Entities\\Entities",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"business/entities"}
 }

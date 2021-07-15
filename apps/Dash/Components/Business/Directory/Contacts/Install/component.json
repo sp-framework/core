@@ -1,6 +1,6 @@
 {
     "route"         : "business/directory/contacts",
-    "name"          : "Contacts",
+    "name"          : "Business Contacts",
     "description"   : "List business contacts via this component",
     "app_type"      : "dash",
     "category"      : "business",

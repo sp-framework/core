@@ -62,6 +62,47 @@ class Notifications extends BasePackage
         }
     }
 
+    public function emailNotification(
+        $emailAddresses,
+        $notificationTitle,
+        $notificationDetails = null,
+        $appId = null,
+        $accountId = null,
+        $createdBy = 0,
+        $packageName = null,
+        $packageRowId = null,
+        $notificationType = 0
+    ) {
+        if (!$notificationTitle) {
+            throw new \Exception('Notification title missing');
+        }
+
+        $body = 'Notification Title: ' . $notificationTitle . '<br>Notification Details: ' . $notificationDetails . '<br>';
+
+        if ($createdBy != 0) {
+            $profile = $this->basepackages->profile->getProfile($createdBy);
+
+            $now = date("F j, Y, g:i a");
+
+            if ($profile) {
+                $body .= 'Notification By: ' . $profile['full_name'] . ' (' . $now . ')<br>';
+            } else {
+                $body .= 'Notification By: System (' . $now . ')<br>';
+            }
+        } else {
+            $body .= 'Notification By: System (' . $now . ')<br>';
+        }
+
+        $email['app_id'] = $appId;
+        $email['status'] = 0;
+        $email['priority'] = 3;
+        $email['to_addresses'] = Json::encode($emailAddresses);
+        $email['subject'] = 'Notification for ' . $this->domains->getDomain()['name'];
+        $email['body'] = $body;
+
+        $this->basepackages->emailqueue->addToQueue($email);
+    }
+
     public function fetchNewNotificationsCount($type = 0)
     {
         if (isset($this->auth->account()['profile']['settings']['notifications']['mute'])) {
@@ -154,7 +195,8 @@ class Notifications extends BasePackage
         return $notificationsArr;
     }
 
-    public function bulk(array $data) {
+    public function bulk(array $data)
+    {
         if (isset($data['task'])) {
             if ((!isset($data['ids']) || !is_array($data['ids'])) ||
                 (isset($data['ids']) && is_array($data['ids']) && count($data['ids']) === 0)

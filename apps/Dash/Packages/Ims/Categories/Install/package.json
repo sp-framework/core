@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-ims-categories",
     "class"         : "Apps\\Dash\\Packages\\Ims\\Categories\\Categories",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"ims/categories"}
 }

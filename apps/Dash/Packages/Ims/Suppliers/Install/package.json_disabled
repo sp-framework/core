@@ -8,5 +8,5 @@
     "version"       : "0.0.1",
     "repo"          : "https://.../dash-package-business-ims-suppliers",
     "class"         : "Apps\\Dash\\Packages\\Ims\\Suppliers\\Suppliers",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"ims/suppliers"}
 }

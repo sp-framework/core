@@ -1,6 +1,6 @@
 {
 	"route"			: "devtools/api/contracts",
-	"name"			: "Contracts",
+	"name"			: "Devtools Contracts",
 	"description"	: "Contracts generate API code using openapi standard",
 	"app_type"      : "dash",
 	"category"      : "system",
