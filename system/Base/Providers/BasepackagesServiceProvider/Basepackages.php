@@ -7,6 +7,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Book as A
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Types as Addresstypes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
@@ -15,7 +16,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Settings;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Processes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
@@ -32,6 +33,8 @@ class Basepackages
 	protected $email;
 
 	protected $emailservices;
+
+	protected $emailqueue;
 
 	protected $filters;
 
@@ -57,7 +60,7 @@ class Basepackages
 
 	protected $notes;
 
-	protected $settings;
+	protected $processes;
 
 	protected $notifications;
 
@@ -109,6 +112,13 @@ class Basepackages
 		$this->emailservices = (new EmailServices())->init();
 
 		return $this->emailservices;
+	}
+
+	protected function initEmailqueue()
+	{
+		$this->emailqueue = (new EmailQueue())->init();
+
+		return $this->emailqueue;
 	}
 
 	protected function initFilters()
@@ -188,11 +198,11 @@ class Basepackages
 		return $this->notes;
 	}
 
-	protected function initSettings()
+	protected function initProcesses()
 	{
-		$this->settings = (new Settings())->init();
+		$this->processes = (new Processes())->init();
 
-		return $this->settings;
+		return $this->processes;
 	}
 
 	protected function initNotifications()

@@ -31,6 +31,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Book as AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Types as AddressTypes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
@@ -151,6 +152,7 @@ class Setup
 		$this->db->createTable('basepackages_cache', $dbName, (new Cache)->columns());
 		$this->db->createTable('basepackages_logs', $dbName, (new Logs)->columns());
 		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
+		$this->db->createTable('basepackages_email_queue', $dbName, (new EmailQueue)->columns());
 		$this->db->createTable('basepackages_users_accounts', $dbName, (new Accounts)->columns());
 		$this->db->createTable('basepackages_users_profiles', $dbName, (new Profiles)->columns());
 		$this->db->createTable('basepackages_users_roles', $dbName, (new Roles)->columns());
@@ -167,7 +169,6 @@ class Setup
 		$this->db->createTable('basepackages_storages_local', $dbName, (new StoragesLocal)->columns());
 		$this->db->createTable('basepackages_activity_logs', $dbName, (new ActivityLogs)->columns());
 		$this->db->createTable('basepackages_notes', $dbName, (new Notes)->columns());
-		$this->db->createTable('basepackages_settings', $dbName, (new Settings)->columns());
 		$this->db->createTable('basepackages_notifications', $dbName, (new Notifications)->columns());
 	}
 
@@ -244,6 +245,12 @@ class Setup
 		} else if ($type === 'packages') {
 
 			$adminPackages = $this->getInstalledFiles('apps/Dash/Packages/', true);
+
+			$adminPackages =
+				array_merge_recursive(
+					$adminPackages,
+					$this->getInstalledFiles('system/Base/Installer/Packages/Setup/Register/Modules/Packages/', true)
+				);
 
 			if (!$adminPackages || count($adminPackages) === 0) {
 				return false;

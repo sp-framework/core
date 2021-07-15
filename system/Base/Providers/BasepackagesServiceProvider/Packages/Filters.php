@@ -285,6 +285,12 @@ class Filters extends BasePackage
             return;
         }
 
+        if ($component && $component['route'] === 'system/email/queue') {
+            $this->addFilterForEmailQueue($component);
+
+            return;
+        }
+
         $this->addFilter(
             [
                 'name'              => 'Show All ' . $component['name'],
@@ -344,6 +350,65 @@ class Filters extends BasePackage
         }
     }
 
+    protected function addFilterForEmailQueue($component)
+    {
+        $conditions =
+            [
+                'all_in_queue'      => '-:status:equals:0&',
+                'all_sent'          => '-:status:equals:1&',
+                'all_errors'        => '-:status:equals:2&',
+                'high_prioriry'     => '-:priority:equals:1&',
+                'all'               => ''
+            ];
+
+        foreach ($conditions as $conditionKey => $condition) {
+            $filterCondition =
+                [
+                    'conditions'    => 'conditions = :conditions:',
+                    'bind'          =>
+                        [
+                            'conditions'   => $condition
+                        ]
+                ];
+            $filter = $this->getByParams($filterCondition);
+            if (!$filter) {
+                if ($conditionKey === 'all_in_queue') {
+                    $name = 'Show All In Queue Emails';
+                    $default = 1;
+                } else if ($conditionKey === 'all_sent') {
+                    $name = 'Show All Sent Emails';
+                    $default = 0;
+                } else if ($conditionKey === 'all_errors') {
+                    $name = 'Show All Queue Errors';
+                    $default = 0;
+                } else if ($conditionKey === 'high_prioriry') {
+                    $name = 'Show All High Priority Emails';
+                    $default = 0;
+                } else if ($conditionKey === 'all') {
+                    $name = 'Show All Emails';
+                    $default = 0;
+                }
+
+                $this->addFilter(
+                    [
+                        'name'              => $name,
+                        'conditions'        => $condition,
+                        'component_id'      => $component['id'],
+                        'filter_type'       => 0,//System
+                        'is_default'        => $default,
+                        'auto_generated'    => 1,
+                        'account_id'        => 0
+                    ]
+                );
+            }
+        }
+    }
+
+    /**
+     * @notification(name=add)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function addFilter(array $data)
     {
         if (!isset($data['filter_type'])) {
@@ -395,6 +460,11 @@ class Filters extends BasePackage
         return false;
     }
 
+    /**
+     * @notification(name=update)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function updateFilter(array $data)
     {
         $component = $this->modules->components->getById($data['component_id']);
@@ -448,6 +518,11 @@ class Filters extends BasePackage
         return false;
     }
 
+    /**
+     * @notification(name=remove)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function removeFilter(array $data)
     {
         $filter = $this->getById($data['id']);
