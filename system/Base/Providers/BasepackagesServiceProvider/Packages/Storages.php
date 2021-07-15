@@ -23,6 +23,11 @@ class Storages extends BasePackage
         return $this;
     }
 
+    /**
+     * @notification(name=add)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function addStorage(array $data)
     {
         $data = $this->extractSelectData($data);
@@ -40,6 +45,11 @@ class Storages extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function updateStorage(array $data)
     {
         $data = $this->extractSelectData($data);
@@ -69,6 +79,11 @@ class Storages extends BasePackage
         return $data;
     }
 
+    /**
+     * @notification(name=remove)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function removeStorage(array $data)
     {
         $remove = $this->remove($data['id']);

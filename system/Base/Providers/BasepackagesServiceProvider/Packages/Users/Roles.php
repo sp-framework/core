@@ -21,6 +21,11 @@ class Roles extends BasePackage
         return $this;
     }
 
+    /**
+     * @notification(name=add)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function addRole(array $data)
     {
         if ($this->add($data)) {
@@ -34,6 +39,11 @@ class Roles extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function updateRole(array $data)
     {
         if ($this->update($data)) {
@@ -47,6 +57,11 @@ class Roles extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=remove)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function removeRole(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {

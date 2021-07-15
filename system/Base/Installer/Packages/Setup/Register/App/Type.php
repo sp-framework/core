@@ -35,7 +35,7 @@ class Type
                 '5'    =>
                     [
                         'app_type'      => 'other',
-                        'name'          => 'Other/Custom',
+                        'name'          => 'Other',
                         'description'   => 'Used for any other/custom app. Modules for this app are developed under app route name.',
                     ]
             ];

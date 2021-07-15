@@ -929,9 +929,11 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null)
+	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null)
 	{
-		$package = $this->checkPackage($this->packageName);
+		if (!$package) {
+			$package = $this->checkPackage($this->packageName);
+		}
 
 		if ($package) {
 			if (isset($this->packagesData->last)) {
@@ -964,6 +966,20 @@ abstract class BasePackage extends Controller
 								0
 							);
 						}
+					}
+
+					if (isset($subscriptions['email']) && count($subscriptions['email']) > 0) {
+						$this->basepackages->notifications->emailNotification(
+							$subscriptions['email'],
+							$messageTitle,
+							$messageDetails,
+							$appId,
+							$aId,
+							$this->auth->account()['id'],
+							$package['name'],
+							$packageRowId,
+							0
+						);
 					}
 				}
 			}

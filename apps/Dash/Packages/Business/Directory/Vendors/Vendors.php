@@ -75,7 +75,7 @@ class Vendors extends BasePackage
 
             $this->addToNotification('update', 'Updated vendor ' . $data['business_name']);
         } else {
-            $this->addResponse('Error adding new vendor.', 1);
+            $this->addResponse('Error updating vendor.', 1);
         }
     }
 
@@ -97,7 +97,7 @@ class Vendors extends BasePackage
 
             $this->addToNotification('remove', 'Removed vendor ' . $vendor['business_name']);
         } else {
-            $this->addResponse('Error removing new vendor.', 1);
+            $this->addResponse('Error removing vendor.', 1);
         }
     }
 

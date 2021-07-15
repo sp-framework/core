@@ -48,48 +48,81 @@ class Domains extends BasePackage
 		}
 	}
 
+	/**
+	 * @notification(name=add)
+	 * notification_allowed_methods(email, sms)//Example
+	 * @notification_allowed_methods(email, sms)
+	 */
 	public function addDomain(array $data)
 	{
-		$add = $this->add($data);
+		try {
+			$add = $this->add($data);
+		} catch (\Exception $e) {
+			if ($e->getCode() == '23000') {
+				$this->addResponse('Domain name already in use.', 1);
+
+				return;
+			}
+		}
 
 		if ($add) {
-			$this->packagesData->responseCode = 0;
+			$this->addActivityLog($data);
 
-			$this->packagesData->responseMessage = 'Domain ' . $data['name'] . ' Added';
+			$this->addResponse('Added ' . $data['name'] . ' domain', 0, null, true);
+
+			$this->addToNotification('add', 'Added new domain ' . $data['name'], null, $this->modules->packages->getNamePackage('Domains'));
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error Adding Domain';
+			$this->addResponse('Error adding new domain.', 1, []);
 		}
 	}
 
+	/**
+	 * @notification(name=update)
+	 * notification_allowed_methods(email, sms)//Example
+	 * @notification_allowed_methods(email, sms)
+	 */
 	public function updateDomain(array $data)
 	{
-		$update = $this->update($data);
+		$domain = $this->getById($data['id']);
+
+		$domain = array_merge($domain, $data);
+
+		try {
+			$update = $this->update($domain);
+		} catch (\Exception $e) {
+			if ($e->getCode() == '23000') {
+				$this->addResponse('Domain name ' . $data['name'] . ' already in use.', 1);
+
+				return;
+			}
+		}
 
 		if ($update) {
-			$this->packagesData->responseCode = 0;
+			$this->addActivityLog($data, $domain);
 
-			$this->packagesData->responseMessage = 'Domain ' . $data['name'] . ' Updated';
+			$this->addResponse('Updated domain ' . $data['name']);
+
+			$this->addToNotification('update', 'Updated domain ' . $data['name'], null, $this->modules->packages->getNamePackage('Domains'));
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error Updating Domain';
+			$this->addResponse('Error adding new domain.', 1);
 		}
 	}
 
+	/**
+	 * @notification(name=remove)
+	 * notification_allowed_methods(email, sms)//Example
+	 * @notification_allowed_methods(email, sms)
+	 */
 	public function removeDomain(array $data)
 	{
-		$remove = $this->remove($data['id']);
+		$domain = $this->getById($data['id']);
 
-		if ($remove) {
-			$this->packagesData->responseCode = 0;
+		if ($this->remove($domain['id'])) {
+			$this->addResponse('Removed domain ' . $domain['name']);
 
-			$this->packagesData->responseMessage = 'Domain ' . $data['name'] . ' Removed';
+			$this->addToNotification('remove', 'Removed domain ' . $domain['name'], null, $this->modules->packages->getNamePackage('Domains'));
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error Removing Domain';
+			$this->addResponse('Error removing domain.', 1);
 		}
 	}
 
@@ -126,7 +159,7 @@ class Domains extends BasePackage
 
 		$this->packagesData->apps = $apps;
 
-		$this->packagesData->emailservices = $this->basepackages->emailservices->init()->emailservices;
+		$this->packagesData->emailservices = $this->basepackages->emailservices->init()->emailServices;
 
 		$this->packagesData->storages = $this->basepackages->storages->storages;
 

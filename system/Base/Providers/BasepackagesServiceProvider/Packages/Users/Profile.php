@@ -105,6 +105,11 @@ class Profile extends BasePackage
         return $profile;
     }
 
+    /**
+     * @notification(name=add)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function addProfile(array $data)
     {
         $accountId = $data['id'];
@@ -126,6 +131,11 @@ class Profile extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function updateProfileViaAccount(array $data)
     {
         $profile = $this->getProfile($data['id']);
@@ -340,7 +350,7 @@ class Profile extends BasePackage
         $appsArr = $this->apps->apps;
 
         foreach ($appsArr as $appKey => $app) {
-            if ($account['can_login'][$app['route']]) {
+            if (isset($account['can_login'][$app['route']])) {
                 $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
 
                 if (count($packagesArr) > 0) {
@@ -374,7 +384,7 @@ class Profile extends BasePackage
         $notifications = [];
 
         foreach ($appsArr as $appKey => $app) {
-            if ($account['can_login'][$app['route']]) {
+            if (isset($account['can_login'][$app['route']])) {
 
                 $packagesArr = $this->modules->packages->getPackagesForApp($app['id']);
 

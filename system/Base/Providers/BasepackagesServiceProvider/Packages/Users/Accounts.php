@@ -16,6 +16,11 @@ class Accounts extends BasePackage
 
     public $accounts;
 
+    /**
+     * @notification(name=add)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function addAccount(array $data)
     {
         $data['email'] = strtolower($data['email']);
@@ -23,11 +28,9 @@ class Accounts extends BasePackage
         $data['domain'] = explode('@', $data['email'])[1];
 
         if ($this->checkAccountByEmail($data['email'])) {
-            $this->packagesData->responseCode = 1;
+            $this->addResponse('Account for ID: ' . $data['email'] . ' already exists!', 1);
 
-            $this->packagesData->responseMessage = 'Account already exists!';
-
-            return false;
+            return;
         }
 
         if ($this->validateData($data)) {
@@ -36,10 +39,7 @@ class Accounts extends BasePackage
 
             $data['password'] = $this->secTools->hashPassword($password);
 
-            $newAccount = $this->add($data);
-
-            if ($newAccount) {
-
+            if ($this->add($data)) {
                 $id = $this->packagesData->last['id'];
 
                 $data['id'] = $id;
@@ -48,40 +48,33 @@ class Accounts extends BasePackage
                 $this->updateRoleAccounts($data['role_id'], $id);
 
                 if ($data['email_new_password'] === '1') {
-                    if ($this->emailNewPassword($data['email'], $password) !== true) {
-                        $this->packagesData->responseCode = 1;
-
-                        $this->packagesData->responseMessage = 'Error sending email for new password.';
-                    }
+                    $this->emailNewPassword($data['email'], $password);
                 }
 
-                $this->packagesData->responseCode = 0;
+                $this->addActivityLog($data);
 
-                $this->packagesData->responseMessage = 'Account added';
+                $this->addResponse('Added new account for ID: ' . $data['email'], 0, null, true);
 
-                return true;
+                $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
             }
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding account.';
-
-            return false;
+            $this->addResponse('Error adding account.', 1);
         }
-
-        return true;
     }
 
+    /**
+     * @notification(name=update)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function updateAccount(array $data)
     {
         $account = $this->getById($data['id']);
 
         if (!$account) {
-            $this->packagesData->responseCode = 1;
+            $this->addResponse('Account Not Found.', 1);
 
-            $this->packagesData->responseMessage = 'Account Not Found.';
-
-            return false;
+            return;
         }
 
         if ($data['override_role'] == 0) {
@@ -111,27 +104,28 @@ class Accounts extends BasePackage
         if ($this->update($data)) {
 
             if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
-                if (!$this->emailNewPassword($data['email'], $password)) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error sending email for new password.';
-                }
+                $this->emailNewPassword($data['email'], $password);
             }
 
             $this->basepackages->profile->updateProfileViaAccount($data);
 
             $this->updateRoleAccounts($data['role_id'], $data['id'], $account['role_id']);
 
-            $this->packagesData->responseCode = 0;
+            $this->addActivityLog($data);
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['email'] . ' account';
+            $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
+
+            $this->addToNotification('add', 'Updated account for ID: ' . $data['email']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating account.';
+            $this->addResponse('Error updating account.', 1);
         }
     }
 
+    /**
+     * @notification(name=remove)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function removeAccount(array $data)
     {
         $account = $this->getById($data['id']);
@@ -139,21 +133,16 @@ class Accounts extends BasePackage
         $this->removeRoleAccount($account['role_id'], $account['id']);
 
         if (isset($data['id']) && $data['id'] != 1) {
-
             if ($this->remove($data['id'])) {
 
-                $this->packagesData->responseCode = 0;
+                $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
 
-                $this->packagesData->responseMessage = 'Removed account';
+                $this->addResponse('Removed account for ID: ' . $account['email']);
             } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error removing account.';
+                $this->addResponse('Error removing account.', 1);
             }
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Cannot remove default account.';
+            $this->addResponse('Cannot remove default account.', 1);
         }
     }
 
@@ -242,18 +231,15 @@ class Accounts extends BasePackage
 
     protected function emailNewPassword($email, $password)
     {
-        if ($this->basepackages->email->setup()) {
-            $emailSettings = $this->basepackages->email->getEmailSettings();
+        $emailData['app_id'] = $this->app['id'];
+        $emailData['status'] = 0;
+        $emailData['priority'] = 1;
+        $emailData['confidential'] = 1;
+        $emailData['to_addresses'] = Json::encode([$email]);
+        $emailData['subject'] = 'OTP for ' . $this->domains->getDomain()['name'];
+        $emailData['body'] = $password;
 
-            $this->basepackages->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
-            $this->basepackages->email->setRecipientTo($email, $email);
-            $this->basepackages->email->setSubject('OTP for ' . $this->domains->getDomain()['name']);
-            $this->basepackages->email->setBody($password);
-
-            return $this->basepackages->email->sendNewEmail();
-        } else {
-            return false;
-        }
+        return $this->basepackages->emailqueue->addToQueue($emailData);
     }
 
     protected function updateRoleAccounts(int $rid, int $id, int $oldRid = null)
@@ -310,15 +296,6 @@ class Accounts extends BasePackage
 
     public function generateViewData(int $uid = null)
     {
-        if (isset($this->domains->getDomain()['apps'][$this->app['id']]['email_service']) &&
-            $this->domains->getDomain()['apps'][$this->app['id']]['email_service'] !== '' &&
-            $this->domains->getDomain()['apps'][$this->app['id']]['email_service'] !== 0
-        ) {
-            $this->packagesData->canEmail = true;
-        } else {
-            $this->packagesData->canEmail = false;
-        }
-
         $acls = [];
 
         $appsArr = $this->apps->apps;

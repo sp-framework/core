@@ -26,6 +26,8 @@ class Apps extends BasePackage
 
 		$this->getAll($resetCache);
 
+		$this->app = $this->getAppInfo();
+
 		return $this;
 	}
 
@@ -160,6 +162,11 @@ class Apps extends BasePackage
 		}
 	}
 
+	/**
+	 * @notification(name=add)
+	 * notification_allowed_methods(email, sms)//Example
+	 * @notification_allowed_methods(email, sms)
+	 */
 	public function addApp(array $data)
 	{
 		if (!$this->checkType($data)) {
@@ -178,12 +185,22 @@ class Apps extends BasePackage
 		$data['can_login_role_ids'] = Json::encode($data['can_login_role_ids']['data']);
 
 		if ($this->add($data)) {
+
+			$this->addActivityLog($data);
+
 			$this->addResponse('Added ' . $data['name'] . ' app', 0, null, true);
+
+			$this->addToNotification('add', 'Added new app ' . $data['name']);
 		} else {
 			$this->addResponse('Error adding new app.', 1, []);
 		}
 	}
 
+	/**
+	 * @notification(name=update)
+	 * notification_allowed_methods(email, sms)//Example
+	 * @notification_allowed_methods(email, sms)
+	 */
 	public function updateApp(array $data)
 	{
 		$app = $this->getById($data['id']);
@@ -221,6 +238,10 @@ class Apps extends BasePackage
 		}
 
 		if ($this->update($app)) {
+			$this->addActivityLog($data, $app);
+
+			$this->addToNotification('update', 'Updated app ' . $data['name']);
+
 			$this->addResponse('Updated ' . $app['name'] . ' app');
 		} else {
 			$this->addResponse('Error updating app.', 1);
@@ -242,6 +263,11 @@ class Apps extends BasePackage
 		return true;
 	}
 
+	/**
+	 * @notification(name=remove)
+	 * notification_allowed_methods(email, sms)//Example
+	 * @notification_allowed_methods(email, sms)
+	 */
 	public function removeApp(array $data)
 	{
 		if ($data['id'] == 1) {
@@ -256,6 +282,8 @@ class Apps extends BasePackage
 		if ($this->remove($data['id'])) {
 
 			$this->domains->removeAppFromApps($data['id']);
+
+			$this->addToNotification('remove', 'Removed app ' . $app['business_name']);
 
 			$this->addResponse('Removed App ' . $app['name']);
 		} else {

@@ -42,13 +42,12 @@ class AccountsComponent extends BaseComponent
                 $this->view->apps = $this->accounts->packagesData->apps;
 
                 $this->view->roles = $this->accounts->packagesData->roles;
-
-                $this->view->canEmail = $this->accounts->packagesData->canEmail;
             }
 
-            $this->view->responseCode = $this->accounts->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
+            $this->addResponse(
+                $this->accounts->packagesData->responseMessage,
+                $this->accounts->packagesData->responseCode
+            );
 
             $this->view->pick('accounts/view');
 
@@ -107,14 +106,12 @@ class AccountsComponent extends BaseComponent
 
             $this->accounts->addAccount($this->postData());
 
-            $this->view->responseCode = $this->accounts->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->accounts->packagesData->responseMessage,
+                $this->accounts->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -131,14 +128,12 @@ class AccountsComponent extends BaseComponent
 
             $this->accounts->updateAccount($this->postData());
 
-            $this->view->responseCode = $this->accounts->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->accounts->packagesData->responseMessage,
+                $this->accounts->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -151,14 +146,12 @@ class AccountsComponent extends BaseComponent
 
             $this->accounts->removeAccount($this->postData());
 
-            $this->view->responseCode = $this->accounts->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->accounts->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->accounts->packagesData->responseMessage,
+                $this->accounts->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }

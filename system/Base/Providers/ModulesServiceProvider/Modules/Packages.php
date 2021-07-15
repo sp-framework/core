@@ -97,7 +97,7 @@ class Packages extends BasePackage
 			$this->model->filter(
 				function($package) use ($name) {
 					$package = $package->toArray();
-					if ($package['name'] === $name) {
+					if ($package['name'] === ucfirst($name)) {
 						return $package;
 					}
 				}
