@@ -14,7 +14,7 @@ class Locations
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_INTEGER,
+                        'type'          => Column::TYPE_SMALLINTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,

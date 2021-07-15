@@ -14,7 +14,7 @@ class Vendors
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_MEDIUMINTEGER,
+                        'type'          => Column::TYPE_INTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,

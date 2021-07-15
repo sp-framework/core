@@ -16,7 +16,7 @@ class SystemApi extends BasePackage
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_INTEGER,
+                        'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,
@@ -25,7 +25,7 @@ class SystemApi extends BasePackage
                 new Column(
                     'api_id',
                     [
-                        'type'    => Column::TYPE_INTEGER,
+                        'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => true,
                     ]
                 ),
