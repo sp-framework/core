@@ -10,13 +10,15 @@ class Notes extends BasePackage
 {
     protected $modelToUse = BasepackagesNotes::class;
 
+    protected $packageName = 'notes';
+
     public $notes;
 
     public $notesSettings = null;
 
     public function init(bool $resetCache = false)
     {
-        $notesSettings = $this->basepackages->settings->getNamedSettings('Notes');
+        $notesSettings = $this->modules->packages->getNamePackage($this->packageName);
 
         if ($notesSettings) {
             $this->notesSettings = Json::decode($notesSettings['settings'], true);
@@ -31,7 +33,7 @@ class Notes extends BasePackage
             $newSettings['settings']['useStorage'] = 'private';
             $newSettings['settings']['allowedUploads'] = true;
 
-            $this->basepackages->settings->addSettings($newSettings);
+            $this->modules->packages->update($newSettings);
 
             $this->notesSettings = $newSettings['settings'];
         }
