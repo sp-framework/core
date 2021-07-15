@@ -402,8 +402,6 @@ dataCollectionSection =
                 );
 
                 function toggleGridCell(dataGridId, dataNodeId, bulk, bulkState) {
-                    //eslint-disable-next-line
-                    console.log(dataGridId, dataNodeId, bulk, bulkState);
                     // Only run on columns that have data and are not empty or na (N/A)
                     if (!$('#' + dataGridId).children('span').hasClass('empty') && !$('#' + dataGridId).children('span').hasClass('na')) {
                         // parents = gridData[dataNodeId]['parents'];

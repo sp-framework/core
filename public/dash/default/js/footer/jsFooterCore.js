@@ -3227,29 +3227,28 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     dataCollection[componentId][sectionId]['dataToSubmit'] = { };
                 }
 
-                validationObject = {
-                    'componentId'   : componentId,
-                    'sectionId'     : sectionId,
-                    'on'            : 'section'
-                }
-
-                if ($('#' + sectionId + '-form-fields').length > 0) {
-                    this._buildFormJsTree();
-                    validationObject['formJsTreeSelector'] = formJsTreeSelector;
-                }
-
-                BazContentFieldsValidator.initValidator(validationObject);
-
-                BazContentFields.init({
-                    'componentId'   : componentId,
-                    'sectionId'     : sectionId
-                });
-
                 if (options.task === 'validateForm') {
                     this._validateForm();
                 } else if (options.task === 'sectionToObj') {
                     this._sectionToObj();
                 } else {
+                    validationObject = {
+                        'componentId'   : componentId,
+                        'sectionId'     : sectionId,
+                        'on'            : 'section'
+                    }
+
+                    if ($('#' + sectionId + '-form-fields').length > 0) {
+                        this._buildFormJsTree();
+                        validationObject['formJsTreeSelector'] = formJsTreeSelector;
+                    }
+
+                    BazContentFieldsValidator.initValidator(validationObject);
+
+                    BazContentFields.init({
+                        'componentId'   : componentId,
+                        'sectionId'     : sectionId
+                    });
                     this._initSectionButtonsAndActions();
                 }
             };

@@ -29249,6 +29249,10 @@ a.text-muted:hover {
   margin-top: 0;
 }
 
+.select2-selection__clear {
+  left: -12px;
+}
+
 /* VERTICAL DIVIDER */
 .vdivide > div[class*='col']:not(:last-child):after {
   background: #ccd4d5;
