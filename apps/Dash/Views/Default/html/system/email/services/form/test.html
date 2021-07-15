@@ -1,0 +1,71 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'test',
+                'fieldLabel'                     : 'Test Settings',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Test the above configuration.',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'primary',
+                'fieldCheckboxChecked'           : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'test_email_address',
+                'fieldLabel'                            : 'Test Email Address',
+                'fieldType'                             : 'input',
+                'fieldGroupPostAddonButtonId'           : 'test',
+                'fieldGroupPostAddonButtonValue'        : 'Test',
+                'fieldGroupPostAddonButtonTooltipTitle' : 'Test Email Service Settings',
+                'fieldGroupPostAddonButtonIcon'         : 'cog fa-spin',
+                'fieldGroupPostAddonButtonIconHidden'   : true,
+                'fieldGroupPostAddonButtonDisabled'     : true,
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Email address to test the email service settings with.',
+                'fieldRequired'                         : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazScan'                          : true,
+                'fieldDataInputMinLength'               : 1,
+                'fieldDataInputMaxLength'               : 50,
+                'fieldDisabled'                         : true
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'debug',
+                'fieldLabel'                     : 'Test Debug Messages',
+                'fieldType'                      : 'textarea',
+                'fieldHelp'                      : true,
+                'fieldInputAdditionalClass'      : 'text-dark',
+                'fieldHelpTooltipContent'        : 'Debug messages from test are shown here.',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : false,
+                'fieldDisabled'                  : true,
+                'fieldTextareaRows'              : '16'
+            ]
+        )}}
+    </div>
+</div>

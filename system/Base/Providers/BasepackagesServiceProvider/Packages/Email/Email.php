@@ -35,12 +35,10 @@ class Email extends BasePackage
 
     protected $debugOutput = [];
 
-    protected $emailSettings;
+    protected $emailSettings = null;
 
     public function init()
     {
-        // include (__DIR__ . '/vendor/autoload.php');
-
         $this->email = new PHPMailer(true);
 
         $this->app = $this->apps->getAppInfo();
@@ -52,21 +50,29 @@ class Email extends BasePackage
 
     public function getEmailSettings()
     {
+        if (!$this->emailSettings) {
+            $this->setup();
+        }
+
         return $this->emailSettings;
     }
 
-    public function setup($emailSettings = null)
+    public function setup($emailSettings = null, $appId = null)
     {
         $emailservices = new EmailServices;
+
+        if ($appId === null) {
+            $appId = $this->app['id'];
+        }
 
         if ($emailSettings) {
             $this->emailSettings = $emailSettings;
         } else {
-            if (isset($this->domain['apps'][$this->app['id']]['email_service']) &&
-                $this->domain['apps'][$this->app['id']]['email_service'] !== ''
+            if (isset($this->domain['apps'][$appId]['email_service']) &&
+                $this->domain['apps'][$appId]['email_service'] !== ''
             ) {
                 $this->emailSettings =
-                    $emailservices->init()->getById($this->domain['apps'][$this->app['id']]['email_service']);
+                    $emailservices->init()->getById($this->domain['apps'][$appId]['email_service']);
             } else {
                 // throw new EmailException(
                 //     'No Email Service Configured & attached to the Domain. Please setup email service and attach it to domain ' . $this->domain['name']

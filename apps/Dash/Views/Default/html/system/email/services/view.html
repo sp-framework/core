@@ -1,0 +1,34 @@
+{% if emailservice['id'] is defined %}
+    {% set emailserviceId = emailservice['id'] %}
+    {% set title = 'Email Service (' ~ emailservice['name'] ~ ')' %}
+{% else %}
+    {% set emailserviceId = '' %}
+    {% set title = 'New Email Service' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'envelope',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'services/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : emailserviceId,
+            'addActionUrl'                  : 'system/email/services/add',
+            'addSuccessRedirectUrl'         : 'system/email/services',
+            'updateActionUrl'               : 'system/email/services/update',
+            'updateSuccessRedirectUrl'      : 'system/email/services',
+            'cancelActionUrl'               : 'system/email/services',
+            'closeActionUrl'                : 'system/email/services'
+        ]
+    ]
+)}}

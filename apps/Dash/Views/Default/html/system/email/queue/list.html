@@ -1,0 +1,88 @@
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'envelope',
+        'cardTitle'             : 'Email Services',
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize'],
+        'dtFixedHeader'         : true,
+        'dtFilter'              : true,
+        'dtFilterButtons'       : ['edit', 'delete', 'add', 'clone', 'reset'],
+        'dtFilters'             : table['filters'],
+        'dtPrimaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'process-queue' : {
+                            'title'                   : 'Process Queue',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog',
+                            'iconHidden'              : true,
+                            'position'                : 'right',
+                            'url'                     : links.url('system/email/queue/processqueue')
+                        }
+                    }
+            },
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 6,
+        'dtTableCompact'        : true,
+        'dtZeroRecords'         : 'No email service available. Add by clicking the Add new email service button.'
+    ]
+)}}
+<script>
+/* globals Swal PNotify BazContentLoader BazCore */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    BazContentLoader.init();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    BazContentLoader.init();
+}
+
+$('#{{componentId}}-listing-process-queue').click(function(e) {
+    e.preventDefault();
+
+    var thisButton = this;
+    var url = $(this).attr('href');
+
+    var dataToSend = { };
+    dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.ajax({
+        url         : url,
+        method      : 'post',
+        dataType    : 'json',
+        data        : dataToSend,
+        success     : function(response) {
+            if (response.responseCode === 0) {
+                window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+            } else {
+                PNotify.error({
+                    title           : response.responseMessage,
+                });
+            }
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+        }
+    });
+});
+</script>

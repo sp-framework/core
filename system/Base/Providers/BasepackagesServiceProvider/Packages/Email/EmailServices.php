@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Email;
 
+use Phalcon\Validation\Validator\Between;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
@@ -11,81 +12,125 @@ class EmailServices extends BasePackage
 {
     protected $modelToUse = BasepackagesEmailServices::class;
 
-    protected $packageName = 'emailservices';
+    protected $packageName = 'emailServices';
 
-    public $emailservices;
+    public $emailServices;
 
     public function init(bool $resetCache = false)
     {
         $this->getAll($resetCache);
 
+        parent::init();
+
         return $this;
     }
 
+    /**
+     * @notification(name=add)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function addEmailService(array $data)
     {
-        $add = $this->add($data);
+        $data = $this->encryptPass($data);
 
-        if ($add) {
-            $this->packagesData->responseCode = 0;
+        $validate = $this->validateServiceData($data);
 
-            $this->packagesData->responseMessage = $data['name'] . ' email service added';
+        if ($validate !== true) {
+            $this->addResponse($validate, 1);
 
-            return true;
+            return false;
         }
-        $this->packagesData->responseCode = 1;
 
-        $this->packagesData->responseMessage = 'Error adding email service ';
+        if ($this->add($data)){
+            $this->addActivityLog($data);
 
-        return false;
+            $this->addResponse('Added new email service ' . $data['name'], 0, null, true);
+
+            $this->addToNotification('add', 'Added new email service ' . $data['name']);
+        } else {
+            $this->addResponse('Error adding new email service.', 1, []);
+        }
     }
 
+    /**
+     * @notification(name=update)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function updateEmailService(array $data)
     {
-        $update = $this->update($data);
+        $data = $this->encryptPass($data);
 
-        if ($update) {
-            $this->packagesData->responseCode = 0;
+        $validate = $this->validateServiceData($data);
 
-            $this->packagesData->responseMessage = $data['name'] . ' email service updated';
+        if ($validate !== true) {
+            $this->addResponse($validate, 1);
 
-            return true;
+            return false;
         }
-        $this->packagesData->responseCode = 1;
 
-        $this->packagesData->responseMessage = 'Error updating email service ';
+        $emailService = $this->getById($data['id']);
 
-        return false;
+        $emailService = array_merge($emailService, $data);
+
+        if ($this->update($emailService)) {
+            $this->addActivityLog($data, $emailService);
+
+            $this->addToNotification('update', 'Updated email service ' . $data['name']);
+
+            $this->addResponse('Updated email service ' . $data['name']);
+        } else {
+            $this->addResponse('Error updating email service.', 1);
+        }
     }
 
+    /**
+     * @notification(name=remove)
+     * notification_allowed_methods(email, sms)//Example
+     * @notification_allowed_methods(email, sms)
+     */
     public function removeEmailService(array $data)
     {
         $emailService = $this->getById($data['id']);
 
-        if ($emailService) {
-            $remove = $this->remove($emailService['id']);
+        //Check relations before removing.
+        if ($this->remove($emailService['id'])) {
+            $this->addToNotification('remove', 'Removed email service ' . $emailService['name']);
 
-            if ($remove) {
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = $emailService['name'] . ' email service removed';
-
-                return true;
-            }
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing email service';
-
-            return false;
+            $this->addResponse('Removed email service ' . $emailService['name']);
+        } else {
+            $this->addResponse('Error removing email service.', 1);
         }
-        $this->packagesData->responseCode = 1;
-
-        $this->packagesData->responseMessage = 'Email Service with Id ' . $data['id'] . ' not found';
-
-        return false;
     }
 
-    protected function validateData(array $data)
+    protected function validateServiceData(array $data)
+    {
+        $this->validation->add('from_address', PresenceOf::class, ["message" => "Enter valid from email address."]);
+        $this->validation->add('from_address', Email::class, ["message" => "Enter valid from email address."]);
+        $this->validation->add('port', Between::class,
+            [
+                "minimum" => 1,
+                "maximum" => 65535,
+                "message" => "Enter port number between 1 and 65535."
+            ]
+        );
+
+        $validated = $this->validation->validate($data)->jsonSerialize();
+
+        if (count($validated) > 0) {
+            $messages = 'Error: ';
+
+            foreach ($validated as $key => $value) {
+                $messages .= $value['message'] . ' ';
+            }
+            return $messages;
+        } else {
+            return true;
+        }
+    }
+
+    protected function validateTestData(array $data)
     {
         $this->validation->add('test_email_address', PresenceOf::class, ["message" => "Enter valid test email address."]);
         $this->validation->add('test_email_address', Email::class, ["message" => "Enter valid test email address."]);
@@ -106,12 +151,10 @@ class EmailServices extends BasePackage
 
     public function testEmailService(array $data)
     {
-        $validate = $this->validateData($data);
+        $validate = $this->validateTestData($data);
 
         if ($validate !== true) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $validate;
+            $this->addResponse($validate, 1);
 
             return false;
         }
@@ -119,9 +162,32 @@ class EmailServices extends BasePackage
         $test = $this->basepackages->email->sendTestEmail($data);
 
         if ($test) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = $this->basepackages->email->getDebugOutput();
+            $this->addResponse($this->basepackages->email->getDebugOutput());
         }
+    }
+
+    public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
+    {
+        $emailService = parent::getById($id, $resetCache, $enableCache);
+
+        return $this->decryptPass($emailService);
+    }
+
+    protected function decryptPass(array $data)
+    {
+        if ($data['password'] && $data['password'] != '') {
+            $data['password'] = $this->crypt->decryptBase64($data['password'], $this->secTools->getSigKey());
+        }
+
+        return $data;
+    }
+
+    protected function encryptPass(array $data)
+    {
+        if ($data['password'] != '') {
+            $data['password'] = $this->crypt->encryptBase64($data['password'], $this->secTools->getSigKey());
+        }
+
+        return $data;
     }
 }

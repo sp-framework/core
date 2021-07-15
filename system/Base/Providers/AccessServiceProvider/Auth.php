@@ -46,6 +46,8 @@ class Auth
 
     protected $email;
 
+    protected $emailQueue;
+
     protected $domains;
 
     public $packagesData;
@@ -64,6 +66,7 @@ class Auth
         $accounts,
         $profile,
         $email,
+        $emailQueue,
         $domains
     ) {
         $this->request = $request;
@@ -91,6 +94,8 @@ class Auth
         $this->profile = $profile;
 
         $this->email = $email;
+
+        $this->emailQueue = $emailQueue;
 
         $this->domains = $domains;
 
@@ -959,18 +964,15 @@ class Auth
 
     protected function emailVerificationCode($verificationCode)
     {
-        if ($this->email->setup()) {
-            $emailSettings = $this->email->getEmailSettings();
+        $emailData['app_id'] = $this->app['id'];
+        $emailData['status'] = 0;
+        $emailData['priority'] = 1;
+        $emailData['confidential'] = 1;
+        $emailData['to_addresses'] = Json::encode([$this->account['email']]);
+        $emailData['subject'] = 'Verification Code for ' . $this->domains->getDomain()['name'];
+        $emailData['body'] = $verificationCode;
 
-            $this->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
-            $this->email->setRecipientTo($this->account['email'], $this->account['email']);
-            $this->email->setSubject('Verification Code for ' . $this->domains->getDomain()['name']);
-            $this->email->setBody($verificationCode);
-
-            return $this->email->sendNewEmail();
-        } else {
-            return false;
-        }
+        return $this->emailQueue->addToQueue($emailData);
     }
 
     public function verifyVerficationCode(array $data)

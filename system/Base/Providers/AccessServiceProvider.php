@@ -27,6 +27,7 @@ class AccessServiceProvider implements ServiceProviderInterface
                 $accounts = $container->getShared('basepackages')->accounts;
                 $profile = $container->getShared('basepackages')->profile;
                 $email = $container->getShared('basepackages')->email;
+                $emailQueue = $container->getShared('basepackages')->emailqueue;
                 $domains = $container->getShared('domains');
 
                 return (
@@ -44,6 +45,7 @@ class AccessServiceProvider implements ServiceProviderInterface
                         $accounts,
                         $profile,
                         $email,
+                        $emailQueue,
                         $domains
                     ))->init();
             }

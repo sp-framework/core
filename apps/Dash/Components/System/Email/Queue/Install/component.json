@@ -1,0 +1,53 @@
+{
+    "route"         : "system/email/queue",
+    "name"          : "Email Queue",
+    "description"   : "Manage email queue via this component",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-system-admin-email-queue",
+    "class"         : "Apps\\Dash\\Components\\System\\Email\\Queue\\QueueComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      : [],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 6,
+        "system"      : {
+            "icon"      : "cogs",
+            "title"     : "system",
+            "childs"    : {
+                "email" : {
+                    "title"     : "Email",
+                    "icon"      : "envelope",
+                    "childs"    : {
+                        "queue" : {
+                            "title"     : "Queue",
+                            "link"      : "system/email/queue"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+        "mandatory"     : {
+            "admin"     : true
+        }
+    }
+}
