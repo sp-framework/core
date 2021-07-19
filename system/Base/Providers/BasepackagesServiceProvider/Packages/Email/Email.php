@@ -151,12 +151,13 @@ class Email extends BasePackage
 
             $this->email->send();
 
+            $this->reset();
+
             return true;
         } catch (Exception $e) {
 
             return $this->email->ErrorInfo;
         }
-
     }
 
     public function setSender($email, $name)
@@ -255,5 +256,20 @@ class Email extends BasePackage
     public function getDebugOutput()
     {
         return $this->debugOutput;
+    }
+
+    private function reset()
+    {
+        $this->fromEmailAddress = null;
+        $this->fromName = null;
+        $this->to = [];
+        $this->cc = [];
+        $this->bcc = [];
+        $this->attachments = [];
+        $this->subject = null;
+        $this->body = null;
+        $this->debugOutput = [];
+        $this->email = null;
+        $this->init();
     }
 }

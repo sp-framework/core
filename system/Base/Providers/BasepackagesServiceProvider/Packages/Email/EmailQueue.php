@@ -79,45 +79,47 @@ class EmailQueue extends BasePackage
             $queue = $this->getByParams($conditions);
 
             if ($queue && is_array($queue) && count($queue) > 0) {
-                foreach ($queue as $key => $email) {
-                    if (!$this->basepackages->email->setup(null, $email['app_id'])) {
-                        $email['status'] = 2;
-                        $email['logs'] = 'Email Service is not configured or assigned to a domain, please configure email service and try again.';
+                foreach ($queue as $key => $queueEmail) {
+                    if (!$this->basepackages->email->setup(null, $queueEmail['app_id'])) {
+                        $queueEmail['status'] = 2;
+                        $queueEmail['logs'] = 'Email Service is not configured or assigned to a domain, please configure email service and try again.';
 
-                        $this->update($email);
+                        $this->update($queueEmail);
 
                         $hadErrors = true;
                     } else {
-                        $emailSettings = $this->basepackages->email->getEmailSettings();
+                        $queueEmailSettings = $this->basepackages->email->getEmailSettings();
 
-                        $this->basepackages->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
+                        $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
 
-                        $email['to_addresses'] = Json::decode($email['to_addresses'], true);
-                        if (count($email['to_addresses']) > 1) {
-                            foreach ($email['to_addresses'] as $key => $toAddress) {
+                        $queueEmail['to_addresses'] = Json::decode($queueEmail['to_addresses'], true);
+                        if (count($queueEmail['to_addresses']) > 1) {
+                            foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
                                 $this->basepackages->email->setRecipientTo($toAddress, $toAddress);
                             }
                         } else {
-                            $this->basepackages->email->setRecipientTo(Arr::first($email['to_addresses']), Arr::first($email['to_addresses']));
+                            $this->basepackages->email->setRecipientTo(Arr::first($queueEmail['to_addresses']), Arr::first($queueEmail['to_addresses']));
                         }
-                        $email['to_addresses'] = Json::encode($email['to_addresses']);
+                        $queueEmail['to_addresses'] = Json::encode($queueEmail['to_addresses']);
 
-                        $this->basepackages->email->setSubject($email['subject']);
+                        $this->basepackages->email->setSubject($queueEmail['subject']);
 
-                        if (isset($email['confidential']) && $email['confidential'] == 1) {
-                            $email = $this->decryptBody($email);
+                        if (isset($queueEmail['confidential']) && $queueEmail['confidential'] == 1) {
+                            $queueEmail = $this->decryptBody($queueEmail);
+                            $this->basepackages->email->setBody($queueEmail['body']);
+                            $queueEmail = $this->encryptBody($queueEmail);
+                        } else {
+                            $this->basepackages->email->setBody($queueEmail['body']);
                         }
-
-                        $this->basepackages->email->setBody($email['body']);
 
                         $logs = $this->basepackages->email->sendNewEmail();
 
                         if ($logs === true) {
-                            $email['status'] = 1;
-                            $email['logs'] = 'Sent';
-                            $email['sent_on'] = date("F j, Y, g:i a");
+                            $queueEmail['status'] = 1;
+                            $queueEmail['logs'] = 'Sent';
+                            $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
-                            $this->update($email);
+                            $this->update($queueEmail);
                         }
                     }
                 }
@@ -131,22 +133,6 @@ class EmailQueue extends BasePackage
         }
 
         $this->addResponse('Queue processes successfully.');
-    }
-
-    protected function sendEmail()
-    {
-
-        //     $emailSettings = $this->basepackages->email->getEmailSettings();
-
-        //     $this->basepackages->email->setSender($emailSettings['from_address'], $emailSettings['from_address']);
-        //     $this->basepackages->email->setRecipientTo($this->account['email'], $this->account['email']);
-        //     $this->basepackages->email->setSubject('Verification Code for ' . $this->domains->getDomain()['name']);
-        //     $this->basepackages->email->setBody($verificationCode);
-
-        //     return $this->basepackages->email->sendNewEmail();
-        // } else {
-        //     return false;
-        // }
     }
 
     public function removeFromQueue(array $data)
