@@ -453,4 +453,52 @@ class Profile extends BasePackage
 
         return true;
     }
+
+    public function getMessengerSettings()
+    {
+        if (isset($this->profile['settings']['messenger'])) {
+            $messengerSettings = $this->profile['settings']['messenger'];
+
+            if (is_array($messengerSettings)) {
+                if (isset($messengerSettings['members']['users']) &&
+                    is_array($messengerSettings['members']['users']) &&
+                    count($messengerSettings['members']['users']) > 0
+                ) {
+                    foreach ($messengerSettings['members']['users'] as $accountKey => $accountId) {
+                        $account = $this->basepackages->accounts->getById($accountId);
+
+                        if ($account) {
+                            $messengerSettings['members']['users'][$accountKey] = [];
+                            $messengerSettings['members']['users'][$accountKey]['id'] = $account['id'];
+                            $messengerSettings['members']['users'][$accountKey]['email'] = $account['email'];
+                            $profile = $this->getProfile($account['id']);
+
+                            if ($profile) {
+                                $messengerSettings['members']['users'][$accountKey]['full_name'] = $profile['full_name'];
+                                if ($profile['portrait'] !== '') {
+                                    $messengerSettings['members']['users'][$accountKey]['portrait'] = $profile['portrait'];
+                                }
+                                if (isset($profile['settings']['messenger']) && isset($profile['settings']['messenger']['status'])) {
+                                    $messengerSettings['members']['users'][$accountKey]['status'] = $profile['settings']['messenger']['status'];
+                                } else {
+                                    $messengerSettings['members']['users'][$accountKey]['status'] = 4;
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    $messengerSettings['members']['users'] = null;
+                }
+            }
+
+            return $messengerSettings;
+        }
+
+        return null;
+    }
+
+    public function changeMessengerStatus(array $data)
+    {
+        var_dump($data);
+    }
 }

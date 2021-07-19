@@ -1,4 +1,4 @@
-
+<!-- htmlhint tag-pair:false -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -29,6 +29,7 @@ if (!window.dataCollection) {
     dataCollection.env = { };
     dataCollection.env.breadcrumb = '{{breadcrumb}}';
     //Paths
+    dataCollection.env.httpHost = '{{request.getHttpHost()}}';
     dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
     dataCollection.env.appRoute = "{{apps.getAppInfo()['route']}}";
     dataCollection.env.jsPath =
@@ -54,6 +55,7 @@ if (!window.dataCollection) {
     dataCollection.env.sounds.notificationSound = new Audio(dataCollection.env.soundPath + 'notification.mp3');
 
     dataCollection.env.notifications = { };
+    dataCollection.env.account = { };
 
     dataCollection.env.fontsPath =
         dataCollection.env.rootPath +
@@ -79,7 +81,9 @@ if (localStorage.getItem('bazDevMode') === null) {
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/header/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/view') %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/content/view') %}
-            {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/controlsidebar/view') %}
+            {% if modules.components.getNamedComponentForApp('Messenger', apps.getAppInfo()['id']) %}
+                {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/messenger/view') %}
+            {% endif %}
             {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/footer/view') %}
         </div>
     </body>

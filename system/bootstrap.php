@@ -7,6 +7,8 @@ use Phalcon\Mvc\Application;
 use System\Base\Loader\Service;
 use System\Base\Providers\SessionServiceProvider;
 
+ini_set('zlib.output_compression', 1);
+
 include('../system/Base/Loader/Service.php');
 Service::Instance(__DIR__ . '/../')->load();
 
@@ -18,7 +20,8 @@ $session = $container->getShared('session');
 $connection = $container->getShared('connection');
 $session->start();
 
-foreach (include(base_path('system/Base/Providers.php')) as $provider) {
+$providers = include(base_path('system/Base/Providers.php'));
+foreach ($providers['mvc'] as $provider) {
     $container->register(new $provider());
 }
 

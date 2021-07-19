@@ -1,4 +1,8 @@
 <?php
+if (PHP_SAPI === 'cli') {
+	echo "Cannot use cli on index.php";
+	exit();
+}
 // require_once "../vendor/autoload.php";
 
 // $config = array(

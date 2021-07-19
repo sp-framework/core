@@ -1,5 +1,5 @@
 /* exported BazCore */
-/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile BazHelpers */
+/* globals PNotify Pace BazContentLoader PNotifyBootstrap4 PNotifyFontAwesome5 PNotifyFontAwesome5Fix PNotifyPaginate PNotifyMobile BazTunnels */
 /*
 * @title                    : BazCore
 * @description              : Baz Core Lib
@@ -98,15 +98,14 @@ var BazCore = function() {
         PNotify.defaultModules.set(PNotifyMobile, {});
         // PNotify.defaultModules.set(PNotifyDesktop, {});
         PNotify.defaultModules.set(PNotifyPaginate, {});
+        Pace.options.ajax.trackWebSockets = false;
         bazContent();
         toolTipsAndPopovers();
         bazUpdateBreadcrumb();
         openMenu();
 
         if (dataCollection.env.currentRoute.indexOf('auth') === -1) {
-            setTimeout(function() {
-                initNotifications();
-            }, 5000);
+            BazTunnels.init();
         }
     }
 
@@ -245,18 +244,50 @@ var BazCore = function() {
         }, 'json');
     }
 
-    function initNotifications() {
-        $(document).ready(function() {
-            getNotificationsCount();
-        });
+    // function initWsTunnels() {
+    //     dataCollection.env.wsTunnels = { };
+    //     dataCollection.env.wsTunnels.messenger = new WebSocket('ws://' + dataCollection.env.httpHost + '/messenger/');
+    //     dataCollection.env.wsTunnels.messenger.onopen = function(e) {
+    //         //eslint-disable-next-line
+    //         console.log(e);
+    //     };
 
-        BazHelpers.interval(
-            async() => {
-                BazCore.getNotificationsCount();
-            },
-            500000
-        );
-    }
+    //     dataCollection.env.wsTunnels.notifications =
+    //         new ab.Session('ws://' + dataCollection.env.httpHost + '/notifications/',
+    //             function() {
+    //                 dataCollection.env.wsTunnels.notifications.subscribe('systemNotifications', function(topic, data) {
+    //                     //eslint-disable-next-line
+    //                     console.log(topic);
+    //                     //eslint-disable-next-line
+    //                     console.log(data);
+    //                 });
+    //                 dataCollection.env.wsTunnels.notifications.subscribe('messengerNotifications', function(topic, data) {
+    //                     //eslint-disable-next-line
+    //                     console.log(topic);
+    //                     //eslint-disable-next-line
+    //                     console.log(data);
+    //                 });
+    //             },
+    //             function() {
+    //                 //eslint-disable-next-line
+    //                 console.warn('WebSocket connection closed');
+    //             },
+    //             {'skipSubprotocolCheck': true}
+    //         );
+    // }
+
+    // function initNotifications() {
+    //     // $(document).ready(function() {
+    //     //     getNotificationsCount();
+    //     // });
+
+    //     // BazHelpers.interval(
+    //         // async() => {
+    //         //     BazCore.getNotificationsCount();
+    //         // },
+    //         // 500000
+    //     // );
+    // }
 
     //PageParser
     function bazContent() {

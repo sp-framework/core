@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
+use ZMQContext;
 
 class Notifications extends BasePackage
 {
@@ -56,9 +57,51 @@ class Notifications extends BasePackage
         $newNotification['notification_details'] = $notificationDetails;
 
         if ($this->add($newNotification)) {
+            $this->pushNotification($newNotification);
+
             $this->addResponse('Added new notification');
         } else {
             $this->addResponse('Error adding new notification', 1);
+        }
+    }
+
+    protected function pushNotification($notification)
+    {
+        $account = $this->basepackages->accounts->getById($notification['account_id']);
+
+        if ($account['notifications_tunnel_id']) {
+            $count =
+                $this->modelToUse::count(
+                    [
+                        'conditions' => 'account_id = :aid: AND read = :r:',
+                        'bind'  => [
+                            'aid' => $notification['account_id'],
+                            'r' => 0
+                        ]
+                    ]
+            );
+
+            if ($count && $count > 0) {
+                $context = new ZMQContext();
+
+                $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'New Notification');
+                $socket->connect("tcp://localhost:5555");
+
+                $data =
+                    [
+                        'type'              => 'systemNotifications',
+                        'send_to'           => $account['notifications_tunnel_id'],
+                        'response'          => [
+                            'responseCode'      => 0,
+                            'responseData'      =>
+                                [
+                                    "count" => $count
+                                ]
+                        ]
+                    ];
+
+                $socket->send(Json::encode($data));
+            }
         }
     }
 

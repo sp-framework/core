@@ -106,7 +106,7 @@ class CacheTools
 		return null;
 	}
 
-	public function setCache(string $cacheKey, array $data)
+	public function setCache(string $cacheKey, $data)
 	{
 		if ($this->cacheConfig->enabled) {
 			$this->cache->set($cacheKey, $data);

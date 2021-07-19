@@ -1,6 +1,6 @@
 {
     "name"          : "Matrix",
-    "display_name"   : "Matrix",
+    "display_name"  : "Matrix",
     "description"   : "Package for Matrix component",
     "version"       : "0.0.1",
     "app_type"      : "dash",

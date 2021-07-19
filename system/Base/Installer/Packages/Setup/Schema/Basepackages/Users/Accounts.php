@@ -123,6 +123,20 @@ class Accounts
                             'type'    => Column::TYPE_TEXT,
                             'notNull' => false
                         ]
+                    ),
+                    new Column(
+                        'notifications_tunnel_id',
+                        [
+                            'type'    => Column::TYPE_SMALLINTEGER,
+                            'notNull' => false
+                        ]
+                    ),
+                    new Column(
+                        'messenger_tunnel_id',
+                        [
+                            'type'    => Column::TYPE_SMALLINTEGER,
+                            'notNull' => false
+                        ]
                     )
                 ],
                 'indexes' => [

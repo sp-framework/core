@@ -636,6 +636,8 @@ class Croppie
                                         $("#profile-portrait").children("img").attr("src", window.dataCollection.env.rootPath + window.dataCollection.env.appRoute +
                                             "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/30");
                                         $("#profile-portrait").children("img").attr("hidden", false);
+                                        window.dataCollection.env.profile.portrait =
+                                            window.dataCollection.env.rootPath + window.dataCollection.env.appRoute + "/system/storages/q/uuid/" + uploadUUIDs[0] + "/w/80";
                                     }
                                 });
 

@@ -32,7 +32,7 @@ class Service
 	public function load()
 	{
 		try {
-			$config = include('../system/Configs/Base.php');
+			$config = include(__DIR__ . '/../../../system/Configs/Base.php');
 		} catch (\ErrorException $e) {
 			throw new \Exception("Base.php file in configs directory missing");
 		}

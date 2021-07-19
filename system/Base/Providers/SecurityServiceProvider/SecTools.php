@@ -96,4 +96,29 @@ class SecTools
 
         return $this->core->core['settings']['security']['passwordWorkFactor'];
     }
+
+    public function encryptBase64(string $data)
+    {
+        return $this->crypt->encryptBase64($data, $this->getSigKey());
+    }
+
+    public function decryptBase64(string $data)
+    {
+        return $this->crypt->decryptBase64($data, $this->getSigKey());
+    }
+
+    public function encrypt(string $data)
+    {
+        return $this->crypt->encrypt($data, $this->getSigKey());
+    }
+
+    public function decrypt(string $data)
+    {
+        return $this->crypt->decrypt($data, $this->getSigKey());
+    }
+
+    public function decryptCookie($data)
+    {
+        return $this->crypt->decryptBase64($data, $this->getCookiesSig());
+    }
 }

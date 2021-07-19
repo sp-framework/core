@@ -2,18 +2,19 @@
 
 namespace Apps\Dash\Components\Home;
 
+use Apps\Dash\Components\Devtools\Api\Contracts\Install\Component as ContractsComponent;
+use Apps\Dash\Components\Devtools\Api\Enums\Install\Component as EnumsComponent;
 use Apps\Dash\Components\Hrms\Designations\Install\Component as EmployeesDesignationsComponent;
 use Apps\Dash\Components\Hrms\Skills\Install\Component as SkillsComponent;
 use Apps\Dash\Components\Ims\Brands\Install\Component as BrandsComponent;
 use Apps\Dash\Components\Ims\Categories\Install\Component as CategoriesComponent;
 use Apps\Dash\Components\Ims\Products\Install\Component as ProductsComponent;
 use Apps\Dash\Components\Ims\Specifications\Install\Component as SpecificationsComponent;
-use Apps\Dash\Components\Ims\Suppliers\Install\Component as SuppliersComponent;
-use Apps\Dash\Components\Devtools\Api\Contracts\Install\Component as ContractsComponent;
-use Apps\Dash\Components\Devtools\Api\Enums\Install\Component as EnumsComponent;
 use Apps\Dash\Components\Ims\Stock\Purchaseorders\Install\Component as PurchaseOrdersComponent;
+use Apps\Dash\Components\Ims\Suppliers\Install\Component as SuppliersComponent;
 use Apps\Dash\Components\System\Api\Ebay\Taxonomy\Install\Component as TaxonomyComponent;
 use Apps\Dash\Components\System\Api\Install\Component as ApiComponent;
+use Apps\Dash\Components\System\Messenger\MessengerComponent;
 use Apps\Dash\Packages\Business\ABNLookup\Install\Package as ABNLookupPackage;
 use Apps\Dash\Packages\Business\Channels\Install\Package as ChannelsPackage;
 use Apps\Dash\Packages\Business\Directory\Contacts\Install\Package as ContactsPackage;
@@ -37,6 +38,7 @@ use Apps\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
 use Apps\Dash\Packages\System\Api\Api;
 use Apps\Dash\Packages\System\Api\Ebay\Taxonomy\Install\Package as TaxonomyPackage;
 use Apps\Dash\Packages\System\Api\Install\Package as ApiPackage;
+use Apps\Dash\Packages\System\Messenger\Install\Package as MessengerPackage;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -199,6 +201,11 @@ class HomeComponent extends BaseComponent
         // $purchaseOrdersComponent->installComponent();
         $purchaseOrdersPackage = new PurchaseOrdersPackage();
         $purchaseOrdersPackage->installPackage(true);
+
+        // $messengerComponent = new MessengerComponent();
+        // $messengerComponent->installComponent();
+        $messengerPackage = new MessengerPackage();
+        $messengerPackage->installPackage(true);
     }
 
     protected function addStatuses()

@@ -445,6 +445,8 @@ var BazContentSectionWithWizard = function() {
                 PNotify.error({
                     title   : response.responseMessage,
                 });
+                $('#' + sectionId + '-next').children('i').attr('hidden', true);
+                $('#' + sectionId + '-next').attr('disabled', false);
                 $('#' + sectionId + '-' + step + '-accordioncard-header').removeClass('bg-success').addClass('bg-danger');
             }
             if (lastStep) {

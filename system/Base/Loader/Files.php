@@ -2,5 +2,5 @@
 
 return
     [
-        '../system/Base/Helpers.php'
+        __DIR__ . '/../../Base/Helpers.php'
     ];

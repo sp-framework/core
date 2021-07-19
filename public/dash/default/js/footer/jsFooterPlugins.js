@@ -4360,3 +4360,5508 @@ var a,b;a=this,b=function(){"use strict";function e(e,t){for(var n=0;n<t.length;
  */
 (function webpackUniversalModuleDefinition(root,factory){if(typeof exports==="object"&&typeof module==="object")module.exports=factory(require("jquery"));else if(typeof define==="function"&&define.amd)define("bootstrap-colorpicker",["jquery"],factory);else if(typeof exports==="object")exports["bootstrap-colorpicker"]=factory(require("jquery"));else root["bootstrap-colorpicker"]=factory(root["jQuery"])})(window,function(__WEBPACK_EXTERNAL_MODULE__0__){return function(modules){var installedModules={};function __webpack_require__(moduleId){if(installedModules[moduleId]){return installedModules[moduleId].exports}var module=installedModules[moduleId]={i:moduleId,l:false,exports:{}};modules[moduleId].call(module.exports,module,module.exports,__webpack_require__);module.l=true;return module.exports}__webpack_require__.m=modules;__webpack_require__.c=installedModules;__webpack_require__.d=function(exports,name,getter){if(!__webpack_require__.o(exports,name)){Object.defineProperty(exports,name,{enumerable:true,get:getter})}};__webpack_require__.r=function(exports){if(typeof Symbol!=="undefined"&&Symbol.toStringTag){Object.defineProperty(exports,Symbol.toStringTag,{value:"Module"})}Object.defineProperty(exports,"__esModule",{value:true})};__webpack_require__.t=function(value,mode){if(mode&1)value=__webpack_require__(value);if(mode&8)return value;if(mode&4&&typeof value==="object"&&value&&value.__esModule)return value;var ns=Object.create(null);__webpack_require__.r(ns);Object.defineProperty(ns,"default",{enumerable:true,value});if(mode&2&&typeof value!="string")for(var key in value)__webpack_require__.d(ns,key,function(key){return value[key]}.bind(null,key));return ns};__webpack_require__.n=function(module){var getter=module&&module.__esModule?function getDefault(){return module["default"]}:function getModuleExports(){return module};__webpack_require__.d(getter,"a",getter);return getter};__webpack_require__.o=function(object,property){return Object.prototype.hasOwnProperty.call(object,property)};__webpack_require__.p="";return __webpack_require__(__webpack_require__.s=7)}([function(module,exports){module.exports=__WEBPACK_EXTERNAL_MODULE__0__},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var Extension=function(){function Extension(colorpicker){var options=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};_classCallCheck(this,Extension);this.colorpicker=colorpicker;this.options=options;if(!(this.colorpicker.element&&this.colorpicker.element.length)){throw new Error("Extension: this.colorpicker.element is not valid")}this.colorpicker.element.on("colorpickerCreate.colorpicker-ext",_jquery2.default.proxy(this.onCreate,this));this.colorpicker.element.on("colorpickerDestroy.colorpicker-ext",_jquery2.default.proxy(this.onDestroy,this));this.colorpicker.element.on("colorpickerUpdate.colorpicker-ext",_jquery2.default.proxy(this.onUpdate,this));this.colorpicker.element.on("colorpickerChange.colorpicker-ext",_jquery2.default.proxy(this.onChange,this));this.colorpicker.element.on("colorpickerInvalid.colorpicker-ext",_jquery2.default.proxy(this.onInvalid,this));this.colorpicker.element.on("colorpickerShow.colorpicker-ext",_jquery2.default.proxy(this.onShow,this));this.colorpicker.element.on("colorpickerHide.colorpicker-ext",_jquery2.default.proxy(this.onHide,this));this.colorpicker.element.on("colorpickerEnable.colorpicker-ext",_jquery2.default.proxy(this.onEnable,this));this.colorpicker.element.on("colorpickerDisable.colorpicker-ext",_jquery2.default.proxy(this.onDisable,this))}_createClass(Extension,[{key:"resolveColor",value:function resolveColor(color){var realColor=arguments.length>1&&arguments[1]!==undefined?arguments[1]:true;return false}},{key:"onCreate",value:function onCreate(event){}},{key:"onDestroy",value:function onDestroy(event){this.colorpicker.element.off(".colorpicker-ext")}},{key:"onUpdate",value:function onUpdate(event){}},{key:"onChange",value:function onChange(event){}},{key:"onInvalid",value:function onInvalid(event){}},{key:"onHide",value:function onHide(event){}},{key:"onShow",value:function onShow(event){}},{key:"onDisable",value:function onDisable(event){}},{key:"onEnable",value:function onEnable(event){}}]);return Extension}();exports.default=Extension;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.ColorItem=exports.HSVAColor=undefined;var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _color=__webpack_require__(16);var _color2=_interopRequireDefault(_color);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var HSVAColor=function(){function HSVAColor(h,s,v,a){_classCallCheck(this,HSVAColor);this.h=isNaN(h)?0:h;this.s=isNaN(s)?0:s;this.v=isNaN(v)?0:v;this.a=isNaN(h)?1:a}_createClass(HSVAColor,[{key:"toString",value:function toString(){return this.h+", "+this.s+"%, "+this.v+"%, "+this.a}}]);return HSVAColor}();var ColorItem=function(){_createClass(ColorItem,[{key:"api",value:function api(fn){for(var _len=arguments.length,args=Array(_len>1?_len-1:0),_key=1;_key<_len;_key++){args[_key-1]=arguments[_key]}if(arguments.length===0){return this._color}var result=this._color[fn].apply(this._color,args);if(!(result instanceof _color2.default)){return result}return new ColorItem(result,this.format)}},{key:"original",get:function get(){return this._original}}],[{key:"HSVAColor",get:function get(){return HSVAColor}}]);function ColorItem(){var color=arguments.length>0&&arguments[0]!==undefined?arguments[0]:null;var format=arguments.length>1&&arguments[1]!==undefined?arguments[1]:null;_classCallCheck(this,ColorItem);this.replace(color,format)}_createClass(ColorItem,[{key:"replace",value:function replace(color){var format=arguments.length>1&&arguments[1]!==undefined?arguments[1]:null;format=ColorItem.sanitizeFormat(format);this._original={color,format,valid:true};this._color=ColorItem.parse(color);if(this._color===null){this._color=(0,_color2.default)();this._original.valid=false;return}this._format=format?format:ColorItem.isHex(color)?"hex":this._color.model}},{key:"isValid",value:function isValid(){return this._original.valid===true}},{key:"setHueRatio",value:function setHueRatio(h){this.hue=(1-h)*360}},{key:"setSaturationRatio",value:function setSaturationRatio(s){this.saturation=s*100}},{key:"setValueRatio",value:function setValueRatio(v){this.value=(1-v)*100}},{key:"setAlphaRatio",value:function setAlphaRatio(a){this.alpha=1-a}},{key:"isDesaturated",value:function isDesaturated(){return this.saturation===0}},{key:"isTransparent",value:function isTransparent(){return this.alpha===0}},{key:"hasTransparency",value:function hasTransparency(){return this.hasAlpha()&&this.alpha<1}},{key:"hasAlpha",value:function hasAlpha(){return!isNaN(this.alpha)}},{key:"toObject",value:function toObject(){return new HSVAColor(this.hue,this.saturation,this.value,this.alpha)}},{key:"toHsva",value:function toHsva(){return this.toObject()}},{key:"toHsvaRatio",value:function toHsvaRatio(){return new HSVAColor(this.hue/360,this.saturation/100,this.value/100,this.alpha)}},{key:"toString",value:function toString(){return this.string()}},{key:"string",value:function string(){var format=arguments.length>0&&arguments[0]!==undefined?arguments[0]:null;format=ColorItem.sanitizeFormat(format?format:this.format);if(!format){return this._color.round().string()}if(this._color[format]===undefined){throw new Error("Unsupported color format: '"+format+"'")}var str=this._color[format]();return str.round?str.round().string():str}},{key:"equals",value:function equals(color){color=color instanceof ColorItem?color:new ColorItem(color);if(!color.isValid()||!this.isValid()){return false}return this.hue===color.hue&&this.saturation===color.saturation&&this.value===color.value&&this.alpha===color.alpha}},{key:"getClone",value:function getClone(){return new ColorItem(this._color,this.format)}},{key:"getCloneHueOnly",value:function getCloneHueOnly(){return new ColorItem([this.hue,100,100,1],this.format)}},{key:"getCloneOpaque",value:function getCloneOpaque(){return new ColorItem(this._color.alpha(1),this.format)}},{key:"toRgbString",value:function toRgbString(){return this.string("rgb")}},{key:"toHexString",value:function toHexString(){return this.string("hex")}},{key:"toHslString",value:function toHslString(){return this.string("hsl")}},{key:"isDark",value:function isDark(){return this._color.isDark()}},{key:"isLight",value:function isLight(){return this._color.isLight()}},{key:"generate",value:function generate(formula){var hues=[];if(Array.isArray(formula)){hues=formula}else if(!ColorItem.colorFormulas.hasOwnProperty(formula)){throw new Error("No color formula found with the name '"+formula+"'.")}else{hues=ColorItem.colorFormulas[formula]}var colors=[],mainColor=this._color,format=this.format;hues.forEach(function(hue){var levels=[hue?(mainColor.hue()+hue)%360:mainColor.hue(),mainColor.saturationv(),mainColor.value(),mainColor.alpha()];colors.push(new ColorItem(levels,format))});return colors}},{key:"hue",get:function get(){return this._color.hue()},set:function set(value){this._color=this._color.hue(value)}},{key:"saturation",get:function get(){return this._color.saturationv()},set:function set(value){this._color=this._color.saturationv(value)}},{key:"value",get:function get(){return this._color.value()},set:function set(value){this._color=this._color.value(value)}},{key:"alpha",get:function get(){var a=this._color.alpha();return isNaN(a)?1:a},set:function set(value){this._color=this._color.alpha(Math.round(value*100)/100)}},{key:"format",get:function get(){return this._format?this._format:this._color.model},set:function set(value){this._format=ColorItem.sanitizeFormat(value)}}],[{key:"parse",value:function parse(color){if(color instanceof _color2.default){return color}if(color instanceof ColorItem){return color._color}var format=null;if(color instanceof HSVAColor){color=[color.h,color.s,color.v,isNaN(color.a)?1:color.a]}else{color=ColorItem.sanitizeString(color)}if(color===null){return null}if(Array.isArray(color)){format="hsv"}try{return(0,_color2.default)(color,format)}catch(e){return null}}},{key:"sanitizeString",value:function sanitizeString(str){if(!(typeof str==="string"||str instanceof String)){return str}if(str.match(/^[0-9a-f]{2,}$/i)){return"#"+str}if(str.toLowerCase()==="transparent"){return"#FFFFFF00"}return str}},{key:"isHex",value:function isHex(str){if(!(typeof str==="string"||str instanceof String)){return false}return!!str.match(/^#?[0-9a-f]{2,}$/i)}},{key:"sanitizeFormat",value:function sanitizeFormat(format){switch(format){case"hex":case"hex3":case"hex4":case"hex6":case"hex8":return"hex";case"rgb":case"rgba":case"keyword":case"name":return"rgb";case"hsl":case"hsla":case"hsv":case"hsva":case"hwb":case"hwba":return"hsl";default:return""}}}]);return ColorItem}();ColorItem.colorFormulas={complementary:[180],triad:[0,120,240],tetrad:[0,90,180,270],splitcomplement:[0,72,216]};exports.default=ColorItem;exports.HSVAColor=HSVAColor;exports.ColorItem=ColorItem},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var sassVars={bar_size_short:16,base_margin:6,columns:6};var sliderSize=sassVars.bar_size_short*sassVars.columns+sassVars.base_margin*(sassVars.columns-1);exports.default={customClass:null,color:false,fallbackColor:false,format:"auto",horizontal:false,inline:false,container:false,popover:{animation:true,placement:"bottom",fallbackPlacement:"flip"},debug:false,input:"input",addon:".colorpicker-input-addon",autoInputFallback:true,useHashPrefix:true,useAlpha:true,template:'<div class="colorpicker">\n      <div class="colorpicker-saturation"><i class="colorpicker-guide"></i></div>\n      <div class="colorpicker-hue"><i class="colorpicker-guide"></i></div>\n      <div class="colorpicker-alpha">\n        <div class="colorpicker-alpha-color"></div>\n        <i class="colorpicker-guide"></i>\n      </div>\n    </div>',extensions:[{name:"preview",options:{showText:true}}],sliders:{saturation:{selector:".colorpicker-saturation",maxLeft:sliderSize,maxTop:sliderSize,callLeft:"setSaturationRatio",callTop:"setValueRatio"},hue:{selector:".colorpicker-hue",maxLeft:0,maxTop:sliderSize,callLeft:false,callTop:"setHueRatio"},alpha:{selector:".colorpicker-alpha",childSelector:".colorpicker-alpha-color",maxLeft:0,maxTop:sliderSize,callLeft:false,callTop:"setAlphaRatio"}},slidersHorz:{saturation:{selector:".colorpicker-saturation",maxLeft:sliderSize,maxTop:sliderSize,callLeft:"setSaturationRatio",callTop:"setValueRatio"},hue:{selector:".colorpicker-hue",maxLeft:sliderSize,maxTop:0,callLeft:"setHueRatio",callTop:false},alpha:{selector:".colorpicker-alpha",childSelector:".colorpicker-alpha-color",maxLeft:sliderSize,maxTop:0,callLeft:"setAlphaRatio",callTop:false}}};module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _typeof=typeof Symbol==="function"&&typeof Symbol.iterator==="symbol"?function(obj){return typeof obj}:function(obj){return obj&&typeof Symbol==="function"&&obj.constructor===Symbol&&obj!==Symbol.prototype?"symbol":typeof obj};var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _Extension2=__webpack_require__(1);var _Extension3=_interopRequireDefault(_Extension2);var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}function _possibleConstructorReturn(self,call){if(!self){throw new ReferenceError("this hasn't been initialised - super() hasn't been called")}return call&&(typeof call==="object"||typeof call==="function")?call:self}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function, not "+typeof superClass)}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__=superClass}var defaults={colors:null,namesAsValues:true};var Palette=function(_Extension){_inherits(Palette,_Extension);_createClass(Palette,[{key:"colors",get:function get(){return this.options.colors}}]);function Palette(colorpicker){var options=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};_classCallCheck(this,Palette);var _this=_possibleConstructorReturn(this,(Palette.__proto__||Object.getPrototypeOf(Palette)).call(this,colorpicker,_jquery2.default.extend(true,{},defaults,options)));if(!Array.isArray(_this.options.colors)&&_typeof(_this.options.colors)!=="object"){_this.options.colors=null}return _this}_createClass(Palette,[{key:"getLength",value:function getLength(){if(!this.options.colors){return 0}if(Array.isArray(this.options.colors)){return this.options.colors.length}if(_typeof(this.options.colors)==="object"){return Object.keys(this.options.colors).length}return 0}},{key:"resolveColor",value:function resolveColor(color){var realColor=arguments.length>1&&arguments[1]!==undefined?arguments[1]:true;if(this.getLength()<=0){return false}if(Array.isArray(this.options.colors)){if(this.options.colors.indexOf(color)>=0){return color}if(this.options.colors.indexOf(color.toUpperCase())>=0){return color.toUpperCase()}if(this.options.colors.indexOf(color.toLowerCase())>=0){return color.toLowerCase()}return false}if(_typeof(this.options.colors)!=="object"){return false}if(!this.options.namesAsValues||realColor){return this.getValue(color,false)}return this.getName(color,this.getName("#"+color))}},{key:"getName",value:function getName(value){var defaultValue=arguments.length>1&&arguments[1]!==undefined?arguments[1]:false;if(!(typeof value==="string")||!this.options.colors){return defaultValue}for(var name in this.options.colors){if(!this.options.colors.hasOwnProperty(name)){continue}if(this.options.colors[name].toLowerCase()===value.toLowerCase()){return name}}return defaultValue}},{key:"getValue",value:function getValue(name){var defaultValue=arguments.length>1&&arguments[1]!==undefined?arguments[1]:false;if(!(typeof name==="string")||!this.options.colors){return defaultValue}if(this.options.colors.hasOwnProperty(name)){return this.options.colors[name]}return defaultValue}}]);return Palette}(_Extension3.default);exports.default=Palette;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";module.exports={aliceblue:[240,248,255],antiquewhite:[250,235,215],aqua:[0,255,255],aquamarine:[127,255,212],azure:[240,255,255],beige:[245,245,220],bisque:[255,228,196],black:[0,0,0],blanchedalmond:[255,235,205],blue:[0,0,255],blueviolet:[138,43,226],brown:[165,42,42],burlywood:[222,184,135],cadetblue:[95,158,160],chartreuse:[127,255,0],chocolate:[210,105,30],coral:[255,127,80],cornflowerblue:[100,149,237],cornsilk:[255,248,220],crimson:[220,20,60],cyan:[0,255,255],darkblue:[0,0,139],darkcyan:[0,139,139],darkgoldenrod:[184,134,11],darkgray:[169,169,169],darkgreen:[0,100,0],darkgrey:[169,169,169],darkkhaki:[189,183,107],darkmagenta:[139,0,139],darkolivegreen:[85,107,47],darkorange:[255,140,0],darkorchid:[153,50,204],darkred:[139,0,0],darksalmon:[233,150,122],darkseagreen:[143,188,143],darkslateblue:[72,61,139],darkslategray:[47,79,79],darkslategrey:[47,79,79],darkturquoise:[0,206,209],darkviolet:[148,0,211],deeppink:[255,20,147],deepskyblue:[0,191,255],dimgray:[105,105,105],dimgrey:[105,105,105],dodgerblue:[30,144,255],firebrick:[178,34,34],floralwhite:[255,250,240],forestgreen:[34,139,34],fuchsia:[255,0,255],gainsboro:[220,220,220],ghostwhite:[248,248,255],gold:[255,215,0],goldenrod:[218,165,32],gray:[128,128,128],green:[0,128,0],greenyellow:[173,255,47],grey:[128,128,128],honeydew:[240,255,240],hotpink:[255,105,180],indianred:[205,92,92],indigo:[75,0,130],ivory:[255,255,240],khaki:[240,230,140],lavender:[230,230,250],lavenderblush:[255,240,245],lawngreen:[124,252,0],lemonchiffon:[255,250,205],lightblue:[173,216,230],lightcoral:[240,128,128],lightcyan:[224,255,255],lightgoldenrodyellow:[250,250,210],lightgray:[211,211,211],lightgreen:[144,238,144],lightgrey:[211,211,211],lightpink:[255,182,193],lightsalmon:[255,160,122],lightseagreen:[32,178,170],lightskyblue:[135,206,250],lightslategray:[119,136,153],lightslategrey:[119,136,153],lightsteelblue:[176,196,222],lightyellow:[255,255,224],lime:[0,255,0],limegreen:[50,205,50],linen:[250,240,230],magenta:[255,0,255],maroon:[128,0,0],mediumaquamarine:[102,205,170],mediumblue:[0,0,205],mediumorchid:[186,85,211],mediumpurple:[147,112,219],mediumseagreen:[60,179,113],mediumslateblue:[123,104,238],mediumspringgreen:[0,250,154],mediumturquoise:[72,209,204],mediumvioletred:[199,21,133],midnightblue:[25,25,112],mintcream:[245,255,250],mistyrose:[255,228,225],moccasin:[255,228,181],navajowhite:[255,222,173],navy:[0,0,128],oldlace:[253,245,230],olive:[128,128,0],olivedrab:[107,142,35],orange:[255,165,0],orangered:[255,69,0],orchid:[218,112,214],palegoldenrod:[238,232,170],palegreen:[152,251,152],paleturquoise:[175,238,238],palevioletred:[219,112,147],papayawhip:[255,239,213],peachpuff:[255,218,185],peru:[205,133,63],pink:[255,192,203],plum:[221,160,221],powderblue:[176,224,230],purple:[128,0,128],rebeccapurple:[102,51,153],red:[255,0,0],rosybrown:[188,143,143],royalblue:[65,105,225],saddlebrown:[139,69,19],salmon:[250,128,114],sandybrown:[244,164,96],seagreen:[46,139,87],seashell:[255,245,238],sienna:[160,82,45],silver:[192,192,192],skyblue:[135,206,235],slateblue:[106,90,205],slategray:[112,128,144],slategrey:[112,128,144],snow:[255,250,250],springgreen:[0,255,127],steelblue:[70,130,180],tan:[210,180,140],teal:[0,128,128],thistle:[216,191,216],tomato:[255,99,71],turquoise:[64,224,208],violet:[238,130,238],wheat:[245,222,179],white:[255,255,255],whitesmoke:[245,245,245],yellow:[255,255,0],yellowgreen:[154,205,50]}},function(module,exports,__webpack_require__){var cssKeywords=__webpack_require__(5);var reverseKeywords={};for(var key in cssKeywords){if(cssKeywords.hasOwnProperty(key)){reverseKeywords[cssKeywords[key]]=key}}var convert=module.exports={rgb:{channels:3,labels:"rgb"},hsl:{channels:3,labels:"hsl"},hsv:{channels:3,labels:"hsv"},hwb:{channels:3,labels:"hwb"},cmyk:{channels:4,labels:"cmyk"},xyz:{channels:3,labels:"xyz"},lab:{channels:3,labels:"lab"},lch:{channels:3,labels:"lch"},hex:{channels:1,labels:["hex"]},keyword:{channels:1,labels:["keyword"]},ansi16:{channels:1,labels:["ansi16"]},ansi256:{channels:1,labels:["ansi256"]},hcg:{channels:3,labels:["h","c","g"]},apple:{channels:3,labels:["r16","g16","b16"]},gray:{channels:1,labels:["gray"]}};for(var model in convert){if(convert.hasOwnProperty(model)){if(!("channels"in convert[model])){throw new Error("missing channels property: "+model)}if(!("labels"in convert[model])){throw new Error("missing channel labels property: "+model)}if(convert[model].labels.length!==convert[model].channels){throw new Error("channel and label counts mismatch: "+model)}var channels=convert[model].channels;var labels=convert[model].labels;delete convert[model].channels;delete convert[model].labels;Object.defineProperty(convert[model],"channels",{value:channels});Object.defineProperty(convert[model],"labels",{value:labels})}}convert.rgb.hsl=function(rgb){var r=rgb[0]/255;var g=rgb[1]/255;var b=rgb[2]/255;var min=Math.min(r,g,b);var max=Math.max(r,g,b);var delta=max-min;var h;var s;var l;if(max===min){h=0}else if(r===max){h=(g-b)/delta}else if(g===max){h=2+(b-r)/delta}else if(b===max){h=4+(r-g)/delta}h=Math.min(h*60,360);if(h<0){h+=360}l=(min+max)/2;if(max===min){s=0}else if(l<=.5){s=delta/(max+min)}else{s=delta/(2-max-min)}return[h,s*100,l*100]};convert.rgb.hsv=function(rgb){var rdif;var gdif;var bdif;var h;var s;var r=rgb[0]/255;var g=rgb[1]/255;var b=rgb[2]/255;var v=Math.max(r,g,b);var diff=v-Math.min(r,g,b);var diffc=function(c){return(v-c)/6/diff+1/2};if(diff===0){h=s=0}else{s=diff/v;rdif=diffc(r);gdif=diffc(g);bdif=diffc(b);if(r===v){h=bdif-gdif}else if(g===v){h=1/3+rdif-bdif}else if(b===v){h=2/3+gdif-rdif}if(h<0){h+=1}else if(h>1){h-=1}}return[h*360,s*100,v*100]};convert.rgb.hwb=function(rgb){var r=rgb[0];var g=rgb[1];var b=rgb[2];var h=convert.rgb.hsl(rgb)[0];var w=1/255*Math.min(r,Math.min(g,b));b=1-1/255*Math.max(r,Math.max(g,b));return[h,w*100,b*100]};convert.rgb.cmyk=function(rgb){var r=rgb[0]/255;var g=rgb[1]/255;var b=rgb[2]/255;var c;var m;var y;var k;k=Math.min(1-r,1-g,1-b);c=(1-r-k)/(1-k)||0;m=(1-g-k)/(1-k)||0;y=(1-b-k)/(1-k)||0;return[c*100,m*100,y*100,k*100]};function comparativeDistance(x,y){return Math.pow(x[0]-y[0],2)+Math.pow(x[1]-y[1],2)+Math.pow(x[2]-y[2],2)}convert.rgb.keyword=function(rgb){var reversed=reverseKeywords[rgb];if(reversed){return reversed}var currentClosestDistance=Infinity;var currentClosestKeyword;for(var keyword in cssKeywords){if(cssKeywords.hasOwnProperty(keyword)){var value=cssKeywords[keyword];var distance=comparativeDistance(rgb,value);if(distance<currentClosestDistance){currentClosestDistance=distance;currentClosestKeyword=keyword}}}return currentClosestKeyword};convert.keyword.rgb=function(keyword){return cssKeywords[keyword]};convert.rgb.xyz=function(rgb){var r=rgb[0]/255;var g=rgb[1]/255;var b=rgb[2]/255;r=r>.04045?Math.pow((r+.055)/1.055,2.4):r/12.92;g=g>.04045?Math.pow((g+.055)/1.055,2.4):g/12.92;b=b>.04045?Math.pow((b+.055)/1.055,2.4):b/12.92;var x=r*.4124+g*.3576+b*.1805;var y=r*.2126+g*.7152+b*.0722;var z=r*.0193+g*.1192+b*.9505;return[x*100,y*100,z*100]};convert.rgb.lab=function(rgb){var xyz=convert.rgb.xyz(rgb);var x=xyz[0];var y=xyz[1];var z=xyz[2];var l;var a;var b;x/=95.047;y/=100;z/=108.883;x=x>.008856?Math.pow(x,1/3):7.787*x+16/116;y=y>.008856?Math.pow(y,1/3):7.787*y+16/116;z=z>.008856?Math.pow(z,1/3):7.787*z+16/116;l=116*y-16;a=500*(x-y);b=200*(y-z);return[l,a,b]};convert.hsl.rgb=function(hsl){var h=hsl[0]/360;var s=hsl[1]/100;var l=hsl[2]/100;var t1;var t2;var t3;var rgb;var val;if(s===0){val=l*255;return[val,val,val]}if(l<.5){t2=l*(1+s)}else{t2=l+s-l*s}t1=2*l-t2;rgb=[0,0,0];for(var i=0;i<3;i++){t3=h+1/3*-(i-1);if(t3<0){t3++}if(t3>1){t3--}if(6*t3<1){val=t1+(t2-t1)*6*t3}else if(2*t3<1){val=t2}else if(3*t3<2){val=t1+(t2-t1)*(2/3-t3)*6}else{val=t1}rgb[i]=val*255}return rgb};convert.hsl.hsv=function(hsl){var h=hsl[0];var s=hsl[1]/100;var l=hsl[2]/100;var smin=s;var lmin=Math.max(l,.01);var sv;var v;l*=2;s*=l<=1?l:2-l;smin*=lmin<=1?lmin:2-lmin;v=(l+s)/2;sv=l===0?2*smin/(lmin+smin):2*s/(l+s);return[h,sv*100,v*100]};convert.hsv.rgb=function(hsv){var h=hsv[0]/60;var s=hsv[1]/100;var v=hsv[2]/100;var hi=Math.floor(h)%6;var f=h-Math.floor(h);var p=255*v*(1-s);var q=255*v*(1-s*f);var t=255*v*(1-s*(1-f));v*=255;switch(hi){case 0:return[v,t,p];case 1:return[q,v,p];case 2:return[p,v,t];case 3:return[p,q,v];case 4:return[t,p,v];case 5:return[v,p,q]}};convert.hsv.hsl=function(hsv){var h=hsv[0];var s=hsv[1]/100;var v=hsv[2]/100;var vmin=Math.max(v,.01);var lmin;var sl;var l;l=(2-s)*v;lmin=(2-s)*vmin;sl=s*vmin;sl/=lmin<=1?lmin:2-lmin;sl=sl||0;l/=2;return[h,sl*100,l*100]};convert.hwb.rgb=function(hwb){var h=hwb[0]/360;var wh=hwb[1]/100;var bl=hwb[2]/100;var ratio=wh+bl;var i;var v;var f;var n;if(ratio>1){wh/=ratio;bl/=ratio}i=Math.floor(6*h);v=1-bl;f=6*h-i;if((i&1)!==0){f=1-f}n=wh+f*(v-wh);var r;var g;var b;switch(i){default:case 6:case 0:r=v;g=n;b=wh;break;case 1:r=n;g=v;b=wh;break;case 2:r=wh;g=v;b=n;break;case 3:r=wh;g=n;b=v;break;case 4:r=n;g=wh;b=v;break;case 5:r=v;g=wh;b=n;break}return[r*255,g*255,b*255]};convert.cmyk.rgb=function(cmyk){var c=cmyk[0]/100;var m=cmyk[1]/100;var y=cmyk[2]/100;var k=cmyk[3]/100;var r;var g;var b;r=1-Math.min(1,c*(1-k)+k);g=1-Math.min(1,m*(1-k)+k);b=1-Math.min(1,y*(1-k)+k);return[r*255,g*255,b*255]};convert.xyz.rgb=function(xyz){var x=xyz[0]/100;var y=xyz[1]/100;var z=xyz[2]/100;var r;var g;var b;r=x*3.2406+y*-1.5372+z*-.4986;g=x*-.9689+y*1.8758+z*.0415;b=x*.0557+y*-.204+z*1.057;r=r>.0031308?1.055*Math.pow(r,1/2.4)-.055:r*12.92;g=g>.0031308?1.055*Math.pow(g,1/2.4)-.055:g*12.92;b=b>.0031308?1.055*Math.pow(b,1/2.4)-.055:b*12.92;r=Math.min(Math.max(0,r),1);g=Math.min(Math.max(0,g),1);b=Math.min(Math.max(0,b),1);return[r*255,g*255,b*255]};convert.xyz.lab=function(xyz){var x=xyz[0];var y=xyz[1];var z=xyz[2];var l;var a;var b;x/=95.047;y/=100;z/=108.883;x=x>.008856?Math.pow(x,1/3):7.787*x+16/116;y=y>.008856?Math.pow(y,1/3):7.787*y+16/116;z=z>.008856?Math.pow(z,1/3):7.787*z+16/116;l=116*y-16;a=500*(x-y);b=200*(y-z);return[l,a,b]};convert.lab.xyz=function(lab){var l=lab[0];var a=lab[1];var b=lab[2];var x;var y;var z;y=(l+16)/116;x=a/500+y;z=y-b/200;var y2=Math.pow(y,3);var x2=Math.pow(x,3);var z2=Math.pow(z,3);y=y2>.008856?y2:(y-16/116)/7.787;x=x2>.008856?x2:(x-16/116)/7.787;z=z2>.008856?z2:(z-16/116)/7.787;x*=95.047;y*=100;z*=108.883;return[x,y,z]};convert.lab.lch=function(lab){var l=lab[0];var a=lab[1];var b=lab[2];var hr;var h;var c;hr=Math.atan2(b,a);h=hr*360/2/Math.PI;if(h<0){h+=360}c=Math.sqrt(a*a+b*b);return[l,c,h]};convert.lch.lab=function(lch){var l=lch[0];var c=lch[1];var h=lch[2];var a;var b;var hr;hr=h/360*2*Math.PI;a=c*Math.cos(hr);b=c*Math.sin(hr);return[l,a,b]};convert.rgb.ansi16=function(args){var r=args[0];var g=args[1];var b=args[2];var value=1 in arguments?arguments[1]:convert.rgb.hsv(args)[2];value=Math.round(value/50);if(value===0){return 30}var ansi=30+(Math.round(b/255)<<2|Math.round(g/255)<<1|Math.round(r/255));if(value===2){ansi+=60}return ansi};convert.hsv.ansi16=function(args){return convert.rgb.ansi16(convert.hsv.rgb(args),args[2])};convert.rgb.ansi256=function(args){var r=args[0];var g=args[1];var b=args[2];if(r===g&&g===b){if(r<8){return 16}if(r>248){return 231}return Math.round((r-8)/247*24)+232}var ansi=16+36*Math.round(r/255*5)+6*Math.round(g/255*5)+Math.round(b/255*5);return ansi};convert.ansi16.rgb=function(args){var color=args%10;if(color===0||color===7){if(args>50){color+=3.5}color=color/10.5*255;return[color,color,color]}var mult=(~~(args>50)+1)*.5;var r=(color&1)*mult*255;var g=(color>>1&1)*mult*255;var b=(color>>2&1)*mult*255;return[r,g,b]};convert.ansi256.rgb=function(args){if(args>=232){var c=(args-232)*10+8;return[c,c,c]}args-=16;var rem;var r=Math.floor(args/36)/5*255;var g=Math.floor((rem=args%36)/6)/5*255;var b=rem%6/5*255;return[r,g,b]};convert.rgb.hex=function(args){var integer=((Math.round(args[0])&255)<<16)+((Math.round(args[1])&255)<<8)+(Math.round(args[2])&255);var string=integer.toString(16).toUpperCase();return"000000".substring(string.length)+string};convert.hex.rgb=function(args){var match=args.toString(16).match(/[a-f0-9]{6}|[a-f0-9]{3}/i);if(!match){return[0,0,0]}var colorString=match[0];if(match[0].length===3){colorString=colorString.split("").map(function(char){return char+char}).join("")}var integer=parseInt(colorString,16);var r=integer>>16&255;var g=integer>>8&255;var b=integer&255;return[r,g,b]};convert.rgb.hcg=function(rgb){var r=rgb[0]/255;var g=rgb[1]/255;var b=rgb[2]/255;var max=Math.max(Math.max(r,g),b);var min=Math.min(Math.min(r,g),b);var chroma=max-min;var grayscale;var hue;if(chroma<1){grayscale=min/(1-chroma)}else{grayscale=0}if(chroma<=0){hue=0}else if(max===r){hue=(g-b)/chroma%6}else if(max===g){hue=2+(b-r)/chroma}else{hue=4+(r-g)/chroma+4}hue/=6;hue%=1;return[hue*360,chroma*100,grayscale*100]};convert.hsl.hcg=function(hsl){var s=hsl[1]/100;var l=hsl[2]/100;var c=1;var f=0;if(l<.5){c=2*s*l}else{c=2*s*(1-l)}if(c<1){f=(l-.5*c)/(1-c)}return[hsl[0],c*100,f*100]};convert.hsv.hcg=function(hsv){var s=hsv[1]/100;var v=hsv[2]/100;var c=s*v;var f=0;if(c<1){f=(v-c)/(1-c)}return[hsv[0],c*100,f*100]};convert.hcg.rgb=function(hcg){var h=hcg[0]/360;var c=hcg[1]/100;var g=hcg[2]/100;if(c===0){return[g*255,g*255,g*255]}var pure=[0,0,0];var hi=h%1*6;var v=hi%1;var w=1-v;var mg=0;switch(Math.floor(hi)){case 0:pure[0]=1;pure[1]=v;pure[2]=0;break;case 1:pure[0]=w;pure[1]=1;pure[2]=0;break;case 2:pure[0]=0;pure[1]=1;pure[2]=v;break;case 3:pure[0]=0;pure[1]=w;pure[2]=1;break;case 4:pure[0]=v;pure[1]=0;pure[2]=1;break;default:pure[0]=1;pure[1]=0;pure[2]=w}mg=(1-c)*g;return[(c*pure[0]+mg)*255,(c*pure[1]+mg)*255,(c*pure[2]+mg)*255]};convert.hcg.hsv=function(hcg){var c=hcg[1]/100;var g=hcg[2]/100;var v=c+g*(1-c);var f=0;if(v>0){f=c/v}return[hcg[0],f*100,v*100]};convert.hcg.hsl=function(hcg){var c=hcg[1]/100;var g=hcg[2]/100;var l=g*(1-c)+.5*c;var s=0;if(l>0&&l<.5){s=c/(2*l)}else if(l>=.5&&l<1){s=c/(2*(1-l))}return[hcg[0],s*100,l*100]};convert.hcg.hwb=function(hcg){var c=hcg[1]/100;var g=hcg[2]/100;var v=c+g*(1-c);return[hcg[0],(v-c)*100,(1-v)*100]};convert.hwb.hcg=function(hwb){var w=hwb[1]/100;var b=hwb[2]/100;var v=1-b;var c=v-w;var g=0;if(c<1){g=(v-c)/(1-c)}return[hwb[0],c*100,g*100]};convert.apple.rgb=function(apple){return[apple[0]/65535*255,apple[1]/65535*255,apple[2]/65535*255]};convert.rgb.apple=function(rgb){return[rgb[0]/255*65535,rgb[1]/255*65535,rgb[2]/255*65535]};convert.gray.rgb=function(args){return[args[0]/100*255,args[0]/100*255,args[0]/100*255]};convert.gray.hsl=convert.gray.hsv=function(args){return[0,0,args[0]]};convert.gray.hwb=function(gray){return[0,100,gray[0]]};convert.gray.cmyk=function(gray){return[0,0,0,gray[0]]};convert.gray.lab=function(gray){return[gray[0],0,0]};convert.gray.hex=function(gray){var val=Math.round(gray[0]/100*255)&255;var integer=(val<<16)+(val<<8)+val;var string=integer.toString(16).toUpperCase();return"000000".substring(string.length)+string};convert.rgb.gray=function(rgb){var val=(rgb[0]+rgb[1]+rgb[2])/3;return[val/255*100]}},function(module,exports,__webpack_require__){"use strict";var _typeof=typeof Symbol==="function"&&typeof Symbol.iterator==="symbol"?function(obj){return typeof obj}:function(obj){return obj&&typeof Symbol==="function"&&obj.constructor===Symbol&&obj!==Symbol.prototype?"symbol":typeof obj};var _Colorpicker=__webpack_require__(8);var _Colorpicker2=_interopRequireDefault(_Colorpicker);var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}var plugin="colorpicker";_jquery2.default[plugin]=_Colorpicker2.default;_jquery2.default.fn[plugin]=function(option){var fnArgs=Array.prototype.slice.call(arguments,1),isSingleElement=this.length===1,returnValue=null;var $elements=this.each(function(){var $this=(0,_jquery2.default)(this),inst=$this.data(plugin),options=(typeof option==="undefined"?"undefined":_typeof(option))==="object"?option:{};if(!inst){inst=new _Colorpicker2.default(this,options);$this.data(plugin,inst)}if(!isSingleElement){return}returnValue=$this;if(typeof option==="string"){if(option==="colorpicker"){returnValue=inst}else if(_jquery2.default.isFunction(inst[option])){returnValue=inst[option].apply(inst,fnArgs)}else{returnValue=inst[option]}}});return isSingleElement?returnValue:$elements};_jquery2.default.fn[plugin].constructor=_Colorpicker2.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _Extension=__webpack_require__(1);var _Extension2=_interopRequireDefault(_Extension);var _options=__webpack_require__(3);var _options2=_interopRequireDefault(_options);var _extensions=__webpack_require__(9);var _extensions2=_interopRequireDefault(_extensions);var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);var _SliderHandler=__webpack_require__(13);var _SliderHandler2=_interopRequireDefault(_SliderHandler);var _PopupHandler=__webpack_require__(14);var _PopupHandler2=_interopRequireDefault(_PopupHandler);var _InputHandler=__webpack_require__(15);var _InputHandler2=_interopRequireDefault(_InputHandler);var _ColorHandler=__webpack_require__(22);var _ColorHandler2=_interopRequireDefault(_ColorHandler);var _PickerHandler=__webpack_require__(23);var _PickerHandler2=_interopRequireDefault(_PickerHandler);var _AddonHandler=__webpack_require__(24);var _AddonHandler2=_interopRequireDefault(_AddonHandler);var _ColorItem=__webpack_require__(2);var _ColorItem2=_interopRequireDefault(_ColorItem);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var colorPickerIdCounter=0;var root=typeof self!=="undefined"?self:undefined;var Colorpicker=function(){_createClass(Colorpicker,[{key:"color",get:function get(){return this.colorHandler.color}},{key:"format",get:function get(){return this.colorHandler.format}},{key:"picker",get:function get(){return this.pickerHandler.picker}}],[{key:"Color",get:function get(){return _ColorItem2.default}},{key:"Extension",get:function get(){return _Extension2.default}}]);function Colorpicker(element,options){_classCallCheck(this,Colorpicker);colorPickerIdCounter+=1;this.id=colorPickerIdCounter;this.lastEvent={alias:null,e:null};this.element=(0,_jquery2.default)(element).addClass("colorpicker-element").attr("data-colorpicker-id",this.id);this.options=_jquery2.default.extend(true,{},_options2.default,options,this.element.data());this.disabled=false;this.extensions=[];this.container=this.options.container===true||this.options.container!==true&&this.options.inline===true?this.element:this.options.container;this.container=this.container!==false?(0,_jquery2.default)(this.container):false;this.inputHandler=new _InputHandler2.default(this);this.colorHandler=new _ColorHandler2.default(this);this.sliderHandler=new _SliderHandler2.default(this);this.popupHandler=new _PopupHandler2.default(this,root);this.pickerHandler=new _PickerHandler2.default(this);this.addonHandler=new _AddonHandler2.default(this);this.init();(0,_jquery2.default)(_jquery2.default.proxy(function(){this.trigger("colorpickerCreate")},this))}_createClass(Colorpicker,[{key:"init",value:function init(){this.addonHandler.bind();this.inputHandler.bind();this.initExtensions();this.colorHandler.bind();this.pickerHandler.bind();this.sliderHandler.bind();this.popupHandler.bind();this.pickerHandler.attach();this.update();if(this.inputHandler.isDisabled()){this.disable()}}},{key:"initExtensions",value:function initExtensions(){var _this=this;if(!Array.isArray(this.options.extensions)){this.options.extensions=[]}if(this.options.debug){this.options.extensions.push({name:"debugger"})}this.options.extensions.forEach(function(ext){_this.registerExtension(Colorpicker.extensions[ext.name.toLowerCase()],ext.options||{})})}},{key:"registerExtension",value:function registerExtension(ExtensionClass){var config=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};var ext=new ExtensionClass(this,config);this.extensions.push(ext);return ext}},{key:"destroy",value:function destroy(){var color=this.color;this.sliderHandler.unbind();this.inputHandler.unbind();this.popupHandler.unbind();this.colorHandler.unbind();this.addonHandler.unbind();this.pickerHandler.unbind();this.element.removeClass("colorpicker-element").removeData("colorpicker","color").off(".colorpicker");this.trigger("colorpickerDestroy",color)}},{key:"show",value:function show(e){this.popupHandler.show(e)}},{key:"hide",value:function hide(e){this.popupHandler.hide(e)}},{key:"toggle",value:function toggle(e){this.popupHandler.toggle(e)}},{key:"getValue",value:function getValue(){var defaultValue=arguments.length>0&&arguments[0]!==undefined?arguments[0]:null;var val=this.colorHandler.color;val=val instanceof _ColorItem2.default?val:defaultValue;if(val instanceof _ColorItem2.default){return val.string(this.format)}return val}},{key:"setValue",value:function setValue(val){if(this.isDisabled()){return}var ch=this.colorHandler;if(ch.hasColor()&&!!val&&ch.color.equals(val)||!ch.hasColor()&&!val){return}ch.color=val?ch.createColor(val,this.options.autoInputFallback):null;this.trigger("colorpickerChange",ch.color,val);this.update()}},{key:"update",value:function update(){if(this.colorHandler.hasColor()){this.inputHandler.update()}else{this.colorHandler.assureColor()}this.addonHandler.update();this.pickerHandler.update();this.trigger("colorpickerUpdate")}},{key:"enable",value:function enable(){this.inputHandler.enable();this.disabled=false;this.picker.removeClass("colorpicker-disabled");this.trigger("colorpickerEnable");return true}},{key:"disable",value:function disable(){this.inputHandler.disable();this.disabled=true;this.picker.addClass("colorpicker-disabled");this.trigger("colorpickerDisable");return true}},{key:"isEnabled",value:function isEnabled(){return!this.isDisabled()}},{key:"isDisabled",value:function isDisabled(){return this.disabled===true}},{key:"trigger",value:function trigger(eventName){var color=arguments.length>1&&arguments[1]!==undefined?arguments[1]:null;var value=arguments.length>2&&arguments[2]!==undefined?arguments[2]:null;this.element.trigger({type:eventName,colorpicker:this,color:color?color:this.color,value:value?value:this.getValue()})}}]);return Colorpicker}();Colorpicker.extensions=_extensions2.default;exports.default=Colorpicker;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});exports.Palette=exports.Swatches=exports.Preview=exports.Debugger=undefined;var _Debugger=__webpack_require__(10);var _Debugger2=_interopRequireDefault(_Debugger);var _Preview=__webpack_require__(11);var _Preview2=_interopRequireDefault(_Preview);var _Swatches=__webpack_require__(12);var _Swatches2=_interopRequireDefault(_Swatches);var _Palette=__webpack_require__(4);var _Palette2=_interopRequireDefault(_Palette);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}exports.Debugger=_Debugger2.default;exports.Preview=_Preview2.default;exports.Swatches=_Swatches2.default;exports.Palette=_Palette2.default;exports.default={debugger:_Debugger2.default,preview:_Preview2.default,swatches:_Swatches2.default,palette:_Palette2.default}},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _get=function get(object,property,receiver){if(object===null)object=Function.prototype;var desc=Object.getOwnPropertyDescriptor(object,property);if(desc===undefined){var parent=Object.getPrototypeOf(object);if(parent===null){return undefined}else{return get(parent,property,receiver)}}else if("value"in desc){return desc.value}else{var getter=desc.get;if(getter===undefined){return undefined}return getter.call(receiver)}};var _Extension2=__webpack_require__(1);var _Extension3=_interopRequireDefault(_Extension2);var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}function _possibleConstructorReturn(self,call){if(!self){throw new ReferenceError("this hasn't been initialised - super() hasn't been called")}return call&&(typeof call==="object"||typeof call==="function")?call:self}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function, not "+typeof superClass)}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__=superClass}var Debugger=function(_Extension){_inherits(Debugger,_Extension);function Debugger(colorpicker){var options=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};_classCallCheck(this,Debugger);var _this=_possibleConstructorReturn(this,(Debugger.__proto__||Object.getPrototypeOf(Debugger)).call(this,colorpicker,options));_this.eventCounter=0;if(_this.colorpicker.inputHandler.hasInput()){_this.colorpicker.inputHandler.input.on("change.colorpicker-ext",_jquery2.default.proxy(_this.onChangeInput,_this))}return _this}_createClass(Debugger,[{key:"log",value:function log(eventName){var _console;for(var _len=arguments.length,args=Array(_len>1?_len-1:0),_key=1;_key<_len;_key++){args[_key-1]=arguments[_key]}this.eventCounter+=1;var logMessage="#"+this.eventCounter+": Colorpicker#"+this.colorpicker.id+" ["+eventName+"]";(_console=console).debug.apply(_console,[logMessage].concat(args));this.colorpicker.element.trigger({type:"colorpickerDebug",colorpicker:this.colorpicker,color:this.color,value:null,debug:{debugger:this,eventName,logArgs:args,logMessage}})}},{key:"resolveColor",value:function resolveColor(color){var realColor=arguments.length>1&&arguments[1]!==undefined?arguments[1]:true;this.log("resolveColor()",color,realColor);return false}},{key:"onCreate",value:function onCreate(event){this.log("colorpickerCreate");return _get(Debugger.prototype.__proto__||Object.getPrototypeOf(Debugger.prototype),"onCreate",this).call(this,event)}},{key:"onDestroy",value:function onDestroy(event){this.log("colorpickerDestroy");this.eventCounter=0;if(this.colorpicker.inputHandler.hasInput()){this.colorpicker.inputHandler.input.off(".colorpicker-ext")}return _get(Debugger.prototype.__proto__||Object.getPrototypeOf(Debugger.prototype),"onDestroy",this).call(this,event)}},{key:"onUpdate",value:function onUpdate(event){this.log("colorpickerUpdate")}},{key:"onChangeInput",value:function onChangeInput(event){this.log("input:change.colorpicker",event.value,event.color)}},{key:"onChange",value:function onChange(event){this.log("colorpickerChange",event.value,event.color)}},{key:"onInvalid",value:function onInvalid(event){this.log("colorpickerInvalid",event.value,event.color)}},{key:"onHide",value:function onHide(event){this.log("colorpickerHide");this.eventCounter=0}},{key:"onShow",value:function onShow(event){this.log("colorpickerShow")}},{key:"onDisable",value:function onDisable(event){this.log("colorpickerDisable")}},{key:"onEnable",value:function onEnable(event){this.log("colorpickerEnable")}}]);return Debugger}(_Extension3.default);exports.default=Debugger;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _get=function get(object,property,receiver){if(object===null)object=Function.prototype;var desc=Object.getOwnPropertyDescriptor(object,property);if(desc===undefined){var parent=Object.getPrototypeOf(object);if(parent===null){return undefined}else{return get(parent,property,receiver)}}else if("value"in desc){return desc.value}else{var getter=desc.get;if(getter===undefined){return undefined}return getter.call(receiver)}};var _Extension2=__webpack_require__(1);var _Extension3=_interopRequireDefault(_Extension2);var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}function _possibleConstructorReturn(self,call){if(!self){throw new ReferenceError("this hasn't been initialised - super() hasn't been called")}return call&&(typeof call==="object"||typeof call==="function")?call:self}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function, not "+typeof superClass)}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__=superClass}var Preview=function(_Extension){_inherits(Preview,_Extension);function Preview(colorpicker){var options=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};_classCallCheck(this,Preview);var _this=_possibleConstructorReturn(this,(Preview.__proto__||Object.getPrototypeOf(Preview)).call(this,colorpicker,_jquery2.default.extend(true,{},{template:'<div class="colorpicker-bar colorpicker-preview"><div /></div>',showText:true,format:colorpicker.format},options)));_this.element=(0,_jquery2.default)(_this.options.template);_this.elementInner=_this.element.find("div");return _this}_createClass(Preview,[{key:"onCreate",value:function onCreate(event){_get(Preview.prototype.__proto__||Object.getPrototypeOf(Preview.prototype),"onCreate",this).call(this,event);this.colorpicker.picker.append(this.element)}},{key:"onUpdate",value:function onUpdate(event){_get(Preview.prototype.__proto__||Object.getPrototypeOf(Preview.prototype),"onUpdate",this).call(this,event);if(!event.color){this.elementInner.css("backgroundColor",null).css("color",null).html("");return}this.elementInner.css("backgroundColor",event.color.toRgbString());if(this.options.showText){this.elementInner.html(event.color.string(this.options.format||this.colorpicker.format));if(event.color.isDark()&&event.color.alpha>.5){this.elementInner.css("color","white")}else{this.elementInner.css("color","black")}}}}]);return Preview}(_Extension3.default);exports.default=Preview;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _get=function get(object,property,receiver){if(object===null)object=Function.prototype;var desc=Object.getOwnPropertyDescriptor(object,property);if(desc===undefined){var parent=Object.getPrototypeOf(object);if(parent===null){return undefined}else{return get(parent,property,receiver)}}else if("value"in desc){return desc.value}else{var getter=desc.get;if(getter===undefined){return undefined}return getter.call(receiver)}};var _Palette2=__webpack_require__(4);var _Palette3=_interopRequireDefault(_Palette2);var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}function _possibleConstructorReturn(self,call){if(!self){throw new ReferenceError("this hasn't been initialised - super() hasn't been called")}return call&&(typeof call==="object"||typeof call==="function")?call:self}function _inherits(subClass,superClass){if(typeof superClass!=="function"&&superClass!==null){throw new TypeError("Super expression must either be null or a function, not "+typeof superClass)}subClass.prototype=Object.create(superClass&&superClass.prototype,{constructor:{value:subClass,enumerable:false,writable:true,configurable:true}});if(superClass)Object.setPrototypeOf?Object.setPrototypeOf(subClass,superClass):subClass.__proto__=superClass}var defaults={barTemplate:'<div class="colorpicker-bar colorpicker-swatches">\n                    <div class="colorpicker-swatches--inner"></div>\n                </div>',swatchTemplate:'<i class="colorpicker-swatch"><i class="colorpicker-swatch--inner"></i></i>'};var Swatches=function(_Palette){_inherits(Swatches,_Palette);function Swatches(colorpicker){var options=arguments.length>1&&arguments[1]!==undefined?arguments[1]:{};_classCallCheck(this,Swatches);var _this=_possibleConstructorReturn(this,(Swatches.__proto__||Object.getPrototypeOf(Swatches)).call(this,colorpicker,_jquery2.default.extend(true,{},defaults,options)));_this.element=null;return _this}_createClass(Swatches,[{key:"isEnabled",value:function isEnabled(){return this.getLength()>0}},{key:"onCreate",value:function onCreate(event){_get(Swatches.prototype.__proto__||Object.getPrototypeOf(Swatches.prototype),"onCreate",this).call(this,event);if(!this.isEnabled()){return}this.element=(0,_jquery2.default)(this.options.barTemplate);this.load();this.colorpicker.picker.append(this.element)}},{key:"load",value:function load(){var _this2=this;var colorpicker=this.colorpicker,swatchContainer=this.element.find(".colorpicker-swatches--inner"),isAliased=this.options.namesAsValues===true&&!Array.isArray(this.colors);swatchContainer.empty();_jquery2.default.each(this.colors,function(name,value){var $swatch=(0,_jquery2.default)(_this2.options.swatchTemplate).attr("data-name",name).attr("data-value",value).attr("title",isAliased?name+": "+value:value).on("mousedown.colorpicker touchstart.colorpicker",function(e){var $sw=(0,_jquery2.default)(this);colorpicker.setValue(isAliased?$sw.attr("data-name"):$sw.attr("data-value"))});$swatch.find(".colorpicker-swatch--inner").css("background-color",value);swatchContainer.append($swatch)});swatchContainer.append((0,_jquery2.default)('<i class="colorpicker-clear"></i>'))}}]);return Swatches}(_Palette3.default);exports.default=Swatches;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var SliderHandler=function(){function SliderHandler(colorpicker){_classCallCheck(this,SliderHandler);this.colorpicker=colorpicker;this.currentSlider=null;this.mousePointer={left:0,top:0};this.onMove=_jquery2.default.proxy(this.defaultOnMove,this)}_createClass(SliderHandler,[{key:"defaultOnMove",value:function defaultOnMove(top,left){if(!this.currentSlider){return}var slider=this.currentSlider,cp=this.colorpicker,ch=cp.colorHandler;var color=!ch.hasColor()?ch.getFallbackColor():ch.color.getClone();slider.guideStyle.left=left+"px";slider.guideStyle.top=top+"px";if(slider.callLeft){color[slider.callLeft](left/slider.maxLeft)}if(slider.callTop){color[slider.callTop](top/slider.maxTop)}cp.setValue(color);cp.popupHandler.focus()}},{key:"bind",value:function bind(){var sliders=this.colorpicker.options.horizontal?this.colorpicker.options.slidersHorz:this.colorpicker.options.sliders;var sliderClasses=[];for(var sliderName in sliders){if(!sliders.hasOwnProperty(sliderName)){continue}sliderClasses.push(sliders[sliderName].selector)}this.colorpicker.picker.find(sliderClasses.join(", ")).on("mousedown.colorpicker touchstart.colorpicker",_jquery2.default.proxy(this.pressed,this))}},{key:"unbind",value:function unbind(){(0,_jquery2.default)(this.colorpicker.picker).off({"mousemove.colorpicker":_jquery2.default.proxy(this.moved,this),"touchmove.colorpicker":_jquery2.default.proxy(this.moved,this),"mouseup.colorpicker":_jquery2.default.proxy(this.released,this),"touchend.colorpicker":_jquery2.default.proxy(this.released,this)})}},{key:"pressed",value:function pressed(e){if(this.colorpicker.isDisabled()){return}this.colorpicker.lastEvent.alias="pressed";this.colorpicker.lastEvent.e=e;if(!e.pageX&&!e.pageY&&e.originalEvent&&e.originalEvent.touches){e.pageX=e.originalEvent.touches[0].pageX;e.pageY=e.originalEvent.touches[0].pageY}var target=(0,_jquery2.default)(e.target);var zone=target.closest("div");var sliders=this.colorpicker.options.horizontal?this.colorpicker.options.slidersHorz:this.colorpicker.options.sliders;if(zone.is(".colorpicker")){return}this.currentSlider=null;for(var sliderName in sliders){if(!sliders.hasOwnProperty(sliderName)){continue}var slider=sliders[sliderName];if(zone.is(slider.selector)){this.currentSlider=_jquery2.default.extend({},slider,{name:sliderName});break}else if(slider.childSelector!==undefined&&zone.is(slider.childSelector)){this.currentSlider=_jquery2.default.extend({},slider,{name:sliderName});zone=zone.parent();break}}var guide=zone.find(".colorpicker-guide").get(0);if(this.currentSlider===null||guide===null){return}var offset=zone.offset();this.currentSlider.guideStyle=guide.style;this.currentSlider.left=e.pageX-offset.left;this.currentSlider.top=e.pageY-offset.top;this.mousePointer={left:e.pageX,top:e.pageY};(0,_jquery2.default)(this.colorpicker.picker).on({"mousemove.colorpicker":_jquery2.default.proxy(this.moved,this),"touchmove.colorpicker":_jquery2.default.proxy(this.moved,this),"mouseup.colorpicker":_jquery2.default.proxy(this.released,this),"touchend.colorpicker":_jquery2.default.proxy(this.released,this)}).trigger("mousemove")}},{key:"moved",value:function moved(e){this.colorpicker.lastEvent.alias="moved";this.colorpicker.lastEvent.e=e;if(!e.pageX&&!e.pageY&&e.originalEvent&&e.originalEvent.touches){e.pageX=e.originalEvent.touches[0].pageX;e.pageY=e.originalEvent.touches[0].pageY}e.preventDefault();var left=Math.max(0,Math.min(this.currentSlider.maxLeft,this.currentSlider.left+((e.pageX||this.mousePointer.left)-this.mousePointer.left)));var top=Math.max(0,Math.min(this.currentSlider.maxTop,this.currentSlider.top+((e.pageY||this.mousePointer.top)-this.mousePointer.top)));this.onMove(top,left)}},{key:"released",value:function released(e){this.colorpicker.lastEvent.alias="released";this.colorpicker.lastEvent.e=e;(0,_jquery2.default)(this.colorpicker.picker).off({"mousemove.colorpicker":this.moved,"touchmove.colorpicker":this.moved,"mouseup.colorpicker":this.released,"touchend.colorpicker":this.released})}}]);return SliderHandler}();exports.default=SliderHandler;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);var _options=__webpack_require__(3);var _options2=_interopRequireDefault(_options);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var PopupHandler=function(){function PopupHandler(colorpicker,root){_classCallCheck(this,PopupHandler);this.root=root;this.colorpicker=colorpicker;this.popoverTarget=null;this.popoverTip=null;this.clicking=false;this.hidding=false;this.showing=false}_createClass(PopupHandler,[{key:"bind",value:function bind(){var cp=this.colorpicker;if(cp.options.inline){cp.picker.addClass("colorpicker-inline colorpicker-visible");return}cp.picker.addClass("colorpicker-popup colorpicker-hidden");if(!this.hasInput&&!this.hasAddon){return}if(cp.options.popover){this.createPopover()}if(this.hasAddon){if(!this.addon.attr("tabindex")){this.addon.attr("tabindex",0)}this.addon.on({"mousedown.colorpicker touchstart.colorpicker":_jquery2.default.proxy(this.toggle,this)});this.addon.on({"focus.colorpicker":_jquery2.default.proxy(this.show,this)});this.addon.on({"focusout.colorpicker":_jquery2.default.proxy(this.hide,this)})}if(this.hasInput&&!this.hasAddon){this.input.on({"mousedown.colorpicker touchstart.colorpicker":_jquery2.default.proxy(this.show,this),"focus.colorpicker":_jquery2.default.proxy(this.show,this)});this.input.on({"focusout.colorpicker":_jquery2.default.proxy(this.hide,this)})}(0,_jquery2.default)(this.root).on("resize.colorpicker",_jquery2.default.proxy(this.reposition,this))}},{key:"unbind",value:function unbind(){if(this.hasInput){this.input.off({"mousedown.colorpicker touchstart.colorpicker":_jquery2.default.proxy(this.show,this),"focus.colorpicker":_jquery2.default.proxy(this.show,this)});this.input.off({"focusout.colorpicker":_jquery2.default.proxy(this.hide,this)})}if(this.hasAddon){this.addon.off({"mousedown.colorpicker touchstart.colorpicker":_jquery2.default.proxy(this.toggle,this)});this.addon.off({"focus.colorpicker":_jquery2.default.proxy(this.show,this)});this.addon.off({"focusout.colorpicker":_jquery2.default.proxy(this.hide,this)})}if(this.popoverTarget){this.popoverTarget.popover("dispose")}(0,_jquery2.default)(this.root).off("resize.colorpicker",_jquery2.default.proxy(this.reposition,this));(0,_jquery2.default)(this.root.document).off("mousedown.colorpicker touchstart.colorpicker",_jquery2.default.proxy(this.hide,this));(0,_jquery2.default)(this.root.document).off("mousedown.colorpicker touchstart.colorpicker",_jquery2.default.proxy(this.onClickingInside,this))}},{key:"isClickingInside",value:function isClickingInside(e){if(!e){return false}return this.isOrIsInside(this.popoverTip,e.currentTarget)||this.isOrIsInside(this.popoverTip,e.target)||this.isOrIsInside(this.colorpicker.picker,e.currentTarget)||this.isOrIsInside(this.colorpicker.picker,e.target)}},{key:"isOrIsInside",value:function isOrIsInside(container,element){if(!container||!element){return false}element=(0,_jquery2.default)(element);return element.is(container)||container.find(element).length>0}},{key:"onClickingInside",value:function onClickingInside(e){this.clicking=this.isClickingInside(e)}},{key:"createPopover",value:function createPopover(){var cp=this.colorpicker;this.popoverTarget=this.hasAddon?this.addon:this.input;cp.picker.addClass("colorpicker-bs-popover-content");this.popoverTarget.popover(_jquery2.default.extend(true,{},_options2.default.popover,cp.options.popover,{trigger:"manual",content:cp.picker,html:true}));this.popoverTip=(0,_jquery2.default)(this.popoverTarget.popover("getTipElement").data("bs.popover").tip);this.popoverTip.addClass("colorpicker-bs-popover");this.popoverTarget.on("shown.bs.popover",_jquery2.default.proxy(this.fireShow,this));this.popoverTarget.on("hidden.bs.popover",_jquery2.default.proxy(this.fireHide,this))}},{key:"reposition",value:function reposition(e){if(this.popoverTarget&&this.isVisible()){this.popoverTarget.popover("update")}}},{key:"toggle",value:function toggle(e){if(this.isVisible()){this.hide(e)}else{this.show(e)}}},{key:"show",value:function show(e){if(this.isVisible()||this.showing||this.hidding){return}this.showing=true;this.hidding=false;this.clicking=false;var cp=this.colorpicker;cp.lastEvent.alias="show";cp.lastEvent.e=e;if(e&&(!this.hasInput||this.input.attr("type")==="color")&&e&&e.preventDefault){e.stopPropagation();e.preventDefault()}if(this.isPopover){(0,_jquery2.default)(this.root).on("resize.colorpicker",_jquery2.default.proxy(this.reposition,this))}cp.picker.addClass("colorpicker-visible").removeClass("colorpicker-hidden");if(this.popoverTarget){this.popoverTarget.popover("show")}else{this.fireShow()}}},{key:"fireShow",value:function fireShow(){this.hidding=false;this.showing=false;if(this.isPopover){(0,_jquery2.default)(this.root.document).on("mousedown.colorpicker touchstart.colorpicker",_jquery2.default.proxy(this.hide,this));(0,_jquery2.default)(this.root.document).on("mousedown.colorpicker touchstart.colorpicker",_jquery2.default.proxy(this.onClickingInside,this))}this.colorpicker.trigger("colorpickerShow")}},{key:"hide",value:function hide(e){if(this.isHidden()||this.showing||this.hidding){return}var cp=this.colorpicker,clicking=this.clicking||this.isClickingInside(e);this.hidding=true;this.showing=false;this.clicking=false;cp.lastEvent.alias="hide";cp.lastEvent.e=e;if(clicking){this.hidding=false;return}if(this.popoverTarget){this.popoverTarget.popover("hide")}else{this.fireHide()}}},{key:"fireHide",value:function fireHide(){this.hidding=false;this.showing=false;var cp=this.colorpicker;cp.picker.addClass("colorpicker-hidden").removeClass("colorpicker-visible");(0,_jquery2.default)(this.root).off("resize.colorpicker",_jquery2.default.proxy(this.reposition,this));(0,_jquery2.default)(this.root.document).off("mousedown.colorpicker touchstart.colorpicker",_jquery2.default.proxy(this.hide,this));(0,_jquery2.default)(this.root.document).off("mousedown.colorpicker touchstart.colorpicker",_jquery2.default.proxy(this.onClickingInside,this));cp.trigger("colorpickerHide")}},{key:"focus",value:function focus(){if(this.hasAddon){return this.addon.focus()}if(this.hasInput){return this.input.focus()}return false}},{key:"isVisible",value:function isVisible(){return this.colorpicker.picker.hasClass("colorpicker-visible")&&!this.colorpicker.picker.hasClass("colorpicker-hidden")}},{key:"isHidden",value:function isHidden(){return this.colorpicker.picker.hasClass("colorpicker-hidden")&&!this.colorpicker.picker.hasClass("colorpicker-visible")}},{key:"input",get:function get(){return this.colorpicker.inputHandler.input}},{key:"hasInput",get:function get(){return this.colorpicker.inputHandler.hasInput()}},{key:"addon",get:function get(){return this.colorpicker.addonHandler.addon}},{key:"hasAddon",get:function get(){return this.colorpicker.addonHandler.hasAddon()}},{key:"isPopover",get:function get(){return!this.colorpicker.options.inline&&!!this.popoverTip}}]);return PopupHandler}();exports.default=PopupHandler;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);var _ColorItem=__webpack_require__(2);var _ColorItem2=_interopRequireDefault(_ColorItem);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var InputHandler=function(){function InputHandler(colorpicker){_classCallCheck(this,InputHandler);this.colorpicker=colorpicker;this.input=this.colorpicker.element.is("input")?this.colorpicker.element:this.colorpicker.options.input?this.colorpicker.element.find(this.colorpicker.options.input):false;if(this.input&&this.input.length===0){this.input=false}this._initValue()}_createClass(InputHandler,[{key:"bind",value:function bind(){if(!this.hasInput()){return}this.input.on({"keyup.colorpicker":_jquery2.default.proxy(this.onkeyup,this)});this.input.on({"change.colorpicker":_jquery2.default.proxy(this.onchange,this)})}},{key:"unbind",value:function unbind(){if(!this.hasInput()){return}this.input.off(".colorpicker")}},{key:"_initValue",value:function _initValue(){if(!this.hasInput()){return}var val="";[this.input.val(),this.input.data("color"),this.input.attr("data-color")].map(function(item){if(item&&val===""){val=item}});if(val instanceof _ColorItem2.default){val=this.getFormattedColor(val.string(this.colorpicker.format))}else if(!(typeof val==="string"||val instanceof String)){val=""}this.input.prop("value",val)}},{key:"getValue",value:function getValue(){if(!this.hasInput()){return false}return this.input.val()}},{key:"setValue",value:function setValue(val){if(!this.hasInput()){return}var inputVal=this.input.prop("value");val=val?val:"";if(val===(inputVal?inputVal:"")){return}this.input.prop("value",val);this.input.trigger({type:"change",colorpicker:this.colorpicker,color:this.colorpicker.color,value:val})}},{key:"getFormattedColor",value:function getFormattedColor(){var val=arguments.length>0&&arguments[0]!==undefined?arguments[0]:null;val=val?val:this.colorpicker.colorHandler.getColorString();if(!val){return""}val=this.colorpicker.colorHandler.resolveColorDelegate(val,false);if(this.colorpicker.options.useHashPrefix===false){val=val.replace(/^#/g,"")}return val}},{key:"hasInput",value:function hasInput(){return this.input!==false}},{key:"isEnabled",value:function isEnabled(){return this.hasInput()&&!this.isDisabled()}},{key:"isDisabled",value:function isDisabled(){return this.hasInput()&&this.input.prop("disabled")===true}},{key:"disable",value:function disable(){if(this.hasInput()){this.input.prop("disabled",true)}}},{key:"enable",value:function enable(){if(this.hasInput()){this.input.prop("disabled",false)}}},{key:"update",value:function update(){if(!this.hasInput()){return}if(this.colorpicker.options.autoInputFallback===false&&this.colorpicker.colorHandler.isInvalidColor()){return}this.setValue(this.getFormattedColor())}},{key:"onchange",value:function onchange(e){this.colorpicker.lastEvent.alias="input.change";this.colorpicker.lastEvent.e=e;var val=this.getValue();if(val!==e.value){this.colorpicker.setValue(val)}}},{key:"onkeyup",value:function onkeyup(e){this.colorpicker.lastEvent.alias="input.keyup";this.colorpicker.lastEvent.e=e;var val=this.getValue();if(val!==e.value){this.colorpicker.setValue(val)}}}]);return InputHandler}();exports.default=InputHandler;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";var colorString=__webpack_require__(17);var convert=__webpack_require__(20);var _slice=[].slice;var skippedModels=["keyword","gray","hex"];var hashedModelKeys={};Object.keys(convert).forEach(function(model){hashedModelKeys[_slice.call(convert[model].labels).sort().join("")]=model});var limiters={};function Color(obj,model){if(!(this instanceof Color)){return new Color(obj,model)}if(model&&model in skippedModels){model=null}if(model&&!(model in convert)){throw new Error("Unknown model: "+model)}var i;var channels;if(obj==null){this.model="rgb";this.color=[0,0,0];this.valpha=1}else if(obj instanceof Color){this.model=obj.model;this.color=obj.color.slice();this.valpha=obj.valpha}else if(typeof obj==="string"){var result=colorString.get(obj);if(result===null){throw new Error("Unable to parse color from string: "+obj)}this.model=result.model;channels=convert[this.model].channels;this.color=result.value.slice(0,channels);this.valpha=typeof result.value[channels]==="number"?result.value[channels]:1}else if(obj.length){this.model=model||"rgb";channels=convert[this.model].channels;var newArr=_slice.call(obj,0,channels);this.color=zeroArray(newArr,channels);this.valpha=typeof obj[channels]==="number"?obj[channels]:1}else if(typeof obj==="number"){obj&=16777215;this.model="rgb";this.color=[obj>>16&255,obj>>8&255,obj&255];this.valpha=1}else{this.valpha=1;var keys=Object.keys(obj);if("alpha"in obj){keys.splice(keys.indexOf("alpha"),1);this.valpha=typeof obj.alpha==="number"?obj.alpha:0}var hashedKeys=keys.sort().join("");if(!(hashedKeys in hashedModelKeys)){throw new Error("Unable to parse color from object: "+JSON.stringify(obj))}this.model=hashedModelKeys[hashedKeys];var labels=convert[this.model].labels;var color=[];for(i=0;i<labels.length;i++){color.push(obj[labels[i]])}this.color=zeroArray(color)}if(limiters[this.model]){channels=convert[this.model].channels;for(i=0;i<channels;i++){var limit=limiters[this.model][i];if(limit){this.color[i]=limit(this.color[i])}}}this.valpha=Math.max(0,Math.min(1,this.valpha));if(Object.freeze){Object.freeze(this)}}Color.prototype={toString:function(){return this.string()},toJSON:function(){return this[this.model]()},string:function(places){var self=this.model in colorString.to?this:this.rgb();self=self.round(typeof places==="number"?places:1);var args=self.valpha===1?self.color:self.color.concat(this.valpha);return colorString.to[self.model](args)},percentString:function(places){var self=this.rgb().round(typeof places==="number"?places:1);var args=self.valpha===1?self.color:self.color.concat(this.valpha);return colorString.to.rgb.percent(args)},array:function(){return this.valpha===1?this.color.slice():this.color.concat(this.valpha)},object:function(){var result={};var channels=convert[this.model].channels;var labels=convert[this.model].labels;for(var i=0;i<channels;i++){result[labels[i]]=this.color[i]}if(this.valpha!==1){result.alpha=this.valpha}return result},unitArray:function(){var rgb=this.rgb().color;rgb[0]/=255;rgb[1]/=255;rgb[2]/=255;if(this.valpha!==1){rgb.push(this.valpha)}return rgb},unitObject:function(){var rgb=this.rgb().object();rgb.r/=255;rgb.g/=255;rgb.b/=255;if(this.valpha!==1){rgb.alpha=this.valpha}return rgb},round:function(places){places=Math.max(places||0,0);return new Color(this.color.map(roundToPlace(places)).concat(this.valpha),this.model)},alpha:function(val){if(arguments.length){return new Color(this.color.concat(Math.max(0,Math.min(1,val))),this.model)}return this.valpha},red:getset("rgb",0,maxfn(255)),green:getset("rgb",1,maxfn(255)),blue:getset("rgb",2,maxfn(255)),hue:getset(["hsl","hsv","hsl","hwb","hcg"],0,function(val){return(val%360+360)%360}),saturationl:getset("hsl",1,maxfn(100)),lightness:getset("hsl",2,maxfn(100)),saturationv:getset("hsv",1,maxfn(100)),value:getset("hsv",2,maxfn(100)),chroma:getset("hcg",1,maxfn(100)),gray:getset("hcg",2,maxfn(100)),white:getset("hwb",1,maxfn(100)),wblack:getset("hwb",2,maxfn(100)),cyan:getset("cmyk",0,maxfn(100)),magenta:getset("cmyk",1,maxfn(100)),yellow:getset("cmyk",2,maxfn(100)),black:getset("cmyk",3,maxfn(100)),x:getset("xyz",0,maxfn(100)),y:getset("xyz",1,maxfn(100)),z:getset("xyz",2,maxfn(100)),l:getset("lab",0,maxfn(100)),a:getset("lab",1),b:getset("lab",2),keyword:function(val){if(arguments.length){return new Color(val)}return convert[this.model].keyword(this.color)},hex:function(val){if(arguments.length){return new Color(val)}return colorString.to.hex(this.rgb().round().color)},rgbNumber:function(){var rgb=this.rgb().color;return(rgb[0]&255)<<16|(rgb[1]&255)<<8|rgb[2]&255},luminosity:function(){var rgb=this.rgb().color;var lum=[];for(var i=0;i<rgb.length;i++){var chan=rgb[i]/255;lum[i]=chan<=.03928?chan/12.92:Math.pow((chan+.055)/1.055,2.4)}return.2126*lum[0]+.7152*lum[1]+.0722*lum[2]},contrast:function(color2){var lum1=this.luminosity();var lum2=color2.luminosity();if(lum1>lum2){return(lum1+.05)/(lum2+.05)}return(lum2+.05)/(lum1+.05)},level:function(color2){var contrastRatio=this.contrast(color2);if(contrastRatio>=7.1){return"AAA"}return contrastRatio>=4.5?"AA":""},isDark:function(){var rgb=this.rgb().color;var yiq=(rgb[0]*299+rgb[1]*587+rgb[2]*114)/1e3;return yiq<128},isLight:function(){return!this.isDark()},negate:function(){var rgb=this.rgb();for(var i=0;i<3;i++){rgb.color[i]=255-rgb.color[i]}return rgb},lighten:function(ratio){var hsl=this.hsl();hsl.color[2]+=hsl.color[2]*ratio;return hsl},darken:function(ratio){var hsl=this.hsl();hsl.color[2]-=hsl.color[2]*ratio;return hsl},saturate:function(ratio){var hsl=this.hsl();hsl.color[1]+=hsl.color[1]*ratio;return hsl},desaturate:function(ratio){var hsl=this.hsl();hsl.color[1]-=hsl.color[1]*ratio;return hsl},whiten:function(ratio){var hwb=this.hwb();hwb.color[1]+=hwb.color[1]*ratio;return hwb},blacken:function(ratio){var hwb=this.hwb();hwb.color[2]+=hwb.color[2]*ratio;return hwb},grayscale:function(){var rgb=this.rgb().color;var val=rgb[0]*.3+rgb[1]*.59+rgb[2]*.11;return Color.rgb(val,val,val)},fade:function(ratio){return this.alpha(this.valpha-this.valpha*ratio)},opaquer:function(ratio){return this.alpha(this.valpha+this.valpha*ratio)},rotate:function(degrees){var hsl=this.hsl();var hue=hsl.color[0];hue=(hue+degrees)%360;hue=hue<0?360+hue:hue;hsl.color[0]=hue;return hsl},mix:function(mixinColor,weight){if(!mixinColor||!mixinColor.rgb){throw new Error('Argument to "mix" was not a Color instance, but rather an instance of '+typeof mixinColor)}var color1=mixinColor.rgb();var color2=this.rgb();var p=weight===undefined?.5:weight;var w=2*p-1;var a=color1.alpha()-color2.alpha();var w1=((w*a===-1?w:(w+a)/(1+w*a))+1)/2;var w2=1-w1;return Color.rgb(w1*color1.red()+w2*color2.red(),w1*color1.green()+w2*color2.green(),w1*color1.blue()+w2*color2.blue(),color1.alpha()*p+color2.alpha()*(1-p))}};Object.keys(convert).forEach(function(model){if(skippedModels.indexOf(model)!==-1){return}var channels=convert[model].channels;Color.prototype[model]=function(){if(this.model===model){return new Color(this)}if(arguments.length){return new Color(arguments,model)}var newAlpha=typeof arguments[channels]==="number"?channels:this.valpha;return new Color(assertArray(convert[this.model][model].raw(this.color)).concat(newAlpha),model)};Color[model]=function(color){if(typeof color==="number"){color=zeroArray(_slice.call(arguments),channels)}return new Color(color,model)}});function roundTo(num,places){return Number(num.toFixed(places))}function roundToPlace(places){return function(num){return roundTo(num,places)}}function getset(model,channel,modifier){model=Array.isArray(model)?model:[model];model.forEach(function(m){(limiters[m]||(limiters[m]=[]))[channel]=modifier});model=model[0];return function(val){var result;if(arguments.length){if(modifier){val=modifier(val)}result=this[model]();result.color[channel]=val;return result}result=this[model]().color[channel];if(modifier){result=modifier(result)}return result}}function maxfn(max){return function(v){return Math.max(0,Math.min(max,v))}}function assertArray(val){return Array.isArray(val)?val:[val]}function zeroArray(arr,length){for(var i=0;i<length;i++){if(typeof arr[i]!=="number"){arr[i]=0}}return arr}module.exports=Color},function(module,exports,__webpack_require__){var colorNames=__webpack_require__(5);var swizzle=__webpack_require__(18);var reverseNames={};for(var name in colorNames){if(colorNames.hasOwnProperty(name)){reverseNames[colorNames[name]]=name}}var cs=module.exports={to:{},get:{}};cs.get=function(string){var prefix=string.substring(0,3).toLowerCase();var val;var model;switch(prefix){case"hsl":val=cs.get.hsl(string);model="hsl";break;case"hwb":val=cs.get.hwb(string);model="hwb";break;default:val=cs.get.rgb(string);model="rgb";break}if(!val){return null}return{model,value:val}};cs.get.rgb=function(string){if(!string){return null}var abbr=/^#([a-f0-9]{3,4})$/i;var hex=/^#([a-f0-9]{6})([a-f0-9]{2})?$/i;var rgba=/^rgba?\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/;var per=/^rgba?\(\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/;var keyword=/(\D+)/;var rgb=[0,0,0,1];var match;var i;var hexAlpha;if(match=string.match(hex)){hexAlpha=match[2];match=match[1];for(i=0;i<3;i++){var i2=i*2;rgb[i]=parseInt(match.slice(i2,i2+2),16)}if(hexAlpha){rgb[3]=Math.round(parseInt(hexAlpha,16)/255*100)/100}}else if(match=string.match(abbr)){match=match[1];hexAlpha=match[3];for(i=0;i<3;i++){rgb[i]=parseInt(match[i]+match[i],16)}if(hexAlpha){rgb[3]=Math.round(parseInt(hexAlpha+hexAlpha,16)/255*100)/100}}else if(match=string.match(rgba)){for(i=0;i<3;i++){rgb[i]=parseInt(match[i+1],0)}if(match[4]){rgb[3]=parseFloat(match[4])}}else if(match=string.match(per)){for(i=0;i<3;i++){rgb[i]=Math.round(parseFloat(match[i+1])*2.55)}if(match[4]){rgb[3]=parseFloat(match[4])}}else if(match=string.match(keyword)){if(match[1]==="transparent"){return[0,0,0,0]}rgb=colorNames[match[1]];if(!rgb){return null}rgb[3]=1;return rgb}else{return null}for(i=0;i<3;i++){rgb[i]=clamp(rgb[i],0,255)}rgb[3]=clamp(rgb[3],0,1);return rgb};cs.get.hsl=function(string){if(!string){return null}var hsl=/^hsla?\(\s*([+-]?(?:\d*\.)?\d+)(?:deg)?\s*,\s*([+-]?[\d\.]+)%\s*,\s*([+-]?[\d\.]+)%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/;var match=string.match(hsl);if(match){var alpha=parseFloat(match[4]);var h=(parseFloat(match[1])+360)%360;var s=clamp(parseFloat(match[2]),0,100);var l=clamp(parseFloat(match[3]),0,100);var a=clamp(isNaN(alpha)?1:alpha,0,1);return[h,s,l,a]}return null};cs.get.hwb=function(string){if(!string){return null}var hwb=/^hwb\(\s*([+-]?\d*[\.]?\d+)(?:deg)?\s*,\s*([+-]?[\d\.]+)%\s*,\s*([+-]?[\d\.]+)%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/;var match=string.match(hwb);if(match){var alpha=parseFloat(match[4]);var h=(parseFloat(match[1])%360+360)%360;var w=clamp(parseFloat(match[2]),0,100);var b=clamp(parseFloat(match[3]),0,100);var a=clamp(isNaN(alpha)?1:alpha,0,1);return[h,w,b,a]}return null};cs.to.hex=function(){var rgba=swizzle(arguments);return"#"+hexDouble(rgba[0])+hexDouble(rgba[1])+hexDouble(rgba[2])+(rgba[3]<1?hexDouble(Math.round(rgba[3]*255)):"")};cs.to.rgb=function(){var rgba=swizzle(arguments);return rgba.length<4||rgba[3]===1?"rgb("+Math.round(rgba[0])+", "+Math.round(rgba[1])+", "+Math.round(rgba[2])+")":"rgba("+Math.round(rgba[0])+", "+Math.round(rgba[1])+", "+Math.round(rgba[2])+", "+rgba[3]+")"};cs.to.rgb.percent=function(){var rgba=swizzle(arguments);var r=Math.round(rgba[0]/255*100);var g=Math.round(rgba[1]/255*100);var b=Math.round(rgba[2]/255*100);return rgba.length<4||rgba[3]===1?"rgb("+r+"%, "+g+"%, "+b+"%)":"rgba("+r+"%, "+g+"%, "+b+"%, "+rgba[3]+")"};cs.to.hsl=function(){var hsla=swizzle(arguments);return hsla.length<4||hsla[3]===1?"hsl("+hsla[0]+", "+hsla[1]+"%, "+hsla[2]+"%)":"hsla("+hsla[0]+", "+hsla[1]+"%, "+hsla[2]+"%, "+hsla[3]+")"};cs.to.hwb=function(){var hwba=swizzle(arguments);var a="";if(hwba.length>=4&&hwba[3]!==1){a=", "+hwba[3]}return"hwb("+hwba[0]+", "+hwba[1]+"%, "+hwba[2]+"%"+a+")"};cs.to.keyword=function(rgb){return reverseNames[rgb.slice(0,3)]};function clamp(num,min,max){return Math.min(Math.max(min,num),max)}function hexDouble(num){var str=num.toString(16).toUpperCase();return str.length<2?"0"+str:str}},function(module,exports,__webpack_require__){"use strict";var isArrayish=__webpack_require__(19);var concat=Array.prototype.concat;var slice=Array.prototype.slice;var swizzle=module.exports=function swizzle(args){var results=[];for(var i=0,len=args.length;i<len;i++){var arg=args[i];if(isArrayish(arg)){results=concat.call(results,slice.call(arg))}else{results.push(arg)}}return results};swizzle.wrap=function(fn){return function(){return fn(swizzle(arguments))}}},function(module,exports,__webpack_require__){"use strict";module.exports=function isArrayish(obj){if(!obj){return false}return obj instanceof Array||Array.isArray(obj)||obj.length>=0&&obj.splice instanceof Function}},function(module,exports,__webpack_require__){var conversions=__webpack_require__(6);var route=__webpack_require__(21);var convert={};var models=Object.keys(conversions);function wrapRaw(fn){var wrappedFn=function(args){if(args===undefined||args===null){return args}if(arguments.length>1){args=Array.prototype.slice.call(arguments)}return fn(args)};if("conversion"in fn){wrappedFn.conversion=fn.conversion}return wrappedFn}function wrapRounded(fn){var wrappedFn=function(args){if(args===undefined||args===null){return args}if(arguments.length>1){args=Array.prototype.slice.call(arguments)}var result=fn(args);if(typeof result==="object"){for(var len=result.length,i=0;i<len;i++){result[i]=Math.round(result[i])}}return result};if("conversion"in fn){wrappedFn.conversion=fn.conversion}return wrappedFn}models.forEach(function(fromModel){convert[fromModel]={};Object.defineProperty(convert[fromModel],"channels",{value:conversions[fromModel].channels});Object.defineProperty(convert[fromModel],"labels",{value:conversions[fromModel].labels});var routes=route(fromModel);var routeModels=Object.keys(routes);routeModels.forEach(function(toModel){var fn=routes[toModel];convert[fromModel][toModel]=wrapRounded(fn);convert[fromModel][toModel].raw=wrapRaw(fn)})});module.exports=convert},function(module,exports,__webpack_require__){var conversions=__webpack_require__(6);function buildGraph(){var graph={};var models=Object.keys(conversions);for(var len=models.length,i=0;i<len;i++){graph[models[i]]={distance:-1,parent:null}}return graph}function deriveBFS(fromModel){var graph=buildGraph();var queue=[fromModel];graph[fromModel].distance=0;while(queue.length){var current=queue.pop();var adjacents=Object.keys(conversions[current]);for(var len=adjacents.length,i=0;i<len;i++){var adjacent=adjacents[i];var node=graph[adjacent];if(node.distance===-1){node.distance=graph[current].distance+1;node.parent=current;queue.unshift(adjacent)}}}return graph}function link(from,to){return function(args){return to(from(args))}}function wrapConversion(toModel,graph){var path=[graph[toModel].parent,toModel];var fn=conversions[graph[toModel].parent][toModel];var cur=graph[toModel].parent;while(graph[cur].parent){path.unshift(graph[cur].parent);fn=link(conversions[graph[cur].parent][cur],fn);cur=graph[cur].parent}fn.conversion=path;return fn}module.exports=function(fromModel){var graph=deriveBFS(fromModel);var conversion={};var models=Object.keys(graph);for(var len=models.length,i=0;i<len;i++){var toModel=models[i];var node=graph[toModel];if(node.parent===null){continue}conversion[toModel]=wrapConversion(toModel,graph)}return conversion}},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);var _ColorItem=__webpack_require__(2);var _ColorItem2=_interopRequireDefault(_ColorItem);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var ColorHandler=function(){function ColorHandler(colorpicker){_classCallCheck(this,ColorHandler);this.colorpicker=colorpicker}_createClass(ColorHandler,[{key:"bind",value:function bind(){if(this.colorpicker.options.color){this.color=this.createColor(this.colorpicker.options.color);return}if(!this.color&&!!this.colorpicker.inputHandler.getValue()){this.color=this.createColor(this.colorpicker.inputHandler.getValue(),this.colorpicker.options.autoInputFallback)}}},{key:"unbind",value:function unbind(){this.colorpicker.element.removeData("color")}},{key:"getColorString",value:function getColorString(){if(!this.hasColor()){return""}return this.color.string(this.format)}},{key:"setColorString",value:function setColorString(val){var color=val?this.createColor(val):null;this.color=color?color:null}},{key:"createColor",value:function createColor(val){var fallbackOnInvalid=arguments.length>1&&arguments[1]!==undefined?arguments[1]:true;var color=new _ColorItem2.default(this.resolveColorDelegate(val),this.format);if(!color.isValid()){if(fallbackOnInvalid){color=this.getFallbackColor()}this.colorpicker.trigger("colorpickerInvalid",color,val)}if(!this.isAlphaEnabled()){color.alpha=1}return color}},{key:"getFallbackColor",value:function getFallbackColor(){if(this.fallback&&this.fallback===this.color){return this.color}var fallback=this.resolveColorDelegate(this.fallback);var color=new _ColorItem2.default(fallback,this.format);if(!color.isValid()){console.warn("The fallback color is invalid. Falling back to the previous color or black if any.");return this.color?this.color:new _ColorItem2.default("#000000",this.format)}return color}},{key:"assureColor",value:function assureColor(){if(!this.hasColor()){this.color=this.getFallbackColor()}return this.color}},{key:"resolveColorDelegate",value:function resolveColorDelegate(color){var realColor=arguments.length>1&&arguments[1]!==undefined?arguments[1]:true;var extResolvedColor=false;_jquery2.default.each(this.colorpicker.extensions,function(name,ext){if(extResolvedColor!==false){return}extResolvedColor=ext.resolveColor(color,realColor)});return extResolvedColor?extResolvedColor:color}},{key:"isInvalidColor",value:function isInvalidColor(){return!this.hasColor()||!this.color.isValid()}},{key:"isAlphaEnabled",value:function isAlphaEnabled(){return this.colorpicker.options.useAlpha!==false}},{key:"hasColor",value:function hasColor(){return this.color instanceof _ColorItem2.default}},{key:"fallback",get:function get(){return this.colorpicker.options.fallbackColor?this.colorpicker.options.fallbackColor:this.hasColor()?this.color:null}},{key:"format",get:function get(){if(this.colorpicker.options.format){return this.colorpicker.options.format}if(this.hasColor()&&this.color.hasTransparency()&&this.color.format.match(/^hex/)){return this.isAlphaEnabled()?"rgba":"hex"}if(this.hasColor()){return this.color.format}return"rgb"}},{key:"color",get:function get(){return this.colorpicker.element.data("color")},set:function set(value){this.colorpicker.element.data("color",value);if(value instanceof _ColorItem2.default&&this.colorpicker.options.format==="auto"){this.colorpicker.options.format=this.color.format}}}]);return ColorHandler}();exports.default=ColorHandler;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();var _jquery=__webpack_require__(0);var _jquery2=_interopRequireDefault(_jquery);function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var PickerHandler=function(){function PickerHandler(colorpicker){_classCallCheck(this,PickerHandler);this.colorpicker=colorpicker;this.picker=null}_createClass(PickerHandler,[{key:"bind",value:function bind(){var picker=this.picker=(0,_jquery2.default)(this.options.template);if(this.options.customClass){picker.addClass(this.options.customClass)}if(this.options.horizontal){picker.addClass("colorpicker-horizontal")}if(this._supportsAlphaBar()){this.options.useAlpha=true;picker.addClass("colorpicker-with-alpha")}else{this.options.useAlpha=false}}},{key:"attach",value:function attach(){var pickerParent=this.colorpicker.container?this.colorpicker.container:null;if(pickerParent){this.picker.appendTo(pickerParent)}}},{key:"unbind",value:function unbind(){this.picker.remove()}},{key:"_supportsAlphaBar",value:function _supportsAlphaBar(){return(this.options.useAlpha||this.colorpicker.colorHandler.hasColor()&&this.color.hasTransparency())&&this.options.useAlpha!==false&&(!this.options.format||this.options.format&&!this.options.format.match(/^hex([36])?$/i))}},{key:"update",value:function update(){if(!this.colorpicker.colorHandler.hasColor()){return}var vertical=this.options.horizontal!==true,slider=vertical?this.options.sliders:this.options.slidersHorz;var saturationGuide=this.picker.find(".colorpicker-saturation .colorpicker-guide"),hueGuide=this.picker.find(".colorpicker-hue .colorpicker-guide"),alphaGuide=this.picker.find(".colorpicker-alpha .colorpicker-guide");var hsva=this.color.toHsvaRatio();if(hueGuide.length){hueGuide.css(vertical?"top":"left",(vertical?slider.hue.maxTop:slider.hue.maxLeft)*(1-hsva.h))}if(alphaGuide.length){alphaGuide.css(vertical?"top":"left",(vertical?slider.alpha.maxTop:slider.alpha.maxLeft)*(1-hsva.a))}if(saturationGuide.length){saturationGuide.css({top:slider.saturation.maxTop-hsva.v*slider.saturation.maxTop,left:hsva.s*slider.saturation.maxLeft})}this.picker.find(".colorpicker-saturation").css("backgroundColor",this.color.getCloneHueOnly().toHexString());var hexColor=this.color.toHexString();var alphaBg="";if(this.options.horizontal){alphaBg="linear-gradient(to right, "+hexColor+" 0%, transparent 100%)"}else{alphaBg="linear-gradient(to bottom, "+hexColor+" 0%, transparent 100%)"}this.picker.find(".colorpicker-alpha-color").css("background",alphaBg)}},{key:"options",get:function get(){return this.colorpicker.options}},{key:"color",get:function get(){return this.colorpicker.colorHandler.color}}]);return PickerHandler}();exports.default=PickerHandler;module.exports=exports.default},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:true});var _createClass=function(){function defineProperties(target,props){for(var i=0;i<props.length;i++){var descriptor=props[i];descriptor.enumerable=descriptor.enumerable||false;descriptor.configurable=true;if("value"in descriptor)descriptor.writable=true;Object.defineProperty(target,descriptor.key,descriptor)}}return function(Constructor,protoProps,staticProps){if(protoProps)defineProperties(Constructor.prototype,protoProps);if(staticProps)defineProperties(Constructor,staticProps);return Constructor}}();function _classCallCheck(instance,Constructor){if(!(instance instanceof Constructor)){throw new TypeError("Cannot call a class as a function")}}var AddonHandler=function(){function AddonHandler(colorpicker){_classCallCheck(this,AddonHandler);this.colorpicker=colorpicker;this.addon=null}_createClass(AddonHandler,[{key:"hasAddon",value:function hasAddon(){return!!this.addon}},{key:"bind",value:function bind(){this.addon=this.colorpicker.options.addon?this.colorpicker.element.find(this.colorpicker.options.addon):null;if(this.addon&&this.addon.length===0){this.addon=null}}},{key:"unbind",value:function unbind(){if(this.hasAddon()){this.addon.off(".colorpicker")}}},{key:"update",value:function update(){if(!this.colorpicker.colorHandler.hasColor()||!this.hasAddon()){return}var colorStr=this.colorpicker.colorHandler.getColorString();var styles={background:colorStr};var icn=this.addon.find("i").eq(0);if(icn.length>0){icn.css(styles)}else{this.addon.css(styles)}}}]);return AddonHandler}();exports.default=AddonHandler;module.exports=exports.default}])});
 !function(e){e(["jquery"],function(e,t){var o,a="recycle-bin",n="<div>",r="",l="click",s="hide",i="shown.bs.modal",d="submit",c="eFooter",u=s+".bs.modal",f="input",m="danger",p={OK:"Cancel",True:"False",Yes:"No"},b={},v="modal-body",y=".modal-dialog",h={},g="modal-rec",x={sm:"sm",lg:"lg",xl:"xl"},w="modal-tmp",j={allowContentRecycle:!0,confirmLabel:Object.keys(p)[0],labels:p,loadingHtml:'<h5>Loading...</h5><div class=progress><div class="progress-bar progress-bar-striped active" style="width: 100%"></div></div>',size:r,title:"Attention",autofocus:!1};return(t=t||{}).addLabel=function(e,t){p[e]=t},t.ajax=function(t,a){var n=k();"object"==typeof t&&L(t);var r={async:!0,deferred:n,xhrFields:{withCredentials:!1},loading:!0,title:a||j.title,url:t.url||t,dataType:t.dataType||"text"};t.url&&e.extend(r,t);return e.ajax(r).done(function(e){return o.find("."+v).html(t.success?t.success(e):e),n.resolve(o)}).fail(function(e,a){var l=t.error?t.error(e,a,r):'<div class="alert alert-danger"><strong>XHR Fail: </strong>URL [ '+r.url+"] load fail.</div>";return o.find("."+v).html(l),n.reject(e)}),H(r,a)},t.alert=H,t.close=T,t.confirm=function(t,o){var a=k();"object"==typeof t&&L(t);return H({async:!0,buttons:[{close:!0,click:n,text:p[t.label]?p[t.label]:p[j.confirmLabel],style:t.style&&t.style[0]||m},{close:!0,click:n,text:p[t.label]?t.label:j.confirmLabel,style:t.style&&t.style[1]}],deferred:a,message:t.message||t,onHide:n,size:t.size,title:t.title||o});function n(t){T();var o=e(t.currentTarget).html();return p[o]?a.resolve():a.reject()}},t.emptyBin=function(){return e("#"+a+" > *").remove()},t.iframe=function(t,o){var a=k();"object"==typeof data&&L(data);var n=t.data?Object.keys(t.data).map(function(e){return e+'="'+t.data[e]+'"'}).join(" "):"",r='<div class=modal-body style="position: absolute;width: 100%;background-color: rgba(255,255,255,0.8);height: 100%;">%1%</div><iframe class="embed-responsive-item" frameborder=0 src="%0%" %2% style="width:100%;height:75vh;display:block;"/>'.replace("%0%",t.message||t.url||t).replace("%1%",j.loadingHtml).replace("%2%",n),l=(s="3.0.0",i=e.fn.jquery.split("."),d=s.split("."),c=i[0],u=i[1],f=i[2],m=d[0],p=d[1],b=d[2],m>c||m===c&&p>u||m===c&&p===u&&b>f?e(r).load(v):e(r).on("load",v));var s,i,d,c,u,f,m,p,b;return H({async:!0,buttons:t.buttons||!1,deferred:a,message:l,size:t.size||x.xl,title:t.title||o});function v(){return e(this).parent().find("div."+w).fadeOut(function(){e(this).remove()}),a.resolve()}},t.prompt=function(t,a){var n=k();"object"==typeof t&&L(t);var l,s={deferred:n};"object"==typeof t?e.extend(s,t):(s.message=t,s.title=a);if(s.async=!0,s.buttons)for(var i=0,c=s.buttons.length;i<c;i++)(l=s.buttons[i]).style=(l.style||"default")+" pull-left",l.type=l.type||"button";var u=C([{close:!0,type:"reset",text:p.OK,style:m},{close:!1,type:d,text:j.confirmLabel}].concat(s.buttons||[]));return s.buttons=!1,s.onHide=b,s.message=e('<form role=form style="margin-bottom:0;"><div class=modal-body><label for=prompt-input class=control-label>'+(s.message||r)+'</label><input type=text class=form-control required autocomplete="on" value="'+(s.value||r)+(s.pattern?'" pattern="'+s.pattern:r)+'"></div></form>').append(u).on(d,b),H(s);function b(e){var t=o.find(f).val();return T(),e.type!==d?n.reject(t):n.resolve(t),!1}},t.setId=function(e){z(!0).find(y).prop("id",e)},t.setEModalOptions=L,t.setModalOptions=function(t){return o&&o.remove(),e.extend(h,t)},t.size=x,t.version="1.2.67",t;function k(){var t,o;try{o=require("Q")}catch(e){o=window.Q}return o?t=o.defer():(t=e.Deferred()).promise=t.promise(),t.promise.element=z(!0).find(y),t}function C(t){if(!1===t)return r;var o=e(n).addClass("modal-footer").prop("id",c);if(t)for(var a=0,s=t.length;a<s;a++){var i=t[a],d=e("<button>").addClass("btn btn-"+(i.style||"primary"));for(var u in i)if(i.hasOwnProperty(u))switch(u){case"close":i[u]&&d.attr("data-dismiss","modal").addClass("x");break;case l:var f=i.click.bind(z(!0).find(".modal-content"));d.click(f);break;case"text":d.html(i[u]);break;default:d.attr(u,i[u])}o.append(d)}else o.append('<button class="x btn btn-primary" data-dismiss=modal type=button>Close</button>');return o}function z(t){return o||(e("#"+a).length||e("body").append(e(n).prop("id",a).hide()),o=e('<div class="modal fade" tabindex="-1"><style>.modal-title{display:inline;}.modal-xl{width:96%;}.modal-body{max-height: calc(100vh - 145px);overflow-y: auto;}</style><div class=modal-dialog><div class=modal-content> <div class=modal-header><h5 class=modal-title></h5><button type=button class="x close" data-dismiss=modal aria-label="Close"><span aria-hidden=true>&times;</span></button></div></div></div></div>').on("hidden.bs.modal",O).on(l,"button.x",function(t){var a=e(t.currentTarget);if(a.prop("type")!==d)return o.modal(s);try{if(a.closest("form")[0].checkValidity())return T()}catch(e){return T()}return o})),t&&o?o:(j.autofocus&&o.on(i,function(){e(this).find(f).first().focus()}),o)}function O(){if(o){var e=o.find("."+g).removeClass(g).appendTo("#"+a);o.off(u).off(i).find(".modal-content > div:not(:first-child)").remove(),j.allowContentRecycle&&!b.clone||e.remove()}}function H(t,a){!function(t,o){if(!t)throw new Error("Invalid parameters!");O(),b=t;var a=z(),n="modal-"+(t.size||j.size);a.find(y).removeClass("modal-sm modal-lg modal-xl").addClass(t.size||j.size?n:null),a.find(".modal-title").html((t.title||o||j.title)+" ").append(e("<small>").html(t.subtitle||r)),a.on(u,t.onHide)}(t,a);var l=t.deferred||k();"object"==typeof t&&L(t);var s,d=e(n).append(function(t){var o,a=t.loading?j.loadingHtml:t.message||t;return a.on||a.onclick?(o=!0===t.clone?e(a).clone():e(a)).addClass(t.useBin&&!t.loading?g:w):o=e(n).attr("style","position:relative;word-wrap:break-word;").addClass(v).html(a),t.css&&t.css!==o.css&&o.css(t.css),o}(t),C(t.buttons));return s=d,o.modal(h).find(".modal-content").append(s),t.async||o.on(i,l.resolve),l.promise}function L(t){return e.extend(j,t)}function T(){return o&&o.off(u).modal(s),o}})}("function"==typeof define&&define.amd?define:function(e,t){this.eModal="undefined"!=typeof module&&module.exports?t(require(e[0],{}),module.exports):t(window.$)});
+!function(e,t){"object"==typeof exports&&"undefined"!=typeof module?module.exports=t():"function"==typeof define&&define.amd?define(t):e.moment=t()}(this,function(){"use strict";var e,i;function f(){return e.apply(null,arguments)}function o(e){return e instanceof Array||"[object Array]"===Object.prototype.toString.call(e)}function u(e){return null!=e&&"[object Object]"===Object.prototype.toString.call(e)}function m(e,t){return Object.prototype.hasOwnProperty.call(e,t)}function l(e){if(Object.getOwnPropertyNames)return 0===Object.getOwnPropertyNames(e).length;for(var t in e)if(m(e,t))return;return 1}function r(e){return void 0===e}function h(e){return"number"==typeof e||"[object Number]"===Object.prototype.toString.call(e)}function a(e){return e instanceof Date||"[object Date]"===Object.prototype.toString.call(e)}function d(e,t){for(var n=[],s=0;s<e.length;++s)n.push(t(e[s],s));return n}function c(e,t){for(var n in t)m(t,n)&&(e[n]=t[n]);return m(t,"toString")&&(e.toString=t.toString),m(t,"valueOf")&&(e.valueOf=t.valueOf),e}function _(e,t,n,s){return xt(e,t,n,s,!0).utc()}function y(e){return null==e._pf&&(e._pf={empty:!1,unusedTokens:[],unusedInput:[],overflow:-2,charsLeftOver:0,nullInput:!1,invalidEra:null,invalidMonth:null,invalidFormat:!1,userInvalidated:!1,iso:!1,parsedDateParts:[],era:null,meridiem:null,rfc2822:!1,weekdayMismatch:!1}),e._pf}function g(e){if(null==e._isValid){var t=y(e),n=i.call(t.parsedDateParts,function(e){return null!=e}),s=!isNaN(e._d.getTime())&&t.overflow<0&&!t.empty&&!t.invalidEra&&!t.invalidMonth&&!t.invalidWeekday&&!t.weekdayMismatch&&!t.nullInput&&!t.invalidFormat&&!t.userInvalidated&&(!t.meridiem||t.meridiem&&n);if(e._strict&&(s=s&&0===t.charsLeftOver&&0===t.unusedTokens.length&&void 0===t.bigHour),null!=Object.isFrozen&&Object.isFrozen(e))return s;e._isValid=s}return e._isValid}function w(e){var t=_(NaN);return null!=e?c(y(t),e):y(t).userInvalidated=!0,t}i=Array.prototype.some?Array.prototype.some:function(e){for(var t=Object(this),n=t.length>>>0,s=0;s<n;s++)if(s in t&&e.call(this,t[s],s,t))return!0;return!1};var p=f.momentProperties=[],t=!1;function v(e,t){var n,s,i;if(r(t._isAMomentObject)||(e._isAMomentObject=t._isAMomentObject),r(t._i)||(e._i=t._i),r(t._f)||(e._f=t._f),r(t._l)||(e._l=t._l),r(t._strict)||(e._strict=t._strict),r(t._tzm)||(e._tzm=t._tzm),r(t._isUTC)||(e._isUTC=t._isUTC),r(t._offset)||(e._offset=t._offset),r(t._pf)||(e._pf=y(t)),r(t._locale)||(e._locale=t._locale),0<p.length)for(n=0;n<p.length;n++)r(i=t[s=p[n]])||(e[s]=i);return e}function k(e){v(this,e),this._d=new Date(null!=e._d?e._d.getTime():NaN),this.isValid()||(this._d=new Date(NaN)),!1===t&&(t=!0,f.updateOffset(this),t=!1)}function M(e){return e instanceof k||null!=e&&null!=e._isAMomentObject}function D(e){!1===f.suppressDeprecationWarnings&&"undefined"!=typeof console&&console.warn&&console.warn("Deprecation warning: "+e)}function n(i,r){var a=!0;return c(function(){if(null!=f.deprecationHandler&&f.deprecationHandler(null,i),a){for(var e,t,n=[],s=0;s<arguments.length;s++){if(e="","object"==typeof arguments[s]){for(t in e+="\n["+s+"] ",arguments[0])m(arguments[0],t)&&(e+=t+": "+arguments[0][t]+", ");e=e.slice(0,-2)}else e=arguments[s];n.push(e)}D(i+"\nArguments: "+Array.prototype.slice.call(n).join("")+"\n"+(new Error).stack),a=!1}return r.apply(this,arguments)},r)}var s,S={};function Y(e,t){null!=f.deprecationHandler&&f.deprecationHandler(e,t),S[e]||(D(t),S[e]=!0)}function O(e){return"undefined"!=typeof Function&&e instanceof Function||"[object Function]"===Object.prototype.toString.call(e)}function b(e,t){var n,s=c({},e);for(n in t)m(t,n)&&(u(e[n])&&u(t[n])?(s[n]={},c(s[n],e[n]),c(s[n],t[n])):null!=t[n]?s[n]=t[n]:delete s[n]);for(n in e)m(e,n)&&!m(t,n)&&u(e[n])&&(s[n]=c({},s[n]));return s}function x(e){null!=e&&this.set(e)}f.suppressDeprecationWarnings=!1,f.deprecationHandler=null,s=Object.keys?Object.keys:function(e){var t,n=[];for(t in e)m(e,t)&&n.push(t);return n};function T(e,t,n){var s=""+Math.abs(e),i=t-s.length;return(0<=e?n?"+":"":"-")+Math.pow(10,Math.max(0,i)).toString().substr(1)+s}var N=/(\[[^\[]*\])|(\\)?([Hh]mm(ss)?|Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Qo?|N{1,5}|YYYYYY|YYYYY|YYYY|YY|y{2,4}|yo?|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|kk?|mm?|ss?|S{1,9}|x|X|zz?|ZZ?|.)/g,P=/(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g,R={},W={};function C(e,t,n,s){var i="string"==typeof s?function(){return this[s]()}:s;e&&(W[e]=i),t&&(W[t[0]]=function(){return T(i.apply(this,arguments),t[1],t[2])}),n&&(W[n]=function(){return this.localeData().ordinal(i.apply(this,arguments),e)})}function U(e,t){return e.isValid()?(t=H(t,e.localeData()),R[t]=R[t]||function(s){for(var e,i=s.match(N),t=0,r=i.length;t<r;t++)W[i[t]]?i[t]=W[i[t]]:i[t]=(e=i[t]).match(/\[[\s\S]/)?e.replace(/^\[|\]$/g,""):e.replace(/\\/g,"");return function(e){for(var t="",n=0;n<r;n++)t+=O(i[n])?i[n].call(e,s):i[n];return t}}(t),R[t](e)):e.localeData().invalidDate()}function H(e,t){var n=5;function s(e){return t.longDateFormat(e)||e}for(P.lastIndex=0;0<=n&&P.test(e);)e=e.replace(P,s),P.lastIndex=0,--n;return e}var F={};function L(e,t){var n=e.toLowerCase();F[n]=F[n+"s"]=F[t]=e}function V(e){return"string"==typeof e?F[e]||F[e.toLowerCase()]:void 0}function G(e){var t,n,s={};for(n in e)m(e,n)&&(t=V(n))&&(s[t]=e[n]);return s}var E={};function A(e,t){E[e]=t}function j(e){return e%4==0&&e%100!=0||e%400==0}function I(e){return e<0?Math.ceil(e)||0:Math.floor(e)}function Z(e){var t=+e,n=0;return 0!=t&&isFinite(t)&&(n=I(t)),n}function z(t,n){return function(e){return null!=e?(q(this,t,e),f.updateOffset(this,n),this):$(this,t)}}function $(e,t){return e.isValid()?e._d["get"+(e._isUTC?"UTC":"")+t]():NaN}function q(e,t,n){e.isValid()&&!isNaN(n)&&("FullYear"===t&&j(e.year())&&1===e.month()&&29===e.date()?(n=Z(n),e._d["set"+(e._isUTC?"UTC":"")+t](n,e.month(),xe(n,e.month()))):e._d["set"+(e._isUTC?"UTC":"")+t](n))}var B,J=/\d/,Q=/\d\d/,X=/\d{3}/,K=/\d{4}/,ee=/[+-]?\d{6}/,te=/\d\d?/,ne=/\d\d\d\d?/,se=/\d\d\d\d\d\d?/,ie=/\d{1,3}/,re=/\d{1,4}/,ae=/[+-]?\d{1,6}/,oe=/\d+/,ue=/[+-]?\d+/,le=/Z|[+-]\d\d:?\d\d/gi,he=/Z|[+-]\d\d(?::?\d\d)?/gi,de=/[0-9]{0,256}['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFF07\uFF10-\uFFEF]{1,256}|[\u0600-\u06FF\/]{1,256}(\s*?[\u0600-\u06FF]{1,256}){1,2}/i;function ce(e,n,s){B[e]=O(n)?n:function(e,t){return e&&s?s:n}}function fe(e,t){return m(B,e)?B[e](t._strict,t._locale):new RegExp(me(e.replace("\\","").replace(/\\(\[)|\\(\])|\[([^\]\[]*)\]|\\(.)/g,function(e,t,n,s,i){return t||n||s||i})))}function me(e){return e.replace(/[-\/\\^$*+?.()|[\]{}]/g,"\\$&")}B={};var _e={};function ye(e,n){var t,s=n;for("string"==typeof e&&(e=[e]),h(n)&&(s=function(e,t){t[n]=Z(e)}),t=0;t<e.length;t++)_e[e[t]]=s}function ge(e,i){ye(e,function(e,t,n,s){n._w=n._w||{},i(e,n._w,n,s)})}var we,pe=0,ve=1,ke=2,Me=3,De=4,Se=5,Ye=6,Oe=7,be=8;function xe(e,t){if(isNaN(e)||isNaN(t))return NaN;var n,s=(t%(n=12)+n)%n;return e+=(t-s)/12,1==s?j(e)?29:28:31-s%7%2}we=Array.prototype.indexOf?Array.prototype.indexOf:function(e){for(var t=0;t<this.length;++t)if(this[t]===e)return t;return-1},C("M",["MM",2],"Mo",function(){return this.month()+1}),C("MMM",0,0,function(e){return this.localeData().monthsShort(this,e)}),C("MMMM",0,0,function(e){return this.localeData().months(this,e)}),L("month","M"),A("month",8),ce("M",te),ce("MM",te,Q),ce("MMM",function(e,t){return t.monthsShortRegex(e)}),ce("MMMM",function(e,t){return t.monthsRegex(e)}),ye(["M","MM"],function(e,t){t[ve]=Z(e)-1}),ye(["MMM","MMMM"],function(e,t,n,s){var i=n._locale.monthsParse(e,s,n._strict);null!=i?t[ve]=i:y(n).invalidMonth=e});var Te="January_February_March_April_May_June_July_August_September_October_November_December".split("_"),Ne="Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec".split("_"),Pe=/D[oD]?(\[[^\[\]]*\]|\s)+MMMM?/,Re=de,We=de;function Ce(e,t){var n;if(!e.isValid())return e;if("string"==typeof t)if(/^\d+$/.test(t))t=Z(t);else if(!h(t=e.localeData().monthsParse(t)))return e;return n=Math.min(e.date(),xe(e.year(),t)),e._d["set"+(e._isUTC?"UTC":"")+"Month"](t,n),e}function Ue(e){return null!=e?(Ce(this,e),f.updateOffset(this,!0),this):$(this,"Month")}function He(){function e(e,t){return t.length-e.length}for(var t,n=[],s=[],i=[],r=0;r<12;r++)t=_([2e3,r]),n.push(this.monthsShort(t,"")),s.push(this.months(t,"")),i.push(this.months(t,"")),i.push(this.monthsShort(t,""));for(n.sort(e),s.sort(e),i.sort(e),r=0;r<12;r++)n[r]=me(n[r]),s[r]=me(s[r]);for(r=0;r<24;r++)i[r]=me(i[r]);this._monthsRegex=new RegExp("^("+i.join("|")+")","i"),this._monthsShortRegex=this._monthsRegex,this._monthsStrictRegex=new RegExp("^("+s.join("|")+")","i"),this._monthsShortStrictRegex=new RegExp("^("+n.join("|")+")","i")}function Fe(e){return j(e)?366:365}C("Y",0,0,function(){var e=this.year();return e<=9999?T(e,4):"+"+e}),C(0,["YY",2],0,function(){return this.year()%100}),C(0,["YYYY",4],0,"year"),C(0,["YYYYY",5],0,"year"),C(0,["YYYYYY",6,!0],0,"year"),L("year","y"),A("year",1),ce("Y",ue),ce("YY",te,Q),ce("YYYY",re,K),ce("YYYYY",ae,ee),ce("YYYYYY",ae,ee),ye(["YYYYY","YYYYYY"],pe),ye("YYYY",function(e,t){t[pe]=2===e.length?f.parseTwoDigitYear(e):Z(e)}),ye("YY",function(e,t){t[pe]=f.parseTwoDigitYear(e)}),ye("Y",function(e,t){t[pe]=parseInt(e,10)}),f.parseTwoDigitYear=function(e){return Z(e)+(68<Z(e)?1900:2e3)};var Le=z("FullYear",!0);function Ve(e){var t,n;return e<100&&0<=e?((n=Array.prototype.slice.call(arguments))[0]=e+400,t=new Date(Date.UTC.apply(null,n)),isFinite(t.getUTCFullYear())&&t.setUTCFullYear(e)):t=new Date(Date.UTC.apply(null,arguments)),t}function Ge(e,t,n){var s=7+t-n;return s-(7+Ve(e,0,s).getUTCDay()-t)%7-1}function Ee(e,t,n,s,i){var r,a=1+7*(t-1)+(7+n-s)%7+Ge(e,s,i),o=a<=0?Fe(r=e-1)+a:a>Fe(e)?(r=e+1,a-Fe(e)):(r=e,a);return{year:r,dayOfYear:o}}function Ae(e,t,n){var s,i,r=Ge(e.year(),t,n),a=Math.floor((e.dayOfYear()-r-1)/7)+1;return a<1?s=a+je(i=e.year()-1,t,n):a>je(e.year(),t,n)?(s=a-je(e.year(),t,n),i=e.year()+1):(i=e.year(),s=a),{week:s,year:i}}function je(e,t,n){var s=Ge(e,t,n),i=Ge(e+1,t,n);return(Fe(e)-s+i)/7}C("w",["ww",2],"wo","week"),C("W",["WW",2],"Wo","isoWeek"),L("week","w"),L("isoWeek","W"),A("week",5),A("isoWeek",5),ce("w",te),ce("ww",te,Q),ce("W",te),ce("WW",te,Q),ge(["w","ww","W","WW"],function(e,t,n,s){t[s.substr(0,1)]=Z(e)});function Ie(e,t){return e.slice(t,7).concat(e.slice(0,t))}C("d",0,"do","day"),C("dd",0,0,function(e){return this.localeData().weekdaysMin(this,e)}),C("ddd",0,0,function(e){return this.localeData().weekdaysShort(this,e)}),C("dddd",0,0,function(e){return this.localeData().weekdays(this,e)}),C("e",0,0,"weekday"),C("E",0,0,"isoWeekday"),L("day","d"),L("weekday","e"),L("isoWeekday","E"),A("day",11),A("weekday",11),A("isoWeekday",11),ce("d",te),ce("e",te),ce("E",te),ce("dd",function(e,t){return t.weekdaysMinRegex(e)}),ce("ddd",function(e,t){return t.weekdaysShortRegex(e)}),ce("dddd",function(e,t){return t.weekdaysRegex(e)}),ge(["dd","ddd","dddd"],function(e,t,n,s){var i=n._locale.weekdaysParse(e,s,n._strict);null!=i?t.d=i:y(n).invalidWeekday=e}),ge(["d","e","E"],function(e,t,n,s){t[s]=Z(e)});var Ze="Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday".split("_"),ze="Sun_Mon_Tue_Wed_Thu_Fri_Sat".split("_"),$e="Su_Mo_Tu_We_Th_Fr_Sa".split("_"),qe=de,Be=de,Je=de;function Qe(){function e(e,t){return t.length-e.length}for(var t,n,s,i,r=[],a=[],o=[],u=[],l=0;l<7;l++)t=_([2e3,1]).day(l),n=me(this.weekdaysMin(t,"")),s=me(this.weekdaysShort(t,"")),i=me(this.weekdays(t,"")),r.push(n),a.push(s),o.push(i),u.push(n),u.push(s),u.push(i);r.sort(e),a.sort(e),o.sort(e),u.sort(e),this._weekdaysRegex=new RegExp("^("+u.join("|")+")","i"),this._weekdaysShortRegex=this._weekdaysRegex,this._weekdaysMinRegex=this._weekdaysRegex,this._weekdaysStrictRegex=new RegExp("^("+o.join("|")+")","i"),this._weekdaysShortStrictRegex=new RegExp("^("+a.join("|")+")","i"),this._weekdaysMinStrictRegex=new RegExp("^("+r.join("|")+")","i")}function Xe(){return this.hours()%12||12}function Ke(e,t){C(e,0,0,function(){return this.localeData().meridiem(this.hours(),this.minutes(),t)})}function et(e,t){return t._meridiemParse}C("H",["HH",2],0,"hour"),C("h",["hh",2],0,Xe),C("k",["kk",2],0,function(){return this.hours()||24}),C("hmm",0,0,function(){return""+Xe.apply(this)+T(this.minutes(),2)}),C("hmmss",0,0,function(){return""+Xe.apply(this)+T(this.minutes(),2)+T(this.seconds(),2)}),C("Hmm",0,0,function(){return""+this.hours()+T(this.minutes(),2)}),C("Hmmss",0,0,function(){return""+this.hours()+T(this.minutes(),2)+T(this.seconds(),2)}),Ke("a",!0),Ke("A",!1),L("hour","h"),A("hour",13),ce("a",et),ce("A",et),ce("H",te),ce("h",te),ce("k",te),ce("HH",te,Q),ce("hh",te,Q),ce("kk",te,Q),ce("hmm",ne),ce("hmmss",se),ce("Hmm",ne),ce("Hmmss",se),ye(["H","HH"],Me),ye(["k","kk"],function(e,t,n){var s=Z(e);t[Me]=24===s?0:s}),ye(["a","A"],function(e,t,n){n._isPm=n._locale.isPM(e),n._meridiem=e}),ye(["h","hh"],function(e,t,n){t[Me]=Z(e),y(n).bigHour=!0}),ye("hmm",function(e,t,n){var s=e.length-2;t[Me]=Z(e.substr(0,s)),t[De]=Z(e.substr(s)),y(n).bigHour=!0}),ye("hmmss",function(e,t,n){var s=e.length-4,i=e.length-2;t[Me]=Z(e.substr(0,s)),t[De]=Z(e.substr(s,2)),t[Se]=Z(e.substr(i)),y(n).bigHour=!0}),ye("Hmm",function(e,t,n){var s=e.length-2;t[Me]=Z(e.substr(0,s)),t[De]=Z(e.substr(s))}),ye("Hmmss",function(e,t,n){var s=e.length-4,i=e.length-2;t[Me]=Z(e.substr(0,s)),t[De]=Z(e.substr(s,2)),t[Se]=Z(e.substr(i))});var tt=z("Hours",!0);var nt,st={calendar:{sameDay:"[Today at] LT",nextDay:"[Tomorrow at] LT",nextWeek:"dddd [at] LT",lastDay:"[Yesterday at] LT",lastWeek:"[Last] dddd [at] LT",sameElse:"L"},longDateFormat:{LTS:"h:mm:ss A",LT:"h:mm A",L:"MM/DD/YYYY",LL:"MMMM D, YYYY",LLL:"MMMM D, YYYY h:mm A",LLLL:"dddd, MMMM D, YYYY h:mm A"},invalidDate:"Invalid date",ordinal:"%d",dayOfMonthOrdinalParse:/\d{1,2}/,relativeTime:{future:"in %s",past:"%s ago",s:"a few seconds",ss:"%d seconds",m:"a minute",mm:"%d minutes",h:"an hour",hh:"%d hours",d:"a day",dd:"%d days",w:"a week",ww:"%d weeks",M:"a month",MM:"%d months",y:"a year",yy:"%d years"},months:Te,monthsShort:Ne,week:{dow:0,doy:6},weekdays:Ze,weekdaysMin:$e,weekdaysShort:ze,meridiemParse:/[ap]\.?m?\.?/i},it={},rt={};function at(e){return e?e.toLowerCase().replace("_","-"):e}function ot(e){for(var t,n,s,i,r=0;r<e.length;){for(t=(i=at(e[r]).split("-")).length,n=(n=at(e[r+1]))?n.split("-"):null;0<t;){if(s=ut(i.slice(0,t).join("-")))return s;if(n&&n.length>=t&&function(e,t){for(var n=Math.min(e.length,t.length),s=0;s<n;s+=1)if(e[s]!==t[s])return s;return n}(i,n)>=t-1)break;t--}r++}return nt}function ut(t){var e;if(void 0===it[t]&&"undefined"!=typeof module&&module&&module.exports)try{e=nt._abbr,require("./locale/"+t),lt(e)}catch(e){it[t]=null}return it[t]}function lt(e,t){var n;return e&&((n=r(t)?dt(e):ht(e,t))?nt=n:"undefined"!=typeof console&&console.warn&&console.warn("Locale "+e+" not found. Did you forget to load it?")),nt._abbr}function ht(e,t){if(null===t)return delete it[e],null;var n,s=st;if(t.abbr=e,null!=it[e])Y("defineLocaleOverride","use moment.updateLocale(localeName, config) to change an existing locale. moment.defineLocale(localeName, config) should only be used for creating a new locale See http://momentjs.com/guides/#/warnings/define-locale/ for more info."),s=it[e]._config;else if(null!=t.parentLocale)if(null!=it[t.parentLocale])s=it[t.parentLocale]._config;else{if(null==(n=ut(t.parentLocale)))return rt[t.parentLocale]||(rt[t.parentLocale]=[]),rt[t.parentLocale].push({name:e,config:t}),null;s=n._config}return it[e]=new x(b(s,t)),rt[e]&&rt[e].forEach(function(e){ht(e.name,e.config)}),lt(e),it[e]}function dt(e){var t;if(e&&e._locale&&e._locale._abbr&&(e=e._locale._abbr),!e)return nt;if(!o(e)){if(t=ut(e))return t;e=[e]}return ot(e)}function ct(e){var t,n=e._a;return n&&-2===y(e).overflow&&(t=n[ve]<0||11<n[ve]?ve:n[ke]<1||n[ke]>xe(n[pe],n[ve])?ke:n[Me]<0||24<n[Me]||24===n[Me]&&(0!==n[De]||0!==n[Se]||0!==n[Ye])?Me:n[De]<0||59<n[De]?De:n[Se]<0||59<n[Se]?Se:n[Ye]<0||999<n[Ye]?Ye:-1,y(e)._overflowDayOfYear&&(t<pe||ke<t)&&(t=ke),y(e)._overflowWeeks&&-1===t&&(t=Oe),y(e)._overflowWeekday&&-1===t&&(t=be),y(e).overflow=t),e}var ft=/^\s*((?:[+-]\d{6}|\d{4})-(?:\d\d-\d\d|W\d\d-\d|W\d\d|\d\d\d|\d\d))(?:(T| )(\d\d(?::\d\d(?::\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,mt=/^\s*((?:[+-]\d{6}|\d{4})(?:\d\d\d\d|W\d\d\d|W\d\d|\d\d\d|\d\d|))(?:(T| )(\d\d(?:\d\d(?:\d\d(?:[.,]\d+)?)?)?)([+-]\d\d(?::?\d\d)?|\s*Z)?)?$/,_t=/Z|[+-]\d\d(?::?\d\d)?/,yt=[["YYYYYY-MM-DD",/[+-]\d{6}-\d\d-\d\d/],["YYYY-MM-DD",/\d{4}-\d\d-\d\d/],["GGGG-[W]WW-E",/\d{4}-W\d\d-\d/],["GGGG-[W]WW",/\d{4}-W\d\d/,!1],["YYYY-DDD",/\d{4}-\d{3}/],["YYYY-MM",/\d{4}-\d\d/,!1],["YYYYYYMMDD",/[+-]\d{10}/],["YYYYMMDD",/\d{8}/],["GGGG[W]WWE",/\d{4}W\d{3}/],["GGGG[W]WW",/\d{4}W\d{2}/,!1],["YYYYDDD",/\d{7}/],["YYYYMM",/\d{6}/,!1],["YYYY",/\d{4}/,!1]],gt=[["HH:mm:ss.SSSS",/\d\d:\d\d:\d\d\.\d+/],["HH:mm:ss,SSSS",/\d\d:\d\d:\d\d,\d+/],["HH:mm:ss",/\d\d:\d\d:\d\d/],["HH:mm",/\d\d:\d\d/],["HHmmss.SSSS",/\d\d\d\d\d\d\.\d+/],["HHmmss,SSSS",/\d\d\d\d\d\d,\d+/],["HHmmss",/\d\d\d\d\d\d/],["HHmm",/\d\d\d\d/],["HH",/\d\d/]],wt=/^\/?Date\((-?\d+)/i,pt=/^(?:(Mon|Tue|Wed|Thu|Fri|Sat|Sun),?\s)?(\d{1,2})\s(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s(\d{2,4})\s(\d\d):(\d\d)(?::(\d\d))?\s(?:(UT|GMT|[ECMP][SD]T)|([Zz])|([+-]\d{4}))$/,vt={UT:0,GMT:0,EDT:-240,EST:-300,CDT:-300,CST:-360,MDT:-360,MST:-420,PDT:-420,PST:-480};function kt(e){var t,n,s,i,r,a,o=e._i,u=ft.exec(o)||mt.exec(o);if(u){for(y(e).iso=!0,t=0,n=yt.length;t<n;t++)if(yt[t][1].exec(u[1])){i=yt[t][0],s=!1!==yt[t][2];break}if(null==i)return void(e._isValid=!1);if(u[3]){for(t=0,n=gt.length;t<n;t++)if(gt[t][1].exec(u[3])){r=(u[2]||" ")+gt[t][0];break}if(null==r)return void(e._isValid=!1)}if(!s&&null!=r)return void(e._isValid=!1);if(u[4]){if(!_t.exec(u[4]))return void(e._isValid=!1);a="Z"}e._f=i+(r||"")+(a||""),Ot(e)}else e._isValid=!1}function Mt(e,t,n,s,i,r){var a=[function(e){var t=parseInt(e,10);{if(t<=49)return 2e3+t;if(t<=999)return 1900+t}return t}(e),Ne.indexOf(t),parseInt(n,10),parseInt(s,10),parseInt(i,10)];return r&&a.push(parseInt(r,10)),a}function Dt(e){var t,n,s,i,r=pt.exec(e._i.replace(/\([^)]*\)|[\n\t]/g," ").replace(/(\s\s+)/g," ").replace(/^\s\s*/,"").replace(/\s\s*$/,""));if(r){if(t=Mt(r[4],r[3],r[2],r[5],r[6],r[7]),n=r[1],s=t,i=e,n&&ze.indexOf(n)!==new Date(s[0],s[1],s[2]).getDay()&&(y(i).weekdayMismatch=!0,!void(i._isValid=!1)))return;e._a=t,e._tzm=function(e,t,n){if(e)return vt[e];if(t)return 0;var s=parseInt(n,10),i=s%100;return 60*((s-i)/100)+i}(r[8],r[9],r[10]),e._d=Ve.apply(null,e._a),e._d.setUTCMinutes(e._d.getUTCMinutes()-e._tzm),y(e).rfc2822=!0}else e._isValid=!1}function St(e,t,n){return null!=e?e:null!=t?t:n}function Yt(e){var t,n,s,i,r,a,o,u=[];if(!e._d){for(a=e,o=new Date(f.now()),s=a._useUTC?[o.getUTCFullYear(),o.getUTCMonth(),o.getUTCDate()]:[o.getFullYear(),o.getMonth(),o.getDate()],e._w&&null==e._a[ke]&&null==e._a[ve]&&function(e){var t,n,s,i,r,a,o,u,l;null!=(t=e._w).GG||null!=t.W||null!=t.E?(r=1,a=4,n=St(t.GG,e._a[pe],Ae(Tt(),1,4).year),s=St(t.W,1),((i=St(t.E,1))<1||7<i)&&(u=!0)):(r=e._locale._week.dow,a=e._locale._week.doy,l=Ae(Tt(),r,a),n=St(t.gg,e._a[pe],l.year),s=St(t.w,l.week),null!=t.d?((i=t.d)<0||6<i)&&(u=!0):null!=t.e?(i=t.e+r,(t.e<0||6<t.e)&&(u=!0)):i=r);s<1||s>je(n,r,a)?y(e)._overflowWeeks=!0:null!=u?y(e)._overflowWeekday=!0:(o=Ee(n,s,i,r,a),e._a[pe]=o.year,e._dayOfYear=o.dayOfYear)}(e),null!=e._dayOfYear&&(r=St(e._a[pe],s[pe]),(e._dayOfYear>Fe(r)||0===e._dayOfYear)&&(y(e)._overflowDayOfYear=!0),n=Ve(r,0,e._dayOfYear),e._a[ve]=n.getUTCMonth(),e._a[ke]=n.getUTCDate()),t=0;t<3&&null==e._a[t];++t)e._a[t]=u[t]=s[t];for(;t<7;t++)e._a[t]=u[t]=null==e._a[t]?2===t?1:0:e._a[t];24===e._a[Me]&&0===e._a[De]&&0===e._a[Se]&&0===e._a[Ye]&&(e._nextDay=!0,e._a[Me]=0),e._d=(e._useUTC?Ve:function(e,t,n,s,i,r,a){var o;return e<100&&0<=e?(o=new Date(e+400,t,n,s,i,r,a),isFinite(o.getFullYear())&&o.setFullYear(e)):o=new Date(e,t,n,s,i,r,a),o}).apply(null,u),i=e._useUTC?e._d.getUTCDay():e._d.getDay(),null!=e._tzm&&e._d.setUTCMinutes(e._d.getUTCMinutes()-e._tzm),e._nextDay&&(e._a[Me]=24),e._w&&void 0!==e._w.d&&e._w.d!==i&&(y(e).weekdayMismatch=!0)}}function Ot(e){if(e._f!==f.ISO_8601)if(e._f!==f.RFC_2822){e._a=[],y(e).empty=!0;for(var t,n,s,i,r,a,o,u=""+e._i,l=u.length,h=0,d=H(e._f,e._locale).match(N)||[],c=0;c<d.length;c++)n=d[c],(t=(u.match(fe(n,e))||[])[0])&&(0<(s=u.substr(0,u.indexOf(t))).length&&y(e).unusedInput.push(s),u=u.slice(u.indexOf(t)+t.length),h+=t.length),W[n]?(t?y(e).empty=!1:y(e).unusedTokens.push(n),r=n,o=e,null!=(a=t)&&m(_e,r)&&_e[r](a,o._a,o,r)):e._strict&&!t&&y(e).unusedTokens.push(n);y(e).charsLeftOver=l-h,0<u.length&&y(e).unusedInput.push(u),e._a[Me]<=12&&!0===y(e).bigHour&&0<e._a[Me]&&(y(e).bigHour=void 0),y(e).parsedDateParts=e._a.slice(0),y(e).meridiem=e._meridiem,e._a[Me]=function(e,t,n){var s;if(null==n)return t;return null!=e.meridiemHour?e.meridiemHour(t,n):(null!=e.isPM&&((s=e.isPM(n))&&t<12&&(t+=12),s||12!==t||(t=0)),t)}(e._locale,e._a[Me],e._meridiem),null!==(i=y(e).era)&&(e._a[pe]=e._locale.erasConvertYear(i,e._a[pe])),Yt(e),ct(e)}else Dt(e);else kt(e)}function bt(e){var t,n,s=e._i,i=e._f;return e._locale=e._locale||dt(e._l),null===s||void 0===i&&""===s?w({nullInput:!0}):("string"==typeof s&&(e._i=s=e._locale.preparse(s)),M(s)?new k(ct(s)):(a(s)?e._d=s:o(i)?function(e){var t,n,s,i,r,a,o=!1;if(0===e._f.length)return y(e).invalidFormat=!0,e._d=new Date(NaN);for(i=0;i<e._f.length;i++)r=0,a=!1,t=v({},e),null!=e._useUTC&&(t._useUTC=e._useUTC),t._f=e._f[i],Ot(t),g(t)&&(a=!0),r+=y(t).charsLeftOver,r+=10*y(t).unusedTokens.length,y(t).score=r,o?r<s&&(s=r,n=t):(null==s||r<s||a)&&(s=r,n=t,a&&(o=!0));c(e,n||t)}(e):i?Ot(e):r(n=(t=e)._i)?t._d=new Date(f.now()):a(n)?t._d=new Date(n.valueOf()):"string"==typeof n?function(e){var t=wt.exec(e._i);null===t?(kt(e),!1===e._isValid&&(delete e._isValid,Dt(e),!1===e._isValid&&(delete e._isValid,e._strict?e._isValid=!1:f.createFromInputFallback(e)))):e._d=new Date(+t[1])}(t):o(n)?(t._a=d(n.slice(0),function(e){return parseInt(e,10)}),Yt(t)):u(n)?function(e){var t,n;e._d||(n=void 0===(t=G(e._i)).day?t.date:t.day,e._a=d([t.year,t.month,n,t.hour,t.minute,t.second,t.millisecond],function(e){return e&&parseInt(e,10)}),Yt(e))}(t):h(n)?t._d=new Date(n):f.createFromInputFallback(t),g(e)||(e._d=null),e))}function xt(e,t,n,s,i){var r,a={};return!0!==t&&!1!==t||(s=t,t=void 0),!0!==n&&!1!==n||(s=n,n=void 0),(u(e)&&l(e)||o(e)&&0===e.length)&&(e=void 0),a._isAMomentObject=!0,a._useUTC=a._isUTC=i,a._l=n,a._i=e,a._f=t,a._strict=s,(r=new k(ct(bt(a))))._nextDay&&(r.add(1,"d"),r._nextDay=void 0),r}function Tt(e,t,n,s){return xt(e,t,n,s,!1)}f.createFromInputFallback=n("value provided is not in a recognized RFC2822 or ISO format. moment construction falls back to js Date(), which is not reliable across all browsers and versions. Non RFC2822/ISO date formats are discouraged. Please refer to http://momentjs.com/guides/#/warnings/js-date/ for more info.",function(e){e._d=new Date(e._i+(e._useUTC?" UTC":""))}),f.ISO_8601=function(){},f.RFC_2822=function(){};var Nt=n("moment().min is deprecated, use moment.max instead. http://momentjs.com/guides/#/warnings/min-max/",function(){var e=Tt.apply(null,arguments);return this.isValid()&&e.isValid()?e<this?this:e:w()}),Pt=n("moment().max is deprecated, use moment.min instead. http://momentjs.com/guides/#/warnings/min-max/",function(){var e=Tt.apply(null,arguments);return this.isValid()&&e.isValid()?this<e?this:e:w()});function Rt(e,t){var n,s;if(1===t.length&&o(t[0])&&(t=t[0]),!t.length)return Tt();for(n=t[0],s=1;s<t.length;++s)t[s].isValid()&&!t[s][e](n)||(n=t[s]);return n}var Wt=["year","quarter","month","week","day","hour","minute","second","millisecond"];function Ct(e){var t=G(e),n=t.year||0,s=t.quarter||0,i=t.month||0,r=t.week||t.isoWeek||0,a=t.day||0,o=t.hour||0,u=t.minute||0,l=t.second||0,h=t.millisecond||0;this._isValid=function(e){var t,n,s=!1;for(t in e)if(m(e,t)&&(-1===we.call(Wt,t)||null!=e[t]&&isNaN(e[t])))return!1;for(n=0;n<Wt.length;++n)if(e[Wt[n]]){if(s)return!1;parseFloat(e[Wt[n]])!==Z(e[Wt[n]])&&(s=!0)}return!0}(t),this._milliseconds=+h+1e3*l+6e4*u+1e3*o*60*60,this._days=+a+7*r,this._months=+i+3*s+12*n,this._data={},this._locale=dt(),this._bubble()}function Ut(e){return e instanceof Ct}function Ht(e){return e<0?-1*Math.round(-1*e):Math.round(e)}function Ft(e,n){C(e,0,0,function(){var e=this.utcOffset(),t="+";return e<0&&(e=-e,t="-"),t+T(~~(e/60),2)+n+T(~~e%60,2)})}Ft("Z",":"),Ft("ZZ",""),ce("Z",he),ce("ZZ",he),ye(["Z","ZZ"],function(e,t,n){n._useUTC=!0,n._tzm=Vt(he,e)});var Lt=/([\+\-]|\d\d)/gi;function Vt(e,t){var n,s,i=(t||"").match(e);return null===i?null:0===(s=60*(n=((i[i.length-1]||[])+"").match(Lt)||["-",0,0])[1]+Z(n[2]))?0:"+"===n[0]?s:-s}function Gt(e,t){var n,s;return t._isUTC?(n=t.clone(),s=(M(e)||a(e)?e.valueOf():Tt(e).valueOf())-n.valueOf(),n._d.setTime(n._d.valueOf()+s),f.updateOffset(n,!1),n):Tt(e).local()}function Et(e){return-Math.round(e._d.getTimezoneOffset())}function At(){return!!this.isValid()&&(this._isUTC&&0===this._offset)}f.updateOffset=function(){};var jt=/^(-|\+)?(?:(\d*)[. ])?(\d+):(\d+)(?::(\d+)(\.\d*)?)?$/,It=/^(-|\+)?P(?:([-+]?[0-9,.]*)Y)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)W)?(?:([-+]?[0-9,.]*)D)?(?:T(?:([-+]?[0-9,.]*)H)?(?:([-+]?[0-9,.]*)M)?(?:([-+]?[0-9,.]*)S)?)?$/;function Zt(e,t){var n,s,i,r=e,a=null;return Ut(e)?r={ms:e._milliseconds,d:e._days,M:e._months}:h(e)||!isNaN(+e)?(r={},t?r[t]=+e:r.milliseconds=+e):(a=jt.exec(e))?(n="-"===a[1]?-1:1,r={y:0,d:Z(a[ke])*n,h:Z(a[Me])*n,m:Z(a[De])*n,s:Z(a[Se])*n,ms:Z(Ht(1e3*a[Ye]))*n}):(a=It.exec(e))?(n="-"===a[1]?-1:1,r={y:zt(a[2],n),M:zt(a[3],n),w:zt(a[4],n),d:zt(a[5],n),h:zt(a[6],n),m:zt(a[7],n),s:zt(a[8],n)}):null==r?r={}:"object"==typeof r&&("from"in r||"to"in r)&&(i=function(e,t){var n;if(!e.isValid()||!t.isValid())return{milliseconds:0,months:0};t=Gt(t,e),e.isBefore(t)?n=$t(e,t):((n=$t(t,e)).milliseconds=-n.milliseconds,n.months=-n.months);return n}(Tt(r.from),Tt(r.to)),(r={}).ms=i.milliseconds,r.M=i.months),s=new Ct(r),Ut(e)&&m(e,"_locale")&&(s._locale=e._locale),Ut(e)&&m(e,"_isValid")&&(s._isValid=e._isValid),s}function zt(e,t){var n=e&&parseFloat(e.replace(",","."));return(isNaN(n)?0:n)*t}function $t(e,t){var n={};return n.months=t.month()-e.month()+12*(t.year()-e.year()),e.clone().add(n.months,"M").isAfter(t)&&--n.months,n.milliseconds=t-e.clone().add(n.months,"M"),n}function qt(s,i){return function(e,t){var n;return null===t||isNaN(+t)||(Y(i,"moment()."+i+"(period, number) is deprecated. Please use moment()."+i+"(number, period). See http://momentjs.com/guides/#/warnings/add-inverted-param/ for more info."),n=e,e=t,t=n),Bt(this,Zt(e,t),s),this}}function Bt(e,t,n,s){var i=t._milliseconds,r=Ht(t._days),a=Ht(t._months);e.isValid()&&(s=null==s||s,a&&Ce(e,$(e,"Month")+a*n),r&&q(e,"Date",$(e,"Date")+r*n),i&&e._d.setTime(e._d.valueOf()+i*n),s&&f.updateOffset(e,r||a))}Zt.fn=Ct.prototype,Zt.invalid=function(){return Zt(NaN)};var Jt=qt(1,"add"),Qt=qt(-1,"subtract");function Xt(e){return"string"==typeof e||e instanceof String}function Kt(e){return M(e)||a(e)||Xt(e)||h(e)||function(t){var e=o(t),n=!1;e&&(n=0===t.filter(function(e){return!h(e)&&Xt(t)}).length);return e&&n}(e)||function(e){var t,n,s=u(e)&&!l(e),i=!1,r=["years","year","y","months","month","M","days","day","d","dates","date","D","hours","hour","h","minutes","minute","m","seconds","second","s","milliseconds","millisecond","ms"];for(t=0;t<r.length;t+=1)n=r[t],i=i||m(e,n);return s&&i}(e)||null==e}function en(e,t){if(e.date()<t.date())return-en(t,e);var n=12*(t.year()-e.year())+(t.month()-e.month()),s=e.clone().add(n,"months"),i=t-s<0?(t-s)/(s-e.clone().add(n-1,"months")):(t-s)/(e.clone().add(1+n,"months")-s);return-(n+i)||0}function tn(e){var t;return void 0===e?this._locale._abbr:(null!=(t=dt(e))&&(this._locale=t),this)}f.defaultFormat="YYYY-MM-DDTHH:mm:ssZ",f.defaultFormatUtc="YYYY-MM-DDTHH:mm:ss[Z]";var nn=n("moment().lang() is deprecated. Instead, use moment().localeData() to get the language configuration. Use moment().locale() to change languages.",function(e){return void 0===e?this.localeData():this.locale(e)});function sn(){return this._locale}var rn=126227808e5;function an(e,t){return(e%t+t)%t}function on(e,t,n){return e<100&&0<=e?new Date(e+400,t,n)-rn:new Date(e,t,n).valueOf()}function un(e,t,n){return e<100&&0<=e?Date.UTC(e+400,t,n)-rn:Date.UTC(e,t,n)}function ln(e,t){return t.erasAbbrRegex(e)}function hn(){for(var e=[],t=[],n=[],s=[],i=this.eras(),r=0,a=i.length;r<a;++r)t.push(me(i[r].name)),e.push(me(i[r].abbr)),n.push(me(i[r].narrow)),s.push(me(i[r].name)),s.push(me(i[r].abbr)),s.push(me(i[r].narrow));this._erasRegex=new RegExp("^("+s.join("|")+")","i"),this._erasNameRegex=new RegExp("^("+t.join("|")+")","i"),this._erasAbbrRegex=new RegExp("^("+e.join("|")+")","i"),this._erasNarrowRegex=new RegExp("^("+n.join("|")+")","i")}function dn(e,t){C(0,[e,e.length],0,t)}function cn(e,t,n,s,i){var r;return null==e?Ae(this,s,i).year:((r=je(e,s,i))<t&&(t=r),function(e,t,n,s,i){var r=Ee(e,t,n,s,i),a=Ve(r.year,0,r.dayOfYear);return this.year(a.getUTCFullYear()),this.month(a.getUTCMonth()),this.date(a.getUTCDate()),this}.call(this,e,t,n,s,i))}C("N",0,0,"eraAbbr"),C("NN",0,0,"eraAbbr"),C("NNN",0,0,"eraAbbr"),C("NNNN",0,0,"eraName"),C("NNNNN",0,0,"eraNarrow"),C("y",["y",1],"yo","eraYear"),C("y",["yy",2],0,"eraYear"),C("y",["yyy",3],0,"eraYear"),C("y",["yyyy",4],0,"eraYear"),ce("N",ln),ce("NN",ln),ce("NNN",ln),ce("NNNN",function(e,t){return t.erasNameRegex(e)}),ce("NNNNN",function(e,t){return t.erasNarrowRegex(e)}),ye(["N","NN","NNN","NNNN","NNNNN"],function(e,t,n,s){var i=n._locale.erasParse(e,s,n._strict);i?y(n).era=i:y(n).invalidEra=e}),ce("y",oe),ce("yy",oe),ce("yyy",oe),ce("yyyy",oe),ce("yo",function(e,t){return t._eraYearOrdinalRegex||oe}),ye(["y","yy","yyy","yyyy"],pe),ye(["yo"],function(e,t,n,s){var i;n._locale._eraYearOrdinalRegex&&(i=e.match(n._locale._eraYearOrdinalRegex)),n._locale.eraYearOrdinalParse?t[pe]=n._locale.eraYearOrdinalParse(e,i):t[pe]=parseInt(e,10)}),C(0,["gg",2],0,function(){return this.weekYear()%100}),C(0,["GG",2],0,function(){return this.isoWeekYear()%100}),dn("gggg","weekYear"),dn("ggggg","weekYear"),dn("GGGG","isoWeekYear"),dn("GGGGG","isoWeekYear"),L("weekYear","gg"),L("isoWeekYear","GG"),A("weekYear",1),A("isoWeekYear",1),ce("G",ue),ce("g",ue),ce("GG",te,Q),ce("gg",te,Q),ce("GGGG",re,K),ce("gggg",re,K),ce("GGGGG",ae,ee),ce("ggggg",ae,ee),ge(["gggg","ggggg","GGGG","GGGGG"],function(e,t,n,s){t[s.substr(0,2)]=Z(e)}),ge(["gg","GG"],function(e,t,n,s){t[s]=f.parseTwoDigitYear(e)}),C("Q",0,"Qo","quarter"),L("quarter","Q"),A("quarter",7),ce("Q",J),ye("Q",function(e,t){t[ve]=3*(Z(e)-1)}),C("D",["DD",2],"Do","date"),L("date","D"),A("date",9),ce("D",te),ce("DD",te,Q),ce("Do",function(e,t){return e?t._dayOfMonthOrdinalParse||t._ordinalParse:t._dayOfMonthOrdinalParseLenient}),ye(["D","DD"],ke),ye("Do",function(e,t){t[ke]=Z(e.match(te)[0])});var fn=z("Date",!0);C("DDD",["DDDD",3],"DDDo","dayOfYear"),L("dayOfYear","DDD"),A("dayOfYear",4),ce("DDD",ie),ce("DDDD",X),ye(["DDD","DDDD"],function(e,t,n){n._dayOfYear=Z(e)}),C("m",["mm",2],0,"minute"),L("minute","m"),A("minute",14),ce("m",te),ce("mm",te,Q),ye(["m","mm"],De);var mn=z("Minutes",!1);C("s",["ss",2],0,"second"),L("second","s"),A("second",15),ce("s",te),ce("ss",te,Q),ye(["s","ss"],Se);var _n,yn,gn=z("Seconds",!1);for(C("S",0,0,function(){return~~(this.millisecond()/100)}),C(0,["SS",2],0,function(){return~~(this.millisecond()/10)}),C(0,["SSS",3],0,"millisecond"),C(0,["SSSS",4],0,function(){return 10*this.millisecond()}),C(0,["SSSSS",5],0,function(){return 100*this.millisecond()}),C(0,["SSSSSS",6],0,function(){return 1e3*this.millisecond()}),C(0,["SSSSSSS",7],0,function(){return 1e4*this.millisecond()}),C(0,["SSSSSSSS",8],0,function(){return 1e5*this.millisecond()}),C(0,["SSSSSSSSS",9],0,function(){return 1e6*this.millisecond()}),L("millisecond","ms"),A("millisecond",16),ce("S",ie,J),ce("SS",ie,Q),ce("SSS",ie,X),_n="SSSS";_n.length<=9;_n+="S")ce(_n,oe);function wn(e,t){t[Ye]=Z(1e3*("0."+e))}for(_n="S";_n.length<=9;_n+="S")ye(_n,wn);yn=z("Milliseconds",!1),C("z",0,0,"zoneAbbr"),C("zz",0,0,"zoneName");var pn=k.prototype;function vn(e){return e}pn.add=Jt,pn.calendar=function(e,t){1===arguments.length&&(arguments[0]?Kt(arguments[0])?(e=arguments[0],t=void 0):function(e){for(var t=u(e)&&!l(e),n=!1,s=["sameDay","nextDay","lastDay","nextWeek","lastWeek","sameElse"],i=0;i<s.length;i+=1)n=n||m(e,s[i]);return t&&n}(arguments[0])&&(t=arguments[0],e=void 0):t=e=void 0);var n=e||Tt(),s=Gt(n,this).startOf("day"),i=f.calendarFormat(this,s)||"sameElse",r=t&&(O(t[i])?t[i].call(this,n):t[i]);return this.format(r||this.localeData().calendar(i,this,Tt(n)))},pn.clone=function(){return new k(this)},pn.diff=function(e,t,n){var s,i,r;if(!this.isValid())return NaN;if(!(s=Gt(e,this)).isValid())return NaN;switch(i=6e4*(s.utcOffset()-this.utcOffset()),t=V(t)){case"year":r=en(this,s)/12;break;case"month":r=en(this,s);break;case"quarter":r=en(this,s)/3;break;case"second":r=(this-s)/1e3;break;case"minute":r=(this-s)/6e4;break;case"hour":r=(this-s)/36e5;break;case"day":r=(this-s-i)/864e5;break;case"week":r=(this-s-i)/6048e5;break;default:r=this-s}return n?r:I(r)},pn.endOf=function(e){var t,n;if(void 0===(e=V(e))||"millisecond"===e||!this.isValid())return this;switch(n=this._isUTC?un:on,e){case"year":t=n(this.year()+1,0,1)-1;break;case"quarter":t=n(this.year(),this.month()-this.month()%3+3,1)-1;break;case"month":t=n(this.year(),this.month()+1,1)-1;break;case"week":t=n(this.year(),this.month(),this.date()-this.weekday()+7)-1;break;case"isoWeek":t=n(this.year(),this.month(),this.date()-(this.isoWeekday()-1)+7)-1;break;case"day":case"date":t=n(this.year(),this.month(),this.date()+1)-1;break;case"hour":t=this._d.valueOf(),t+=36e5-an(t+(this._isUTC?0:6e4*this.utcOffset()),36e5)-1;break;case"minute":t=this._d.valueOf(),t+=6e4-an(t,6e4)-1;break;case"second":t=this._d.valueOf(),t+=1e3-an(t,1e3)-1;break}return this._d.setTime(t),f.updateOffset(this,!0),this},pn.format=function(e){e=e||(this.isUtc()?f.defaultFormatUtc:f.defaultFormat);var t=U(this,e);return this.localeData().postformat(t)},pn.from=function(e,t){return this.isValid()&&(M(e)&&e.isValid()||Tt(e).isValid())?Zt({to:this,from:e}).locale(this.locale()).humanize(!t):this.localeData().invalidDate()},pn.fromNow=function(e){return this.from(Tt(),e)},pn.to=function(e,t){return this.isValid()&&(M(e)&&e.isValid()||Tt(e).isValid())?Zt({from:this,to:e}).locale(this.locale()).humanize(!t):this.localeData().invalidDate()},pn.toNow=function(e){return this.to(Tt(),e)},pn.get=function(e){return O(this[e=V(e)])?this[e]():this},pn.invalidAt=function(){return y(this).overflow},pn.isAfter=function(e,t){var n=M(e)?e:Tt(e);return!(!this.isValid()||!n.isValid())&&("millisecond"===(t=V(t)||"millisecond")?this.valueOf()>n.valueOf():n.valueOf()<this.clone().startOf(t).valueOf())},pn.isBefore=function(e,t){var n=M(e)?e:Tt(e);return!(!this.isValid()||!n.isValid())&&("millisecond"===(t=V(t)||"millisecond")?this.valueOf()<n.valueOf():this.clone().endOf(t).valueOf()<n.valueOf())},pn.isBetween=function(e,t,n,s){var i=M(e)?e:Tt(e),r=M(t)?t:Tt(t);return!!(this.isValid()&&i.isValid()&&r.isValid())&&(("("===(s=s||"()")[0]?this.isAfter(i,n):!this.isBefore(i,n))&&(")"===s[1]?this.isBefore(r,n):!this.isAfter(r,n)))},pn.isSame=function(e,t){var n,s=M(e)?e:Tt(e);return!(!this.isValid()||!s.isValid())&&("millisecond"===(t=V(t)||"millisecond")?this.valueOf()===s.valueOf():(n=s.valueOf(),this.clone().startOf(t).valueOf()<=n&&n<=this.clone().endOf(t).valueOf()))},pn.isSameOrAfter=function(e,t){return this.isSame(e,t)||this.isAfter(e,t)},pn.isSameOrBefore=function(e,t){return this.isSame(e,t)||this.isBefore(e,t)},pn.isValid=function(){return g(this)},pn.lang=nn,pn.locale=tn,pn.localeData=sn,pn.max=Pt,pn.min=Nt,pn.parsingFlags=function(){return c({},y(this))},pn.set=function(e,t){if("object"==typeof e)for(var n=function(e){var t,n=[];for(t in e)m(e,t)&&n.push({unit:t,priority:E[t]});return n.sort(function(e,t){return e.priority-t.priority}),n}(e=G(e)),s=0;s<n.length;s++)this[n[s].unit](e[n[s].unit]);else if(O(this[e=V(e)]))return this[e](t);return this},pn.startOf=function(e){var t,n;if(void 0===(e=V(e))||"millisecond"===e||!this.isValid())return this;switch(n=this._isUTC?un:on,e){case"year":t=n(this.year(),0,1);break;case"quarter":t=n(this.year(),this.month()-this.month()%3,1);break;case"month":t=n(this.year(),this.month(),1);break;case"week":t=n(this.year(),this.month(),this.date()-this.weekday());break;case"isoWeek":t=n(this.year(),this.month(),this.date()-(this.isoWeekday()-1));break;case"day":case"date":t=n(this.year(),this.month(),this.date());break;case"hour":t=this._d.valueOf(),t-=an(t+(this._isUTC?0:6e4*this.utcOffset()),36e5);break;case"minute":t=this._d.valueOf(),t-=an(t,6e4);break;case"second":t=this._d.valueOf(),t-=an(t,1e3);break}return this._d.setTime(t),f.updateOffset(this,!0),this},pn.subtract=Qt,pn.toArray=function(){var e=this;return[e.year(),e.month(),e.date(),e.hour(),e.minute(),e.second(),e.millisecond()]},pn.toObject=function(){var e=this;return{years:e.year(),months:e.month(),date:e.date(),hours:e.hours(),minutes:e.minutes(),seconds:e.seconds(),milliseconds:e.milliseconds()}},pn.toDate=function(){return new Date(this.valueOf())},pn.toISOString=function(e){if(!this.isValid())return null;var t=!0!==e,n=t?this.clone().utc():this;return n.year()<0||9999<n.year()?U(n,t?"YYYYYY-MM-DD[T]HH:mm:ss.SSS[Z]":"YYYYYY-MM-DD[T]HH:mm:ss.SSSZ"):O(Date.prototype.toISOString)?t?this.toDate().toISOString():new Date(this.valueOf()+60*this.utcOffset()*1e3).toISOString().replace("Z",U(n,"Z")):U(n,t?"YYYY-MM-DD[T]HH:mm:ss.SSS[Z]":"YYYY-MM-DD[T]HH:mm:ss.SSSZ")},pn.inspect=function(){if(!this.isValid())return"moment.invalid(/* "+this._i+" */)";var e,t,n,s="moment",i="";return this.isLocal()||(s=0===this.utcOffset()?"moment.utc":"moment.parseZone",i="Z"),e="["+s+'("]',t=0<=this.year()&&this.year()<=9999?"YYYY":"YYYYYY",n=i+'[")]',this.format(e+t+"-MM-DD[T]HH:mm:ss.SSS"+n)},"undefined"!=typeof Symbol&&null!=Symbol.for&&(pn[Symbol.for("nodejs.util.inspect.custom")]=function(){return"Moment<"+this.format()+">"}),pn.toJSON=function(){return this.isValid()?this.toISOString():null},pn.toString=function(){return this.clone().locale("en").format("ddd MMM DD YYYY HH:mm:ss [GMT]ZZ")},pn.unix=function(){return Math.floor(this.valueOf()/1e3)},pn.valueOf=function(){return this._d.valueOf()-6e4*(this._offset||0)},pn.creationData=function(){return{input:this._i,format:this._f,locale:this._locale,isUTC:this._isUTC,strict:this._strict}},pn.eraName=function(){for(var e,t=this.localeData().eras(),n=0,s=t.length;n<s;++n){if(e=this.clone().startOf("day").valueOf(),t[n].since<=e&&e<=t[n].until)return t[n].name;if(t[n].until<=e&&e<=t[n].since)return t[n].name}return""},pn.eraNarrow=function(){for(var e,t=this.localeData().eras(),n=0,s=t.length;n<s;++n){if(e=this.clone().startOf("day").valueOf(),t[n].since<=e&&e<=t[n].until)return t[n].narrow;if(t[n].until<=e&&e<=t[n].since)return t[n].narrow}return""},pn.eraAbbr=function(){for(var e,t=this.localeData().eras(),n=0,s=t.length;n<s;++n){if(e=this.clone().startOf("day").valueOf(),t[n].since<=e&&e<=t[n].until)return t[n].abbr;if(t[n].until<=e&&e<=t[n].since)return t[n].abbr}return""},pn.eraYear=function(){for(var e,t,n=this.localeData().eras(),s=0,i=n.length;s<i;++s)if(e=n[s].since<=n[s].until?1:-1,t=this.clone().startOf("day").valueOf(),n[s].since<=t&&t<=n[s].until||n[s].until<=t&&t<=n[s].since)return(this.year()-f(n[s].since).year())*e+n[s].offset;return this.year()},pn.year=Le,pn.isLeapYear=function(){return j(this.year())},pn.weekYear=function(e){return cn.call(this,e,this.week(),this.weekday(),this.localeData()._week.dow,this.localeData()._week.doy)},pn.isoWeekYear=function(e){return cn.call(this,e,this.isoWeek(),this.isoWeekday(),1,4)},pn.quarter=pn.quarters=function(e){return null==e?Math.ceil((this.month()+1)/3):this.month(3*(e-1)+this.month()%3)},pn.month=Ue,pn.daysInMonth=function(){return xe(this.year(),this.month())},pn.week=pn.weeks=function(e){var t=this.localeData().week(this);return null==e?t:this.add(7*(e-t),"d")},pn.isoWeek=pn.isoWeeks=function(e){var t=Ae(this,1,4).week;return null==e?t:this.add(7*(e-t),"d")},pn.weeksInYear=function(){var e=this.localeData()._week;return je(this.year(),e.dow,e.doy)},pn.weeksInWeekYear=function(){var e=this.localeData()._week;return je(this.weekYear(),e.dow,e.doy)},pn.isoWeeksInYear=function(){return je(this.year(),1,4)},pn.isoWeeksInISOWeekYear=function(){return je(this.isoWeekYear(),1,4)},pn.date=fn,pn.day=pn.days=function(e){if(!this.isValid())return null!=e?this:NaN;var t,n,s=this._isUTC?this._d.getUTCDay():this._d.getDay();return null!=e?(t=e,n=this.localeData(),e="string"!=typeof t?t:isNaN(t)?"number"==typeof(t=n.weekdaysParse(t))?t:null:parseInt(t,10),this.add(e-s,"d")):s},pn.weekday=function(e){if(!this.isValid())return null!=e?this:NaN;var t=(this.day()+7-this.localeData()._week.dow)%7;return null==e?t:this.add(e-t,"d")},pn.isoWeekday=function(e){if(!this.isValid())return null!=e?this:NaN;if(null==e)return this.day()||7;var t,n,s=(t=e,n=this.localeData(),"string"==typeof t?n.weekdaysParse(t)%7||7:isNaN(t)?null:t);return this.day(this.day()%7?s:s-7)},pn.dayOfYear=function(e){var t=Math.round((this.clone().startOf("day")-this.clone().startOf("year"))/864e5)+1;return null==e?t:this.add(e-t,"d")},pn.hour=pn.hours=tt,pn.minute=pn.minutes=mn,pn.second=pn.seconds=gn,pn.millisecond=pn.milliseconds=yn,pn.utcOffset=function(e,t,n){var s,i=this._offset||0;if(!this.isValid())return null!=e?this:NaN;if(null==e)return this._isUTC?i:Et(this);if("string"==typeof e){if(null===(e=Vt(he,e)))return this}else Math.abs(e)<16&&!n&&(e*=60);return!this._isUTC&&t&&(s=Et(this)),this._offset=e,this._isUTC=!0,null!=s&&this.add(s,"m"),i!==e&&(!t||this._changeInProgress?Bt(this,Zt(e-i,"m"),1,!1):this._changeInProgress||(this._changeInProgress=!0,f.updateOffset(this,!0),this._changeInProgress=null)),this},pn.utc=function(e){return this.utcOffset(0,e)},pn.local=function(e){return this._isUTC&&(this.utcOffset(0,e),this._isUTC=!1,e&&this.subtract(Et(this),"m")),this},pn.parseZone=function(){var e;return null!=this._tzm?this.utcOffset(this._tzm,!1,!0):"string"==typeof this._i&&(null!=(e=Vt(le,this._i))?this.utcOffset(e):this.utcOffset(0,!0)),this},pn.hasAlignedHourOffset=function(e){return!!this.isValid()&&(e=e?Tt(e).utcOffset():0,(this.utcOffset()-e)%60==0)},pn.isDST=function(){return this.utcOffset()>this.clone().month(0).utcOffset()||this.utcOffset()>this.clone().month(5).utcOffset()},pn.isLocal=function(){return!!this.isValid()&&!this._isUTC},pn.isUtcOffset=function(){return!!this.isValid()&&this._isUTC},pn.isUtc=At,pn.isUTC=At,pn.zoneAbbr=function(){return this._isUTC?"UTC":""},pn.zoneName=function(){return this._isUTC?"Coordinated Universal Time":""},pn.dates=n("dates accessor is deprecated. Use date instead.",fn),pn.months=n("months accessor is deprecated. Use month instead",Ue),pn.years=n("years accessor is deprecated. Use year instead",Le),pn.zone=n("moment().zone is deprecated, use moment().utcOffset instead. http://momentjs.com/guides/#/warnings/zone/",function(e,t){return null!=e?("string"!=typeof e&&(e=-e),this.utcOffset(e,t),this):-this.utcOffset()}),pn.isDSTShifted=n("isDSTShifted is deprecated. See http://momentjs.com/guides/#/warnings/dst-shifted/ for more information",function(){if(!r(this._isDSTShifted))return this._isDSTShifted;var e,t={};return v(t,this),(t=bt(t))._a?(e=(t._isUTC?_:Tt)(t._a),this._isDSTShifted=this.isValid()&&0<function(e,t,n){for(var s=Math.min(e.length,t.length),i=Math.abs(e.length-t.length),r=0,a=0;a<s;a++)(n&&e[a]!==t[a]||!n&&Z(e[a])!==Z(t[a]))&&r++;return r+i}(t._a,e.toArray())):this._isDSTShifted=!1,this._isDSTShifted});var kn=x.prototype;function Mn(e,t,n,s){var i=dt(),r=_().set(s,t);return i[n](r,e)}function Dn(e,t,n){if(h(e)&&(t=e,e=void 0),e=e||"",null!=t)return Mn(e,t,n,"month");for(var s=[],i=0;i<12;i++)s[i]=Mn(e,i,n,"month");return s}function Sn(e,t,n,s){t=("boolean"==typeof e?h(t)&&(n=t,t=void 0):(t=e,e=!1,h(n=t)&&(n=t,t=void 0)),t||"");var i,r=dt(),a=e?r._week.dow:0,o=[];if(null!=n)return Mn(t,(n+a)%7,s,"day");for(i=0;i<7;i++)o[i]=Mn(t,(i+a)%7,s,"day");return o}kn.calendar=function(e,t,n){var s=this._calendar[e]||this._calendar.sameElse;return O(s)?s.call(t,n):s},kn.longDateFormat=function(e){var t=this._longDateFormat[e],n=this._longDateFormat[e.toUpperCase()];return t||!n?t:(this._longDateFormat[e]=n.match(N).map(function(e){return"MMMM"===e||"MM"===e||"DD"===e||"dddd"===e?e.slice(1):e}).join(""),this._longDateFormat[e])},kn.invalidDate=function(){return this._invalidDate},kn.ordinal=function(e){return this._ordinal.replace("%d",e)},kn.preparse=vn,kn.postformat=vn,kn.relativeTime=function(e,t,n,s){var i=this._relativeTime[n];return O(i)?i(e,t,n,s):i.replace(/%d/i,e)},kn.pastFuture=function(e,t){var n=this._relativeTime[0<e?"future":"past"];return O(n)?n(t):n.replace(/%s/i,t)},kn.set=function(e){var t,n;for(n in e)m(e,n)&&(O(t=e[n])?this[n]=t:this["_"+n]=t);this._config=e,this._dayOfMonthOrdinalParseLenient=new RegExp((this._dayOfMonthOrdinalParse.source||this._ordinalParse.source)+"|"+/\d{1,2}/.source)},kn.eras=function(e,t){for(var n,s=this._eras||dt("en")._eras,i=0,r=s.length;i<r;++i){switch(typeof s[i].since){case"string":n=f(s[i].since).startOf("day"),s[i].since=n.valueOf();break}switch(typeof s[i].until){case"undefined":s[i].until=1/0;break;case"string":n=f(s[i].until).startOf("day").valueOf(),s[i].until=n.valueOf();break}}return s},kn.erasParse=function(e,t,n){var s,i,r,a,o,u=this.eras();for(e=e.toUpperCase(),s=0,i=u.length;s<i;++s)if(r=u[s].name.toUpperCase(),a=u[s].abbr.toUpperCase(),o=u[s].narrow.toUpperCase(),n)switch(t){case"N":case"NN":case"NNN":if(a===e)return u[s];break;case"NNNN":if(r===e)return u[s];break;case"NNNNN":if(o===e)return u[s];break}else if(0<=[r,a,o].indexOf(e))return u[s]},kn.erasConvertYear=function(e,t){var n=e.since<=e.until?1:-1;return void 0===t?f(e.since).year():f(e.since).year()+(t-e.offset)*n},kn.erasAbbrRegex=function(e){return m(this,"_erasAbbrRegex")||hn.call(this),e?this._erasAbbrRegex:this._erasRegex},kn.erasNameRegex=function(e){return m(this,"_erasNameRegex")||hn.call(this),e?this._erasNameRegex:this._erasRegex},kn.erasNarrowRegex=function(e){return m(this,"_erasNarrowRegex")||hn.call(this),e?this._erasNarrowRegex:this._erasRegex},kn.months=function(e,t){return e?o(this._months)?this._months[e.month()]:this._months[(this._months.isFormat||Pe).test(t)?"format":"standalone"][e.month()]:o(this._months)?this._months:this._months.standalone},kn.monthsShort=function(e,t){return e?o(this._monthsShort)?this._monthsShort[e.month()]:this._monthsShort[Pe.test(t)?"format":"standalone"][e.month()]:o(this._monthsShort)?this._monthsShort:this._monthsShort.standalone},kn.monthsParse=function(e,t,n){var s,i,r;if(this._monthsParseExact)return function(e,t,n){var s,i,r,a=e.toLocaleLowerCase();if(!this._monthsParse)for(this._monthsParse=[],this._longMonthsParse=[],this._shortMonthsParse=[],s=0;s<12;++s)r=_([2e3,s]),this._shortMonthsParse[s]=this.monthsShort(r,"").toLocaleLowerCase(),this._longMonthsParse[s]=this.months(r,"").toLocaleLowerCase();return n?"MMM"===t?-1!==(i=we.call(this._shortMonthsParse,a))?i:null:-1!==(i=we.call(this._longMonthsParse,a))?i:null:"MMM"===t?-1!==(i=we.call(this._shortMonthsParse,a))||-1!==(i=we.call(this._longMonthsParse,a))?i:null:-1!==(i=we.call(this._longMonthsParse,a))||-1!==(i=we.call(this._shortMonthsParse,a))?i:null}.call(this,e,t,n);for(this._monthsParse||(this._monthsParse=[],this._longMonthsParse=[],this._shortMonthsParse=[]),s=0;s<12;s++){if(i=_([2e3,s]),n&&!this._longMonthsParse[s]&&(this._longMonthsParse[s]=new RegExp("^"+this.months(i,"").replace(".","")+"$","i"),this._shortMonthsParse[s]=new RegExp("^"+this.monthsShort(i,"").replace(".","")+"$","i")),n||this._monthsParse[s]||(r="^"+this.months(i,"")+"|^"+this.monthsShort(i,""),this._monthsParse[s]=new RegExp(r.replace(".",""),"i")),n&&"MMMM"===t&&this._longMonthsParse[s].test(e))return s;if(n&&"MMM"===t&&this._shortMonthsParse[s].test(e))return s;if(!n&&this._monthsParse[s].test(e))return s}},kn.monthsRegex=function(e){return this._monthsParseExact?(m(this,"_monthsRegex")||He.call(this),e?this._monthsStrictRegex:this._monthsRegex):(m(this,"_monthsRegex")||(this._monthsRegex=We),this._monthsStrictRegex&&e?this._monthsStrictRegex:this._monthsRegex)},kn.monthsShortRegex=function(e){return this._monthsParseExact?(m(this,"_monthsRegex")||He.call(this),e?this._monthsShortStrictRegex:this._monthsShortRegex):(m(this,"_monthsShortRegex")||(this._monthsShortRegex=Re),this._monthsShortStrictRegex&&e?this._monthsShortStrictRegex:this._monthsShortRegex)},kn.week=function(e){return Ae(e,this._week.dow,this._week.doy).week},kn.firstDayOfYear=function(){return this._week.doy},kn.firstDayOfWeek=function(){return this._week.dow},kn.weekdays=function(e,t){var n=o(this._weekdays)?this._weekdays:this._weekdays[e&&!0!==e&&this._weekdays.isFormat.test(t)?"format":"standalone"];return!0===e?Ie(n,this._week.dow):e?n[e.day()]:n},kn.weekdaysMin=function(e){return!0===e?Ie(this._weekdaysMin,this._week.dow):e?this._weekdaysMin[e.day()]:this._weekdaysMin},kn.weekdaysShort=function(e){return!0===e?Ie(this._weekdaysShort,this._week.dow):e?this._weekdaysShort[e.day()]:this._weekdaysShort},kn.weekdaysParse=function(e,t,n){var s,i,r;if(this._weekdaysParseExact)return function(e,t,n){var s,i,r,a=e.toLocaleLowerCase();if(!this._weekdaysParse)for(this._weekdaysParse=[],this._shortWeekdaysParse=[],this._minWeekdaysParse=[],s=0;s<7;++s)r=_([2e3,1]).day(s),this._minWeekdaysParse[s]=this.weekdaysMin(r,"").toLocaleLowerCase(),this._shortWeekdaysParse[s]=this.weekdaysShort(r,"").toLocaleLowerCase(),this._weekdaysParse[s]=this.weekdays(r,"").toLocaleLowerCase();return n?"dddd"===t?-1!==(i=we.call(this._weekdaysParse,a))?i:null:"ddd"===t?-1!==(i=we.call(this._shortWeekdaysParse,a))?i:null:-1!==(i=we.call(this._minWeekdaysParse,a))?i:null:"dddd"===t?-1!==(i=we.call(this._weekdaysParse,a))||-1!==(i=we.call(this._shortWeekdaysParse,a))||-1!==(i=we.call(this._minWeekdaysParse,a))?i:null:"ddd"===t?-1!==(i=we.call(this._shortWeekdaysParse,a))||-1!==(i=we.call(this._weekdaysParse,a))||-1!==(i=we.call(this._minWeekdaysParse,a))?i:null:-1!==(i=we.call(this._minWeekdaysParse,a))||-1!==(i=we.call(this._weekdaysParse,a))||-1!==(i=we.call(this._shortWeekdaysParse,a))?i:null}.call(this,e,t,n);for(this._weekdaysParse||(this._weekdaysParse=[],this._minWeekdaysParse=[],this._shortWeekdaysParse=[],this._fullWeekdaysParse=[]),s=0;s<7;s++){if(i=_([2e3,1]).day(s),n&&!this._fullWeekdaysParse[s]&&(this._fullWeekdaysParse[s]=new RegExp("^"+this.weekdays(i,"").replace(".","\\.?")+"$","i"),this._shortWeekdaysParse[s]=new RegExp("^"+this.weekdaysShort(i,"").replace(".","\\.?")+"$","i"),this._minWeekdaysParse[s]=new RegExp("^"+this.weekdaysMin(i,"").replace(".","\\.?")+"$","i")),this._weekdaysParse[s]||(r="^"+this.weekdays(i,"")+"|^"+this.weekdaysShort(i,"")+"|^"+this.weekdaysMin(i,""),this._weekdaysParse[s]=new RegExp(r.replace(".",""),"i")),n&&"dddd"===t&&this._fullWeekdaysParse[s].test(e))return s;if(n&&"ddd"===t&&this._shortWeekdaysParse[s].test(e))return s;if(n&&"dd"===t&&this._minWeekdaysParse[s].test(e))return s;if(!n&&this._weekdaysParse[s].test(e))return s}},kn.weekdaysRegex=function(e){return this._weekdaysParseExact?(m(this,"_weekdaysRegex")||Qe.call(this),e?this._weekdaysStrictRegex:this._weekdaysRegex):(m(this,"_weekdaysRegex")||(this._weekdaysRegex=qe),this._weekdaysStrictRegex&&e?this._weekdaysStrictRegex:this._weekdaysRegex)},kn.weekdaysShortRegex=function(e){return this._weekdaysParseExact?(m(this,"_weekdaysRegex")||Qe.call(this),e?this._weekdaysShortStrictRegex:this._weekdaysShortRegex):(m(this,"_weekdaysShortRegex")||(this._weekdaysShortRegex=Be),this._weekdaysShortStrictRegex&&e?this._weekdaysShortStrictRegex:this._weekdaysShortRegex)},kn.weekdaysMinRegex=function(e){return this._weekdaysParseExact?(m(this,"_weekdaysRegex")||Qe.call(this),e?this._weekdaysMinStrictRegex:this._weekdaysMinRegex):(m(this,"_weekdaysMinRegex")||(this._weekdaysMinRegex=Je),this._weekdaysMinStrictRegex&&e?this._weekdaysMinStrictRegex:this._weekdaysMinRegex)},kn.isPM=function(e){return"p"===(e+"").toLowerCase().charAt(0)},kn.meridiem=function(e,t,n){return 11<e?n?"pm":"PM":n?"am":"AM"},lt("en",{eras:[{since:"0001-01-01",until:1/0,offset:1,name:"Anno Domini",narrow:"AD",abbr:"AD"},{since:"0000-12-31",until:-1/0,offset:1,name:"Before Christ",narrow:"BC",abbr:"BC"}],dayOfMonthOrdinalParse:/\d{1,2}(th|st|nd|rd)/,ordinal:function(e){var t=e%10;return e+(1===Z(e%100/10)?"th":1==t?"st":2==t?"nd":3==t?"rd":"th")}}),f.lang=n("moment.lang is deprecated. Use moment.locale instead.",lt),f.langData=n("moment.langData is deprecated. Use moment.localeData instead.",dt);var Yn=Math.abs;function On(e,t,n,s){var i=Zt(t,n);return e._milliseconds+=s*i._milliseconds,e._days+=s*i._days,e._months+=s*i._months,e._bubble()}function bn(e){return e<0?Math.floor(e):Math.ceil(e)}function xn(e){return 4800*e/146097}function Tn(e){return 146097*e/4800}function Nn(e){return function(){return this.as(e)}}var Pn=Nn("ms"),Rn=Nn("s"),Wn=Nn("m"),Cn=Nn("h"),Un=Nn("d"),Hn=Nn("w"),Fn=Nn("M"),Ln=Nn("Q"),Vn=Nn("y");function Gn(e){return function(){return this.isValid()?this._data[e]:NaN}}var En=Gn("milliseconds"),An=Gn("seconds"),jn=Gn("minutes"),In=Gn("hours"),Zn=Gn("days"),zn=Gn("months"),$n=Gn("years");var qn=Math.round,Bn={ss:44,s:45,m:45,h:22,d:26,w:null,M:11};function Jn(e,t,n,s){var i=Zt(e).abs(),r=qn(i.as("s")),a=qn(i.as("m")),o=qn(i.as("h")),u=qn(i.as("d")),l=qn(i.as("M")),h=qn(i.as("w")),d=qn(i.as("y")),c=(r<=n.ss?["s",r]:r<n.s&&["ss",r])||a<=1&&["m"]||a<n.m&&["mm",a]||o<=1&&["h"]||o<n.h&&["hh",o]||u<=1&&["d"]||u<n.d&&["dd",u];return null!=n.w&&(c=c||h<=1&&["w"]||h<n.w&&["ww",h]),(c=c||l<=1&&["M"]||l<n.M&&["MM",l]||d<=1&&["y"]||["yy",d])[2]=t,c[3]=0<+e,c[4]=s,function(e,t,n,s,i){return i.relativeTime(t||1,!!n,e,s)}.apply(null,c)}var Qn=Math.abs;function Xn(e){return(0<e)-(e<0)||+e}function Kn(){if(!this.isValid())return this.localeData().invalidDate();var e,t,n,s,i,r,a,o,u=Qn(this._milliseconds)/1e3,l=Qn(this._days),h=Qn(this._months),d=this.asSeconds();return d?(e=I(u/60),t=I(e/60),u%=60,e%=60,n=I(h/12),h%=12,s=u?u.toFixed(3).replace(/\.?0+$/,""):"",i=d<0?"-":"",r=Xn(this._months)!==Xn(d)?"-":"",a=Xn(this._days)!==Xn(d)?"-":"",o=Xn(this._milliseconds)!==Xn(d)?"-":"",i+"P"+(n?r+n+"Y":"")+(h?r+h+"M":"")+(l?a+l+"D":"")+(t||e||u?"T":"")+(t?o+t+"H":"")+(e?o+e+"M":"")+(u?o+s+"S":"")):"P0D"}var es=Ct.prototype;return es.isValid=function(){return this._isValid},es.abs=function(){var e=this._data;return this._milliseconds=Yn(this._milliseconds),this._days=Yn(this._days),this._months=Yn(this._months),e.milliseconds=Yn(e.milliseconds),e.seconds=Yn(e.seconds),e.minutes=Yn(e.minutes),e.hours=Yn(e.hours),e.months=Yn(e.months),e.years=Yn(e.years),this},es.add=function(e,t){return On(this,e,t,1)},es.subtract=function(e,t){return On(this,e,t,-1)},es.as=function(e){if(!this.isValid())return NaN;var t,n,s=this._milliseconds;if("month"===(e=V(e))||"quarter"===e||"year"===e)switch(t=this._days+s/864e5,n=this._months+xn(t),e){case"month":return n;case"quarter":return n/3;case"year":return n/12}else switch(t=this._days+Math.round(Tn(this._months)),e){case"week":return t/7+s/6048e5;case"day":return t+s/864e5;case"hour":return 24*t+s/36e5;case"minute":return 1440*t+s/6e4;case"second":return 86400*t+s/1e3;case"millisecond":return Math.floor(864e5*t)+s;default:throw new Error("Unknown unit "+e)}},es.asMilliseconds=Pn,es.asSeconds=Rn,es.asMinutes=Wn,es.asHours=Cn,es.asDays=Un,es.asWeeks=Hn,es.asMonths=Fn,es.asQuarters=Ln,es.asYears=Vn,es.valueOf=function(){return this.isValid()?this._milliseconds+864e5*this._days+this._months%12*2592e6+31536e6*Z(this._months/12):NaN},es._bubble=function(){var e,t,n,s,i,r=this._milliseconds,a=this._days,o=this._months,u=this._data;return 0<=r&&0<=a&&0<=o||r<=0&&a<=0&&o<=0||(r+=864e5*bn(Tn(o)+a),o=a=0),u.milliseconds=r%1e3,e=I(r/1e3),u.seconds=e%60,t=I(e/60),u.minutes=t%60,n=I(t/60),u.hours=n%24,a+=I(n/24),o+=i=I(xn(a)),a-=bn(Tn(i)),s=I(o/12),o%=12,u.days=a,u.months=o,u.years=s,this},es.clone=function(){return Zt(this)},es.get=function(e){return e=V(e),this.isValid()?this[e+"s"]():NaN},es.milliseconds=En,es.seconds=An,es.minutes=jn,es.hours=In,es.days=Zn,es.weeks=function(){return I(this.days()/7)},es.months=zn,es.years=$n,es.humanize=function(e,t){if(!this.isValid())return this.localeData().invalidDate();var n,s,i=!1,r=Bn;return"object"==typeof e&&(t=e,e=!1),"boolean"==typeof e&&(i=e),"object"==typeof t&&(r=Object.assign({},Bn,t),null!=t.s&&null==t.ss&&(r.ss=t.s-1)),n=this.localeData(),s=Jn(this,!i,r,n),i&&(s=n.pastFuture(+this,s)),n.postformat(s)},es.toISOString=Kn,es.toString=Kn,es.toJSON=Kn,es.locale=tn,es.localeData=sn,es.toIsoString=n("toIsoString() is deprecated. Please use toISOString() instead (notice the capitals)",Kn),es.lang=nn,C("X",0,0,"unix"),C("x",0,0,"valueOf"),ce("x",ue),ce("X",/[+-]?\d+(\.\d{1,3})?/),ye("X",function(e,t,n){n._d=new Date(1e3*parseFloat(e))}),ye("x",function(e,t,n){n._d=new Date(Z(e))}),f.version="2.29.1",e=Tt,f.fn=pn,f.min=function(){return Rt("isBefore",[].slice.call(arguments,0))},f.max=function(){return Rt("isAfter",[].slice.call(arguments,0))},f.now=function(){return Date.now?Date.now():+new Date},f.utc=_,f.unix=function(e){return Tt(1e3*e)},f.months=function(e,t){return Dn(e,t,"months")},f.isDate=a,f.locale=lt,f.invalid=w,f.duration=Zt,f.isMoment=M,f.weekdays=function(e,t,n){return Sn(e,t,n,"weekdays")},f.parseZone=function(){return Tt.apply(null,arguments).parseZone()},f.localeData=dt,f.isDuration=Ut,f.monthsShort=function(e,t){return Dn(e,t,"monthsShort")},f.weekdaysMin=function(e,t,n){return Sn(e,t,n,"weekdaysMin")},f.defineLocale=ht,f.updateLocale=function(e,t){var n,s,i;return null!=t?(i=st,null!=it[e]&&null!=it[e].parentLocale?it[e].set(b(it[e]._config,t)):(null!=(s=ut(e))&&(i=s._config),t=b(i,t),null==s&&(t.abbr=e),(n=new x(t)).parentLocale=it[e],it[e]=n),lt(e)):null!=it[e]&&(null!=it[e].parentLocale?(it[e]=it[e].parentLocale,e===lt()&&lt(e)):null!=it[e]&&delete it[e]),it[e]},f.locales=function(){return s(it)},f.weekdaysShort=function(e,t,n){return Sn(e,t,n,"weekdaysShort")},f.normalizeUnits=V,f.relativeTimeRounding=function(e){return void 0===e?qn:"function"==typeof e&&(qn=e,!0)},f.relativeTimeThreshold=function(e,t){return void 0!==Bn[e]&&(void 0===t?Bn[e]:(Bn[e]=t,"s"===e&&(Bn.ss=t-1),!0))},f.calendarFormat=function(e,t){var n=e.diff(t,"days",!0);return n<-6?"sameElse":n<-1?"lastWeek":n<0?"lastDay":n<1?"sameDay":n<2?"nextDay":n<7?"nextWeek":"sameElse"},f.prototype=pn,f.HTML5_FMT={DATETIME_LOCAL:"YYYY-MM-DDTHH:mm",DATETIME_LOCAL_SECONDS:"YYYY-MM-DDTHH:mm:ss",DATETIME_LOCAL_MS:"YYYY-MM-DDTHH:mm:ss.SSS",DATE:"YYYY-MM-DD",TIME:"HH:mm",TIME_SECONDS:"HH:mm:ss",TIME_MS:"HH:mm:ss.SSS",WEEK:"GGGG-[W]WW",MONTH:"YYYY-MM"},f});
+'use strict';
+var Config = {};
+Config.Emoji = {
+    "00a9": ["\u00A9", ["copyright"]],
+    "00ae": ["\u00AE", ["registered"]],
+    "203c": ["\u203C", ["bangbang"]],
+    "2049": ["\u2049", ["interrobang"]],
+    "2122": ["\u2122", ["tm"]],
+    "2139": ["\u2139", ["information_source"]],
+    "2194": ["\u2194", ["left_right_arrow"]],
+    "2195": ["\u2195", ["arrow_up_down"]],
+    "2196": ["\u2196", ["arrow_upper_left"]],
+    "2197": ["\u2197", ["arrow_upper_right"]],
+    "2198": ["\u2198", ["arrow_lower_right"]],
+    "2199": ["\u2199", ["arrow_lower_left"]],
+    "21a9": ["\u21A9", ["leftwards_arrow_with_hook"]],
+    "21aa": ["\u21AA", ["arrow_right_hook"]],
+    "231a": ["\u231A", ["watch"]],
+    "231b": ["\u231B", ["hourglass"]],
+    "23e9": ["\u23E9", ["fast_forward"]],
+    "23ea": ["\u23EA", ["rewind"]],
+    "23eb": ["\u23EB", ["arrow_double_up"]],
+    "23ec": ["\u23EC", ["arrow_double_down"]],
+    "23f0": ["\u23F0", ["alarm_clock"]],
+    "23f3": ["\u23F3", ["hourglass_flowing_sand"]],
+    "24c2": ["\u24C2", ["m"]],
+    "25aa": ["\u25AA", ["black_small_square"]],
+    "25ab": ["\u25AB", ["white_small_square"]],
+    "25b6": ["\u25B6", ["arrow_forward"]],
+    "25c0": ["\u25C0", ["arrow_backward"]],
+    "25fb": ["\u25FB", ["white_medium_square"]],
+    "25fc": ["\u25FC", ["black_medium_square"]],
+    "25fd": ["\u25FD", ["white_medium_small_square"]],
+    "25fe": ["\u25FE", ["black_medium_small_square"]],
+    "2600": ["\u2600", ["sunny"]],
+    "2601": ["\u2601", ["cloud"]],
+    "260e": ["\u260E", ["phone", "telephone"]],
+    "2611": ["\u2611", ["ballot_box_with_check"]],
+    "2614": ["\u2614", ["umbrella"]],
+    "2615": ["\u2615", ["coffee"]],
+    "261d": ["\u261D", ["point_up"]],
+    "263a": ["\u263A", ["relaxed"]],
+    "2648": ["\u2648", ["aries"]],
+    "2649": ["\u2649", ["taurus"]],
+    "264a": ["\u264A", ["gemini"]],
+    "264b": ["\u264B", ["cancer"]],
+    "264c": ["\u264C", ["leo"]],
+    "264d": ["\u264D", ["virgo"]],
+    "264e": ["\u264E", ["libra"]],
+    "264f": ["\u264F", ["scorpius"]],
+    "2650": ["\u2650", ["sagittarius"]],
+    "2651": ["\u2651", ["capricorn"]],
+    "2652": ["\u2652", ["aquarius"]],
+    "2653": ["\u2653", ["pisces"]],
+    "2660": ["\u2660", ["spades"]],
+    "2663": ["\u2663", ["clubs"]],
+    "2665": ["\u2665", ["hearts"]],
+    "2666": ["\u2666", ["diamonds"]],
+    "2668": ["\u2668", ["hotsprings"]],
+    "267b": ["\u267B", ["recycle"]],
+    "267f": ["\u267F", ["wheelchair"]],
+    "2693": ["\u2693", ["anchor"]],
+    "26a0": ["\u26A0", ["warning"]],
+    "26a1": ["\u26A1", ["zap"]],
+    "26aa": ["\u26AA", ["white_circle"]],
+    "26ab": ["\u26AB", ["black_circle"]],
+    "26bd": ["\u26BD", ["soccer"]],
+    "26be": ["\u26BE", ["baseball"]],
+    "26c4": ["\u26C4", ["snowman"]],
+    "26c5": ["\u26C5", ["partly_sunny"]],
+    "26ce": ["\u26CE", ["ophiuchus"]],
+    "26d4": ["\u26D4", ["no_entry"]],
+    "26ea": ["\u26EA", ["church"]],
+    "26f2": ["\u26F2", ["fountain"]],
+    "26f3": ["\u26F3", ["golf"]],
+    "26f5": ["\u26F5", ["boat", "sailboat"]],
+    "26fa": ["\u26FA", ["tent"]],
+    "26fd": ["\u26FD", ["fuelpump"]],
+    "2702": ["\u2702", ["scissors"]],
+    "2705": ["\u2705", ["white_check_mark"]],
+    "2708": ["\u2708", ["airplane"]],
+    "2709": ["\u2709", ["email", "envelope"]],
+    "270a": ["\u270A", ["fist"]],
+    "270b": ["\u270B", ["hand", "raised_hand"]],
+    "270c": ["\u270C", ["v"]],
+    "270f": ["\u270F", ["pencil2"]],
+    "2712": ["\u2712", ["black_nib"]],
+    "2714": ["\u2714", ["heavy_check_mark"]],
+    "2716": ["\u2716", ["heavy_multiplication_x"]],
+    "2728": ["\u2728", ["sparkles"]],
+    "2733": ["\u2733", ["eight_spoked_asterisk"]],
+    "2734": ["\u2734", ["eight_pointed_black_star"]],
+    "2744": ["\u2744", ["snowflake"]],
+    "2747": ["\u2747", ["sparkle"]],
+    "274c": ["\u274C", ["x"]],
+    "274e": ["\u274E", ["negative_squared_cross_mark"]],
+    "2753": ["\u2753", ["question"]],
+    "2754": ["\u2754", ["grey_question"]],
+    "2755": ["\u2755", ["grey_exclamation"]],
+    "2757": ["\u2757", ["exclamation", "heavy_exclamation_mark"]],
+    "2764": ["\u2764", ["heart"], "<3"],
+    "2795": ["\u2795", ["heavy_plus_sign"]],
+    "2796": ["\u2796", ["heavy_minus_sign"]],
+    "2797": ["\u2797", ["heavy_division_sign"]],
+    "27a1": ["\u27A1", ["arrow_right"]],
+    "27b0": ["\u27B0", ["curly_loop"]],
+    "27bf": ["\u27BF", ["loop"]],
+    "2934": ["\u2934", ["arrow_heading_up"]],
+    "2935": ["\u2935", ["arrow_heading_down"]],
+    "2b05": ["\u2B05", ["arrow_left"]],
+    "2b06": ["\u2B06", ["arrow_up"]],
+    "2b07": ["\u2B07", ["arrow_down"]],
+    "2b1b": ["\u2B1B", ["black_large_square"]],
+    "2b1c": ["\u2B1C", ["white_large_square"]],
+    "2b50": ["\u2B50", ["star"]],
+    "2b55": ["\u2B55", ["o"]],
+    "3030": ["\u3030", ["wavy_dash"]],
+    "303d": ["\u303D", ["part_alternation_mark"]],
+    "3297": ["\u3297", ["congratulations"]],
+    "3299": ["\u3299", ["secret"]],
+    "1f004": ["\uD83C\uDC04", ["mahjong"]],
+    "1f0cf": ["\uD83C\uDCCF", ["black_joker"]],
+    "1f170": ["\uD83C\uDD70", ["a"]],
+    "1f171": ["\uD83C\uDD71", ["b"]],
+    "1f17e": ["\uD83C\uDD7E", ["o2"]],
+    "1f17f": ["\uD83C\uDD7F", ["parking"]],
+    "1f18e": ["\uD83C\uDD8E", ["ab"]],
+    "1f191": ["\uD83C\uDD91", ["cl"]],
+    "1f192": ["\uD83C\uDD92", ["cool"]],
+    "1f193": ["\uD83C\uDD93", ["free"]],
+    "1f194": ["\uD83C\uDD94", ["id"]],
+    "1f195": ["\uD83C\uDD95", ["new"]],
+    "1f196": ["\uD83C\uDD96", ["ng"]],
+    "1f197": ["\uD83C\uDD97", ["ok"]],
+    "1f198": ["\uD83C\uDD98", ["sos"]],
+    "1f199": ["\uD83C\uDD99", ["up"]],
+    "1f19a": ["\uD83C\uDD9A", ["vs"]],
+    "1f201": ["\uD83C\uDE01", ["koko"]],
+    "1f202": ["\uD83C\uDE02", ["sa"]],
+    "1f21a": ["\uD83C\uDE1A", ["u7121"]],
+    "1f22f": ["\uD83C\uDE2F", ["u6307"]],
+    "1f232": ["\uD83C\uDE32", ["u7981"]],
+    "1f233": ["\uD83C\uDE33", ["u7a7a"]],
+    "1f234": ["\uD83C\uDE34", ["u5408"]],
+    "1f235": ["\uD83C\uDE35", ["u6e80"]],
+    "1f236": ["\uD83C\uDE36", ["u6709"]],
+    "1f237": ["\uD83C\uDE37", ["u6708"]],
+    "1f238": ["\uD83C\uDE38", ["u7533"]],
+    "1f239": ["\uD83C\uDE39", ["u5272"]],
+    "1f23a": ["\uD83C\uDE3A", ["u55b6"]],
+    "1f250": ["\uD83C\uDE50", ["ideograph_advantage"]],
+    "1f251": ["\uD83C\uDE51", ["accept"]],
+    "1f300": ["\uD83C\uDF00", ["cyclone"]],
+    "1f301": ["\uD83C\uDF01", ["foggy"]],
+    "1f302": ["\uD83C\uDF02", ["closed_umbrella"]],
+    "1f303": ["\uD83C\uDF03", ["night_with_stars"]],
+    "1f304": ["\uD83C\uDF04", ["sunrise_over_mountains"]],
+    "1f305": ["\uD83C\uDF05", ["sunrise"]],
+    "1f306": ["\uD83C\uDF06", ["city_sunset"]],
+    "1f307": ["\uD83C\uDF07", ["city_sunrise"]],
+    "1f308": ["\uD83C\uDF08", ["rainbow"]],
+    "1f309": ["\uD83C\uDF09", ["bridge_at_night"]],
+    "1f30a": ["\uD83C\uDF0A", ["ocean"]],
+    "1f30b": ["\uD83C\uDF0B", ["volcano"]],
+    "1f30c": ["\uD83C\uDF0C", ["milky_way"]],
+    "1f30d": ["\uD83C\uDF0D", ["earth_africa"]],
+    "1f30e": ["\uD83C\uDF0E", ["earth_americas"]],
+    "1f30f": ["\uD83C\uDF0F", ["earth_asia"]],
+    "1f310": ["\uD83C\uDF10", ["globe_with_meridians"]],
+    "1f311": ["\uD83C\uDF11", ["new_moon"]],
+    "1f312": ["\uD83C\uDF12", ["waxing_crescent_moon"]],
+    "1f313": ["\uD83C\uDF13", ["first_quarter_moon"]],
+    "1f314": ["\uD83C\uDF14", ["moon", "waxing_gibbous_moon"]],
+    "1f315": ["\uD83C\uDF15", ["full_moon"]],
+    "1f316": ["\uD83C\uDF16", ["waning_gibbous_moon"]],
+    "1f317": ["\uD83C\uDF17", ["last_quarter_moon"]],
+    "1f318": ["\uD83C\uDF18", ["waning_crescent_moon"]],
+    "1f319": ["\uD83C\uDF19", ["crescent_moon"]],
+    "1f320": ["\uD83C\uDF20", ["stars"]],
+    "1f31a": ["\uD83C\uDF1A", ["new_moon_with_face"]],
+    "1f31b": ["\uD83C\uDF1B", ["first_quarter_moon_with_face"]],
+    "1f31c": ["\uD83C\uDF1C", ["last_quarter_moon_with_face"]],
+    "1f31d": ["\uD83C\uDF1D", ["full_moon_with_face"]],
+    "1f31e": ["\uD83C\uDF1E", ["sun_with_face"]],
+    "1f31f": ["\uD83C\uDF1F", ["star2"]],
+    "1f330": ["\uD83C\uDF30", ["chestnut"]],
+    "1f331": ["\uD83C\uDF31", ["seedling"]],
+    "1f332": ["\uD83C\uDF32", ["evergreen_tree"]],
+    "1f333": ["\uD83C\uDF33", ["deciduous_tree"]],
+    "1f334": ["\uD83C\uDF34", ["palm_tree"]],
+    "1f335": ["\uD83C\uDF35", ["cactus"]],
+    "1f337": ["\uD83C\uDF37", ["tulip"]],
+    "1f338": ["\uD83C\uDF38", ["cherry_blossom"]],
+    "1f339": ["\uD83C\uDF39", ["rose"]],
+    "1f33a": ["\uD83C\uDF3A", ["hibiscus"]],
+    "1f33b": ["\uD83C\uDF3B", ["sunflower"]],
+    "1f33c": ["\uD83C\uDF3C", ["blossom"]],
+    "1f33d": ["\uD83C\uDF3D", ["corn"]],
+    "1f33e": ["\uD83C\uDF3E", ["ear_of_rice"]],
+    "1f33f": ["\uD83C\uDF3F", ["herb"]],
+    "1f340": ["\uD83C\uDF40", ["four_leaf_clover"]],
+    "1f341": ["\uD83C\uDF41", ["maple_leaf"]],
+    "1f342": ["\uD83C\uDF42", ["fallen_leaf"]],
+    "1f343": ["\uD83C\uDF43", ["leaves"]],
+    "1f344": ["\uD83C\uDF44", ["mushroom"]],
+    "1f345": ["\uD83C\uDF45", ["tomato"]],
+    "1f346": ["\uD83C\uDF46", ["eggplant"]],
+    "1f347": ["\uD83C\uDF47", ["grapes"]],
+    "1f348": ["\uD83C\uDF48", ["melon"]],
+    "1f349": ["\uD83C\uDF49", ["watermelon"]],
+    "1f34a": ["\uD83C\uDF4A", ["tangerine"]],
+    "1f34b": ["\uD83C\uDF4B", ["lemon"]],
+    "1f34c": ["\uD83C\uDF4C", ["banana"]],
+    "1f34d": ["\uD83C\uDF4D", ["pineapple"]],
+    "1f34e": ["\uD83C\uDF4E", ["apple"]],
+    "1f34f": ["\uD83C\uDF4F", ["green_apple"]],
+    "1f350": ["\uD83C\uDF50", ["pear"]],
+    "1f351": ["\uD83C\uDF51", ["peach"]],
+    "1f352": ["\uD83C\uDF52", ["cherries"]],
+    "1f353": ["\uD83C\uDF53", ["strawberry"]],
+    "1f354": ["\uD83C\uDF54", ["hamburger"]],
+    "1f355": ["\uD83C\uDF55", ["pizza"]],
+    "1f356": ["\uD83C\uDF56", ["meat_on_bone"]],
+    "1f357": ["\uD83C\uDF57", ["poultry_leg"]],
+    "1f358": ["\uD83C\uDF58", ["rice_cracker"]],
+    "1f359": ["\uD83C\uDF59", ["rice_ball"]],
+    "1f35a": ["\uD83C\uDF5A", ["rice"]],
+    "1f35b": ["\uD83C\uDF5B", ["curry"]],
+    "1f35c": ["\uD83C\uDF5C", ["ramen"]],
+    "1f35d": ["\uD83C\uDF5D", ["spaghetti"]],
+    "1f35e": ["\uD83C\uDF5E", ["bread"]],
+    "1f35f": ["\uD83C\uDF5F", ["fries"]],
+    "1f360": ["\uD83C\uDF60", ["sweet_potato"]],
+    "1f361": ["\uD83C\uDF61", ["dango"]],
+    "1f362": ["\uD83C\uDF62", ["oden"]],
+    "1f363": ["\uD83C\uDF63", ["sushi"]],
+    "1f364": ["\uD83C\uDF64", ["fried_shrimp"]],
+    "1f365": ["\uD83C\uDF65", ["fish_cake"]],
+    "1f366": ["\uD83C\uDF66", ["icecream"]],
+    "1f367": ["\uD83C\uDF67", ["shaved_ice"]],
+    "1f368": ["\uD83C\uDF68", ["ice_cream"]],
+    "1f369": ["\uD83C\uDF69", ["doughnut"]],
+    "1f36a": ["\uD83C\uDF6A", ["cookie"]],
+    "1f36b": ["\uD83C\uDF6B", ["chocolate_bar"]],
+    "1f36c": ["\uD83C\uDF6C", ["candy"]],
+    "1f36d": ["\uD83C\uDF6D", ["lollipop"]],
+    "1f36e": ["\uD83C\uDF6E", ["custard"]],
+    "1f36f": ["\uD83C\uDF6F", ["honey_pot"]],
+    "1f370": ["\uD83C\uDF70", ["cake"]],
+    "1f371": ["\uD83C\uDF71", ["bento"]],
+    "1f372": ["\uD83C\uDF72", ["stew"]],
+    "1f373": ["\uD83C\uDF73", ["egg"]],
+    "1f374": ["\uD83C\uDF74", ["fork_and_knife"]],
+    "1f375": ["\uD83C\uDF75", ["tea"]],
+    "1f376": ["\uD83C\uDF76", ["sake"]],
+    "1f377": ["\uD83C\uDF77", ["wine_glass"]],
+    "1f378": ["\uD83C\uDF78", ["cocktail"]],
+    "1f379": ["\uD83C\uDF79", ["tropical_drink"]],
+    "1f37a": ["\uD83C\uDF7A", ["beer"]],
+    "1f37b": ["\uD83C\uDF7B", ["beers"]],
+    "1f37c": ["\uD83C\uDF7C", ["baby_bottle"]],
+    "1f380": ["\uD83C\uDF80", ["ribbon"]],
+    "1f381": ["\uD83C\uDF81", ["gift"]],
+    "1f382": ["\uD83C\uDF82", ["birthday"]],
+    "1f383": ["\uD83C\uDF83", ["jack_o_lantern"]],
+    "1f384": ["\uD83C\uDF84", ["christmas_tree"]],
+    "1f385": ["\uD83C\uDF85", ["santa"]],
+    "1f386": ["\uD83C\uDF86", ["fireworks"]],
+    "1f387": ["\uD83C\uDF87", ["sparkler"]],
+    "1f388": ["\uD83C\uDF88", ["balloon"]],
+    "1f389": ["\uD83C\uDF89", ["tada"]],
+    "1f38a": ["\uD83C\uDF8A", ["confetti_ball"]],
+    "1f38b": ["\uD83C\uDF8B", ["tanabata_tree"]],
+    "1f38c": ["\uD83C\uDF8C", ["crossed_flags"]],
+    "1f38d": ["\uD83C\uDF8D", ["bamboo"]],
+    "1f38e": ["\uD83C\uDF8E", ["dolls"]],
+    "1f38f": ["\uD83C\uDF8F", ["flags"]],
+    "1f390": ["\uD83C\uDF90", ["wind_chime"]],
+    "1f391": ["\uD83C\uDF91", ["rice_scene"]],
+    "1f392": ["\uD83C\uDF92", ["school_satchel"]],
+    "1f393": ["\uD83C\uDF93", ["mortar_board"]],
+    "1f3a0": ["\uD83C\uDFA0", ["carousel_horse"]],
+    "1f3a1": ["\uD83C\uDFA1", ["ferris_wheel"]],
+    "1f3a2": ["\uD83C\uDFA2", ["roller_coaster"]],
+    "1f3a3": ["\uD83C\uDFA3", ["fishing_pole_and_fish"]],
+    "1f3a4": ["\uD83C\uDFA4", ["microphone"]],
+    "1f3a5": ["\uD83C\uDFA5", ["movie_camera"]],
+    "1f3a6": ["\uD83C\uDFA6", ["cinema"]],
+    "1f3a7": ["\uD83C\uDFA7", ["headphones"]],
+    "1f3a8": ["\uD83C\uDFA8", ["art"]],
+    "1f3a9": ["\uD83C\uDFA9", ["tophat"]],
+    "1f3aa": ["\uD83C\uDFAA", ["circus_tent"]],
+    "1f3ab": ["\uD83C\uDFAB", ["ticket"]],
+    "1f3ac": ["\uD83C\uDFAC", ["clapper"]],
+    "1f3ad": ["\uD83C\uDFAD", ["performing_arts"]],
+    "1f3ae": ["\uD83C\uDFAE", ["video_game"]],
+    "1f3af": ["\uD83C\uDFAF", ["dart"]],
+    "1f3b0": ["\uD83C\uDFB0", ["slot_machine"]],
+    "1f3b1": ["\uD83C\uDFB1", ["8ball"]],
+    "1f3b2": ["\uD83C\uDFB2", ["game_die"]],
+    "1f3b3": ["\uD83C\uDFB3", ["bowling"]],
+    "1f3b4": ["\uD83C\uDFB4", ["flower_playing_cards"]],
+    "1f3b5": ["\uD83C\uDFB5", ["musical_note"]],
+    "1f3b6": ["\uD83C\uDFB6", ["notes"]],
+    "1f3b7": ["\uD83C\uDFB7", ["saxophone"]],
+    "1f3b8": ["\uD83C\uDFB8", ["guitar"]],
+    "1f3b9": ["\uD83C\uDFB9", ["musical_keyboard"]],
+    "1f3ba": ["\uD83C\uDFBA", ["trumpet"]],
+    "1f3bb": ["\uD83C\uDFBB", ["violin"]],
+    "1f3bc": ["\uD83C\uDFBC", ["musical_score"]],
+    "1f3bd": ["\uD83C\uDFBD", ["running_shirt_with_sash"]],
+    "1f3be": ["\uD83C\uDFBE", ["tennis"]],
+    "1f3bf": ["\uD83C\uDFBF", ["ski"]],
+    "1f3c0": ["\uD83C\uDFC0", ["basketball"]],
+    "1f3c1": ["\uD83C\uDFC1", ["checkered_flag"]],
+    "1f3c2": ["\uD83C\uDFC2", ["snowboarder"]],
+    "1f3c3": ["\uD83C\uDFC3", ["runner", "running"]],
+    "1f3c4": ["\uD83C\uDFC4", ["surfer"]],
+    "1f3c6": ["\uD83C\uDFC6", ["trophy"]],
+    "1f3c7": ["\uD83C\uDFC7", ["horse_racing"]],
+    "1f3c8": ["\uD83C\uDFC8", ["football"]],
+    "1f3c9": ["\uD83C\uDFC9", ["rugby_football"]],
+    "1f3ca": ["\uD83C\uDFCA", ["swimmer"]],
+    "1f3e0": ["\uD83C\uDFE0", ["house"]],
+    "1f3e1": ["\uD83C\uDFE1", ["house_with_garden"]],
+    "1f3e2": ["\uD83C\uDFE2", ["office"]],
+    "1f3e3": ["\uD83C\uDFE3", ["post_office"]],
+    "1f3e4": ["\uD83C\uDFE4", ["european_post_office"]],
+    "1f3e5": ["\uD83C\uDFE5", ["hospital"]],
+    "1f3e6": ["\uD83C\uDFE6", ["bank"]],
+    "1f3e7": ["\uD83C\uDFE7", ["atm"]],
+    "1f3e8": ["\uD83C\uDFE8", ["hotel"]],
+    "1f3e9": ["\uD83C\uDFE9", ["love_hotel"]],
+    "1f3ea": ["\uD83C\uDFEA", ["convenience_store"]],
+    "1f3eb": ["\uD83C\uDFEB", ["school"]],
+    "1f3ec": ["\uD83C\uDFEC", ["department_store"]],
+    "1f3ed": ["\uD83C\uDFED", ["factory"]],
+    "1f3ee": ["\uD83C\uDFEE", ["izakaya_lantern", "lantern"]],
+    "1f3ef": ["\uD83C\uDFEF", ["japanese_castle"]],
+    "1f3f0": ["\uD83C\uDFF0", ["european_castle"]],
+    "1f400": ["\uD83D\uDC00", ["rat"]],
+    "1f401": ["\uD83D\uDC01", ["mouse2"]],
+    "1f402": ["\uD83D\uDC02", ["ox"]],
+    "1f403": ["\uD83D\uDC03", ["water_buffalo"]],
+    "1f404": ["\uD83D\uDC04", ["cow2"]],
+    "1f405": ["\uD83D\uDC05", ["tiger2"]],
+    "1f406": ["\uD83D\uDC06", ["leopard"]],
+    "1f407": ["\uD83D\uDC07", ["rabbit2"]],
+    "1f408": ["\uD83D\uDC08", ["cat2"]],
+    "1f409": ["\uD83D\uDC09", ["dragon"]],
+    "1f40a": ["\uD83D\uDC0A", ["crocodile"]],
+    "1f40b": ["\uD83D\uDC0B", ["whale2"]],
+    "1f40c": ["\uD83D\uDC0C", ["snail"]],
+    "1f40d": ["\uD83D\uDC0D", ["snake"]],
+    "1f40e": ["\uD83D\uDC0E", ["racehorse"]],
+    "1f40f": ["\uD83D\uDC0F", ["ram"]],
+    "1f410": ["\uD83D\uDC10", ["goat"]],
+    "1f411": ["\uD83D\uDC11", ["sheep"]],
+    "1f412": ["\uD83D\uDC12", ["monkey"]],
+    "1f413": ["\uD83D\uDC13", ["rooster"]],
+    "1f414": ["\uD83D\uDC14", ["chicken"]],
+    "1f415": ["\uD83D\uDC15", ["dog2"]],
+    "1f416": ["\uD83D\uDC16", ["pig2"]],
+    "1f417": ["\uD83D\uDC17", ["boar"]],
+    "1f418": ["\uD83D\uDC18", ["elephant"]],
+    "1f419": ["\uD83D\uDC19", ["octopus"]],
+    "1f41a": ["\uD83D\uDC1A", ["shell"]],
+    "1f41b": ["\uD83D\uDC1B", ["bug"]],
+    "1f41c": ["\uD83D\uDC1C", ["ant"]],
+    "1f41d": ["\uD83D\uDC1D", ["bee", "honeybee"]],
+    "1f41e": ["\uD83D\uDC1E", ["beetle"]],
+    "1f41f": ["\uD83D\uDC1F", ["fish"]],
+    "1f420": ["\uD83D\uDC20", ["tropical_fish"]],
+    "1f421": ["\uD83D\uDC21", ["blowfish"]],
+    "1f422": ["\uD83D\uDC22", ["turtle"]],
+    "1f423": ["\uD83D\uDC23", ["hatching_chick"]],
+    "1f424": ["\uD83D\uDC24", ["baby_chick"]],
+    "1f425": ["\uD83D\uDC25", ["hatched_chick"]],
+    "1f426": ["\uD83D\uDC26", ["bird"]],
+    "1f427": ["\uD83D\uDC27", ["penguin"]],
+    "1f428": ["\uD83D\uDC28", ["koala"]],
+    "1f429": ["\uD83D\uDC29", ["poodle"]],
+    "1f42a": ["\uD83D\uDC2A", ["dromedary_camel"]],
+    "1f42b": ["\uD83D\uDC2B", ["camel"]],
+    "1f42c": ["\uD83D\uDC2C", ["dolphin", "flipper"]],
+    "1f42d": ["\uD83D\uDC2D", ["mouse"]],
+    "1f42e": ["\uD83D\uDC2E", ["cow"]],
+    "1f42f": ["\uD83D\uDC2F", ["tiger"]],
+    "1f430": ["\uD83D\uDC30", ["rabbit"]],
+    "1f431": ["\uD83D\uDC31", ["cat"]],
+    "1f432": ["\uD83D\uDC32", ["dragon_face"]],
+    "1f433": ["\uD83D\uDC33", ["whale"]],
+    "1f434": ["\uD83D\uDC34", ["horse"]],
+    "1f435": ["\uD83D\uDC35", ["monkey_face"]],
+    "1f436": ["\uD83D\uDC36", ["dog"]],
+    "1f437": ["\uD83D\uDC37", ["pig"]],
+    "1f438": ["\uD83D\uDC38", ["frog"]],
+    "1f439": ["\uD83D\uDC39", ["hamster"]],
+    "1f43a": ["\uD83D\uDC3A", ["wolf"]],
+    "1f43b": ["\uD83D\uDC3B", ["bear"]],
+    "1f43c": ["\uD83D\uDC3C", ["panda_face"]],
+    "1f43d": ["\uD83D\uDC3D", ["pig_nose"]],
+    "1f43e": ["\uD83D\uDC3E", ["feet", "paw_prints"]],
+    "1f440": ["\uD83D\uDC40", ["eyes"]],
+    "1f442": ["\uD83D\uDC42", ["ear"]],
+    "1f443": ["\uD83D\uDC43", ["nose"]],
+    "1f444": ["\uD83D\uDC44", ["lips"]],
+    "1f445": ["\uD83D\uDC45", ["tongue"]],
+    "1f446": ["\uD83D\uDC46", ["point_up_2"]],
+    "1f447": ["\uD83D\uDC47", ["point_down"]],
+    "1f448": ["\uD83D\uDC48", ["point_left"]],
+    "1f449": ["\uD83D\uDC49", ["point_right"]],
+    "1f44a": ["\uD83D\uDC4A", ["facepunch", "punch"]],
+    "1f44b": ["\uD83D\uDC4B", ["wave"]],
+    "1f44c": ["\uD83D\uDC4C", ["ok_hand"]],
+    "1f44d": ["\uD83D\uDC4D", ["+1", "thumbsup"]],
+    "1f44e": ["\uD83D\uDC4E", ["-1", "thumbsdown"]],
+    "1f44f": ["\uD83D\uDC4F", ["clap"]],
+    "1f450": ["\uD83D\uDC50", ["open_hands"]],
+    "1f451": ["\uD83D\uDC51", ["crown"]],
+    "1f452": ["\uD83D\uDC52", ["womans_hat"]],
+    "1f453": ["\uD83D\uDC53", ["eyeglasses"]],
+    "1f454": ["\uD83D\uDC54", ["necktie"]],
+    "1f455": ["\uD83D\uDC55", ["shirt", "tshirt"]],
+    "1f456": ["\uD83D\uDC56", ["jeans"]],
+    "1f457": ["\uD83D\uDC57", ["dress"]],
+    "1f458": ["\uD83D\uDC58", ["kimono"]],
+    "1f459": ["\uD83D\uDC59", ["bikini"]],
+    "1f45a": ["\uD83D\uDC5A", ["womans_clothes"]],
+    "1f45b": ["\uD83D\uDC5B", ["purse"]],
+    "1f45c": ["\uD83D\uDC5C", ["handbag"]],
+    "1f45d": ["\uD83D\uDC5D", ["pouch"]],
+    "1f45e": ["\uD83D\uDC5E", ["mans_shoe", "shoe"]],
+    "1f45f": ["\uD83D\uDC5F", ["athletic_shoe"]],
+    "1f460": ["\uD83D\uDC60", ["high_heel"]],
+    "1f461": ["\uD83D\uDC61", ["sandal"]],
+    "1f462": ["\uD83D\uDC62", ["boot"]],
+    "1f463": ["\uD83D\uDC63", ["footprints"]],
+    "1f464": ["\uD83D\uDC64", ["bust_in_silhouette"]],
+    "1f465": ["\uD83D\uDC65", ["busts_in_silhouette"]],
+    "1f466": ["\uD83D\uDC66", ["boy"]],
+    "1f467": ["\uD83D\uDC67", ["girl"]],
+    "1f468": ["\uD83D\uDC68", ["man"]],
+    "1f469": ["\uD83D\uDC69", ["woman"]],
+    "1f46a": ["\uD83D\uDC6A", ["family"]],
+    "1f46b": ["\uD83D\uDC6B", ["couple"]],
+    "1f46c": ["\uD83D\uDC6C", ["two_men_holding_hands"]],
+    "1f46d": ["\uD83D\uDC6D", ["two_women_holding_hands"]],
+    "1f46e": ["\uD83D\uDC6E", ["cop"]],
+    "1f46f": ["\uD83D\uDC6F", ["dancers"]],
+    "1f470": ["\uD83D\uDC70", ["bride_with_veil"]],
+    "1f471": ["\uD83D\uDC71", ["person_with_blond_hair"]],
+    "1f472": ["\uD83D\uDC72", ["man_with_gua_pi_mao"]],
+    "1f473": ["\uD83D\uDC73", ["man_with_turban"]],
+    "1f474": ["\uD83D\uDC74", ["older_man"]],
+    "1f475": ["\uD83D\uDC75", ["older_woman"]],
+    "1f476": ["\uD83D\uDC76", ["baby"]],
+    "1f477": ["\uD83D\uDC77", ["construction_worker"]],
+    "1f478": ["\uD83D\uDC78", ["princess"]],
+    "1f479": ["\uD83D\uDC79", ["japanese_ogre"]],
+    "1f47a": ["\uD83D\uDC7A", ["japanese_goblin"]],
+    "1f47b": ["\uD83D\uDC7B", ["ghost"]],
+    "1f47c": ["\uD83D\uDC7C", ["angel"]],
+    "1f47d": ["\uD83D\uDC7D", ["alien"]],
+    "1f47e": ["\uD83D\uDC7E", ["space_invader"]],
+    "1f47f": ["\uD83D\uDC7F", ["imp"]],
+    "1f480": ["\uD83D\uDC80", ["skull"]],
+    "1f481": ["\uD83D\uDC81", ["information_desk_person"]],
+    "1f482": ["\uD83D\uDC82", ["guardsman"]],
+    "1f483": ["\uD83D\uDC83", ["dancer"]],
+    "1f484": ["\uD83D\uDC84", ["lipstick"]],
+    "1f485": ["\uD83D\uDC85", ["nail_care"]],
+    "1f486": ["\uD83D\uDC86", ["massage"]],
+    "1f487": ["\uD83D\uDC87", ["haircut"]],
+    "1f488": ["\uD83D\uDC88", ["barber"]],
+    "1f489": ["\uD83D\uDC89", ["syringe"]],
+    "1f48a": ["\uD83D\uDC8A", ["pill"]],
+    "1f48b": ["\uD83D\uDC8B", ["kiss"]],
+    "1f48c": ["\uD83D\uDC8C", ["love_letter"]],
+    "1f48d": ["\uD83D\uDC8D", ["ring"]],
+    "1f48e": ["\uD83D\uDC8E", ["gem"]],
+    "1f48f": ["\uD83D\uDC8F", ["couplekiss"]],
+    "1f490": ["\uD83D\uDC90", ["bouquet"]],
+    "1f491": ["\uD83D\uDC91", ["couple_with_heart"]],
+    "1f492": ["\uD83D\uDC92", ["wedding"]],
+    "1f493": ["\uD83D\uDC93", ["heartbeat"]],
+    "1f494": ["\uD83D\uDC94", ["broken_heart"], "<\/3"],
+    "1f495": ["\uD83D\uDC95", ["two_hearts"]],
+    "1f496": ["\uD83D\uDC96", ["sparkling_heart"]],
+    "1f497": ["\uD83D\uDC97", ["heartpulse"]],
+    "1f498": ["\uD83D\uDC98", ["cupid"]],
+    "1f499": ["\uD83D\uDC99", ["blue_heart"], "<3"],
+    "1f49a": ["\uD83D\uDC9A", ["green_heart"], "<3"],
+    "1f49b": ["\uD83D\uDC9B", ["yellow_heart"], "<3"],
+    "1f49c": ["\uD83D\uDC9C", ["purple_heart"], "<3"],
+    "1f49d": ["\uD83D\uDC9D", ["gift_heart"]],
+    "1f49e": ["\uD83D\uDC9E", ["revolving_hearts"]],
+    "1f49f": ["\uD83D\uDC9F", ["heart_decoration"]],
+    "1f4a0": ["\uD83D\uDCA0", ["diamond_shape_with_a_dot_inside"]],
+    "1f4a1": ["\uD83D\uDCA1", ["bulb"]],
+    "1f4a2": ["\uD83D\uDCA2", ["anger"]],
+    "1f4a3": ["\uD83D\uDCA3", ["bomb"]],
+    "1f4a4": ["\uD83D\uDCA4", ["zzz"]],
+    "1f4a5": ["\uD83D\uDCA5", ["boom", "collision"]],
+    "1f4a6": ["\uD83D\uDCA6", ["sweat_drops"]],
+    "1f4a7": ["\uD83D\uDCA7", ["droplet"]],
+    "1f4a8": ["\uD83D\uDCA8", ["dash"]],
+    "1f4a9": ["\uD83D\uDCA9", ["hankey", "poop", "shit"]],
+    "1f4aa": ["\uD83D\uDCAA", ["muscle"]],
+    "1f4ab": ["\uD83D\uDCAB", ["dizzy"]],
+    "1f4ac": ["\uD83D\uDCAC", ["speech_balloon"]],
+    "1f4ad": ["\uD83D\uDCAD", ["thought_balloon"]],
+    "1f4ae": ["\uD83D\uDCAE", ["white_flower"]],
+    "1f4af": ["\uD83D\uDCAF", ["100"]],
+    "1f4b0": ["\uD83D\uDCB0", ["moneybag"]],
+    "1f4b1": ["\uD83D\uDCB1", ["currency_exchange"]],
+    "1f4b2": ["\uD83D\uDCB2", ["heavy_dollar_sign"]],
+    "1f4b3": ["\uD83D\uDCB3", ["credit_card"]],
+    "1f4b4": ["\uD83D\uDCB4", ["yen"]],
+    "1f4b5": ["\uD83D\uDCB5", ["dollar"]],
+    "1f4b6": ["\uD83D\uDCB6", ["euro"]],
+    "1f4b7": ["\uD83D\uDCB7", ["pound"]],
+    "1f4b8": ["\uD83D\uDCB8", ["money_with_wings"]],
+    "1f4b9": ["\uD83D\uDCB9", ["chart"]],
+    "1f4ba": ["\uD83D\uDCBA", ["seat"]],
+    "1f4bb": ["\uD83D\uDCBB", ["computer"]],
+    "1f4bc": ["\uD83D\uDCBC", ["briefcase"]],
+    "1f4bd": ["\uD83D\uDCBD", ["minidisc"]],
+    "1f4be": ["\uD83D\uDCBE", ["floppy_disk"]],
+    "1f4bf": ["\uD83D\uDCBF", ["cd"]],
+    "1f4c0": ["\uD83D\uDCC0", ["dvd"]],
+    "1f4c1": ["\uD83D\uDCC1", ["file_folder"]],
+    "1f4c2": ["\uD83D\uDCC2", ["open_file_folder"]],
+    "1f4c3": ["\uD83D\uDCC3", ["page_with_curl"]],
+    "1f4c4": ["\uD83D\uDCC4", ["page_facing_up"]],
+    "1f4c5": ["\uD83D\uDCC5", ["date"]],
+    "1f4c6": ["\uD83D\uDCC6", ["calendar"]],
+    "1f4c7": ["\uD83D\uDCC7", ["card_index"]],
+    "1f4c8": ["\uD83D\uDCC8", ["chart_with_upwards_trend"]],
+    "1f4c9": ["\uD83D\uDCC9", ["chart_with_downwards_trend"]],
+    "1f4ca": ["\uD83D\uDCCA", ["bar_chart"]],
+    "1f4cb": ["\uD83D\uDCCB", ["clipboard"]],
+    "1f4cc": ["\uD83D\uDCCC", ["pushpin"]],
+    "1f4cd": ["\uD83D\uDCCD", ["round_pushpin"]],
+    "1f4ce": ["\uD83D\uDCCE", ["paperclip"]],
+    "1f4cf": ["\uD83D\uDCCF", ["straight_ruler"]],
+    "1f4d0": ["\uD83D\uDCD0", ["triangular_ruler"]],
+    "1f4d1": ["\uD83D\uDCD1", ["bookmark_tabs"]],
+    "1f4d2": ["\uD83D\uDCD2", ["ledger"]],
+    "1f4d3": ["\uD83D\uDCD3", ["notebook"]],
+    "1f4d4": ["\uD83D\uDCD4", ["notebook_with_decorative_cover"]],
+    "1f4d5": ["\uD83D\uDCD5", ["closed_book"]],
+    "1f4d6": ["\uD83D\uDCD6", ["book", "open_book"]],
+    "1f4d7": ["\uD83D\uDCD7", ["green_book"]],
+    "1f4d8": ["\uD83D\uDCD8", ["blue_book"]],
+    "1f4d9": ["\uD83D\uDCD9", ["orange_book"]],
+    "1f4da": ["\uD83D\uDCDA", ["books"]],
+    "1f4db": ["\uD83D\uDCDB", ["name_badge"]],
+    "1f4dc": ["\uD83D\uDCDC", ["scroll"]],
+    "1f4dd": ["\uD83D\uDCDD", ["memo", "pencil"]],
+    "1f4de": ["\uD83D\uDCDE", ["telephone_receiver"]],
+    "1f4df": ["\uD83D\uDCDF", ["pager"]],
+    "1f4e0": ["\uD83D\uDCE0", ["fax"]],
+    "1f4e1": ["\uD83D\uDCE1", ["satellite"]],
+    "1f4e2": ["\uD83D\uDCE2", ["loudspeaker"]],
+    "1f4e3": ["\uD83D\uDCE3", ["mega"]],
+    "1f4e4": ["\uD83D\uDCE4", ["outbox_tray"]],
+    "1f4e5": ["\uD83D\uDCE5", ["inbox_tray"]],
+    "1f4e6": ["\uD83D\uDCE6", ["package"]],
+    "1f4e7": ["\uD83D\uDCE7", ["e-mail"]],
+    "1f4e8": ["\uD83D\uDCE8", ["incoming_envelope"]],
+    "1f4e9": ["\uD83D\uDCE9", ["envelope_with_arrow"]],
+    "1f4ea": ["\uD83D\uDCEA", ["mailbox_closed"]],
+    "1f4eb": ["\uD83D\uDCEB", ["mailbox"]],
+    "1f4ec": ["\uD83D\uDCEC", ["mailbox_with_mail"]],
+    "1f4ed": ["\uD83D\uDCED", ["mailbox_with_no_mail"]],
+    "1f4ee": ["\uD83D\uDCEE", ["postbox"]],
+    "1f4ef": ["\uD83D\uDCEF", ["postal_horn"]],
+    "1f4f0": ["\uD83D\uDCF0", ["newspaper"]],
+    "1f4f1": ["\uD83D\uDCF1", ["iphone"]],
+    "1f4f2": ["\uD83D\uDCF2", ["calling"]],
+    "1f4f3": ["\uD83D\uDCF3", ["vibration_mode"]],
+    "1f4f4": ["\uD83D\uDCF4", ["mobile_phone_off"]],
+    "1f4f5": ["\uD83D\uDCF5", ["no_mobile_phones"]],
+    "1f4f6": ["\uD83D\uDCF6", ["signal_strength"]],
+    "1f4f7": ["\uD83D\uDCF7", ["camera"]],
+    "1f4f9": ["\uD83D\uDCF9", ["video_camera"]],
+    "1f4fa": ["\uD83D\uDCFA", ["tv"]],
+    "1f4fb": ["\uD83D\uDCFB", ["radio"]],
+    "1f4fc": ["\uD83D\uDCFC", ["vhs"]],
+    "1f500": ["\uD83D\uDD00", ["twisted_rightwards_arrows"]],
+    "1f501": ["\uD83D\uDD01", ["repeat"]],
+    "1f502": ["\uD83D\uDD02", ["repeat_one"]],
+    "1f503": ["\uD83D\uDD03", ["arrows_clockwise"]],
+    "1f504": ["\uD83D\uDD04", ["arrows_counterclockwise"]],
+    "1f505": ["\uD83D\uDD05", ["low_brightness"]],
+    "1f506": ["\uD83D\uDD06", ["high_brightness"]],
+    "1f507": ["\uD83D\uDD07", ["mute"]],
+    "1f508": ["\uD83D\uDD09", ["speaker"]],
+    "1f509": ["\uD83D\uDD09", ["sound"]],
+    "1f50a": ["\uD83D\uDD0A", ["loud_sound"]],
+    "1f50b": ["\uD83D\uDD0B", ["battery"]],
+    "1f50c": ["\uD83D\uDD0C", ["electric_plug"]],
+    "1f50d": ["\uD83D\uDD0D", ["mag"]],
+    "1f50e": ["\uD83D\uDD0E", ["mag_right"]],
+    "1f50f": ["\uD83D\uDD0F", ["lock_with_ink_pen"]],
+    "1f510": ["\uD83D\uDD10", ["closed_lock_with_key"]],
+    "1f511": ["\uD83D\uDD11", ["key"]],
+    "1f512": ["\uD83D\uDD12", ["lock"]],
+    "1f513": ["\uD83D\uDD13", ["unlock"]],
+    "1f514": ["\uD83D\uDD14", ["bell"]],
+    "1f515": ["\uD83D\uDD15", ["no_bell"]],
+    "1f516": ["\uD83D\uDD16", ["bookmark"]],
+    "1f517": ["\uD83D\uDD17", ["link"]],
+    "1f518": ["\uD83D\uDD18", ["radio_button"]],
+    "1f519": ["\uD83D\uDD19", ["back"]],
+    "1f51a": ["\uD83D\uDD1A", ["end"]],
+    "1f51b": ["\uD83D\uDD1B", ["on"]],
+    "1f51c": ["\uD83D\uDD1C", ["soon"]],
+    "1f51d": ["\uD83D\uDD1D", ["top"]],
+    "1f51e": ["\uD83D\uDD1E", ["underage"]],
+    "1f51f": ["\uD83D\uDD1F", ["keycap_ten"]],
+    "1f520": ["\uD83D\uDD20", ["capital_abcd"]],
+    "1f521": ["\uD83D\uDD21", ["abcd"]],
+    "1f522": ["\uD83D\uDD22", ["1234"]],
+    "1f523": ["\uD83D\uDD23", ["symbols"]],
+    "1f524": ["\uD83D\uDD24", ["abc"]],
+    "1f525": ["\uD83D\uDD25", ["fire"]],
+    "1f526": ["\uD83D\uDD26", ["flashlight"]],
+    "1f527": ["\uD83D\uDD27", ["wrench"]],
+    "1f528": ["\uD83D\uDD28", ["hammer"]],
+    "1f529": ["\uD83D\uDD29", ["nut_and_bolt"]],
+    "1f52a": ["\uD83D\uDD2A", ["hocho"]],
+    "1f52b": ["\uD83D\uDD2B", ["gun"]],
+    "1f52c": ["\uD83D\uDD2C", ["microscope"]],
+    "1f52d": ["\uD83D\uDD2D", ["telescope"]],
+    "1f52e": ["\uD83D\uDD2E", ["crystal_ball"]],
+    "1f52f": ["\uD83D\uDD2F", ["six_pointed_star"]],
+    "1f530": ["\uD83D\uDD30", ["beginner"]],
+    "1f531": ["\uD83D\uDD31", ["trident"]],
+    "1f532": ["\uD83D\uDD32", ["black_square_button"]],
+    "1f533": ["\uD83D\uDD33", ["white_square_button"]],
+    "1f534": ["\uD83D\uDD34", ["red_circle"]],
+    "1f535": ["\uD83D\uDD35", ["large_blue_circle"]],
+    "1f536": ["\uD83D\uDD36", ["large_orange_diamond"]],
+    "1f537": ["\uD83D\uDD37", ["large_blue_diamond"]],
+    "1f538": ["\uD83D\uDD38", ["small_orange_diamond"]],
+    "1f539": ["\uD83D\uDD39", ["small_blue_diamond"]],
+    "1f53a": ["\uD83D\uDD3A", ["small_red_triangle"]],
+    "1f53b": ["\uD83D\uDD3B", ["small_red_triangle_down"]],
+    "1f53c": ["\uD83D\uDD3C", ["arrow_up_small"]],
+    "1f53d": ["\uD83D\uDD3D", ["arrow_down_small"]],
+    "1f550": ["\uD83D\uDD50", ["clock1"]],
+    "1f551": ["\uD83D\uDD51", ["clock2"]],
+    "1f552": ["\uD83D\uDD52", ["clock3"]],
+    "1f553": ["\uD83D\uDD53", ["clock4"]],
+    "1f554": ["\uD83D\uDD54", ["clock5"]],
+    "1f555": ["\uD83D\uDD55", ["clock6"]],
+    "1f556": ["\uD83D\uDD56", ["clock7"]],
+    "1f557": ["\uD83D\uDD57", ["clock8"]],
+    "1f558": ["\uD83D\uDD58", ["clock9"]],
+    "1f559": ["\uD83D\uDD59", ["clock10"]],
+    "1f55a": ["\uD83D\uDD5A", ["clock11"]],
+    "1f55b": ["\uD83D\uDD5B", ["clock12"]],
+    "1f55c": ["\uD83D\uDD5C", ["clock130"]],
+    "1f55d": ["\uD83D\uDD5D", ["clock230"]],
+    "1f55e": ["\uD83D\uDD5E", ["clock330"]],
+    "1f55f": ["\uD83D\uDD5F", ["clock430"]],
+    "1f560": ["\uD83D\uDD60", ["clock530"]],
+    "1f561": ["\uD83D\uDD61", ["clock630"]],
+    "1f562": ["\uD83D\uDD62", ["clock730"]],
+    "1f563": ["\uD83D\uDD63", ["clock830"]],
+    "1f564": ["\uD83D\uDD64", ["clock930"]],
+    "1f565": ["\uD83D\uDD65", ["clock1030"]],
+    "1f566": ["\uD83D\uDD66", ["clock1130"]],
+    "1f567": ["\uD83D\uDD67", ["clock1230"]],
+    "1f5fb": ["\uD83D\uDDFB", ["mount_fuji"]],
+    "1f5fc": ["\uD83D\uDDFC", ["tokyo_tower"]],
+    "1f5fd": ["\uD83D\uDDFD", ["statue_of_liberty"]],
+    "1f5fe": ["\uD83D\uDDFE", ["japan"]],
+    "1f5ff": ["\uD83D\uDDFF", ["moyai"]],
+    "1f600": ["\uD83D\uDE00", ["grinning"]],
+    "1f601": ["\uD83D\uDE01", ["grin"]],
+    "1f602": ["\uD83D\uDE02", ["joy"]],
+    "1f603": ["\uD83D\uDE03", ["smiley"], ":)"],
+    "1f604": ["\uD83D\uDE04", ["smile"], ":)"],
+    "1f605": ["\uD83D\uDE05", ["sweat_smile"]],
+    "1f606": ["\uD83D\uDE06", ["satisfied"]],
+    "1f607": ["\uD83D\uDE07", ["innocent"]],
+    "1f608": ["\uD83D\uDE08", ["smiling_imp"]],
+    "1f609": ["\uD83D\uDE09", ["wink"], ";)"],
+    "1f60a": ["\uD83D\uDE0A", ["blush"]],
+    "1f60b": ["\uD83D\uDE0B", ["yum"]],
+    "1f60c": ["\uD83D\uDE0C", ["relieved"]],
+    "1f60d": ["\uD83D\uDE0D", ["heart_eyes"]],
+    "1f60e": ["\uD83D\uDE0E", ["sunglasses"]],
+    "1f60f": ["\uD83D\uDE0F", ["smirk"]],
+    "1f610": ["\uD83D\uDE10", ["neutral_face"]],
+    "1f611": ["\uD83D\uDE11", ["expressionless"]],
+    "1f612": ["\uD83D\uDE12", ["unamused"]],
+    "1f613": ["\uD83D\uDE13", ["sweat"]],
+    "1f614": ["\uD83D\uDE14", ["pensive"]],
+    "1f615": ["\uD83D\uDE15", ["confused"]],
+    "1f616": ["\uD83D\uDE16", ["confounded"]],
+    "1f617": ["\uD83D\uDE17", ["kissing"]],
+    "1f618": ["\uD83D\uDE18", ["kissing_heart"]],
+    "1f619": ["\uD83D\uDE19", ["kissing_smiling_eyes"]],
+    "1f61a": ["\uD83D\uDE1A", ["kissing_closed_eyes"]],
+    "1f61b": ["\uD83D\uDE1B", ["stuck_out_tongue"]],
+    "1f61c": ["\uD83D\uDE1C", ["stuck_out_tongue_winking_eye"], ";p"],
+    "1f61d": ["\uD83D\uDE1D", ["stuck_out_tongue_closed_eyes"]],
+    "1f61e": ["\uD83D\uDE1E", ["disappointed"], ":("],
+    "1f61f": ["\uD83D\uDE1F", ["worried"]],
+    "1f620": ["\uD83D\uDE20", ["angry"]],
+    "1f621": ["\uD83D\uDE21", ["rage"]],
+    "1f622": ["\uD83D\uDE22", ["cry"], ":'("],
+    "1f623": ["\uD83D\uDE23", ["persevere"]],
+    "1f624": ["\uD83D\uDE24", ["triumph"]],
+    "1f625": ["\uD83D\uDE25", ["disappointed_relieved"]],
+    "1f626": ["\uD83D\uDE26", ["frowning"]],
+    "1f627": ["\uD83D\uDE27", ["anguished"]],
+    "1f628": ["\uD83D\uDE28", ["fearful"]],
+    "1f629": ["\uD83D\uDE29", ["weary"]],
+    "1f62a": ["\uD83D\uDE2A", ["sleepy"]],
+    "1f62b": ["\uD83D\uDE2B", ["tired_face"]],
+    "1f62c": ["\uD83D\uDE2C", ["grimacing"]],
+    "1f62d": ["\uD83D\uDE2D", ["sob"], ":'("],
+    "1f62e": ["\uD83D\uDE2E", ["open_mouth"]],
+    "1f62f": ["\uD83D\uDE2F", ["hushed"]],
+    "1f630": ["\uD83D\uDE30", ["cold_sweat"]],
+    "1f631": ["\uD83D\uDE31", ["scream"]],
+    "1f632": ["\uD83D\uDE32", ["astonished"]],
+    "1f633": ["\uD83D\uDE33", ["flushed"]],
+    "1f634": ["\uD83D\uDE34", ["sleeping"]],
+    "1f635": ["\uD83D\uDE35", ["dizzy_face"]],
+    "1f636": ["\uD83D\uDE36", ["no_mouth"]],
+    "1f637": ["\uD83D\uDE37", ["mask"]],
+    "1f638": ["\uD83D\uDE38", ["smile_cat"]],
+    "1f639": ["\uD83D\uDE39", ["joy_cat"]],
+    "1f63a": ["\uD83D\uDE3A", ["smiley_cat"]],
+    "1f63b": ["\uD83D\uDE3B", ["heart_eyes_cat"]],
+    "1f63c": ["\uD83D\uDE3C", ["smirk_cat"]],
+    "1f63d": ["\uD83D\uDE3D", ["kissing_cat"]],
+    "1f63e": ["\uD83D\uDE3E", ["pouting_cat"]],
+    "1f63f": ["\uD83D\uDE3F", ["crying_cat_face"]],
+    "1f640": ["\uD83D\uDE40", ["scream_cat"]],
+    "1f645": ["\uD83D\uDE45", ["no_good"]],
+    "1f646": ["\uD83D\uDE46", ["ok_woman"]],
+    "1f647": ["\uD83D\uDE47", ["bow"]],
+    "1f648": ["\uD83D\uDE48", ["see_no_evil"]],
+    "1f649": ["\uD83D\uDE49", ["hear_no_evil"]],
+    "1f64a": ["\uD83D\uDE4A", ["speak_no_evil"]],
+    "1f64b": ["\uD83D\uDE4B", ["raising_hand"]],
+    "1f64c": ["\uD83D\uDE4C", ["raised_hands"]],
+    "1f64d": ["\uD83D\uDE4D", ["person_frowning"]],
+    "1f64e": ["\uD83D\uDE4E", ["person_with_pouting_face"]],
+    "1f64f": ["\uD83D\uDE4F", ["pray"]],
+    "1f680": ["\uD83D\uDE80", ["rocket"]],
+    "1f681": ["\uD83D\uDE81", ["helicopter"]],
+    "1f682": ["\uD83D\uDE82", ["steam_locomotive"]],
+    "1f683": ["\uD83D\uDE83", ["railway_car"]],
+    "1f68b": ["\uD83D\uDE8B", ["train"]],
+    "1f684": ["\uD83D\uDE84", ["bullettrain_side"]],
+    "1f685": ["\uD83D\uDE85", ["bullettrain_front"]],
+    "1f686": ["\uD83D\uDE86", ["train2"]],
+    "1f687": ["\uD83D\uDE87", ["metro"]],
+    "1f688": ["\uD83D\uDE88", ["light_rail"]],
+    "1f689": ["\uD83D\uDE89", ["station"]],
+    "1f68a": ["\uD83D\uDE8A", ["tram"]],
+    "1f68c": ["\uD83D\uDE8C", ["bus"]],
+    "1f68d": ["\uD83D\uDE8D", ["oncoming_bus"]],
+    "1f68e": ["\uD83D\uDE8E", ["trolleybus"]],
+    "1f68f": ["\uD83D\uDE8F", ["busstop"]],
+    "1f690": ["\uD83D\uDE90", ["minibus"]],
+    "1f691": ["\uD83D\uDE91", ["ambulance"]],
+    "1f692": ["\uD83D\uDE92", ["fire_engine"]],
+    "1f693": ["\uD83D\uDE93", ["police_car"]],
+    "1f694": ["\uD83D\uDE94", ["oncoming_police_car"]],
+    "1f695": ["\uD83D\uDE95", ["taxi"]],
+    "1f696": ["\uD83D\uDE96", ["oncoming_taxi"]],
+    "1f697": ["\uD83D\uDE97", ["car", "red_car"]],
+    "1f698": ["\uD83D\uDE98", ["oncoming_automobile"]],
+    "1f699": ["\uD83D\uDE99", ["blue_car"]],
+    "1f69a": ["\uD83D\uDE9A", ["truck"]],
+    "1f69b": ["\uD83D\uDE9B", ["articulated_lorry"]],
+    "1f69c": ["\uD83D\uDE9C", ["tractor"]],
+    "1f69d": ["\uD83D\uDE9D", ["monorail"]],
+    "1f69e": ["\uD83D\uDE9E", ["mountain_railway"]],
+    "1f69f": ["\uD83D\uDE9F", ["suspension_railway"]],
+    "1f6a0": ["\uD83D\uDEA0", ["mountain_cableway"]],
+    "1f6a1": ["\uD83D\uDEA1", ["aerial_tramway"]],
+    "1f6a2": ["\uD83D\uDEA2", ["ship"]],
+    "1f6a3": ["\uD83D\uDEA3", ["rowboat"]],
+    "1f6a4": ["\uD83D\uDEA4", ["speedboat"]],
+    "1f6a5": ["\uD83D\uDEA5", ["traffic_light"]],
+    "1f6a6": ["\uD83D\uDEA6", ["vertical_traffic_light"]],
+    "1f6a7": ["\uD83D\uDEA7", ["construction"]],
+    "1f6a8": ["\uD83D\uDEA8", ["rotating_light"]],
+    "1f6a9": ["\uD83D\uDEA9", ["triangular_flag_on_post"]],
+    "1f6aa": ["\uD83D\uDEAA", ["door"]],
+    "1f6ab": ["\uD83D\uDEAB", ["no_entry_sign"]],
+    "1f6ac": ["\uD83D\uDEAC", ["smoking"]],
+    "1f6ad": ["\uD83D\uDEAD", ["no_smoking"]],
+    "1f6ae": ["\uD83D\uDEAE", ["put_litter_in_its_place"]],
+    "1f6af": ["\uD83D\uDEAF", ["do_not_litter"]],
+    "1f6b0": ["\uD83D\uDEB0", ["potable_water"]],
+    "1f6b1": ["\uD83D\uDEB1", ["non-potable_water"]],
+    "1f6b2": ["\uD83D\uDEB2", ["bike"]],
+    "1f6b3": ["\uD83D\uDEB3", ["no_bicycles"]],
+    "1f6b4": ["\uD83D\uDEB4", ["bicyclist"]],
+    "1f6b5": ["\uD83D\uDEB5", ["mountain_bicyclist"]],
+    "1f6b6": ["\uD83D\uDEB6", ["walking"]],
+    "1f6b7": ["\uD83D\uDEB7", ["no_pedestrians"]],
+    "1f6b8": ["\uD83D\uDEB8", ["children_crossing"]],
+    "1f6b9": ["\uD83D\uDEB9", ["mens"]],
+    "1f6ba": ["\uD83D\uDEBA", ["womens"]],
+    "1f6bb": ["\uD83D\uDEBB", ["restroom"]],
+    "1f6bc": ["\uD83D\uDEBC", ["baby_symbol"]],
+    "1f6bd": ["\uD83D\uDEBD", ["toilet"]],
+    "1f6be": ["\uD83D\uDEBE", ["wc"]],
+    "1f6bf": ["\uD83D\uDEBF", ["shower"]],
+    "1f6c0": ["\uD83D\uDEC0", ["bath"]],
+    "1f6c1": ["\uD83D\uDEC1", ["bathtub"]],
+    "1f6c2": ["\uD83D\uDEC2", ["passport_control"]],
+    "1f6c3": ["\uD83D\uDEC3", ["customs"]],
+    "1f6c4": ["\uD83D\uDEC4", ["baggage_claim"]],
+    "1f6c5": ["\uD83D\uDEC5", ["left_luggage"]],
+    "0023": ["\u0023\u20E3", ["hash"]],
+    "0030": ["\u0030\u20E3", ["zero"]],
+    "0031": ["\u0031\u20E3", ["one"]],
+    "0032": ["\u0032\u20E3", ["two"]],
+    "0033": ["\u0033\u20E3", ["three"]],
+    "0034": ["\u0034\u20E3", ["four"]],
+    "0035": ["\u0035\u20E3", ["five"]],
+    "0036": ["\u0036\u20E3", ["six"]],
+    "0037": ["\u0037\u20E3", ["seven"]],
+    "0038": ["\u0038\u20E3", ["eight"]],
+    "0039": ["\u0039\u20E3", ["nine"]],
+    "1f1e8-1f1f3": ["\uD83C\uDDE8\uD83C\uDDF3", ["cn"]],
+    "1f1e9-1f1ea": ["\uD83C\uDDE9\uD83C\uDDEA", ["de"]],
+    "1f1ea-1f1f8": ["\uD83C\uDDEA\uD83C\uDDF8", ["es"]],
+    "1f1eb-1f1f7": ["\uD83C\uDDEB\uD83C\uDDF7", ["fr"]],
+    "1f1ec-1f1e7": ["\uD83C\uDDEC\uD83C\uDDE7", ["gb", "uk"]],
+    "1f1ee-1f1f9": ["\uD83C\uDDEE\uD83C\uDDF9", ["it"]],
+    "1f1ef-1f1f5": ["\uD83C\uDDEF\uD83C\uDDF5", ["jp"]],
+    "1f1f0-1f1f7": ["\uD83C\uDDF0\uD83C\uDDF7", ["kr"]],
+    "1f1f7-1f1fa": ["\uD83C\uDDF7\uD83C\uDDFA", ["ru"]],
+    "1f1fa-1f1f8": ["\uD83C\uDDFA\uD83C\uDDF8", ["us"]]
+}
+
+Config.EmojiCategories = [
+    ["1f604", "1f603", "1f600", "1f60a", "263a", "1f609", "1f60d", "1f618", "1f61a", "1f617", "1f619", "1f61c", "1f61d", "1f61b", "1f633", "1f601", "1f614", "1f60c", "1f612", "1f61e", "1f623", "1f622", "1f602", "1f62d", "1f62a", "1f625", "1f630", "1f605", "1f613", "1f629", "1f62b", "1f628", "1f631", "1f620", "1f621", "1f624", "1f616", "1f606", "1f60b", "1f637", "1f60e", "1f634", "1f635", "1f632", "1f61f", "1f626", "1f627", "1f608", "1f47f", "1f62e", "1f62c", "1f610", "1f615", "1f62f", "1f636", "1f607", "1f60f", "1f611", "1f472", "1f473", "1f46e", "1f477", "1f482", "1f476", "1f466", "1f467", "1f468", "1f469", "1f474", "1f475", "1f471", "1f47c", "1f478", "1f63a", "1f638", "1f63b", "1f63d", "1f63c", "1f640", "1f63f", "1f639", "1f63e", "1f479", "1f47a", "1f648", "1f649", "1f64a", "1f480", "1f47d", "1f4a9", "1f525", "2728", "1f31f", "1f4ab", "1f4a5", "1f4a2", "1f4a6", "1f4a7", "1f4a4", "1f4a8", "1f442", "1f440", "1f443", "1f445", "1f444", "1f44d", "1f44e", "1f44c", "1f44a", "270a", "270c", "1f44b", "270b", "1f450", "1f446", "1f447", "1f449", "1f448", "1f64c", "1f64f", "261d", "1f44f", "1f4aa", "1f6b6", "1f3c3", "1f483", "1f46b", "1f46a", "1f46c", "1f46d", "1f48f", "1f491", "1f46f", "1f646", "1f645", "1f481", "1f64b", "1f486", "1f487", "1f485", "1f470", "1f64e", "1f64d", "1f647", "1f3a9", "1f451", "1f452", "1f45f", "1f45e", "1f461", "1f460", "1f462", "1f455", "1f454", "1f45a", "1f457", "1f3bd", "1f456", "1f458", "1f459", "1f4bc", "1f45c", "1f45d", "1f45b", "1f453", "1f380", "1f302", "1f484", "1f49b", "1f499", "1f49c", "1f49a", "2764", "1f494", "1f497", "1f493", "1f495", "1f496", "1f49e", "1f498", "1f48c", "1f48b", "1f48d", "1f48e", "1f464", "1f465", "1f4ac", "1f463", "1f4ad"],
+    ["1f436", "1f43a", "1f431", "1f42d", "1f439", "1f430", "1f438", "1f42f", "1f428", "1f43b", "1f437", "1f43d", "1f42e", "1f417", "1f435", "1f412", "1f434", "1f411", "1f418", "1f43c", "1f427", "1f426", "1f424", "1f425", "1f423", "1f414", "1f40d", "1f422", "1f41b", "1f41d", "1f41c", "1f41e", "1f40c", "1f419", "1f41a", "1f420", "1f41f", "1f42c", "1f433", "1f40b", "1f404", "1f40f", "1f400", "1f403", "1f405", "1f407", "1f409", "1f40e", "1f410", "1f413", "1f415", "1f416", "1f401", "1f402", "1f432", "1f421", "1f40a", "1f42b", "1f42a", "1f406", "1f408", "1f429", "1f43e", "1f490", "1f338", "1f337", "1f340", "1f339", "1f33b", "1f33a", "1f341", "1f343", "1f342", "1f33f", "1f33e", "1f344", "1f335", "1f334", "1f332", "1f333", "1f330", "1f331", "1f33c", "1f310", "1f31e", "1f31d", "1f31a", "1f311", "1f312", "1f313", "1f314", "1f315", "1f316", "1f317", "1f318", "1f31c", "1f31b", "1f319", "1f30d", "1f30e", "1f30f", "1f30b", "1f30c", "1f320", "2b50", "2600", "26c5", "2601", "26a1", "2614", "2744", "26c4", "1f300", "1f301", "1f308", "1f30a"],
+    ["1f38d", "1f49d", "1f38e", "1f392", "1f393", "1f38f", "1f386", "1f387", "1f390", "1f391", "1f383", "1f47b", "1f385", "1f384", "1f381", "1f38b", "1f389", "1f38a", "1f388", "1f38c", "1f52e", "1f3a5", "1f4f7", "1f4f9", "1f4fc", "1f4bf", "1f4c0", "1f4bd", "1f4be", "1f4bb", "1f4f1", "260e", "1f4de", "1f4df", "1f4e0", "1f4e1", "1f4fa", "1f4fb", "1f50a", "1f509", "1f508", "1f507", "1f514", "1f515", "1f4e3", "1f4e2", "23f3", "231b", "23f0", "231a", "1f513", "1f512", "1f50f", "1f510", "1f511", "1f50e", "1f4a1", "1f526", "1f506", "1f505", "1f50c", "1f50b", "1f50d", "1f6c0", "1f6c1", "1f6bf", "1f6bd", "1f527", "1f529", "1f528", "1f6aa", "1f6ac", "1f4a3", "1f52b", "1f52a", "1f48a", "1f489", "1f4b0", "1f4b4", "1f4b5", "1f4b7", "1f4b6", "1f4b3", "1f4b8", "1f4f2", "1f4e7", "1f4e5", "1f4e4", "2709", "1f4e9", "1f4e8", "1f4ef", "1f4eb", "1f4ea", "1f4ec", "1f4ed", "1f4ee", "1f4e6", "1f4dd", "1f4c4", "1f4c3", "1f4d1", "1f4ca", "1f4c8", "1f4c9", "1f4dc", "1f4cb", "1f4c5", "1f4c6", "1f4c7", "1f4c1", "1f4c2", "2702", "1f4cc", "1f4ce", "2712", "270f", "1f4cf", "1f4d0", "1f4d5", "1f4d7", "1f4d8", "1f4d9", "1f4d3", "1f4d4", "1f4d2", "1f4da", "1f4d6", "1f516", "1f4db", "1f52c", "1f52d", "1f4f0", "1f3a8", "1f3ac", "1f3a4", "1f3a7", "1f3bc", "1f3b5", "1f3b6", "1f3b9", "1f3bb", "1f3ba", "1f3b7", "1f3b8", "1f47e", "1f3ae", "1f0cf", "1f3b4", "1f004", "1f3b2", "1f3af", "1f3c8", "1f3c0", "26bd", "26be", "1f3be", "1f3b1", "1f3c9", "1f3b3", "26f3", "1f6b5", "1f6b4", "1f3c1", "1f3c7", "1f3c6", "1f3bf", "1f3c2", "1f3ca", "1f3c4", "1f3a3", "2615", "1f375", "1f376", "1f37c", "1f37a", "1f37b", "1f378", "1f379", "1f377", "1f374", "1f355", "1f354", "1f35f", "1f357", "1f356", "1f35d", "1f35b", "1f364", "1f371", "1f363", "1f365", "1f359", "1f358", "1f35a", "1f35c", "1f372", "1f362", "1f361", "1f373", "1f35e", "1f369", "1f36e", "1f366", "1f368", "1f367", "1f382", "1f370", "1f36a", "1f36b", "1f36c", "1f36d", "1f36f", "1f34e", "1f34f", "1f34a", "1f34b", "1f352", "1f347", "1f349", "1f353", "1f351", "1f348", "1f34c", "1f350", "1f34d", "1f360", "1f346", "1f345", "1f33d"],
+    ["1f3e0", "1f3e1", "1f3eb", "1f3e2", "1f3e3", "1f3e5", "1f3e6", "1f3ea", "1f3e9", "1f3e8", "1f492", "26ea", "1f3ec", "1f3e4", "1f307", "1f306", "1f3ef", "1f3f0", "26fa", "1f3ed", "1f5fc", "1f5fe", "1f5fb", "1f304", "1f305", "1f303", "1f5fd", "1f309", "1f3a0", "1f3a1", "26f2", "1f3a2", "1f6a2", "26f5", "1f6a4", "1f6a3", "2693", "1f680", "2708", "1f4ba", "1f681", "1f682", "1f68a", "1f689", "1f69e", "1f686", "1f684", "1f685", "1f688", "1f687", "1f69d", "1f683", "1f68b", "1f68e", "1f68c", "1f68d", "1f699", "1f698", "1f697", "1f695", "1f696", "1f69b", "1f69a", "1f6a8", "1f693", "1f694", "1f692", "1f691", "1f690", "1f6b2", "1f6a1", "1f69f", "1f6a0", "1f69c", "1f488", "1f68f", "1f3ab", "1f6a6", "1f6a5", "26a0", "1f6a7", "1f530", "26fd", "1f3ee", "1f3b0", "2668", "1f5ff", "1f3aa", "1f3ad", "1f4cd", "1f6a9", "1f1ef-1f1f5", "1f1f0-1f1f7", "1f1e9-1f1ea", "1f1e8-1f1f3", "1f1fa-1f1f8", "1f1eb-1f1f7", "1f1ea-1f1f8", "1f1ee-1f1f9", "1f1f7-1f1fa", "1f1ec-1f1e7"],
+    ["0031", "0032", "0033", "0034", "0035", "0036", "0037", "0038", "0039", "0030", "1f51f", "1f522", "0023", "1f523", "2b06", "2b07", "2b05", "27a1", "1f520", "1f521", "1f524", "2197", "2196", "2198", "2199", "2194", "2195", "1f504", "25c0", "25b6", "1f53c", "1f53d", "21a9", "21aa", "2139", "23ea", "23e9", "23eb", "23ec", "2935", "2934", "1f197", "1f500", "1f501", "1f502", "1f195", "1f199", "1f192", "1f193", "1f196", "1f4f6", "1f3a6", "1f201", "1f22f", "1f233", "1f235", "1f234", "1f232", "1f250", "1f239", "1f23a", "1f236", "1f21a", "1f6bb", "1f6b9", "1f6ba", "1f6bc", "1f6be", "1f6b0", "1f6ae", "1f17f", "267f", "1f6ad", "1f237", "1f238", "1f202", "24c2", "1f6c2", "1f6c4", "1f6c5", "1f6c3", "1f251", "3299", "3297", "1f191", "1f198", "1f194", "1f6ab", "1f51e", "1f4f5", "1f6af", "1f6b1", "1f6b3", "1f6b7", "1f6b8", "26d4", "2733", "2747", "274e", "2705", "2734", "1f49f", "1f19a", "1f4f3", "1f4f4", "1f170", "1f171", "1f18e", "1f17e", "1f4a0", "27bf", "267b", "2648", "2649", "264a", "264b", "264c", "264d", "264e", "264f", "2650", "2651", "2652", "2653", "26ce", "1f52f", "1f3e7", "1f4b9", "1f4b2", "1f4b1", "00a9", "00ae", "2122", "274c", "203c", "2049", "2757", "2753", "2755", "2754", "2b55", "1f51d", "1f51a", "1f519", "1f51b", "1f51c", "1f503", "1f55b", "1f567", "1f550", "1f55c", "1f551", "1f55d", "1f552", "1f55e", "1f553", "1f55f", "1f554", "1f560", "1f555", "1f556", "1f557", "1f558", "1f559", "1f55a", "1f561", "1f562", "1f563", "1f564", "1f565", "1f566", "2716", "2795", "2796", "2797", "2660", "2665", "2663", "2666", "1f4ae", "1f4af", "2714", "2611", "1f518", "1f517", "27b0", "3030", "303d", "1f531", "25fc", "25fb", "25fe", "25fd", "25aa", "25ab", "1f53a", "1f532", "1f533", "26ab", "26aa", "1f534", "1f535", "1f53b", "2b1c", "2b1b", "1f536", "1f537", "1f538", "1f539"]
+];
+
+
+
+Config.EmojiCategorySpritesheetDimens = [
+    [7, 27],
+    [4, 29],
+    [7, 33],
+    [3, 34],
+    [7, 34]
+];
+
+
+Config.emoji_data = {
+    "00a9": [
+        ["\u00A9"], "\uE24E", "\uDBBA\uDF29", ["copyright"], 0, 0
+    ],
+    "00ae": [
+        ["\u00AE"], "\uE24F", "\uDBBA\uDF2D", ["registered"], 0, 1
+    ],
+    "203c": [
+        ["\u203C\uFE0F", "\u203C"], "", "\uDBBA\uDF06", ["bangbang"], 0, 2
+    ],
+    "2049": [
+        ["\u2049\uFE0F", "\u2049"], "", "\uDBBA\uDF05", ["interrobang"], 0, 3
+    ],
+    "2122": [
+        ["\u2122"], "\uE537", "\uDBBA\uDF2A", ["tm"], 0, 4
+    ],
+    "2139": [
+        ["\u2139\uFE0F", "\u2139"], "", "\uDBBA\uDF47", ["information_source"], 0, 5
+    ],
+    "2194": [
+        ["\u2194\uFE0F", "\u2194"], "", "\uDBBA\uDEF6", ["left_right_arrow"], 0, 6
+    ],
+    "2195": [
+        ["\u2195\uFE0F", "\u2195"], "", "\uDBBA\uDEF7", ["arrow_up_down"], 0, 7
+    ],
+    "2196": [
+        ["\u2196\uFE0F", "\u2196"], "\uE237", "\uDBBA\uDEF2", ["arrow_upper_left"], 0, 8
+    ],
+    "2197": [
+        ["\u2197\uFE0F", "\u2197"], "\uE236", "\uDBBA\uDEF0", ["arrow_upper_right"], 0, 9
+    ],
+    "2198": [
+        ["\u2198\uFE0F", "\u2198"], "\uE238", "\uDBBA\uDEF1", ["arrow_lower_right"], 0, 10
+    ],
+    "2199": [
+        ["\u2199\uFE0F", "\u2199"], "\uE239", "\uDBBA\uDEF3", ["arrow_lower_left"], 0, 11
+    ],
+    "21a9": [
+        ["\u21A9\uFE0F", "\u21A9"], "", "\uDBBA\uDF83", ["leftwards_arrow_with_hook"], 0, 12
+    ],
+    "21aa": [
+        ["\u21AA\uFE0F", "\u21AA"], "", "\uDBBA\uDF88", ["arrow_right_hook"], 0, 13
+    ],
+    "231a": [
+        ["\u231A\uFE0F", "\u231A"], "", "\uDBB8\uDC1D", ["watch"], 0, 14
+    ],
+    "231b": [
+        ["\u231B\uFE0F", "\u231B"], "", "\uDBB8\uDC1C", ["hourglass"], 0, 15
+    ],
+    "23e9": [
+        ["\u23E9"], "\uE23C", "\uDBBA\uDEFE", ["fast_forward"], 0, 16
+    ],
+    "23ea": [
+        ["\u23EA"], "\uE23D", "\uDBBA\uDEFF", ["rewind"], 0, 17
+    ],
+    "23eb": [
+        ["\u23EB"], "", "\uDBBA\uDF03", ["arrow_double_up"], 0, 18
+    ],
+    "23ec": [
+        ["\u23EC"], "", "\uDBBA\uDF02", ["arrow_double_down"], 0, 19
+    ],
+    "23f0": [
+        ["\u23F0"], "\uE02D", "\uDBB8\uDC2A", ["alarm_clock"], 0, 20
+    ],
+    "23f3": [
+        ["\u23F3"], "", "\uDBB8\uDC1B", ["hourglass_flowing_sand"], 0, 21
+    ],
+    "24c2": [
+        ["\u24C2\uFE0F", "\u24C2"], "\uE434", "\uDBB9\uDFE1", ["m"], 0, 22
+    ],
+    "25aa": [
+        ["\u25AA\uFE0F", "\u25AA"], "\uE21A", "\uDBBA\uDF6E", ["black_small_square"], 0, 23
+    ],
+    "25ab": [
+        ["\u25AB\uFE0F", "\u25AB"], "\uE21B", "\uDBBA\uDF6D", ["white_small_square"], 0, 24
+    ],
+    "25b6": [
+        ["\u25B6\uFE0F", "\u25B6"], "\uE23A", "\uDBBA\uDEFC", ["arrow_forward"], 0, 25
+    ],
+    "25c0": [
+        ["\u25C0\uFE0F", "\u25C0"], "\uE23B", "\uDBBA\uDEFD", ["arrow_backward"], 0, 26
+    ],
+    "25fb": [
+        ["\u25FB\uFE0F", "\u25FB"], "\uE21B", "\uDBBA\uDF71", ["white_medium_square"], 0, 27
+    ],
+    "25fc": [
+        ["\u25FC\uFE0F", "\u25FC"], "\uE21A", "\uDBBA\uDF72", ["black_medium_square"], 0, 28
+    ],
+    "25fd": [
+        ["\u25FD\uFE0F", "\u25FD"], "\uE21B", "\uDBBA\uDF6F", ["white_medium_small_square"], 0, 29
+    ],
+    "25fe": [
+        ["\u25FE\uFE0F", "\u25FE"], "\uE21A", "\uDBBA\uDF70", ["black_medium_small_square"], 1, 0
+    ],
+    "2600": [
+        ["\u2600\uFE0F", "\u2600"], "\uE04A", "\uDBB8\uDC00", ["sunny"], 1, 1
+    ],
+    "2601": [
+        ["\u2601\uFE0F", "\u2601"], "\uE049", "\uDBB8\uDC01", ["cloud"], 1, 2
+    ],
+    "260e": [
+        ["\u260E\uFE0F", "\u260E"], "\uE009", "\uDBB9\uDD23", ["phone", "telephone"], 1, 3
+    ],
+    "2611": [
+        ["\u2611\uFE0F", "\u2611"], "", "\uDBBA\uDF8B", ["ballot_box_with_check"], 1, 4
+    ],
+    "2614": [
+        ["\u2614\uFE0F", "\u2614"], "\uE04B", "\uDBB8\uDC02", ["umbrella"], 1, 5
+    ],
+    "2615": [
+        ["\u2615\uFE0F", "\u2615"], "\uE045", "\uDBBA\uDD81", ["coffee"], 1, 6
+    ],
+    "261d": [
+        ["\u261D\uFE0F", "\u261D"], "\uE00F", "\uDBBA\uDF98", ["point_up"], 1, 7
+    ],
+    "263a": [
+        ["\u263A\uFE0F", "\u263A"], "\uE414", "\uDBB8\uDF36", ["relaxed"], 1, 8
+    ],
+    "2648": [
+        ["\u2648\uFE0F", "\u2648"], "\uE23F", "\uDBB8\uDC2B", ["aries"], 1, 9
+    ],
+    "2649": [
+        ["\u2649\uFE0F", "\u2649"], "\uE240", "\uDBB8\uDC2C", ["taurus"], 1, 10
+    ],
+    "264a": [
+        ["\u264A\uFE0F", "\u264A"], "\uE241", "\uDBB8\uDC2D", ["gemini"], 1, 11
+    ],
+    "264b": [
+        ["\u264B\uFE0F", "\u264B"], "\uE242", "\uDBB8\uDC2E", ["cancer"], 1, 12
+    ],
+    "264c": [
+        ["\u264C\uFE0F", "\u264C"], "\uE243", "\uDBB8\uDC2F", ["leo"], 1, 13
+    ],
+    "264d": [
+        ["\u264D\uFE0F", "\u264D"], "\uE244", "\uDBB8\uDC30", ["virgo"], 1, 14
+    ],
+    "264e": [
+        ["\u264E\uFE0F", "\u264E"], "\uE245", "\uDBB8\uDC31", ["libra"], 1, 15
+    ],
+    "264f": [
+        ["\u264F\uFE0F", "\u264F"], "\uE246", "\uDBB8\uDC32", ["scorpius"], 1, 16
+    ],
+    "2650": [
+        ["\u2650\uFE0F", "\u2650"], "\uE247", "\uDBB8\uDC33", ["sagittarius"], 1, 17
+    ],
+    "2651": [
+        ["\u2651\uFE0F", "\u2651"], "\uE248", "\uDBB8\uDC34", ["capricorn"], 1, 18
+    ],
+    "2652": [
+        ["\u2652\uFE0F", "\u2652"], "\uE249", "\uDBB8\uDC35", ["aquarius"], 1, 19
+    ],
+    "2653": [
+        ["\u2653\uFE0F", "\u2653"], "\uE24A", "\uDBB8\uDC36", ["pisces"], 1, 20
+    ],
+    "2660": [
+        ["\u2660\uFE0F", "\u2660"], "\uE20E", "\uDBBA\uDF1B", ["spades"], 1, 21
+    ],
+    "2663": [
+        ["\u2663\uFE0F", "\u2663"], "\uE20F", "\uDBBA\uDF1D", ["clubs"], 1, 22
+    ],
+    "2665": [
+        ["\u2665\uFE0F", "\u2665"], "\uE20C", "\uDBBA\uDF1A", ["hearts"], 1, 23
+    ],
+    "2666": [
+        ["\u2666\uFE0F", "\u2666"], "\uE20D", "\uDBBA\uDF1C", ["diamonds"], 1, 24
+    ],
+    "2668": [
+        ["\u2668\uFE0F", "\u2668"], "\uE123", "\uDBB9\uDFFA", ["hotsprings"], 1, 25
+    ],
+    "267b": [
+        ["\u267B\uFE0F", "\u267B"], "", "\uDBBA\uDF2C", ["recycle"], 1, 26
+    ],
+    "267f": [
+        ["\u267F\uFE0F", "\u267F"], "\uE20A", "\uDBBA\uDF20", ["wheelchair"], 1, 27
+    ],
+    "2693": [
+        ["\u2693\uFE0F", "\u2693"], "\uE202", "\uDBB9\uDCC1", ["anchor"], 1, 28
+    ],
+    "26a0": [
+        ["\u26A0\uFE0F", "\u26A0"], "\uE252", "\uDBBA\uDF23", ["warning"], 1, 29
+    ],
+    "26a1": [
+        ["\u26A1\uFE0F", "\u26A1"], "\uE13D", "\uDBB8\uDC04", ["zap"], 2, 0
+    ],
+    "26aa": [
+        ["\u26AA\uFE0F", "\u26AA"], "\uE219", "\uDBBA\uDF65", ["white_circle"], 2, 1
+    ],
+    "26ab": [
+        ["\u26AB\uFE0F", "\u26AB"], "\uE219", "\uDBBA\uDF66", ["black_circle"], 2, 2
+    ],
+    "26bd": [
+        ["\u26BD\uFE0F", "\u26BD"], "\uE018", "\uDBB9\uDFD4", ["soccer"], 2, 3
+    ],
+    "26be": [
+        ["\u26BE\uFE0F", "\u26BE"], "\uE016", "\uDBB9\uDFD1", ["baseball"], 2, 4
+    ],
+    "26c4": [
+        ["\u26C4\uFE0F", "\u26C4"], "\uE048", "\uDBB8\uDC03", ["snowman"], 2, 5
+    ],
+    "26c5": [
+        ["\u26C5\uFE0F", "\u26C5"], "\uE04A\uE049", "\uDBB8\uDC0F", ["partly_sunny"], 2, 6
+    ],
+    "26ce": [
+        ["\u26CE"], "\uE24B", "\uDBB8\uDC37", ["ophiuchus"], 2, 7
+    ],
+    "26d4": [
+        ["\u26D4\uFE0F", "\u26D4"], "\uE137", "\uDBBA\uDF26", ["no_entry"], 2, 8
+    ],
+    "26ea": [
+        ["\u26EA\uFE0F", "\u26EA"], "\uE037", "\uDBB9\uDCBB", ["church"], 2, 9
+    ],
+    "26f2": [
+        ["\u26F2\uFE0F", "\u26F2"], "\uE121", "\uDBB9\uDCBC", ["fountain"], 2, 10
+    ],
+    "26f3": [
+        ["\u26F3\uFE0F", "\u26F3"], "\uE014", "\uDBB9\uDFD2", ["golf"], 2, 11
+    ],
+    "26f5": [
+        ["\u26F5\uFE0F", "\u26F5"], "\uE01C", "\uDBB9\uDFEA", ["boat", "sailboat"], 2, 12
+    ],
+    "26fa": [
+        ["\u26FA\uFE0F", "\u26FA"], "\uE122", "\uDBB9\uDFFB", ["tent"], 2, 13
+    ],
+    "26fd": [
+        ["\u26FD\uFE0F", "\u26FD"], "\uE03A", "\uDBB9\uDFF5", ["fuelpump"], 2, 14
+    ],
+    "2702": [
+        ["\u2702\uFE0F", "\u2702"], "\uE313", "\uDBB9\uDD3E", ["scissors"], 2, 15
+    ],
+    "2705": [
+        ["\u2705"], "", "\uDBBA\uDF4A", ["white_check_mark"], 2, 16
+    ],
+    "2708": [
+        ["\u2708\uFE0F", "\u2708"], "\uE01D", "\uDBB9\uDFE9", ["airplane"], 2, 17
+    ],
+    "2709": [
+        ["\u2709\uFE0F", "\u2709"], "\uE103", "\uDBB9\uDD29", ["email", "envelope"], 2, 18
+    ],
+    "270a": [
+        ["\u270A"], "\uE010", "\uDBBA\uDF93", ["fist"], 2, 19
+    ],
+    "270b": [
+        ["\u270B"], "\uE012", "\uDBBA\uDF95", ["hand", "raised_hand"], 2, 20
+    ],
+    "270c": [
+        ["\u270C\uFE0F", "\u270C"], "\uE011", "\uDBBA\uDF94", ["v"], 2, 21
+    ],
+    "270f": [
+        ["\u270F\uFE0F", "\u270F"], "\uE301", "\uDBB9\uDD39", ["pencil2"], 2, 22
+    ],
+    "2712": [
+        ["\u2712\uFE0F", "\u2712"], "", "\uDBB9\uDD36", ["black_nib"], 2, 23
+    ],
+    "2714": [
+        ["\u2714\uFE0F", "\u2714"], "", "\uDBBA\uDF49", ["heavy_check_mark"], 2, 24
+    ],
+    "2716": [
+        ["\u2716\uFE0F", "\u2716"], "\uE333", "\uDBBA\uDF53", ["heavy_multiplication_x"], 2, 25
+    ],
+    "2728": [
+        ["\u2728"], "\uE32E", "\uDBBA\uDF60", ["sparkles"], 2, 26
+    ],
+    "2733": [
+        ["\u2733\uFE0F", "\u2733"], "\uE206", "\uDBBA\uDF62", ["eight_spoked_asterisk"], 2, 27
+    ],
+    "2734": [
+        ["\u2734\uFE0F", "\u2734"], "\uE205", "\uDBBA\uDF61", ["eight_pointed_black_star"], 2, 28
+    ],
+    "2744": [
+        ["\u2744\uFE0F", "\u2744"], "", "\uDBB8\uDC0E", ["snowflake"], 2, 29
+    ],
+    "2747": [
+        ["\u2747\uFE0F", "\u2747"], "\uE32E", "\uDBBA\uDF77", ["sparkle"], 3, 0
+    ],
+    "274c": [
+        ["\u274C"], "\uE333", "\uDBBA\uDF45", ["x"], 3, 1
+    ],
+    "274e": [
+        ["\u274E"], "\uE333", "\uDBBA\uDF46", ["negative_squared_cross_mark"], 3, 2
+    ],
+    "2753": [
+        ["\u2753"], "\uE020", "\uDBBA\uDF09", ["question"], 3, 3
+    ],
+    "2754": [
+        ["\u2754"], "\uE336", "\uDBBA\uDF0A", ["grey_question"], 3, 4
+    ],
+    "2755": [
+        ["\u2755"], "\uE337", "\uDBBA\uDF0B", ["grey_exclamation"], 3, 5
+    ],
+    "2757": [
+        ["\u2757\uFE0F", "\u2757"], "\uE021", "\uDBBA\uDF04", ["exclamation", "heavy_exclamation_mark"], 3, 6
+    ],
+    "2764": [
+        ["\u2764\uFE0F", "\u2764"], "\uE022", "\uDBBA\uDF0C", ["heart"], 3, 7, "<3"
+    ],
+    "2795": [
+        ["\u2795"], "", "\uDBBA\uDF51", ["heavy_plus_sign"], 3, 8
+    ],
+    "2796": [
+        ["\u2796"], "", "\uDBBA\uDF52", ["heavy_minus_sign"], 3, 9
+    ],
+    "2797": [
+        ["\u2797"], "", "\uDBBA\uDF54", ["heavy_division_sign"], 3, 10
+    ],
+    "27a1": [
+        ["\u27A1\uFE0F", "\u27A1"], "\uE234", "\uDBBA\uDEFA", ["arrow_right"], 3, 11
+    ],
+    "27b0": [
+        ["\u27B0"], "", "\uDBBA\uDF08", ["curly_loop"], 3, 12
+    ],
+    "27bf": [
+        ["\u27BF"], "\uE211", "\uDBBA\uDC2B", ["loop"], 3, 13
+    ],
+    "2934": [
+        ["\u2934\uFE0F", "\u2934"], "\uE236", "\uDBBA\uDEF4", ["arrow_heading_up"], 3, 14
+    ],
+    "2935": [
+        ["\u2935\uFE0F", "\u2935"], "\uE238", "\uDBBA\uDEF5", ["arrow_heading_down"], 3, 15
+    ],
+    "2b05": [
+        ["\u2B05\uFE0F", "\u2B05"], "\uE235", "\uDBBA\uDEFB", ["arrow_left"], 3, 16
+    ],
+    "2b06": [
+        ["\u2B06\uFE0F", "\u2B06"], "\uE232", "\uDBBA\uDEF8", ["arrow_up"], 3, 17
+    ],
+    "2b07": [
+        ["\u2B07\uFE0F", "\u2B07"], "\uE233", "\uDBBA\uDEF9", ["arrow_down"], 3, 18
+    ],
+    "2b1b": [
+        ["\u2B1B\uFE0F", "\u2B1B"], "\uE21A", "\uDBBA\uDF6C", ["black_large_square"], 3, 19
+    ],
+    "2b1c": [
+        ["\u2B1C\uFE0F", "\u2B1C"], "\uE21B", "\uDBBA\uDF6B", ["white_large_square"], 3, 20
+    ],
+    "2b50": [
+        ["\u2B50\uFE0F", "\u2B50"], "\uE32F", "\uDBBA\uDF68", ["star"], 3, 21
+    ],
+    "2b55": [
+        ["\u2B55\uFE0F", "\u2B55"], "\uE332", "\uDBBA\uDF44", ["o"], 3, 22
+    ],
+    "3030": [
+        ["\u3030"], "", "\uDBBA\uDF07", ["wavy_dash"], 3, 23
+    ],
+    "303d": [
+        ["\u303D\uFE0F", "\u303D"], "\uE12C", "\uDBBA\uDC1B", ["part_alternation_mark"], 3, 24
+    ],
+    "3297": [
+        ["\u3297\uFE0F", "\u3297"], "\uE30D", "\uDBBA\uDF43", ["congratulations"], 3, 25
+    ],
+    "3299": [
+        ["\u3299\uFE0F", "\u3299"], "\uE315", "\uDBBA\uDF2B", ["secret"], 3, 26
+    ],
+    "1f004": [
+        ["\uD83C\uDC04\uFE0F", "\uD83C\uDC04"], "\uE12D", "\uDBBA\uDC0B", ["mahjong"], 3, 27
+    ],
+    "1f0cf": [
+        ["\uD83C\uDCCF"], "", "\uDBBA\uDC12", ["black_joker"], 3, 28
+    ],
+    "1f170": [
+        ["\uD83C\uDD70"], "\uE532", "\uDBB9\uDD0B", ["a"], 3, 29
+    ],
+    "1f171": [
+        ["\uD83C\uDD71"], "\uE533", "\uDBB9\uDD0C", ["b"], 4, 0
+    ],
+    "1f17e": [
+        ["\uD83C\uDD7E"], "\uE535", "\uDBB9\uDD0E", ["o2"], 4, 1
+    ],
+    "1f17f": [
+        ["\uD83C\uDD7F\uFE0F", "\uD83C\uDD7F"], "\uE14F", "\uDBB9\uDFF6", ["parking"], 4, 2
+    ],
+    "1f18e": [
+        ["\uD83C\uDD8E"], "\uE534", "\uDBB9\uDD0D", ["ab"], 4, 3
+    ],
+    "1f191": [
+        ["\uD83C\uDD91"], "", "\uDBBA\uDF84", ["cl"], 4, 4
+    ],
+    "1f192": [
+        ["\uD83C\uDD92"], "\uE214", "\uDBBA\uDF38", ["cool"], 4, 5
+    ],
+    "1f193": [
+        ["\uD83C\uDD93"], "", "\uDBBA\uDF21", ["free"], 4, 6
+    ],
+    "1f194": [
+        ["\uD83C\uDD94"], "\uE229", "\uDBBA\uDF81", ["id"], 4, 7
+    ],
+    "1f195": [
+        ["\uD83C\uDD95"], "\uE212", "\uDBBA\uDF36", ["new"], 4, 8
+    ],
+    "1f196": [
+        ["\uD83C\uDD96"], "", "\uDBBA\uDF28", ["ng"], 4, 9
+    ],
+    "1f197": [
+        ["\uD83C\uDD97"], "\uE24D", "\uDBBA\uDF27", ["ok"], 4, 10
+    ],
+    "1f198": [
+        ["\uD83C\uDD98"], "", "\uDBBA\uDF4F", ["sos"], 4, 11
+    ],
+    "1f199": [
+        ["\uD83C\uDD99"], "\uE213", "\uDBBA\uDF37", ["up"], 4, 12
+    ],
+    "1f19a": [
+        ["\uD83C\uDD9A"], "\uE12E", "\uDBBA\uDF32", ["vs"], 4, 13
+    ],
+    "1f201": [
+        ["\uD83C\uDE01"], "\uE203", "\uDBBA\uDF24", ["koko"], 4, 14
+    ],
+    "1f202": [
+        ["\uD83C\uDE02"], "\uE228", "\uDBBA\uDF3F", ["sa"], 4, 15
+    ],
+    "1f21a": [
+        ["\uD83C\uDE1A\uFE0F", "\uD83C\uDE1A"], "\uE216", "\uDBBA\uDF3A", ["u7121"], 4, 16
+    ],
+    "1f22f": [
+        ["\uD83C\uDE2F\uFE0F", "\uD83C\uDE2F"], "\uE22C", "\uDBBA\uDF40", ["u6307"], 4, 17
+    ],
+    "1f232": [
+        ["\uD83C\uDE32"], "", "\uDBBA\uDF2E", ["u7981"], 4, 18
+    ],
+    "1f233": [
+        ["\uD83C\uDE33"], "\uE22B", "\uDBBA\uDF2F", ["u7a7a"], 4, 19
+    ],
+    "1f234": [
+        ["\uD83C\uDE34"], "", "\uDBBA\uDF30", ["u5408"], 4, 20
+    ],
+    "1f235": [
+        ["\uD83C\uDE35"], "\uE22A", "\uDBBA\uDF31", ["u6e80"], 4, 21
+    ],
+    "1f236": [
+        ["\uD83C\uDE36"], "\uE215", "\uDBBA\uDF39", ["u6709"], 4, 22
+    ],
+    "1f237": [
+        ["\uD83C\uDE37"], "\uE217", "\uDBBA\uDF3B", ["u6708"], 4, 23
+    ],
+    "1f238": [
+        ["\uD83C\uDE38"], "\uE218", "\uDBBA\uDF3C", ["u7533"], 4, 24
+    ],
+    "1f239": [
+        ["\uD83C\uDE39"], "\uE227", "\uDBBA\uDF3E", ["u5272"], 4, 25
+    ],
+    "1f23a": [
+        ["\uD83C\uDE3A"], "\uE22D", "\uDBBA\uDF41", ["u55b6"], 4, 26
+    ],
+    "1f250": [
+        ["\uD83C\uDE50"], "\uE226", "\uDBBA\uDF3D", ["ideograph_advantage"], 4, 27
+    ],
+    "1f251": [
+        ["\uD83C\uDE51"], "", "\uDBBA\uDF50", ["accept"], 4, 28
+    ],
+    "1f300": [
+        ["\uD83C\uDF00"], "\uE443", "\uDBB8\uDC05", ["cyclone"], 4, 29
+    ],
+    "1f301": [
+        ["\uD83C\uDF01"], "", "\uDBB8\uDC06", ["foggy"], 5, 0
+    ],
+    "1f302": [
+        ["\uD83C\uDF02"], "\uE43C", "\uDBB8\uDC07", ["closed_umbrella"], 5, 1
+    ],
+    "1f303": [
+        ["\uD83C\uDF03"], "\uE44B", "\uDBB8\uDC08", ["night_with_stars"], 5, 2
+    ],
+    "1f304": [
+        ["\uD83C\uDF04"], "\uE04D", "\uDBB8\uDC09", ["sunrise_over_mountains"], 5, 3
+    ],
+    "1f305": [
+        ["\uD83C\uDF05"], "\uE449", "\uDBB8\uDC0A", ["sunrise"], 5, 4
+    ],
+    "1f306": [
+        ["\uD83C\uDF06"], "\uE146", "\uDBB8\uDC0B", ["city_sunset"], 5, 5
+    ],
+    "1f307": [
+        ["\uD83C\uDF07"], "\uE44A", "\uDBB8\uDC0C", ["city_sunrise"], 5, 6
+    ],
+    "1f308": [
+        ["\uD83C\uDF08"], "\uE44C", "\uDBB8\uDC0D", ["rainbow"], 5, 7
+    ],
+    "1f309": [
+        ["\uD83C\uDF09"], "\uE44B", "\uDBB8\uDC10", ["bridge_at_night"], 5, 8
+    ],
+    "1f30a": [
+        ["\uD83C\uDF0A"], "\uE43E", "\uDBB8\uDC38", ["ocean"], 5, 9
+    ],
+    "1f30b": [
+        ["\uD83C\uDF0B"], "", "\uDBB8\uDC3A", ["volcano"], 5, 10
+    ],
+    "1f30c": [
+        ["\uD83C\uDF0C"], "\uE44B", "\uDBB8\uDC3B", ["milky_way"], 5, 11
+    ],
+    "1f30d": [
+        ["\uD83C\uDF0D"], "", "", ["earth_africa"], 5, 12
+    ],
+    "1f30e": [
+        ["\uD83C\uDF0E"], "", "", ["earth_americas"], 5, 13
+    ],
+    "1f30f": [
+        ["\uD83C\uDF0F"], "", "\uDBB8\uDC39", ["earth_asia"], 5, 14
+    ],
+    "1f310": [
+        ["\uD83C\uDF10"], "", "", ["globe_with_meridians"], 5, 15
+    ],
+    "1f311": [
+        ["\uD83C\uDF11"], "", "\uDBB8\uDC11", ["new_moon"], 5, 16
+    ],
+    "1f312": [
+        ["\uD83C\uDF12"], "", "", ["waxing_crescent_moon"], 5, 17
+    ],
+    "1f313": [
+        ["\uD83C\uDF13"], "\uE04C", "\uDBB8\uDC13", ["first_quarter_moon"], 5, 18
+    ],
+    "1f314": [
+        ["\uD83C\uDF14"], "\uE04C", "\uDBB8\uDC12", ["moon", "waxing_gibbous_moon"], 5, 19
+    ],
+    "1f315": [
+        ["\uD83C\uDF15"], "", "\uDBB8\uDC15", ["full_moon"], 5, 20
+    ],
+    "1f316": [
+        ["\uD83C\uDF16"], "", "", ["waning_gibbous_moon"], 5, 21
+    ],
+    "1f317": [
+        ["\uD83C\uDF17"], "", "", ["last_quarter_moon"], 5, 22
+    ],
+    "1f318": [
+        ["\uD83C\uDF18"], "", "", ["waning_crescent_moon"], 5, 23
+    ],
+    "1f319": [
+        ["\uD83C\uDF19"], "\uE04C", "\uDBB8\uDC14", ["crescent_moon"], 5, 24
+    ],
+    "1f31a": [
+        ["\uD83C\uDF1A"], "", "", ["new_moon_with_face"], 5, 25
+    ],
+    "1f31b": [
+        ["\uD83C\uDF1B"], "\uE04C", "\uDBB8\uDC16", ["first_quarter_moon_with_face"], 5, 26
+    ],
+    "1f31c": [
+        ["\uD83C\uDF1C"], "", "", ["last_quarter_moon_with_face"], 5, 27
+    ],
+    "1f31d": [
+        ["\uD83C\uDF1D"], "", "", ["full_moon_with_face"], 5, 28
+    ],
+    "1f31e": [
+        ["\uD83C\uDF1E"], "", "", ["sun_with_face"], 5, 29
+    ],
+    "1f31f": [
+        ["\uD83C\uDF1F"], "\uE335", "\uDBBA\uDF69", ["star2"], 6, 0
+    ],
+    "1f320": [
+        ["\uD83C\uDF20"], "", "\uDBBA\uDF6A", ["stars"], 6, 1
+    ],
+    "1f330": [
+        ["\uD83C\uDF30"], "", "\uDBB8\uDC4C", ["chestnut"], 6, 2
+    ],
+    "1f331": [
+        ["\uD83C\uDF31"], "\uE110", "\uDBB8\uDC3E", ["seedling"], 6, 3
+    ],
+    "1f332": [
+        ["\uD83C\uDF32"], "", "", ["evergreen_tree"], 6, 4
+    ],
+    "1f333": [
+        ["\uD83C\uDF33"], "", "", ["deciduous_tree"], 6, 5
+    ],
+    "1f334": [
+        ["\uD83C\uDF34"], "\uE307", "\uDBB8\uDC47", ["palm_tree"], 6, 6
+    ],
+    "1f335": [
+        ["\uD83C\uDF35"], "\uE308", "\uDBB8\uDC48", ["cactus"], 6, 7
+    ],
+    "1f337": [
+        ["\uD83C\uDF37"], "\uE304", "\uDBB8\uDC3D", ["tulip"], 6, 8
+    ],
+    "1f338": [
+        ["\uD83C\uDF38"], "\uE030", "\uDBB8\uDC40", ["cherry_blossom"], 6, 9
+    ],
+    "1f339": [
+        ["\uD83C\uDF39"], "\uE032", "\uDBB8\uDC41", ["rose"], 6, 10
+    ],
+    "1f33a": [
+        ["\uD83C\uDF3A"], "\uE303", "\uDBB8\uDC45", ["hibiscus"], 6, 11
+    ],
+    "1f33b": [
+        ["\uD83C\uDF3B"], "\uE305", "\uDBB8\uDC46", ["sunflower"], 6, 12
+    ],
+    "1f33c": [
+        ["\uD83C\uDF3C"], "\uE305", "\uDBB8\uDC4D", ["blossom"], 6, 13
+    ],
+    "1f33d": [
+        ["\uD83C\uDF3D"], "", "\uDBB8\uDC4A", ["corn"], 6, 14
+    ],
+    "1f33e": [
+        ["\uD83C\uDF3E"], "\uE444", "\uDBB8\uDC49", ["ear_of_rice"], 6, 15
+    ],
+    "1f33f": [
+        ["\uD83C\uDF3F"], "\uE110", "\uDBB8\uDC4E", ["herb"], 6, 16
+    ],
+    "1f340": [
+        ["\uD83C\uDF40"], "\uE110", "\uDBB8\uDC3C", ["four_leaf_clover"], 6, 17
+    ],
+    "1f341": [
+        ["\uD83C\uDF41"], "\uE118", "\uDBB8\uDC3F", ["maple_leaf"], 6, 18
+    ],
+    "1f342": [
+        ["\uD83C\uDF42"], "\uE119", "\uDBB8\uDC42", ["fallen_leaf"], 6, 19
+    ],
+    "1f343": [
+        ["\uD83C\uDF43"], "\uE447", "\uDBB8\uDC43", ["leaves"], 6, 20
+    ],
+    "1f344": [
+        ["\uD83C\uDF44"], "", "\uDBB8\uDC4B", ["mushroom"], 6, 21
+    ],
+    "1f345": [
+        ["\uD83C\uDF45"], "\uE349", "\uDBB8\uDC55", ["tomato"], 6, 22
+    ],
+    "1f346": [
+        ["\uD83C\uDF46"], "\uE34A", "\uDBB8\uDC56", ["eggplant"], 6, 23
+    ],
+    "1f347": [
+        ["\uD83C\uDF47"], "", "\uDBB8\uDC59", ["grapes"], 6, 24
+    ],
+    "1f348": [
+        ["\uD83C\uDF48"], "", "\uDBB8\uDC57", ["melon"], 6, 25
+    ],
+    "1f349": [
+        ["\uD83C\uDF49"], "\uE348", "\uDBB8\uDC54", ["watermelon"], 6, 26
+    ],
+    "1f34a": [
+        ["\uD83C\uDF4A"], "\uE346", "\uDBB8\uDC52", ["tangerine"], 6, 27
+    ],
+    "1f34b": [
+        ["\uD83C\uDF4B"], "", "", ["lemon"], 6, 28
+    ],
+    "1f34c": [
+        ["\uD83C\uDF4C"], "", "\uDBB8\uDC50", ["banana"], 6, 29
+    ],
+    "1f34d": [
+        ["\uD83C\uDF4D"], "", "\uDBB8\uDC58", ["pineapple"], 7, 0
+    ],
+    "1f34e": [
+        ["\uD83C\uDF4E"], "\uE345", "\uDBB8\uDC51", ["apple"], 7, 1
+    ],
+    "1f34f": [
+        ["\uD83C\uDF4F"], "\uE345", "\uDBB8\uDC5B", ["green_apple"], 7, 2
+    ],
+    "1f350": [
+        ["\uD83C\uDF50"], "", "", ["pear"], 7, 3
+    ],
+    "1f351": [
+        ["\uD83C\uDF51"], "", "\uDBB8\uDC5A", ["peach"], 7, 4
+    ],
+    "1f352": [
+        ["\uD83C\uDF52"], "", "\uDBB8\uDC4F", ["cherries"], 7, 5
+    ],
+    "1f353": [
+        ["\uD83C\uDF53"], "\uE347", "\uDBB8\uDC53", ["strawberry"], 7, 6
+    ],
+    "1f354": [
+        ["\uD83C\uDF54"], "\uE120", "\uDBBA\uDD60", ["hamburger"], 7, 7
+    ],
+    "1f355": [
+        ["\uD83C\uDF55"], "", "\uDBBA\uDD75", ["pizza"], 7, 8
+    ],
+    "1f356": [
+        ["\uD83C\uDF56"], "", "\uDBBA\uDD72", ["meat_on_bone"], 7, 9
+    ],
+    "1f357": [
+        ["\uD83C\uDF57"], "", "\uDBBA\uDD76", ["poultry_leg"], 7, 10
+    ],
+    "1f358": [
+        ["\uD83C\uDF58"], "\uE33D", "\uDBBA\uDD69", ["rice_cracker"], 7, 11
+    ],
+    "1f359": [
+        ["\uD83C\uDF59"], "\uE342", "\uDBBA\uDD61", ["rice_ball"], 7, 12
+    ],
+    "1f35a": [
+        ["\uD83C\uDF5A"], "\uE33E", "\uDBBA\uDD6A", ["rice"], 7, 13
+    ],
+    "1f35b": [
+        ["\uD83C\uDF5B"], "\uE341", "\uDBBA\uDD6C", ["curry"], 7, 14
+    ],
+    "1f35c": [
+        ["\uD83C\uDF5C"], "\uE340", "\uDBBA\uDD63", ["ramen"], 7, 15
+    ],
+    "1f35d": [
+        ["\uD83C\uDF5D"], "\uE33F", "\uDBBA\uDD6B", ["spaghetti"], 7, 16
+    ],
+    "1f35e": [
+        ["\uD83C\uDF5E"], "\uE339", "\uDBBA\uDD64", ["bread"], 7, 17
+    ],
+    "1f35f": [
+        ["\uD83C\uDF5F"], "\uE33B", "\uDBBA\uDD67", ["fries"], 7, 18
+    ],
+    "1f360": [
+        ["\uD83C\uDF60"], "", "\uDBBA\uDD74", ["sweet_potato"], 7, 19
+    ],
+    "1f361": [
+        ["\uD83C\uDF61"], "\uE33C", "\uDBBA\uDD68", ["dango"], 7, 20
+    ],
+    "1f362": [
+        ["\uD83C\uDF62"], "\uE343", "\uDBBA\uDD6D", ["oden"], 7, 21
+    ],
+    "1f363": [
+        ["\uD83C\uDF63"], "\uE344", "\uDBBA\uDD6E", ["sushi"], 7, 22
+    ],
+    "1f364": [
+        ["\uD83C\uDF64"], "", "\uDBBA\uDD7F", ["fried_shrimp"], 7, 23
+    ],
+    "1f365": [
+        ["\uD83C\uDF65"], "", "\uDBBA\uDD73", ["fish_cake"], 7, 24
+    ],
+    "1f366": [
+        ["\uD83C\uDF66"], "\uE33A", "\uDBBA\uDD66", ["icecream"], 7, 25
+    ],
+    "1f367": [
+        ["\uD83C\uDF67"], "\uE43F", "\uDBBA\uDD71", ["shaved_ice"], 7, 26
+    ],
+    "1f368": [
+        ["\uD83C\uDF68"], "", "\uDBBA\uDD77", ["ice_cream"], 7, 27
+    ],
+    "1f369": [
+        ["\uD83C\uDF69"], "", "\uDBBA\uDD78", ["doughnut"], 7, 28
+    ],
+    "1f36a": [
+        ["\uD83C\uDF6A"], "", "\uDBBA\uDD79", ["cookie"], 7, 29
+    ],
+    "1f36b": [
+        ["\uD83C\uDF6B"], "", "\uDBBA\uDD7A", ["chocolate_bar"], 8, 0
+    ],
+    "1f36c": [
+        ["\uD83C\uDF6C"], "", "\uDBBA\uDD7B", ["candy"], 8, 1
+    ],
+    "1f36d": [
+        ["\uD83C\uDF6D"], "", "\uDBBA\uDD7C", ["lollipop"], 8, 2
+    ],
+    "1f36e": [
+        ["\uD83C\uDF6E"], "", "\uDBBA\uDD7D", ["custard"], 8, 3
+    ],
+    "1f36f": [
+        ["\uD83C\uDF6F"], "", "\uDBBA\uDD7E", ["honey_pot"], 8, 4
+    ],
+    "1f370": [
+        ["\uD83C\uDF70"], "\uE046", "\uDBBA\uDD62", ["cake"], 8, 5
+    ],
+    "1f371": [
+        ["\uD83C\uDF71"], "\uE34C", "\uDBBA\uDD6F", ["bento"], 8, 6
+    ],
+    "1f372": [
+        ["\uD83C\uDF72"], "\uE34D", "\uDBBA\uDD70", ["stew"], 8, 7
+    ],
+    "1f373": [
+        ["\uD83C\uDF73"], "\uE147", "\uDBBA\uDD65", ["egg"], 8, 8
+    ],
+    "1f374": [
+        ["\uD83C\uDF74"], "\uE043", "\uDBBA\uDD80", ["fork_and_knife"], 8, 9
+    ],
+    "1f375": [
+        ["\uD83C\uDF75"], "\uE338", "\uDBBA\uDD84", ["tea"], 8, 10
+    ],
+    "1f376": [
+        ["\uD83C\uDF76"], "\uE30B", "\uDBBA\uDD85", ["sake"], 8, 11
+    ],
+    "1f377": [
+        ["\uD83C\uDF77"], "\uE044", "\uDBBA\uDD86", ["wine_glass"], 8, 12
+    ],
+    "1f378": [
+        ["\uD83C\uDF78"], "\uE044", "\uDBBA\uDD82", ["cocktail"], 8, 13
+    ],
+    "1f379": [
+        ["\uD83C\uDF79"], "\uE044", "\uDBBA\uDD88", ["tropical_drink"], 8, 14
+    ],
+    "1f37a": [
+        ["\uD83C\uDF7A"], "\uE047", "\uDBBA\uDD83", ["beer"], 8, 15
+    ],
+    "1f37b": [
+        ["\uD83C\uDF7B"], "\uE30C", "\uDBBA\uDD87", ["beers"], 8, 16
+    ],
+    "1f37c": [
+        ["\uD83C\uDF7C"], "", "", ["baby_bottle"], 8, 17
+    ],
+    "1f380": [
+        ["\uD83C\uDF80"], "\uE314", "\uDBB9\uDD0F", ["ribbon"], 8, 18
+    ],
+    "1f381": [
+        ["\uD83C\uDF81"], "\uE112", "\uDBB9\uDD10", ["gift"], 8, 19
+    ],
+    "1f382": [
+        ["\uD83C\uDF82"], "\uE34B", "\uDBB9\uDD11", ["birthday"], 8, 20
+    ],
+    "1f383": [
+        ["\uD83C\uDF83"], "\uE445", "\uDBB9\uDD1F", ["jack_o_lantern"], 8, 21
+    ],
+    "1f384": [
+        ["\uD83C\uDF84"], "\uE033", "\uDBB9\uDD12", ["christmas_tree"], 8, 22
+    ],
+    "1f385": [
+        ["\uD83C\uDF85"], "\uE448", "\uDBB9\uDD13", ["santa"], 8, 23
+    ],
+    "1f386": [
+        ["\uD83C\uDF86"], "\uE117", "\uDBB9\uDD15", ["fireworks"], 8, 24
+    ],
+    "1f387": [
+        ["\uD83C\uDF87"], "\uE440", "\uDBB9\uDD1D", ["sparkler"], 8, 25
+    ],
+    "1f388": [
+        ["\uD83C\uDF88"], "\uE310", "\uDBB9\uDD16", ["balloon"], 8, 26
+    ],
+    "1f389": [
+        ["\uD83C\uDF89"], "\uE312", "\uDBB9\uDD17", ["tada"], 8, 27
+    ],
+    "1f38a": [
+        ["\uD83C\uDF8A"], "", "\uDBB9\uDD20", ["confetti_ball"], 8, 28
+    ],
+    "1f38b": [
+        ["\uD83C\uDF8B"], "", "\uDBB9\uDD21", ["tanabata_tree"], 8, 29
+    ],
+    "1f38c": [
+        ["\uD83C\uDF8C"], "\uE143", "\uDBB9\uDD14", ["crossed_flags"], 9, 0
+    ],
+    "1f38d": [
+        ["\uD83C\uDF8D"], "\uE436", "\uDBB9\uDD18", ["bamboo"], 9, 1
+    ],
+    "1f38e": [
+        ["\uD83C\uDF8E"], "\uE438", "\uDBB9\uDD19", ["dolls"], 9, 2
+    ],
+    "1f38f": [
+        ["\uD83C\uDF8F"], "\uE43B", "\uDBB9\uDD1C", ["flags"], 9, 3
+    ],
+    "1f390": [
+        ["\uD83C\uDF90"], "\uE442", "\uDBB9\uDD1E", ["wind_chime"], 9, 4
+    ],
+    "1f391": [
+        ["\uD83C\uDF91"], "\uE446", "\uDBB8\uDC17", ["rice_scene"], 9, 5
+    ],
+    "1f392": [
+        ["\uD83C\uDF92"], "\uE43A", "\uDBB9\uDD1B", ["school_satchel"], 9, 6
+    ],
+    "1f393": [
+        ["\uD83C\uDF93"], "\uE439", "\uDBB9\uDD1A", ["mortar_board"], 9, 7
+    ],
+    "1f3a0": [
+        ["\uD83C\uDFA0"], "", "\uDBB9\uDFFC", ["carousel_horse"], 9, 8
+    ],
+    "1f3a1": [
+        ["\uD83C\uDFA1"], "\uE124", "\uDBB9\uDFFD", ["ferris_wheel"], 9, 9
+    ],
+    "1f3a2": [
+        ["\uD83C\uDFA2"], "\uE433", "\uDBB9\uDFFE", ["roller_coaster"], 9, 10
+    ],
+    "1f3a3": [
+        ["\uD83C\uDFA3"], "\uE019", "\uDBB9\uDFFF", ["fishing_pole_and_fish"], 9, 11
+    ],
+    "1f3a4": [
+        ["\uD83C\uDFA4"], "\uE03C", "\uDBBA\uDC00", ["microphone"], 9, 12
+    ],
+    "1f3a5": [
+        ["\uD83C\uDFA5"], "\uE03D", "\uDBBA\uDC01", ["movie_camera"], 9, 13
+    ],
+    "1f3a6": [
+        ["\uD83C\uDFA6"], "\uE507", "\uDBBA\uDC02", ["cinema"], 9, 14
+    ],
+    "1f3a7": [
+        ["\uD83C\uDFA7"], "\uE30A", "\uDBBA\uDC03", ["headphones"], 9, 15
+    ],
+    "1f3a8": [
+        ["\uD83C\uDFA8"], "\uE502", "\uDBBA\uDC04", ["art"], 9, 16
+    ],
+    "1f3a9": [
+        ["\uD83C\uDFA9"], "\uE503", "\uDBBA\uDC05", ["tophat"], 9, 17
+    ],
+    "1f3aa": [
+        ["\uD83C\uDFAA"], "", "\uDBBA\uDC06", ["circus_tent"], 9, 18
+    ],
+    "1f3ab": [
+        ["\uD83C\uDFAB"], "\uE125", "\uDBBA\uDC07", ["ticket"], 9, 19
+    ],
+    "1f3ac": [
+        ["\uD83C\uDFAC"], "\uE324", "\uDBBA\uDC08", ["clapper"], 9, 20
+    ],
+    "1f3ad": [
+        ["\uD83C\uDFAD"], "\uE503", "\uDBBA\uDC09", ["performing_arts"], 9, 21
+    ],
+    "1f3ae": [
+        ["\uD83C\uDFAE"], "", "\uDBBA\uDC0A", ["video_game"], 9, 22
+    ],
+    "1f3af": [
+        ["\uD83C\uDFAF"], "\uE130", "\uDBBA\uDC0C", ["dart"], 9, 23
+    ],
+    "1f3b0": [
+        ["\uD83C\uDFB0"], "\uE133", "\uDBBA\uDC0D", ["slot_machine"], 9, 24
+    ],
+    "1f3b1": [
+        ["\uD83C\uDFB1"], "\uE42C", "\uDBBA\uDC0E", ["8ball"], 9, 25
+    ],
+    "1f3b2": [
+        ["\uD83C\uDFB2"], "", "\uDBBA\uDC0F", ["game_die"], 9, 26
+    ],
+    "1f3b3": [
+        ["\uD83C\uDFB3"], "", "\uDBBA\uDC10", ["bowling"], 9, 27
+    ],
+    "1f3b4": [
+        ["\uD83C\uDFB4"], "", "\uDBBA\uDC11", ["flower_playing_cards"], 9, 28
+    ],
+    "1f3b5": [
+        ["\uD83C\uDFB5"], "\uE03E", "\uDBBA\uDC13", ["musical_note"], 9, 29
+    ],
+    "1f3b6": [
+        ["\uD83C\uDFB6"], "\uE326", "\uDBBA\uDC14", ["notes"], 10, 0
+    ],
+    "1f3b7": [
+        ["\uD83C\uDFB7"], "\uE040", "\uDBBA\uDC15", ["saxophone"], 10, 1
+    ],
+    "1f3b8": [
+        ["\uD83C\uDFB8"], "\uE041", "\uDBBA\uDC16", ["guitar"], 10, 2
+    ],
+    "1f3b9": [
+        ["\uD83C\uDFB9"], "", "\uDBBA\uDC17", ["musical_keyboard"], 10, 3
+    ],
+    "1f3ba": [
+        ["\uD83C\uDFBA"], "\uE042", "\uDBBA\uDC18", ["trumpet"], 10, 4
+    ],
+    "1f3bb": [
+        ["\uD83C\uDFBB"], "", "\uDBBA\uDC19", ["violin"], 10, 5
+    ],
+    "1f3bc": [
+        ["\uD83C\uDFBC"], "\uE326", "\uDBBA\uDC1A", ["musical_score"], 10, 6
+    ],
+    "1f3bd": [
+        ["\uD83C\uDFBD"], "", "\uDBB9\uDFD0", ["running_shirt_with_sash"], 10, 7
+    ],
+    "1f3be": [
+        ["\uD83C\uDFBE"], "\uE015", "\uDBB9\uDFD3", ["tennis"], 10, 8
+    ],
+    "1f3bf": [
+        ["\uD83C\uDFBF"], "\uE013", "\uDBB9\uDFD5", ["ski"], 10, 9
+    ],
+    "1f3c0": [
+        ["\uD83C\uDFC0"], "\uE42A", "\uDBB9\uDFD6", ["basketball"], 10, 10
+    ],
+    "1f3c1": [
+        ["\uD83C\uDFC1"], "\uE132", "\uDBB9\uDFD7", ["checkered_flag"], 10, 11
+    ],
+    "1f3c2": [
+        ["\uD83C\uDFC2"], "", "\uDBB9\uDFD8", ["snowboarder"], 10, 12
+    ],
+    "1f3c3": [
+        ["\uD83C\uDFC3"], "\uE115", "\uDBB9\uDFD9", ["runner", "running"], 10, 13
+    ],
+    "1f3c4": [
+        ["\uD83C\uDFC4"], "\uE017", "\uDBB9\uDFDA", ["surfer"], 10, 14
+    ],
+    "1f3c6": [
+        ["\uD83C\uDFC6"], "\uE131", "\uDBB9\uDFDB", ["trophy"], 10, 15
+    ],
+    "1f3c7": [
+        ["\uD83C\uDFC7"], "", "", ["horse_racing"], 10, 16
+    ],
+    "1f3c8": [
+        ["\uD83C\uDFC8"], "\uE42B", "\uDBB9\uDFDD", ["football"], 10, 17
+    ],
+    "1f3c9": [
+        ["\uD83C\uDFC9"], "", "", ["rugby_football"], 10, 18
+    ],
+    "1f3ca": [
+        ["\uD83C\uDFCA"], "\uE42D", "\uDBB9\uDFDE", ["swimmer"], 10, 19
+    ],
+    "1f3e0": [
+        ["\uD83C\uDFE0"], "\uE036", "\uDBB9\uDCB0", ["house"], 10, 20
+    ],
+    "1f3e1": [
+        ["\uD83C\uDFE1"], "\uE036", "\uDBB9\uDCB1", ["house_with_garden"], 10, 21
+    ],
+    "1f3e2": [
+        ["\uD83C\uDFE2"], "\uE038", "\uDBB9\uDCB2", ["office"], 10, 22
+    ],
+    "1f3e3": [
+        ["\uD83C\uDFE3"], "\uE153", "\uDBB9\uDCB3", ["post_office"], 10, 23
+    ],
+    "1f3e4": [
+        ["\uD83C\uDFE4"], "", "", ["european_post_office"], 10, 24
+    ],
+    "1f3e5": [
+        ["\uD83C\uDFE5"], "\uE155", "\uDBB9\uDCB4", ["hospital"], 10, 25
+    ],
+    "1f3e6": [
+        ["\uD83C\uDFE6"], "\uE14D", "\uDBB9\uDCB5", ["bank"], 10, 26
+    ],
+    "1f3e7": [
+        ["\uD83C\uDFE7"], "\uE154", "\uDBB9\uDCB6", ["atm"], 10, 27
+    ],
+    "1f3e8": [
+        ["\uD83C\uDFE8"], "\uE158", "\uDBB9\uDCB7", ["hotel"], 10, 28
+    ],
+    "1f3e9": [
+        ["\uD83C\uDFE9"], "\uE501", "\uDBB9\uDCB8", ["love_hotel"], 10, 29
+    ],
+    "1f3ea": [
+        ["\uD83C\uDFEA"], "\uE156", "\uDBB9\uDCB9", ["convenience_store"], 11, 0
+    ],
+    "1f3eb": [
+        ["\uD83C\uDFEB"], "\uE157", "\uDBB9\uDCBA", ["school"], 11, 1
+    ],
+    "1f3ec": [
+        ["\uD83C\uDFEC"], "\uE504", "\uDBB9\uDCBD", ["department_store"], 11, 2
+    ],
+    "1f3ed": [
+        ["\uD83C\uDFED"], "\uE508", "\uDBB9\uDCC0", ["factory"], 11, 3
+    ],
+    "1f3ee": [
+        ["\uD83C\uDFEE"], "\uE30B", "\uDBB9\uDCC2", ["izakaya_lantern", "lantern"], 11, 4
+    ],
+    "1f3ef": [
+        ["\uD83C\uDFEF"], "\uE505", "\uDBB9\uDCBE", ["japanese_castle"], 11, 5
+    ],
+    "1f3f0": [
+        ["\uD83C\uDFF0"], "\uE506", "\uDBB9\uDCBF", ["european_castle"], 11, 6
+    ],
+    "1f400": [
+        ["\uD83D\uDC00"], "", "", ["rat"], 11, 7
+    ],
+    "1f401": [
+        ["\uD83D\uDC01"], "", "", ["mouse2"], 11, 8
+    ],
+    "1f402": [
+        ["\uD83D\uDC02"], "", "", ["ox"], 11, 9
+    ],
+    "1f403": [
+        ["\uD83D\uDC03"], "", "", ["water_buffalo"], 11, 10
+    ],
+    "1f404": [
+        ["\uD83D\uDC04"], "", "", ["cow2"], 11, 11
+    ],
+    "1f405": [
+        ["\uD83D\uDC05"], "", "", ["tiger2"], 11, 12
+    ],
+    "1f406": [
+        ["\uD83D\uDC06"], "", "", ["leopard"], 11, 13
+    ],
+    "1f407": [
+        ["\uD83D\uDC07"], "", "", ["rabbit2"], 11, 14
+    ],
+    "1f408": [
+        ["\uD83D\uDC08"], "", "", ["cat2"], 11, 15
+    ],
+    "1f409": [
+        ["\uD83D\uDC09"], "", "", ["dragon"], 11, 16
+    ],
+    "1f40a": [
+        ["\uD83D\uDC0A"], "", "", ["crocodile"], 11, 17
+    ],
+    "1f40b": [
+        ["\uD83D\uDC0B"], "", "", ["whale2"], 11, 18
+    ],
+    "1f40c": [
+        ["\uD83D\uDC0C"], "", "\uDBB8\uDDB9", ["snail"], 11, 19
+    ],
+    "1f40d": [
+        ["\uD83D\uDC0D"], "\uE52D", "\uDBB8\uDDD3", ["snake"], 11, 20
+    ],
+    "1f40e": [
+        ["\uD83D\uDC0E"], "\uE134", "\uDBB9\uDFDC", ["racehorse"], 11, 21
+    ],
+    "1f40f": [
+        ["\uD83D\uDC0F"], "", "", ["ram"], 11, 22
+    ],
+    "1f410": [
+        ["\uD83D\uDC10"], "", "", ["goat"], 11, 23
+    ],
+    "1f411": [
+        ["\uD83D\uDC11"], "\uE529", "\uDBB8\uDDCF", ["sheep"], 11, 24
+    ],
+    "1f412": [
+        ["\uD83D\uDC12"], "\uE528", "\uDBB8\uDDCE", ["monkey"], 11, 25
+    ],
+    "1f413": [
+        ["\uD83D\uDC13"], "", "", ["rooster"], 11, 26
+    ],
+    "1f414": [
+        ["\uD83D\uDC14"], "\uE52E", "\uDBB8\uDDD4", ["chicken"], 11, 27
+    ],
+    "1f415": [
+        ["\uD83D\uDC15"], "", "", ["dog2"], 11, 28
+    ],
+    "1f416": [
+        ["\uD83D\uDC16"], "", "", ["pig2"], 11, 29
+    ],
+    "1f417": [
+        ["\uD83D\uDC17"], "\uE52F", "\uDBB8\uDDD5", ["boar"], 12, 0
+    ],
+    "1f418": [
+        ["\uD83D\uDC18"], "\uE526", "\uDBB8\uDDCC", ["elephant"], 12, 1
+    ],
+    "1f419": [
+        ["\uD83D\uDC19"], "\uE10A", "\uDBB8\uDDC5", ["octopus"], 12, 2
+    ],
+    "1f41a": [
+        ["\uD83D\uDC1A"], "\uE441", "\uDBB8\uDDC6", ["shell"], 12, 3
+    ],
+    "1f41b": [
+        ["\uD83D\uDC1B"], "\uE525", "\uDBB8\uDDCB", ["bug"], 12, 4
+    ],
+    "1f41c": [
+        ["\uD83D\uDC1C"], "", "\uDBB8\uDDDA", ["ant"], 12, 5
+    ],
+    "1f41d": [
+        ["\uD83D\uDC1D"], "", "\uDBB8\uDDE1", ["bee", "honeybee"], 12, 6
+    ],
+    "1f41e": [
+        ["\uD83D\uDC1E"], "", "\uDBB8\uDDE2", ["beetle"], 12, 7
+    ],
+    "1f41f": [
+        ["\uD83D\uDC1F"], "\uE019", "\uDBB8\uDDBD", ["fish"], 12, 8
+    ],
+    "1f420": [
+        ["\uD83D\uDC20"], "\uE522", "\uDBB8\uDDC9", ["tropical_fish"], 12, 9
+    ],
+    "1f421": [
+        ["\uD83D\uDC21"], "\uE019", "\uDBB8\uDDD9", ["blowfish"], 12, 10
+    ],
+    "1f422": [
+        ["\uD83D\uDC22"], "", "\uDBB8\uDDDC", ["turtle"], 12, 11
+    ],
+    "1f423": [
+        ["\uD83D\uDC23"], "\uE523", "\uDBB8\uDDDD", ["hatching_chick"], 12, 12
+    ],
+    "1f424": [
+        ["\uD83D\uDC24"], "\uE523", "\uDBB8\uDDBA", ["baby_chick"], 12, 13
+    ],
+    "1f425": [
+        ["\uD83D\uDC25"], "\uE523", "\uDBB8\uDDBB", ["hatched_chick"], 12, 14
+    ],
+    "1f426": [
+        ["\uD83D\uDC26"], "\uE521", "\uDBB8\uDDC8", ["bird"], 12, 15
+    ],
+    "1f427": [
+        ["\uD83D\uDC27"], "\uE055", "\uDBB8\uDDBC", ["penguin"], 12, 16
+    ],
+    "1f428": [
+        ["\uD83D\uDC28"], "\uE527", "\uDBB8\uDDCD", ["koala"], 12, 17
+    ],
+    "1f429": [
+        ["\uD83D\uDC29"], "\uE052", "\uDBB8\uDDD8", ["poodle"], 12, 18
+    ],
+    "1f42a": [
+        ["\uD83D\uDC2A"], "", "", ["dromedary_camel"], 12, 19
+    ],
+    "1f42b": [
+        ["\uD83D\uDC2B"], "\uE530", "\uDBB8\uDDD6", ["camel"], 12, 20
+    ],
+    "1f42c": [
+        ["\uD83D\uDC2C"], "\uE520", "\uDBB8\uDDC7", ["dolphin", "flipper"], 12, 21
+    ],
+    "1f42d": [
+        ["\uD83D\uDC2D"], "\uE053", "\uDBB8\uDDC2", ["mouse"], 12, 22
+    ],
+    "1f42e": [
+        ["\uD83D\uDC2E"], "\uE52B", "\uDBB8\uDDD1", ["cow"], 12, 23
+    ],
+    "1f42f": [
+        ["\uD83D\uDC2F"], "\uE050", "\uDBB8\uDDC0", ["tiger"], 12, 24
+    ],
+    "1f430": [
+        ["\uD83D\uDC30"], "\uE52C", "\uDBB8\uDDD2", ["rabbit"], 12, 25
+    ],
+    "1f431": [
+        ["\uD83D\uDC31"], "\uE04F", "\uDBB8\uDDB8", ["cat"], 12, 26
+    ],
+    "1f432": [
+        ["\uD83D\uDC32"], "", "\uDBB8\uDDDE", ["dragon_face"], 12, 27
+    ],
+    "1f433": [
+        ["\uD83D\uDC33"], "\uE054", "\uDBB8\uDDC3", ["whale"], 12, 28
+    ],
+    "1f434": [
+        ["\uD83D\uDC34"], "\uE01A", "\uDBB8\uDDBE", ["horse"], 12, 29
+    ],
+    "1f435": [
+        ["\uD83D\uDC35"], "\uE109", "\uDBB8\uDDC4", ["monkey_face"], 13, 0
+    ],
+    "1f436": [
+        ["\uD83D\uDC36"], "\uE052", "\uDBB8\uDDB7", ["dog"], 13, 1
+    ],
+    "1f437": [
+        ["\uD83D\uDC37"], "\uE10B", "\uDBB8\uDDBF", ["pig"], 13, 2
+    ],
+    "1f438": [
+        ["\uD83D\uDC38"], "\uE531", "\uDBB8\uDDD7", ["frog"], 13, 3
+    ],
+    "1f439": [
+        ["\uD83D\uDC39"], "\uE524", "\uDBB8\uDDCA", ["hamster"], 13, 4
+    ],
+    "1f43a": [
+        ["\uD83D\uDC3A"], "\uE52A", "\uDBB8\uDDD0", ["wolf"], 13, 5
+    ],
+    "1f43b": [
+        ["\uD83D\uDC3B"], "\uE051", "\uDBB8\uDDC1", ["bear"], 13, 6
+    ],
+    "1f43c": [
+        ["\uD83D\uDC3C"], "", "\uDBB8\uDDDF", ["panda_face"], 13, 7
+    ],
+    "1f43d": [
+        ["\uD83D\uDC3D"], "\uE10B", "\uDBB8\uDDE0", ["pig_nose"], 13, 8
+    ],
+    "1f43e": [
+        ["\uD83D\uDC3E"], "\uE536", "\uDBB8\uDDDB", ["feet", "paw_prints"], 13, 9
+    ],
+    "1f440": [
+        ["\uD83D\uDC40"], "\uE419", "\uDBB8\uDD90", ["eyes"], 13, 10
+    ],
+    "1f442": [
+        ["\uD83D\uDC42"], "\uE41B", "\uDBB8\uDD91", ["ear"], 13, 11
+    ],
+    "1f443": [
+        ["\uD83D\uDC43"], "\uE41A", "\uDBB8\uDD92", ["nose"], 13, 12
+    ],
+    "1f444": [
+        ["\uD83D\uDC44"], "\uE41C", "\uDBB8\uDD93", ["lips"], 13, 13
+    ],
+    "1f445": [
+        ["\uD83D\uDC45"], "\uE409", "\uDBB8\uDD94", ["tongue"], 13, 14
+    ],
+    "1f446": [
+        ["\uD83D\uDC46"], "\uE22E", "\uDBBA\uDF99", ["point_up_2"], 13, 15
+    ],
+    "1f447": [
+        ["\uD83D\uDC47"], "\uE22F", "\uDBBA\uDF9A", ["point_down"], 13, 16
+    ],
+    "1f448": [
+        ["\uD83D\uDC48"], "\uE230", "\uDBBA\uDF9B", ["point_left"], 13, 17
+    ],
+    "1f449": [
+        ["\uD83D\uDC49"], "\uE231", "\uDBBA\uDF9C", ["point_right"], 13, 18
+    ],
+    "1f44a": [
+        ["\uD83D\uDC4A"], "\uE00D", "\uDBBA\uDF96", ["facepunch", "punch"], 13, 19
+    ],
+    "1f44b": [
+        ["\uD83D\uDC4B"], "\uE41E", "\uDBBA\uDF9D", ["wave"], 13, 20
+    ],
+    "1f44c": [
+        ["\uD83D\uDC4C"], "\uE420", "\uDBBA\uDF9F", ["ok_hand"], 13, 21
+    ],
+    "1f44d": [
+        ["\uD83D\uDC4D"], "\uE00E", "\uDBBA\uDF97", ["+1", "thumbsup"], 13, 22
+    ],
+    "1f44e": [
+        ["\uD83D\uDC4E"], "\uE421", "\uDBBA\uDFA0", ["-1", "thumbsdown"], 13, 23
+    ],
+    "1f44f": [
+        ["\uD83D\uDC4F"], "\uE41F", "\uDBBA\uDF9E", ["clap"], 13, 24
+    ],
+    "1f450": [
+        ["\uD83D\uDC50"], "\uE422", "\uDBBA\uDFA1", ["open_hands"], 13, 25
+    ],
+    "1f451": [
+        ["\uD83D\uDC51"], "\uE10E", "\uDBB9\uDCD1", ["crown"], 13, 26
+    ],
+    "1f452": [
+        ["\uD83D\uDC52"], "\uE318", "\uDBB9\uDCD4", ["womans_hat"], 13, 27
+    ],
+    "1f453": [
+        ["\uD83D\uDC53"], "", "\uDBB9\uDCCE", ["eyeglasses"], 13, 28
+    ],
+    "1f454": [
+        ["\uD83D\uDC54"], "\uE302", "\uDBB9\uDCD3", ["necktie"], 13, 29
+    ],
+    "1f455": [
+        ["\uD83D\uDC55"], "\uE006", "\uDBB9\uDCCF", ["shirt", "tshirt"], 14, 0
+    ],
+    "1f456": [
+        ["\uD83D\uDC56"], "", "\uDBB9\uDCD0", ["jeans"], 14, 1
+    ],
+    "1f457": [
+        ["\uD83D\uDC57"], "\uE319", "\uDBB9\uDCD5", ["dress"], 14, 2
+    ],
+    "1f458": [
+        ["\uD83D\uDC58"], "\uE321", "\uDBB9\uDCD9", ["kimono"], 14, 3
+    ],
+    "1f459": [
+        ["\uD83D\uDC59"], "\uE322", "\uDBB9\uDCDA", ["bikini"], 14, 4
+    ],
+    "1f45a": [
+        ["\uD83D\uDC5A"], "\uE006", "\uDBB9\uDCDB", ["womans_clothes"], 14, 5
+    ],
+    "1f45b": [
+        ["\uD83D\uDC5B"], "", "\uDBB9\uDCDC", ["purse"], 14, 6
+    ],
+    "1f45c": [
+        ["\uD83D\uDC5C"], "\uE323", "\uDBB9\uDCF0", ["handbag"], 14, 7
+    ],
+    "1f45d": [
+        ["\uD83D\uDC5D"], "", "\uDBB9\uDCF1", ["pouch"], 14, 8
+    ],
+    "1f45e": [
+        ["\uD83D\uDC5E"], "\uE007", "\uDBB9\uDCCC", ["mans_shoe", "shoe"], 14, 9
+    ],
+    "1f45f": [
+        ["\uD83D\uDC5F"], "\uE007", "\uDBB9\uDCCD", ["athletic_shoe"], 14, 10
+    ],
+    "1f460": [
+        ["\uD83D\uDC60"], "\uE13E", "\uDBB9\uDCD6", ["high_heel"], 14, 11
+    ],
+    "1f461": [
+        ["\uD83D\uDC61"], "\uE31A", "\uDBB9\uDCD7", ["sandal"], 14, 12
+    ],
+    "1f462": [
+        ["\uD83D\uDC62"], "\uE31B", "\uDBB9\uDCD8", ["boot"], 14, 13
+    ],
+    "1f463": [
+        ["\uD83D\uDC63"], "\uE536", "\uDBB9\uDD53", ["footprints"], 14, 14
+    ],
+    "1f464": [
+        ["\uD83D\uDC64"], "", "\uDBB8\uDD9A", ["bust_in_silhouette"], 14, 15
+    ],
+    "1f465": [
+        ["\uD83D\uDC65"], "", "", ["busts_in_silhouette"], 14, 16
+    ],
+    "1f466": [
+        ["\uD83D\uDC66"], "\uE001", "\uDBB8\uDD9B", ["boy"], 14, 17
+    ],
+    "1f467": [
+        ["\uD83D\uDC67"], "\uE002", "\uDBB8\uDD9C", ["girl"], 14, 18
+    ],
+    "1f468": [
+        ["\uD83D\uDC68"], "\uE004", "\uDBB8\uDD9D", ["man"], 14, 19
+    ],
+    "1f469": [
+        ["\uD83D\uDC69"], "\uE005", "\uDBB8\uDD9E", ["woman"], 14, 20
+    ],
+    "1f46a": [
+        ["\uD83D\uDC6A"], "", "\uDBB8\uDD9F", ["family"], 14, 21
+    ],
+    "1f46b": [
+        ["\uD83D\uDC6B"], "\uE428", "\uDBB8\uDDA0", ["couple"], 14, 22
+    ],
+    "1f46c": [
+        ["\uD83D\uDC6C"], "", "", ["two_men_holding_hands"], 14, 23
+    ],
+    "1f46d": [
+        ["\uD83D\uDC6D"], "", "", ["two_women_holding_hands"], 14, 24
+    ],
+    "1f46e": [
+        ["\uD83D\uDC6E"], "\uE152", "\uDBB8\uDDA1", ["cop"], 14, 25
+    ],
+    "1f46f": [
+        ["\uD83D\uDC6F"], "\uE429", "\uDBB8\uDDA2", ["dancers"], 14, 26
+    ],
+    "1f470": [
+        ["\uD83D\uDC70"], "", "\uDBB8\uDDA3", ["bride_with_veil"], 14, 27
+    ],
+    "1f471": [
+        ["\uD83D\uDC71"], "\uE515", "\uDBB8\uDDA4", ["person_with_blond_hair"], 14, 28
+    ],
+    "1f472": [
+        ["\uD83D\uDC72"], "\uE516", "\uDBB8\uDDA5", ["man_with_gua_pi_mao"], 14, 29
+    ],
+    "1f473": [
+        ["\uD83D\uDC73"], "\uE517", "\uDBB8\uDDA6", ["man_with_turban"], 15, 0
+    ],
+    "1f474": [
+        ["\uD83D\uDC74"], "\uE518", "\uDBB8\uDDA7", ["older_man"], 15, 1
+    ],
+    "1f475": [
+        ["\uD83D\uDC75"], "\uE519", "\uDBB8\uDDA8", ["older_woman"], 15, 2
+    ],
+    "1f476": [
+        ["\uD83D\uDC76"], "\uE51A", "\uDBB8\uDDA9", ["baby"], 15, 3
+    ],
+    "1f477": [
+        ["\uD83D\uDC77"], "\uE51B", "\uDBB8\uDDAA", ["construction_worker"], 15, 4
+    ],
+    "1f478": [
+        ["\uD83D\uDC78"], "\uE51C", "\uDBB8\uDDAB", ["princess"], 15, 5
+    ],
+    "1f479": [
+        ["\uD83D\uDC79"], "", "\uDBB8\uDDAC", ["japanese_ogre"], 15, 6
+    ],
+    "1f47a": [
+        ["\uD83D\uDC7A"], "", "\uDBB8\uDDAD", ["japanese_goblin"], 15, 7
+    ],
+    "1f47b": [
+        ["\uD83D\uDC7B"], "\uE11B", "\uDBB8\uDDAE", ["ghost"], 15, 8
+    ],
+    "1f47c": [
+        ["\uD83D\uDC7C"], "\uE04E", "\uDBB8\uDDAF", ["angel"], 15, 9
+    ],
+    "1f47d": [
+        ["\uD83D\uDC7D"], "\uE10C", "\uDBB8\uDDB0", ["alien"], 15, 10
+    ],
+    "1f47e": [
+        ["\uD83D\uDC7E"], "\uE12B", "\uDBB8\uDDB1", ["space_invader"], 15, 11
+    ],
+    "1f47f": [
+        ["\uD83D\uDC7F"], "\uE11A", "\uDBB8\uDDB2", ["imp"], 15, 12
+    ],
+    "1f480": [
+        ["\uD83D\uDC80"], "\uE11C", "\uDBB8\uDDB3", ["skull"], 15, 13
+    ],
+    "1f481": [
+        ["\uD83D\uDC81"], "\uE253", "\uDBB8\uDDB4", ["information_desk_person"], 15, 14
+    ],
+    "1f482": [
+        ["\uD83D\uDC82"], "\uE51E", "\uDBB8\uDDB5", ["guardsman"], 15, 15
+    ],
+    "1f483": [
+        ["\uD83D\uDC83"], "\uE51F", "\uDBB8\uDDB6", ["dancer"], 15, 16
+    ],
+    "1f484": [
+        ["\uD83D\uDC84"], "\uE31C", "\uDBB8\uDD95", ["lipstick"], 15, 17
+    ],
+    "1f485": [
+        ["\uD83D\uDC85"], "\uE31D", "\uDBB8\uDD96", ["nail_care"], 15, 18
+    ],
+    "1f486": [
+        ["\uD83D\uDC86"], "\uE31E", "\uDBB8\uDD97", ["massage"], 15, 19
+    ],
+    "1f487": [
+        ["\uD83D\uDC87"], "\uE31F", "\uDBB8\uDD98", ["haircut"], 15, 20
+    ],
+    "1f488": [
+        ["\uD83D\uDC88"], "\uE320", "\uDBB8\uDD99", ["barber"], 15, 21
+    ],
+    "1f489": [
+        ["\uD83D\uDC89"], "\uE13B", "\uDBB9\uDD09", ["syringe"], 15, 22
+    ],
+    "1f48a": [
+        ["\uD83D\uDC8A"], "\uE30F", "\uDBB9\uDD0A", ["pill"], 15, 23
+    ],
+    "1f48b": [
+        ["\uD83D\uDC8B"], "\uE003", "\uDBBA\uDC23", ["kiss"], 15, 24
+    ],
+    "1f48c": [
+        ["\uD83D\uDC8C"], "\uE103\uE328", "\uDBBA\uDC24", ["love_letter"], 15, 25
+    ],
+    "1f48d": [
+        ["\uD83D\uDC8D"], "\uE034", "\uDBBA\uDC25", ["ring"], 15, 26
+    ],
+    "1f48e": [
+        ["\uD83D\uDC8E"], "\uE035", "\uDBBA\uDC26", ["gem"], 15, 27
+    ],
+    "1f48f": [
+        ["\uD83D\uDC8F"], "\uE111", "\uDBBA\uDC27", ["couplekiss"], 15, 28
+    ],
+    "1f490": [
+        ["\uD83D\uDC90"], "\uE306", "\uDBBA\uDC28", ["bouquet"], 15, 29
+    ],
+    "1f491": [
+        ["\uD83D\uDC91"], "\uE425", "\uDBBA\uDC29", ["couple_with_heart"], 16, 0
+    ],
+    "1f492": [
+        ["\uD83D\uDC92"], "\uE43D", "\uDBBA\uDC2A", ["wedding"], 16, 1
+    ],
+    "1f493": [
+        ["\uD83D\uDC93"], "\uE327", "\uDBBA\uDF0D", ["heartbeat"], 16, 2
+    ],
+    "1f494": [
+        ["\uD83D\uDC94"], "\uE023", "\uDBBA\uDF0E", ["broken_heart"], 16, 3, "<\/3"
+    ],
+    "1f495": [
+        ["\uD83D\uDC95"], "\uE327", "\uDBBA\uDF0F", ["two_hearts"], 16, 4
+    ],
+    "1f496": [
+        ["\uD83D\uDC96"], "\uE327", "\uDBBA\uDF10", ["sparkling_heart"], 16, 5
+    ],
+    "1f497": [
+        ["\uD83D\uDC97"], "\uE328", "\uDBBA\uDF11", ["heartpulse"], 16, 6
+    ],
+    "1f498": [
+        ["\uD83D\uDC98"], "\uE329", "\uDBBA\uDF12", ["cupid"], 16, 7
+    ],
+    "1f499": [
+        ["\uD83D\uDC99"], "\uE32A", "\uDBBA\uDF13", ["blue_heart"], 16, 8, "<3"
+    ],
+    "1f49a": [
+        ["\uD83D\uDC9A"], "\uE32B", "\uDBBA\uDF14", ["green_heart"], 16, 9, "<3"
+    ],
+    "1f49b": [
+        ["\uD83D\uDC9B"], "\uE32C", "\uDBBA\uDF15", ["yellow_heart"], 16, 10, "<3"
+    ],
+    "1f49c": [
+        ["\uD83D\uDC9C"], "\uE32D", "\uDBBA\uDF16", ["purple_heart"], 16, 11, "<3"
+    ],
+    "1f49d": [
+        ["\uD83D\uDC9D"], "\uE437", "\uDBBA\uDF17", ["gift_heart"], 16, 12
+    ],
+    "1f49e": [
+        ["\uD83D\uDC9E"], "\uE327", "\uDBBA\uDF18", ["revolving_hearts"], 16, 13
+    ],
+    "1f49f": [
+        ["\uD83D\uDC9F"], "\uE204", "\uDBBA\uDF19", ["heart_decoration"], 16, 14
+    ],
+    "1f4a0": [
+        ["\uD83D\uDCA0"], "", "\uDBBA\uDF55", ["diamond_shape_with_a_dot_inside"], 16, 15
+    ],
+    "1f4a1": [
+        ["\uD83D\uDCA1"], "\uE10F", "\uDBBA\uDF56", ["bulb"], 16, 16
+    ],
+    "1f4a2": [
+        ["\uD83D\uDCA2"], "\uE334", "\uDBBA\uDF57", ["anger"], 16, 17
+    ],
+    "1f4a3": [
+        ["\uD83D\uDCA3"], "\uE311", "\uDBBA\uDF58", ["bomb"], 16, 18
+    ],
+    "1f4a4": [
+        ["\uD83D\uDCA4"], "\uE13C", "\uDBBA\uDF59", ["zzz"], 16, 19
+    ],
+    "1f4a5": [
+        ["\uD83D\uDCA5"], "", "\uDBBA\uDF5A", ["boom", "collision"], 16, 20
+    ],
+    "1f4a6": [
+        ["\uD83D\uDCA6"], "\uE331", "\uDBBA\uDF5B", ["sweat_drops"], 16, 21
+    ],
+    "1f4a7": [
+        ["\uD83D\uDCA7"], "\uE331", "\uDBBA\uDF5C", ["droplet"], 16, 22
+    ],
+    "1f4a8": [
+        ["\uD83D\uDCA8"], "\uE330", "\uDBBA\uDF5D", ["dash"], 16, 23
+    ],
+    "1f4a9": [
+        ["\uD83D\uDCA9"], "\uE05A", "\uDBB9\uDCF4", ["hankey", "poop", "shit"], 16, 24
+    ],
+    "1f4aa": [
+        ["\uD83D\uDCAA"], "\uE14C", "\uDBBA\uDF5E", ["muscle"], 16, 25
+    ],
+    "1f4ab": [
+        ["\uD83D\uDCAB"], "\uE407", "\uDBBA\uDF5F", ["dizzy"], 16, 26
+    ],
+    "1f4ac": [
+        ["\uD83D\uDCAC"], "", "\uDBB9\uDD32", ["speech_balloon"], 16, 27
+    ],
+    "1f4ad": [
+        ["\uD83D\uDCAD"], "", "", ["thought_balloon"], 16, 28
+    ],
+    "1f4ae": [
+        ["\uD83D\uDCAE"], "", "\uDBBA\uDF7A", ["white_flower"], 16, 29
+    ],
+    "1f4af": [
+        ["\uD83D\uDCAF"], "", "\uDBBA\uDF7B", ["100"], 17, 0
+    ],
+    "1f4b0": [
+        ["\uD83D\uDCB0"], "\uE12F", "\uDBB9\uDCDD", ["moneybag"], 17, 1
+    ],
+    "1f4b1": [
+        ["\uD83D\uDCB1"], "\uE149", "\uDBB9\uDCDE", ["currency_exchange"], 17, 2
+    ],
+    "1f4b2": [
+        ["\uD83D\uDCB2"], "\uE12F", "\uDBB9\uDCE0", ["heavy_dollar_sign"], 17, 3
+    ],
+    "1f4b3": [
+        ["\uD83D\uDCB3"], "", "\uDBB9\uDCE1", ["credit_card"], 17, 4
+    ],
+    "1f4b4": [
+        ["\uD83D\uDCB4"], "", "\uDBB9\uDCE2", ["yen"], 17, 5
+    ],
+    "1f4b5": [
+        ["\uD83D\uDCB5"], "\uE12F", "\uDBB9\uDCE3", ["dollar"], 17, 6
+    ],
+    "1f4b6": [
+        ["\uD83D\uDCB6"], "", "", ["euro"], 17, 7
+    ],
+    "1f4b7": [
+        ["\uD83D\uDCB7"], "", "", ["pound"], 17, 8
+    ],
+    "1f4b8": [
+        ["\uD83D\uDCB8"], "", "\uDBB9\uDCE4", ["money_with_wings"], 17, 9
+    ],
+    "1f4b9": [
+        ["\uD83D\uDCB9"], "\uE14A", "\uDBB9\uDCDF", ["chart"], 17, 10
+    ],
+    "1f4ba": [
+        ["\uD83D\uDCBA"], "\uE11F", "\uDBB9\uDD37", ["seat"], 17, 11
+    ],
+    "1f4bb": [
+        ["\uD83D\uDCBB"], "\uE00C", "\uDBB9\uDD38", ["computer"], 17, 12
+    ],
+    "1f4bc": [
+        ["\uD83D\uDCBC"], "\uE11E", "\uDBB9\uDD3B", ["briefcase"], 17, 13
+    ],
+    "1f4bd": [
+        ["\uD83D\uDCBD"], "\uE316", "\uDBB9\uDD3C", ["minidisc"], 17, 14
+    ],
+    "1f4be": [
+        ["\uD83D\uDCBE"], "\uE316", "\uDBB9\uDD3D", ["floppy_disk"], 17, 15
+    ],
+    "1f4bf": [
+        ["\uD83D\uDCBF"], "\uE126", "\uDBBA\uDC1D", ["cd"], 17, 16
+    ],
+    "1f4c0": [
+        ["\uD83D\uDCC0"], "\uE127", "\uDBBA\uDC1E", ["dvd"], 17, 17
+    ],
+    "1f4c1": [
+        ["\uD83D\uDCC1"], "", "\uDBB9\uDD43", ["file_folder"], 17, 18
+    ],
+    "1f4c2": [
+        ["\uD83D\uDCC2"], "", "\uDBB9\uDD44", ["open_file_folder"], 17, 19
+    ],
+    "1f4c3": [
+        ["\uD83D\uDCC3"], "\uE301", "\uDBB9\uDD40", ["page_with_curl"], 17, 20
+    ],
+    "1f4c4": [
+        ["\uD83D\uDCC4"], "\uE301", "\uDBB9\uDD41", ["page_facing_up"], 17, 21
+    ],
+    "1f4c5": [
+        ["\uD83D\uDCC5"], "", "\uDBB9\uDD42", ["date"], 17, 22
+    ],
+    "1f4c6": [
+        ["\uD83D\uDCC6"], "", "\uDBB9\uDD49", ["calendar"], 17, 23
+    ],
+    "1f4c7": [
+        ["\uD83D\uDCC7"], "\uE148", "\uDBB9\uDD4D", ["card_index"], 17, 24
+    ],
+    "1f4c8": [
+        ["\uD83D\uDCC8"], "\uE14A", "\uDBB9\uDD4B", ["chart_with_upwards_trend"], 17, 25
+    ],
+    "1f4c9": [
+        ["\uD83D\uDCC9"], "", "\uDBB9\uDD4C", ["chart_with_downwards_trend"], 17, 26
+    ],
+    "1f4ca": [
+        ["\uD83D\uDCCA"], "\uE14A", "\uDBB9\uDD4A", ["bar_chart"], 17, 27
+    ],
+    "1f4cb": [
+        ["\uD83D\uDCCB"], "\uE301", "\uDBB9\uDD48", ["clipboard"], 17, 28
+    ],
+    "1f4cc": [
+        ["\uD83D\uDCCC"], "", "\uDBB9\uDD4E", ["pushpin"], 17, 29
+    ],
+    "1f4cd": [
+        ["\uD83D\uDCCD"], "", "\uDBB9\uDD3F", ["round_pushpin"], 18, 0
+    ],
+    "1f4ce": [
+        ["\uD83D\uDCCE"], "", "\uDBB9\uDD3A", ["paperclip"], 18, 1
+    ],
+    "1f4cf": [
+        ["\uD83D\uDCCF"], "", "\uDBB9\uDD50", ["straight_ruler"], 18, 2
+    ],
+    "1f4d0": [
+        ["\uD83D\uDCD0"], "", "\uDBB9\uDD51", ["triangular_ruler"], 18, 3
+    ],
+    "1f4d1": [
+        ["\uD83D\uDCD1"], "\uE301", "\uDBB9\uDD52", ["bookmark_tabs"], 18, 4
+    ],
+    "1f4d2": [
+        ["\uD83D\uDCD2"], "\uE148", "\uDBB9\uDD4F", ["ledger"], 18, 5
+    ],
+    "1f4d3": [
+        ["\uD83D\uDCD3"], "\uE148", "\uDBB9\uDD45", ["notebook"], 18, 6
+    ],
+    "1f4d4": [
+        ["\uD83D\uDCD4"], "\uE148", "\uDBB9\uDD47", ["notebook_with_decorative_cover"], 18, 7
+    ],
+    "1f4d5": [
+        ["\uD83D\uDCD5"], "\uE148", "\uDBB9\uDD02", ["closed_book"], 18, 8
+    ],
+    "1f4d6": [
+        ["\uD83D\uDCD6"], "\uE148", "\uDBB9\uDD46", ["book", "open_book"], 18, 9
+    ],
+    "1f4d7": [
+        ["\uD83D\uDCD7"], "\uE148", "\uDBB9\uDCFF", ["green_book"], 18, 10
+    ],
+    "1f4d8": [
+        ["\uD83D\uDCD8"], "\uE148", "\uDBB9\uDD00", ["blue_book"], 18, 11
+    ],
+    "1f4d9": [
+        ["\uD83D\uDCD9"], "\uE148", "\uDBB9\uDD01", ["orange_book"], 18, 12
+    ],
+    "1f4da": [
+        ["\uD83D\uDCDA"], "\uE148", "\uDBB9\uDD03", ["books"], 18, 13
+    ],
+    "1f4db": [
+        ["\uD83D\uDCDB"], "", "\uDBB9\uDD04", ["name_badge"], 18, 14
+    ],
+    "1f4dc": [
+        ["\uD83D\uDCDC"], "", "\uDBB9\uDCFD", ["scroll"], 18, 15
+    ],
+    "1f4dd": [
+        ["\uD83D\uDCDD"], "\uE301", "\uDBB9\uDD27", ["memo", "pencil"], 18, 16
+    ],
+    "1f4de": [
+        ["\uD83D\uDCDE"], "\uE009", "\uDBB9\uDD24", ["telephone_receiver"], 18, 17
+    ],
+    "1f4df": [
+        ["\uD83D\uDCDF"], "", "\uDBB9\uDD22", ["pager"], 18, 18
+    ],
+    "1f4e0": [
+        ["\uD83D\uDCE0"], "\uE00B", "\uDBB9\uDD28", ["fax"], 18, 19
+    ],
+    "1f4e1": [
+        ["\uD83D\uDCE1"], "\uE14B", "\uDBB9\uDD31", ["satellite"], 18, 20
+    ],
+    "1f4e2": [
+        ["\uD83D\uDCE2"], "\uE142", "\uDBB9\uDD2F", ["loudspeaker"], 18, 21
+    ],
+    "1f4e3": [
+        ["\uD83D\uDCE3"], "\uE317", "\uDBB9\uDD30", ["mega"], 18, 22
+    ],
+    "1f4e4": [
+        ["\uD83D\uDCE4"], "", "\uDBB9\uDD33", ["outbox_tray"], 18, 23
+    ],
+    "1f4e5": [
+        ["\uD83D\uDCE5"], "", "\uDBB9\uDD34", ["inbox_tray"], 18, 24
+    ],
+    "1f4e6": [
+        ["\uD83D\uDCE6"], "\uE112", "\uDBB9\uDD35", ["package"], 18, 25
+    ],
+    "1f4e7": [
+        ["\uD83D\uDCE7"], "\uE103", "\uDBBA\uDF92", ["e-mail"], 18, 26
+    ],
+    "1f4e8": [
+        ["\uD83D\uDCE8"], "\uE103", "\uDBB9\uDD2A", ["incoming_envelope"], 18, 27
+    ],
+    "1f4e9": [
+        ["\uD83D\uDCE9"], "\uE103", "\uDBB9\uDD2B", ["envelope_with_arrow"], 18, 28
+    ],
+    "1f4ea": [
+        ["\uD83D\uDCEA"], "\uE101", "\uDBB9\uDD2C", ["mailbox_closed"], 18, 29
+    ],
+    "1f4eb": [
+        ["\uD83D\uDCEB"], "\uE101", "\uDBB9\uDD2D", ["mailbox"], 19, 0
+    ],
+    "1f4ec": [
+        ["\uD83D\uDCEC"], "", "", ["mailbox_with_mail"], 19, 1
+    ],
+    "1f4ed": [
+        ["\uD83D\uDCED"], "", "", ["mailbox_with_no_mail"], 19, 2
+    ],
+    "1f4ee": [
+        ["\uD83D\uDCEE"], "\uE102", "\uDBB9\uDD2E", ["postbox"], 19, 3
+    ],
+    "1f4ef": [
+        ["\uD83D\uDCEF"], "", "", ["postal_horn"], 19, 4
+    ],
+    "1f4f0": [
+        ["\uD83D\uDCF0"], "", "\uDBBA\uDC22", ["newspaper"], 19, 5
+    ],
+    "1f4f1": [
+        ["\uD83D\uDCF1"], "\uE00A", "\uDBB9\uDD25", ["iphone"], 19, 6
+    ],
+    "1f4f2": [
+        ["\uD83D\uDCF2"], "\uE104", "\uDBB9\uDD26", ["calling"], 19, 7
+    ],
+    "1f4f3": [
+        ["\uD83D\uDCF3"], "\uE250", "\uDBBA\uDC39", ["vibration_mode"], 19, 8
+    ],
+    "1f4f4": [
+        ["\uD83D\uDCF4"], "\uE251", "\uDBBA\uDC3A", ["mobile_phone_off"], 19, 9
+    ],
+    "1f4f5": [
+        ["\uD83D\uDCF5"], "", "", ["no_mobile_phones"], 19, 10
+    ],
+    "1f4f6": [
+        ["\uD83D\uDCF6"], "\uE20B", "\uDBBA\uDC38", ["signal_strength"], 19, 11
+    ],
+    "1f4f7": [
+        ["\uD83D\uDCF7"], "\uE008", "\uDBB9\uDCEF", ["camera"], 19, 12
+    ],
+    "1f4f9": [
+        ["\uD83D\uDCF9"], "\uE03D", "\uDBB9\uDCF9", ["video_camera"], 19, 13
+    ],
+    "1f4fa": [
+        ["\uD83D\uDCFA"], "\uE12A", "\uDBBA\uDC1C", ["tv"], 19, 14
+    ],
+    "1f4fb": [
+        ["\uD83D\uDCFB"], "\uE128", "\uDBBA\uDC1F", ["radio"], 19, 15
+    ],
+    "1f4fc": [
+        ["\uD83D\uDCFC"], "\uE129", "\uDBBA\uDC20", ["vhs"], 19, 16
+    ],
+    "1f500": [
+        ["\uD83D\uDD00"], "", "", ["twisted_rightwards_arrows"], 19, 17
+    ],
+    "1f501": [
+        ["\uD83D\uDD01"], "", "", ["repeat"], 19, 18
+    ],
+    "1f502": [
+        ["\uD83D\uDD02"], "", "", ["repeat_one"], 19, 19
+    ],
+    "1f503": [
+        ["\uD83D\uDD03"], "", "\uDBBA\uDF91", ["arrows_clockwise"], 19, 20
+    ],
+    "1f504": [
+        ["\uD83D\uDD04"], "", "", ["arrows_counterclockwise"], 19, 21
+    ],
+    "1f505": [
+        ["\uD83D\uDD05"], "", "", ["low_brightness"], 19, 22
+    ],
+    "1f506": [
+        ["\uD83D\uDD06"], "", "", ["high_brightness"], 19, 23
+    ],
+    "1f507": [
+        ["\uD83D\uDD07"], "", "", ["mute"], 19, 24
+    ],
+    "1f508": [
+        ["\uD83D\uDD08"], "", "", ["speaker"], 19, 25
+    ],
+    "1f509": [
+        ["\uD83D\uDD09"], "", "", ["sound"], 19, 26
+    ],
+    "1f50a": [
+        ["\uD83D\uDD0A"], "\uE141", "\uDBBA\uDC21", ["loud_sound"], 19, 27
+    ],
+    "1f50b": [
+        ["\uD83D\uDD0B"], "", "\uDBB9\uDCFC", ["battery"], 19, 28
+    ],
+    "1f50c": [
+        ["\uD83D\uDD0C"], "", "\uDBB9\uDCFE", ["electric_plug"], 19, 29
+    ],
+    "1f50d": [
+        ["\uD83D\uDD0D"], "\uE114", "\uDBBA\uDF85", ["mag"], 20, 0
+    ],
+    "1f50e": [
+        ["\uD83D\uDD0E"], "\uE114", "\uDBBA\uDF8D", ["mag_right"], 20, 1
+    ],
+    "1f50f": [
+        ["\uD83D\uDD0F"], "\uE144", "\uDBBA\uDF90", ["lock_with_ink_pen"], 20, 2
+    ],
+    "1f510": [
+        ["\uD83D\uDD10"], "\uE144", "\uDBBA\uDF8A", ["closed_lock_with_key"], 20, 3
+    ],
+    "1f511": [
+        ["\uD83D\uDD11"], "\uE03F", "\uDBBA\uDF82", ["key"], 20, 4
+    ],
+    "1f512": [
+        ["\uD83D\uDD12"], "\uE144", "\uDBBA\uDF86", ["lock"], 20, 5
+    ],
+    "1f513": [
+        ["\uD83D\uDD13"], "\uE145", "\uDBBA\uDF87", ["unlock"], 20, 6
+    ],
+    "1f514": [
+        ["\uD83D\uDD14"], "\uE325", "\uDBB9\uDCF2", ["bell"], 20, 7
+    ],
+    "1f515": [
+        ["\uD83D\uDD15"], "", "", ["no_bell"], 20, 8
+    ],
+    "1f516": [
+        ["\uD83D\uDD16"], "", "\uDBBA\uDF8F", ["bookmark"], 20, 9
+    ],
+    "1f517": [
+        ["\uD83D\uDD17"], "", "\uDBBA\uDF4B", ["link"], 20, 10
+    ],
+    "1f518": [
+        ["\uD83D\uDD18"], "", "\uDBBA\uDF8C", ["radio_button"], 20, 11
+    ],
+    "1f519": [
+        ["\uD83D\uDD19"], "\uE235", "\uDBBA\uDF8E", ["back"], 20, 12
+    ],
+    "1f51a": [
+        ["\uD83D\uDD1A"], "", "\uDBB8\uDC1A", ["end"], 20, 13
+    ],
+    "1f51b": [
+        ["\uD83D\uDD1B"], "", "\uDBB8\uDC19", ["on"], 20, 14
+    ],
+    "1f51c": [
+        ["\uD83D\uDD1C"], "", "\uDBB8\uDC18", ["soon"], 20, 15
+    ],
+    "1f51d": [
+        ["\uD83D\uDD1D"], "\uE24C", "\uDBBA\uDF42", ["top"], 20, 16
+    ],
+    "1f51e": [
+        ["\uD83D\uDD1E"], "\uE207", "\uDBBA\uDF25", ["underage"], 20, 17
+    ],
+    "1f51f": [
+        ["\uD83D\uDD1F"], "", "\uDBBA\uDC3B", ["keycap_ten"], 20, 18
+    ],
+    "1f520": [
+        ["\uD83D\uDD20"], "", "\uDBBA\uDF7C", ["capital_abcd"], 20, 19
+    ],
+    "1f521": [
+        ["\uD83D\uDD21"], "", "\uDBBA\uDF7D", ["abcd"], 20, 20
+    ],
+    "1f522": [
+        ["\uD83D\uDD22"], "", "\uDBBA\uDF7E", ["1234"], 20, 21
+    ],
+    "1f523": [
+        ["\uD83D\uDD23"], "", "\uDBBA\uDF7F", ["symbols"], 20, 22
+    ],
+    "1f524": [
+        ["\uD83D\uDD24"], "", "\uDBBA\uDF80", ["abc"], 20, 23
+    ],
+    "1f525": [
+        ["\uD83D\uDD25"], "\uE11D", "\uDBB9\uDCF6", ["fire"], 20, 24
+    ],
+    "1f526": [
+        ["\uD83D\uDD26"], "", "\uDBB9\uDCFB", ["flashlight"], 20, 25
+    ],
+    "1f527": [
+        ["\uD83D\uDD27"], "", "\uDBB9\uDCC9", ["wrench"], 20, 26
+    ],
+    "1f528": [
+        ["\uD83D\uDD28"], "\uE116", "\uDBB9\uDCCA", ["hammer"], 20, 27
+    ],
+    "1f529": [
+        ["\uD83D\uDD29"], "", "\uDBB9\uDCCB", ["nut_and_bolt"], 20, 28
+    ],
+    "1f52a": [
+        ["\uD83D\uDD2A"], "", "\uDBB9\uDCFA", ["hocho", "knife"], 20, 29
+    ],
+    "1f52b": [
+        ["\uD83D\uDD2B"], "\uE113", "\uDBB9\uDCF5", ["gun"], 21, 0
+    ],
+    "1f52c": [
+        ["\uD83D\uDD2C"], "", "", ["microscope"], 21, 1
+    ],
+    "1f52d": [
+        ["\uD83D\uDD2D"], "", "", ["telescope"], 21, 2
+    ],
+    "1f52e": [
+        ["\uD83D\uDD2E"], "\uE23E", "\uDBB9\uDCF7", ["crystal_ball"], 21, 3
+    ],
+    "1f52f": [
+        ["\uD83D\uDD2F"], "\uE23E", "\uDBB9\uDCF8", ["six_pointed_star"], 21, 4
+    ],
+    "1f530": [
+        ["\uD83D\uDD30"], "\uE209", "\uDBB8\uDC44", ["beginner"], 21, 5
+    ],
+    "1f531": [
+        ["\uD83D\uDD31"], "\uE031", "\uDBB9\uDCD2", ["trident"], 21, 6
+    ],
+    "1f532": [
+        ["\uD83D\uDD32"], "\uE21A", "\uDBBA\uDF64", ["black_square_button"], 21, 7
+    ],
+    "1f533": [
+        ["\uD83D\uDD33"], "\uE21B", "\uDBBA\uDF67", ["white_square_button"], 21, 8
+    ],
+    "1f534": [
+        ["\uD83D\uDD34"], "\uE219", "\uDBBA\uDF63", ["red_circle"], 21, 9
+    ],
+    "1f535": [
+        ["\uD83D\uDD35"], "\uE21A", "\uDBBA\uDF64", ["large_blue_circle"], 21, 10
+    ],
+    "1f536": [
+        ["\uD83D\uDD36"], "\uE21B", "\uDBBA\uDF73", ["large_orange_diamond"], 21, 11
+    ],
+    "1f537": [
+        ["\uD83D\uDD37"], "\uE21B", "\uDBBA\uDF74", ["large_blue_diamond"], 21, 12
+    ],
+    "1f538": [
+        ["\uD83D\uDD38"], "\uE21B", "\uDBBA\uDF75", ["small_orange_diamond"], 21, 13
+    ],
+    "1f539": [
+        ["\uD83D\uDD39"], "\uE21B", "\uDBBA\uDF76", ["small_blue_diamond"], 21, 14
+    ],
+    "1f53a": [
+        ["\uD83D\uDD3A"], "", "\uDBBA\uDF78", ["small_red_triangle"], 21, 15
+    ],
+    "1f53b": [
+        ["\uD83D\uDD3B"], "", "\uDBBA\uDF79", ["small_red_triangle_down"], 21, 16
+    ],
+    "1f53c": [
+        ["\uD83D\uDD3C"], "", "\uDBBA\uDF01", ["arrow_up_small"], 21, 17
+    ],
+    "1f53d": [
+        ["\uD83D\uDD3D"], "", "\uDBBA\uDF00", ["arrow_down_small"], 21, 18
+    ],
+    "1f550": [
+        ["\uD83D\uDD50"], "\uE024", "\uDBB8\uDC1E", ["clock1"], 21, 19
+    ],
+    "1f551": [
+        ["\uD83D\uDD51"], "\uE025", "\uDBB8\uDC1F", ["clock2"], 21, 20
+    ],
+    "1f552": [
+        ["\uD83D\uDD52"], "\uE026", "\uDBB8\uDC20", ["clock3"], 21, 21
+    ],
+    "1f553": [
+        ["\uD83D\uDD53"], "\uE027", "\uDBB8\uDC21", ["clock4"], 21, 22
+    ],
+    "1f554": [
+        ["\uD83D\uDD54"], "\uE028", "\uDBB8\uDC22", ["clock5"], 21, 23
+    ],
+    "1f555": [
+        ["\uD83D\uDD55"], "\uE029", "\uDBB8\uDC23", ["clock6"], 21, 24
+    ],
+    "1f556": [
+        ["\uD83D\uDD56"], "\uE02A", "\uDBB8\uDC24", ["clock7"], 21, 25
+    ],
+    "1f557": [
+        ["\uD83D\uDD57"], "\uE02B", "\uDBB8\uDC25", ["clock8"], 21, 26
+    ],
+    "1f558": [
+        ["\uD83D\uDD58"], "\uE02C", "\uDBB8\uDC26", ["clock9"], 21, 27
+    ],
+    "1f559": [
+        ["\uD83D\uDD59"], "\uE02D", "\uDBB8\uDC27", ["clock10"], 21, 28
+    ],
+    "1f55a": [
+        ["\uD83D\uDD5A"], "\uE02E", "\uDBB8\uDC28", ["clock11"], 21, 29
+    ],
+    "1f55b": [
+        ["\uD83D\uDD5B"], "\uE02F", "\uDBB8\uDC29", ["clock12"], 22, 0
+    ],
+    "1f55c": [
+        ["\uD83D\uDD5C"], "", "", ["clock130"], 22, 1
+    ],
+    "1f55d": [
+        ["\uD83D\uDD5D"], "", "", ["clock230"], 22, 2
+    ],
+    "1f55e": [
+        ["\uD83D\uDD5E"], "", "", ["clock330"], 22, 3
+    ],
+    "1f55f": [
+        ["\uD83D\uDD5F"], "", "", ["clock430"], 22, 4
+    ],
+    "1f560": [
+        ["\uD83D\uDD60"], "", "", ["clock530"], 22, 5
+    ],
+    "1f561": [
+        ["\uD83D\uDD61"], "", "", ["clock630"], 22, 6
+    ],
+    "1f562": [
+        ["\uD83D\uDD62"], "", "", ["clock730"], 22, 7
+    ],
+    "1f563": [
+        ["\uD83D\uDD63"], "", "", ["clock830"], 22, 8
+    ],
+    "1f564": [
+        ["\uD83D\uDD64"], "", "", ["clock930"], 22, 9
+    ],
+    "1f565": [
+        ["\uD83D\uDD65"], "", "", ["clock1030"], 22, 10
+    ],
+    "1f566": [
+        ["\uD83D\uDD66"], "", "", ["clock1130"], 22, 11
+    ],
+    "1f567": [
+        ["\uD83D\uDD67"], "", "", ["clock1230"], 22, 12
+    ],
+    "1f5fb": [
+        ["\uD83D\uDDFB"], "\uE03B", "\uDBB9\uDCC3", ["mount_fuji"], 22, 13
+    ],
+    "1f5fc": [
+        ["\uD83D\uDDFC"], "\uE509", "\uDBB9\uDCC4", ["tokyo_tower"], 22, 14
+    ],
+    "1f5fd": [
+        ["\uD83D\uDDFD"], "\uE51D", "\uDBB9\uDCC6", ["statue_of_liberty"], 22, 15
+    ],
+    "1f5fe": [
+        ["\uD83D\uDDFE"], "", "\uDBB9\uDCC7", ["japan"], 22, 16
+    ],
+    "1f5ff": [
+        ["\uD83D\uDDFF"], "", "\uDBB9\uDCC8", ["moyai"], 22, 17
+    ],
+    "1f600": [
+        ["\uD83D\uDE00"], "", "", ["grinning"], 22, 18, ":D"
+    ],
+    "1f601": [
+        ["\uD83D\uDE01"], "\uE404", "\uDBB8\uDF33", ["grin"], 22, 19
+    ],
+    "1f602": [
+        ["\uD83D\uDE02"], "\uE412", "\uDBB8\uDF34", ["joy"], 22, 20
+    ],
+    "1f603": [
+        ["\uD83D\uDE03"], "\uE057", "\uDBB8\uDF30", ["smiley"], 22, 21, ":)"
+    ],
+    "1f604": [
+        ["\uD83D\uDE04"], "\uE415", "\uDBB8\uDF38", ["smile"], 22, 22, ":)"
+    ],
+    "1f605": [
+        ["\uD83D\uDE05"], "\uE415\uE331", "\uDBB8\uDF31", ["sweat_smile"], 22, 23
+    ],
+    "1f606": [
+        ["\uD83D\uDE06"], "\uE40A", "\uDBB8\uDF32", ["satisfied"], 22, 24
+    ],
+    "1f607": [
+        ["\uD83D\uDE07"], "", "", ["innocent"], 22, 25
+    ],
+    "1f608": [
+        ["\uD83D\uDE08"], "", "", ["smiling_imp"], 22, 26
+    ],
+    "1f609": [
+        ["\uD83D\uDE09"], "\uE405", "\uDBB8\uDF47", ["wink"], 22, 27, ";)"
+    ],
+    "1f60a": [
+        ["\uD83D\uDE0A"], "\uE056", "\uDBB8\uDF35", ["blush"], 22, 28
+    ],
+    "1f60b": [
+        ["\uD83D\uDE0B"], "\uE056", "\uDBB8\uDF2B", ["yum"], 22, 29
+    ],
+    "1f60c": [
+        ["\uD83D\uDE0C"], "\uE40A", "\uDBB8\uDF3E", ["relieved"], 23, 0
+    ],
+    "1f60d": [
+        ["\uD83D\uDE0D"], "\uE106", "\uDBB8\uDF27", ["heart_eyes"], 23, 1
+    ],
+    "1f60e": [
+        ["\uD83D\uDE0E"], "", "", ["sunglasses"], 23, 2
+    ],
+    "1f60f": [
+        ["\uD83D\uDE0F"], "\uE402", "\uDBB8\uDF43", ["smirk"], 23, 3
+    ],
+    "1f610": [
+        ["\uD83D\uDE10"], "", "", ["neutral_face"], 23, 4
+    ],
+    "1f611": [
+        ["\uD83D\uDE11"], "", "", ["expressionless"], 23, 5
+    ],
+    "1f612": [
+        ["\uD83D\uDE12"], "\uE40E", "\uDBB8\uDF26", ["unamused"], 23, 6
+    ],
+    "1f613": [
+        ["\uD83D\uDE13"], "\uE108", "\uDBB8\uDF44", ["sweat"], 23, 7
+    ],
+    "1f614": [
+        ["\uD83D\uDE14"], "\uE403", "\uDBB8\uDF40", ["pensive"], 23, 8
+    ],
+    "1f615": [
+        ["\uD83D\uDE15"], "", "", ["confused"], 23, 9
+    ],
+    "1f616": [
+        ["\uD83D\uDE16"], "\uE407", "\uDBB8\uDF3F", ["confounded"], 23, 10
+    ],
+    "1f617": [
+        ["\uD83D\uDE17"], "", "", ["kissing"], 23, 11
+    ],
+    "1f618": [
+        ["\uD83D\uDE18"], "\uE418", "\uDBB8\uDF2C", ["kissing_heart"], 23, 12
+    ],
+    "1f619": [
+        ["\uD83D\uDE19"], "", "", ["kissing_smiling_eyes"], 23, 13
+    ],
+    "1f61a": [
+        ["\uD83D\uDE1A"], "\uE417", "\uDBB8\uDF2D", ["kissing_closed_eyes"], 23, 14
+    ],
+    "1f61b": [
+        ["\uD83D\uDE1B"], "", "", ["stuck_out_tongue"], 23, 15, ":p"
+    ],
+    "1f61c": [
+        ["\uD83D\uDE1C"], "\uE105", "\uDBB8\uDF29", ["stuck_out_tongue_winking_eye"], 23, 16, ";p"
+    ],
+    "1f61d": [
+        ["\uD83D\uDE1D"], "\uE409", "\uDBB8\uDF2A", ["stuck_out_tongue_closed_eyes"], 23, 17
+    ],
+    "1f61e": [
+        ["\uD83D\uDE1E"], "\uE058", "\uDBB8\uDF23", ["disappointed"], 23, 18, ":("
+    ],
+    "1f61f": [
+        ["\uD83D\uDE1F"], "", "", ["worried"], 23, 19
+    ],
+    "1f620": [
+        ["\uD83D\uDE20"], "\uE059", "\uDBB8\uDF20", ["angry"], 23, 20
+    ],
+    "1f621": [
+        ["\uD83D\uDE21"], "\uE416", "\uDBB8\uDF3D", ["rage"], 23, 21
+    ],
+    "1f622": [
+        ["\uD83D\uDE22"], "\uE413", "\uDBB8\uDF39", ["cry"], 23, 22, ":'("
+    ],
+    "1f623": [
+        ["\uD83D\uDE23"], "\uE406", "\uDBB8\uDF3C", ["persevere"], 23, 23
+    ],
+    "1f624": [
+        ["\uD83D\uDE24"], "\uE404", "\uDBB8\uDF28", ["triumph"], 23, 24
+    ],
+    "1f625": [
+        ["\uD83D\uDE25"], "\uE401", "\uDBB8\uDF45", ["disappointed_relieved"], 23, 25
+    ],
+    "1f626": [
+        ["\uD83D\uDE26"], "", "", ["frowning"], 23, 26
+    ],
+    "1f627": [
+        ["\uD83D\uDE27"], "", "", ["anguished"], 23, 27
+    ],
+    "1f628": [
+        ["\uD83D\uDE28"], "\uE40B", "\uDBB8\uDF3B", ["fearful"], 23, 28
+    ],
+    "1f629": [
+        ["\uD83D\uDE29"], "\uE403", "\uDBB8\uDF21", ["weary"], 23, 29
+    ],
+    "1f62a": [
+        ["\uD83D\uDE2A"], "\uE408", "\uDBB8\uDF42", ["sleepy"], 24, 0
+    ],
+    "1f62b": [
+        ["\uD83D\uDE2B"], "\uE406", "\uDBB8\uDF46", ["tired_face"], 24, 1
+    ],
+    "1f62c": [
+        ["\uD83D\uDE2C"], "", "", ["grimacing"], 24, 2
+    ],
+    "1f62d": [
+        ["\uD83D\uDE2D"], "\uE411", "\uDBB8\uDF3A", ["sob"], 24, 3, ":'("
+    ],
+    "1f62e": [
+        ["\uD83D\uDE2E"], "", "", ["open_mouth"], 24, 4
+    ],
+    "1f62f": [
+        ["\uD83D\uDE2F"], "", "", ["hushed"], 24, 5
+    ],
+    "1f630": [
+        ["\uD83D\uDE30"], "\uE40F", "\uDBB8\uDF25", ["cold_sweat"], 24, 6
+    ],
+    "1f631": [
+        ["\uD83D\uDE31"], "\uE107", "\uDBB8\uDF41", ["scream"], 24, 7
+    ],
+    "1f632": [
+        ["\uD83D\uDE32"], "\uE410", "\uDBB8\uDF22", ["astonished"], 24, 8
+    ],
+    "1f633": [
+        ["\uD83D\uDE33"], "\uE40D", "\uDBB8\uDF2F", ["flushed"], 24, 9
+    ],
+    "1f634": [
+        ["\uD83D\uDE34"], "", "", ["sleeping"], 24, 10
+    ],
+    "1f635": [
+        ["\uD83D\uDE35"], "\uE406", "\uDBB8\uDF24", ["dizzy_face"], 24, 11
+    ],
+    "1f636": [
+        ["\uD83D\uDE36"], "", "", ["no_mouth"], 24, 12
+    ],
+    "1f637": [
+        ["\uD83D\uDE37"], "\uE40C", "\uDBB8\uDF2E", ["mask"], 24, 13
+    ],
+    "1f638": [
+        ["\uD83D\uDE38"], "\uE404", "\uDBB8\uDF49", ["smile_cat"], 24, 14
+    ],
+    "1f639": [
+        ["\uD83D\uDE39"], "\uE412", "\uDBB8\uDF4A", ["joy_cat"], 24, 15
+    ],
+    "1f63a": [
+        ["\uD83D\uDE3A"], "\uE057", "\uDBB8\uDF48", ["smiley_cat"], 24, 16
+    ],
+    "1f63b": [
+        ["\uD83D\uDE3B"], "\uE106", "\uDBB8\uDF4C", ["heart_eyes_cat"], 24, 17
+    ],
+    "1f63c": [
+        ["\uD83D\uDE3C"], "\uE404", "\uDBB8\uDF4F", ["smirk_cat"], 24, 18
+    ],
+    "1f63d": [
+        ["\uD83D\uDE3D"], "\uE418", "\uDBB8\uDF4B", ["kissing_cat"], 24, 19
+    ],
+    "1f63e": [
+        ["\uD83D\uDE3E"], "\uE416", "\uDBB8\uDF4E", ["pouting_cat"], 24, 20
+    ],
+    "1f63f": [
+        ["\uD83D\uDE3F"], "\uE413", "\uDBB8\uDF4D", ["crying_cat_face"], 24, 21
+    ],
+    "1f640": [
+        ["\uD83D\uDE40"], "\uE403", "\uDBB8\uDF50", ["scream_cat"], 24, 22
+    ],
+    "1f645": [
+        ["\uD83D\uDE45"], "\uE423", "\uDBB8\uDF51", ["no_good"], 24, 23
+    ],
+    "1f646": [
+        ["\uD83D\uDE46"], "\uE424", "\uDBB8\uDF52", ["ok_woman"], 24, 24
+    ],
+    "1f647": [
+        ["\uD83D\uDE47"], "\uE426", "\uDBB8\uDF53", ["bow"], 24, 25
+    ],
+    "1f648": [
+        ["\uD83D\uDE48"], "", "\uDBB8\uDF54", ["see_no_evil"], 24, 26
+    ],
+    "1f649": [
+        ["\uD83D\uDE49"], "", "\uDBB8\uDF56", ["hear_no_evil"], 24, 27
+    ],
+    "1f64a": [
+        ["\uD83D\uDE4A"], "", "\uDBB8\uDF55", ["speak_no_evil"], 24, 28
+    ],
+    "1f64b": [
+        ["\uD83D\uDE4B"], "\uE012", "\uDBB8\uDF57", ["raising_hand"], 24, 29
+    ],
+    "1f64c": [
+        ["\uD83D\uDE4C"], "\uE427", "\uDBB8\uDF58", ["raised_hands"], 25, 0
+    ],
+    "1f64d": [
+        ["\uD83D\uDE4D"], "\uE403", "\uDBB8\uDF59", ["person_frowning"], 25, 1
+    ],
+    "1f64e": [
+        ["\uD83D\uDE4E"], "\uE416", "\uDBB8\uDF5A", ["person_with_pouting_face"], 25, 2
+    ],
+    "1f64f": [
+        ["\uD83D\uDE4F"], "\uE41D", "\uDBB8\uDF5B", ["pray"], 25, 3
+    ],
+    "1f680": [
+        ["\uD83D\uDE80"], "\uE10D", "\uDBB9\uDFED", ["rocket"], 25, 4
+    ],
+    "1f681": [
+        ["\uD83D\uDE81"], "", "", ["helicopter"], 25, 5
+    ],
+    "1f682": [
+        ["\uD83D\uDE82"], "", "", ["steam_locomotive"], 25, 6
+    ],
+    "1f683": [
+        ["\uD83D\uDE83"], "\uE01E", "\uDBB9\uDFDF", ["railway_car"], 25, 7
+    ],
+    "1f684": [
+        ["\uD83D\uDE84"], "\uE435", "\uDBB9\uDFE2", ["bullettrain_side"], 25, 8
+    ],
+    "1f685": [
+        ["\uD83D\uDE85"], "\uE01F", "\uDBB9\uDFE3", ["bullettrain_front"], 25, 9
+    ],
+    "1f686": [
+        ["\uD83D\uDE86"], "", "", ["train2"], 25, 10
+    ],
+    "1f687": [
+        ["\uD83D\uDE87"], "\uE434", "\uDBB9\uDFE0", ["metro"], 25, 11
+    ],
+    "1f688": [
+        ["\uD83D\uDE88"], "", "", ["light_rail"], 25, 12
+    ],
+    "1f689": [
+        ["\uD83D\uDE89"], "\uE039", "\uDBB9\uDFEC", ["station"], 25, 13
+    ],
+    "1f68a": [
+        ["\uD83D\uDE8A"], "", "", ["tram"], 25, 14
+    ],
+    "1f68b": [
+        ["\uD83D\uDE8B"], "", "", ["train"], 25, 15
+    ],
+    "1f68c": [
+        ["\uD83D\uDE8C"], "\uE159", "\uDBB9\uDFE6", ["bus"], 25, 16
+    ],
+    "1f68d": [
+        ["\uD83D\uDE8D"], "", "", ["oncoming_bus"], 25, 17
+    ],
+    "1f68e": [
+        ["\uD83D\uDE8E"], "", "", ["trolleybus"], 25, 18
+    ],
+    "1f68f": [
+        ["\uD83D\uDE8F"], "\uE150", "\uDBB9\uDFE7", ["busstop"], 25, 19
+    ],
+    "1f690": [
+        ["\uD83D\uDE90"], "", "", ["minibus"], 25, 20
+    ],
+    "1f691": [
+        ["\uD83D\uDE91"], "\uE431", "\uDBB9\uDFF3", ["ambulance"], 25, 21
+    ],
+    "1f692": [
+        ["\uD83D\uDE92"], "\uE430", "\uDBB9\uDFF2", ["fire_engine"], 25, 22
+    ],
+    "1f693": [
+        ["\uD83D\uDE93"], "\uE432", "\uDBB9\uDFF4", ["police_car"], 25, 23
+    ],
+    "1f694": [
+        ["\uD83D\uDE94"], "", "", ["oncoming_police_car"], 25, 24
+    ],
+    "1f695": [
+        ["\uD83D\uDE95"], "\uE15A", "\uDBB9\uDFEF", ["taxi"], 25, 25
+    ],
+    "1f696": [
+        ["\uD83D\uDE96"], "", "", ["oncoming_taxi"], 25, 26
+    ],
+    "1f697": [
+        ["\uD83D\uDE97"], "\uE01B", "\uDBB9\uDFE4", ["car", "red_car"], 25, 27
+    ],
+    "1f698": [
+        ["\uD83D\uDE98"], "", "", ["oncoming_automobile"], 25, 28
+    ],
+    "1f699": [
+        ["\uD83D\uDE99"], "\uE42E", "\uDBB9\uDFE5", ["blue_car"], 25, 29
+    ],
+    "1f69a": [
+        ["\uD83D\uDE9A"], "\uE42F", "\uDBB9\uDFF1", ["truck"], 26, 0
+    ],
+    "1f69b": [
+        ["\uD83D\uDE9B"], "", "", ["articulated_lorry"], 26, 1
+    ],
+    "1f69c": [
+        ["\uD83D\uDE9C"], "", "", ["tractor"], 26, 2
+    ],
+    "1f69d": [
+        ["\uD83D\uDE9D"], "", "", ["monorail"], 26, 3
+    ],
+    "1f69e": [
+        ["\uD83D\uDE9E"], "", "", ["mountain_railway"], 26, 4
+    ],
+    "1f69f": [
+        ["\uD83D\uDE9F"], "", "", ["suspension_railway"], 26, 5
+    ],
+    "1f6a0": [
+        ["\uD83D\uDEA0"], "", "", ["mountain_cableway"], 26, 6
+    ],
+    "1f6a1": [
+        ["\uD83D\uDEA1"], "", "", ["aerial_tramway"], 26, 7
+    ],
+    "1f6a2": [
+        ["\uD83D\uDEA2"], "\uE202", "\uDBB9\uDFE8", ["ship"], 26, 8
+    ],
+    "1f6a3": [
+        ["\uD83D\uDEA3"], "", "", ["rowboat"], 26, 9
+    ],
+    "1f6a4": [
+        ["\uD83D\uDEA4"], "\uE135", "\uDBB9\uDFEE", ["speedboat"], 26, 10
+    ],
+    "1f6a5": [
+        ["\uD83D\uDEA5"], "\uE14E", "\uDBB9\uDFF7", ["traffic_light"], 26, 11
+    ],
+    "1f6a6": [
+        ["\uD83D\uDEA6"], "", "", ["vertical_traffic_light"], 26, 12
+    ],
+    "1f6a7": [
+        ["\uD83D\uDEA7"], "\uE137", "\uDBB9\uDFF8", ["construction"], 26, 13
+    ],
+    "1f6a8": [
+        ["\uD83D\uDEA8"], "\uE432", "\uDBB9\uDFF9", ["rotating_light"], 26, 14
+    ],
+    "1f6a9": [
+        ["\uD83D\uDEA9"], "", "\uDBBA\uDF22", ["triangular_flag_on_post"], 26, 15
+    ],
+    "1f6aa": [
+        ["\uD83D\uDEAA"], "", "\uDBB9\uDCF3", ["door"], 26, 16
+    ],
+    "1f6ab": [
+        ["\uD83D\uDEAB"], "", "\uDBBA\uDF48", ["no_entry_sign"], 26, 17
+    ],
+    "1f6ac": [
+        ["\uD83D\uDEAC"], "\uE30E", "\uDBBA\uDF1E", ["smoking"], 26, 18
+    ],
+    "1f6ad": [
+        ["\uD83D\uDEAD"], "\uE208", "\uDBBA\uDF1F", ["no_smoking"], 26, 19
+    ],
+    "1f6ae": [
+        ["\uD83D\uDEAE"], "", "", ["put_litter_in_its_place"], 26, 20
+    ],
+    "1f6af": [
+        ["\uD83D\uDEAF"], "", "", ["do_not_litter"], 26, 21
+    ],
+    "1f6b0": [
+        ["\uD83D\uDEB0"], "", "", ["potable_water"], 26, 22
+    ],
+    "1f6b1": [
+        ["\uD83D\uDEB1"], "", "", ["non-potable_water"], 26, 23
+    ],
+    "1f6b2": [
+        ["\uD83D\uDEB2"], "\uE136", "\uDBB9\uDFEB", ["bike"], 26, 24
+    ],
+    "1f6b3": [
+        ["\uD83D\uDEB3"], "", "", ["no_bicycles"], 26, 25
+    ],
+    "1f6b4": [
+        ["\uD83D\uDEB4"], "", "", ["bicyclist"], 26, 26
+    ],
+    "1f6b5": [
+        ["\uD83D\uDEB5"], "", "", ["mountain_bicyclist"], 26, 27
+    ],
+    "1f6b6": [
+        ["\uD83D\uDEB6"], "\uE201", "\uDBB9\uDFF0", ["walking"], 26, 28
+    ],
+    "1f6b7": [
+        ["\uD83D\uDEB7"], "", "", ["no_pedestrians"], 26, 29
+    ],
+    "1f6b8": [
+        ["\uD83D\uDEB8"], "", "", ["children_crossing"], 27, 0
+    ],
+    "1f6b9": [
+        ["\uD83D\uDEB9"], "\uE138", "\uDBBA\uDF33", ["mens"], 27, 1
+    ],
+    "1f6ba": [
+        ["\uD83D\uDEBA"], "\uE139", "\uDBBA\uDF34", ["womens"], 27, 2
+    ],
+    "1f6bb": [
+        ["\uD83D\uDEBB"], "\uE151", "\uDBB9\uDD06", ["restroom"], 27, 3
+    ],
+    "1f6bc": [
+        ["\uD83D\uDEBC"], "\uE13A", "\uDBBA\uDF35", ["baby_symbol"], 27, 4
+    ],
+    "1f6bd": [
+        ["\uD83D\uDEBD"], "\uE140", "\uDBB9\uDD07", ["toilet"], 27, 5
+    ],
+    "1f6be": [
+        ["\uD83D\uDEBE"], "\uE309", "\uDBB9\uDD08", ["wc"], 27, 6
+    ],
+    "1f6bf": [
+        ["\uD83D\uDEBF"], "", "", ["shower"], 27, 7
+    ],
+    "1f6c0": [
+        ["\uD83D\uDEC0"], "\uE13F", "\uDBB9\uDD05", ["bath"], 27, 8
+    ],
+    "1f6c1": [
+        ["\uD83D\uDEC1"], "", "", ["bathtub"], 27, 9
+    ],
+    "1f6c2": [
+        ["\uD83D\uDEC2"], "", "", ["passport_control"], 27, 10
+    ],
+    "1f6c3": [
+        ["\uD83D\uDEC3"], "", "", ["customs"], 27, 11
+    ],
+    "1f6c4": [
+        ["\uD83D\uDEC4"], "", "", ["baggage_claim"], 27, 12
+    ],
+    "1f6c5": [
+        ["\uD83D\uDEC5"], "", "", ["left_luggage"], 27, 13
+    ],
+    "0023-20e3": [
+        ["\u0023\uFE0F\u20E3", "\u0023\u20E3"], "\uE210", "\uDBBA\uDC2C", ["hash"], 27, 14
+    ],
+    "0030-20e3": [
+        ["\u0030\uFE0F\u20E3", "\u0030\u20E3"], "\uE225", "\uDBBA\uDC37", ["zero"], 27, 15
+    ],
+    "0031-20e3": [
+        ["\u0031\uFE0F\u20E3", "\u0031\u20E3"], "\uE21C", "\uDBBA\uDC2E", ["one"], 27, 16
+    ],
+    "0032-20e3": [
+        ["\u0032\uFE0F\u20E3", "\u0032\u20E3"], "\uE21D", "\uDBBA\uDC2F", ["two"], 27, 17
+    ],
+    "0033-20e3": [
+        ["\u0033\uFE0F\u20E3", "\u0033\u20E3"], "\uE21E", "\uDBBA\uDC30", ["three"], 27, 18
+    ],
+    "0034-20e3": [
+        ["\u0034\uFE0F\u20E3", "\u0034\u20E3"], "\uE21F", "\uDBBA\uDC31", ["four"], 27, 19
+    ],
+    "0035-20e3": [
+        ["\u0035\uFE0F\u20E3", "\u0035\u20E3"], "\uE220", "\uDBBA\uDC32", ["five"], 27, 20
+    ],
+    "0036-20e3": [
+        ["\u0036\uFE0F\u20E3", "\u0036\u20E3"], "\uE221", "\uDBBA\uDC33", ["six"], 27, 21
+    ],
+    "0037-20e3": [
+        ["\u0037\uFE0F\u20E3", "\u0037\u20E3"], "\uE222", "\uDBBA\uDC34", ["seven"], 27, 22
+    ],
+    "0038-20e3": [
+        ["\u0038\uFE0F\u20E3", "\u0038\u20E3"], "\uE223", "\uDBBA\uDC35", ["eight"], 27, 23
+    ],
+    "0039-20e3": [
+        ["\u0039\uFE0F\u20E3", "\u0039\u20E3"], "\uE224", "\uDBBA\uDC36", ["nine"], 27, 24
+    ],
+    "1f1e8-1f1f3": [
+        ["\uD83C\uDDE8\uD83C\uDDF3"], "\uE513", "\uDBB9\uDCED", ["cn"], 27, 25
+    ],
+    "1f1e9-1f1ea": [
+        ["\uD83C\uDDE9\uD83C\uDDEA"], "\uE50E", "\uDBB9\uDCE8", ["de"], 27, 26
+    ],
+    "1f1ea-1f1f8": [
+        ["\uD83C\uDDEA\uD83C\uDDF8"], "\uE511", "\uDBB9\uDCEB", ["es"], 27, 27
+    ],
+    "1f1eb-1f1f7": [
+        ["\uD83C\uDDEB\uD83C\uDDF7"], "\uE50D", "\uDBB9\uDCE7", ["fr"], 27, 28
+    ],
+    "1f1ec-1f1e7": [
+        ["\uD83C\uDDEC\uD83C\uDDE7"], "\uE510", "\uDBB9\uDCEA", ["gb", "uk"], 27, 29
+    ],
+    "1f1ee-1f1f9": [
+        ["\uD83C\uDDEE\uD83C\uDDF9"], "\uE50F", "\uDBB9\uDCE9", ["it"], 28, 0
+    ],
+    "1f1ef-1f1f5": [
+        ["\uD83C\uDDEF\uD83C\uDDF5"], "\uE50B", "\uDBB9\uDCE5", ["jp"], 28, 1
+    ],
+    "1f1f0-1f1f7": [
+        ["\uD83C\uDDF0\uD83C\uDDF7"], "\uE514", "\uDBB9\uDCEE", ["kr"], 28, 2
+    ],
+    "1f1f7-1f1fa": [
+        ["\uD83C\uDDF7\uD83C\uDDFA"], "\uE512", "\uDBB9\uDCEC", ["ru"], 28, 3
+    ],
+    "1f1fa-1f1f8": [
+        ["\uD83C\uDDFA\uD83C\uDDF8"], "\uE50C", "\uDBB9\uDCE6", ["us"], 28, 4
+    ]
+};
+
+Config.smileys = {
+    "<3": "heart",
+    "<\/3": "broken_heart",
+    ":)": "blush",
+    "(:": "blush",
+    ":-)": "blush",
+    "C:": "smile",
+    "c:": "smile",
+    ":D": "smile",
+    ":-D": "smile",
+    ";)": "wink",
+    ";-)": "wink",
+    "):": "disappointed",
+    ":(": "disappointed",
+    ":-(": "disappointed",
+    ":'(": "cry",
+    "=)": "smiley",
+    "=-)": "smiley",
+    ":*": "kiss",
+    ":-*": "kiss",
+    ":>": "laughing",
+    ":->": "laughing",
+    "8)": "sunglasses",
+    ":\\\\": "confused",
+    ":-\\\\": "confused",
+    ":\/": "confused",
+    ":-\/": "confused",
+    ":|": "neutral_face",
+    ":-|": "neutral_face",
+    ":o": "open_mouth",
+    ":-o": "open_mouth",
+    ">:(": "angry",
+    ">:-(": "angry",
+    ":p": "stuck_out_tongue",
+    ":-p": "stuck_out_tongue",
+    ":P": "stuck_out_tongue",
+    ":-P": "stuck_out_tongue",
+    ":b": "stuck_out_tongue",
+    ":-b": "stuck_out_tongue",
+    ";p": "stuck_out_tongue_winking_eye",
+    ";-p": "stuck_out_tongue_winking_eye",
+    ";b": "stuck_out_tongue_winking_eye",
+    ";-b": "stuck_out_tongue_winking_eye",
+    ";P": "stuck_out_tongue_winking_eye",
+    ";-P": "stuck_out_tongue_winking_eye",
+    ":o)": "monkey_face",
+    "D:": "anguished"
+};
+
+Config.inits = {};
+Config.map = {};
+
+Config.mapcolon = {};
+var a = [];
+Config.reversemap = {};
+
+Config.init_emoticons = function()
+{
+    if (Config.inits.emoticons)
+        return;
+    Config.init_colons(); // we require this for the emoticons map
+    Config.inits.emoticons = 1;
+
+    var a = [];
+    Config.map.emoticons = {};
+    for (var i in Config.emoticons_data)
+    {
+        // because we never see some characters in our text except as
+        // entities, we must do some replacing
+        var emoticon = i.replace(/\&/g, '&amp;').replace(/\</g, '&lt;')
+            .replace(/\>/g, '&gt;');
+
+        if (!Config.map.colons[emoji.emoticons_data[i]])
+            continue;
+
+        Config.map.emoticons[emoticon] = Config.map.colons[Config.emoticons_data[i]];
+        a.push(Config.escape_rx(emoticon));
+    }
+    Config.rx_emoticons = new RegExp(
+        ('(^|\\s)(' + a.join('|') + ')(?=$|[\\s|\\?\\.,!])'), 'g');
+};
+Config.init_colons = function()
+{
+    if (Config.inits.colons)
+        return;
+    Config.inits.colons = 1;
+    Config.rx_colons = new RegExp('\:[^\\s:]+\:', 'g');
+    Config.map.colons = {};
+    for (var i in Config.data)
+    {
+        for (var j = 0; j < Config.data[i][3].length; j++)
+        {
+            Config.map.colons[emoji.data[i][3][j]] = i;
+        }
+    }
+};
+Config.init_unified = function()
+{
+    if (Config.inits.unified)
+        return;
+    Config.inits.unified = 1;
+
+    buildMap();
+
+};
+
+
+Config.escape_rx = function(text)
+{
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+};
+
+function buildMap()
+{
+
+    var colons = [],codes=[];
+    for (var i in Config.emoji_data)
+    {
+        for (var j = 0; j < Config.emoji_data[i][0].length; j++)
+        {
+            colons.push(Config.escape_rx (":"+Config.emoji_data[i][3][0])+":");
+            codes.push(Config.emoji_data[i][0][0]);
+
+            // it is a map of {"colon smiley":"unicode char"}
+            Config.map[Config.emoji_data[i][3][0]] = Config.emoji_data[i][0][0];
+            Config.mapcolon[":"+Config.emoji_data[i][3][0]+":"] = Config.emoji_data[i][0][0];
+            // it is a map of {"unicode char": "colon smiley"}
+            Config.reversemap[Config.emoji_data[i][0][0]] = Config.emoji_data[i][3][0];
+        }
+
+        Config.rx_colons = new RegExp('(' + colons.join('|') + ')', "g");
+        Config.rx_codes = new RegExp('(' + codes.join('|') + ')', "g");
+    }
+}
+
+
+'use strict';
+
+function cancelEvent (event) {
+  event = event || window.event;
+  if (event) {
+    event = event.originalEvent || event;
+
+    if (event.stopPropagation) event.stopPropagation();
+    if (event.preventDefault) event.preventDefault();
+  }
+
+  return false;
+}
+
+function getGuid() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+        return v.toString(16);
+    });
+}
+
+//ConfigStorage
+(function(window)
+{
+    var keyPrefix = '';
+    var noPrefix = false;
+    var cache = {};
+    var useCs = !!(window.chrome && chrome.storage && chrome.storage.local);
+    var useLs = !useCs && !!window.localStorage;
+
+    function storageSetPrefix(newPrefix)
+    {
+        keyPrefix = newPrefix;
+    }
+
+    function storageSetNoPrefix()
+    {
+        noPrefix = true;
+    }
+
+    function storageGetPrefix()
+    {
+        if (noPrefix)
+        {
+            noPrefix = false;
+            return '';
+        }
+        return keyPrefix;
+    }
+
+    function storageGetValue()
+    {
+        var keys = Array.prototype.slice.call(arguments),
+            callback = keys.pop(),
+            result = [],
+            single = keys.length == 1,
+            value,
+            allFound = true,
+            prefix = storageGetPrefix(),
+            i, key;
+
+        for (i = 0; i < keys.length; i++)
+        {
+            key = keys[i] = prefix + keys[i];
+            if (key.substr(0, 3) != 'xt_' && cache[key] !== undefined)
+            {
+                result.push(cache[key]);
+            }
+            else if (useLs)
+            {
+                try
+                {
+                    value = localStorage.getItem(key);
+                }
+                catch (e)
+                {
+                    useLs = false;
+                }
+                try
+                {
+                    value = (value === undefined || value === null) ? false : JSON.parse(value);
+                }
+                catch (e)
+                {
+                    value = false;
+                }
+                result.push(cache[key] = value);
+            }
+            else if (!useCs)
+            {
+                result.push(cache[key] = false);
+            }
+            else
+            {
+                allFound = false;
+            }
+        }
+
+        if (allFound)
+        {
+            return callback(single ? result[0] : result);
+        }
+
+        chrome.storage.local.get(keys, function(resultObj)
+        {
+            var value;
+            result = [];
+            for (i = 0; i < keys.length; i++)
+            {
+                key = keys[i];
+                value = resultObj[key];
+                value = value === undefined || value === null ? false : JSON.parse(value);
+                result.push(cache[key] = value);
+            }
+
+            callback(single ? result[0] : result);
+        });
+    };
+
+    function storageSetValue(obj, callback)
+    {
+        var keyValues = {},
+            prefix = storageGetPrefix(),
+            key, value;
+
+        for (key in obj)
+        {
+            if (obj.hasOwnProperty(key))
+            {
+                value = obj[key];
+                key = prefix + key;
+                cache[key] = value;
+                value = JSON.stringify(value);
+                if (useLs)
+                {
+                    try
+                    {
+                        localStorage.setItem(key, value);
+                    }
+                    catch (e)
+                    {
+                        useLs = false;
+                    }
+                }
+                else
+                {
+                    keyValues[key] = value;
+                }
+            }
+        }
+
+        if (useLs || !useCs)
+        {
+            if (callback)
+            {
+                callback();
+            }
+            return;
+        }
+
+        chrome.storage.local.set(keyValues, callback);
+    };
+
+    function storageRemoveValue()
+    {
+        var keys = Array.prototype.slice.call(arguments),
+            prefix = storageGetPrefix(),
+            i, key, callback;
+
+        if (typeof keys[keys.length - 1] === 'function')
+        {
+            callback = keys.pop();
+        }
+
+        for (i = 0; i < keys.length; i++)
+        {
+            key = keys[i] = prefix + keys[i];
+            delete cache[key];
+            if (useLs)
+            {
+                try
+                {
+                    localStorage.removeItem(key);
+                }
+                catch (e)
+                {
+                    useLs = false;
+                }
+            }
+        }
+        if (useCs)
+        {
+            chrome.storage.local.remove(keys, callback);
+        }
+        else if (callback)
+        {
+            callback();
+        }
+    };
+
+    window.ConfigStorage = {
+        prefix: storageSetPrefix,
+        noPrefix: storageSetNoPrefix,
+        get: storageGetValue,
+        set: storageSetValue,
+        remove: storageRemoveValue
+    };
+})(this);
+
+// Pollyfill for IE 9 support of CustomEvent
+(function () {
+
+  if ( typeof window.CustomEvent === "function" ) return false;
+
+  function CustomEvent ( event, params ) {
+    params = params || { bubbles: false, cancelable: false, detail: undefined };
+    var evt = document.createEvent( 'CustomEvent' );
+    evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+    return evt;
+   }
+
+  CustomEvent.prototype = window.Event.prototype;
+
+  window.CustomEvent = CustomEvent;
+})();
+
+/**
+ * emojiarea - A rich textarea control that supports emojis, WYSIWYG-style.
+ * Copyright (c) 2012 DIY Co
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License. You may obtain a copy of the License at:
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under
+ * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+ * ANY KIND, either express or implied. See the License for the specific language
+ * governing permissions and limitations under the License.
+ *
+ * @author Brian Reavis <brian@diy.org>
+ */
+
+/**
+ * This file also contains some modifications by Igor Zhukov in order to add
+ * custom scrollbars to EmojiMenu See keyword `MODIFICATION` in source code.
+ */
+(function($, window, document) {
+
+  var ELEMENT_NODE = 1;
+  var TEXT_NODE = 3;
+  var TAGS_BLOCK = [ 'p', 'div', 'pre', 'form' ];
+  var KEY_ESC = 27;
+  var KEY_TAB = 9;
+  /* Keys that are not intercepted and canceled when the textbox has reached its max length:
+        Backspace, Tab, Ctrl, Alt, Left Arrow, Up Arrow, Right Arrow, Down Arrow, Cmd Key, Delete
+  */
+  var MAX_LENGTH_ALLOWED_KEYS = [8, 9, 17, 18, 37, 38, 39, 40, 91, 46];
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  /*
+   * ! MODIFICATION START Options 'spritesheetPath', 'spritesheetDimens',
+   * 'iconSize' added by Andre Staltz.
+   */
+  $.emojiarea = {
+    assetsPath : '',
+    spriteSheetPath: '',
+    blankGifPath: '',
+    iconSize : 25,
+    icons : {},
+  };
+  var defaultRecentEmojis = ':joy:,:kissing_heart:,:heart:,:heart_eyes:,:blush:,:grin:,:+1:,:relaxed:,:pensive:,:smile:,:sob:,:kiss:,:unamused:,:flushed:,:stuck_out_tongue_winking_eye:,:see_no_evil:,:wink:,:smiley:,:cry:,:stuck_out_tongue_closed_eyes:,:scream:,:rage:,:smirk:,:disappointed:,:sweat_smile:,:kissing_closed_eyes:,:speak_no_evil:,:relieved:,:grinning:,:yum:,:laughing:,:ok_hand:,:neutral_face:,:confused:'
+      .split(',');
+  /* ! MODIFICATION END */
+
+  $.fn.emojiarea = function(options) {
+    options = $.extend({}, options);
+    return this
+      .each(function () {
+        var originalInput = $(this);
+        if ('contentEditable' in document.body
+          && options.wysiwyg !== false) {
+          var id = getGuid();
+          new EmojiArea_WYSIWYG(originalInput, id, $.extend({}, options));
+        } else {
+          var id = getGuid();
+          new EmojiArea_Plain(originalInput, id, options);
+        }
+        originalInput.attr(
+          {
+            'data-emojiable': 'converted',
+            'data-id': id,
+            'data-type': 'original-input'
+          });
+      });
+  };
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  var util = {};
+
+  util.restoreSelection = (function() {
+    if (window.getSelection) {
+      return function(savedSelection) {
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        for (var i = 0, len = savedSelection.length; i < len; ++i) {
+          sel.addRange(savedSelection[i]);
+        }
+      };
+    } else if (document.selection && document.selection.createRange) {
+      return function(savedSelection) {
+        if (savedSelection) {
+          savedSelection.select();
+        }
+      };
+    }
+  })();
+
+  util.saveSelection = (function() {
+    if (window.getSelection) {
+      return function() {
+        var sel = window.getSelection(), ranges = [];
+        if (sel.rangeCount) {
+          for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+            ranges.push(sel.getRangeAt(i));
+          }
+        }
+        return ranges;
+      };
+    } else if (document.selection && document.selection.createRange) {
+      return function() {
+        var sel = document.selection;
+        return (sel.type.toLowerCase() !== 'none') ? sel.createRange()
+            : null;
+      };
+    }
+  })();
+
+  util.replaceSelection = (function() {
+    if (window.getSelection) {
+      return function(content) {
+        var range, sel = window.getSelection();
+        var node = typeof content === 'string' ? document
+            .createTextNode(content) : content;
+        if (sel.getRangeAt && sel.rangeCount) {
+          range = sel.getRangeAt(0);
+          range.deleteContents();
+          //range.insertNode(document.createTextNode(''));
+          range.insertNode(node);
+          range.setStart(node, 0);
+
+          window.setTimeout(function() {
+            range = document.createRange();
+            range.setStartAfter(node);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+          }, 0);
+        }
+      }
+    } else if (document.selection && document.selection.createRange) {
+      return function(content) {
+        var range = document.selection.createRange();
+        if (typeof content === 'string') {
+          range.text = content;
+        } else {
+          range.pasteHTML(content.outerHTML);
+        }
+      }
+    }
+  })();
+
+  util.insertAtCursor = function(text, el) {
+    text = ' ' + text;
+    var val = el.value, endIndex, startIndex, range;
+    if (typeof el.selectionStart != 'undefined'
+        && typeof el.selectionEnd != 'undefined') {
+      startIndex = el.selectionStart;
+      endIndex = el.selectionEnd;
+      el.value = val.substring(0, startIndex) + text
+          + val.substring(el.selectionEnd);
+      el.selectionStart = el.selectionEnd = startIndex + text.length;
+    } else if (typeof document.selection != 'undefined'
+        && typeof document.selection.createRange != 'undefined') {
+      el.focus();
+      range = document.selection.createRange();
+      range.text = text;
+      range.select();
+    }
+  };
+
+  util.extend = function(a, b) {
+    if (typeof a === 'undefined' || !a) {
+      a = {};
+    }
+    if (typeof b === 'object') {
+      for ( var key in b) {
+        if (b.hasOwnProperty(key)) {
+          a[key] = b[key];
+        }
+      }
+    }
+    return a;
+  };
+
+  util.escapeRegex = function(str) {
+    return (str + '').replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1');
+  };
+
+  util.htmlEntities = function(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  };
+
+  /*
+   * ! MODIFICATION START This function was added by Igor Zhukov to save
+   * recent used emojis.
+   */
+  util.emojiInserted = function(emojiKey, menu) {
+    ConfigStorage.get('emojis_recent', function(curEmojis) {
+      curEmojis = curEmojis || defaultRecentEmojis || [];
+
+      var pos = curEmojis.indexOf(emojiKey);
+      if (!pos) {
+        return false;
+      }
+      if (pos != -1) {
+        curEmojis.splice(pos, 1);
+      }
+      curEmojis.unshift(emojiKey);
+      if (curEmojis.length > 42) {
+        curEmojis = curEmojis.slice(42);
+      }
+
+      ConfigStorage.set({
+        emojis_recent : curEmojis
+      });
+    })
+  };
+  /* ! MODIFICATION END */
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  var EmojiArea = function() {
+  };
+
+  EmojiArea.prototype.setup = function() {
+    var self = this;
+
+    this.$editor.on('focus', function() {
+      self.hasFocus = true;
+    });
+    this.$editor.on('blur', function() {
+      self.hasFocus = false;
+    });
+
+    // Assign a unique instance of an emojiMenu to
+    self.emojiMenu = new EmojiMenu(self);
+
+    this.setupButton();
+  };
+
+  EmojiArea.prototype.setupButton = function() {
+    var self = this;
+    var $button = $('[data-id=' + this.id + '][data-type=picker]');
+
+    $button.on('click', function(e) {
+      self.emojiMenu.show(self);
+    });
+
+    this.$button = $button;
+    this.$dontHideOnClick = 'emoji-picker';
+  };
+
+  /*
+   * ! MODIFICATION START This function was modified by Andre Staltz so that
+   * the icon is created from a spritesheet.
+   */
+  EmojiArea.createIcon = function(emoji, menu) {
+    var category = emoji[0];
+    var row = emoji[1];
+    var column = emoji[2];
+    var name = emoji[3];
+    var filename = $.emojiarea.spriteSheetPath ? $.emojiarea.spriteSheetPath : $.emojiarea.assetsPath + '/emoji_spritesheet_!.png';
+    var blankGifPath = $.emojiarea.blankGifPath ? $.emojiarea.blankGifPath : $.emojiarea.assetsPath + '/blank.gif';
+    var iconSize = menu && Config.Mobile ? 26 : $.emojiarea.iconSize
+    var xoffset = -(iconSize * column);
+    var yoffset = -(iconSize * row);
+    var scaledWidth = (Config.EmojiCategorySpritesheetDimens[category][1] * iconSize);
+    var scaledHeight = (Config.EmojiCategorySpritesheetDimens[category][0] * iconSize);
+
+    var style = 'display:inline-block;';
+    style += 'width:' + iconSize + 'px;';
+    style += 'height:' + iconSize + 'px;';
+    style += 'background:url(\'' + filename.replace('!', category) + '\') '
+        + xoffset + 'px ' + yoffset + 'px no-repeat;';
+    style += 'background-size:' + scaledWidth + 'px ' + scaledHeight
+        + 'px;';
+    return '<img src="' + blankGifPath + '" class="img" style="'
+        + style + '" alt="' + util.htmlEntities(name) + '">';
+  };
+
+  $.emojiarea.createIcon = EmojiArea.createIcon;
+  /* ! MODIFICATION END */
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  /**
+   * Editor (plain-text)
+   *
+   * @constructor
+   * @param {object}
+   *            $textarea
+   * @param {object}
+   *            options
+   */
+
+  var EmojiArea_Plain = function($textarea, id, options) {
+    this.options = options;
+    this.$textarea = $textarea;
+    this.$editor = $textarea;
+    this.id = id;
+    this.setup();
+  };
+
+  EmojiArea_Plain.prototype.insert = function(emoji) {
+    if (!$.emojiarea.icons.hasOwnProperty(emoji))
+      return;
+    util.insertAtCursor(emoji, this.$textarea[0]);
+    /*
+     * MODIFICATION: Following line was added by Igor Zhukov, in order to
+     * save recent emojis
+     */
+    util.emojiInserted(emoji, this.menu);
+    this.$textarea.trigger('change');
+  };
+
+  EmojiArea_Plain.prototype.val = function() {
+    if (this.$textarea == '\n')
+      return '';
+    return this.$textarea.val();
+  };
+
+  util.extend(EmojiArea_Plain.prototype, EmojiArea.prototype);
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  /**
+   * Editor (rich)
+   *
+   * @constructor
+   * @param {object}
+   *            $textarea
+   * @param {object}
+   *            options
+   */
+
+  var EmojiArea_WYSIWYG = function($textarea, id, options) {
+    var self = this;
+
+    this.options = options || {};
+    if ($($textarea).attr('data-emoji-input') === 'unicode')
+      this.options.inputMethod = 'unicode';
+    else
+      this.options.inputMethod = 'image';
+    this.id = id;
+    this.$textarea = $textarea;
+    this.emojiPopup = options.emojiPopup;
+    this.$editor = $('<div>').addClass('emoji-wysiwyg-editor').addClass($($textarea)[0].className);
+    this.$editor.data('self', this);
+
+    if ($textarea.attr('maxlength')) {
+      this.$editor.attr('maxlength', $textarea.attr('maxlength'));
+    }
+    this.$editor.height($textarea.outerHeight()); //auto adjust height
+    this.emojiPopup.appendUnicodeAsImageToElement(this.$editor, $textarea.val());
+
+    this.$editor.attr({
+      'data-id': id,
+      'data-type': 'input',
+      'placeholder': $textarea.attr('placeholder'),
+      'contenteditable': 'true',
+    });
+
+    /*
+     * ! MODIFICATION START Following code was modified by Igor Zhukov, in
+     * order to improve rich text paste
+     */
+    var changeEvents = 'blur change';
+    if (!this.options.norealTime) {
+      changeEvents += ' keyup';
+    }
+    this.$editor.on(changeEvents, function(e) {
+      return self.onChange.apply(self, [ e ]);
+    });
+    /* ! MODIFICATION END */
+
+    this.$editor.on('mousedown focus', function() {
+      document.execCommand('enableObjectResizing', false, false);
+    });
+    this.$editor.on('blur', function() {
+      document.execCommand('enableObjectResizing', true, true);
+    });
+
+    var editorDiv = this.$editor;
+    this.$editor.on("change keydown keyup resize scroll", function(e) {
+      if(MAX_LENGTH_ALLOWED_KEYS.indexOf(e.which) == -1 &&
+        !((e.ctrlKey || e.metaKey) && e.which == 65) && // Ctrl + A
+        !((e.ctrlKey || e.metaKey) && e.which == 67) && // Ctrl + C
+        editorDiv.text().length + editorDiv.find('img').length >= editorDiv.attr('maxlength'))
+      {
+        e.preventDefault();
+      }
+      self.updateBodyPadding(editorDiv);
+    });
+
+    this.$editor.on("paste", function (e) {
+      e.preventDefault();
+      var content;
+      var charsRemaining = editorDiv.attr('maxlength') - (editorDiv.text().length + editorDiv.find('img').length);
+      if ((e.originalEvent || e).clipboardData) {
+        content = (e.originalEvent || e).clipboardData.getData('text/plain');
+        if (self.options.onPaste) {
+          content = self.options.onPaste(content);
+        }
+        if (charsRemaining < content.length) {
+          content = content.substring(0, charsRemaining);
+        }
+        document.execCommand('insertText', false, content);
+      }
+      else if (window.clipboardData) {
+        content = window.clipboardData.getData('Text');
+        if (self.options.onPaste) {
+          content = self.options.onPaste(content);
+        }
+        if (charsRemaining < content.length) {
+          content = content.substring(0, charsRemaining);
+        }
+        document.selection.createRange().pasteHTML(content);
+      }
+      editorDiv.scrollTop(editorDiv[0].scrollHeight);
+    });
+
+    $textarea.after("<i class='emoji-picker-icon emoji-picker " + this.options.popupButtonClasses + "' data-id='" + id + "' data-type='picker'></i>");
+
+    $textarea.hide().after(this.$editor);
+    this.setup();
+
+    /*
+     * MODIFICATION: Following line was modified by Igor Zhukov, in order to
+     * improve emoji insert behaviour
+     */
+    $(document.body).on('mousedown', function() {
+      if (self.hasFocus) {
+        self.selection = util.saveSelection();
+      }
+    });
+  };
+
+  EmojiArea_WYSIWYG.prototype.updateBodyPadding = function(target) {
+    var emojiPicker = $('[data-id=' + this.id + '][data-type=picker]');
+    if ($(target).hasScrollbar()) {
+      if (!(emojiPicker.hasClass('parent-has-scroll')))
+        emojiPicker.addClass('parent-has-scroll');
+      if (!($(target).hasClass('parent-has-scroll')))
+        $(target).addClass('parent-has-scroll');
+    } else {
+      if ((emojiPicker.hasClass('parent-has-scroll')))
+        emojiPicker.removeClass('parent-has-scroll');
+      if (($(target).hasClass('parent-has-scroll')))
+        $(target).removeClass('parent-has-scroll');
+    }
+  };
+
+  EmojiArea_WYSIWYG.prototype.onChange = function(e) {
+    var event = new CustomEvent('input', { bubbles: true });
+    this.$textarea.val(this.val())[0].dispatchEvent(event);
+  };
+
+  EmojiArea_WYSIWYG.prototype.insert = function(emoji) {
+    var content;
+    /*
+     * MODIFICATION: Following line was modified by Andre Staltz, to use new
+     * implementation of createIcon function.
+     */
+    var insertionContent = '';
+    if (this.options.inputMethod == 'unicode') {
+      insertionContent = this.emojiPopup.colonToUnicode(emoji);
+    } else {
+      var $img = $(EmojiArea.createIcon($.emojiarea.icons[emoji]));
+      if ($img[0].attachEvent) {
+        $img[0].attachEvent('onresizestart', function(e) {
+          e.returnValue = false;
+        }, false);
+      }
+      insertionContent = $img[0];
+    }
+
+    this.$editor.trigger('focus');
+    if (this.selection) {
+      util.restoreSelection(this.selection);
+    }
+    try {
+      util.replaceSelection(insertionContent);
+    } catch (e) {
+    }
+
+    /*
+     * MODIFICATION: Following line was added by Igor Zhukov, in order to
+     * save recent emojis
+     */
+    util.emojiInserted(emoji, this.menu);
+
+    this.onChange();
+  };
+
+  EmojiArea_WYSIWYG.prototype.val = function() {
+    var lines = [];
+    var line = [];
+    var emojiPopup = this.emojiPopup;
+
+    var flush = function() {
+      lines.push(line.join(''));
+      line = [];
+    };
+
+    var sanitizeNode = function(node) {
+      if (node.nodeType === TEXT_NODE) {
+        line.push(node.nodeValue);
+      } else if (node.nodeType === ELEMENT_NODE) {
+        var tagName = node.tagName.toLowerCase();
+        var isBlock = TAGS_BLOCK.indexOf(tagName) !== -1;
+
+        if (isBlock && line.length)
+          flush();
+
+        if (tagName === 'img') {
+          var alt = node.getAttribute('alt') || '';
+          if (alt) {
+              line.push(alt);
+          }
+          return;
+        } else if (tagName === 'br') {
+          flush();
+        }
+
+        var children = node.childNodes;
+        for (var i = 0; i < children.length; i++) {
+           sanitizeNode(children[i]);
+        }
+
+        if (isBlock && line.length)
+          flush();
+      }
+    };
+
+    var children = this.$editor[0].childNodes;
+    for (var i = 0; i < children.length; i++) {
+      sanitizeNode(children[i]);
+    }
+
+    if (line.length)
+      flush();
+
+    var returnValue = lines.join('\n');
+    return emojiPopup.colonToUnicode(returnValue);
+  };
+
+  util.extend(EmojiArea_WYSIWYG.prototype, EmojiArea.prototype);
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  jQuery.fn.hasScrollbar = function() {
+    var scrollHeight = this.get(0).scrollHeight;
+
+    //safari's scrollHeight includes padding
+    //if ($.browser.safari)
+//      scrollHeight -= parseInt(this.css('padding-top')) + parseInt(this.css('padding-bottom'));
+    if (this.outerHeight() < scrollHeight)
+      return true;
+    else
+      return false;
+  }
+
+  /**
+   * Emoji Dropdown Menu
+   *
+   * @constructor
+   * @param {object}
+   *            emojiarea
+   */
+  var EmojiMenu = function(emojiarea) {
+    var self = this;
+    self.id = emojiarea.id;
+    var $body = $(document.body);
+    var $window = $(window);
+
+    this.visible = false;
+    this.emojiarea = emojiarea;
+    EmojiMenu.menuZIndex = 5000;
+    this.$menu = $('<div>');
+    this.$menu.addClass('emoji-menu');
+    this.$menu.attr('data-id', self.id);
+    this.$menu.attr('data-type', 'menu');
+    this.$menu.hide();
+
+    this.$itemsTailWrap = $('<div class="emoji-items-wrap1"></div>')
+        .appendTo(this.$menu);
+    this.$categoryTabs = $(
+        '<table class="emoji-menu-tabs"><tr>'
+            + '<td><a class="emoji-menu-tab icon-recent" ></a></td>'
+            + '<td><a class="emoji-menu-tab icon-smile" ></a></td>'
+            + '<td><a class="emoji-menu-tab icon-flower"></a></td>'
+            + '<td><a class="emoji-menu-tab icon-bell"></a></td>'
+            + '<td><a class="emoji-menu-tab icon-car"></a></td>'
+            + '<td><a class="emoji-menu-tab icon-grid"></a></td>'
+            + '</tr></table>').appendTo(this.$itemsTailWrap);
+    this.$itemsWrap = $(
+        '<div class="emoji-items-wrap mobile_scrollable_wrap"></div>')
+        .appendTo(this.$itemsTailWrap);
+    this.$items = $('<div class="emoji-items">').appendTo(
+        this.$itemsWrap);
+
+    this.emojiarea.$editor.after(this.$menu)
+
+    $body.on('keydown', function(e) {
+      if (e.keyCode === KEY_ESC || e.keyCode === KEY_TAB) {
+        self.hide();
+      }
+    });
+
+    /*
+     * ! MODIFICATION: Following 3 lines were added by Igor Zhukov, in order
+     * to hide menu on message submit with keyboard
+     */
+    $body.on('message_send', function(e) {
+      self.hide();
+    });
+
+    $body.on('mouseup', function(e) {
+      e = e.originalEvent || e;
+      var target = e.target || window;
+
+      if ($(target).hasClass(self.emojiarea.$dontHideOnClick)) {
+        return;
+      }
+
+      while (target && target != window) {
+        target = target.parentNode;
+        if (target == self.$menu[0] || self.emojiarea
+            && target == self.emojiarea.$button[0]) {
+          return;
+        }
+      }
+      self.hide();
+    });
+
+    this.$menu.on('mouseup', 'a', function(e) {
+      e.stopPropagation();
+      return false;
+    });
+
+    this.$menu.on('click', 'a', function(e) {
+
+      self.emojiarea.updateBodyPadding(self.emojiarea.$editor);
+      if ($(this).hasClass('emoji-menu-tab')) {
+        if (self.getTabIndex(this) !== self.currentCategory) {
+          self.selectCategory(self.getTabIndex(this));
+        }
+        return false;
+      }
+
+      var emoji = $('.label', $(this)).text();
+      window.setTimeout(function() {
+        self.onItemSelected(emoji);
+        if (e.ctrlKey || e.metaKey) {
+          self.hide();
+        }
+      }, 0);
+      e.stopPropagation();
+      return false;
+    });
+
+    this.selectCategory(0);
+  };
+
+  /*
+   * ! MODIFICATION START Following code was added by Andre Staltz, to
+   * implement category selection.
+   */
+  EmojiMenu.prototype.getTabIndex = function(tab) {
+    return this.$categoryTabs.find('.emoji-menu-tab').index(tab);
+  };
+
+  EmojiMenu.prototype.selectCategory = function(category) {
+    var self = this;
+    this.$categoryTabs.find('.emoji-menu-tab').each(function(index) {
+      if (index === category) {
+        this.className += '-selected';
+      } else {
+        this.className = this.className.replace('-selected', '');
+      }
+    });
+    this.currentCategory = category;
+    this.load(category);
+  };
+  /* ! MODIFICATION END */
+
+  EmojiMenu.prototype.onItemSelected = function(emoji) {
+    if(this.emojiarea.$editor.text().length + this.emojiarea.$editor.find('img').length >= this.emojiarea.$editor.attr('maxlength'))
+    {
+      return;
+    }
+    this.emojiarea.insert(emoji);
+  };
+
+  /*
+   * MODIFICATION: The following function argument was modified by Andre
+   * Staltz, in order to load only icons from a category. Also function was
+   * modified by Igor Zhukov in order to display recent emojis from
+   * localStorage
+   */
+  EmojiMenu.prototype.load = function(category) {
+    var html = [];
+    var options = $.emojiarea.icons;
+    var path = $.emojiarea.assetsPath;
+    var self = this;
+    if (path.length && path.charAt(path.length - 1) !== '/') {
+      path += '/';
+    }
+
+    /*
+     * ! MODIFICATION: Following function was added by Igor Zhukov, in order
+     * to add scrollbars to EmojiMenu
+     */
+    var updateItems = function() {
+      self.$items.html(html.join(''));
+    }
+
+    if (category > 0) {
+      for ( var key in options) {
+        /*
+         * MODIFICATION: The following 2 lines were modified by Andre
+         * Staltz, in order to load only icons from the specified
+         * category.
+         */
+        if (options.hasOwnProperty(key)
+            && options[key][0] === (category - 1)) {
+          html.push('<a href="javascript:void(0)" title="'
+              + util.htmlEntities(key) + '">'
+              + EmojiArea.createIcon(options[key], true)
+              + '<span class="label">' + util.htmlEntities(key)
+              + '</span></a>');
+        }
+      }
+      updateItems();
+    } else {
+      ConfigStorage.get('emojis_recent', function(curEmojis) {
+        curEmojis = curEmojis || defaultRecentEmojis || [];
+        var key, i;
+        for (i = 0; i < curEmojis.length; i++) {
+          key = curEmojis[i]
+          if (options[key]) {
+            html.push('<a href="javascript:void(0)" title="'
+                + util.htmlEntities(key) + '">'
+                + EmojiArea.createIcon(options[key], true)
+                + '<span class="label">'
+                + util.htmlEntities(key) + '</span></a>');
+          }
+        }
+        updateItems();
+      });
+    }
+  };
+
+  EmojiMenu.prototype.hide = function(callback) {
+    this.visible = false;
+    this.$menu.hide("fast");
+  };
+
+  EmojiMenu.prototype.show = function(emojiarea) {
+    /*
+     * MODIFICATION: Following line was modified by Igor Zhukov, in order to
+     * improve EmojiMenu behaviour
+     */
+    if (this.visible)
+      return this.hide();
+    $(this.$menu).css('z-index', ++EmojiMenu.menuZIndex);
+    this.$menu.show("fast");
+    /*
+     * MODIFICATION: Following 3 lines were added by Igor Zhukov, in order
+     * to update EmojiMenu contents
+     */
+    if (!this.currentCategory) {
+      this.load(0);
+    }
+    this.visible = true;
+  };
+
+})(jQuery, window, document);
+
+// Generated by CoffeeScript 1.12.5
+(function() {
+  this.EmojiPicker = (function() {
+    function EmojiPicker(options) {
+      var ref, ref1;
+      if (options == null) {
+        options = {};
+      }
+      $.emojiarea.iconSize = (ref = options.iconSize) != null ? ref : 25;
+      $.emojiarea.assetsPath = (ref1 = options.assetsPath) != null ? ref1 : '';
+      this.generateEmojiIconSets(options);
+      if (!options.emojiable_selector) {
+        options.emojiable_selector = '[data-emojiable=true]';
+      }
+      this.options = options;
+    }
+
+    EmojiPicker.prototype.discover = function() {
+      var isiOS;
+      isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isiOS) {
+        return;
+      }
+      return $(this.options.emojiable_selector).emojiarea($.extend({
+        emojiPopup: this,
+        norealTime: true
+      }, this.options));
+    };
+
+    EmojiPicker.prototype.generateEmojiIconSets = function(options) {
+      var column, dataItem, hex, i, icons, j, name, reverseIcons, row, totalColumns;
+      icons = {};
+      reverseIcons = {};
+      i = void 0;
+      j = void 0;
+      hex = void 0;
+      name = void 0;
+      dataItem = void 0;
+      row = void 0;
+      column = void 0;
+      totalColumns = void 0;
+      j = 0;
+      while (j < Config.EmojiCategories.length) {
+        totalColumns = Config.EmojiCategorySpritesheetDimens[j][1];
+        i = 0;
+        while (i < Config.EmojiCategories[j].length) {
+          dataItem = Config.Emoji[Config.EmojiCategories[j][i]];
+          name = dataItem[1][0];
+          row = Math.floor(i / totalColumns);
+          column = i % totalColumns;
+          icons[':' + name + ':'] = [j, row, column, ':' + name + ':'];
+          reverseIcons[name] = dataItem[0];
+          i++;
+        }
+        j++;
+      }
+      $.emojiarea.icons = icons;
+      return $.emojiarea.reverseIcons = reverseIcons;
+    };
+
+    EmojiPicker.prototype.colonToUnicode = function(input) {
+      if (!input) {
+        return '';
+      }
+      if (!Config.rx_colons) {
+        Config.init_unified();
+      }
+      return input.replace(Config.rx_colons, function(m) {
+        var val;
+        val = Config.mapcolon[m];
+        if (val) {
+          return val;
+        } else {
+          return '';
+        }
+      });
+    };
+
+    EmojiPicker.prototype.appendUnicodeAsImageToElement = function(element, input) {
+      var k, len, split_on_unicode, text, val;
+      if (!input) {
+        return '';
+      }
+      if (!Config.rx_codes) {
+        Config.init_unified();
+      }
+      split_on_unicode = input.split(Config.rx_codes);
+      for (k = 0, len = split_on_unicode.length; k < len; k++) {
+        text = split_on_unicode[k];
+        val = '';
+        if (Config.rx_codes.test(text)) {
+          val = Config.reversemap[text];
+          if (val) {
+            val = ':' + val + ':';
+            val = $.emojiarea.createIcon($.emojiarea.icons[val]);
+          }
+        } else {
+          val = document.createTextNode(text);
+        }
+        element.append(val);
+      }
+      return input.replace(Config.rx_codes, function(m) {
+        var $img;
+        val = Config.reversemap[m];
+        if (val) {
+          val = ':' + val + ':';
+          $img = $.emojiarea.createIcon($.emojiarea.icons[val]);
+          return $img;
+        } else {
+          return '';
+        }
+      });
+    };
+
+    EmojiPicker.prototype.colonToImage = function(input) {
+      if (!input) {
+        return '';
+      }
+      if (!Config.rx_colons) {
+        Config.init_unified();
+      }
+      return input.replace(Config.rx_colons, function(m) {
+        var $img;
+        if (m) {
+          $img = $.emojiarea.createIcon($.emojiarea.icons[m]);
+          return $img;
+        } else {
+          return '';
+        }
+      });
+    };
+
+    return EmojiPicker;
+
+  })();
+
+}).call(this);
+/** @license MIT License (c) 2011,2012 Copyright Tavendo GmbH. */
+
+/**
+ * AutobahnJS - http://autobahn.ws
+ *
+ * A lightweight implementation of
+ *
+ *   WAMP (The WebSocket Application Messaging Protocol) - http://wamp.ws
+ *
+ * Provides asynchronous RPC/PubSub over WebSocket.
+ *
+ * Copyright 2011, 2012 Tavendo GmbH. Licensed under the MIT License.
+ * See license text at http://www.opensource.org/licenses/mit-license.php
+ */
+
+"use strict";
+
+/** @define {string} */
+var AUTOBAHNJS_VERSION = '?.?.?';
+
+/** @define {boolean} */
+var AUTOBAHNJS_DEBUG = true;
+
+
+
+var ab = window.ab = {};
+
+ab._version = AUTOBAHNJS_VERSION;
+
+/**
+ * Fallbacks for browsers lacking
+ *
+ *    Array.prototype.indexOf
+ *    Array.prototype.forEach
+ *
+ * most notably MSIE8.
+ *
+ * Source:
+ *    https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/indexOf
+ *    https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/forEach
+ */
+(function () {
+   if (!Array.prototype.indexOf) {
+      Array.prototype.indexOf = function (searchElement /*, fromIndex */ ) {
+         "use strict";
+         if (this === null) {
+            throw new TypeError();
+         }
+         var t = new Object(this);
+         var len = t.length >>> 0;
+         if (len === 0) {
+            return -1;
+         }
+         var n = 0;
+         if (arguments.length > 0) {
+            n = Number(arguments[1]);
+            if (n !== n) { // shortcut for verifying if it's NaN
+               n = 0;
+            } else if (n !== 0 && n !== Infinity && n !== -Infinity) {
+               n = (n > 0 || -1) * Math.floor(Math.abs(n));
+            }
+         }
+         if (n >= len) {
+            return -1;
+         }
+         var k = n >= 0 ? n : Math.max(len - Math.abs(n), 0);
+         for (; k < len; k++) {
+            if (k in t && t[k] === searchElement) {
+               return k;
+            }
+         }
+         return -1;
+      };
+   }
+
+   if (!Array.prototype.forEach) {
+
+      Array.prototype.forEach = function (callback, thisArg) {
+
+         var T, k;
+
+         if (this === null) {
+            throw new TypeError(" this is null or not defined");
+         }
+
+         // 1. Let O be the result of calling ToObject passing the |this| value as the argument.
+         var O = new Object(this);
+
+         // 2. Let lenValue be the result of calling the Get internal method of O with the argument "length".
+         // 3. Let len be ToUint32(lenValue).
+         var len = O.length >>> 0; // Hack to convert O.length to a UInt32
+
+         // 4. If IsCallable(callback) is false, throw a TypeError exception.
+         // See: http://es5.github.com/#x9.11
+         if ({}.toString.call(callback) !== "[object Function]") {
+            throw new TypeError(callback + " is not a function");
+         }
+
+         // 5. If thisArg was supplied, let T be thisArg; else let T be undefined.
+         if (thisArg) {
+            T = thisArg;
+         }
+
+         // 6. Let k be 0
+         k = 0;
+
+         // 7. Repeat, while k < len
+         while (k < len) {
+
+            var kValue;
+
+            // a. Let Pk be ToString(k).
+            //   This is implicit for LHS operands of the in operator
+            // b. Let kPresent be the result of calling the HasProperty internal method of O with argument Pk.
+            //   This step can be combined with c
+            // c. If kPresent is true, then
+            if (k in O) {
+
+               // i. Let kValue be the result of calling the Get internal method of O with argument Pk.
+               kValue = O[k];
+
+               // ii. Call the Call internal method of callback with T as the this value and
+               // argument list containing kValue, k, and O.
+               callback.call(T, kValue, k, O);
+            }
+            // d. Increase k by 1.
+            k++;
+         }
+         // 8. return undefined
+      };
+   }
+
+})();
+
+
+// Helper to slice out browser / version from userAgent
+ab._sliceUserAgent = function (str, delim, delim2) {
+   var ver = [];
+   var ua = navigator.userAgent;
+   var i = ua.indexOf(str);
+   var j = ua.indexOf(delim, i);
+   if (j < 0) {
+      j = ua.length;
+   }
+   var agent = ua.slice(i, j).split(delim2);
+   var v = agent[1].split('.');
+   for (var k = 0; k < v.length; ++k) {
+      ver.push(parseInt(v[k], 10));
+   }
+   return {name: agent[0], version: ver};
+};
+
+/**
+ * Detect browser and browser version.
+ */
+ab.getBrowser = function () {
+
+   var ua = navigator.userAgent;
+   if (ua.indexOf("Chrome") > -1) {
+      return ab._sliceUserAgent("Chrome", " ", "/");
+   } else if (ua.indexOf("Safari") > -1) {
+      return ab._sliceUserAgent("Safari", " ", "/");
+   } else if (ua.indexOf("Firefox") > -1) {
+      return ab._sliceUserAgent("Firefox", " ", "/");
+   } else if (ua.indexOf("MSIE") > -1) {
+      return ab._sliceUserAgent("MSIE", ";", " ");
+   } else {
+      return null;
+   }
+};
+
+
+// Logging message for unsupported browser.
+ab.browserNotSupportedMessage = "Browser does not support WebSockets (RFC6455)";
+
+
+ab._idchars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+ab._idlen = 16;
+ab._subprotocol = "wamp";
+
+ab._newid = function () {
+   var id = "";
+   for (var i = 0; i < ab._idlen; i += 1) {
+      id += ab._idchars.charAt(Math.floor(Math.random() * ab._idchars.length));
+   }
+   return id;
+};
+
+ab.log = function (o) {
+   if (window.console && console.log) {
+      //console.log.apply(console, !!arguments.length ? arguments : [this]);
+      if (arguments.length > 1) {
+         console.group("Log Item");
+         for (var i = 0; i < arguments.length; i += 1) {
+            console.log(arguments[i]);
+         }
+         console.groupEnd();
+      } else {
+         console.log(arguments[0]);
+      }
+   }
+};
+
+ab._debugrpc = false;
+ab._debugpubsub = false;
+ab._debugws = false;
+
+ab.debug = function (debugWamp, debugWs) {
+   if ("console" in window) {
+      ab._debugrpc = debugWamp;
+      ab._debugpubsub = debugWamp;
+      ab._debugws = debugWs;
+   } else {
+      throw "browser does not support console object";
+   }
+};
+
+ab.version = function () {
+   return ab._version;
+};
+
+ab.PrefixMap = function () {
+
+   var self = this;
+   self._index = {};
+   self._rindex = {};
+};
+
+ab.PrefixMap.prototype.get = function (prefix) {
+
+   var self = this;
+   return self._index[prefix];
+};
+
+ab.PrefixMap.prototype.set = function (prefix, uri) {
+
+   var self = this;
+   self._index[prefix] = uri;
+   self._rindex[uri] = prefix;
+};
+
+ab.PrefixMap.prototype.setDefault = function (uri) {
+
+   var self = this;
+   self._index[""] = uri;
+   self._rindex[uri] = "";
+};
+
+ab.PrefixMap.prototype.remove = function (prefix) {
+
+   var self = this;
+   var uri = self._index[prefix];
+   if (uri) {
+      delete self._index[prefix];
+      delete self._rindex[uri];
+   }
+};
+
+ab.PrefixMap.prototype.resolve = function (curie, pass) {
+
+   var self = this;
+
+   // skip if not a CURIE
+   var i = curie.indexOf(":");
+   if (i >= 0) {
+      var prefix = curie.substring(0, i);
+      if (self._index[prefix]) {
+         return self._index[prefix] + curie.substring(i + 1);
+      }
+   }
+
+   // either pass-through or null
+   if (pass == true) {
+      return curie;
+   } else {
+      return null;
+   }
+};
+
+ab.PrefixMap.prototype.shrink = function (uri, pass) {
+
+   var self = this;
+
+   // skip if already a CURIE
+   var i = uri.indexOf(":");
+   if (i == -1) {
+      for (var i = uri.length; i > 0; i -= 1) {
+         var u = uri.substring(0, i);
+         var p = self._rindex[u];
+         if (p) {
+            return p + ":" + uri.substring(i);
+         }
+      }
+   }
+
+   // either pass-through or null
+   if (pass == true) {
+      return uri;
+   } else {
+      return null;
+   }
+};
+
+
+ab._MESSAGE_TYPEID_WELCOME        = 0;
+ab._MESSAGE_TYPEID_PREFIX         = 1;
+ab._MESSAGE_TYPEID_CALL           = 2;
+ab._MESSAGE_TYPEID_CALL_RESULT    = 3;
+ab._MESSAGE_TYPEID_CALL_ERROR     = 4;
+ab._MESSAGE_TYPEID_SUBSCRIBE      = 5;
+ab._MESSAGE_TYPEID_UNSUBSCRIBE    = 6;
+ab._MESSAGE_TYPEID_PUBLISH        = 7;
+ab._MESSAGE_TYPEID_EVENT          = 8;
+
+
+ab.CONNECTION_CLOSED = 0;
+ab.CONNECTION_LOST = 1;
+ab.CONNECTION_UNREACHABLE = 2;
+ab.CONNECTION_UNSUPPORTED = 3;
+
+ab.Session = function (wsuri, onopen, onclose, options) {
+
+   var self = this;
+
+   self._wsuri = wsuri;
+   self._options = options;
+   self._websocket_onopen = onopen;
+   self._websocket_onclose = onclose;
+   self._websocket = null;
+   self._websocket_connected = false;
+   self._session_id = null;
+   self._calls = {};
+   self._subscriptions = {};
+   self._prefixes = new ab.PrefixMap();
+
+   self._txcnt = 0;
+   self._rxcnt = 0;
+
+   if ("WebSocket" in window) {
+      // Chrome, MSIE, newer Firefox
+      self._websocket = new WebSocket(self._wsuri, [ab._subprotocol]);
+   } else if ("MozWebSocket" in window) {
+      // older versions of Firefox prefix the WebSocket object
+      self._websocket = new MozWebSocket(self._wsuri, [ab._subprotocol]);
+   } else {
+      if (onclose !== undefined) {
+         onclose(ab.CONNECTION_UNSUPPORTED);
+         return;
+      } else {
+         throw ab.browserNotSupportedMessage;
+      }
+   }
+
+   self._websocket.onmessage = function (e)
+   {
+      if (ab._debugws) {
+         self._rxcnt += 1;
+         console.group("WS Receive");
+         console.info(self._wsuri + "  [" + self._session_id + "]");
+         console.log(self._rxcnt);
+         console.log(e.data);
+         console.groupEnd();
+      }
+
+      var o = JSON.parse(e.data);
+      if (o[1] in self._calls)
+      {
+         if (o[0] === ab._MESSAGE_TYPEID_CALL_RESULT) {
+
+            var dr = self._calls[o[1]];
+            var r = o[2];
+
+            if (ab._debugrpc && dr._ab_callobj !== undefined) {
+               console.group("WAMP Call", dr._ab_callobj[2]);
+               console.timeEnd(dr._ab_tid);
+               console.group("Arguments");
+               for (var i = 3; i < dr._ab_callobj.length; i += 1) {
+                  var arg = dr._ab_callobj[i];
+                  if (arg !== undefined) {
+                     console.log(arg);
+                  } else {
+                     break;
+                  }
+               }
+               console.groupEnd();
+               console.group("Result");
+               console.log(r);
+               console.groupEnd();
+               console.groupEnd();
+            }
+
+            dr.resolve(r);
+         }
+         else if (o[0] === ab._MESSAGE_TYPEID_CALL_ERROR) {
+
+            var de = self._calls[o[1]];
+            var uri = o[2];
+            var desc = o[3];
+            var detail = o[4];
+
+            if (ab._debugrpc && de._ab_callobj !== undefined) {
+               console.group("WAMP Call", de._ab_callobj[2]);
+               console.timeEnd(de._ab_tid);
+               console.group("Arguments");
+               for (var j = 3; j < de._ab_callobj.length; j += 1) {
+                  var arg2 = de._ab_callobj[j];
+                  if (arg2 !== undefined) {
+                     console.log(arg2);
+                  } else {
+                     break;
+                  }
+               }
+               console.groupEnd();
+               console.group("Error");
+               console.log(uri);
+               console.log(desc);
+               if (detail !== undefined) {
+                  console.log(detail);
+               }
+               console.groupEnd();
+               console.groupEnd();
+            }
+
+            if (detail !== undefined) {
+               de.reject(uri, desc, detail);
+            } else {
+               de.reject(uri, desc);
+            }
+         }
+         delete self._calls[o[1]];
+      }
+      else if (o[0] === ab._MESSAGE_TYPEID_EVENT)
+      {
+         var subid = self._prefixes.resolve(o[1], true);
+         if (subid in self._subscriptions) {
+
+            var uri2 = o[1];
+            var val = o[2];
+
+            if (ab._debugpubsub) {
+               console.group("WAMP Event");
+               console.info(self._wsuri + "  [" + self._session_id + "]");
+               console.log(uri2);
+               console.log(val);
+               console.groupEnd();
+            }
+
+            self._subscriptions[subid].forEach(function (callback) {
+
+               callback(uri2, val);
+            });
+         }
+         else {
+            // ignore unsolicited event!
+         }
+      }
+      else if (o[0] === ab._MESSAGE_TYPEID_WELCOME)
+      {
+         if (self._session_id === null) {
+            self._session_id = o[1];
+            self._wamp_version = o[2];
+            self._server = o[3];
+
+            if (ab._debugrpc || ab._debugpubsub) {
+               console.group("WAMP Welcome");
+               console.info(self._wsuri + "  [" + self._session_id + "]");
+               console.log(self._wamp_version);
+               console.log(self._server);
+               console.groupEnd();
+            }
+
+            // only now that we have received the initial server-to-client
+            // welcome message, fire application onopen() hook
+            if (self._websocket_onopen !== null) {
+               self._websocket_onopen(self._session_id, self._wamp_version, self._server);
+            }
+         } else {
+            throw "protocol error (welcome message received more than once)";
+         }
+      }
+   };
+
+   self._websocket.onopen = function (e)
+   {
+      // check if we can speak WAMP!
+      if (self._websocket.protocol !== ab._subprotocol) {
+
+         if (typeof self._websocket.protocol === 'undefined') {
+            // i.e. Safari does subprotocol negotiation (broken), but then
+            // does NOT set the protocol attribute of the websocket object (broken)
+            //
+            if (ab._debugws) {
+               console.group("WS Warning");
+               console.info(self._wsuri);
+               console.log("WebSocket object has no protocol attribute: WAMP subprotocol check skipped!");
+               console.groupEnd();
+            }
+         }
+         else if (self._options && self._options.skipSubprotocolCheck) {
+            // WAMP subprotocol check disabled by session option
+            //
+            if (ab._debugws) {
+               console.group("WS Warning");
+               console.info(self._wsuri);
+               console.log("Server does not speak WAMP, but subprotocol check disabled by option!");
+               console.log(self._websocket.protocol);
+               console.groupEnd();
+            }
+         } else {
+            // we only speak WAMP .. if the server denied us this, we bail out.
+            //
+            self._websocket.close(1000, "server does not speak WAMP");
+            throw "server does not speak WAMP (but '" + self._websocket.protocol + "' !)";
+         }
+      }
+      if (ab._debugws) {
+         console.group("WAMP Connect");
+         console.info(self._wsuri);
+         console.log(self._websocket.protocol);
+         console.groupEnd();
+      }
+      self._websocket_connected = true;
+   };
+
+   self._websocket.onerror = function (e)
+   {
+      // FF fires this upon unclean closes
+      // Chrome does not fire this
+   };
+
+   self._websocket.onclose = function (e)
+   {
+      if (ab._debugws) {
+         if (self._websocket_connected) {
+            console.log("Autobahn connection to " + self._wsuri + " lost (code " + e.code + ", reason '" + e.reason + "', wasClean " + e.wasClean + ").");
+         } else {
+            console.log("Autobahn could not connect to " + self._wsuri + " (code " + e.code + ", reason '" + e.reason + "', wasClean " + e.wasClean + ").");
+         }
+      }
+
+      // fire app callback
+      if (self._websocket_onclose !== undefined) {
+         if (self._websocket_connected) {
+            if (e.wasClean) {
+               // connection was closed cleanly (closing HS was performed)
+               self._websocket_onclose(ab.CONNECTION_CLOSED);
+            } else {
+               // connection was closed uncleanly (lost without closing HS)
+               self._websocket_onclose(ab.CONNECTION_LOST);
+            }
+         } else {
+            // connection could not be established in the first place
+            self._websocket_onclose(ab.CONNECTION_UNREACHABLE);
+         }
+      }
+
+      // cleanup - reconnect requires a new session object!
+      self._websocket_connected = false;
+      self._wsuri = null;
+      self._websocket_onopen = null;
+      self._websocket_onclose = null;
+      self._websocket = null;
+   };
+};
+
+
+ab.Session.prototype._send = function (msg) {
+
+   var self = this;
+
+   if (!self._websocket_connected) {
+      throw "Autobahn not connected";
+   }
+
+   var rmsg = JSON.stringify(msg);
+   self._websocket.send(rmsg);
+   self._txcnt += 1;
+
+   if (ab._debugws) {
+      console.group("WS Send");
+      console.info(self._wsuri + "  [" + self._session_id + "]");
+      console.log(self._txcnt);
+      console.log(rmsg);
+      console.groupEnd();
+   }
+};
+
+
+ab.Session.prototype.close = function () {
+
+   var self = this;
+
+   if (!self._websocket_connected) {
+      throw "Autobahn not connected";
+   }
+
+   self._websocket.close();
+};
+
+
+ab.Session.prototype.sessionid = function () {
+
+   var self = this;
+   return self._session_id;
+};
+
+
+ab.Session.prototype.shrink = function (uri, pass) {
+
+   var self = this;
+   return self._prefixes.shrink(uri, pass);
+};
+
+
+ab.Session.prototype.resolve = function (curie, pass) {
+
+   var self = this;
+   return self._prefixes.resolve(curie, pass);
+};
+
+
+ab.Session.prototype.prefix = function (prefix, uri) {
+
+   var self = this;
+
+   if (self._prefixes.get(prefix) !== undefined) {
+      throw "prefix '" + prefix + "' already defined";
+   }
+
+   self._prefixes.set(prefix, uri);
+
+   if (ab._debugrpc || ab._debugpubsub) {
+      console.group("WAMP Prefix");
+      console.info(self._wsuri + "  [" + self._session_id + "]");
+      console.log(prefix);
+      console.log(uri);
+      console.groupEnd();
+   }
+
+   var msg = [ab._MESSAGE_TYPEID_PREFIX, prefix, uri];
+   self._send(msg);
+};
+
+
+ab.Session.prototype.call = function () {
+
+   var self = this;
+
+   var d = new when.defer();
+   var callid;
+   while (true) {
+      callid = ab._newid();
+      if (!(callid in self._calls)) {
+         break;
+      }
+   }
+   self._calls[callid] = d;
+
+   var procuri = self._prefixes.shrink(arguments[0], true);
+   var obj = [ab._MESSAGE_TYPEID_CALL, callid, procuri];
+   for (var i = 1; i < arguments.length; i += 1) {
+      obj.push(arguments[i]);
+   }
+
+   self._send(obj);
+
+   if (ab._debugrpc) {
+      d._ab_callobj = obj;
+      d._ab_tid = self._wsuri + "  [" + self._session_id + "][" + callid + "]";
+      console.time(d._ab_tid);
+      console.info();
+   }
+
+   return d;
+};
+
+
+ab.Session.prototype.subscribe = function (topicuri, callback) {
+
+   var self = this;
+
+   // subscribe by sending WAMP message when topic not already subscribed
+   //
+   var rtopicuri = self._prefixes.resolve(topicuri, true);
+   if (!(rtopicuri in self._subscriptions)) {
+
+      if (ab._debugpubsub) {
+         console.group("WAMP Subscribe");
+         console.info(self._wsuri + "  [" + self._session_id + "]");
+         console.log(topicuri);
+         console.log(callback);
+         console.groupEnd();
+      }
+
+      var msg = [ab._MESSAGE_TYPEID_SUBSCRIBE, topicuri];
+      self._send(msg);
+
+      self._subscriptions[rtopicuri] = [];
+   }
+
+   // add callback to event listeners list if not already in list
+   //
+   var i = self._subscriptions[rtopicuri].indexOf(callback);
+   if (i === -1) {
+      self._subscriptions[rtopicuri].push(callback);
+   }
+   else {
+      throw "callback " + callback + " already subscribed for topic " + rtopicuri;
+   }
+};
+
+
+ab.Session.prototype.unsubscribe = function (topicuri, callback) {
+
+   var self = this;
+
+   var rtopicuri = self._prefixes.resolve(topicuri, true);
+   if (!(rtopicuri in self._subscriptions)) {
+      throw "not subscribed to topic " + rtopicuri;
+   }
+   else {
+      var removed;
+      if (callback !== undefined) {
+         var idx = self._subscriptions[rtopicuri].indexOf(callback);
+         if (idx !== -1) {
+            removed = callback;
+            self._subscriptions[rtopicuri].splice(idx, 1);
+         }
+         else {
+            throw "no callback " + callback + " subscribed on topic " + rtopicuri;
+         }
+      }
+      else {
+         removed = self._subscriptions[rtopicuri].slice();
+         self._subscriptions[rtopicuri] = [];
+      }
+
+      if (self._subscriptions[rtopicuri].length === 0) {
+
+         delete self._subscriptions[rtopicuri];
+
+         if (ab._debugpubsub) {
+            console.group("WAMP Unsubscribe");
+            console.info(self._wsuri + "  [" + self._session_id + "]");
+            console.log(topicuri);
+            console.log(removed);
+            console.groupEnd();
+         }
+
+         var msg = [ab._MESSAGE_TYPEID_UNSUBSCRIBE, topicuri];
+         self._send(msg);
+      }
+   }
+};
+
+
+ab.Session.prototype.publish = function () {
+
+   var self = this;
+
+   var topicuri = arguments[0];
+   var event = arguments[1];
+
+   var excludeMe = null;
+   var exclude = null;
+   var eligible = null;
+
+   var msg = null;
+
+   if (arguments.length > 3) {
+
+      if (!(arguments[2] instanceof Array)) {
+         throw "invalid argument type(s)";
+      }
+      if (!(arguments[3] instanceof Array)) {
+         throw "invalid argument type(s)";
+      }
+
+      exclude = arguments[2];
+      eligible = arguments[3];
+      msg = [ab._MESSAGE_TYPEID_PUBLISH, topicuri, event, exclude, eligible];
+
+   } else if (arguments.length > 2) {
+
+      if (typeof(arguments[2]) === 'boolean') {
+
+         excludeMe = arguments[2];
+         msg = [ab._MESSAGE_TYPEID_PUBLISH, topicuri, event, excludeMe];
+
+      } else if (arguments[2] instanceof Array) {
+
+         exclude = arguments[2];
+         msg = [ab._MESSAGE_TYPEID_PUBLISH, topicuri, event, exclude];
+
+      } else {
+         throw "invalid argument type(s)";
+      }
+
+   } else {
+
+      msg = [ab._MESSAGE_TYPEID_PUBLISH, topicuri, event];
+   }
+
+   if (ab._debugpubsub) {
+      console.group("WAMP Publish");
+      console.info(self._wsuri + "  [" + self._session_id + "]");
+      console.log(topicuri);
+      console.log(event);
+
+      if (excludeMe !== null) {
+         console.log(excludeMe);
+      } else {
+         if (exclude !== null) {
+            console.log(exclude);
+            if (eligible !== null) {
+               console.log(eligible);
+            }
+         }
+      }
+      console.groupEnd();
+   }
+
+   self._send(msg);
+};
