@@ -205,6 +205,28 @@ class Accounts extends BasePackage
         }
     }
 
+    public function checkAccountByNotificationsTunnelId($tunnelId)
+    {
+        $account =
+            $this->getByParams(
+                    [
+                        'conditions'    => '[notifications_tunnel_id] = :tunnelId:',
+                        'bind'          =>
+                            [
+                                'tunnelId'  => $tunnelId
+                            ]
+                    ],
+                    false,
+                    false
+                );
+
+        if ($account) {
+            return $account[0];
+        } else {
+            return false;
+        }
+    }
+
     protected function validateData(array $data)
     {
         $this->validation->add('email', PresenceOf::class, ["message" => "Enter valid username."]);

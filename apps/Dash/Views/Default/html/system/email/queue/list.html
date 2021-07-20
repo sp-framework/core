@@ -8,8 +8,8 @@
         'contentType'           : 'sectionWithListing',
         'cardHeader'            : true,
         'cardType'              : 'primary',
-        'cardIcon'              : 'envelope',
-        'cardTitle'             : 'Email Services',
+        'cardIcon'              : 'inbox',
+        'cardTitle'             : 'Email Queue',
         'cardAdditionalClass'   : 'rounded-0',
         'cardShowTools'         : ['maximize'],
         'dtFixedHeader'         : true,
@@ -27,7 +27,7 @@
                             'title'                   : 'Process Queue',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
-                            'icon'                    : 'cog',
+                            'icon'                    : 'cog fa-spin',
                             'iconHidden'              : true,
                             'position'                : 'right',
                             'url'                     : links.url('system/email/queue/processqueue')
@@ -44,7 +44,7 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No email service available. Add by clicking the Add new email service button.'
+        'dtZeroRecords'         : 'No email in queue.'
     ]
 )}}
 <script>
@@ -61,6 +61,8 @@ $('#{{componentId}}-listing-process-queue').click(function(e) {
 
     var thisButton = this;
     var url = $(this).attr('href');
+    $(this).addClass('disabled');
+    $(this).children('i').attr('hidden', false);
 
     var dataToSend = { };
     dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
@@ -78,6 +80,8 @@ $('#{{componentId}}-listing-process-queue').click(function(e) {
                     title           : response.responseMessage,
                 });
             }
+            $(thisButton).removeClass('disabled');
+            $(thisButton).children('i').attr('hidden', true);
             if (response.tokenKey && response.token) {
                 $('#security-token').attr('name', response.tokenKey);
                 $('#security-token').val(response.token);

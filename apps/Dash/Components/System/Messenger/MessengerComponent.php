@@ -43,6 +43,43 @@ class MessengerComponent extends BaseComponent
         }
     }
 
+    public function getUnreadMessagesCountAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->messengerPackage->getUnreadMessagesCount();
+
+            $this->addResponse(
+                $this->messengerPackage->packagesData->responseMessage,
+                $this->messengerPackage->packagesData->responseCode,
+                $this->messengerPackage->packagesData->responseData
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function markAllMessagesReadAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->messengerPackage->markAllMessagesRead($this->postData());
+
+            $this->addResponse(
+                $this->messengerPackage->packagesData->responseMessage,
+                $this->messengerPackage->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
     public function addAction()
     {
         if ($this->request->isPost()) {
@@ -107,6 +144,25 @@ class MessengerComponent extends BaseComponent
             }
 
             $this->messengerPackage->changeStatus($this->postData());
+
+            $this->addResponse(
+                $this->messengerPackage->packagesData->responseMessage,
+                $this->messengerPackage->packagesData->responseCode
+            );
+
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function changeSettingsAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->messengerPackage->changeSettings($this->postData());
 
             $this->addResponse(
                 $this->messengerPackage->packagesData->responseMessage,

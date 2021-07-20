@@ -161,15 +161,29 @@ abstract class BasePackage extends Controller
 			unset($params['columns']);
 		}
 
-		$pageParams['currentPage'] =
-			isset($this->request->getPost()['page']) ?
-			$this->request->getPost()['page'] :
-			1;
+		if (isset($this->request->getPost()['page'])) {
+			$pageParams['currentPage'] = $this->request->getPost()['page'];
+		} else if (isset($params['page'])) {
+			$pageParams['currentPage'] = $params['page'];
+		} else {
+			$pageParams['currentPage'] = 1;
+		}
 
-		$pageParams['limit'] =
-			isset($this->request->getPost()['limit']) ?
-			$this->request->getPost()['limit'] :
-			20;
+		if (isset($this->request->getPost()['conditions'])) {
+			$pageParams['conditions'] = $this->request->getPost()['conditions'];
+		} else if (isset($params['conditions'])) {
+			$pageParams['conditions'] = $params['conditions'];
+		} else {
+			$pageParams['conditions'] = '';
+		}
+
+		if (isset($this->request->getPost()['limit'])) {
+			$pageParams['limit'] = $this->request->getPost()['limit'];
+		} else if (isset($params['limit'])) {
+			$pageParams['limit'] = $params['limit'];
+		} else {
+			$pageParams['limit'] = 20;
+		}
 
 		if ($pageParams['currentPage'] > 1) {
 			$offset = ['offset' => $pageParams['currentPage'] * $pageParams['limit']];
@@ -187,10 +201,8 @@ abstract class BasePackage extends Controller
 				]
 			);
 
-		if (isset($this->request->getPost()['conditions']) &&
-			$this->request->getPost()['conditions'] !== ''
-		) {
-			$postConditions = explode('&', rtrim($this->request->getPost()['conditions'], '&'));
+		if (isset($pageParams['conditions']) && $pageParams['conditions'] !== '') {
+			$postConditions = explode('&', rtrim($pageParams['conditions'], '&'));
 			$conditions = '';
 			$bind = [];
 

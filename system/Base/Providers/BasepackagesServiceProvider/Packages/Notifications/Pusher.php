@@ -23,7 +23,7 @@ class Pusher extends BasePackage implements WampServerInterface
 
     public function onOpen(ConnectionInterface $conn)
     {
-        var_dump($conn->resourceId);
+        var_dump('Open: '. $conn->resourceId);
         if (!$this->checkAccount($conn)) {
             $conn->close();
         }
@@ -31,7 +31,8 @@ class Pusher extends BasePackage implements WampServerInterface
 
     public function onClose(ConnectionInterface $conn)
     {
-        //
+        var_dump('Close: '.  $conn->resourceId);
+        $this->markMessengerOffline($conn->resourceId);
     }
 
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
@@ -63,14 +64,16 @@ class Pusher extends BasePackage implements WampServerInterface
 
         $topic = $this->subscribedNotifications[$newNotification['type']];
 
-        if (!isset($newNotification['broadcast'])) {
+        if (!isset($newNotification['broadcast']) ||
+            (isset($newNotification['broadcast']) && !$newNotification['broadcast'])
+        ) {
             $excludeUsers = [];
             $eligibleUsers = [];
 
             foreach ($topic->getIterator() as $key => $connection) {
-                if ($connection->resourceId != $newNotification['send_to']) {
+                if ($connection->resourceId != $newNotification['to']) {
                     array_push($excludeUsers, $connection->WAMP->sessionId);
-                } else if ($connection->resourceId == $newNotification['send_to']) {
+                } else if ($connection->resourceId == $newNotification['to']) {
                     array_push($eligibleUsers, $connection->WAMP->sessionId);
                 }
             }
@@ -143,5 +146,20 @@ class Pusher extends BasePackage implements WampServerInterface
         }
 
         return false;
+    }
+
+    protected function markMessengerOffline($resourceId)
+    {
+        $account = $this->basepackages->accounts->checkAccountByNotificationsTunnelId($resourceId);
+
+        if ($account) {
+            $account['notifications_tunnel_id'] = null;
+
+            $this->basepackages->accounts->update($account);
+
+            $messenger = new \Apps\Dash\Packages\System\Messenger\Messenger();
+
+            $messenger->changeStatus(['user' => $account['id'], 'status' => 4]);
+        }
     }
 }

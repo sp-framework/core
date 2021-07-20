@@ -9530,6 +9530,12 @@ var BazTunnels = function() {
             console.log(e);
             dataCollection.env.wsTunnels.messenger.close();
         };
+
+        dataCollection.env.wsTunnels.messenger.onmessage = null;
+        dataCollection.env.wsTunnels.messenger.onmessage = function(e) {
+            //eslint-disable-next-line
+            console.log(e);
+        };
     }
 
     function initWANMPTunnel() {
@@ -9582,7 +9588,7 @@ var BazTunnels = function() {
     return bazTunnelsConstructor;
 }();
 /* exported BazMessenger */
-/* globals PNotify EmojiPicker autoComplete moment */
+/* globals PNotify EmojiPicker autoComplete dayjs Swal */
 /*
 * @title                    : BazMessenger
 * @description              : Baz Messenger Lib
@@ -9607,8 +9613,11 @@ var BazMessenger = function() {
     // }
 
     //Init
-    function init() {
+    function init(initialConnection = true) {
         initialized = true;
+
+        dayjs.extend(window.dayjs_plugin_advancedFormat);
+
         dataCollection = window.dataCollection;
         dataCollection.env.messenger = { };
 
@@ -9697,7 +9706,10 @@ var BazMessenger = function() {
                     $('#messenger-main-search').attr('value', feedback.selection.value.email);
                 }
             });
-        serviceOnline();
+
+        if (initialConnection) {
+            serviceOnline();
+        }
     }
 
     function serviceOnline() {
@@ -9705,7 +9717,7 @@ var BazMessenger = function() {
         console.log('serviceOnline');
 
         if (!initialized) {
-            init();
+            init(false);
         }
 
         $("#messenger-online").attr('hidden', false);
@@ -9713,16 +9725,35 @@ var BazMessenger = function() {
         $('#messenger-offline-icon').attr('hidden', true);
         $('#messenger-button-icon').removeClass('text-success text-warning text-danger text-secondary').addClass('text-' + messengerButonIconColor);
         initListeners();
+        getUnreadMessagesCount();
+    }
+
+    function serviceOffline() {
+        if (!initialized) {
+            init(false);
+        }
     }
 
     function initListeners() {
         $('#messenger-main-status').off();
         $('#messenger-main-status').change(function() {
+            //eslint-disable-next-line
+            console.log($(this).data('status'));
+            var oldStatus = $(this).data('status')
+
             var status = $('#messenger-main-status option:selected').val();
 
             if (status == 0) {
                 return;
             }
+            if (status != 4) {
+                $('#messenger-main').attr('hidden', false);
+
+            } else {
+                $('#messenger-main').attr('hidden', true);
+                $('#messenger-windows').remove();
+            }
+
             var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/changestatus';
 
             var postData = { };
@@ -9748,6 +9779,9 @@ var BazMessenger = function() {
 
                     $('#messenger-button-icon').removeClass('text-success text-warning text-danger text-secondary').addClass('text-' + statusTextColor);
                     messengerButonIconColor = statusTextColor;
+                    if (oldStatus == '4') {
+                        getUnreadMessagesCount();
+                    }
                 } else {
                     PNotify.error({
                         text        : response.responseMessage,
@@ -9755,6 +9789,7 @@ var BazMessenger = function() {
                     });
                 }
             }, 'json');
+            $(this).data('status', status);
         });
 
         $('#messenger-users li').each(function(index, li) {
@@ -9762,6 +9797,29 @@ var BazMessenger = function() {
             $(li).click(function(e) {
                 e.preventDefault();
                 messengerWindow($(this).data());
+
+                $('.messenger-counter-' + $(this).data('user')).html('');
+
+                var totalCounter = 0;
+                $('#messenger-users span.badge').each(function() {
+                    if ($(this).html() !== '') {
+                        totalCounter = totalCounter + parseInt($(this).html());
+                    }
+                });
+                //eslint-disable-next-line
+                console.log(totalCounter);
+                if (totalCounter === 0) {
+                    $('#messenger-button-counter').html('');
+                } else if (totalCounter < 10) {
+                    $('#messenger-button-counter').css({'right': '10px'});
+                    $('#messenger-button-counter').html(totalCounter);
+                } else if (totalCounter < 99) {
+                    $('#messenger-button-counter').css({'right': '5px'});
+                    $('#messenger-button-counter').html(totalCounter);
+                } else if (totalCounter > 99) {
+                    $('#messenger-button-counter').css({'right': 0});
+                    $('#messenger-button-counter').html('99+');
+                }
 
                 $('#messenger-button').ControlSidebar('toggle');
             });
@@ -9776,6 +9834,64 @@ var BazMessenger = function() {
         });
         $('#messenger-main-search').focusout(function() {
             $('#messenger-main-search_list').children().remove();
+        });
+
+        $('#messenger-main-mute').off();
+        $('#messenger-main-mute').click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/changesettings';
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend['changestate'] = 1;
+
+            $.post(url, dataToSend, function(response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+
+                if (response.responseCode == 0) {
+                    $(thisButton).attr('hidden', true);
+                    $('#messenger-main-unmute').attr('hidden', false);
+                    $('#messenger-button').children('i').removeClass('fa-comment').addClass('fa-comment-slash');
+                } else {
+                    PNotify.error({
+                        title           : response.responseMessage,
+                    });
+                }
+            }, 'json');
+        });
+
+        $('#messenger-main-unmute').off();
+        $('#messenger-main-unmute').click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/changesettings';
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend['changestate'] = 0;
+
+            $.post(url, dataToSend, function(response) {
+                if (response.tokenKey && response.token) {
+                    $('#security-token').attr('name', response.tokenKey);
+                    $('#security-token').val(response.token);
+                }
+
+                if (response.responseCode == 0) {
+                    $(thisButton).attr('hidden', true);
+                    $('#messenger-main-mute').attr('hidden', false);
+                    $('#messenger-button').children('i').removeClass('fa-comment-slash').addClass('fa-comment');
+                } else {
+                    PNotify.error({
+                        title           : response.responseMessage,
+                    });
+                }
+            }, 'json');
         });
     }
 
@@ -9814,14 +9930,14 @@ var BazMessenger = function() {
         $('#messenger-windows').append(
             '<div id="messenger-window-' + user.user + '" class="messenger-window" style="position: fixed;right: ' + fromLeft + 'px;bottom: ' + fromBottom + 'px;">' +
                 '<div id="messenger-card-' + user.user + '" data-user="' + user.user + '" class="card card-' + cardHeader + ' rounded-0 direct-chat direct-chat-info">' +
-                    '<div class="card-header rounded-0" style="min-width: 270px;">' +
+                    '<div class="card-header rounded-0" style="min-width: 473px;">' +
                         '<h3 class="card-title text-truncate">' + user.name + '</h3>' +
                         '<div class="card-tools">' +
                             '<span class="badge badge-light mr-2 messenger-counter-' + user.user + '"></span>' +
                             '<button type="button" class="btn btn-tool" data-card-widget="collapse" data-animationspeed="0">' +
                                 '<i class="fas fa-fw fa-minus"></i>' +
                             '</button>' +
-                            '<button type="button" class="btn btn-tool" data-card-widget="remove">' +
+                            '<button type="button" class="btn btn-tool" data-card-widget="remove" data-animationspeed="0">' +
                                 '<i class="fas fa-fw fa-times"></i>'+
                             '</button>' +
                         '</div>' +
@@ -9833,6 +9949,11 @@ var BazMessenger = function() {
                             '        <div class="fa-2x">' +
                             '            <i class="fa fa-cog fa-spin"></i> Loading Messages...' +
                             '        </div>' +
+                            '    </div>' +
+                            '</div>' +
+                            '<div class="row text-center text-info" id="messenger-no-messages-' + user.user + '" hidden>' +
+                            '    <div class="col">' +
+                            '       <i class="fas fa-fw fa-exclamation-circle"></i> No Messages. Send your first message...' +
                             '    </div>' +
                             '</div>' +
                         '</div>' +
@@ -9853,18 +9974,46 @@ var BazMessenger = function() {
 
         window.dataCollection.env.messenger.emojiPicker.discover();
 
-        $("#messenger-card-" + user.user).on('collapsed.lte.cardwidget', function(e) {
-            expandCollapse(e, false);
+        // $("#messenger-card-" + user.user).on('collapsed.lte.cardwidget', function(e) {
+            // expandCollapse(e, false);
+        // });
+
+       // $("#messenger-card-" + user.user).on('expanded.lte.cardwidget', function(e) {
+            // expandCollapse(e, true);
+        // });
+
+        // function expandCollapse(e, expand) {
+        //     var numberOfWindows = $('.messenger-window').length;
+
+        //     if (numberOfWindows > 1) {
+        //         var windowObj = { };
+        //         $('.messenger-window').each(function(index, windowId) {
+        //             windowObj[windowId.id] = index + 1;
+        //         });
+        //         var windowPosition = windowObj[$(e.currentTarget).parent()[0].id];
+
+        //         for (var leftWindow in windowObj) {
+        //             if (windowObj[leftWindow] > windowPosition) {
+        //                 var rightVal = parseInt($('#' + leftWindow).css('right'));
+        //                 if (expand) {
+        //                     $('#' + leftWindow).css('right', rightVal + 202);
+        //                 } else {
+        //                     $('#' + leftWindow).css('right', rightVal - 202);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
+        $("#messenger-card-" + user.user).on('removed.lte.cardwidget', function(e) {
+            removeCard(e);
         });
 
-       $("#messenger-card-" + user.user).on('expanded.lte.cardwidget', function(e) {
-            expandCollapse(e, true);
-        });
-
-        function expandCollapse(e, expand) {
+        function removeCard(e) {
             var numberOfWindows = $('.messenger-window').length;
 
             if (numberOfWindows > 1) {
+                // var collapsedCards = $('.messenger-window .collapsed-card').length;
                 var windowObj = { };
                 $('.messenger-window').each(function(index, windowId) {
                     windowObj[windowId.id] = index + 1;
@@ -9874,25 +10023,27 @@ var BazMessenger = function() {
                 for (var leftWindow in windowObj) {
                     if (windowObj[leftWindow] > windowPosition) {
                         var rightVal = parseInt($('#' + leftWindow).css('right'));
-                        if (expand) {
-                            $('#' + leftWindow).css('right', rightVal + 202);
-                        } else {
-                            $('#' + leftWindow).css('right', rightVal - 202);
-                        }
+                        //eslint-disable-next-line
+                        console.log(rightVal);
+                        // if (collapsedCards > 0) {
+                        //     if ($('#' + leftWindow + ' .card-collapsed')) {
+                        //         $('#' + leftWindow).css('right', rightVal - 275);
+                        //     } else {
+                        //         var newValue = collapsedCards * 275;
+                        //         $('#' + leftWindow).css('right', rightVal - newValue);
+                        //     }
+                        // } else {
+                            $('#' + leftWindow).css('right', rightVal - 478);
+                        // }
                     }
                 }
-            }
-        }
-
-        $("#messenger-card-" + user.user).on('removed.lte.cardwidget', function(e) {
-            var currentMessengerWindows = $('.main-footer .messenger-window').length;
-
-            if (currentMessengerWindows === 1) {
+                $(e.currentTarget).parent().remove();
+            } else if (numberOfWindows === 1) {
                 $(e.currentTarget).parents('#messenger-windows').remove();
             } else {
                 $(e.currentTarget).parent().remove();
             }
-        });
+        }
 
         $('.messenger-input-' + user.user).keypress(function(e) {
             if (e.keyCode === 13 && !e.shiftKey) {
@@ -9920,26 +10071,147 @@ var BazMessenger = function() {
             }
         });
 
-                            // '<div class="direct-chat-msg">'
-                            //     '<div class="direct-chat-infos clearfix">' +
-                            //         <span class="direct-chat-name float-left">Alexander Pierce</span>
-                            //         <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
-                            //     </div>
-                            //     <img class="direct-chat-img" src="{{users['portrait']}}" alt="message user image">
-                            //     <div class="direct-chat-text">
-                            //         Is this template really for free? That's unbelievable!
-                            //     </div>
-                            // </div>
-                            // <div class="direct-chat-msg right">
-                            //     <div class="direct-chat-infos clearfix">
-                            //         <span class="direct-chat-name float-right">Sarah Bullock</span>
-                            //         <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
-                            //     </div>
-                            //     <img class="direct-chat-img" src="{{users['portrait']}}" alt="message user image">
-                            //     <div class="direct-chat-text">
-                            //         You better believe it!
-                            //     </div>
-                            // </div>
+        //Get Messages from Server for user.user
+        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/getmessages';
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['user'] = user.user;
+
+        $.post(url, postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+            if (response.responseCode == 0) {
+                $('#messenger-loader-' + user.user).attr('hidden', true);
+
+                populateMessages(user, response.responseData.messages, response.responseData.paginationCounters);
+
+                markAllMessagesRead(user);
+            } else {
+                PNotify.error({
+                    text        : response.responseMessage,
+                    textTrusted : true
+                });
+            }
+        }, 'json');
+    }
+
+    function populateMessages(toUser, messages, paginationCounters, update = false) {
+        if (messages.length === 0) {
+            $('#messenger-no-messages-' + toUser.user).attr('hidden', false);
+            return;
+        }
+        //eslint-disable-next-line
+        // console.log(toUser, messages, paginationCounters, update);
+
+        var messagesHtml = '';
+
+        if (paginationCounters) {
+            $('#direct-chat-messages-' + toUser.user).data('current', paginationCounters.current);
+            $('#direct-chat-messages-' + toUser.user).data('filtered_items', paginationCounters.filtered_items);
+            $('#direct-chat-messages-' + toUser.user).data('first', paginationCounters.first);
+            $('#direct-chat-messages-' + toUser.user).data('last', paginationCounters.last);
+            $('#direct-chat-messages-' + toUser.user).data('limit', paginationCounters.limit);
+            $('#direct-chat-messages-' + toUser.user).data('next', paginationCounters.next);
+            $('#direct-chat-messages-' + toUser.user).data('previous', paginationCounters.previous);
+            $('#direct-chat-messages-' + toUser.user).data('total_items', paginationCounters.total_items);
+
+            if (paginationCounters.current < paginationCounters.last) {
+                messagesHtml +=
+                    '<div class="row pb-2">' +
+                    '   <div class="col text-center">' +
+                    '       <button class="btn btn-xs btn-primary" id="messenger-messages-load-more-' + toUser.user + '" ' +
+                    '           data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="">' +
+                    '           <i class="fas fa-fw fa-download"></i> Load More...' +
+                    '       </button>' +
+                    '   </div>' +
+                    '</div>';
+            }
+        }
+
+        $(messages).each(function(index, message) {
+            if (message.to_account_id == toUser.user) {
+                messagesHtml +=
+                    '<div id="messenger-message-' + message.id + '" data-messageid="' + message.id + '" class="direct-chat-msg right">' +
+                    '    <div class="direct-chat-infos clearfix">' +
+                    '        <span class="direct-chat-name float-right"></span>' +
+                    '        <span class="direct-chat-timestamp float-left">' +
+                    '           <span>' + dayjs(message.updated_at, 'YYYY-MM-DD HH:mm:ss').format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
+                    '           <a href="#" class="messenger-message-tools messenger-message-edit" hidden>' +
+                    '               <i class="fas fa-fw fa-edit text-warning"></i>' +
+                    '           </a>' +
+                    '           <a href="#" class="messenger-message-tools messenger-message-edit-cancel" hidden>' +
+                    '               <i class="fas fa-fw fa-times-circle text-danger"></i>' +
+                    '           </a>' +
+                    '           <a href="#" class="messenger-message-tools messenger-message-remove" hidden>' +
+                    '               <i class="fas fa-fw fa-trash text-danger"></i>' +
+                    '           </a>' +
+                    '        </span>' +
+                    '    </div>' +
+                    '    <img class="direct-chat-img" src="' + window.dataCollection.env.profile.portrait + '" alt="message user image">' +
+                    '    <div class="direct-chat-text">' + message.message + '</div>' +
+                    '</div>';
+            } else {
+                messagesHtml +=
+                    '<div id="messenger-message-' + message.id + '" data-messageid="' + message.id + '" class="direct-chat-msg">' +
+                    '    <div class="direct-chat-infos clearfix">' +
+                    '        <span class="direct-chat-name float-left">' + toUser.name + '</span>' +
+                    '        <span class="direct-chat-timestamp float-right">' +
+                    '           <span>' + dayjs(message.updated_at, 'YYYY-MM-DD HH:mm:ss').format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
+                    '        </span>' +
+                    '    </div>' +
+                    '    <img class="direct-chat-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + toUser.portrait +
+                    '/w/80" alt="message user image">' +
+                    '    <div class="direct-chat-text">' + message.message + '</div>' +
+                    '</div>';
+            }
+        });
+
+        if (update) {
+            $('#direct-chat-messages-' + toUser.user).prepend(messagesHtml);
+        } else {
+            $('#direct-chat-messages-' + toUser.user).append(messagesHtml);
+            $('#direct-chat-messages-' + toUser.user).scrollTop($('#direct-chat-messages-' + toUser.user).get(0).scrollHeight);
+        }
+        $(messages).each(function(index, message) {
+            if (message.removed != 1) {
+                initMessagesListeners(message.id, toUser);
+                messageHover(message.id, toUser);
+            }
+        });
+
+        if ($('#messenger-messages-load-more-' + toUser.user).length > 0) {
+            $('#messenger-messages-load-more-' + toUser.user).off();
+            $('#messenger-messages-load-more-' + toUser.user).click(function(e) {
+                e.preventDefault();
+
+                var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/getmessages';
+
+                var postData = { };
+                postData[$('#security-token').attr('name')] = $('#security-token').val();
+                postData['user'] = toUser.user;
+                postData['page'] = paginationCounters.current + 1;
+
+                $.post(url, postData, function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                    if (response.responseCode == 0) {
+                        $('#messenger-loader-' + toUser.user).attr('hidden', true);
+                        $('#messenger-messages-load-more-' + toUser.user).closest('div.row').remove();
+                        populateMessages(toUser, response.responseData.messages, response.responseData.paginationCounters, true);
+                    } else {
+                        PNotify.error({
+                            text        : response.responseMessage,
+                            textTrusted : true
+                        });
+                    }
+                }, 'json');
+            });
+        }
     }
 
     function sendMessage(user, message) {
@@ -9973,7 +10245,7 @@ var BazMessenger = function() {
                         '    <div class="direct-chat-infos clearfix">' +
                         '        <span class="direct-chat-name float-right"></span>' +
                         '        <span class="direct-chat-timestamp float-left">' +
-                        '           <span>' + moment().format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
+                        '           <span>' + dayjs().format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
                         '           <a href="#" class="messenger-message-tools messenger-message-edit" hidden>' +
                         '               <i class="fas fa-fw fa-edit text-warning"></i>' +
                         '           </a>' +
@@ -9990,69 +10262,10 @@ var BazMessenger = function() {
                         '</div>'
                     );
 
+                    initMessagesListeners(response.responseData.id, user);
                     messageHover(response.responseData.id);
-
-                    $('#messenger-message-' + response.responseData.id + ' .messenger-message-edit').click(function(e) {
-                        e.preventDefault();
-
-                        $('#messenger-message-' + response.responseData.id).off();
-
-                        $('div.messenger-input-' + user.user)
-                            .html($(this).parents('.direct-chat-infos').siblings('.direct-chat-text').html());
-
-                        $(this).attr('hidden', true);
-                        $('#messenger-message-' + response.responseData.id + ' .messenger-message-edit-cancel').attr('hidden', false);
-                        $('#messenger-message-' + response.responseData.id + ' .messenger-message-edit-cancel').off();
-                        $('#messenger-message-' + response.responseData.id + ' .messenger-message-edit-cancel').click(function(e) {
-                            e.preventDefault();
-
-                            $(this).attr('hidden', true);
-                            $('#messenger-message-' + response.responseData.id + ' .messenger-message-edit').attr('hidden', false);
-                            messageHover(response.responseData.id);
-
-                            $('div.messenger-input-' + user.user).empty();
-
-                            $('.messenger-send-' + user.user).removeClass('btn-warning').addClass('btn-primary');
-                            $('.messenger-send-' + user.user).data('action', 'add');
-                            $('.messenger-send-' + user.user).data('msgid', '');
-                        });
-
-                        $('.messenger-send-' + user.user).removeClass('btn-primary').addClass('btn-warning');
-                        $('.messenger-send-' + user.user).data('action', 'update');
-                        $('.messenger-send-' + user.user).data('msgid', response.responseData.id);
-                    });
-
-                    $('#messenger-message-' + response.responseData.id + ' .messenger-message-remove').click(function(e) {
-                        e.preventDefault();
-
-                        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/remove';
-
-                        var postData = { };
-                        postData[$('#security-token').attr('name')] = $('#security-token').val();
-                        postData['id'] = response.responseData.id;
-
-                        $.post(url, postData, function(response) {
-                            if (response.tokenKey && response.token) {
-                                $('#security-token').attr('name', response.tokenKey);
-                                $('#security-token').val(response.token);
-                            }
-                            if (response.responseCode == 0) {
-                                $('#messenger-message-' + postData['id'] + ' .direct-chat-timestamp span').html(moment().format('MMMM Do YYYY, h:mm:ss a'));
-                                $('#messenger-message-' + postData['id'] + ' .direct-chat-text').html('Message Removed');
-                                $('#messenger-message-' + postData['id'] + ' .messenger-message-edit-cancel').attr('hidden', true);
-                                $('#messenger-message-' + postData['id'] + ' .messenger-message-edit').attr('hidden', true);
-                                $('#messenger-message-' + postData['id'] + ' .messenger-message-remove').attr('hidden', true);
-                                $('#messenger-message-' + postData['id']).off();
-                            } else {
-                                PNotify.error({
-                                    text        : response.responseMessage,
-                                    textTrusted : true
-                                });
-                            }
-                        }, 'json');
-                    });
                 } else if (action === 'update') {
-                    $('#messenger-message-' + response.responseData.id + ' .direct-chat-timestamp span').html(moment().format('MMMM Do YYYY, h:mm:ss a') + ' (Edited)');
+                    $('#messenger-message-' + response.responseData.id + ' .direct-chat-timestamp span').html(dayjs().format('MMMM Do YYYY, h:mm:ss a') + ' (Edited)');
                     $('#messenger-message-' + response.responseData.id + ' .direct-chat-text').html(message);
                     $('#messenger-message-' + response.responseData.id + ' .messenger-message-edit-cancel').attr('hidden', true);
                     $('#messenger-message-' + response.responseData.id + ' .messenger-message-edit').attr('hidden', true);
@@ -10063,6 +10276,8 @@ var BazMessenger = function() {
                     $('.messenger-send-' + user.user).data('action', 'add');
                     $('.messenger-send-' + user.user).data('msgid', '');
                 }
+                $('#messenger-no-messages-' + user.user).attr('hidden', true);
+                $('#direct-chat-messages-' + user.user).scrollTop($('#direct-chat-messages-' + user.user).get(0).scrollHeight);
             } else {
                 PNotify.error({
                     text        : response.responseMessage,
@@ -10070,6 +10285,90 @@ var BazMessenger = function() {
                 });
             }
         }, 'json');
+    }
+
+    function initMessagesListeners(id, user) {
+        $('#messenger-message-' + id + ' .messenger-message-edit').off();
+        $('#messenger-message-' + id + ' .messenger-message-edit').click(function(e) {
+            e.preventDefault();
+
+            $('div.messenger-input-' + user.user)
+                .html($(this).parents('.direct-chat-infos').siblings('.direct-chat-text').html());
+
+            $(this).attr('hidden', true);
+            $('#messenger-message-' + id + ' .messenger-message-edit-cancel').attr('hidden', false);
+            $('#messenger-message-' + id + ' .messenger-message-edit-cancel').off();
+            $('#messenger-message-' + id + ' .messenger-message-edit-cancel').click(function(e) {
+                e.preventDefault();
+
+                $(this).attr('hidden', true);
+                $('#messenger-message-' + id + ' .messenger-message-edit').attr('hidden', false);
+                messageHover(id);
+
+                $('div.messenger-input-' + user.user).empty();
+
+                $('.messenger-send-' + user.user).removeClass('btn-warning').addClass('btn-primary');
+                $('.messenger-send-' + user.user).data('action', 'add');
+                $('.messenger-send-' + user.user).data('msgid', '');
+            });
+
+            $('.messenger-send-' + user.user).removeClass('btn-primary').addClass('btn-warning');
+            $('.messenger-send-' + user.user).data('action', 'update');
+            $('.messenger-send-' + user.user).data('msgid', id);
+        });
+
+        $('#messenger-message-' + id + ' .messenger-message-remove').off();
+        $('#messenger-message-' + id + ' .messenger-message-remove').click(function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title                       : '<span class="text-danger"> Delete selected message?</span>',
+                icon                        : 'question',
+                background                  : 'rgba(0,0,0,.8)',
+                backdrop                    : 'rgba(0,0,0,.6)',
+                buttonsStyling              : false,
+                confirmButtonText           : 'Delete',
+                customClass                 : {
+                    'confirmButton'             : 'btn btn-danger text-uppercase',
+                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                },
+                showCancelButton            : true,
+                keydownListenerCapture      : true,
+                allowOutsideClick           : false,
+                allowEscapeKey              : false,
+                didOpen                      : function() {
+                    window.dataCollection.env.sounds.swalSound.play();
+                }
+            }).then((result) => {
+                if (result.value) {
+                    var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/remove';
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = id;
+
+                    $.post(url, postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+                        if (response.responseCode == 0) {
+                            $('#messenger-message-' + postData['id'] + ' .direct-chat-timestamp span').html(dayjs().format('MMMM Do YYYY, h:mm:ss a'));
+                            $('#messenger-message-' + postData['id'] + ' .direct-chat-text').html('Message Removed');
+                            $('#messenger-message-' + postData['id'] + ' .messenger-message-edit-cancel').attr('hidden', true);
+                            $('#messenger-message-' + postData['id'] + ' .messenger-message-edit').attr('hidden', true);
+                            $('#messenger-message-' + postData['id'] + ' .messenger-message-remove').attr('hidden', true);
+                            $('#messenger-message-' + postData['id']).off();
+                        } else {
+                            PNotify.error({
+                                text        : response.responseMessage,
+                                textTrusted : true
+                            });
+                        }
+                    }, 'json');
+                }
+            });
+        });
     }
 
     function messageHover(id) {
@@ -10085,23 +10384,13 @@ var BazMessenger = function() {
         );
     }
 
-    function serviceOffline() {
-        if (!initialized) {
-            init();
-        }
-
-        //eslint-disable-next-line
-        console.log('serviceOffline');
-        $("#messenger-online").attr('hidden', true);
-        $("#messenger-offline").attr('hidden', false);
-        $('#messenger-offline-icon').attr('hidden', false);
-        $('#messenger-button-icon').removeClass('text-success text-warning text-danger text-secondary').addClass('text-secondary');
-    }
-
     function onMessage(message) {
         if (message.responseCode === 0) {
             if (message.responseData.type === 'statusChange') {
                 userStatusChange(message.responseData.data);
+            }
+            if (message.responseData.type === 'newMessage') {
+                userNewMessage(message.responseData.data);
             }
         }
     }
@@ -10116,7 +10405,7 @@ var BazMessenger = function() {
                 if (data.status != 4) {
                     if (data.status == 1) {
                         color = 'success';
-                        text = 'Available';
+                        text = 'Active';
                     } else if (data.status == 2) {
                         color = 'warning';
                         text = 'Away';
@@ -10151,15 +10440,206 @@ var BazMessenger = function() {
             $('#direct-chat-messages-' + data.id).append(
                 '<div class="direct-chat-infos clearfix">' +
                 '   <span class="direct-chat-name float-right">' + text + '</span>' +
-                '   <span class="direct-chat-timestamp float-left">' + moment().format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
+                '   <span class="direct-chat-timestamp float-left">' + dayjs().format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
                 '</div>'
             );
+            $('#direct-chat-messages-' + data.id).scrollTop($('#direct-chat-messages-' + data.id).get(0).scrollHeight);
         }
     }
 
-    //Init
-    function getNotificationsCount() {
-        // dataCollection = window.dataCollection;
+    function userNewMessage(data) {
+        if ($('#direct-chat-messages-' + data.user.id).length > 0) {
+            $('#messenger-loader-' + data.user.id).attr('hidden', true);
+            $('#direct-chat-messages-' + data.user.id).append(
+                '<div id="messenger-message-' + data.message.id + '" data-messageid="' + data.message.id + '" class="direct-chat-msg">' +
+                '    <div class="direct-chat-infos clearfix">' +
+                '        <span class="direct-chat-name float-left">' + $('#messenger-user-' + data.user.id).data('name') + '</span>' +
+                '        <span class="direct-chat-timestamp float-right">' +
+                '           <span>' + dayjs().format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
+                '        </span>' +
+                '    </div>' +
+                '    <img class="direct-chat-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' +
+                        $('#messenger-user-' + data.user.id).data('portrait') + '/w/80" alt="message user image">' +
+                '    <div class="direct-chat-text">' + data.message.message + '</div>' +
+                '</div>'
+            );
+            $('#direct-chat-messages-' + data.user.id).scrollTop($('#direct-chat-messages-' + data.user.id).get(0).scrollHeight);
+        } else {
+            var currentCount;
+
+            currentCount = $('#messenger-button-counter').html();
+
+            if (currentCount === '99+') {
+                //shake bell
+                return;
+            }
+            if (currentCount === '') {
+                currentCount = 0;
+            } else {
+                currentCount = parseInt(currentCount);
+            }
+            currentCount = currentCount + 1;
+
+            if (currentCount < 10) {
+                $('#messenger-button-counter').css({'right': '10px'});
+                $('#messenger-button-counter').html(currentCount);
+                shakeBell();
+            } else if (currentCount < 99) {
+                $('#messenger-button-counter').css({'right': '5px'});
+                $('#messenger-button-counter').html(currentCount);
+                shakeBell();
+            } else if (currentCount > 99) {
+                $('#messenger-button-counter').css({'right': 0});
+                $('#messenger-button-counter').html('99+');
+                shakeBell();
+            }
+
+            if ($('#messenger-user-' + data.user.id).length === 0) {
+                var color;
+                if (data.user.status != 4) {
+                    if (data.user.status == 1) {
+                        color = 'success';
+                    } else if (data.user.status == 2) {
+                        color = 'warning';
+                    } else if (data.user.status == 3) {
+                        color = 'danger';
+                    }
+                } else if (data.user.status == 4) {
+                    color = 'secondary';
+                }
+
+                var newUser =
+                    '<li class="nav-item" id="messenger-user-' + data.user.id + '" data-status="' + data.user.status + '" data-type="user" data-user="' +
+                        data.user.id + '" data-name="' + data.user.name + '" data-portrait="' + data.user.portrait + '">' +
+                        '<a id="messenger-user-' + data.user.id + '-link" class="nav-link" href="#">' +
+                            '<img id="messenger-user-' + data.user.id + '-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + data.user.portrait +
+                            '/w/80" class="rounded-sm" style="position:relative;top: -3px; width:20px;" alt="User Image">' +
+                            '<i id="messenger-user-' + data.user.id + '-icon" class="fa fa-fw fa-circle text-' + color + '" style="font-size: 8px;position: absolute;top: 8px;left: 27px;"></i>' +
+                            '<div id="messenger-user-' + data.user.id + '-name" class="text-uppercase ml-2 text-truncate" style="position:relative; top: 3px;display: inline-block;width: 150px;">' + data.user.name + '</div>' +
+                            '<span class="badge badge-info messenger-counter-' + data.user.id + '" style="position: relative;top: -4px;"></span>' +
+                        '</a>' +
+                    '</li>';
+                if (data.user.status == 4) {
+                    $('#messenger-offline-users').append(newUser);
+                } else {
+                    $('#messenger-online-users').append(newUser);
+                }
+                initListeners();
+            }
+
+            var userCounter;
+
+            userCounter = $('.messenger-counter-' + data.user.id).html();
+
+            if (userCounter === '99+') {
+                //shake bell
+                return;
+            }
+            if (userCounter === '') {
+                userCounter = 0;
+            } else {
+                userCounter = parseInt(userCounter);
+            }
+
+            userCounter = userCounter + 1;
+
+            if (userCounter < 99) {
+                $('.messenger-counter-' + data.user.id).html(userCounter);
+                shakeBell();
+            } else if (userCounter > 99) {
+                $('.messenger-counter-' + data.user.id).html('99+');
+                shakeBell();
+            }
+            //update counters
+            //Ring Bell
+            //Shake
+        }
+    }
+
+    function shakeBell() {
+        if ($('#messenger-button-icon').is('.fa-comment')) {
+            window.dataCollection.env.sounds.messengerSound.play();
+        }
+
+        $('#messenger-button').addClass('animated tada');
+
+        setTimeout(function() {
+            $('#messenger-button').removeClass('animated tada');
+        }, 10000);
+    }
+
+    //Get Unread Messages Count
+    function getUnreadMessagesCount() {
+        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/getUnreadMessagesCount';
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post(url, postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+            if (response.responseCode == 0) {
+                if (response.responseData.total) {
+                    if (response.responseData.total < 10) {
+                        $('#messenger-button-counter').css({'right': '10px'});
+                        $('#messenger-button-counter').html(response.responseData.total);
+                        shakeBell();
+                    } else if (response.responseData.total < 99) {
+                        $('#messenger-button-counter').css({'right': '5px'});
+                        $('#messenger-button-counter').html(response.responseData.total);
+                        shakeBell();
+                    } else if (response.responseData.total > 99) {
+                        $('#messenger-button-counter').css({'right': 0});
+                        $('#messenger-button-counter').html('99+');
+                        shakeBell();
+                    }
+                }
+
+                if (response.responseData.unread_count) {
+                    for (var user in response.responseData.unread_count) {
+                        if (response.responseData.unread_count[user].count > 0) {
+                            if (response.responseData.unread_count[user].count < 99) {
+                                $('.messenger-counter-' + response.responseData.unread_count[user].id).html(response.responseData.unread_count[user].count);
+                                shakeBell();
+                            } else if (response.responseData.unread_count[user].count > 99) {
+                                $('.messenger-counter-' + response.responseData.unread_count[user].id).html('99+');
+                                shakeBell();
+                            }
+                        }
+                    }
+                }
+            } else {
+                PNotify.error({
+                    text        : response.responseMessage,
+                    textTrusted : true
+                });
+            }
+        }, 'json');
+    }
+
+    function markAllMessagesRead(user) {
+        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/markAllMessagesRead';
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['user'] = user.user;
+
+        $.post(url, postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+            if (response.responseCode == 0) {
+                //
+            } else {
+                PNotify.error({
+                    text        : response.responseMessage,
+                    textTrusted : true
+                });
+            }
+        }, 'json');
     }
 
     function bazMessengerConstructor() {
@@ -10182,8 +10662,8 @@ var BazMessenger = function() {
         BazMessenger.onMessage = function(options) {
             onMessage(_extends(BazMessenger.defaults, options));
         }
-        BazMessenger.getNotificationsCount = function(options) {
-            getNotificationsCount(_extends(BazMessenger.defaults, options));
+        BazMessenger.getUnreadMessagesCount = function(options) {
+            getUnreadMessagesCount(_extends(BazMessenger.defaults, options));
         }
     }
 

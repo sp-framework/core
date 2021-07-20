@@ -163,6 +163,12 @@ var BazTunnels = function() {
             console.log(e);
             dataCollection.env.wsTunnels.messenger.close();
         };
+
+        dataCollection.env.wsTunnels.messenger.onmessage = null;
+        dataCollection.env.wsTunnels.messenger.onmessage = function(e) {
+            //eslint-disable-next-line
+            console.log(e);
+        };
     }
 
     function initWANMPTunnel() {

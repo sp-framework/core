@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -50,6 +50,7 @@ if (!window.dataCollection) {
     dataCollection.env.sounds.pnotifySound = new Audio(dataCollection.env.soundPath + 'pnotify.mp3');
     dataCollection.env.sounds.swalSound = new Audio(dataCollection.env.soundPath + 'swal.mp3');
     dataCollection.env.sounds.notificationSound = new Audio(dataCollection.env.soundPath + 'notification.mp3');
+    dataCollection.env.sounds.messengerSound = new Audio(dataCollection.env.soundPath + 'messenger.mp3');
 
     dataCollection.env.notifications = { };
     dataCollection.env.account = { };
@@ -71,3 +72,4 @@ if (!window.dataCollection) {
         {{content()}}
     </body>
 </html>
+<!-- htmlmin:ignore -->

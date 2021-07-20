@@ -20,11 +20,15 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
     protected $clients;
 
+    protected $socket;
+
     protected $account;
 
     public function onConstruct()
     {
         $this->clients = new \SplObjectStorage;
+
+        $this->initSocket();
 
         parent::onConstruct();
     }
@@ -43,6 +47,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
         echo "New connection! ({$conn->resourceId})\n";
     }
 
+    //Off The Record Messages
     public function onMessage(ConnectionInterface $from, $msg)
     {
         $message = Json::decode($msg, true);
@@ -129,7 +134,13 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
     public function changeStatus(array $data)
     {
-        $profile = $this->basepackages->profile->getProfile($this->auth->account()['id']);
+        if (isset($data['user'])) {
+            $account = $this->basepackages->accounts->getById($data['user']);
+        } else {
+            $account = $this->auth->account();
+        }
+
+        $profile = $this->basepackages->profile->getProfile($account['id']);
 
         if ($profile) {
             if (isset($profile['settings']['messenger'])) {
@@ -143,42 +154,134 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
             $this->basepackages->profile->update($profile);
 
-            $this->pushNotification(['id' => $this->auth->account()['id'], 'status' => $data['status']]);
+            $this->pushNotification(
+                'messengerNotifications',
+                $account['notifications_tunnel_id'],
+                null,
+                true,
+                [
+                    'responseCode'      => 0,
+                    'responseData'      =>
+                        [
+                            "type"  => 'statusChange',
+                            "data"  =>
+                                [
+                                    'id'        => $account['id'],
+                                    'status'    => $data['status']
+                                ]
+                        ]
+                ]
+            );
 
             $this->addResponse('Ok');
+
+            return;
         }
 
         $this->addResponse('Could not modify status', 1);
     }
 
-    protected function pushNotification($notification)
+    protected function initSocket()
     {
         $context = new ZMQContext();
 
-        $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'New Notification');
-        $socket->connect("tcp://localhost:5555");
+        $this->socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'New Notification');
+        $this->socket->connect("tcp://localhost:5555");
+    }
 
-        $data =
+    protected function pushNotification($type, $from, $to, bool $broadcast = null, array $data)
+    {
+        $message =
             [
-                'type'              => 'messengerNotifications',
-                'broadcast'         => true,
-                'from'              => $this->auth->account()['notifications_tunnel_id'],
-                'response'          => [
-                    'responseCode'      => 0,
-                    'responseData'      =>
-                        [
-                            "type"  => 'statusChange',
-                            "data"  => $notification
-                        ]
-                ]
+                'type'              => $type,
+                'from'              => $from,
+                'to'                => $to,
+                'broadcast'         => $broadcast,
+                'response'          => $data
             ];
 
-        $socket->send(Json::encode($data));
+        $this->socket->send(Json::encode($message));
     }
 
     public function getMessages(array $data)
     {
-        //
+        $conditions =
+            [
+                'conditions'    =>
+                    '-:from_account_id:equals:' . $data['user'] . '&and:to_account_id:equals:' . $this->auth->account()['id'] . '&' .
+                    'or:from_account_id:equals:' . $this->auth->account()['id'] . '&and:to_account_id:equals:' . $data['user'] . '&',
+                'order'         => 'id desc'
+            ];
+
+        $pagedData = $this->getPaged($conditions);
+
+        if ($pagedData) {
+            if (count($pagedData->getItems()) > 0) {
+                $data['messages'] = array_reverse($pagedData->getItems());
+
+                $data['paginationCounters'] = $this->packagesData->paginationCounters;
+
+                $this->addResponse('Retrieved Messages.', 0, $data);
+            } else {
+                $data['messages'] = [];
+
+                $this->addResponse('No messages for this user.', 0, $data);
+            }
+        } else {
+            $this->addResponse('Error retrieving messages.', 1);
+        }
+    }
+
+    public function getUnreadMessagesCount()
+    {
+        $conditions =
+            [
+                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND unread = 1'
+            ];
+
+        $total = $this->modelToUse::count($conditions);
+
+        $membersArr = $this->basepackages->profile->getProfile($this->auth->account()['id'])['settings']['messenger']['members'];
+
+        $members = [];
+
+        foreach ($membersArr['users'] as $key => $memberId) {
+            $members[$key]['id'] = $memberId;
+            $conditions =
+                [
+                    'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $memberId . ' AND unread = 1'
+                ];
+
+            $members[$key]['count'] = $this->modelToUse::count($conditions);
+        }
+
+        if ($total && $members) {
+            $data['total'] = $total;
+
+            $data['unread_count'] = $members;
+
+            $this->addResponse('Retrieved messages count.', 0, $data);
+        } else {
+            $this->addResponse('Error retrieving messages count.', 1);
+        }
+    }
+
+    public function markAllMessagesRead(array $data)
+    {
+        $conditions =
+            [
+                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $data['user'] . ' AND unread = 1'
+            ];
+
+        $messages = $this->getByParams($conditions);
+
+        foreach ($messages as $key => $message) {
+            $message['unread'] = 0;
+
+            $this->update($message);
+        }
+
+        $this->addResponse('Marked all messaged read.');
     }
 
     public function addMessage(array $data)
@@ -187,10 +290,58 @@ class Messenger extends BasePackage implements MessageComponentInterface
         $messageData['to_account_id'] = $data['user'];
         $messageData['message'] = $data['message'];
 
+        $toAccount = $this->basepackages->accounts->getById($data['user']);
+
+        if ($toAccount) {
+            $toProfile = $this->basepackages->profile->getProfile($data['user']);
+
+            $offline = false;
+
+            if ($toProfile['settings']['messenger']['status'] == 4) {
+                $messageData['unread'] = 1;
+                $offline = true;
+            }
+        } else {
+            $this->addResponse('User not found', 1);
+            return;
+        }
+
         if ($this->add($messageData)) {
             $this->addResponse('Message Added', 0);
+
+            if ($offline) {
+                return;
+            }
+
+            $profile = $this->basepackages->profile->getProfile($this->auth->account()['id']);
+
+            $userData['id'] = $profile['id'];
+            $userData['portrait'] = $profile['portrait'];
+            $userData['name'] = $profile['full_name'];
+            $userData['status'] = $profile['settings']['messenger']['status'];
+
+            $this->pushNotification(
+                'messengerNotifications',
+                $this->auth->account()['notifications_tunnel_id'],
+                $toAccount['notifications_tunnel_id'],
+                false,
+                [
+                    'responseCode'      => 0,
+                    'responseData'      =>
+                        [
+                            "type"  => 'newMessage',
+                            "data"  =>
+                                [
+                                    'user'      => $userData,
+                                    'message'   => $this->packagesData->last
+                                ]
+                        ]
+                ]
+            );
         } else {
             $this->addResponse('Error adding message', 1);
+
+            return;
         }
     }
 
@@ -213,6 +364,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
         $messageData = $this->getById($data['id']);
 
         $messageData['message'] = 'Message Removed';
+        $messageData['removed'] = 1;
         $messageData['updated_at'] = date("Y-m-d H:i:s");
 
         if ($this->update($messageData)) {
@@ -220,5 +372,30 @@ class Messenger extends BasePackage implements MessageComponentInterface
         } else {
             $this->addResponse('Error removing message', 1);
         }
+    }
+
+    public function changeSettings(array $data)
+    {
+        $profile = $this->basepackages->profile->profile();
+
+        if (isset($profile['settings']['messenger']['mute'])) {
+            if ($data['changestate'] == 1) {
+                $profile['settings']['messenger']['mute'] = true;
+            } else if ($data['changestate'] == 0) {
+                $profile['settings']['messenger']['mute'] = false;
+            }
+        } else {
+            if ($data['changestate'] == 1) {
+                $profile['settings']['messenger']['mute'] = true;
+            } else if ($data['changestate'] == 0) {
+                $profile['settings']['messenger']['mute'] = false;
+            }
+        }
+
+        $profile['settings'] = Json::encode($profile['settings']);
+
+        $this->basepackages->profile->updateProfile($profile);
+
+        $this->addResponse('Changed');
     }
 }

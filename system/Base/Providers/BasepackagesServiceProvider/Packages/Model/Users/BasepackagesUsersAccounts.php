@@ -36,6 +36,10 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $agents;
 
+    public $notifications_tunnel_id;
+
+    public $messenger_tunnel_id;
+
     public function initialize()
     {
         //
