@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use Phalcon\Helper\Json;
 use Ratchet\ConnectionInterface;
@@ -9,11 +9,11 @@ use System\Base\BasePackage;
 
 class Pusher extends BasePackage implements WampServerInterface
 {
-    protected $subscribedNotifications = [];
+    protected $subscriptions = [];
 
     public function onSubscribe(ConnectionInterface $conn, $topic)
     {
-        $this->subscribedNotifications[$topic->getId()] = $topic;
+        $this->subscriptions[$topic->getId()] = $topic;
     }
 
     public function onUnSubscribe(ConnectionInterface $conn, $topic)
@@ -54,46 +54,46 @@ class Pusher extends BasePackage implements WampServerInterface
         $conn->close();
     }
 
-    public function onNotification($newNotification)
+    public function onNewPush($newPush)
     {
-        $newNotification = Json::decode($newNotification, true);
+        $newPush = Json::decode($newPush, true);
 
-        if (!array_key_exists($newNotification['type'], $this->subscribedNotifications)) {
+        if (!array_key_exists($newPush['type'], $this->subscriptions)) {
             return;
         }
 
-        $topic = $this->subscribedNotifications[$newNotification['type']];
+        $topic = $this->subscriptions[$newPush['type']];
 
-        if (!isset($newNotification['broadcast']) ||
-            (isset($newNotification['broadcast']) && !$newNotification['broadcast'])
+        if (!isset($newPush['broadcast']) ||
+            (isset($newPush['broadcast']) && !$newPush['broadcast'])
         ) {
             $excludeUsers = [];
             $eligibleUsers = [];
 
             foreach ($topic->getIterator() as $key => $connection) {
-                if ($connection->resourceId != $newNotification['to']) {
+                if ($connection->resourceId != $newPush['to']) {
                     array_push($excludeUsers, $connection->WAMP->sessionId);
-                } else if ($connection->resourceId == $newNotification['to']) {
+                } else if ($connection->resourceId == $newPush['to']) {
                     array_push($eligibleUsers, $connection->WAMP->sessionId);
                 }
             }
 
-            $topic->broadcast($newNotification['response'], $excludeUsers, $eligibleUsers);
-        } else if (isset($newNotification['broadcast']) && isset($newNotification['from'])) {//If from set, it will not broadcast to from
+            $topic->broadcast($newPush['response'], $excludeUsers, $eligibleUsers);
+        } else if (isset($newPush['broadcast']) && isset($newPush['from'])) {//If from set, it will not broadcast to from
             $excludeUsers = [];
             $eligibleUsers = [];
 
             foreach ($topic->getIterator() as $key => $connection) {
-                if ($connection->resourceId != $newNotification['from']) {
+                if ($connection->resourceId != $newPush['from']) {
                     array_push($eligibleUsers, $connection->WAMP->sessionId);
-                } else if ($connection->resourceId == $newNotification['from']) {
+                } else if ($connection->resourceId == $newPush['from']) {
                     array_push($excludeUsers, $connection->WAMP->sessionId);
                 }
             }
 
-            $topic->broadcast($newNotification['response'], $excludeUsers);
+            $topic->broadcast($newPush['response'], $excludeUsers);
         } else {
-            $topic->broadcast($newNotification['response']);
+            $topic->broadcast($newPush['response']);
         }
     }
 

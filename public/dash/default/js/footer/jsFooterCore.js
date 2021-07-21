@@ -9366,7 +9366,7 @@ var BazContentFieldsValidator = function() {
     return bazContentFieldsValidatorConstructor;
 }();
 /* exported BazTunnels */
-/* globals BazMessenger ab */
+/* globals BazNotifications BazMessenger BazAnnouncements ab */
 /*
 * @title                    : BazTunnels
 * @description              : Baz Tunnels Lib for wstunnels
@@ -9385,6 +9385,7 @@ var BazTunnels = function() {
     var dataCollection;
 
     var reconnectMessengerTunnel = null;
+    var reconnectPusherTunnel = null;
 
     // var stoppedPullNotifications = false;
     // var stopPullNotifications = () => {stoppedPullNotifications = true};
@@ -9398,102 +9399,16 @@ var BazTunnels = function() {
     function init() {
         dataCollection = window.dataCollection;
         dataCollection.env.wsTunnels = { };
-
-        initWsTunnels();
-    }
-
-    // function initPullNotifications() {
-    //     // $(document).ready(function() {
-    //         // getNotificationsCount();
-    //     // });
-
-    //     BazHelpers.interval(
-    //         async(iteration, stop) => {
-
-    //             if (stoppedPullNotifications) {
-    //                 stop();
-    //             }
-
-    //             BazTunnels.getNotificationsCount();
-    //         },
-    //         10000
-    //     );
-    // }
-
-    //Notifications
-    function getNotificationsCount() {
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
-
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-        $.post(url, postData, function(response) {
-            if (response.tokenKey && response.token) {
-                $('#security-token').attr('name', response.tokenKey);
-                $('#security-token').val(response.token);
-            }
-
-            if (response.responseCode == 0 && response.responseData) {
-                if (!Number.isInteger(response.responseData.count)) {
-                    parseInt(response.responseData.count);
-                }
-
-                if (response.responseData.count === window.dataCollection.env.notifications.count) {
-                    return;
-                } else if (response.responseData.count < window.dataCollection.env.notifications.count) {
-                    window.dataCollection.env.notifications.count = response.responseData.count;
-                    updateCounter();
-                    return;
-                }
-
-                window.dataCollection.env.notifications.count = response.responseData.count;
-                updateCounter();
-
-                if (response.responseData.count > 0 && !response.responseData.mute) {
-                    window.dataCollection.env.sounds.notificationSound.play();
-                }
-            }
-
-            function updateCounter() {
-                if (response.responseData.count === 0) {
-                    $('#notifications-button-counter').html('');
-                } else if (response.responseData.count < 10) {
-                    $('#notifications-button-counter').css({'right': '10px'});
-                    $('#notifications-button-counter').html(response.responseData.count);
-                    shakeBell();
-                } else if (response.responseData.count < 99) {
-                    $('#notifications-button-counter').css({'right': '5px'});
-                    $('#notifications-button-counter').html(response.responseData.count);
-                    shakeBell();
-                } else if (response.responseData.count > 99) {
-                    $('#notifications-button-counter').css({'right': 0});
-                    $('#notifications-button-counter').html('99+');
-                    shakeBell();
-                }
-            }
-
-            function shakeBell() {
-                $('#notifications-button').addClass('animated tada');
-
-                setTimeout(function() {
-                    $('#notifications-button').removeClass('animated tada');
-                }, 10000);
-            }
-        }, 'json');
-    }
-
-    function initWsTunnels() {
-        initMessengerTunnel();
-        initWANMPTunnel();
-    }
-
-    function initMessengerTunnel() {
         dataCollection.env.wsTunnels.messenger = { };
-        dataCollection.env.wsTunnels.messenger = new WebSocket('ws://' + dataCollection.env.httpHost + '/messenger/');
-        initMessengerListers();
+        dataCollection.env.wsTunnels.pusher = { };
+
+        initPusherTunnel();
     }
 
-    function initMessengerListers() {
+    // Init Messenger tunnel as needed. Messages can be transmitted purely on WSS avoiding message to be added to DB.
+    function initMessengerOTR() {
+        dataCollection.env.wsTunnels.messenger = new WebSocket('ws://' + dataCollection.env.httpHost + '/messenger/');
+
         dataCollection.env.wsTunnels.messenger.onopen = null;
         dataCollection.env.wsTunnels.messenger.onopen = function(e) {
             if (reconnectMessengerTunnel) {
@@ -9503,10 +9418,6 @@ var BazTunnels = function() {
             } else {
                 BazMessenger.init();
             }
-
-            // if (!stoppedPullNotifications) {
-            //     stopPullNotifications();
-            // }
 
             //eslint-disable-next-line
             console.log(e);
@@ -9519,7 +9430,7 @@ var BazTunnels = function() {
             if (!reconnectMessengerTunnel) {
                 BazMessenger.serviceOffline();
                 reconnectMessengerTunnel = setInterval(() => {
-                    initMessengerTunnel();
+                    initMessengerOTR();
                 }, 10000);
             }
         };
@@ -9538,23 +9449,43 @@ var BazTunnels = function() {
         };
     }
 
-    function initWANMPTunnel() {
-        window.ab.debug(true, true);
-        dataCollection.env.wsTunnels.notifications = { };
-        dataCollection.env.wsTunnels.notifications =
-            new ab.Session('ws://' + dataCollection.env.httpHost + '/notifications/',
+    function initPusherTunnel() {
+        // window.ab.debug(true, true);
+        dataCollection.env.wsTunnels.pusher =
+            new ab.Session('ws://' + dataCollection.env.httpHost + '/pusher/',
                 function() {
-                    dataCollection.env.wsTunnels.notifications.subscribe('systemNotifications', function(topic, data) {
-                        //eslint-disable-next-line
-                        console.log(topic);
-                        //eslint-disable-next-line
-                        console.log(data);
+                    //eslint-disable-next-line
+                    console.info('WebSocket connection open');
+                    dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
+                        BazNotifications.onMessage(data);
                     });
-                    dataCollection.env.wsTunnels.notifications.subscribe('messengerNotifications', function(topic, data) {
+                    dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
                         BazMessenger.onMessage(data);
                     });
+                    dataCollection.env.wsTunnels.pusher.subscribe('announcements', function(topic, data) {
+                        BazAnnouncements.onMessage(data);
+                    });
+                    if (reconnectPusherTunnel) {
+                        clearInterval(reconnectPusherTunnel);
+                        reconnectPusherTunnel = null;
+                        BazMessenger.serviceOnline();
+                        BazNotifications.serviceOnline();
+                        BazAnnouncements.serviceOnline();
+                    } else {
+                        BazMessenger.init();
+                        BazNotifications.init();
+                        BazAnnouncements.init();
+                    }
                 },
                 function() {
+                    if (!reconnectPusherTunnel) {
+                        BazMessenger.serviceOffline();
+                        BazNotifications.serviceOffline();
+                        BazAnnouncements.serviceOffline();
+                        reconnectPusherTunnel = setInterval(() => {
+                            initPusherTunnel();
+                        }, 10000);
+                    }
                     //eslint-disable-next-line
                     console.warn('WebSocket connection closed');
                 },
@@ -9578,14 +9509,208 @@ var BazTunnels = function() {
         BazTunnels.init = function(options) {
             init(_extends(BazTunnels.defaults, options));
         }
-        BazTunnels.getNotificationsCount = function(options) {
-            getNotificationsCount(_extends(BazTunnels.defaults, options));
+        BazTunnels.initMessengerOTR = function(options) {
+            initMessengerOTR(_extends(BazTunnels.defaults, options));
         }
     }
 
     setup(bazTunnelsConstructor);
 
     return bazTunnelsConstructor;
+}();
+/* exported BazNotifications */
+/* globals BazHelpers */
+/*
+* @title                    : BazNotifications
+* @description              : Baz Notifications Lib
+* @developer                : guru@bazaari.com.au
+* @usage                    : BazNotifications._function_(_options_);
+* @functions                : BazNotifications
+* @options                  :
+*/
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+// var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+// eslint-disable-next-line no-unused-vars
+var BazNotifications = function() {
+    var BazNotifications = void 0;
+    var dataCollection;
+    var initialized = false;
+    var pullNotifications = false;
+    // Error
+    // function error(errorMsg) {
+    //     throw new Error(errorMsg);
+    // }
+
+    //Init
+    function init(initialConnection = true) {
+        initialized = true;
+
+        dataCollection = window.dataCollection;
+
+        if (initialConnection) {
+            serviceOnline();
+        }
+    }
+
+    function serviceOnline() {
+        if (!initialized) {
+            init(false);
+        } else {
+            getNotificationsCount();
+        }
+
+        //eslint-disable-next-line
+        console.log('Notification service online');
+        initPullNotifications(false);
+    }
+
+    function serviceOffline() {
+        if (!initialized) {
+            init(false);
+        }
+
+        //eslint-disable-next-line
+        console.log('Notification service offline');
+        initPullNotifications(true);
+    }
+
+    //Notifications
+    function getNotificationsCount() {
+        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+        $.post(url, postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+
+            if (response.responseCode == 0 && response.responseData) {
+                if (!Number.isInteger(response.responseData.count)) {
+                    parseInt(response.responseData.count);
+                }
+
+                if (response.responseData.count === window.dataCollection.env.notifications.count) {
+                    return;
+                } else if (response.responseData.count < window.dataCollection.env.notifications.count) {
+                    window.dataCollection.env.notifications.count = response.responseData.count;
+                    updateCounter(response);
+                    return;
+                }
+
+                window.dataCollection.env.notifications.count = response.responseData.count;
+                updateCounter(response);
+
+                if (response.responseData.count > 0 && !response.responseData.mute) {
+                    window.dataCollection.env.sounds.notificationSound.play();
+                }
+            }
+
+        }, 'json');
+    }
+
+    function updateCounter(response) {
+        if (response.responseData.count === 0) {
+            $('#notifications-button-counter').html('');
+        } else if (response.responseData.count < 10) {
+            $('#notifications-button-counter').css({'right': '10px'});
+            $('#notifications-button-counter').html(response.responseData.count);
+            shakeNotificationsButton();
+        } else if (response.responseData.count < 99) {
+            $('#notifications-button-counter').css({'right': '5px'});
+            $('#notifications-button-counter').html(response.responseData.count);
+            shakeNotificationsButton();
+        } else if (response.responseData.count > 99) {
+            $('#notifications-button-counter').css({'right': 0});
+            $('#notifications-button-counter').html('99+');
+            shakeNotificationsButton();
+        }
+    }
+
+    function initPullNotifications(offline) {
+        // $(document).ready(function() {
+            // getNotificationsCount();
+        // });
+        if (offline) {
+            BazHelpers.interval(
+                async(iteration, stop) => {
+                    //eslint-disable-next-line
+                    console.log(BazNotifications.getPullNotifications());
+                    if (!BazNotifications.getPullNotifications()) {
+                        stop();
+                    } else {
+                        BazNotifications.getNotificationsCount();
+                    }
+                },
+                10000000
+            );
+
+        }
+
+        pullNotifications = offline;
+    }
+
+    function getPullNotifications() {
+        return pullNotifications;
+    }
+
+    function shakeNotificationsButton() {
+        $('#notifications-button').addClass('animated tada');
+
+        setTimeout(function() {
+            $('#notifications-button').removeClass('animated tada');
+        }, 10000);
+    }
+
+    function onMessage() {
+        getNotificationsCount();
+
+        if ($('#baz-content section').length > 0) {
+            if ($('#baz-content section')[0].id.match(/notifications-listing/g).length === 1) {
+                var component = $('#baz-content .component')[0].id;
+                window["dataCollection"][component][component + '-listing']['BazContentSectionWithListing']._filterRunAjax();
+            }
+        }
+    }
+
+    function bazNotificationsConstructor() {
+        // if something needs to be constructed
+        return null;
+    }
+
+    function setup(BazNotificationsConstructor) {
+        BazNotifications = BazNotificationsConstructor;
+        BazNotifications.defaults = { };
+        BazNotifications.init = function(options) {
+            init(_extends(BazNotifications.defaults, options));
+        }
+        BazNotifications.serviceOnline = function(options) {
+            serviceOnline(_extends(BazNotifications.defaults, options));
+        }
+        BazNotifications.serviceOffline = function(options) {
+            serviceOffline(_extends(BazNotifications.defaults, options));
+        }
+        BazNotifications.initPullNotifications = function(options) {
+            initPullNotifications(_extends(BazNotifications.defaults, options));
+        }
+        BazNotifications.onMessage = function(options) {
+            onMessage(_extends(BazNotifications.defaults, options));
+        }
+        BazNotifications.getNotificationsCount = function(options) {
+            getNotificationsCount(_extends(BazNotifications.defaults, options));
+        }
+        BazNotifications.getPullNotifications = function(options) {
+            return getPullNotifications(_extends(BazNotifications.defaults, options));
+        }
+    }
+
+    setup(bazNotificationsConstructor);
+
+    return bazNotificationsConstructor;
 }();
 /* exported BazMessenger */
 /* globals PNotify EmojiPicker autoComplete dayjs Swal */
@@ -9619,15 +9744,14 @@ var BazMessenger = function() {
         dayjs.extend(window.dayjs_plugin_advancedFormat);
 
         dataCollection = window.dataCollection;
-        dataCollection.env.messenger = { };
 
-        dataCollection.env.messenger.emojiPicker = new EmojiPicker({
+        dataCollection.env.wsTunnels.messenger.emojiPicker = new EmojiPicker({
             emojiable_selector: '[data-emojiable=true]',
             assetsPath: '/dash/default/images/emoji-picker/',
             popupButtonClasses: 'fa fa-fw fa-smile',
         });
 
-        dataCollection.env.messenger.search =
+        dataCollection.env.wsTunnels.messenger.search =
             new autoComplete({
                 data: {
                     src: async() => {
@@ -9972,7 +10096,7 @@ var BazMessenger = function() {
             '</div>'
         );
 
-        window.dataCollection.env.messenger.emojiPicker.discover();
+        window.dataCollection.env.wsTunnels.messenger.emojiPicker.discover();
 
         // $("#messenger-card-" + user.user).on('collapsed.lte.cardwidget', function(e) {
             // expandCollapse(e, false);
@@ -10483,15 +10607,15 @@ var BazMessenger = function() {
             if (currentCount < 10) {
                 $('#messenger-button-counter').css({'right': '10px'});
                 $('#messenger-button-counter').html(currentCount);
-                shakeBell();
+                shakeMessengerButton();
             } else if (currentCount < 99) {
                 $('#messenger-button-counter').css({'right': '5px'});
                 $('#messenger-button-counter').html(currentCount);
-                shakeBell();
+                shakeMessengerButton();
             } else if (currentCount > 99) {
                 $('#messenger-button-counter').css({'right': 0});
                 $('#messenger-button-counter').html('99+');
-                shakeBell();
+                shakeMessengerButton();
             }
 
             if ($('#messenger-user-' + data.user.id).length === 0) {
@@ -10545,10 +10669,10 @@ var BazMessenger = function() {
 
             if (userCounter < 99) {
                 $('.messenger-counter-' + data.user.id).html(userCounter);
-                shakeBell();
+                shakeMessengerButton();
             } else if (userCounter > 99) {
                 $('.messenger-counter-' + data.user.id).html('99+');
-                shakeBell();
+                shakeMessengerButton();
             }
             //update counters
             //Ring Bell
@@ -10556,7 +10680,7 @@ var BazMessenger = function() {
         }
     }
 
-    function shakeBell() {
+    function shakeMessengerButton() {
         if ($('#messenger-button-icon').is('.fa-comment')) {
             window.dataCollection.env.sounds.messengerSound.play();
         }
@@ -10585,15 +10709,15 @@ var BazMessenger = function() {
                     if (response.responseData.total < 10) {
                         $('#messenger-button-counter').css({'right': '10px'});
                         $('#messenger-button-counter').html(response.responseData.total);
-                        shakeBell();
+                        shakeMessengerButton();
                     } else if (response.responseData.total < 99) {
                         $('#messenger-button-counter').css({'right': '5px'});
                         $('#messenger-button-counter').html(response.responseData.total);
-                        shakeBell();
+                        shakeMessengerButton();
                     } else if (response.responseData.total > 99) {
                         $('#messenger-button-counter').css({'right': 0});
                         $('#messenger-button-counter').html('99+');
-                        shakeBell();
+                        shakeMessengerButton();
                     }
                 }
 
@@ -10602,10 +10726,10 @@ var BazMessenger = function() {
                         if (response.responseData.unread_count[user].count > 0) {
                             if (response.responseData.unread_count[user].count < 99) {
                                 $('.messenger-counter-' + response.responseData.unread_count[user].id).html(response.responseData.unread_count[user].count);
-                                shakeBell();
+                                shakeMessengerButton();
                             } else if (response.responseData.unread_count[user].count > 99) {
                                 $('.messenger-counter-' + response.responseData.unread_count[user].id).html('99+');
-                                shakeBell();
+                                shakeMessengerButton();
                             }
                         }
                     }
@@ -10670,4 +10794,113 @@ var BazMessenger = function() {
     setup(bazMessengerConstructor);
 
     return bazMessengerConstructor;
+}();
+/* exported BazAnnouncements */
+/* globals */
+/*
+* @title                    : BazAnnouncements
+* @description              : Baz Announcements Lib
+* @developer                : guru@bazaari.com.au
+* @usage                    : BazAnnouncements._function_(_options_);
+* @functions                : BazAnnouncements
+* @options                  :
+*/
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+// var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+// eslint-disable-next-line no-unused-vars
+var BazAnnouncements = function() {
+    var BazAnnouncements = void 0;
+    var dataCollection;
+    var initialized = false;
+    // Error
+    // function error(errorMsg) {
+    //     throw new Error(errorMsg);
+    // }
+
+    //Init
+    function init(initialConnection = true) {
+        initialized = true;
+
+        dataCollection = window.dataCollection;
+        dataCollection.env.messenger = { };
+
+        if (initialConnection) {
+            serviceOnline();
+        }
+    }
+
+    function serviceOnline() {
+        if (!initialized) {
+            init(false);
+        }
+    }
+
+    function serviceOffline() {
+        if (!initialized) {
+            init(false);
+        }
+
+        initPullAnnouncements();
+    }
+
+    function initPullAnnouncements() {
+        // $(document).ready(function() {
+            // getAnnouncementsCount();
+        // });
+
+        // BazHelpers.interval(
+        //     async(iteration, stop) => {
+
+        //         if (stoppedPullAnnouncements) {
+        //             stop();
+        //         }
+
+        //         BazTunnels.getAnnouncementsCount();
+        //     },
+        //     10000
+        // );
+    }
+
+    function shakeBell() {
+        $('#notifications-button').addClass('animated tada');
+
+        setTimeout(function() {
+            $('#notifications-button').removeClass('animated tada');
+        }, 10000);
+    }
+
+    function onMessage(data) {
+        //eslint-disable-next-line
+        console.log(data);
+
+        shakeBell();//This will be popup
+    }
+
+    function bazAnnouncementsConstructor() {
+        // if something needs to be constructed
+        return null;
+    }
+
+    function setup(BazAnnouncementsConstructor) {
+        BazAnnouncements = BazAnnouncementsConstructor;
+        BazAnnouncements.defaults = { };
+        BazAnnouncements.init = function(options) {
+            init(_extends(BazAnnouncements.defaults, options));
+        }
+        BazAnnouncements.serviceOnline = function(options) {
+            serviceOnline(_extends(BazAnnouncements.defaults, options));
+        }
+        BazAnnouncements.serviceOffline = function(options) {
+            serviceOffline(_extends(BazAnnouncements.defaults, options));
+        }
+        BazAnnouncements.onMessage = function(options) {
+            onMessage(_extends(BazAnnouncements.defaults, options));
+        }
+    }
+
+    setup(bazAnnouncementsConstructor);
+
+    return bazAnnouncementsConstructor;
 }();

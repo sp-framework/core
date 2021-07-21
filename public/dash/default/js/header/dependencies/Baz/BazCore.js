@@ -182,113 +182,6 @@ var BazCore = function() {
         }
     }
 
-    //Notifications
-    function getNotificationsCount() {
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
-
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-        $.post(url, postData, function(response) {
-            if (response.tokenKey && response.token) {
-                $('#security-token').attr('name', response.tokenKey);
-                $('#security-token').val(response.token);
-            }
-
-            if (response.responseCode == 0 && response.responseData) {
-                if (!Number.isInteger(response.responseData.count)) {
-                    parseInt(response.responseData.count);
-                }
-
-                if (response.responseData.count === window.dataCollection.env.notifications.count) {
-                    return;
-                } else if (response.responseData.count < window.dataCollection.env.notifications.count) {
-                    window.dataCollection.env.notifications.count = response.responseData.count;
-                    updateCounter();
-                    return;
-                }
-
-                window.dataCollection.env.notifications.count = response.responseData.count;
-                updateCounter();
-
-                if (response.responseData.count > 0 && !response.responseData.mute) {
-                    window.dataCollection.env.sounds.notificationSound.play();
-                }
-            }
-
-            function updateCounter() {
-                if (response.responseData.count === 0) {
-                    $('#notifications-button-counter').html('');
-                } else if (response.responseData.count < 10) {
-                    $('#notifications-button-counter').css({'right': '10px'});
-                    $('#notifications-button-counter').html(response.responseData.count);
-                    shakeBell();
-                } else if (response.responseData.count < 99) {
-                    $('#notifications-button-counter').css({'right': '5px'});
-                    $('#notifications-button-counter').html(response.responseData.count);
-                    shakeBell();
-                } else if (response.responseData.count > 99) {
-                    $('#notifications-button-counter').css({'right': 0});
-                    $('#notifications-button-counter').html('99+');
-                    shakeBell();
-                }
-            }
-
-            function shakeBell() {
-                $('#notifications-button').addClass('animated tada');
-
-                setTimeout(function() {
-                    $('#notifications-button').removeClass('animated tada');
-                }, 10000);
-            }
-        }, 'json');
-    }
-
-    // function initWsTunnels() {
-    //     dataCollection.env.wsTunnels = { };
-    //     dataCollection.env.wsTunnels.messenger = new WebSocket('ws://' + dataCollection.env.httpHost + '/messenger/');
-    //     dataCollection.env.wsTunnels.messenger.onopen = function(e) {
-    //         //eslint-disable-next-line
-    //         console.log(e);
-    //     };
-
-    //     dataCollection.env.wsTunnels.notifications =
-    //         new ab.Session('ws://' + dataCollection.env.httpHost + '/notifications/',
-    //             function() {
-    //                 dataCollection.env.wsTunnels.notifications.subscribe('systemNotifications', function(topic, data) {
-    //                     //eslint-disable-next-line
-    //                     console.log(topic);
-    //                     //eslint-disable-next-line
-    //                     console.log(data);
-    //                 });
-    //                 dataCollection.env.wsTunnels.notifications.subscribe('messengerNotifications', function(topic, data) {
-    //                     //eslint-disable-next-line
-    //                     console.log(topic);
-    //                     //eslint-disable-next-line
-    //                     console.log(data);
-    //                 });
-    //             },
-    //             function() {
-    //                 //eslint-disable-next-line
-    //                 console.warn('WebSocket connection closed');
-    //             },
-    //             {'skipSubprotocolCheck': true}
-    //         );
-    // }
-
-    // function initNotifications() {
-    //     // $(document).ready(function() {
-    //     //     getNotificationsCount();
-    //     // });
-
-    //     // BazHelpers.interval(
-    //         // async() => {
-    //         //     BazCore.getNotificationsCount();
-    //         // },
-    //         // 500000
-    //     // );
-    // }
-
     //PageParser
     function bazContent() {
         BazContentLoader.init({
@@ -343,9 +236,6 @@ var BazCore = function() {
         }
         BazCore.bazContent = function(options) {
             bazContent(_extends(BazCore.defaults, options));
-        }
-        BazCore.getNotificationsCount = function(options) {
-            getNotificationsCount(_extends(BazCore.defaults, options));
         }
     }
 

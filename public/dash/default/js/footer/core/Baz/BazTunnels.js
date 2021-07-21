@@ -1,5 +1,5 @@
 /* exported BazTunnels */
-/* globals BazMessenger ab */
+/* globals BazNotifications BazMessenger BazAnnouncements ab */
 /*
 * @title                    : BazTunnels
 * @description              : Baz Tunnels Lib for wstunnels
@@ -18,6 +18,7 @@ var BazTunnels = function() {
     var dataCollection;
 
     var reconnectMessengerTunnel = null;
+    var reconnectPusherTunnel = null;
 
     // var stoppedPullNotifications = false;
     // var stopPullNotifications = () => {stoppedPullNotifications = true};
@@ -31,102 +32,16 @@ var BazTunnels = function() {
     function init() {
         dataCollection = window.dataCollection;
         dataCollection.env.wsTunnels = { };
-
-        initWsTunnels();
-    }
-
-    // function initPullNotifications() {
-    //     // $(document).ready(function() {
-    //         // getNotificationsCount();
-    //     // });
-
-    //     BazHelpers.interval(
-    //         async(iteration, stop) => {
-
-    //             if (stoppedPullNotifications) {
-    //                 stop();
-    //             }
-
-    //             BazTunnels.getNotificationsCount();
-    //         },
-    //         10000
-    //     );
-    // }
-
-    //Notifications
-    function getNotificationsCount() {
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
-
-        var postData = { };
-        postData[$('#security-token').attr('name')] = $('#security-token').val();
-
-        $.post(url, postData, function(response) {
-            if (response.tokenKey && response.token) {
-                $('#security-token').attr('name', response.tokenKey);
-                $('#security-token').val(response.token);
-            }
-
-            if (response.responseCode == 0 && response.responseData) {
-                if (!Number.isInteger(response.responseData.count)) {
-                    parseInt(response.responseData.count);
-                }
-
-                if (response.responseData.count === window.dataCollection.env.notifications.count) {
-                    return;
-                } else if (response.responseData.count < window.dataCollection.env.notifications.count) {
-                    window.dataCollection.env.notifications.count = response.responseData.count;
-                    updateCounter();
-                    return;
-                }
-
-                window.dataCollection.env.notifications.count = response.responseData.count;
-                updateCounter();
-
-                if (response.responseData.count > 0 && !response.responseData.mute) {
-                    window.dataCollection.env.sounds.notificationSound.play();
-                }
-            }
-
-            function updateCounter() {
-                if (response.responseData.count === 0) {
-                    $('#notifications-button-counter').html('');
-                } else if (response.responseData.count < 10) {
-                    $('#notifications-button-counter').css({'right': '10px'});
-                    $('#notifications-button-counter').html(response.responseData.count);
-                    shakeBell();
-                } else if (response.responseData.count < 99) {
-                    $('#notifications-button-counter').css({'right': '5px'});
-                    $('#notifications-button-counter').html(response.responseData.count);
-                    shakeBell();
-                } else if (response.responseData.count > 99) {
-                    $('#notifications-button-counter').css({'right': 0});
-                    $('#notifications-button-counter').html('99+');
-                    shakeBell();
-                }
-            }
-
-            function shakeBell() {
-                $('#notifications-button').addClass('animated tada');
-
-                setTimeout(function() {
-                    $('#notifications-button').removeClass('animated tada');
-                }, 10000);
-            }
-        }, 'json');
-    }
-
-    function initWsTunnels() {
-        initMessengerTunnel();
-        initWANMPTunnel();
-    }
-
-    function initMessengerTunnel() {
         dataCollection.env.wsTunnels.messenger = { };
-        dataCollection.env.wsTunnels.messenger = new WebSocket('ws://' + dataCollection.env.httpHost + '/messenger/');
-        initMessengerListers();
+        dataCollection.env.wsTunnels.pusher = { };
+
+        initPusherTunnel();
     }
 
-    function initMessengerListers() {
+    // Init Messenger tunnel as needed. Messages can be transmitted purely on WSS avoiding message to be added to DB.
+    function initMessengerOTR() {
+        dataCollection.env.wsTunnels.messenger = new WebSocket('ws://' + dataCollection.env.httpHost + '/messenger/');
+
         dataCollection.env.wsTunnels.messenger.onopen = null;
         dataCollection.env.wsTunnels.messenger.onopen = function(e) {
             if (reconnectMessengerTunnel) {
@@ -136,10 +51,6 @@ var BazTunnels = function() {
             } else {
                 BazMessenger.init();
             }
-
-            // if (!stoppedPullNotifications) {
-            //     stopPullNotifications();
-            // }
 
             //eslint-disable-next-line
             console.log(e);
@@ -152,7 +63,7 @@ var BazTunnels = function() {
             if (!reconnectMessengerTunnel) {
                 BazMessenger.serviceOffline();
                 reconnectMessengerTunnel = setInterval(() => {
-                    initMessengerTunnel();
+                    initMessengerOTR();
                 }, 10000);
             }
         };
@@ -171,23 +82,43 @@ var BazTunnels = function() {
         };
     }
 
-    function initWANMPTunnel() {
-        window.ab.debug(true, true);
-        dataCollection.env.wsTunnels.notifications = { };
-        dataCollection.env.wsTunnels.notifications =
-            new ab.Session('ws://' + dataCollection.env.httpHost + '/notifications/',
+    function initPusherTunnel() {
+        // window.ab.debug(true, true);
+        dataCollection.env.wsTunnels.pusher =
+            new ab.Session('ws://' + dataCollection.env.httpHost + '/pusher/',
                 function() {
-                    dataCollection.env.wsTunnels.notifications.subscribe('systemNotifications', function(topic, data) {
-                        //eslint-disable-next-line
-                        console.log(topic);
-                        //eslint-disable-next-line
-                        console.log(data);
+                    //eslint-disable-next-line
+                    console.info('WebSocket connection open');
+                    dataCollection.env.wsTunnels.pusher.subscribe('systemNotifications', function(topic, data) {
+                        BazNotifications.onMessage(data);
                     });
-                    dataCollection.env.wsTunnels.notifications.subscribe('messengerNotifications', function(topic, data) {
+                    dataCollection.env.wsTunnels.pusher.subscribe('messengerNotifications', function(topic, data) {
                         BazMessenger.onMessage(data);
                     });
+                    dataCollection.env.wsTunnels.pusher.subscribe('announcements', function(topic, data) {
+                        BazAnnouncements.onMessage(data);
+                    });
+                    if (reconnectPusherTunnel) {
+                        clearInterval(reconnectPusherTunnel);
+                        reconnectPusherTunnel = null;
+                        BazMessenger.serviceOnline();
+                        BazNotifications.serviceOnline();
+                        BazAnnouncements.serviceOnline();
+                    } else {
+                        BazMessenger.init();
+                        BazNotifications.init();
+                        BazAnnouncements.init();
+                    }
                 },
                 function() {
+                    if (!reconnectPusherTunnel) {
+                        BazMessenger.serviceOffline();
+                        BazNotifications.serviceOffline();
+                        BazAnnouncements.serviceOffline();
+                        reconnectPusherTunnel = setInterval(() => {
+                            initPusherTunnel();
+                        }, 10000);
+                    }
                     //eslint-disable-next-line
                     console.warn('WebSocket connection closed');
                 },
@@ -211,8 +142,8 @@ var BazTunnels = function() {
         BazTunnels.init = function(options) {
             init(_extends(BazTunnels.defaults, options));
         }
-        BazTunnels.getNotificationsCount = function(options) {
-            getNotificationsCount(_extends(BazTunnels.defaults, options));
+        BazTunnels.initMessengerOTR = function(options) {
+            initMessengerOTR(_extends(BazTunnels.defaults, options));
         }
     }
 

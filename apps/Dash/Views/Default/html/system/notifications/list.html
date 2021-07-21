@@ -117,7 +117,7 @@
     ]
 )}}
 <script>
-/* globals Swal PNotify BazContentLoader BazCore */
+/* globals Swal PNotify BazContentLoader BazNotifications */
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
     initFuncs();
     mark();
@@ -194,7 +194,7 @@ function mark() {
             success     : function(response) {
                 if (response.responseCode === 0) {
                     window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-                    BazCore.getNotificationsCount();
+                    BazNotifications.getNotificationsCount();
                 } else {
                     PNotify.error({
                         title           : response.responseMessage,
@@ -257,7 +257,7 @@ function initFuncs() {
                 success     : function(response) {
                     if (response.responseCode === 0) {
                         window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-                        BazCore.getNotificationsCount();
+                        BazNotifications.getNotificationsCount();
                     } else {
                         PNotify.error({
                             title           : response.responseMessage,
@@ -292,7 +292,7 @@ function initFuncs() {
                 success     : function(response) {
                     if (response.responseCode === 0) {
                         window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
-                        BazCore.getNotificationsCount();
+                        BazNotifications.getNotificationsCount();
                     } else {
                         PNotify.error({
                             title           : response.responseMessage,
@@ -360,7 +360,7 @@ $('#{{componentId}}-listing-unmute').click(function(e) {
             $(thisButton).attr('hidden', true);
             $('#{{componentId}}-listing-mute').attr('hidden', false);
             $('#notifications-button').children('i').removeClass('fa-bell-slash').addClass('fa-bell');
-            BazCore.getNotificationsCount();
+            BazNotifications.getNotificationsCount();
         } else {
             PNotify.error({
                 title           : response.responseMessage,

@@ -4,7 +4,6 @@ namespace System\Cli\Tasks;
 
 use Phalcon\Cli\Task;
 use React\EventLoop\Factory;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications\Pusher;
 use React\ZMQ\Context;
 use React\Socket\Server;
 use Ratchet\Http\HttpServer;
@@ -12,7 +11,7 @@ use Ratchet\Server\IoServer;
 use Ratchet\Wamp\WampServer;
 use Ratchet\WebSocket\WsServer;
 
-class NotificationsTask extends Task
+class PusherTask extends Task
 {
     public function mainAction()
     {
@@ -23,13 +22,13 @@ class NotificationsTask extends Task
     {
         $loop = Factory::create();
 
-        $pusher = new Pusher();
-
         $context = new Context($loop);
+
+        $pusher = $this->basepackages->pusher;
 
         $pull = $context->getSocket(\ZMQ::SOCKET_PULL);
         $pull->bind('tcp://127.0.0.1:5555');
-        $pull->on('message', array($pusher, 'onNotification'));
+        $pull->on('message', array($pusher, 'onNewPush'));
 
         $webSock = new Server('0.0.0.0:4444', $loop);
 

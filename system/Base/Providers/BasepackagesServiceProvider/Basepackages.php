@@ -16,6 +16,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Processes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
@@ -63,6 +64,8 @@ class Basepackages
 	protected $processes;
 
 	protected $notifications;
+
+	protected $pusher;
 
 	public function __construct()
 	{
@@ -210,5 +213,12 @@ class Basepackages
 		$this->notifications = (new Notifications())->init();
 
 		return $this->notifications;
+	}
+
+	protected function initPusher()
+	{
+		$this->pusher = (new Pusher())->init();
+
+		return $this->pusher;
 	}
 }

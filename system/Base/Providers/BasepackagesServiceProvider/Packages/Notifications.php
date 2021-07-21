@@ -90,7 +90,7 @@ class Notifications extends BasePackage
                 $data =
                     [
                         'type'              => 'systemNotifications',
-                        'send_to'           => $account['notifications_tunnel_id'],
+                        'to'                => $account['notifications_tunnel_id'],
                         'response'          => [
                             'responseCode'      => 0,
                             'responseData'      =>

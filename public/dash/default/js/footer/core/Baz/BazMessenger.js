@@ -30,15 +30,14 @@ var BazMessenger = function() {
         dayjs.extend(window.dayjs_plugin_advancedFormat);
 
         dataCollection = window.dataCollection;
-        dataCollection.env.messenger = { };
 
-        dataCollection.env.messenger.emojiPicker = new EmojiPicker({
+        dataCollection.env.wsTunnels.messenger.emojiPicker = new EmojiPicker({
             emojiable_selector: '[data-emojiable=true]',
             assetsPath: '/dash/default/images/emoji-picker/',
             popupButtonClasses: 'fa fa-fw fa-smile',
         });
 
-        dataCollection.env.messenger.search =
+        dataCollection.env.wsTunnels.messenger.search =
             new autoComplete({
                 data: {
                     src: async() => {
@@ -383,7 +382,7 @@ var BazMessenger = function() {
             '</div>'
         );
 
-        window.dataCollection.env.messenger.emojiPicker.discover();
+        window.dataCollection.env.wsTunnels.messenger.emojiPicker.discover();
 
         // $("#messenger-card-" + user.user).on('collapsed.lte.cardwidget', function(e) {
             // expandCollapse(e, false);
@@ -894,15 +893,15 @@ var BazMessenger = function() {
             if (currentCount < 10) {
                 $('#messenger-button-counter').css({'right': '10px'});
                 $('#messenger-button-counter').html(currentCount);
-                shakeBell();
+                shakeMessengerButton();
             } else if (currentCount < 99) {
                 $('#messenger-button-counter').css({'right': '5px'});
                 $('#messenger-button-counter').html(currentCount);
-                shakeBell();
+                shakeMessengerButton();
             } else if (currentCount > 99) {
                 $('#messenger-button-counter').css({'right': 0});
                 $('#messenger-button-counter').html('99+');
-                shakeBell();
+                shakeMessengerButton();
             }
 
             if ($('#messenger-user-' + data.user.id).length === 0) {
@@ -956,10 +955,10 @@ var BazMessenger = function() {
 
             if (userCounter < 99) {
                 $('.messenger-counter-' + data.user.id).html(userCounter);
-                shakeBell();
+                shakeMessengerButton();
             } else if (userCounter > 99) {
                 $('.messenger-counter-' + data.user.id).html('99+');
-                shakeBell();
+                shakeMessengerButton();
             }
             //update counters
             //Ring Bell
@@ -967,7 +966,7 @@ var BazMessenger = function() {
         }
     }
 
-    function shakeBell() {
+    function shakeMessengerButton() {
         if ($('#messenger-button-icon').is('.fa-comment')) {
             window.dataCollection.env.sounds.messengerSound.play();
         }
@@ -996,15 +995,15 @@ var BazMessenger = function() {
                     if (response.responseData.total < 10) {
                         $('#messenger-button-counter').css({'right': '10px'});
                         $('#messenger-button-counter').html(response.responseData.total);
-                        shakeBell();
+                        shakeMessengerButton();
                     } else if (response.responseData.total < 99) {
                         $('#messenger-button-counter').css({'right': '5px'});
                         $('#messenger-button-counter').html(response.responseData.total);
-                        shakeBell();
+                        shakeMessengerButton();
                     } else if (response.responseData.total > 99) {
                         $('#messenger-button-counter').css({'right': 0});
                         $('#messenger-button-counter').html('99+');
-                        shakeBell();
+                        shakeMessengerButton();
                     }
                 }
 
@@ -1013,10 +1012,10 @@ var BazMessenger = function() {
                         if (response.responseData.unread_count[user].count > 0) {
                             if (response.responseData.unread_count[user].count < 99) {
                                 $('.messenger-counter-' + response.responseData.unread_count[user].id).html(response.responseData.unread_count[user].count);
-                                shakeBell();
+                                shakeMessengerButton();
                             } else if (response.responseData.unread_count[user].count > 99) {
                                 $('.messenger-counter-' + response.responseData.unread_count[user].id).html('99+');
-                                shakeBell();
+                                shakeMessengerButton();
                             }
                         }
                     }
