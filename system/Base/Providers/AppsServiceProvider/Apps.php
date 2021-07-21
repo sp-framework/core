@@ -17,12 +17,15 @@ class Apps extends BasePackage
 
 	public $types;
 
+	protected $reservedRoutes;
+
 	protected $appInfo = null;
 
 	public function init(bool $resetCache = false)
 	{
-		$this->types =
-			(new Types)->init($resetCache)->types;
+		$this->types = (new Types)->init($resetCache)->types;
+
+		$this->reservedRoutes = $this->getReservedRoutes();
 
 		$this->getAll($resetCache);
 
@@ -33,6 +36,10 @@ class Apps extends BasePackage
 
 	public function getAppInfo()
 	{
+		if (PHP_SAPI === 'cli') {
+			$this->appInfo = $this->getRouteApp('admin');
+		}
+
 		if (isset($this->appInfo)) {
 			return $this->appInfo;
 		} else {
@@ -207,9 +214,7 @@ class Apps extends BasePackage
 
 		$app = array_merge($app, $data);
 
-		if (!$this->checkType($app)) {
-			return;
-		}
+		unset($app['route']);
 
 		if (isset($app['can_login_role_ids'])) {
 			$app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
@@ -240,7 +245,7 @@ class Apps extends BasePackage
 		if ($this->update($app)) {
 			$this->addActivityLog($data, $app);
 
-			$this->addToNotification('update', 'Updated app ' . $data['name']);
+			$this->addToNotification('update', 'Updated app ' . $app['name']);
 
 			$this->addResponse('Updated ' . $app['name'] . ' app');
 		} else {
@@ -253,8 +258,10 @@ class Apps extends BasePackage
 		$typesArr = $this->types;
 
 		foreach ($typesArr as $key => $type) {
-			if (strtolower($data['route']) === $type['app_type']) {
-				$this->addResponse('App route ' . strtolower($data['route']) . ' is reserved. Please use different route.', 1);
+			if (strtolower($data['route']) === $type['app_type'] ||
+				in_array(strtolower($data['route']), $this->reservedRoutes)
+			) {
+				$this->addResponse('App route ' . strtolower($data['route']) . ' is reserved. Please use different route.', 1, []);
 
 				return false;
 			}
@@ -283,12 +290,20 @@ class Apps extends BasePackage
 
 			$this->domains->removeAppFromApps($data['id']);
 
-			$this->addToNotification('remove', 'Removed app ' . $app['business_name']);
+			$this->addToNotification('remove', 'Removed app ' . $app['name']);
 
 			$this->addResponse('Removed App ' . $app['name']);
 		} else {
 			$this->addResponse('Error removing app.', 1);
 		}
+	}
+
+	protected function getReservedRoutes()
+	{
+		return
+			[
+				'admin', 'dash', 'ecom', 'pos', 'cms', 'api', 'pusher'
+			];
 	}
 
 	// public function getAppCategories()
