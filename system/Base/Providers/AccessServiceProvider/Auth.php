@@ -177,6 +177,17 @@ class Auth
             true
         );
         $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
+
+        $this->cookies->set(
+            'id',
+            '0',
+            1,
+            '/',
+            null,
+            null,
+            true
+        );
+
         $this->cookies->send();
 
         if ($this->cookies->has($this->cookieKey)) {
@@ -461,6 +472,22 @@ class Auth
 
         $this->cookies->send();
 
+        $this->cookies->useEncryption(false);
+
+        $this->cookies->set(
+            'id',
+            $this->account['id'],
+            time() + 86400,
+            '/',
+            null,
+            null,
+            true
+        );
+
+        $this->cookies->send();
+
+        $this->cookies->useEncryption(true);
+
         if (isset($this->account['remember_identifier']) && $this->account['remember_identifier'] !== '') {
             $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
         } else {
@@ -496,6 +523,13 @@ class Auth
     public function check()
     {
         if (!$this->account) {
+
+            // $this->setUserFromSession();
+
+            if ($this->account) {
+                return true;
+            }
+
             return false;
         }
 
@@ -838,7 +872,7 @@ class Auth
                     if ($location['clientAddress'] === $clientAddress &&
                         $location['userAgent'] === $userAgent &&
                         $location['session'] === $sessionId &&
-                        $location['verified'] == true
+                        $location['verified'] === true
                     ) {
                         return true;
                     } else if ($location['session'] === $sessionId &&
@@ -857,7 +891,7 @@ class Auth
                         return false;
                     } else if ($location['clientAddress'] === $clientAddress &&
                         $location['userAgent'] === $userAgent &&
-                        $location['verified'] == true &&
+                        $location['verified'] === true &&
                         $location['session'] !== $sessionId
                     ) {
                         //As we are already authenticated and the session is in the session_ids, we check and update our sessionid and allow access.
@@ -876,10 +910,10 @@ class Auth
                         }
                     } else if ($location['clientAddress'] === $clientAddress &&
                         $location['userAgent'] === $userAgent &&
-                        $location['verified'] == false &&
+                        $location['verified'] === false &&
                         $location['session'] === $sessionId
                     ) {
-                        return true;
+                        return false;
                     }
                 }
 
