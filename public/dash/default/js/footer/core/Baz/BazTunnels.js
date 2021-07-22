@@ -37,14 +37,16 @@ var BazTunnels = function() {
         } else if (dataCollection.env.httpScheme === 'https') {
             dataCollection.env.wsTunnels.protocol = 'wss';
         }
-        dataCollection.env.wsTunnels.messenger = { };
+
         dataCollection.env.wsTunnels.pusher = { };
+        dataCollection.env.wsTunnels.messenger = { };
 
         initPusherTunnel();
     }
 
     // Init Messenger tunnel as needed. Messages can be transmitted purely on WSS avoiding message to be added to DB.
     function initMessengerOTR() {
+        dataCollection.env.wsTunnels.messenger = { };
         dataCollection.env.wsTunnels.messenger = new WebSocket(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/messenger/');
 
         dataCollection.env.wsTunnels.messenger.onopen = null;
@@ -89,6 +91,7 @@ var BazTunnels = function() {
 
     function initPusherTunnel() {
         // window.ab.debug(true, true);
+        dataCollection.env.wsTunnels.pusher = { };
         dataCollection.env.wsTunnels.pusher =
             new ab.Session(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/pusher/',
                 function() {
