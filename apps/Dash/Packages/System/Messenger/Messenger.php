@@ -173,7 +173,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
                 ]
             );
 
-            $this->addResponse('Ok');
+            $this->addResponse('Status Changed');
 
             return;
         }
@@ -255,7 +255,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
             $members[$key]['count'] = $this->modelToUse::count($conditions);
         }
 
-        if ($total && $members) {
+        if ($total >= 0 && $members) {
             $data['total'] = $total;
 
             $data['unread_count'] = $members;
@@ -300,6 +300,8 @@ class Messenger extends BasePackage implements MessageComponentInterface
             if ($toProfile['settings']['messenger']['status'] == 4) {
                 $messageData['unread'] = 1;
                 $offline = true;
+            } else if ($toProfile['settings']['messenger']['status'] == 2) {
+                $messageData['unread'] = 1;
             }
         } else {
             $this->addResponse('User not found', 1);

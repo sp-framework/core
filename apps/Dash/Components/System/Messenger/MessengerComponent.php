@@ -201,8 +201,7 @@ class MessengerComponent extends BaseComponent
                                 unset($accounts[$accountKey]);
                             }
                         }
-
-                        $accounts = array_values($accounts);
+                        // $accounts = array_values($accounts);
 
                         $this->addResponse(
                             $this->accounts->packagesData->responseMessage,

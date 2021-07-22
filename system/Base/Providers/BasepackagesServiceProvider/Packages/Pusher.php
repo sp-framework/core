@@ -37,7 +37,7 @@ class Pusher extends BasePackage implements WampServerInterface
     public function onClose(ConnectionInterface $conn)
     {
         var_dump('Close: '.  $conn->resourceId);
-        $this->markMessengerOffline($conn->resourceId);
+        $this->markMessengerAway($conn->resourceId);
     }
 
     public function onCall(ConnectionInterface $conn, $id, $topic, array $params)
@@ -153,8 +153,9 @@ class Pusher extends BasePackage implements WampServerInterface
         return false;
     }
 
-    protected function markMessengerOffline($resourceId)
+    protected function markMessengerAway($resourceId)
     {
+        //if someone closes their browser and hits refresh.
         $account = $this->basepackages->accounts->checkAccountByNotificationsTunnelId($resourceId);
 
         if ($account) {
@@ -164,7 +165,7 @@ class Pusher extends BasePackage implements WampServerInterface
 
             $messenger = new \Apps\Dash\Packages\System\Messenger\Messenger();
 
-            $messenger->changeStatus(['user' => $account['id'], 'status' => 4]);
+            $messenger->changeStatus(['user' => $account['id'], 'status' => 2]);
         }
     }
 }

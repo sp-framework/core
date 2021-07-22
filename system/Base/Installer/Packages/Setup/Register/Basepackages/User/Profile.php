@@ -15,8 +15,8 @@ class Profile
                 'first_name'            => 'System',
                 'last_name'             => 'Administrator',
                 'full_name'             => 'System Administrator',
-                'contact_phone'         => '',
-                'contact_mobile'        => ''
+                'contact_phone'         => '0',
+                'contact_mobile'        => '0'
             ]
         );
     }
