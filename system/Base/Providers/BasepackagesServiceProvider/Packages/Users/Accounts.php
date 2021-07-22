@@ -170,8 +170,8 @@ class Accounts extends BasePackage
 
             foreach ($searchAccounts as $accountKey => $accountValue) {
                 if (in_array($accountValue['domain'], $domains)) {
-                    $accounts[$accountKey]['id'] = $accountValue['id'];
-                    $accounts[$accountKey]['email'] = $accountValue['email'];
+                    $accounts[] =
+                        ['id' => $accountValue['id'], 'email' => $accountValue['email']];
                 }
             }
 

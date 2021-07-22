@@ -297,10 +297,15 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
             $offline = false;
 
-            if ($toProfile['settings']['messenger']['status'] == 4) {
-                $messageData['unread'] = 1;
+            if (isset($toProfile['settings']['messenger']['status'])) {
+                if ($toProfile['settings']['messenger']['status'] == 4) {
+                    $messageData['unread'] = 1;
+                    $offline = true;
+                } else if ($toProfile['settings']['messenger']['status'] == 2) {
+                    $messageData['unread'] = 1;
+                }
+            } else {
                 $offline = true;
-            } else if ($toProfile['settings']['messenger']['status'] == 2) {
                 $messageData['unread'] = 1;
             }
         } else {

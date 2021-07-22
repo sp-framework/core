@@ -9787,7 +9787,8 @@ var BazMessenger = function() {
                             $('#security-token').attr('name', response.tokenKey);
                             $('#security-token').val(response.token);
                         }
-
+                        //eslint-disable-next-line
+                        console.log(response.responseData.accounts);
                         if (response.responseData.accounts) {
                             return response.responseData.accounts;
                         } else {
@@ -9798,7 +9799,7 @@ var BazMessenger = function() {
                     cache: false
                 },
                 selector: "#messenger-main-search",
-                threshold : 2,
+                threshold : 3,
                 debounce: 500,
                 searchEngine: "strict",
                 resultsList: {
@@ -9838,8 +9839,8 @@ var BazMessenger = function() {
                     }
                 },
                 onSelection: (feedback) => {
+                    $('#messenger-main-search').val('');
                     $('#messenger-main-search').blur();
-                    $('#messenger-main-search').val();
                     messengerWindow(feedback.selection.value);
                     addUserToMembersUsers(feedback.selection.value);
                 }
@@ -10365,12 +10366,18 @@ var BazMessenger = function() {
             color = 'secondary';
         }
 
+        if (!user.portrait || (user.portrait && user.portrait === '')) {
+            user.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
+        } else {
+            user.portrait =
+                dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + user.portrait + '/w/80';
+        }
+
         var newUser =
             '<li class="nav-item" id="messenger-user-' + user.id + '" data-status="' + user.status + '" data-type="user" data-user="' +
                 user.id + '" data-name="' + user.name + '" data-portrait="' + user.portrait + '">' +
                 '<a id="messenger-user-' + user.id + '-link" class="nav-link" href="#">' +
-                    '<img id="messenger-user-' + user.id + '-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + user.portrait +
-                    '/w/80" class="rounded-sm" style="position:relative;top: -3px; width:20px;" alt="User Image">' +
+                    '<img id="messenger-user-' + user.id + '-img" src="' + user.portrait + '" class="rounded-sm" style="position:relative;top: -3px; width:20px;" alt="User Image">' +
                     '<i id="messenger-user-' + user.id + '-icon" class="fa fa-fw fa-circle text-' + color + '" style="font-size: 8px;position: absolute;top: 8px;left: 27px;"></i>' +
                     '<div id="messenger-user-' + user.id + '-name" class="text-uppercase ml-2 text-truncate" style="position:relative; top: 3px;display: inline-block;width: 150px;">' + user.name + '</div>' +
                     '<span class="badge badge-info messenger-counter-' + user.id + '" style="position: relative;top: -4px;"></span>' +

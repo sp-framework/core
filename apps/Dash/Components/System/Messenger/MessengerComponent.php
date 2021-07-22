@@ -186,7 +186,7 @@ class MessengerComponent extends BaseComponent
                     return;
                 }
 
-                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery, true);
+                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
 
                 if ($searchAccounts) {
                     $currentAccount = $this->auth->account();
@@ -199,7 +199,9 @@ class MessengerComponent extends BaseComponent
                                 unset($accounts[$accountKey]);
                                 continue;
                             }
+
                             $profile = $this->basepackages->profile->getProfile($account['id']);
+
                             $account['name'] = $profile['full_name'];
                             $account['portrait'] = $profile['portrait'];
                             if (isset($profile['settings']['messenger']['status'])) {

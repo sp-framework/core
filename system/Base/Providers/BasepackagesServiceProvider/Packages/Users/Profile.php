@@ -507,21 +507,17 @@ class Profile extends BasePackage
 
     public function addUserToMembersUsers(array $data)
     {
-        $this->getMessengerSettings();
-
-        if (isset($this->messengerSettings['members']['users'])) {
-            if (!in_array($data['user']['id'], $this->messengerSettings['members']['users'])) {
-                array_push($this->messengerSettings['members']['users'], $data['user']['id']);
+        if (isset($this->profile['settings']['messenger']['members']['users'])) {
+            if (!in_array($data['user']['id'], $this->profile['settings']['messenger']['members']['users'])) {
+                array_push($this->profile['settings']['messenger']['members']['users'], $data['user']['id']);
             } else {
                 $this->addResponse('User already added');
 
                 return;
             }
         } else {
-            $this->messengerSettings['members']['users'][] = $data['user']['id'];
+            $this->profile['settings']['messenger']['members']['users'][] = $data['user']['id'];
         }
-
-        $this->profile['settings']['messenger'] = $this->messengerSettings;
 
         if ($this->update($this->profile)) {
             $this->addResponse('Added to members users');

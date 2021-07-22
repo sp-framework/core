@@ -163,7 +163,15 @@ class Pusher extends BasePackage implements WampServerInterface
 
             $this->basepackages->accounts->update($account);
 
+            $profile = $this->basepackages->profile->getProfile($account['id']);
+
             $messenger = new \Apps\Dash\Packages\System\Messenger\Messenger();
+
+            if (isset($profile['settings']['messenger']['status'])) {
+                if ($profile['settings']['messenger']['status'] == 4) {
+                    return;
+                }
+            }
 
             $messenger->changeStatus(['user' => $account['id'], 'status' => 2]);
         }
