@@ -922,12 +922,18 @@ class Auth
                     }
                 }
 
+                if (!$this->email->setup()) {
+                    $verified = true;
+                } else {
+                    $verified = false;
+                }
+
                 array_push($this->account['agents']['locations'],
                     [
                         'clientAddress' => $clientAddress,
                         'userAgent'     => $userAgent,
                         'session'       => $sessionId,
-                        'verified'      => false
+                        'verified'      => $verified
                     ]
                 );
 
