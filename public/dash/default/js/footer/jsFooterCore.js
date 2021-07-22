@@ -9651,7 +9651,7 @@ var BazNotifications = function() {
                         BazNotifications.getNotificationsCount();
                     }
                 },
-                10000000
+                100000
             );
 
         }
