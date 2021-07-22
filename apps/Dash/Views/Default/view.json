@@ -1,5 +1,6 @@
 {
     "name"          : "Default",
+    "display_name"  : "Bazaari Dashboard Default View",
     "description"   : "Default Dashboard View",
     "app_type"      : "dash",
     "category"      : "system",

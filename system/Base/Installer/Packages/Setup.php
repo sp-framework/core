@@ -233,7 +233,7 @@ class Setup
 						throw new \Exception('Problem reading component.json at location ' . $adminComponent);
 					}
 
-					if ($jsonFile['menu']) {
+					if ($jsonFile['menu'] && $jsonFile['menu'] !== 'false') {
 						$menuId = $this->registerAdminMenu($jsonFile['menu']);
 					} else {
 						$menuId = null;
