@@ -33,117 +33,119 @@
 				<div class="row">
 					<div class="col">
 						<div class="card mt-2 mb-2">
-							<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Core Setup</div>
-							<div class="card-body bg-white">
-								<div class="row vdivide">
-									<div class="col-6 p-3">
-										<legend>Database</legend>
-										<div class="form-group">
-											<label for="host">Host *</label>
-											<div class="input-group">
-												<input type="text" name="host" id="host" class="form-control" value="localhost">
+							<form autocomplete="off">
+								<div class="card-header bg-primary text-white text-center font-weight-bold text-uppercase">Bazaari Framework Core Setup</div>
+								<div class="card-body bg-white">
+									<div class="row vdivide">
+										<div class="col-6 p-3">
+											<legend>Database</legend>
+											<div class="form-group">
+												<label for="host">Host *</label>
+												<div class="input-group">
+													<input type="text" name="host" id="host" class="form-control" value="localhost">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="port">Port *</label>
-											<div class="input-group">
-												<input type="text" name="port" id="port" class="form-control" value="3306">
+											<div class="form-group">
+												<label for="port">Port *</label>
+												<div class="input-group">
+													<input type="text" name="port" id="port" class="form-control" value="3306">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="database_name">Database Name *</label>
-											<div class="input-group">
-												<input type="text" name="database_name" id="database_name" class="form-control">
+											<div class="form-group">
+												<label for="database_name">Database Name *</label>
+												<div class="input-group">
+													<input type="text" name="database_name" id="database_name" class="form-control">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="username">Database Username *</label>
-											<div class="input-group">
-												<input type="text" name="username" id="username" class="form-control">
+											<div class="form-group">
+												<label for="username">Database Username *</label>
+												<div class="input-group">
+													<input type="text" name="username" id="username" class="form-control">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="password">Database Password *</label>
-											<div class="input-group">
-												<input type="password" name="password" id="password" class="form-control">
+											<div class="form-group">
+												<label for="password">Database Password *</label>
+												<div class="input-group">
+													<input type="password" name="password" id="password" class="form-control">
+												</div>
 											</div>
-										</div>
-										<div class="row">
-											<div class="col">
-												<div class="form-group">
-													<div class="checkbox icheck-danger">
-														<input type="checkbox" name="drop" id="drop">
-														<label for="drop">
-															Drop tables if exists
-														</label>
+											<div class="row">
+												<div class="col">
+													<div class="form-group">
+														<div class="checkbox icheck-danger">
+															<input type="checkbox" name="drop" id="drop">
+															<label for="drop">
+																Drop tables if exists
+															</label>
+														</div>
 													</div>
 												</div>
 											</div>
 										</div>
-									</div>
-									<div class="col-6 p-3">
-										<legend>Admin Account</legend>
-										<div class="form-group">
-											<label for="email">Email *</label>
-											<div class="input-group">
-												<input type="text" name="email" id="email" class="form-control">
+										<div class="col-6 p-3">
+											<legend>Admin Account</legend>
+											<div class="form-group">
+												<label for="email">Email *</label>
+												<div class="input-group">
+													<input type="text" name="email" id="email" class="form-control">
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="pass">Password *</label>
-											<div class="input-group">
-												<input type="password" name="pass" id="pass" class="form-control">
+											<div class="form-group">
+												<label for="pass">Password *</label>
+												<div class="input-group">
+													<input type="password" name="pass" id="pass" class="form-control">
+												</div>
 											</div>
-										</div>
-										<hr>
-										<legend>Security</legend>
-										<div class="form-group">
-											<label for="pwf">Password Encryption Level *</label>
-											<div class="input-group">
-												<input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control" value="8" disabled>
+											<hr>
+											<legend>Security</legend>
+											<div class="form-group">
+												<label for="pwf">Password Encryption Level *</label>
+												<div class="input-group">
+													<input type="number" min="4" max="16" name="pwf" id="pwf" class="form-control" value="8" disabled>
+												</div>
 											</div>
-										</div>
-										<div class="form-group">
-											<label for="cwf">Cookies Encryption Level *</label>
-											<div class="input-group">
-												<input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control" value="8" disabled>
+											<div class="form-group">
+												<label for="cwf">Cookies Encryption Level *</label>
+												<div class="input-group">
+													<input type="number" min="4" max="16" name="cwf" id="cwf" class="form-control" value="8" disabled>
+												</div>
 											</div>
-										</div>
-										<div class="row">
-											<div class="col">
-												<div class="form-group">
-													<div class="checkbox icheck-info">
-														<input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
-														<label for="auto-encrypt-level">
-															Calculate level as per system configuration
-														</label>
+											<div class="row">
+												<div class="col">
+													<div class="form-group">
+														<div class="checkbox icheck-info">
+															<input type="checkbox" name="auto-encrypt-level" id="auto-encrypt-level" checked>
+															<label for="auto-encrypt-level">
+																Calculate level as per system configuration
+															</label>
+														</div>
 													</div>
 												</div>
 											</div>
+											<small>Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
 										</div>
-										<small>Note: Higher the number, better the security but, slower the performance. Range: 4-16</small>
 									</div>
+									<hr>
+									<div class="row text-center p-3">
+										<div class="col" id="submit-div">
+											<button id="submit" class="btn btn-primary">
+												<i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
+												Setup
+											</button>
+										</div>
+										<div class="col" id="next-div" hidden>
+											<a href='/' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
+										</div>
+									</div>
+									<hr>
+									<footer class="footer text-center">
+										<strong>Copyright © Bazaari E Trade Pty Ltd.</strong> All rights reserved.
+										<script src="/dash/default/js/footer/jsFooterDependencies.js"></script>
+										<script src="/dash/default/js/footer/jsFooterCore.js"></script>
+										<script src="/dash/default/js/footer/jsFooterPlugins.js"></script>
+									</footer>
 								</div>
-								<hr>
-								<div class="row text-center p-3">
-									<div class="col" id="submit-div">
-										<button id="submit" class="btn btn-primary">
-											<i id="submit-spinner" class="fa fa-cog fa-spin" hidden></i>
-											Setup
-										</button>
-									</div>
-									<div class="col" id="next-div" hidden>
-										<a href='/' id="next" class="btn btn-success" disabled=""><i class="fa fa-check"></i> Access Admin</a>
-									</div>
-								</div>
-								<hr>
-								<footer class="footer text-center">
-									<strong>Copyright © Bazaari E Trade Pty Ltd.</strong> All rights reserved.
-									<script src="/dash/default/js/footer/jsFooterDependencies.js"></script>
-									<script src="/dash/default/js/footer/jsFooterCore.js"></script>
-									<script src="/dash/default/js/footer/jsFooterPlugins.js"></script>
-								</footer>
-							</div>
+							</form>
 						</div>
 					</div>
 				</div>
