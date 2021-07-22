@@ -913,6 +913,11 @@ class Auth
                         $location['verified'] === false &&
                         $location['session'] === $sessionId
                     ) {
+                        //If Email is not configured, we cannot send new passcodes.
+                        if (!$this->email->setup()) {
+                            return true;
+                        }
+
                         return false;
                     }
                 }
