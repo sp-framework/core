@@ -11,6 +11,11 @@ class Pusher extends BasePackage implements WampServerInterface
 {
     protected $subscriptions = [];
 
+    public function init()
+    {
+        return $this;
+    }
+
     public function onSubscribe(ConnectionInterface $conn, $topic)
     {
         $this->subscriptions[$topic->getId()] = $topic;
