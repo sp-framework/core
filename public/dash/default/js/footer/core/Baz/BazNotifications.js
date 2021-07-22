@@ -150,7 +150,8 @@ var BazNotifications = function() {
         getNotificationsCount();
 
         if ($('#baz-content section').length > 0) {
-            if ($('#baz-content section')[0].id.match(/notifications-listing/g).length === 1) {
+            var section = $('#baz-content section')[0].id.match(/notifications-listing/g);
+            if (section && section.length === 1) {
                 var component = $('#baz-content .component')[0].id;
                 window["dataCollection"][component][component + '-listing']['BazContentSectionWithListing']._filterRunAjax();
             }
