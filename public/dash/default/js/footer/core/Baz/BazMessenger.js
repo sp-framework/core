@@ -41,7 +41,7 @@ var BazMessenger = function() {
             new autoComplete({
                 data: {
                     src: async() => {
-                        const url = dataCollection.env.rootPath + dataCollection.env.appRoute + 'system/messenger/searchAccount';
+                        const url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/searchAccount';
 
                         var myHeaders = new Headers();
                         myHeaders.append("accept", "application/json");
