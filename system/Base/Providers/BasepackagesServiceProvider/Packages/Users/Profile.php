@@ -21,6 +21,8 @@ class Profile extends BasePackage
 
     protected $avatar;
 
+    protected $messengerSettings;
+
     public $profile;
 
     public function profile(int $accountId = null)
@@ -456,6 +458,10 @@ class Profile extends BasePackage
 
     public function getMessengerSettings()
     {
+        if ($this->messengerSettings) {
+            return $this->messengerSettings;
+        }
+
         if (isset($this->profile['settings']['messenger'])) {
             $messengerSettings = $this->profile['settings']['messenger'];
 
@@ -491,14 +497,38 @@ class Profile extends BasePackage
                 }
             }
 
+            $this->messengerSettings = $messengerSettings;
+
             return $messengerSettings;
         }
 
         return null;
     }
 
-    public function changeMessengerStatus(array $data)
+    public function addUserToMembersUsers(array $data)
     {
-        var_dump($data);
+        $this->getMessengerSettings();
+
+        if (isset($this->messengerSettings['members']['users'])) {
+            if (!in_array($data['user']['id'], $this->messengerSettings['members']['users'])) {
+                array_push($this->messengerSettings['members']['users'], $data['user']['id']);
+            } else {
+                $this->addResponse('User already added');
+
+                return;
+            }
+        } else {
+            $this->messengerSettings['members']['users'][] = $data['user']['id'];
+        }
+
+        $this->profile['settings']['messenger'] = $this->messengerSettings;
+
+        if ($this->update($this->profile)) {
+            $this->addResponse('Added to members users');
+
+            return;
+        }
+
+        $this->addResponse('Could not add to members users', 1);
     }
 }

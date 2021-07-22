@@ -165,7 +165,7 @@ class Accounts extends BasePackage
                 ]
             );
 
-        if (count($searchAccounts) > 0) {
+        if ($searchAccounts && count($searchAccounts) > 0) {
             $accounts = [];
 
             foreach ($searchAccounts as $accountKey => $accountValue) {
@@ -181,6 +181,8 @@ class Accounts extends BasePackage
 
             return true;
         }
+
+        return false;
     }
 
     public function checkAccountByEmail(string $email)

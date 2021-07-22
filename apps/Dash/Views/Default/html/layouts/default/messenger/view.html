@@ -34,153 +34,149 @@
             {% set unmute = false %}
         {% endif %}
     {% endif %}
-{% else %}
-    {% set status = 4 %}
-    {% set mute = false %}
-    {% set unmute = true %}
-{% endif %}
-<aside class="p-3 control-sidebar control-sidebar-light">
-    <div id="messenger-offline" class="text-danger text-center">
-        Messenger Service Offline!
-    </div>
-    <div id="messenger-online" hidden>
-        <div class="row">
-            <div class="col">
-                <form autocomplete="off">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                         : 'component',
-                            'componentName'                     : 'Messenger',
-                            'componentId'                       : 'messenger',
-                            'sectionId'                         : 'main',
-                            'parentComponentId'                 : 'messenger',
-                            'fieldId'                           : 'status',
-                            'fieldLabel'                        : false,
-                            'fieldType'                         : 'input',
-                            'fieldAdditionalClass'              : 'mb-0',
-                            'fieldDataAttributes'               : ['status' : status],
-                            'fieldGroupPostAddonButtons'        :
-                                [
-                                    'mute'   : [
-                                        'title'                   : false,
-                                        'type'                    : 'warning',
-                                        'icon'                    : 'comment-slash',
-                                        'noMargin'                : true,
-                                        'hidden'                  : mute,
-                                        'buttonAdditionalClass'   : 'rounded-0',
-                                        'position'                : 'right'
-                                    ],
-                                    'unmute'   : [
-                                        'title'                   : false,
-                                        'type'                    : 'success',
-                                        'icon'                    : 'comment',
-                                        'noMargin'                : true,
-                                        'hidden'                  : unmute,
-                                        'buttonAdditionalClass'   : 'rounded-0',
-                                        'position'                : 'right'
-                                    ]
-                                ],
-                            'fieldInputType'                      : 'select',
-                            'fieldHelp'                           : false,
-                            'fieldDataSelectOptions'              : statuses,
-                            'fieldDataSelectOptionsArray'         : true,
-                            'fieldDataSelectOptionsKey'           : 'id',
-                            'fieldDataSelectOptionsValue'         : 'name',
-                            'fieldDataSelectOptionsSelected'      : status,
-                            'fieldDataSelectOptionsZero'          : true,
-                            'fieldDataSelectOptionsZeroTitle'     : 'Status'
-                        ]
-                    )}}
-                </form>
-            </div>
+    <aside class="p-3 control-sidebar control-sidebar-light">
+        <div id="messenger-offline" class="text-danger text-center">
+            Messenger Service Offline!
         </div>
-        {% if status != 4 %}
-            {% set mainHidden = '' %}
-        {% else %}
-            {% set mainHidden = 'hidden' %}
-        {% endif %}
-        <hr>
-        <div id="messenger-main" {{mainHidden}}>
+        <div id="messenger-online" hidden>
             <div class="row">
                 <div class="col">
-                    {{adminltetags.useTag('fields',
-                        [
-                            'component'                             : 'component',
-                            'componentName'                         : 'Messenger',
-                            'componentId'                           : 'messenger',
-                            'sectionId'                             : 'main',
-                            'parentComponentId'                     : 'messenger',
-                            'fieldId'                               : 'search',
-                            'fieldLabel'                            : false,
-                            'fieldPlaceholder'                      : 'Search Users...',
-                            'fieldType'                             : 'input',
-                            'fieldAdditionalClass'                  : 'mb-0',
-                            'fieldHelp'                             : false,
-                            'fieldRequired'                         : true,
-                            'fieldBazScan'                          : true,
-                            'fieldBazPostOnCreate'                  : false,
-                            'fieldBazPostOnUpdate'                  : false,
-                            'fieldValue'                            : ''
-                        ]
-                    )}}
+                    <form autocomplete="off">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                         : 'component',
+                                'componentName'                     : 'Messenger',
+                                'componentId'                       : 'messenger',
+                                'sectionId'                         : 'main',
+                                'parentComponentId'                 : 'messenger',
+                                'fieldId'                           : 'status',
+                                'fieldLabel'                        : false,
+                                'fieldType'                         : 'input',
+                                'fieldAdditionalClass'              : 'mb-0',
+                                'fieldDataAttributes'               : ['status' : status],
+                                'fieldGroupPostAddonButtons'        :
+                                    [
+                                        'mute'   : [
+                                            'title'                   : false,
+                                            'type'                    : 'warning',
+                                            'icon'                    : 'comment-slash',
+                                            'noMargin'                : true,
+                                            'hidden'                  : mute,
+                                            'buttonAdditionalClass'   : 'rounded-0',
+                                            'position'                : 'right'
+                                        ],
+                                        'unmute'   : [
+                                            'title'                   : false,
+                                            'type'                    : 'success',
+                                            'icon'                    : 'comment',
+                                            'noMargin'                : true,
+                                            'hidden'                  : unmute,
+                                            'buttonAdditionalClass'   : 'rounded-0',
+                                            'position'                : 'right'
+                                        ]
+                                    ],
+                                'fieldInputType'                      : 'select',
+                                'fieldHelp'                           : false,
+                                'fieldDataSelectOptions'              : statuses,
+                                'fieldDataSelectOptionsArray'         : true,
+                                'fieldDataSelectOptionsKey'           : 'id',
+                                'fieldDataSelectOptionsValue'         : 'name',
+                                'fieldDataSelectOptionsSelected'      : status,
+                                'fieldDataSelectOptionsZero'          : true,
+                                'fieldDataSelectOptionsZeroTitle'     : 'Status'
+                            ]
+                        )}}
+                    </form>
                 </div>
             </div>
-            <hr>
-            {% set onlineUsers = '' %}
-            {% set offlineUsers = '' %}
-            {% if messengerSettings['members']['users'] is defined and messengerSettings['members']['users']|length > 0 %}
-                {% for users in messengerSettings['members']['users'] %}
-                    {% if users['status'] == 1 %}
-                        {% set statusCircle = 'success' %}
-                    {% elseif users['status'] == 2 %}
-                        {% set statusCircle = 'warning' %}
-                    {% elseif users['status'] == 3 %}
-                        {% set statusCircle = 'danger' %}
-                    {% elseif users['status'] == 4 %}
-                        {% set statusCircle = 'secondary' %}
-                    {% else %}
-                        {% set statusCircle = 'secondary' %}
-                    {% endif %}
-                    {% if users['portrait'] is defined and users['portrait'] !== '' %}
-                        {% set portraitUrl = links.url('system/storages/q/uuid/' ~ users['portrait'] ~ '/w/80') %}
-                    {% else %}
-                        {% set portraitUrl = links.images('general/user.png') %}
-                    {% endif %}
-                    {% set userLi =
-                        '<li class="nav-item" id="messenger-user-' ~ users['id'] ~ '" data-status="' ~ users['status'] ~ '" data-type="user" data-user="' ~ users['id'] ~ '" data-name="' ~ users['full_name'] ~ '" data-portrait="' ~ users['portrait'] ~ '">
-                            <a id="messenger-user-' ~ users['id'] ~ '-link" class="nav-link" href="#">
-                                <img id="messenger-user-' ~ users['id'] ~ '-img" src="' ~ portraitUrl ~ '" class="rounded-sm" style="position:relative;top: -3px; width:20px;" alt="User Image">
-                                <i id="messenger-user-' ~ users['id'] ~ '-icon" class="fa fa-fw fa-circle text-' ~ statusCircle ~ '" style="font-size: 8px;position: absolute;top: 8px;left: 27px;"></i>
-                                <div id="messenger-user-' ~ users['id'] ~ '-name" class="text-uppercase ml-1 text-truncate" style="position:relative; top: 3px;display: inline-block;width: 150px;">' ~ users['full_name'] ~ '</div>
-                                <span class="badge badge-info messenger-counter-' ~ users['id'] ~ '" style="position: relative;top: -4px;"></span>
-                            </a>
-                        </li>'
-                    %}
-                    {% if users['status'] != 4 %}
-                        {% set onlineUsers = onlineUsers ~ userLi %}
-                    {% elseif users['status'] == 4 %}
-                        {% set offlineUsers = offlineUsers ~ userLi %}
-                    {% endif %}
-                {% endfor %}
+            {% if status != 4 %}
+                {% set mainHidden = '' %}
+            {% else %}
+                {% set mainHidden = 'hidden' %}
             {% endif %}
-            <div id="messenger-users">
+            <hr>
+            <div id="messenger-main" {{mainHidden}}>
                 <div class="row">
                     <div class="col">
-                        <h6>Online</h6>
-                        <ul class="nav nav-sidebar flex-column nav-flat" id="messenger-online-users">{{onlineUsers}}</ul>
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : 'component',
+                                'componentName'                         : 'Messenger',
+                                'componentId'                           : 'messenger',
+                                'sectionId'                             : 'main',
+                                'parentComponentId'                     : 'messenger',
+                                'fieldId'                               : 'search',
+                                'fieldLabel'                            : false,
+                                'fieldPlaceholder'                      : 'Search Users...',
+                                'fieldType'                             : 'input',
+                                'fieldAdditionalClass'                  : 'mb-0',
+                                'fieldHelp'                             : false,
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : false,
+                                'fieldBazPostOnUpdate'                  : false,
+                                'fieldValue'                            : ''
+                            ]
+                        )}}
                     </div>
                 </div>
                 <hr>
-                <div class="row">
-                    <div class="col">
-                        <h6>Offline</h6>
-                        <ul class="nav nav-sidebar flex-column nav-flat" id="messenger-offline-users">{{offlineUsers}}</ul>
+                {% set onlineUsers = '' %}
+                {% set offlineUsers = '' %}
+                {% if messengerSettings['members']['users'] is defined and messengerSettings['members']['users']|length > 0 %}
+                    {% for users in messengerSettings['members']['users'] %}
+                        {% if users['status'] == 1 %}
+                            {% set statusCircle = 'success' %}
+                        {% elseif users['status'] == 2 %}
+                            {% set statusCircle = 'warning' %}
+                        {% elseif users['status'] == 3 %}
+                            {% set statusCircle = 'danger' %}
+                        {% elseif users['status'] == 4 %}
+                            {% set statusCircle = 'secondary' %}
+                        {% else %}
+                            {% set statusCircle = 'secondary' %}
+                        {% endif %}
+                        {% if users['portrait'] is defined and users['portrait'] !== '' %}
+                            {% set portraitUrl = links.url('system/storages/q/uuid/' ~ users['portrait'] ~ '/w/80') %}
+                        {% else %}
+                            {% set portraitUrl = links.images('general/user.png') %}
+                        {% endif %}
+                        {% set userLi =
+                            '<li class="nav-item" id="messenger-user-' ~ users['id'] ~ '" data-status="' ~ users['status'] ~ '" data-type="user" data-user="' ~ users['id'] ~ '" data-name="' ~ users['full_name'] ~ '" data-portrait="' ~ users['portrait'] ~ '">
+                                <a id="messenger-user-' ~ users['id'] ~ '-link" class="nav-link" href="#">
+                                    <img id="messenger-user-' ~ users['id'] ~ '-img" src="' ~ portraitUrl ~ '" class="rounded-sm" style="position:relative;top: -3px; width:20px;" alt="User Image">
+                                    <i id="messenger-user-' ~ users['id'] ~ '-icon" class="fa fa-fw fa-circle text-' ~ statusCircle ~ '" style="font-size: 8px;position: absolute;top: 8px;left: 27px;"></i>
+                                    <div id="messenger-user-' ~ users['id'] ~ '-name" class="text-uppercase ml-1 text-truncate" style="position:relative; top: 3px;display: inline-block;width: 150px;">' ~ users['full_name'] ~ '</div>
+                                    <span class="badge badge-info messenger-counter-' ~ users['id'] ~ '" style="position: relative;top: -4px;"></span>
+                                </a>
+                            </li>'
+                        %}
+                        {% if users['status'] != 4 %}
+                            {% set onlineUsers = onlineUsers ~ userLi %}
+                        {% elseif users['status'] == 4 %}
+                            {% set offlineUsers = offlineUsers ~ userLi %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <div id="messenger-users">
+                    <div class="row">
+                        <div class="col">
+                            <h6>Online</h6>
+                            <ul class="nav nav-sidebar flex-column nav-flat" id="messenger-online-users">{{onlineUsers}}</ul>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col">
+                            <h6>Offline</h6>
+                            <ul class="nav nav-sidebar flex-column nav-flat" id="messenger-offline-users">{{offlineUsers}}</ul>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</aside>
+    </aside>
+{% endif %}
 {# <script>
 /* globals autoComplete PNotify EmojiPicker moment */
 // window.dataCollection.env.messenger = { };

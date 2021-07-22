@@ -1,4 +1,4 @@
-<input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}" />
+<input id="security-token" type="hidden" name="{{security.getTokenKey()}}" value="{{security.getToken()}}">
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <div class="container-fluid">
         <ul class="navbar-nav">
@@ -10,24 +10,25 @@
             {% if modules.components.getNamedComponentForApp('Messenger', apps.getAppInfo()['id']) %}
                 <li class="nav-item">
                     {% set statusIcon = 'comment' %}
-                    {% if auth.account()['profile']['settings']['messenger']['mute'] is defined %}
-                        {% if auth.account()['profile']['settings']['messenger']['mute'] == true %}
+                    {% set messengerSettings = basepackages.profile.getMessengerSettings() %}
+                    {% if messengerSettings['mute'] is defined %}
+                        {% if messengerSettings['mute'] == true %}
                             {% set statusIcon = 'comment-slash' %}
-                        {% elseif auth.account()['profile']['settings']['messenger']['mute'] == false %}
+                        {% elseif messengerSettings['mute'] == false %}
                             {% set statusIcon = 'comment' %}
                         {% else %}
                             {% set statusIcon = 'comment' %}
                         {% endif %}
                     {% endif %}
                     {% set statusIconTextColor = 'secondary' %}
-                    {% if auth.account()['profile']['settings']['messenger']['status'] is defined %}
-                        {% if auth.account()['profile']['settings']['messenger']['status'] == 1 %}
+                    {% if messengerSettings['status'] is defined %}
+                        {% if messengerSettings['status'] == 1 %}
                             {% set statusIconTextColor = 'success' %}
-                        {% elseif auth.account()['profile']['settings']['messenger']['status'] == 2 %}
+                        {% elseif messengerSettings['status'] == 2 %}
                             {% set statusIconTextColor = 'warning' %}
-                        {% elseif auth.account()['profile']['settings']['messenger']['status'] == 3 %}
+                        {% elseif messengerSettings['status'] == 3 %}
                             {% set statusIconTextColor = 'danger' %}
-                        {% elseif auth.account()['profile']['settings']['messenger']['status'] == 4 %}
+                        {% elseif messengerSettings['status'] == 4 %}
                             {% set statusIconTextColor = 'secondary' %}
                         {% endif %}
                     {% endif %}

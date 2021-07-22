@@ -9788,17 +9788,17 @@ var BazMessenger = function() {
                             $('#security-token').val(response.token);
                         }
 
-                        if (response.accounts) {
-                            return response.accounts;
+                        if (response.responseData.accounts) {
+                            return response.responseData.accounts;
                         } else {
                             return [];
                         }
                     },
-                    key: ["email"],
+                    key: ["name"],
                     cache: false
                 },
                 selector: "#messenger-main-search",
-                threshold : 4,
+                threshold : 2,
                 debounce: 500,
                 searchEngine: "strict",
                 resultsList: {
@@ -9809,12 +9809,15 @@ var BazMessenger = function() {
                     },
                     destination: "#messenger-main-search",
                     position: "afterend",
-                    element: "div"
+                    element: "div",
+                    className: "autoComplete_results"
                 },
                 maxResults: 5,
                 highlight: true,
                 resultItem: {
                     content: (data, source) => {
+                        //eslint-disable-next-line
+                        console.log(data, source);
                         source.innerHTML = data.match;
                     },
                     element: "div"
@@ -9824,6 +9827,7 @@ var BazMessenger = function() {
                     result.setAttribute("class", "autoComplete_result text-danger");
                     result.setAttribute("tabindex", "1");
                     result.innerHTML = "No search results. Click field help for more information.";
+
                     if (document.querySelector("#messenger-main-search_list")) {
                         $("#messenger-main-search_list").empty().append(result);
                     } else {
@@ -9833,10 +9837,11 @@ var BazMessenger = function() {
                         document.querySelector("#messenger-main-search_list").appendChild(result);
                     }
                 },
-                onSelection: feedback => {
+                onSelection: (feedback) => {
                     $('#messenger-main-search').blur();
-                    $('#messenger-main-search').val(feedback.selection.value.email);
-                    $('#messenger-main-search').attr('value', feedback.selection.value.email);
+                    $('#messenger-main-search').val();
+                    messengerWindow(feedback.selection.value);
+                    addUserToMembersUsers(feedback.selection.value);
                 }
             });
 
@@ -9930,31 +9935,6 @@ var BazMessenger = function() {
             $(li).click(function(e) {
                 e.preventDefault();
                 messengerWindow($(this).data());
-
-                $('.messenger-counter-' + $(this).data('user')).html('');
-
-                var totalCounter = 0;
-                $('#messenger-users span.badge').each(function() {
-                    if ($(this).html() !== '') {
-                        totalCounter = totalCounter + parseInt($(this).html());
-                    }
-                });
-                //eslint-disable-next-line
-                console.log(totalCounter);
-                if (totalCounter === 0) {
-                    $('#messenger-button-counter').html('');
-                } else if (totalCounter < 10) {
-                    $('#messenger-button-counter').css({'right': '10px'});
-                    $('#messenger-button-counter').html(totalCounter);
-                } else if (totalCounter < 99) {
-                    $('#messenger-button-counter').css({'right': '5px'});
-                    $('#messenger-button-counter').html(totalCounter);
-                } else if (totalCounter > 99) {
-                    $('#messenger-button-counter').css({'right': 0});
-                    $('#messenger-button-counter').html('99+');
-                }
-
-                $('#messenger-button').ControlSidebar('toggle');
             });
         });
 
@@ -9964,9 +9944,6 @@ var BazMessenger = function() {
             if ($('#messenger-main-search').val().length === 0) {
                 $('#messenger-main-search_list').children().remove();
             }
-        });
-        $('#messenger-main-search').focusout(function() {
-            $('#messenger-main-search_list').children().remove();
         });
 
         $('#messenger-main-mute').off();
@@ -10029,6 +10006,31 @@ var BazMessenger = function() {
     }
 
     function messengerWindow(user) {
+        $('.messenger-counter-' + $('#messenger-user-' + user.user).data('user')).html('');
+
+        var totalCounter = 0;
+        $('#messenger-users span.badge').each(function() {
+            if ($(this).html() !== '') {
+                totalCounter = totalCounter + parseInt($(this).html());
+            }
+        });
+        //eslint-disable-next-line
+        console.log(totalCounter);
+        if (totalCounter === 0) {
+            $('#messenger-button-counter').html('');
+        } else if (totalCounter < 10) {
+            $('#messenger-button-counter').css({'right': '10px'});
+            $('#messenger-button-counter').html(totalCounter);
+        } else if (totalCounter < 99) {
+            $('#messenger-button-counter').css({'right': '5px'});
+            $('#messenger-button-counter').html(totalCounter);
+        } else if (totalCounter > 99) {
+            $('#messenger-button-counter').css({'right': 0});
+            $('#messenger-button-counter').html('99+');
+        }
+
+        $('#messenger-button').ControlSidebar('toggle');
+
         if ($('#messenger-windows #messenger-window-' + user.user).length > 0) {
             $('.messenger-input-' + user.user).focus();
             return;
@@ -10229,6 +10231,8 @@ var BazMessenger = function() {
                 });
             }
         }, 'json');
+
+        $('.messenger-input-' + user.user).focus();
     }
 
     function populateMessages(toUser, messages, paginationCounters, update = false) {
@@ -10345,6 +10349,61 @@ var BazMessenger = function() {
                 }, 'json');
             });
         }
+    }
+
+    function addUserToMembersUsers(user) {
+        var color;
+        if (user.status != 4) {
+            if (user.status == 1) {
+                color = 'success';
+            } else if (user.status == 2) {
+                color = 'warning';
+            } else if (user.status == 3) {
+                color = 'danger';
+            }
+        } else if (user.status == 4) {
+            color = 'secondary';
+        }
+
+        var newUser =
+            '<li class="nav-item" id="messenger-user-' + user.id + '" data-status="' + user.status + '" data-type="user" data-user="' +
+                user.id + '" data-name="' + user.name + '" data-portrait="' + user.portrait + '">' +
+                '<a id="messenger-user-' + user.id + '-link" class="nav-link" href="#">' +
+                    '<img id="messenger-user-' + user.id + '-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + user.portrait +
+                    '/w/80" class="rounded-sm" style="position:relative;top: -3px; width:20px;" alt="User Image">' +
+                    '<i id="messenger-user-' + user.id + '-icon" class="fa fa-fw fa-circle text-' + color + '" style="font-size: 8px;position: absolute;top: 8px;left: 27px;"></i>' +
+                    '<div id="messenger-user-' + user.id + '-name" class="text-uppercase ml-2 text-truncate" style="position:relative; top: 3px;display: inline-block;width: 150px;">' + user.name + '</div>' +
+                    '<span class="badge badge-info messenger-counter-' + user.id + '" style="position: relative;top: -4px;"></span>' +
+                '</a>' +
+            '</li>';
+        if (user.status == 4) {
+            $('#messenger-offline-users').append(newUser);
+        } else {
+            $('#messenger-online-users').append(newUser);
+        }
+
+        initListeners();
+
+        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/addusertomembersusers';
+
+        var postData = { };
+        postData[$('#security-token').attr('name')] = $('#security-token').val();
+        postData['user'] = user;
+
+        $.post(url, postData, function(response) {
+            if (response.tokenKey && response.token) {
+                $('#security-token').attr('name', response.tokenKey);
+                $('#security-token').val(response.token);
+            }
+            if (response.responseCode == 0) {
+                //
+            } else {
+                PNotify.error({
+                    text        : response.responseMessage,
+                    textTrusted : true
+                });
+            }
+        }, 'json');
     }
 
     function sendMessage(user, message) {
@@ -10628,36 +10687,7 @@ var BazMessenger = function() {
             }
 
             if ($('#messenger-user-' + data.user.id).length === 0) {
-                var color;
-                if (data.user.status != 4) {
-                    if (data.user.status == 1) {
-                        color = 'success';
-                    } else if (data.user.status == 2) {
-                        color = 'warning';
-                    } else if (data.user.status == 3) {
-                        color = 'danger';
-                    }
-                } else if (data.user.status == 4) {
-                    color = 'secondary';
-                }
-
-                var newUser =
-                    '<li class="nav-item" id="messenger-user-' + data.user.id + '" data-status="' + data.user.status + '" data-type="user" data-user="' +
-                        data.user.id + '" data-name="' + data.user.name + '" data-portrait="' + data.user.portrait + '">' +
-                        '<a id="messenger-user-' + data.user.id + '-link" class="nav-link" href="#">' +
-                            '<img id="messenger-user-' + data.user.id + '-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + data.user.portrait +
-                            '/w/80" class="rounded-sm" style="position:relative;top: -3px; width:20px;" alt="User Image">' +
-                            '<i id="messenger-user-' + data.user.id + '-icon" class="fa fa-fw fa-circle text-' + color + '" style="font-size: 8px;position: absolute;top: 8px;left: 27px;"></i>' +
-                            '<div id="messenger-user-' + data.user.id + '-name" class="text-uppercase ml-2 text-truncate" style="position:relative; top: 3px;display: inline-block;width: 150px;">' + data.user.name + '</div>' +
-                            '<span class="badge badge-info messenger-counter-' + data.user.id + '" style="position: relative;top: -4px;"></span>' +
-                        '</a>' +
-                    '</li>';
-                if (data.user.status == 4) {
-                    $('#messenger-offline-users').append(newUser);
-                } else {
-                    $('#messenger-online-users').append(newUser);
-                }
-                initListeners();
+                addUserToMembersUsers(data.user);
             }
 
             var userCounter;

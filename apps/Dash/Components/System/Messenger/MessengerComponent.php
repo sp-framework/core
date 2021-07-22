@@ -14,8 +14,6 @@ class MessengerComponent extends BaseComponent
         $this->messengerPackage = $this->usePackage(Messenger::class);
 
         $this->accounts = $this->basepackages->accounts;
-
-        $this->profile = $this->basepackages->profile;
     }
 
     public function viewAction()
@@ -188,7 +186,7 @@ class MessengerComponent extends BaseComponent
                     return;
                 }
 
-                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery);
+                $searchAccounts = $this->accounts->searchAccountInternal($searchQuery, true);
 
                 if ($searchAccounts) {
                     $currentAccount = $this->auth->account();
@@ -196,12 +194,21 @@ class MessengerComponent extends BaseComponent
                     if ($currentAccount) {
                         $accounts = $this->accounts->packagesData->accounts;
 
-                        foreach ($accounts as $accountKey => $account) {
+                        foreach ($accounts as $accountKey => &$account) {
                             if ($account['id'] == $currentAccount['id']) {
                                 unset($accounts[$accountKey]);
+                                continue;
                             }
+                            $profile = $this->basepackages->profile->getProfile($account['id']);
+                            $account['name'] = $profile['full_name'];
+                            $account['portrait'] = $profile['portrait'];
+                            if (isset($profile['settings']['messenger']['status'])) {
+                                $account['status'] = $profile['settings']['messenger']['status'];
+                            } else {
+                                $account['status'] = 4;
+                            }
+                            $account['user'] = $account['id'];
                         }
-                        // $accounts = array_values($accounts);
 
                         $this->addResponse(
                             $this->accounts->packagesData->responseMessage,
@@ -215,10 +222,35 @@ class MessengerComponent extends BaseComponent
                             ['accounts' => $this->accounts->packagesData->accounts]
                         );
                     }
+                } else {
+                    $this->addResponse(
+                        $this->accounts->packagesData->responseMessage,
+                        $this->accounts->packagesData->responseCode,
+                        ['accounts' => []]
+                    );
                 }
             } else {
                 $this->addResponse('search query missing', 1);
             }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function addUserToMembersUsersAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->profile->addUserToMembersUsers($this->postData());
+
+            $this->addResponse(
+                $this->basepackages->profile->packagesData->responseMessage,
+                $this->basepackages->profile->packagesData->responseCode
+            );
+
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }
