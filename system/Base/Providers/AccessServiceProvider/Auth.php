@@ -942,6 +942,12 @@ class Auth
                 $this->accounts->update($this->account);
             }
         } else {
+            if (!$this->email->setup()) {
+                $verified = true;
+            } else {
+                $verified = false;
+            }
+
             $agents = [];
             $agents['verificationCode'] = null;
             $agents['locations'][] =
@@ -949,7 +955,7 @@ class Auth
                     'clientAddress' => $clientAddress,
                     'userAgent'     => $userAgent,
                     'session'       => $sessionId,
-                    'verified'      => false
+                    'verified'      => $verified
                 ];
 
             $this->account['agents'] = Json::encode($agents);
