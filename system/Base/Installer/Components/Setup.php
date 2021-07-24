@@ -148,6 +148,8 @@ Class Setup
 					$this->setupPackage->registerCountries();
 
 					$this->setupPackage->registerStorages();
+
+					$this->setupPackage->registerSchedules();
 				}
 
 				// $this->setupPackage->removeInstaller();

@@ -2,7 +2,9 @@
 
 namespace System\Base\Installer\Packages;
 
+use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
+use League\Flysystem\UnableToDeleteFile;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Db\Column;
 use Phalcon\Db\Index;
@@ -18,6 +20,7 @@ use System\Base\Installer\Packages\Setup\Register\Basepackages\Storages\Storages
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRootAdminRole;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Schedules as RegisterSchedules;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
@@ -30,8 +33,8 @@ use System\Base\Installer\Packages\Setup\Schema\Apps\Types as AppsTypes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Book as AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Types as AddressTypes;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
@@ -46,6 +49,8 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLo
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Profiles;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Roles;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Schedules;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Tasks;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Core;
 use System\Base\Installer\Packages\Setup\Schema\Domains;
@@ -170,6 +175,8 @@ class Setup
 		$this->db->createTable('basepackages_activity_logs', $dbName, (new ActivityLogs)->columns());
 		$this->db->createTable('basepackages_notes', $dbName, (new Notes)->columns());
 		$this->db->createTable('basepackages_notifications', $dbName, (new Notifications)->columns());
+		$this->db->createTable('basepackages_workers_schedules', $dbName, (new Schedules)->columns());
+		$this->db->createTable('basepackages_workers_tasks', $dbName, (new Tasks)->columns());
 	}
 
 	public function registerRepository()
@@ -433,6 +440,11 @@ class Setup
 		} else {
 			return null;
 		}
+	}
+
+	public function registerSchedules()
+	{
+		(new RegisterSchedules())->register($this->db);
 	}
 
 	public function writeConfigs($coreJson)
