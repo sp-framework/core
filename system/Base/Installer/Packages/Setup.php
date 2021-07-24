@@ -71,6 +71,8 @@ class Setup
 
 	protected $request;
 
+	protected $session;
+
 	protected $db;
 
 	protected $dbConfig;
@@ -84,6 +86,8 @@ class Setup
 		$this->localContent = $this->container['localContent'];
 
 		$this->request = $this->container->getShared('request');
+
+		$this->session = $this->container->getShared('session');
 
 		$this->postData = $this->request->getPost();
 
@@ -120,6 +124,23 @@ class Setup
 					];
 
 			$this->db = new Mysql($this->dbConfig['db']);
+		}
+	}
+
+	public function cleanVar()
+	{
+		$sessionId = $this->session->getId();
+
+		$files = $this->getInstalledFiles('var/');
+
+		foreach ($files['files'] as $key => $file) {
+			if (str_contains($file, $sessionId)) {
+				try {
+					$this->localContent->delete($file);
+				} catch (FilesystemException | UnableToDeleteFile $exception) {
+					throw $exception;
+				}
+			}
 		}
 	}
 

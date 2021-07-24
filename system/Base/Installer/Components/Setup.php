@@ -22,7 +22,7 @@ Class Setup
 
 	protected $coreJson;
 
-	public function __construct()
+	public function __construct($session)
 	{
 		$container = new FactoryDefault();
 
@@ -58,6 +58,8 @@ Class Setup
 			}
 		);
 
+		$container->setShared('session', $session);
+
 		$this->container = $container;
 
 		$this->response = $this->container->getShared('response');
@@ -88,6 +90,8 @@ Class Setup
 		}
 
 		if ($this->request->isPost()) {
+
+			$this->setupPackage->cleanVar();
 
 			$this->coreJson = Json::decode($this->container->getShared('localContent')->read('core.json'), true);
 
