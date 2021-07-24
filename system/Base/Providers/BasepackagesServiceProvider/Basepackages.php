@@ -6,8 +6,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Book as Addressbook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Types as Addresstypes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Filters;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
@@ -17,11 +17,11 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Processes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
 class Basepackages
 {
@@ -61,7 +61,7 @@ class Basepackages
 
 	protected $notes;
 
-	protected $processes;
+	protected $workers;
 
 	protected $notifications;
 
@@ -201,13 +201,6 @@ class Basepackages
 		return $this->notes;
 	}
 
-	protected function initProcesses()
-	{
-		$this->processes = (new Processes())->init();
-
-		return $this->processes;
-	}
-
 	protected function initNotifications()
 	{
 		$this->notifications = (new Notifications())->init();
@@ -220,5 +213,12 @@ class Basepackages
 		$this->pusher = (new Pusher())->init();
 
 		return $this->pusher;
+	}
+
+	protected function initWorkers()
+	{
+		$this->workers = (new Workers())->init();
+
+		return $this->workers;
 	}
 }

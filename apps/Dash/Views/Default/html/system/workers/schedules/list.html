@@ -1,0 +1,46 @@
+{{adminltetags.useTag('content',
+    [
+        'component'             : table['component'],
+        'componentName'         : componentName,
+        'componentId'           : componentId,
+        'parentComponentId'     : parent,
+        'sectionId'             : 'listing',
+        'contentType'           : 'sectionWithListing',
+        'cardHeader'            : true,
+        'cardType'              : 'primary',
+        'cardIcon'              : 'clock',
+        'cardTitle'             : 'Schedules',
+        'cardAdditionalClass'   : 'rounded-0',
+        'cardShowTools'         : ['maximize'],
+        'dtFixedHeader'         : true,
+        'dtPrimaryButtons'      :
+            {
+                'componentId'           : componentId,
+                'sectionId'             : 'listing',
+                'buttonType'            : 'button',
+                'buttons'               :
+                    {
+                        'process-queue' : {
+                            'title'                   : 'Add New Schedule',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'plus',
+                            'position'                : 'right',
+                            'buttonAdditionalClass'   : 'contentAjaxLink',
+                            'url'                     : links.url('system/workers/schedules/q/id/0')
+                        }
+                    }
+            },
+        'dtTable'               : table,
+        'dtColumns'             : table['columns'],
+        'dtPostUrl'             : table['postUrl'],
+        'dtPostUrlParams'       : table['postUrlParams'],
+        'dtStriped'             : true,
+        'dtStateSave'           : false,
+        'dtBordered'            : false,
+        'dtHideIdColumn'        : true,
+        'dtNoOfColumnsToShow'   : 6,
+        'dtTableCompact'        : true,
+        'dtZeroRecords'         : 'No schedules data available. Add by clicking the Add new schedule button.'
+    ]
+)}}

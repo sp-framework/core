@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
+namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers;
 
 use Phalcon\Db\Column;
 
-class Notifications
+class Schedules
 {
     public function columns()
     {
@@ -14,21 +14,14 @@ class Notifications
                     new Column(
                         'id',
                         [
-                            'type'          => Column::TYPE_INTEGER,
+                            'type'          => Column::TYPE_SMALLINTEGER,
                             'notNull'       => true,
                             'autoIncrement' => true,
                             'primary'       => true,
                         ]
                     ),
                     new Column(
-                        'root_process',
-                        [
-                            'type'          => Column::TYPE_INTEGER,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'process_name',
+                        'name',
                         [
                             'type'          => Column::TYPE_VARCHAR,
                             'size'          => 50,
@@ -36,19 +29,28 @@ class Notifications
                         ]
                     ),
                     new Column(
-                        'status',
+                        'description',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
-                            'notNull' => true,
+                            'type'    => Column::TYPE_VARCHAR,
+                            'size'    => 2048,
+                            'notNull' => false,
                         ]
                     ),
                     new Column(
-                        'priority',
+                        'schedule',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
-                            'notNull' => true,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 1027,
+                            'notNull'       => true,
                         ]
                     ),
+                    new Column(
+                        'type',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => true,
+                        ]
+                    )
                 ]
             ];
     }

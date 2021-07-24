@@ -43,7 +43,7 @@ return
 				'System\Base\Providers\DomainsServiceProvider',
 				'System\Base\Providers\ModulesServiceProvider',
 				'System\Base\Providers\HttpServiceProvider',
-				// 'System\Base\Providers\LoggerServiceProvider',
+				'System\Base\Providers\LoggerServiceProvider',
 				'System\Base\Providers\ContentServiceProvider',
 				// 'System\Base\Providers\RouterServiceProvider',
 				// 'System\Base\Providers\DispatcherServiceProvider',

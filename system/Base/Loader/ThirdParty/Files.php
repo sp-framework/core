@@ -7,6 +7,7 @@ return
         __DIR__ . '/../../../ThirdParty/vendor/guzzlehttp/promises/src/functions_include.php',
         __DIR__ . '/../../../ThirdParty/vendor/guzzlehttp/psr7/src/functions_include.php',
         __DIR__ . '/../../../ThirdParty/vendor/guzzlehttp/guzzle/src/functions_include.php',
+        __DIR__ . '/../../../ThirdParty/vendor/symfony/polyfill-ctype/bootstrap.php',
         __DIR__ . '/../../../ThirdParty/vendor/khanamiryan/qrcode-detector-decoder/lib/Common/customFunctions.php',
         __DIR__ . '/../../../ThirdParty/vendor/thecodingmachine/safe/generated/array.php',
         __DIR__ . '/../../../ThirdParty/vendor/thecodingmachine/safe/generated/strings.php',

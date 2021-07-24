@@ -4,6 +4,7 @@ return
     [
         'Zxing'                                         => __DIR__ . '/../../../ThirdParty/vendor/khanamiryan/qrcode-detector-decoder/lib',
         'ZxcvbnPhp'                                     => __DIR__ . '/../../../ThirdParty/vendor/bjeavons/zxcvbn-php/src',
+        'Webmozart\\Assert'                             => __DIR__ . '/../../../ThirdParty/vendor/webmozart/assert/src',
         'Safe'                                          => __DIR__ . '/../../../ThirdParty/vendor/thecodingmachine/generated',
         'Psr\\Http\\Message'                            => __DIR__ . '/../../../ThirdParty/vendor/psr/http-message/src/',
         'Psr\\Http\\Client'                             => __DIR__ . '/../../../ThirdParty/vendor/psr/http-client/src/',
@@ -37,5 +38,8 @@ return
         'React\\Cache'                                  => __DIR__ . '/../../../ThirdParty/vendor/react/cache/src',
         'Ratchet\\RFC6455'                              => __DIR__ . '/../../../ThirdParty/vendor/ratchet/rfc6455/src',
         'Ratchet'                                       => __DIR__ . '/../../../ThirdParty/vendor/cboden/ratchet/src/Ratchet',
-        'Evenement'                                     => __DIR__ . '/../../../ThirdParty/vendor/evenement/evenement/src/Evenement'
+        'Evenement'                                     => __DIR__ . '/../../../ThirdParty/vendor/evenement/evenement/src/Evenement',
+        'Symfony\\Polyfill\\Ctype'                      => __DIR__ . '/../../../ThirdParty/vendor/symfony/polyfill-ctype',
+        'GO'                                            => __DIR__ . '/../../../ThirdParty/vendor/peppeocchi/php-cron-scheduler/src/GO',
+        'Cron'                                          => __DIR__ . '/../../../ThirdParty/vendor/dragonmantank/cron-expression/src/Cron'
     ];

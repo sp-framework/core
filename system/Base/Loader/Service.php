@@ -107,19 +107,4 @@ class Service
 				);
 		}
 	}
-
-	public function addNamespaces(array $namespaces = [])
-	{
-		//
-	}
-
-	public function addClasses(array $classes = [])
-	{
-		//
-	}
-
-	public function addFiles(array $files = [])
-	{
-		//
-	}
 }
