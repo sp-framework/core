@@ -24,6 +24,11 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
     protected $account;
 
+    public function init()
+    {
+        return $this;
+    }
+
     public function onConstruct()
     {
         $this->clients = new \SplObjectStorage;
