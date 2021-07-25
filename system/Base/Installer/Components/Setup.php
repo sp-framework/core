@@ -153,7 +153,11 @@ Class Setup
 
 					$this->setupPackage->registerStorages();
 
+					$this->setupPackage->registerWorkers();
+
 					$this->setupPackage->registerSchedules();
+
+					$this->setupPackage->registerTasks();
 				}
 
 				// $this->setupPackage->removeInstaller();

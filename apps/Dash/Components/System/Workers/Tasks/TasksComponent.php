@@ -21,18 +21,79 @@ class TasksComponent extends BaseComponent
      */
     public function viewAction()
     {
+        $schedules = $this->basepackages->workers->schedules->schedules;
+
         if (isset($this->getData()['id'])) {
-            $availableFunctions = $this->tasks->getAllFunctions();
+            $functions = $this->tasks->getAllFunctions();
+
+            $this->view->functions = $functions;
+
+            $this->view->schedules = $schedules;
 
             if ($this->getData()['id'] != 0) {
-                $tasks = $this->tasks->getById($this->getData()['id']);
+                $task = $this->tasks->getById($this->getData()['id']);
 
-                $this->view->tasks = $tasks;
+                $this->view->task = $task;
             }
             $this->view->pick('tasks/view');
 
             return;
         }
+
+        $controlActions =
+            [
+                'actionsToEnable'       =>
+                [
+                    'edit'      => 'apps',
+                    'remove'    => 'apps/remove',
+                ]
+            ];
+
+        $schedulesArr = [];
+
+        foreach ($schedules as $scheduleKey => $schedule) {
+            $schedulesArr[$schedule['id']] = $schedule['name'];
+        }
+
+        $replaceColumns =
+            [
+                'schedule_id'   =>
+                    [
+                        'html'  => $schedulesArr
+                    ],
+                'enabled'       =>
+                    [
+                        'html'  =>
+                            [
+                                '0' => '<span class="badge badge-secondary">No</span>',
+                                '1' => '<span class="badge badge-success">Yes</span>'
+                            ]
+                    ],
+                'status'       =>
+                    [
+                        'html'  =>
+                            [
+                                '0' => '-',
+                                '1' => '<span class="badge badge-secondary">Scheduled</span>',
+                                '2' => '<span class="badge badge-info">Running...</span>',
+                                '3' => '<span class="badge badge-danger">Error!</span>'
+                            ]
+                    ],
+                'previous_run'  =>
+                    [
+                        'html'  =>
+                            [
+                                '0' => '-'
+                            ]
+                    ],
+                'next_run'  =>
+                    [
+                        'html'  =>
+                            [
+                                '0' => '-'
+                            ]
+                    ]
+            ];
 
         $controlActions =
             [
@@ -48,12 +109,12 @@ class TasksComponent extends BaseComponent
             $this->tasks,
             'system/workers/tasks/view',
             null,
-            ['name', 'schedule_id', 'priority', 'enabled', 'status'],
+            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run'],
             true,
-            ['name', 'schedule_id', 'priority', 'enabled', 'status'],
+            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run'],
             $controlActions,
             ['schedule_id' => 'schedule'],
-            null,
+            $replaceColumns,
             'name'
         );
 

@@ -221,3 +221,16 @@ if (!function_exists('drupal_array_merge_deep_array')) {
         return $result;
     }
 }
+
+if (!function_exists('prefix_get_next_key_array')) {
+    function prefix_get_next_key_array( $arr, $key ) {
+        $keys     = array_keys( $arr );
+        $position = array_search( $key, $keys, true );
+
+        if ( isset( $keys[ $position + 1 ] ) ) {
+            $next_key = $keys[ $position + 1 ];
+        }
+
+        return $next_key;
+    }
+}

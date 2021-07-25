@@ -25,12 +25,12 @@
 {% set dailyMinutes = '00' %}
 
 {% set weeklyHidden = 'hidden' %}
-{% set weeklyDays = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'] %}
+{% set weeklyDays = ['0','1','2','3','4','5','6'] %}
 {% set weeklyHours = '00' %}
 {% set weeklyMinutes = '00' %}
 
 {% set monthlyHidden = 'hidden' %}
-{% set monthlyMonths = ['january','february','march','april','may','june','july','august','september','october','november','december'] %}
+{% set monthlyMonths = ['1','2','3','4','5','6','7','8','9','10','11','12'] %}
 {% set monthlyDay = '1' %}
 {% set monthlyHours = '00' %}
 {% set monthlyMinutes = '00' %}
@@ -59,7 +59,6 @@
     {% set monthlyHours = schedule['schedule']['params']['monthly_hours'] %}
     {% set monthlyMinutes = schedule['schedule']['params']['monthly_minutes'] %}
 {% endif %}
-{# {{dump(monthlyMonths)}} #}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
         <div class="row">
@@ -358,37 +357,37 @@
                                     {
                                         '0'            :
                                             {
-                                                'id'            : 'sunday',
+                                                'id'            : '0',
                                                 'name'          : 'Sunday'
                                             },
                                         '1'            :
                                             {
-                                                'id'            : 'monday',
+                                                'id'            : '1',
                                                 'name'          : 'Monday'
                                             },
                                         '2'            :
                                             {
-                                                'id'            : 'tuesday',
+                                                'id'            : '2',
                                                 'name'          : 'Tuesday'
                                             },
                                         '3'            :
                                             {
-                                                'id'            : 'wednesday',
+                                                'id'            : '3',
                                                 'name'          : 'Wednesday'
                                             },
                                         '4'            :
                                             {
-                                                'id'            : 'thursday',
+                                                'id'            : '4',
                                                 'name'          : 'Thursday'
                                             },
                                         '5'            :
                                             {
-                                                'id'            : 'friday',
+                                                'id'            : '5',
                                                 'name'          : 'Friday'
                                             },
                                         '6'            :
                                             {
-                                                'id'            : 'saturday',
+                                                'id'            : '6',
                                                 'name'          : 'Saturday'
                                             }
                                     },
@@ -478,62 +477,62 @@
                                     {
                                         '1'            :
                                             {
-                                                'id'            : 'january',
+                                                'id'            : '1',
                                                 'name'          : 'January'
                                             },
                                         '2'            :
                                             {
-                                                'id'            : 'february',
+                                                'id'            : '2',
                                                 'name'          : 'February'
                                             },
                                         '3'            :
                                             {
-                                                'id'            : 'march',
+                                                'id'            : '3',
                                                 'name'          : 'March'
                                             },
                                         '4'            :
                                             {
-                                                'id'            : 'april',
+                                                'id'            : '4',
                                                 'name'          : 'April'
                                             },
                                         '5'            :
                                             {
-                                                'id'            : 'may',
+                                                'id'            : '5',
                                                 'name'          : 'May'
                                             },
                                         '6'            :
                                             {
-                                                'id'            : 'june',
+                                                'id'            : '6',
                                                 'name'          : 'June'
                                             },
                                         '7'            :
                                             {
-                                                'id'            : 'july',
+                                                'id'            : '7',
                                                 'name'          : 'July'
                                             },
                                         '8'            :
                                             {
-                                                'id'            : 'august',
+                                                'id'            : '8',
                                                 'name'          : 'August'
                                             },
                                         '9'            :
                                             {
-                                                'id'            : 'september',
+                                                'id'            : '9',
                                                 'name'          : 'September'
                                             },
                                         '10'           :
                                             {
-                                                'id'            : 'october',
+                                                'id'            : '10',
                                                 'name'          : 'October'
                                             },
                                         '11'           :
                                             {
-                                                'id'            : 'november',
+                                                'id'            : '11',
                                                 'name'          : 'November'
                                             },
                                         '12'           :
                                             {
-                                                'id'            : 'december',
+                                                'id'            : '12',
                                                 'name'          : 'December'
                                             }
                                     },

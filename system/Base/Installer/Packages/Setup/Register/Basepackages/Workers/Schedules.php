@@ -11,7 +11,7 @@ class Schedules
         $schedulesArr = $this->systemSchedules();
 
         foreach ($schedulesArr as $key => $schedule) {
-            $insertAdmin = $db->insertAsDict(
+            $db->insertAsDict(
                 'basepackages_workers_schedules',
                 $schedule
             );
@@ -125,21 +125,7 @@ class Schedules
                 'type'      => 'monthly',
                 'params'    =>
                     [
-                        'monthly_months'        =>
-                            [
-                                'january',
-                                'february',
-                                'march',
-                                'april',
-                                'may',
-                                'june',
-                                'july',
-                                'august',
-                                'september',
-                                'october',
-                                'november',
-                                'december'
-                            ],
+                        'monthly_months'        => ['1','2','3','4','5','6','7','8','9','10','11','12'],
                         'monthly_day'           => '1',
                         'monthly_hours'         => '00',
                         'monthly_minutes'       => '00'

@@ -1,87 +1,197 @@
 {% if task['id'] is defined %}
     {% set taskId = task['id'] %}
     {% set taskName = task['name'] %}
+    {% set taskFunction = task['function'] %}
     {% set taskDescription = task['description'] %}
+    {% set taskPriority = task['priority'] %}
+    {% set taskSchedule = task['schedule_id'] %}
+    {% if task['enabled'] == 1 %}
+        {% set taskEnableChecked = true %}
+    {% else %}
+        {% set taskEnableChecked = false %}
+    {% endif %}
 {% else %}
     {% set taskId = '' %}
     {% set taskName = '' %}
+    {% set taskFunction = '' %}
     {% set taskDescription = '' %}
+    {% set taskPriority = '' %}
+    {% set taskSchedule = '' %}
+    {% set taskEnableChecked = false %}
 {% endif %}
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'id',
-                'fieldLabel'                     : 'ID',
-                'fieldType'                      : 'input',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Task ID',
-                'fieldRequired'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazPostOnCreate'           : false,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldHidden'                    : true,
-                'fieldDisabled'                  : true,
-                'fieldValue'                     : taskId
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'name',
-                'fieldLabel'                     : 'Name',
-                'fieldType'                      : 'input',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Name Example: Run Email Every Queue Hour',
-                'fieldRequired'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 50,
-                'fieldValue'                     : taskName
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'description',
-                'fieldLabel'                     : 'Description',
-                'fieldType'                      : 'textarea',
-                'fieldDataMaxLength'             : 1024,
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Description',
-                'fieldRequired'                  : false,
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMaxLength'        : 1024,
-                'fieldTextareaRows'              : 2,
-                'fieldValue'                     : taskDescription
-            ]
-        )}}
-    </div>
-</div>
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'id',
+                        'fieldLabel'                            : 'ID',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Task ID',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldHidden'                           : true,
+                        'fieldDisabled'                         : true,
+                        'fieldValue'                            : taskId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'name',
+                        'fieldLabel'                            : 'Name',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Name Example: Email Queue',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 50,
+                        'fieldValue'                            : taskName
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'enabled',
+                        'fieldLabel'                            : 'Enabled',
+                        'fieldType'                             : 'checkbox',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Task enabled?",
+                        'fieldRequired'                         : true,
+                        'fieldCheckboxType'                     : 'success',
+                        'fieldCheckboxChecked'                  : taskEnableChecked,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'description',
+                        'fieldLabel'                     : 'Description',
+                        'fieldType'                      : 'textarea',
+                        'fieldDataMaxLength'             : 1024,
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Description',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 1024,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : taskDescription
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'priority',
+                        'fieldLabel'                            : 'Priority',
+                        'fieldType'                             : 'input',
+                        'fieldInputTypeTextFilter'              : 'positiveInt',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Priority between 1 and 10. 1 being the highest and 10 being the lowest.',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldDataInputMinNumber'               : 1,
+                        'fieldDataInputMaxNumber'               : 10,
+                        'fieldValue'                            : taskPriority
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'schedule_id',
+                        'fieldLabel'                            : 'Schedule',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Select a schedule for the task.",
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : schedules,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : taskSchedule
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'function',
+                        'fieldLabel'                            : 'Function',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Task's function",
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : functions,
+                        'fieldDataSelect2OptionsKey'            : 'func',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : taskFunction
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
 <script>
 /* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -112,23 +222,27 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-enabled'                 : { },
         '{{componentId}}-{{sectionId}}-description'             : { },
         '{{componentId}}-{{sectionId}}-priority'                : { },
-        '{{componentId}}-{{sectionId}}-schedule'                : { },
-        '{{componentId}}-{{sectionId}}-function'                : { },
-        '{{componentId}}-{{sectionId}}-enabled'                 : { },
+        '{{componentId}}-{{sectionId}}-schedule_id'             : {
+            placeholder : "SELECT SCHEDULE"
+        },
+        '{{componentId}}-{{sectionId}}-function'                : {
+            placeholder : "SELECT FUNCTION"
+        },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-priority'                : 'required',
-                '{{componentId}}-{{sectionId}}-schedule'                : 'required',
+                '{{componentId}}-{{sectionId}}-schedule_id'             : 'required',
                 '{{componentId}}-{{sectionId}}-function'                : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter Service name',
                 '{{componentId}}-{{sectionId}}-priority'                : 'Please enter priority between 1 and 10',
-                '{{componentId}}-{{sectionId}}-schedule'                : 'Please select a schedule',
-                '{{componentId}}-{{sectionId}}-function'                : 'Please select a function'
+                '{{componentId}}-{{sectionId}}-schedule_id'             : 'Please select a schedule',
+                '{{componentId}}-{{sectionId}}-function'                : 'Please select a function',
             }
         }
     });

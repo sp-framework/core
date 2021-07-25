@@ -21,7 +21,6 @@ class Schedules extends BasePackage
         return $this;
     }
 
-
     public function addSchedule(array $data)
     {
         if (!isset($data['schedule'])) {
@@ -30,7 +29,7 @@ class Schedules extends BasePackage
             return false;
         }
 
-        if ($data['type'] == 0) {
+        if (isset($data['type']) && $data['type'] == 0) {
             $this->addResponse('Cannot add system schedule.', 1);
 
             return false;
@@ -53,7 +52,7 @@ class Schedules extends BasePackage
             return false;
         }
 
-        if ($data['type'] == 0) {
+        if (isset($data['type']) && $data['type'] == 0) {
             $this->addResponse('Cannot edit system schedule.', 1);
 
             return false;
@@ -64,7 +63,7 @@ class Schedules extends BasePackage
         if ($this->update($data)) {
             $this->addResponse('Updated schedule ' . $data['name']);
         } else {
-            $this->addResponse('Error adding schedule', 1);
+            $this->addResponse('Error updating schedule', 1);
         }
     }
 
@@ -100,7 +99,6 @@ class Schedules extends BasePackage
         } else {
             $this->addResponse('Error removing schedule', 1);
         }
-
     }
 
     protected function createScheduleObject(array $data)
@@ -142,5 +140,23 @@ class Schedules extends BasePackage
         }
 
         return $objData;
+    }
+
+    public function getSchedulesSchedule($id)
+    {
+        $filter =
+            $this->model->filter(
+                function($function) use ($id) {
+                    $function = $function->toArray();
+
+                    if ($function['id'] == $id) {
+                        $function['schedule'] = Json::decode($function['schedule'], true);
+
+                        return $function['schedule'];
+                    }
+                }
+            );
+
+        return $filter[0];
     }
 }

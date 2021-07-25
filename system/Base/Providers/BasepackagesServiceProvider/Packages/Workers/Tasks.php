@@ -19,23 +19,23 @@ class Tasks extends BasePackage
 
     public function init(bool $resetCache = false)
     {
+        $this->getAll($resetCache);
+
         return $this;
     }
 
     public function getAllFunctions()
     {
-        var_dump($this->functionsDir);
-        $availableFunctionsArr =
+        $functionsArr =
             $this->localContent->listContents($this->functionsDir, true)
             ->filter(fn (StorageAttributes $attributes) => $attributes->isFile())
             ->map(fn (StorageAttributes $attributes) => $attributes->path())
             ->toArray();
-        var_dump($availableFunctionsArr);
 
-        $availableFunctions = [];
+        $functions = [];
 
-        if (count($availableFunctionsArr) > 0) {
-            foreach ($availableFunctionsArr as $key => $function) {
+        if (count($functionsArr) > 0) {
+            foreach ($functionsArr as $key => $function) {
                 $function = ucfirst($function);
                 $function = str_replace('/', '\\', $function);
                 $function = str_replace('.php', '', $function);
@@ -43,32 +43,72 @@ class Tasks extends BasePackage
                 try {
                     $function = new $function();
 
-                    $availableFunctions[$key]['func'] = $function->packageName;
-                    $availableFunctions[$key]['name'] = $function->funcName;
+                    $functions[$function->packageName]['func'] = $function->packageName;
+                    $functions[$function->packageName]['name'] = $function->funcName;
 
                 } catch (\Exception $e) {
                     throw $e;
                 }
-                var_dump($function);
             }
         }
 
-        return $availableFunctions;
+        return $functions;
     }
 
     public function addTask(array $data)
     {
-        //
+        if (isset($data['type']) && $data['type'] == 0) {
+            $this->addResponse('Cannot add system task.', 1);
+
+            return false;
+        }
+
+        $data['status'] = 0;
+        $data['type'] = 1;
+        $data['previous_run'] = 0;
+        $data['next_run'] = 0;
+
+        if ($this->add($data)) {
+            $this->addResponse('Added new task ' . $data['name']);
+        } else {
+            $this->addResponse('Error adding new task', 1);
+        }
     }
 
     public function updateTask(array $data)
     {
-        //
+        if (isset($data['type']) && $data['type'] == 0) {
+            $this->addResponse('Cannot update system task.', 1);
+
+            return false;
+        }
+
+        $task = $this->getById($data['id']);
+
+        $task = array_merge($task, $data);
+
+        if ($this->update($task)) {
+            $this->addResponse('Updated task ' . $task['name']);
+        } else {
+            $this->addResponse('Error updating task', 1);
+        }
     }
 
     public function removeTask(array $data)
     {
-        //
+        $task = $this->getById($data['id']);
+
+        if ($task['type'] == 0) {
+            $this->addResponse('Cannot delete system task.', 1);
+
+            return false;
+        }
+
+        if ($this->remove($data['id'])) {
+            $this->addResponse('Task removed');
+        } else {
+            $this->addResponse('Error removing task', 1);
+        }
     }
 
     public function runTask(int $id)
@@ -90,5 +130,20 @@ class Tasks extends BasePackage
 
         // $this->scheduler->work([0,10,20,30,40,50]);
     }
-}
 
+    public function getEnabledTasks()
+    {
+        $filter =
+            $this->model->filter(
+                function($function) {
+                    $function = $function->toArray();
+
+                    if ($function['enabled'] == 1) {
+                        return $function;
+                    }
+                }
+            );
+
+        return $filter;
+    }
+}

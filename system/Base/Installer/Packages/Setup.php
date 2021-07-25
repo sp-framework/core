@@ -21,6 +21,8 @@ use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as R
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Profile as RegisterRootAdminProfile;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Role as RegisterRootAdminRole;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Schedules as RegisterSchedules;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Tasks as RegisterTasks;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Workers\Workers as RegisterWorkers;
 use System\Base\Installer\Packages\Setup\Register\Core as RegisterCore;
 use System\Base\Installer\Packages\Setup\Register\Domain as RegisterDomain;
 use System\Base\Installer\Packages\Setup\Register\Modules\Component as RegisterComponent;
@@ -49,8 +51,10 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLo
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Profiles;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Roles;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Jobs;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Schedules;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Tasks;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Workers\Workers;
 use System\Base\Installer\Packages\Setup\Schema\Cache;
 use System\Base\Installer\Packages\Setup\Schema\Core;
 use System\Base\Installer\Packages\Setup\Schema\Domains;
@@ -196,8 +200,10 @@ class Setup
 		$this->db->createTable('basepackages_activity_logs', $dbName, (new ActivityLogs)->columns());
 		$this->db->createTable('basepackages_notes', $dbName, (new Notes)->columns());
 		$this->db->createTable('basepackages_notifications', $dbName, (new Notifications)->columns());
+		$this->db->createTable('basepackages_workers_workers', $dbName, (new Workers)->columns());
 		$this->db->createTable('basepackages_workers_schedules', $dbName, (new Schedules)->columns());
 		$this->db->createTable('basepackages_workers_tasks', $dbName, (new Tasks)->columns());
+		$this->db->createTable('basepackages_workers_jobs', $dbName, (new Jobs)->columns());
 	}
 
 	public function registerRepository()
@@ -463,9 +469,19 @@ class Setup
 		}
 	}
 
+	public function registerWorkers()
+	{
+		(new RegisterWorkers())->register($this->db);
+	}
+
 	public function registerSchedules()
 	{
 		(new RegisterSchedules())->register($this->db);
+	}
+
+	public function registerTasks()
+	{
+		(new RegisterTasks())->register($this->db);
 	}
 
 	public function writeConfigs($coreJson)

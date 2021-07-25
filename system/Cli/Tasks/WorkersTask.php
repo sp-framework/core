@@ -13,6 +13,10 @@ class WorkersTask extends Task
 
     public function runAction()
     {
-        $this->basepackages->workers->init()->run();
+        $workers = $this->basepackages->workers;
+
+        if ($workers) {
+            $workers->run();
+        }
     }
 }

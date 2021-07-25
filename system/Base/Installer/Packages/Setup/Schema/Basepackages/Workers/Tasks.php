@@ -83,7 +83,7 @@ class Tasks
                         'status',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
-                            'notNull'       => true,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
@@ -96,15 +96,17 @@ class Tasks
                     new Column(
                         'previous_run',
                         [
-                            'type'          => Column::TYPE_INTEGER,
-                            'notNull'       => true,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'next_run',
                         [
-                            'type'          => Column::TYPE_INTEGER,
-                            'notNull'       => true,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
