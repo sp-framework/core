@@ -26,8 +26,6 @@ class JobsComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $job = $this->jobs->getById($this->getData()['id']);
 
-                $job['job'] = Json::decode($job['job'], true);
-
                 $this->view->job = $job;
             }
             $this->view->pick('jobs/view');
@@ -35,32 +33,94 @@ class JobsComponent extends BaseComponent
             return;
         }
 
+        $replaceColumns =
+            function ($dataArr) {
+                if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                    return $this->replaceColumns($dataArr);
+                }
+
+                return $dataArr;
+            };
+
         $controlActions =
             [
                 // 'disableActionsForIds'  => [1],
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'system/workers/jobs',
-                    'remove'    => 'system/workers/jobs/remove'
+                    'view'      => 'system/workers/jobs'
                 ]
+            ];
+
+        $conditions =
+            [
+                'order'         => 'id desc'
             ];
 
         $this->generateDTContent(
             $this->jobs,
             'system/workers/jobs/view',
-            null,
-            ['name', 'task_id', 'run_on', 'status', 'execution_time'],
-            false,
-            ['name', 'task_id', 'run_on', 'status', 'execution_time'],
+            $conditions,
+            ['task_id', 'worker_id', 'run_on', 'status', 'execution_time'],
+            true,
+            ['task_id', 'worker_id', 'run_on', 'status', 'execution_time'],
             $controlActions,
-            null,
-            null,
-            'name'
+            ['task_id'=>'task', 'worker_id'=>'worker'],
+            $replaceColumns,
+            'id'
         );
 
         $this->view->pick('jobs/list');
     }
 
+    protected function replaceColumns($dataArr)
+    {
+        foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->formatStatus($dataKey, $data);
+            $data = $this->formatWorker($dataKey, $data);
+            $data = $this->formatTask($dataKey, $data);
+        }
+
+        return $dataArr;
+    }
+
+    protected function formatStatus($rowId, $data)
+    {
+        if ($data['status'] == '0') {
+            $data['status'] = '-';
+        } else if ($data['status'] == '1') {
+            $data['status'] = '<span class="badge badge-secondary text-uppercase">Scheduled</span>';
+        } else if ($data['status'] == '2') {
+            $data['status'] = '<span class="badge badge-info text-uppercase">Running...</span>';
+        } else if ($data['status'] == '3') {
+            $data['status'] = '<span class="badge badge-success text-uppercase">Success</span>';
+        } else if ($data['status'] == '4') {
+            $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
+        }
+
+        return $data;
+    }
+
+    protected function formatWorker($rowId, $data)
+    {
+        $worker = $this->basepackages->workers->workers->getById($data['worker_id']);
+
+        if ($worker) {
+            $data['worker_id'] = $worker['name'];
+        }
+
+        return $data;
+    }
+
+    protected function formatTask($rowId, $data)
+    {
+        $task = $this->basepackages->workers->tasks->getById($data['task_id']);
+
+        if ($task) {
+            $data['task_id'] = $task['name'];
+        }
+
+        return $data;
+    }
     // /**
     //  * @acl(name="add")
     //  */

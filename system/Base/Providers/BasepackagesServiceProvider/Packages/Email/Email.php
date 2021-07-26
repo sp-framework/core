@@ -45,6 +45,10 @@ class Email extends BasePackage
 
         $this->domain = $this->domains->getDomain();
 
+        if (!$this->domain) {
+            $this->domain = $this->domains->getDefaultAppIdDomain($this->app['id']);
+        }
+
         return $this;
     }
 
@@ -64,7 +68,6 @@ class Email extends BasePackage
         if ($appId === null) {
             $appId = $this->app['id'];
         }
-
         if ($emailSettings) {
             $this->emailSettings = $emailSettings;
         } else {
@@ -118,7 +121,7 @@ class Email extends BasePackage
         return $this;
     }
 
-    public function sendNewEmail()
+    public function sendNewEmail($reset = true)
     {
         try {
             $this->email->setFrom($this->fromEmailAddress, $this->fromName);
@@ -151,7 +154,9 @@ class Email extends BasePackage
 
             $this->email->send();
 
-            $this->reset();
+            if ($reset) {
+                $this->reset();
+            }
 
             return true;
         } catch (Exception $e) {
@@ -250,7 +255,7 @@ class Email extends BasePackage
 
         $this->setBody('Test Successful!');
 
-        return $this->sendNewEmail();
+        return $this->sendNewEmail(false);
     }
 
     public function getDebugOutput()

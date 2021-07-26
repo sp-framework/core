@@ -5303,7 +5303,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         $('#' + sectionId + '-filter-alert').remove();
                     }
 
-                    query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+
+                    if (thisOptions.listOptions.postParams.order) {
+                        query = { };
+                        query['conditions'] = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+                        query['order'] = thisOptions.listOptions.postParams.order;
+                    } else {
+                        query = $('#' + sectionId + '-filter-filters option:selected').data()['conditions'];
+                    }
 
                     that._filterRunAjax(
                         1,

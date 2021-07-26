@@ -287,9 +287,8 @@ class Filters extends BasePackage
 
         if ($component && $component['route'] === 'system/email/queue') {
             $this->addFilterForEmailQueue($component);
-
-            return;
         }
+
 
         $this->addFilter(
             [
@@ -302,6 +301,10 @@ class Filters extends BasePackage
                 'account_id'        => 0
             ]
         );
+
+        if ($component && $component['route'] === 'system/workers/jobs') {
+            $this->addFilterForWorkersJobs($component);
+        }
     }
 
     protected function addFilterForNotifications($component)
@@ -354,11 +357,10 @@ class Filters extends BasePackage
     {
         $conditions =
             [
-                'all_in_queue'      => '-:status:equals:0&',
-                'all_sent'          => '-:status:equals:1&',
-                'all_errors'        => '-:status:equals:2&',
-                'high_prioriry'     => '-:priority:equals:1&',
-                'all'               => ''
+                'all_in_queue'      => '-:status:equals:1&',
+                'all_sent'          => '-:status:equals:2&',
+                'all_errors'        => '-:status:equals:3&',
+                'high_prioriry'     => '-:priority:equals:1&'
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
@@ -386,6 +388,59 @@ class Filters extends BasePackage
                     $default = 0;
                 } else if ($conditionKey === 'all') {
                     $name = 'Show All Emails';
+                    $default = 0;
+                }
+
+                $this->addFilter(
+                    [
+                        'name'              => $name,
+                        'conditions'        => $condition,
+                        'component_id'      => $component['id'],
+                        'filter_type'       => 0,//System
+                        'is_default'        => $default,
+                        'auto_generated'    => 1,
+                        'account_id'        => 0
+                    ]
+                );
+            }
+        }
+    }
+
+    protected function addFilterForWorkersJobs($component)
+    {
+        $conditions =
+            [
+                'all_scheduled_and_running'      => '-:status:equals:1&OR:status:equals:2&',
+                'all_success'                    => '-:status:equals:3&',
+                'all_errors'                     => '-:status:equals:4&',
+                'all_user_jobs'                  => '-:type:equals:1&'
+            ];
+
+        foreach ($conditions as $conditionKey => $condition) {
+            $filterCondition =
+                [
+                    'conditions'    => 'conditions = :conditions:',
+                    'bind'          =>
+                        [
+                            'conditions'   => $condition
+                        ]
+                ];
+            $filter = $this->getByParams($filterCondition);
+            if (!$filter) {
+                if ($conditionKey === 'all_scheduled_and_running') {
+                    $name = 'Show All Scheduled and Running Jobs';
+                    $default = 0;
+                } else if ($conditionKey === 'all_success') {
+                    $name = 'Show All Success Jobs';
+                    $default = 0;
+                } else if ($conditionKey === 'all_errors') {
+                    $name = 'Show All Errors Jobs';
+                    $default = 0;
+                } else if ($conditionKey === 'all_user_jobs') {
+                    $name = 'Show All Jobs Scheduled By Users';
+                    $default = 0;
+                } else if ($conditionKey === 'all') {
+                    $name = 'Show All Jobs';
                     $default = 0;
                 }
 

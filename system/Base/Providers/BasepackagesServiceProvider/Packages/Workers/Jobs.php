@@ -22,16 +22,24 @@ class Jobs extends BasePackage
     public function addJob(array $data)
     {
         if ($this->add($data)) {
-            $this->addResponse('Added job');
+            $this->addResponse('Added job', 0, null, true);
+
+            return true;
         } else {
             $this->addResponse('Error adding job', 1);
+
+            return false;
         }
     }
 
     public function updateJob(array $data)
     {
-        if ($this->update($data)) {
-            $this->addResponse('Updated job ID ' . $data['id']);
+        $job = $this->getById($data['id']);
+
+        $job = array_merge($job, $data);
+
+        if ($this->update($job)) {
+            $this->addResponse('Updated job ID ' . $job['id']);
         } else {
             $this->addResponse('Error updating job', 1);
         }

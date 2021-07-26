@@ -325,7 +325,10 @@ class DynamicTable
 
     protected function generateRowsContent()
     {
-        $this->dtParams['dtRowControls'] = false;
+        $this->dtParams['dtShowRowControls'] =
+            isset($this->params["dtShowRowControls"]) ?
+            $this->params["dtShowRowControls"] :
+            true;
 
         $rowsData = [];
 
@@ -512,7 +515,7 @@ class DynamicTable
 
                     $column = $controlbuttons;
 
-                    $this->dtParams['dtRowControls'] = true;
+                    // $this->dtParams['dtShowRowControls'] = true;
                 }
 
                 $rowData = array_merge($rowData, [$columnKey => $column]);
@@ -526,7 +529,7 @@ class DynamicTable
                     'data'              => $rowsData,
                     'pagination'        => isset($this->params["dtPagination"]) ? $this->params["dtPagination"] : false,
                     'paginationCounters'=> isset($this->params["dtPaginationCounters"]) ? $this->params["dtPaginationCounters"] : false,
-                    'rowControls'       => $this->dtParams['dtRowControls'],
+                    'rowControls'       => $this->dtParams['dtShowRowControls'],
                     'replaceColumns'    => isset($this->params["dtReplaceColumns"]) ? $this->params["dtReplaceColumns"] : false
                 ]
             );

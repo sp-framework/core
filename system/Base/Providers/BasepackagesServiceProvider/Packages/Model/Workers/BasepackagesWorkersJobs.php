@@ -16,6 +16,8 @@ class BasepackagesWorkersJobs extends BaseModel
 
     public $status;
 
+    public $type;
+
     public $execution_time;
 
     public $result;

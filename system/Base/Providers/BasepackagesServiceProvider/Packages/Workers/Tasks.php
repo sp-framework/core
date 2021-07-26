@@ -77,7 +77,9 @@ class Tasks extends BasePackage
 
     public function updateTask(array $data)
     {
-        if (isset($data['type']) && $data['type'] == 0) {
+        if (!isset($data['via_job']) &&
+            (isset($data['type']) && $data['type'] == 0)
+        ) {
             $this->addResponse('Cannot update system task.', 1);
 
             return false;

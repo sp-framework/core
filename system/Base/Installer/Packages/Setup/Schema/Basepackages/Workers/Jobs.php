@@ -50,9 +50,16 @@ class Jobs
                         ]
                     ),
                     new Column(
+                        'type',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => true,
+                        ]
+                    ),
+                    new Column(
                         'execution_time',
                         [
-                            'type'          => Column::TYPE_INTEGER,
+                            'type'          => Column::TYPE_FLOAT,
                             'notNull'       => false,
                         ]
                     ),

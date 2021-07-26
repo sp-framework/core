@@ -137,7 +137,7 @@ class Notifications extends BasePackage
         }
 
         $email['app_id'] = $appId;
-        $email['status'] = 0;
+        $email['status'] = 1;
         $email['priority'] = 3;
         $email['to_addresses'] = Json::encode($emailAddresses);
         $email['subject'] = 'Notification for ' . $this->domains->getDomain()['name'];

@@ -1,0 +1,12 @@
+{
+    "name"          : "Workers",
+    "display_name"  : "Workers",
+    "description"   : "Basepackage Workers",
+    "app_type"      : "dash",
+    "category"      : "system",
+    "sub_category"  : "tools",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Workers",
+    "settings"      : {"componentRoute":"system/workers/workers"}
+}

@@ -1016,7 +1016,7 @@ class Auth
     protected function emailVerificationCode($verificationCode)
     {
         $emailData['app_id'] = $this->app['id'];
-        $emailData['status'] = 0;
+        $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
         $emailData['to_addresses'] = Json::encode([$this->account['email']]);

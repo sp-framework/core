@@ -1,4 +1,11 @@
-{% if email['id'] is defined %}
+{% if job['id'] is defined %}
+    {% set jobId = job['id'] %}
+    {% set title = 'Job ID: (' ~ jobId ~ ')' %}
+    {% if job['status'] == 4 %}
+        {% set cardType = 'danger' %}
+    {% elseif job['status'] == 3 %}
+        {% set cardType = 'success' %}
+    {% endif %}
     {{adminltetags.useTag('content',
         [
             'component'                     : component,
@@ -9,15 +16,15 @@
             'contentType'                   : 'sectionWithForm',
             'cardHeader'                    : true,
             'cardFooter'                    : true,
-            'cardType'                      : 'primary',
-            'cardIcon'                      : 'envelope',
-            'cardTitle'                     : 'Email ID: ' ~ email['id'],
+            'cardType'                      : cardType,
+            'cardIcon'                      : 'clipboard-list',
+            'cardTitle'                     : title,
             'cardAdditionalClass'           : 'rounded-0',
-            'cardBodyInclude'               : 'queue/form',
+            'cardBodyInclude'               : 'jobs/form',
             'formButtons'                   :
             [
-                'updateButtonId'                : email['id'],
-                'closeActionUrl'                : 'system/email/services'
+                'updateButtonId'                : jobId,
+                'closeActionUrl'                : 'system/workers/jobs'
             ]
         ]
     )}}

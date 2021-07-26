@@ -56,44 +56,13 @@ class TasksComponent extends BaseComponent
         }
 
         $replaceColumns =
-            [
-                'schedule_id'   =>
-                    [
-                        'html'  => $schedulesArr
-                    ],
-                'enabled'       =>
-                    [
-                        'html'  =>
-                            [
-                                '0' => '<span class="badge badge-secondary">No</span>',
-                                '1' => '<span class="badge badge-success">Yes</span>'
-                            ]
-                    ],
-                'status'       =>
-                    [
-                        'html'  =>
-                            [
-                                '0' => '-',
-                                '1' => '<span class="badge badge-secondary">Scheduled</span>',
-                                '2' => '<span class="badge badge-info">Running...</span>',
-                                '3' => '<span class="badge badge-danger">Error!</span>'
-                            ]
-                    ],
-                'previous_run'  =>
-                    [
-                        'html'  =>
-                            [
-                                '0' => '-'
-                            ]
-                    ],
-                'next_run'  =>
-                    [
-                        'html'  =>
-                            [
-                                '0' => '-'
-                            ]
-                    ]
-            ];
+            function ($dataArr) {
+                if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                    return $this->replaceColumns($dataArr);
+                }
+
+                return $dataArr;
+            };
 
         $controlActions =
             [
@@ -119,6 +88,66 @@ class TasksComponent extends BaseComponent
         );
 
         $this->view->pick('tasks/list');
+    }
+
+    protected function replaceColumns($dataArr)
+    {
+        foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->formatStatus($dataKey, $data);
+            $data = $this->formatPreviousRun($dataKey, $data);
+            $data = $this->formatNextRun($dataKey, $data);
+            $data = $this->formatEnabled($dataKey, $data);
+        }
+
+        return $dataArr;
+    }
+
+    protected function formatEnabled($rowId, $data)
+    {
+        if ($data['enabled'] == '0') {
+            $data['enabled'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+        } else if ($data['enabled'] == '1') {
+            $data['enabled'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+        }
+
+        return $data;
+    }
+
+    protected function formatPreviousRun($rowId, $data)
+    {
+        if (!$data['previous_run'] || $data['previous_run'] == '0') {
+            $data['previous_run'] = '-';
+        }
+
+        return $data;
+    }
+
+    protected function formatNextRun($rowId, $data)
+    {
+        if (!$data['next_run'] || $data['next_run'] == '0' || $data['enabled'] == '0') {
+            $data['next_run'] = '-';
+        }
+
+        return $data;
+    }
+
+    protected function formatStatus($rowId, $data)
+    {
+        if ($data['enabled'] == '0') {
+            $data['status'] = '-';
+        }
+
+        if ($data['status'] == '0') {
+            $data['status'] = '-';
+        } else if ($data['status'] == '1') {
+            $data['status'] = '<span class="badge badge-secondary text-uppercase">Scheduled</span>';
+        } else if ($data['status'] == '2') {
+            $data['status'] = '<span class="badge badge-info text-uppercase">Running...</span>';
+        } else if ($data['status'] == '3') {
+            $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
+        }
+
+        return $data;
     }
 
     /**

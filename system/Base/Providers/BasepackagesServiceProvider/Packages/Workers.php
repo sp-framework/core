@@ -16,15 +16,17 @@ class Workers extends BasePackage
 {
     use Interval;
 
-    public $schedulesPackage;
+    public $workers;
 
-    public $tasksPackage;
+    public $schedules;
 
     public $tasks;
 
-    public $jobsPackage;
-
     public $jobs;
+
+    protected $cron;
+
+    protected $scheduledJobs = [];
 
     protected $worker;
 
@@ -38,13 +40,10 @@ class Workers extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->schedulesPackage = (new Schedules())->init();
+        $this->workers = (new WorkersWorkers())->init();
 
-        $this->tasksPackage = (new Tasks())->init();
+        $workers = $this->workers->getIdleWorkers();
 
-        $this->jobsPackage = (new Jobs())->init();
-
-        $workers = (new WorkersWorkers())->init()->getIdleWorkers();
         if (count($workers) > 0) {
             $this->worker = $workers[0];
         } else {
@@ -52,6 +51,12 @@ class Workers extends BasePackage
 
             return false;//We quite as there are no available workers.
         }
+
+        $this->schedules = (new Schedules())->init();
+
+        $this->tasks = (new Tasks())->init();
+
+        $this->jobs = (new Jobs())->init();
 
         if ($this->checkTempPath()) {
             $this->schedulerSettings['tempDir'] = base_path('var/workers/');
@@ -72,13 +77,24 @@ class Workers extends BasePackage
 
     public function run()
     {
-        $enabledTasks = $this->tasksPackage->getEnabledTasks();
+        // Task Statuses
+        // 1 - Scheduled
+        // 2 - Running
+        // 3 - Error
 
-        $availableFunctions = array_keys($this->tasksPackage->getAllFunctions());
+        // Job Statuses
+        // 1 - Scheduled
+        // 2 - Running
+        // 3 - Success
+        // 4 - Error
+
+        $enabledTasks = $this->tasks->getEnabledTasks();
+
+        $availableFunctions = array_keys($this->tasks->getAllFunctions());
 
         foreach ($enabledTasks as $taskKey => $task) {
             if (in_array($task['function'], $availableFunctions)) {
-                $schedule = $this->schedulesPackage->getSchedulesSchedule($task['schedule_id']);
+                $schedule = $this->schedules->getSchedulesSchedule($task['schedule_id']);
 
                 $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Functions\\' . ucfirst($task['function']);
                 if ($schedule['type'] === 'everyminute') {
@@ -96,18 +112,46 @@ class Workers extends BasePackage
                 }
             } else {
                 $task['enabled'] = 0;
-                $task['status'] = 3;
+                $task['status'] = 3;//Error
                 $task['result'] = 'Task function not found!';
 
-                $this->tasksPackage->update($task);
+                $this->tasks->update($task);
             }
-
-
-            // var_dump($this->scheduler->getVerboseOutput());
-            // var_dump($this->scheduler->getExecutedJobs());
         }
-        var_dump($this->scheduler);
-        // $this->scheduler->run();
+
+        // die();
+        // var_dump($this->scheduledJobs);
+        // var_dump($this->worker);
+        // var_dump($this->scheduler);
+        $this->scheduler->run();
+        // var_dump('done');
+        // var_dump($this->scheduler->getQueuedJobs());
+        $failedJobs = $this->scheduler->getFailedJobs();
+        // var_dump($failedJobs);
+        if (count($failedJobs) > 0) {
+            foreach ($failedJobs as $failedJobKey => $failedJob) {
+                $id = $failedJob->getJob()->getId();
+                $this->scheduledJobs[$id]['status'] = 4;//Error
+                $this->scheduledJobs[$id]['result'] = $failedJob->getException()->getMessage();
+
+                $this->jobs->updateJob($this->scheduledJobs[$id]);
+            }
+        }
+
+        $executedJobs = $this->scheduler->getExecutedJobs();
+
+        if (count($executedJobs) > 0) {
+            foreach ($executedJobs as $executedJobKey => $executedJob) {
+                $id = $executedJob->getId();
+                // var_dump($executedJob->getOutput());
+                // $this->scheduledJobs[$id]['status'] = 4;//Error
+                // $this->scheduledJobs[$id]['result'] = $failedJob->getException()->getMessage();
+
+                // $this->jobs->updateJob($this->scheduledJobs[$id]);
+            }
+        }
+
+
         //This method will be called via CRON every minute.
         //Taskes that have next_run > current Unix Time will be executed as per their priority.
         //Priorities are set as numbers from 1-10 with 1 being the lowest priority and 10 being the highest.
@@ -118,34 +162,45 @@ class Workers extends BasePackage
 
     protected function scheduleEveryMinute($task, $schedule, $class)
     {
-        $nextRun = $this->everyminute()->executionTime->getNextRunDate()->format('Y-m-d H:i:s');
+        $this->cron = $this->everyminute()->executionTime;
+
+        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
         if ($task['next_run'] !== $nextRun) {
             $task['next_run'] = $nextRun;
-            $this->tasksPackage->update($task);
+            $this->tasks->update($task);
         }
 
+        $newJob = $this->addNewJob($task, $schedule, $nextRun);
+
+        $args =
+            [
+                'job'   => $newJob,
+                'task'  => $task
+            ];
+
         $this->scheduler->call(
-            (new $class)->run(),
+            (new $class)->run($args),
             [],
             $task['id'] . '-' . $schedule['type']
         )->everyminute();
-
-        $this->jobsPackage->addJob(
-            [
-                'task_id'       => $task['id'],
-                'worker_id'     => $this->worker['id'],
-                'run_on'        => $nextRun,
-                'status'        => 0
-            ]
-        );
     }
 
     protected function scheduleEveryXMinute($task, $schedule, $class)
     {
-        if ($this->shouldSchedule($task, $schedule)) {
+        $shouldSchedule = $this->shouldSchedule($task, $schedule);
+
+        if ($shouldSchedule) {
+            $newJob = $this->addNewJob($task, $schedule, $shouldSchedule);
+
+            $args =
+                [
+                    'job'   => $newJob,
+                    'task'  => $task
+                ];
+
             $this->scheduler->call(
-                (new $class)->run(),
+                (new $class)->run($args),
                 [],
                 $task['id'] . '-' . $schedule['type']
             )->everyminute(
@@ -156,7 +211,9 @@ class Workers extends BasePackage
 
     protected function scheduleHourly($task, $schedule, $class)
     {
-        if ($this->shouldSchedule($task, $schedule)) {
+        $shouldSchedule = $this->shouldSchedule($task, $schedule);
+
+        if ($shouldSchedule) {
             $this->scheduler->call(
                 (new $class)->run(),
                 [],
@@ -164,12 +221,16 @@ class Workers extends BasePackage
             )->hourly(
                 (int) $schedule['params']['hourly_minutes']
             );
+
+            $this->addNewJob($task, $schedule, $shouldSchedule);
         }
     }
 
     protected function scheduleDaily($task, $schedule, $class)
     {
-        if ($this->shouldSchedule($task, $schedule)) {
+        $shouldSchedule = $this->shouldSchedule($task, $schedule);
+
+        if ($shouldSchedule) {
             $this->scheduler->call(
                 (new $class)->run(),
                 [],
@@ -178,6 +239,8 @@ class Workers extends BasePackage
                 (int) $schedule['params']['daily_hours'],
                 (int) $schedule['params']['daily_minutes']
             );
+
+            $this->addNewJob($task, $schedule, $shouldSchedule);
         }
     }
 
@@ -187,7 +250,9 @@ class Workers extends BasePackage
             return false;
         }
 
-        if ($this->shouldSchedule($task, $schedule)) {
+        $shouldSchedule = $this->shouldSchedule($task, $schedule);
+
+        if ($shouldSchedule) {
             $this->scheduler->call(
                 (new $class)->run(),
                 [],
@@ -197,6 +262,8 @@ class Workers extends BasePackage
                 (int) $schedule['params']['weekly_hours'],
                 (int) $schedule['params']['weekly_minutes']
             );
+
+            $this->addNewJob($task, $schedule, $shouldSchedule);
         }
     }
 
@@ -210,7 +277,9 @@ class Workers extends BasePackage
             return false;
         }
 
-        if ($this->shouldSchedule($task, $schedule)) {
+        $shouldSchedule = $this->shouldSchedule($task, $schedule);
+
+        if ($shouldSchedule) {
             $this->scheduler->call(
                 (new $class)->run(),
                 [],
@@ -221,83 +290,85 @@ class Workers extends BasePackage
                 (int) $schedule['params']['monthly_hours'],
                 (int) $schedule['params']['monthly_minutes']
             );
+
+            $this->addNewJob($task, $schedule, $shouldSchedule);
         }
     }
 
-    //Only Schedule if less than 2 minutes
+    //Only Schedule if less than 1 minute so its schedules for next run.
     protected function shouldSchedule($task, $schedule)
     {
         if ($schedule['type'] === 'everyxminutes') {
-            $cron =
+            $this->cron =
                 $this->everyminute(
                     (int) $schedule['params']['minutes']
                 )->executionTime;
 
-            $secsLeft = $cron->getNextRunDate()->getTimestamp() - time();
-            $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+            // $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
+            $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
         } else if ($schedule['type'] === 'hourly') {
-            $cron =
+            $this->cron =
                 $this->hourly(
                     (int) $schedule['params']['hourly_minutes']
                 )->executionTime;
 
-            $secsLeft = $cron->getNextRunDate()->getTimestamp() - time();
-            $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+            // $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
+            $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
         } else if ($schedule['type'] === 'daily') {
-            $cron =
+            $this->cron =
                 $this->daily(
                     (int) $schedule['params']['daily_hours'],
                     (int) $schedule['params']['daily_minutes']
                 )->executionTime;
 
-            $secsLeft = $cron->getNextRunDate()->getTimestamp() - time();
-            $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+            // $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
+            $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
-            if ($task['next_run'] !== $cron->getNextRunDate()) {
-                $this->tasksPackage->update($task);
+            if ($task['next_run'] !== $this->cron->getNextRunDate()) {
+                $this->tasks->update($task);
             }
         } else if ($schedule['type'] === 'weekly') {
-            $cron =
+            $this->cron =
                 $this->weekly(
                     $this->dayOfWeek,
                     (int) $schedule['params']['weekly_hours'],
                     (int) $schedule['params']['weekly_minutes']
                 )->executionTime;
 
-            $secsLeft = $cron->getNextRunDate()->getTimestamp() - time();
+            $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
 
-            $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+            $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
             if ($secsLeft > 43200) {//gt 12 hrs means the time has passed so get next time.
                 if (count($schedule['params']['weekly_days']) > 1) {
                     if ($this->dayOfWeek == Arr::last($schedule['params']['weekly_days'])) {//If Saturday, the next day of execution will be 1st of array.
-                        $cron =
+                        $this->cron =
                             $this->weekly(
                                 (int) Arr::first($schedule['params']['weekly_days']),
                                 (int) $schedule['params']['weekly_hours'],
                                 (int) $schedule['params']['weekly_minutes']
                             )->executionTime;
 
-                        $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+                        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
                     } else {
                         var_dump((int) Arr::last($schedule['params']['weekly_days']));
                         $dayOfWeekKey = array_search($this->dayOfWeek, $schedule['params']['weekly_days']);
 
                         $nextKey = prefix_get_next_key_array($schedule['params']['weekly_days'], $dayOfWeekKey);
 
-                        $cron =
+                        $this->cron =
                             $this->weekly(
                                 (int) $schedule['params']['weekly_days'][$nextKey],
                                 (int) $schedule['params']['weekly_hours'],
                                 (int) $schedule['params']['weekly_minutes']
                             )->executionTime;
 
-                        $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+                        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
                     }
                 }
             }
         } else if ($schedule['type'] === 'monthly') {
-            $cron =
+            $this->cron =
                 $this->monthly(
                     (int) $this->month,
                     (int) $this->dateOfMonth,
@@ -305,14 +376,14 @@ class Workers extends BasePackage
                     (int) $schedule['params']['monthly_minutes']
                 )->executionTime;
 
-            $secsLeft = $cron->getNextRunDate()->getTimestamp() - time();
+            $secsLeft = $this->cron->getNextRunDate()->getTimestamp() - time();
 
-            $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+            $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
             if ($secsLeft > 86400) { //gt 1 day means the time has passed so get next time.
                 if (count($schedule['params']['monthly_months']) > 1) {
                     if ($this->month == Arr::last($schedule['params']['monthly_months'])) {//If December, the next day of execution will be 1st of array.
-                        $cron =
+                        $this->cron =
                             $this->monthly(
                                 (int) Arr::first($schedule['params']['monthly_months']),
                                 (int) $this->dateOfMonth,
@@ -320,13 +391,13 @@ class Workers extends BasePackage
                                 (int) $schedule['params']['monthly_minutes']
                             )->executionTime;
 
-                        $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+                        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
                     } else {
                         $monthKey = array_search($this->month, $schedule['params']['monthly_months']);
 
                         $nextKey = prefix_get_next_key_array($schedule['params']['monthly_months'], $monthKey);
 
-                        $cron =
+                        $this->cron =
                             $this->monthly(
                                 (int) $schedule['params']['monthly_months'][$nextKey],
                                 (int) $this->dateOfMonth,
@@ -334,27 +405,55 @@ class Workers extends BasePackage
                                 (int) $schedule['params']['monthly_minutes']
                             )->executionTime;
 
-                        $nextRun = $cron->getNextRunDate()->format('Y-m-d H:i:s');
+                        $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
                     }
                 }
             }
         }
 
-        if ($task['next_run'] !== $nextRun) {
+        if (!$task['next_run'] || $task['next_run'] !== $nextRun) {
             $task['next_run'] = $nextRun;
-            $this->tasksPackage->update($task);
+            $this->tasks->update($task);
         }
 
-        if ($secsLeft < 120) {
+        // var_dump($this->cron->isDue());
+        // if ($secsLeft <= 60) {
+        if ($this->cron->isDue()) {
             if ($task['status'] != 1) {
                 $task['status'] = 1;
-                $this->tasksPackage->update($task);
+                $this->tasks->update($task);
             }
 
             return $nextRun;
         }
 
         return false;
+    }
+
+    protected function addNewJob($task, $schedule, $nextRun)
+    {
+        $addJob = $this->jobs->addJob(
+            [
+                'task_id'       => $task['id'],
+                'worker_id'     => $this->worker['id'],
+                'run_on'        => date('Y-m-d H:i:s'),
+                'type'          => 0,
+                'status'        => 1//Scheduled
+            ]
+        );
+
+        if ($addJob) {
+            $this->scheduledJobs[$task['id'] . '-' . $schedule['type']] = $this->jobs->packagesData->responseData;
+
+            $task = $this->basepackages->workers->tasks->getById($task['id']);
+
+            $task['via_job'] = 1;
+            $task['status'] = 1;//Scheduled
+
+            $this->tasks->updateTask($task);
+
+            return $this->jobs->packagesData->responseData;
+        }
     }
 
     protected function checkTempPath()

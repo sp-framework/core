@@ -21,12 +21,13 @@ class EmailQueue extends BasePackage
     const PRIORITY_MEDIUM = 2;
     const PRIORITY_LOW = 3;
 
-    const STATUS_IN_QUEUE = 0;
-    const STATUS_SENT = 1;
+    const STATUS_IN_QUEUE = 1;
+    const STATUS_SENT = 2;
+    const STATUS_ERROR = 3;
 
     public function init(bool $resetCache = false)
     {
-        $this->getAll($resetCache);
+        // $this->getAll($resetCache);
 
         return $this;
     }
@@ -53,7 +54,7 @@ class EmailQueue extends BasePackage
         return $this->queueLock;
     }
 
-    public function processQueue()
+    public function processQueue($processPriority = 0)
     {
         if ($this->queueLock === true) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
@@ -65,7 +66,13 @@ class EmailQueue extends BasePackage
 
         $hadErrors = false;
 
-        for ($priority = self::PRIORITY_HIGH; $priority <= self::PRIORITY_LOW; $priority++) {
+        if ($processPriority !== 0) {
+            $priorityToProcess = $processPriority;
+        } else {
+            $priorityToProcess = self::PRIORITY_LOW;
+        }
+
+        for ($priority = self::PRIORITY_HIGH; $priority <= $priorityToProcess; $priority++) {
             $conditions =
                 [
                     'conditions'    => 'status = :status: AND priority = :priority:',
@@ -77,11 +84,10 @@ class EmailQueue extends BasePackage
                 ];
 
             $queue = $this->getByParams($conditions);
-
             if ($queue && is_array($queue) && count($queue) > 0) {
                 foreach ($queue as $key => $queueEmail) {
                     if (!$this->basepackages->email->setup(null, $queueEmail['app_id'])) {
-                        $queueEmail['status'] = 2;
+                        $queueEmail['status'] = self::STATUS_ERROR;
                         $queueEmail['logs'] = 'Email Service is not configured or assigned to a domain, please configure email service and try again.';
 
                         $this->update($queueEmail);
@@ -115,7 +121,7 @@ class EmailQueue extends BasePackage
                         $logs = $this->basepackages->email->sendNewEmail();
 
                         if ($logs === true) {
-                            $queueEmail['status'] = 1;
+                            $queueEmail['status'] = self::STATUS_SENT;
                             $queueEmail['logs'] = 'Sent';
                             $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
@@ -133,6 +139,22 @@ class EmailQueue extends BasePackage
         }
 
         $this->addResponse('Queue processes successfully.');
+    }
+
+    public function requeue(array $data)
+    {
+        $email = $this->getById($data['id']);
+
+        $email['status'] = 1;
+        $email['logs'] = '';
+
+        if ($this->update($email)) {
+            $this->addResponse('Requeued');
+
+            return;
+        }
+
+        $this->addResponse('Error requeuing message');
     }
 
     public function removeFromQueue(array $data)

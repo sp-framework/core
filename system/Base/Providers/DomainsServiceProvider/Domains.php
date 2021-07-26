@@ -196,4 +196,27 @@ class Domains extends BasePackage
 			$this->update($domain);
 		}
 	}
+
+	public function getDefaultAppIdDomain($id)
+	{
+		$filter =
+			$this->model->filter(
+				function($domain) use ($id) {
+					if ($domain->default_app_id == $id) {
+						if (!is_array($domain->apps)) {
+							$domain->apps = Json::decode($domain->apps, true);
+						}
+						return $domain;
+					}
+				}
+			);
+
+		if (count($filter) > 1) {
+			throw new \Exception('Duplicate domain name found for domain ' . $name);
+		} else if (count($filter) === 1) {
+			return $filter[0]->toArray();
+		} else {
+			return false;
+		}
+	}
 }

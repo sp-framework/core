@@ -24,32 +24,31 @@ class QueueComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $emailservice = $this->emailqueue->getById($this->getData()['id']);
+                $email = $this->emailqueue->getById($this->getData()['id']);
 
-                $this->view->emailservice = $emailservice;
+                $email = $this->formatStatus(0, $email);
+                $email = $this->formatPriority(0, $email);
+                $email = $this->formatSentOn(0, $email);
+                $email = $this->formatToAddresses(0, $email);
+
+                $this->view->email = $email;
             }
-            $this->view->pick('email/queue/view');
-
             return;
         }
-
-        $emailqueue = $this->emailqueue->init();
 
         $controlActions =
             [
                 // 'disableActionsForIds'  => [1],
                 'actionsToEnable'       =>
                 [
-                    'view'        => 'system/email/queue',
-                    'edit'        => 'system/email/queue',
-                    'remove'      => 'system/email/queue/remove',
+                    'view'        => 'system/email/queue'
                 ]
             ];
 
         $conditions =
             [
                 'conditions'    =>
-                    '-:status:equals:0&',
+                    '-:status:equals:1&',
                 'order'         => 'id desc'
             ];
 
@@ -63,7 +62,7 @@ class QueueComponent extends BaseComponent
             };
 
         $this->generateDTContent(
-            $emailqueue,
+            $this->emailqueue,
             'system/email/queue/view',
             $conditions,
             ['status', 'priority', 'sent_on', 'to_addresses', 'subject'],
@@ -85,6 +84,7 @@ class QueueComponent extends BaseComponent
             $data = $this->formatPriority($dataKey, $data);
             $data = $this->formatSentOn($dataKey, $data);
             $data = $this->formatToAddresses($dataKey, $data);
+            $data = $this->addRequeueButton($dataKey, $data);
         }
 
         return $dataArr;
@@ -92,11 +92,11 @@ class QueueComponent extends BaseComponent
 
     protected function formatStatus($rowId, $data)
     {
-        if ($data['status'] == '0') {
+        if ($data['status'] == '1') {
             $data['status'] = '<span class="badge badge-primary text-uppercase">In Queue</span>';
-        } else if ($data['status'] == '1') {
-            $data['status'] = '<span class="badge badge-success text-uppercase">Sent</span>';
         } else if ($data['status'] == '2') {
+            $data['status'] = '<span class="badge badge-success text-uppercase">Sent</span>';
+        } else if ($data['status'] == '3') {
             $data['status'] = '<span class="badge badge-danger text-uppercase">Error</span>';
         }
 
@@ -130,6 +130,19 @@ class QueueComponent extends BaseComponent
         $data['to_addresses'] = Json::decode($data['to_addresses'], true);
 
         $data['to_addresses'] = implode(',', $data['to_addresses']);
+
+        return $data;
+    }
+
+    protected function addRequeueButton($rowId, $data)
+    {
+        if ($data['status'] === '<span class="badge badge-danger text-uppercase">Error</span>') {
+            $data['status'] .=
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-markread-' . $rowId . '" href="' . $this->links->url('system/email/queue/requeue') . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-primary btn-xs rowRequeue text-uppercase">
+                    <i class="mr-1 fas fa-fw fa-xs fa-sync-alt"></i>
+                    <span class="text-xs"> Requeue</span>
+                </a>';
+        }
 
         return $data;
     }
@@ -183,6 +196,24 @@ class QueueComponent extends BaseComponent
             }
 
             $this->emailqueue->processQueue();
+
+            $this->addResponse(
+                $this->emailqueue->packagesData->responseMessage,
+                $this->emailqueue->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function requeueAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->emailqueue->reQueue($this->postData());
 
             $this->addResponse(
                 $this->emailqueue->packagesData->responseMessage,
