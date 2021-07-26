@@ -30,6 +30,7 @@ class QueueComponent extends BaseComponent
                 $email = $this->formatPriority(0, $email);
                 $email = $this->formatSentOn(0, $email);
                 $email = $this->formatToAddresses(0, $email);
+                $email = $this->formatConfidential(0, $email);
 
                 $this->view->email = $email;
             }
@@ -130,6 +131,18 @@ class QueueComponent extends BaseComponent
         $data['to_addresses'] = Json::decode($data['to_addresses'], true);
 
         $data['to_addresses'] = implode(',', $data['to_addresses']);
+
+        return $data;
+    }
+
+    protected function formatConfidential($rowId, $data)
+    {
+        if ($data['confidential'] == '1') {
+            $data['confidential'] = '<span class="badge badge-danger text-uppercase">Yes</span>';
+            $data['body'] = "Confidential emails are encrypted on the server and cannot be viewed.";
+        } else if ($data['confidential'] == '0') {
+            $data['confidential'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+        }
 
         return $data;
     }
