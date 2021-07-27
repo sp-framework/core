@@ -57,10 +57,10 @@ class Auth extends BaseMiddleware
             }
 
             //Browser Auth
-            if (!$this->auth->checkAgent()) {
-                $this->session->set('needAgentAuth', true);
-                return $this->response->redirect($appRoute . '/auth');
-            }
+            // if (!$this->auth->checkAgent()) {
+            //     $this->session->set('needAgentAuth', true);
+            //     return $this->response->redirect($appRoute . '/auth');
+            // }
 
             return true;
         }

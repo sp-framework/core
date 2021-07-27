@@ -261,12 +261,17 @@ class Acl extends BaseMiddleware
         $auth = $this->modules->middlewares->getNamedMiddlewareForApp('Auth', $appId);
         $authSequence = (int) $auth['apps'][$appId]['sequence'];
 
-        if ($aclSequence < $authSequence) {
+        $agentCheck = $this->modules->middlewares->getNamedMiddlewareForApp('AgentCheck', $appId);
+        $agentCheckSequence = (int) $agentCheck['apps'][$appId]['sequence'];
+
+        if ($aclSequence < $authSequence ||
+            $aclSequence < $agentCheck
+        ) {
             $acl['apps'][$appId]['sequence'] = 99;
             $acl['apps'] = Json::encode($acl['apps']);
             $this->modules->middlewares->update($acl);
 
-            throw new \Exception('ACL middleware sequence is lower then Auth middleware sequence, which is wrong. You need to authenticate before we can apply ACL. I have fixed the problem by changing the ACL middleware sequence to 99.');
+            throw new \Exception('ACL middleware sequence is lower then Auth/AgentCheck middleware sequence, which is wrong. You need to authenticate before we can apply ACL. I have fixed the problem by changing the ACL middleware sequence to 99.');
         }
     }
 }
