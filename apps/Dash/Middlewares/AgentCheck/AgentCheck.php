@@ -29,11 +29,6 @@ class AgentCheck extends BaseMiddleware
 
         $guestAccess =
         [
-            $appRoute . '/auth',
-            $appRoute . '/auth/login',
-            $appRoute . '/auth/logout',
-            $appRoute . '/auth/forgot',
-            $appRoute . '/auth/pwreset',
             $appRoute . '/auth/sendverification',
             $appRoute . '/auth/verify'
         ];

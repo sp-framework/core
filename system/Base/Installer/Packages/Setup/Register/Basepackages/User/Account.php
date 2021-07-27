@@ -8,8 +8,6 @@ class Account
 {
     public function register($db, $email, $password, $adminRoleId)
     {
-        $permissions = Json::encode([]);
-
         $insertAdmin = $db->insertAsDict(
             'basepackages_users_accounts',
             [
@@ -18,10 +16,18 @@ class Account
                 'password'              => $password,
                 'role_id'               => $adminRoleId,
                 'override_role'         => 0,
-                'permissions'           => $permissions,
-                'can_login'             => Json::encode(['admin' => true])
+                'permissions'           => Json::encode([])
             ]
         );
+
+        // $insertAdminCanlogin = $db->insertAsDict(
+        //     'basepackages_users_accounts_canlogin',
+        //     [
+        //         'account_id'            => 1,
+        //         'app'                   => 'admin',
+        //         'allowed'               => true
+        //     ]
+        // );
 
         if ($insertAdmin) {
             return $db->lastInsertId();

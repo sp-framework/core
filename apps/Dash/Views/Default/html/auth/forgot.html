@@ -95,7 +95,7 @@ $(document).ready(function(){
             postData = {
                 'user'      : $('#{{componentId}}-form-user').val().trim(),
                 'pass'      : $('#{{componentId}}-form-pass').val().trim(),
-                // 'remember'  : $('#{{componentId}}-form-remember')[0].checked
+                'remember'  : $('#{{componentId}}-form-remember')[0].checked
             };
 
             if ($('#{{componentId}}-form-twofa').val().trim() !== '') {

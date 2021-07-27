@@ -6,6 +6,7 @@ use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class Accounts extends BasePackage
@@ -202,6 +203,78 @@ class Accounts extends BasePackage
 
         if ($account) {
             return $account[0];
+        } else {
+            return false;
+        }
+    }
+
+    public function canLogin($id, $app)
+    {
+        $this->getById($id);
+
+        $canLogin =
+            $this->model->canlogin->filter(
+                function($allowed) use ($id, $app) {
+                    $allowed = $allowed->toArray();
+
+                    if ($allowed['account_id'] == $id &&
+                        $allowed['app'] === $app &&
+                        $allowed['allowed'] == true
+                    ) {
+                        return $allowed;
+                    }
+                }
+            );
+
+        if (count($canLogin) === 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function hasSession($id, $session)
+    {
+        $this->getById($id);
+
+        $hasSession =
+            $this->model->sessions->filter(
+                function($sessionObj) use ($id, $session) {
+                    $sessionObj = $sessionObj->toArray();
+
+                    if ($sessionObj['account_id'] == $id &&
+                        $sessionObj['session_id'] === $session
+                    ) {
+                        return $sessionObj;
+                    }
+                }
+            );
+
+        if (count($hasSession) === 1) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function hasIdentifier($app, $identifier)
+    {
+        $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+
+        $identifier =
+            $identifierModel->find(
+                    [
+                        'conditions'    => 'identifier = :identifier: AND app = :app:',
+                        'bind'          =>
+                            [
+                                'identifier'  => $identifier,
+                                'app'         => $app
+                            ]
+                    ],
+                )->toArray();
+
+        if (count($identifier) === 1) {
+            return $identifier[0];
         } else {
             return false;
         }

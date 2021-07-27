@@ -24,120 +24,120 @@ class Accounts
                     new Column(
                         'email',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 100,
-                            'notNull' => true,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 100,
+                            'notNull'       => true,
                         ]
                     ),
                     new Column(
                         'domain',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 50,
-                            'notNull' => true,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 50,
+                            'notNull'       => true,
                         ]
                     ),
                     new Column(
                         'password',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
-                            'notNull' => true,
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 2048,
+                            'notNull'       => true,
                         ]
                     ),
                     new Column(
                         'role_id',
                         [
-                            'type'    => Column::TYPE_INTEGER,
-                            'notNull' => true,
+                            'type'          => Column::TYPE_SMALLINTEGER,
+                            'notNull'       => true,
                         ]
                     ),
                     new Column(
                         'override_role',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
-                            'notNull' => true,
+                            'type'          => Column::TYPE_BOOLEAN,
+                            'notNull'       => true,
                         ]
                     ),
                     new Column(
                         'permissions',
                         [
-                            'type'    => Column::TYPE_TEXT,
-                            'notNull' => true,
+                            'type'          => Column::TYPE_TEXT,
+                            'notNull'       => true,
                         ]
                     ),
-                    new Column(
-                        'can_login',
-                        [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 2048,
-                            'notNull' => false,
-                        ]
-                    ),
+                    // new Column(
+                    //     'can_login',
+                    //     [
+                    //         'type'    => Column::TYPE_VARCHAR,
+                    //         'size'    => 2048,
+                    //         'notNull' => false,
+                    //     ]
+                    // ),
                     new Column(
                         'force_pwreset',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
-                            'notNull' => false,
+                            'type'          => Column::TYPE_BOOLEAN,
+                            'notNull'       => false,
                         ]
                     ),
-                    new Column(
-                        'session_ids',
-                        [
-                            'type'    => Column::TYPE_TEXT,
-                            'notNull' => false,
-                        ]
-                    ),
-                    new Column(
-                        'remember_identifier',
-                        [
-                            'type'    => Column::TYPE_TEXT,
-                            'notNull' => false,
-                        ]
-                    ),
-                    new Column(
-                        'remember_token',
-                        [
-                            'type'    => Column::TYPE_TEXT,
-                            'notNull' => false,
-                        ]
-                    ),
+                    // new Column(
+                    //     'session_ids',
+                    //     [
+                    //         'type'    => Column::TYPE_TEXT,
+                    //         'notNull' => false,
+                    //     ]
+                    // ),
+                    // new Column(
+                    //     'remember_identifier',
+                    //     [
+                    //         'type'    => Column::TYPE_TEXT,
+                    //         'notNull' => false,
+                    //     ]
+                    // ),
+                    // new Column(
+                    //     'remember_token',
+                    //     [
+                    //         'type'    => Column::TYPE_TEXT,
+                    //         'notNull' => false,
+                    //     ]
+                    // ),
                     new Column(
                         'two_fa_status',
                         [
-                            'type'    => Column::TYPE_TINYINTEGER,
-                            'notNull' => false,
+                            'type'          => Column::TYPE_BOOLEAN,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'two_fa_secret',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 1024,
-                            'notNull' => false
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 1024,
+                            'notNull'       => false
                         ]
                     ),
-                    new Column(
-                        'agents',
-                        [
-                            'type'    => Column::TYPE_TEXT,
-                            'notNull' => false
-                        ]
-                    ),
-                    new Column(
-                        'notifications_tunnel_id',
-                        [
-                            'type'    => Column::TYPE_SMALLINTEGER,
-                            'notNull' => false
-                        ]
-                    ),
-                    new Column(
-                        'messenger_tunnel_id',
-                        [
-                            'type'    => Column::TYPE_SMALLINTEGER,
-                            'notNull' => false
-                        ]
-                    )
+                    // new Column(
+                    //     'agents',
+                    //     [
+                    //         'type'    => Column::TYPE_TEXT,
+                    //         'notNull' => false
+                    //     ]
+                    // ),
+                    // new Column(
+                    //     'notifications_tunnel_id',
+                    //     [
+                    //         'type'    => Column::TYPE_SMALLINTEGER,
+                    //         'notNull' => false
+                    //     ]
+                    // ),
+                    // new Column(
+                    //     'messenger_tunnel_id',
+                    //     [
+                    //         'type'    => Column::TYPE_SMALLINTEGER,
+                    //         'notNull' => false
+                    //     ]
+                    // )
                 ],
                 'indexes' => [
                     new Index(

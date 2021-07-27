@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users;
 
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class BasepackagesUsersProfiles extends BaseModel
 {
@@ -35,4 +36,16 @@ class BasepackagesUsersProfiles extends BaseModel
     public $contact_other;
 
     public $contact_notes;
+
+    public function initialize()
+    {
+        $this->hasOne(
+            'account_id',
+            BasepackagesUsersAccounts::class,
+            'id',
+            [
+                'alias' => 'account'
+            ]
+        );
+    }
 }
