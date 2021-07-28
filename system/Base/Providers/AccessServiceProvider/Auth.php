@@ -166,24 +166,6 @@ class Auth
                 $this->logger->log->debug($identifier->getMessages());
             }
         }
-        // var_dump($identifier);die();
-        // if (isset($this->account['remember_identifier'])) {
-        //     if ($this->account['remember_identifier'] && !is_array($this->account['remember_identifier'])) {
-        //         $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
-        //     }
-        //     unset($this->account['remember_identifier'][$this->cookieKey][$this->session->getId()]);
-        //     $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
-        // }
-
-        // if (isset($this->account['remember_token'])) {
-        //     if ($this->account['remember_token'] && !is_array($this->account['remember_token'])) {
-        //         $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
-        //     }
-        //     unset($this->account['remember_token'][$this->cookieKey][$this->session->getId()]);
-        //     $this->account['remember_token'] = Json::encode($this->account['remember_token']);
-        // }
-
-        // $this->accounts->update($this->account);
 
         //Set cookies to 1 second so browser removes them.
         $this->cookies->set(
@@ -231,28 +213,7 @@ class Auth
             }
         }
 
-        // if ($this->account['session_ids']) {
-        //     if (!is_array($this->account['session_ids'])) {
-        //         $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
-        //     }
-        //     $sessionIdKey = array_search($this->session->getId(), $this->account['session_ids'][$this->getKey()]);
-        // }
-
-        // if (isset($sessionIdKey) && $sessionIdKey !== false) {
-        //     if (count($this->account['session_ids'][$this->getKey()]) === 1) {
-        //         $this->account['session_ids'][$this->getKey()] = [];
-        //     } else {
-        //         unset($this->account['session_ids'][$this->getKey()][$sessionIdKey]);
-
-        //         $this->account['session_ids'] = Json::encode($this->account['session_ids']);
-        //     }
-        // } else {
-        //     $this->account['session_ids'] = Json::encode($this->account['session_ids']);
-        // }
-
         $this->sessionTools->removeSessionKey($this->getKey());
-
-        // $this->accounts->update($this->account);
     }
 
     public function attempt($data)
@@ -309,14 +270,7 @@ class Auth
         }
 
         if ($this->secTools->passwordNeedsRehash($this->account['password'])) {
-
             $this->account['password'] = $this->secTools->hashPassword($data['pass'], $this->config->security->passwordWorkFactor);
-
-            // if (is_array($this->account['can_login'])) {
-            //     $this->account['can_login'] = Json::encode($this->account['can_login']);
-            // }
-
-            // $this->accounts->update($this->account);
         }
 
         $this->setSessionAndRecaller($data);
@@ -331,24 +285,7 @@ class Auth
         $this->account = $this->accounts->checkAccountByEmail($data['user']);
 
         if ($this->account) {
-            // if ($this->account['can_login']) {
-            //     $this->account['can_login'] = Json::decode($this->account['can_login'], true);
-            // }
-
-            // if (isset($this->account['can_login'][$this->app['route']]) &&
-            //     !$this->account['can_login'][$this->app['route']]
-            // ) {//Not allowed for app
-            // if (!$this->accounts->canLogin($this->account['id'], $this->app['route'])) {
-            //     $this->packagesData->responseCode = 1;
-
-            //     $this->packagesData->responseMessage = 'Error: Contact System Administrator';
-
-            //     $this->logger->log->debug($this->account['email'] . ' is not allowed to login to app ' . $this->app['name']);
-
-            //     return false;
-            // }
-
-            // if (!isset($this->account['can_login'][$this->app['route']])) {//New App OR New account via rego
+            //New App OR New account via rego
             if (!$this->accounts->canLogin($this->account['id'], $this->app['route'])) {
 
                 if ($this->app['can_login_role_ids']) {
@@ -408,7 +345,6 @@ class Auth
 
     protected function setSessionAndRecaller(array $data)
     {
-        // var_dump($this->accounts->getModel()->getsessions());
         if ($this->setUserSession()) {
             $sessionModel = new BasepackagesUsersAccountsSessions;
 
@@ -428,30 +364,6 @@ class Auth
 
                 throw $e;
             }
-            // if ($this->account['session_ids']) {
-            //     $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
-
-            //     if (isset($this->account['session_ids'][$this->getKey()])) {
-            //         if (!in_array($this->session->getId(), $this->account['session_ids'][$this->getKey()])) {
-            //             array_push($this->account['session_ids'][$this->getKey()], $this->session->getId());
-            //         }
-            //     } else {
-            //         $this->account['session_ids'][$this->getKey()] = [];
-            //         array_push($this->account['session_ids'][$this->getKey()], $this->session->getId());
-            //     }
-            // } else {
-            //     $this->account['session_ids'] = [];
-            //     $this->account['session_ids'][$this->getKey()] = [];
-            //     array_push($this->account['session_ids'][$this->getKey()], $this->session->getId());
-            // }
-
-            // $this->account['session_ids'] = Json::encode($this->account['session_ids']);
-
-            // if (is_array($this->account['can_login'])) {
-            //     $this->account['can_login'] = Json::encode($this->account['can_login']);
-            // }
-
-            // $this->accounts->update($this->account);
         }
 
         $this->setUserIdCooikie();
@@ -459,7 +371,6 @@ class Auth
         if (isset($data['remember']) && $data['remember'] === 'true') {
             $this->setRecaller();
         }
-        // $this->setRecaller();
     }
 
     protected function setUserIdCooikie()
@@ -483,30 +394,6 @@ class Auth
 
     public function setUserFromRecaller()
     {
-        // if (!$this->account) {
-        //     return false;
-        // }
-
-        // We need to search the DB with Recaller
-        // if (isset($this->account['remember_token'])) {
-        //     if (!is_array($this->account['remember_token'])) {
-        //         $accountToken = Json::decode($this->account['remember_token'], true)[$this->cookieKey][$this->session->getId()];
-        //     } else {
-        //         $accountToken = $this->account['remember_token'][$this->cookieKey][$this->session->getId()];
-        //     }
-        // } else {
-        //     $accountToken = null;
-        // }
-
-        // if (isset($this->account['remember_identifier'])) {
-        //     if (!is_array($this->account['remember_identifier'])) {
-        //         $accountIdentifier = Json::decode($this->account['remember_identifier'], true)[$this->cookieKey][$this->session->getId()];
-        //     } else {
-        //         $accountIdentifier = $this->account['remember_identifier'][$this->cookieKey][$this->session->getId()];
-        //     }
-        // } else {
-        //     $accountIdentifier = null;
-        // }
         list($identifier, $token) = explode($this->separator, $this->cookies->get($this->cookieKey)->getValue());
 
         $hasIdentifier = $this->accounts->hasIdentifier($this->app['route'], $identifier);
@@ -527,9 +414,7 @@ class Auth
         $this->account = $this->accounts->getById($hasIdentifier['account_id']);
 
         if ($this->account) {
-            // if ($hasIdentifier['session_id'] !== $this->sesion->getId()) {
-                $this->updateSessionIdForSessionAndIdentifier($hasIdentifier);
-            // }
+            $this->updateSessionIdForSessionAndIdentifier($hasIdentifier);
 
             $this->setAccountProfile();
 
@@ -604,26 +489,6 @@ class Auth
         $identifierModel->assign($newIdentifier);
 
         $identifierModel->create();
-        // if (isset($this->account['remember_identifier']) && $this->account['remember_identifier'] !== '') {
-        //     $this->account['remember_identifier'] = Json::decode($this->account['remember_identifier'], true);
-        // } else {
-        //     $this->account['remember_identifier'] = [];
-        // }
-        // $this->account['remember_identifier'][$this->cookieKey][$this->session->getId()] = $identifier;
-        // $this->account['remember_identifier'] = Json::encode($this->account['remember_identifier']);
-
-        // if (isset($this->account['remember_token']) && $this->account['remember_token'] !== '') {
-        //     $this->account['remember_token'] = Json::decode($this->account['remember_token'], true);
-        // } else {
-        //     $this->account['remember_token'] = [];
-        // }
-
-        // $this->account['remember_token'][$this->cookieKey][$this->session->getId()] =
-        //     $this->secTools->hashPassword($token, $this->config->security->cookiesWorkFactor);
-
-        // $this->account['remember_token'] = Json::encode($this->account['remember_token']);
-
-        // $this->accounts->update($this->account);
     }
 
     protected function generateRecaller()
@@ -687,21 +552,6 @@ class Auth
         } else {
             return false;
         }
-        // if (!$this->account['session_ids']) {
-        //     $this->logger->log->debug($this->account['email'] . ' session null, perhaps was forced logged out by Administrator.');
-
-        //     throw new \Exception('User session deleted in DB by administrator via force logout.');
-        // } else if ($this->account['session_ids']) {
-        //     $this->account['session_ids'] = Json::decode($this->account['session_ids'], true);
-
-        //     if (!in_array($this->session->getId(), $this->account['session_ids'][$this->getKey()])) {
-        //         $this->logger->log->debug($this->account['email'] . ' session id ' . $this->session->getId() . ' not present in DB.');
-
-        //         $this->sessionTools->clearSession($this->session->getId());
-
-        //         throw new \Exception('User session deleted in DB by administrator via force logout.');
-        //     }
-        // }
     }
 
     protected function setAccountProfile()
@@ -911,8 +761,6 @@ class Auth
 
             $this->account['two_fa_status'] = '1';
 
-            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
-
             $this->accounts->update($this->account);
         }
     }
@@ -925,8 +773,6 @@ class Auth
             $this->account['two_fa_status'] = null;
 
             $this->account['two_fa_secret'] = null;
-
-            $this->account['session_ids'] = Json::encode($this->account['session_ids']);
 
             $this->accounts->update($this->account);
 
@@ -964,8 +810,6 @@ class Auth
         unset($this->account['profile']);
 
         $this->account['two_fa_secret'] = trim(Base32::encodeUpper(random_bytes(16)), '=');
-
-        $this->account['session_ids'] = Json::encode($this->account['session_ids']);
 
         $this->accounts->update($this->account);
 

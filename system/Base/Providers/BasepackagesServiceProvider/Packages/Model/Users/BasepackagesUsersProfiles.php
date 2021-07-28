@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users;
 
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Address\BasepackagesAddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class BasepackagesUsersProfiles extends BaseModel
@@ -45,6 +46,15 @@ class BasepackagesUsersProfiles extends BaseModel
             'id',
             [
                 'alias' => 'account'
+            ]
+        );
+
+        $this->hasOne(
+            'contact_address_id',
+            BasepackagesAddressBook::class,
+            'id',
+            [
+                'alias' => 'addressbook'
             ]
         );
     }

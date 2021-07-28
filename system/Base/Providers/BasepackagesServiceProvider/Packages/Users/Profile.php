@@ -73,6 +73,7 @@ class Profile extends BasePackage
             $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
 
         if ($profile['contact_address_id'] && $profile['contact_address_id'] !== '') {
+
             $address = $this->basepackages->addressbook->getById($profile['contact_address_id']);
 
             if ($address) {
@@ -123,13 +124,9 @@ class Profile extends BasePackage
         $data['contact_mobile'] = '0';
 
         if ($this->add($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Profile updated';
+            $this->addResponse('Profile updated');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating profile.';
+            $this->addResponse('Error updating profile.', 1);
         }
     }
 
@@ -162,13 +159,9 @@ class Profile extends BasePackage
         }
 
         if ($this->update($profile)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Profile updated';
+            $this->addResponse('Profile updated');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating profile.';
+            $this->addResponse('Error updating profile.', 1);
         }
     }
 
@@ -230,13 +223,9 @@ class Profile extends BasePackage
         if ($this->update($profile)) {
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $portrait);
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Profile updated';
+            $this->addResponse('Profile updated');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating profile.';
+            $this->addResponse('Error updating profile.', 1);
         }
     }
 
@@ -332,9 +321,11 @@ class Profile extends BasePackage
 
     public function generateViewData()
     {
-        $account = $this->auth->account();
+        $accountObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->auth->account()['id']);
 
-        $canLoginArr = $this->basepackages->accounts->getModel()->canlogin->toArray();
+        $canLoginArr = $accountObj->canlogin->toArray();
+
+        $account = $accountObj->toArray();
 
         if ($canLoginArr > 0) {
             foreach ($canLoginArr as $key => $value) {
