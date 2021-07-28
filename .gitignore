@@ -12,12 +12,5 @@ var/*
 *Html_compiled*
 .vscode*
 linter-backup*
-public/Tms/*
-applications/Tms/*
-public/Mee/*
-applications/Mee/*
-public/Webshop/*
-applications/Webshop/*
-public/Eshop/*
-applications/Eshop/*
 repos/*
+system/ThirdParty/vendor/*
