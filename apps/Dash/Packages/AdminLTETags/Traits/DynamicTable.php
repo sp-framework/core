@@ -178,6 +178,7 @@ trait DynamicTable {
                         'dtRows'                                             => $rows,
                         'dtNotificationTextFromColumn'                       => $dtNotificationTextFromColumn,
                         'dtPagination'                                       => true,
+                        'dtShowRowControls'                                  => $controlActions ? true: false,
                         'dtPaginationCounters'                               => $package->packagesData->paginationCounters,
                         'dtReplaceColumns'                                   => $dtReplaceColumns,
                         'dtAdditionControlButtons'                           => $dtAdditionControlButtons,
