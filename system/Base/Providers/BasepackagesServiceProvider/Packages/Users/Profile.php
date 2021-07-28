@@ -334,8 +334,14 @@ class Profile extends BasePackage
     {
         $account = $this->auth->account();
 
-        if ($account['can_login'] && !is_array($account['can_login']) && $account['can_login'] !== '') {
-            $account['can_login'] = Json::decode($account['can_login'], true);
+        $canLoginArr = $this->basepackages->accounts->getModel()->canlogin->toArray();
+
+        if ($canLoginArr > 0) {
+            foreach ($canLoginArr as $key => $value) {
+                $account['can_login'][$value['app']] = $value['allowed'];
+            }
+        } else {
+            $account['can_login'] = [];
         }
 
         if (isset($this->domains->getDomain()['apps'][$this->app['id']]['email_service']) &&

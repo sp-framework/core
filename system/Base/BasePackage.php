@@ -97,7 +97,7 @@ abstract class BasePackage extends Controller
 				$parameters = $this->getIdParams($id);
 			}
 
-			$this->model = $this->modelToUse::findFirst($parameters);
+			$this->model = $this->modelToUse::find($parameters);
 
 			$data = $this->getDbData($parameters, $enableCache);
 
@@ -386,7 +386,7 @@ abstract class BasePackage extends Controller
 					array_push($this->cacheKeys, $parameters['cache']['key']);
 				}
 
-				return $this->model->toArray();
+				return $this->model->toArray()[0];
 
 			} else if ($this->model->count() > 1) {
 				$this->packagesData->responseCode = 1;

@@ -17,6 +17,8 @@ class BasepackagesUsersAccountsAgents extends BaseModel
 
     public $verified;
 
+    public $verification_code;
+
     public function initialize()
     {
         $this->belongsTo(

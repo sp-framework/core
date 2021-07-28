@@ -20,9 +20,6 @@ var BazTunnels = function() {
     var reconnectMessengerTunnel = null;
     var reconnectPusherTunnel = null;
 
-    // var stoppedPullNotifications = false;
-    // var stopPullNotifications = () => {stoppedPullNotifications = true};
-
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -42,6 +39,7 @@ var BazTunnels = function() {
         dataCollection.env.wsTunnels.messenger = { };
 
         initPusherTunnel();
+        // initMessengerOTR();
     }
 
     // Init Messenger tunnel as needed. Messages can be transmitted purely on WSS avoiding message to be added to DB.
@@ -50,7 +48,7 @@ var BazTunnels = function() {
         dataCollection.env.wsTunnels.messenger = new WebSocket(dataCollection.env.wsTunnels.protocol + '://' + dataCollection.env.httpHost + '/messenger/');
 
         dataCollection.env.wsTunnels.messenger.onopen = null;
-        dataCollection.env.wsTunnels.messenger.onopen = function(e) {
+        dataCollection.env.wsTunnels.messenger.onopen = function() {
             if (reconnectMessengerTunnel) {
                 clearInterval(reconnectMessengerTunnel);
                 reconnectMessengerTunnel = null;
@@ -58,15 +56,10 @@ var BazTunnels = function() {
             } else {
                 BazMessenger.init();
             }
-
-            //eslint-disable-next-line
-            console.log(e);
         };
 
         dataCollection.env.wsTunnels.messenger.onclose = null;
-        dataCollection.env.wsTunnels.messenger.onclose = function(e) {
-                //eslint-disable-next-line
-            console.log(e);
+        dataCollection.env.wsTunnels.messenger.onclose = function() {
             if (!reconnectMessengerTunnel) {
                 BazMessenger.serviceOffline();
                 reconnectMessengerTunnel = setInterval(() => {
@@ -76,16 +69,12 @@ var BazTunnels = function() {
         };
 
         dataCollection.env.wsTunnels.messenger.onerror = null;
-        dataCollection.env.wsTunnels.messenger.onerror = function(e) {
-            //eslint-disable-next-line
-            console.log(e);
+        dataCollection.env.wsTunnels.messenger.onerror = function() {
             dataCollection.env.wsTunnels.messenger.close();
         };
 
         dataCollection.env.wsTunnels.messenger.onmessage = null;
-        dataCollection.env.wsTunnels.messenger.onmessage = function(e) {
-            //eslint-disable-next-line
-            console.log(e);
+        dataCollection.env.wsTunnels.messenger.onmessage = function() {
         };
     }
 

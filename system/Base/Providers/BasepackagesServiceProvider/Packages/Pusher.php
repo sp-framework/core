@@ -2,17 +2,25 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
+use Apps\Dash\Packages\System\Messenger\Messenger;
 use Phalcon\Helper\Json;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 
 class Pusher extends BasePackage implements WampServerInterface
 {
     protected $subscriptions = [];
 
+    protected $accountsObj;
+
+    protected $tunnelsObj;
+
     public function init()
     {
+        $this->tunnelsObj = new BasepackagesUsersAccountsTunnels;
+
         return $this;
     }
 
@@ -115,7 +123,9 @@ class Pusher extends BasePackage implements WampServerInterface
             $cookies[trim($cookie[0])] = trim($cookie[1]);
         }
 
-        $this->account = $this->basepackages->accounts->getById($cookies['id']);
+        $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
+
+        $this->account = $this->accountsObj->toArray();
 
         if (!$this->account) {
             return false;
@@ -124,10 +134,20 @@ class Pusher extends BasePackage implements WampServerInterface
         $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
 
         if ($this->checkSession($cookies)) {
-            $this->account['notifications_tunnel_id'] = $conn->resourceId;
+            if (!$this->accountsObj->tunnels) {
+                $newTunnel =
+                    [
+                        'account_id'            => $this->account['id'],
+                        'notifications_tunnel'  => $conn->resourceId
+                    ];
 
-            $this->basepackages->accounts->update($this->account);
 
+                $this->tunnelsObj->assign($newTunnel);
+
+                $this->tunnelsObj->create();
+            } else {
+                $this->accountsObj->tunnels->assign(['notifications_tunnel'  => $conn->resourceId])->update();
+            }
             return true;
         }
 
@@ -136,18 +156,12 @@ class Pusher extends BasePackage implements WampServerInterface
 
     protected function checkSession($cookies)
     {
-        if (isset($this->account['session_ids'])) {
-            if (!is_array($this->account['session_ids'])) {
-                $apps = Json::decode($this->account['session_ids'], true);
-            }
-
-            foreach ($apps as $appKey => $sessions) {
-                if (in_array($cookies['Bazaari'], $sessions)) {
+        if ($this->accountsObj->sessions) {
+            foreach ($this->accountsObj->sessions as $key => $session) {
+                if ($session->session_id === $cookies['Bazaari']) {
                     return true;
                 }
             }
-        } else {
-            return false;
         }
 
         return false;
@@ -159,13 +173,14 @@ class Pusher extends BasePackage implements WampServerInterface
         $account = $this->basepackages->accounts->checkAccountByNotificationsTunnelId($resourceId);
 
         if ($account) {
-            $account['notifications_tunnel_id'] = null;
+            $this->accountsObj->tunnels->assign(['notifications_tunnel'  => null])->update();
+            // $account['notifications_tunnel_id'] = null;
 
-            $this->basepackages->accounts->update($account);
+            // $this->basepackages->accounts->update($account);
 
             $profile = $this->basepackages->profile->getProfile($account['id']);
 
-            $messenger = new \Apps\Dash\Packages\System\Messenger\Messenger();
+            $messenger = new Messenger();
 
             if (isset($profile['settings']['messenger']['status'])) {
                 if ($profile['settings']['messenger']['status'] == 4) {

@@ -3,7 +3,6 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 
 use Phalcon\Db\Column;
-use Phalcon\Db\Index;
 
 class CanLogin
 {

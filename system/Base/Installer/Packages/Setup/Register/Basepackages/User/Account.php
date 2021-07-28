@@ -20,15 +20,6 @@ class Account
             ]
         );
 
-        // $insertAdminCanlogin = $db->insertAsDict(
-        //     'basepackages_users_accounts_canlogin',
-        //     [
-        //         'account_id'            => 1,
-        //         'app'                   => 'admin',
-        //         'allowed'               => true
-        //     ]
-        // );
-
         if ($insertAdmin) {
             return $db->lastInsertId();
         } else {

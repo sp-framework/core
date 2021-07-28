@@ -25,13 +25,13 @@ class BasepackagesUsersAccountsSessions extends BaseModel
             'id'
         );
 
-        $this->hasMany(
+        $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsIdentifiers::class,
             'session_id'
         );
 
-        $this->hasMany(
+        $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsAgents::class,
             'session_id'

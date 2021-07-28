@@ -10,7 +10,6 @@ class AgentCheck extends BaseMiddleware
     public function process()
     {
         $this->account = $this->auth->account();
-
         if (!$this->account) {
             $this->checkAgentCheckMiddlewareSequence();
         }

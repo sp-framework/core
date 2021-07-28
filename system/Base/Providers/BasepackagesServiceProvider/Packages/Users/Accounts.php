@@ -6,7 +6,9 @@ use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class Accounts extends BasePackage
@@ -43,6 +45,8 @@ class Accounts extends BasePackage
             if ($this->add($data)) {
                 $id = $this->packagesData->last['id'];
 
+                $this->addUpdateCanLogin($id, $data['can_login']);
+
                 $data['id'] = $id;
                 $this->basepackages->profile->addProfile($data);
 
@@ -70,13 +74,9 @@ class Accounts extends BasePackage
      */
     public function updateAccount(array $data)
     {
-        $account = $this->getById($data['id']);
+        $accountObj = $this->modelToUse::findFirstById($data['id']);
 
-        if (!$account) {
-            $this->addResponse('Account Not Found.', 1);
-
-            return;
-        }
+        $account = $accountObj->toArray();
 
         if ($data['override_role'] == 0) {
             $data['permissions'] = Json::encode([]);
@@ -93,16 +93,16 @@ class Accounts extends BasePackage
             $data['password'] = $this->secTools->hashPassword($password);
         }
 
-        if (isset($data['force_logout']) && $data['force_logout'] === '1') {
-            $data['session_ids'] = null;
-        }
-
         if (isset($data['disable_two_fa']) && $data['disable_two_fa'] === '1') {
             $data['two_fa_status'] = null;
             $data['two_fa_secret'] = null;
         }
 
         if ($this->update($data)) {
+
+            if (isset($data['can_login'])) {
+                $this->addUpdateCanLogin($data['id'], $data['can_login']);
+            }
 
             if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
                 $this->emailNewPassword($data['email'], $password);
@@ -117,6 +117,10 @@ class Accounts extends BasePackage
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
             $this->addToNotification('add', 'Updated account for ID: ' . $data['email']);
+
+            if (isset($data['force_logout']) && $data['force_logout'] === '1') {
+                $this->removeRelatedData($accountObj);
+            }
         } else {
             $this->addResponse('Error updating account.', 1);
         }
@@ -129,12 +133,16 @@ class Accounts extends BasePackage
      */
     public function removeAccount(array $data)
     {
-        $account = $this->getById($data['id']);
+        $accountObj = $this->modelToUse::findFirstById($data['id']);
+
+        $account = $accountObj->toArray();
 
         $this->removeRoleAccount($account['role_id'], $account['id']);
 
         if (isset($data['id']) && $data['id'] != 1) {
             if ($this->remove($data['id'])) {
+
+                $this->removeRelatedData($accountObj);
 
                 $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
 
@@ -144,6 +152,64 @@ class Accounts extends BasePackage
             }
         } else {
             $this->addResponse('Cannot remove default account.', 1);
+        }
+    }
+
+    protected function removeRelatedData($accountObj)
+    {
+        if ($accountObj->getprofiles()) {
+            $accountObj->getprofiles()->delete();
+        }
+        if ($accountObj->getcanlogin()) {
+            $accountObj->getcanlogin()->delete();
+        }
+        if ($accountObj->gettunnels()) {
+            $accountObj->gettunnels()->delete();
+        }
+        if ($accountObj->getidentifiers()) {
+            $accountObj->getidentifiers()->delete();
+        }
+        if ($accountObj->getsessions()) {
+            $accountObj->getsessions()->delete();
+        }
+    }
+
+    protected function addUpdateCanLogin($id, $canLogin)
+    {
+        if ($canLogin !== '') {
+            $canLogin = Json::decode($canLogin, true);
+        }
+
+        if (count($canLogin) > 0) {
+            foreach ($canLogin as $app => $allowed) {
+                $canloginModel = new BasepackagesUsersAccountsCanlogin;
+                $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app = "' . $app . '"']);
+
+                if ($permission) {
+                    if ($allowed === true) {
+                        $updatePermission['allowed'] = '1';
+                    } else {
+                        $updatePermission['allowed'] = '0';
+                    }
+
+                    $permission->assign($updatePermission);
+
+                    $permission->update();
+                } else {
+                    $newPermission['account_id'] = $id;
+                    $newPermission['app'] = $app;
+
+                    if ($allowed === true) {
+                        $newPermission['allowed'] = '1';
+                    } else {
+                        $newPermission['allowed'] = '0';
+                    }
+
+                    $canloginModel->assign($newPermission);
+
+                    $canloginModel->create();
+                }
+            }
         }
     }
 
@@ -210,7 +276,7 @@ class Accounts extends BasePackage
 
     public function canLogin($id, $app)
     {
-        $this->getById($id);
+        $this->model = $this->modelToUse::findFirst($id);
 
         $canLogin =
             $this->model->canlogin->filter(
@@ -235,7 +301,7 @@ class Accounts extends BasePackage
 
     public function hasSession($id, $session)
     {
-        $this->getById($id);
+        $this->model = $this->modelToUse::findFirst($id);
 
         $hasSession =
             $this->model->sessions->filter(
@@ -282,20 +348,11 @@ class Accounts extends BasePackage
 
     public function checkAccountByNotificationsTunnelId($tunnelId)
     {
-        $account =
-            $this->getByParams(
-                    [
-                        'conditions'    => '[notifications_tunnel_id] = :tunnelId:',
-                        'bind'          =>
-                            [
-                                'tunnelId'  => $tunnelId
-                            ]
-                    ],
-                    false,
-                    false
-                );
+        $tunnelsModel = new BasepackagesUsersAccountsTunnels;
 
-        if ($account) {
+        $account = $tunnelsModel::find('[notifications_tunnel] = ' . $tunnelId)->toArray();
+
+        if (count($account) === 1) {
             return $account[0];
         } else {
             return false;
@@ -329,7 +386,7 @@ class Accounts extends BasePackage
     protected function emailNewPassword($email, $password)
     {
         $emailData['app_id'] = $this->app['id'];
-        $emailData['status'] = 0;
+        $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
         $emailData['to_addresses'] = Json::encode([$email]);
@@ -434,12 +491,17 @@ class Accounts extends BasePackage
         }
 
         if ($uid) {
-            $account = $this->getById($uid);
+            $accountObj = $this->modelToUse::findFirstById($uid);
 
-            if ($account) {
+            if ($accountObj) {
+                $account = $accountObj->toArray();
 
-                if ($account['can_login'] && $account['can_login'] !== '') {
-                    $account['can_login'] = Json::decode($account['can_login'], true);
+                $canLoginArr = $accountObj->canlogin->toArray();
+
+                if ($canLoginArr > 0) {
+                    foreach ($canLoginArr as $key => $value) {
+                        $account['can_login'][$value['app']] = $value['allowed'];
+                    }
                 } else {
                     $account['can_login'] = [];
                 }

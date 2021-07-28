@@ -17,10 +17,10 @@ class BasepackagesUsersAccountsCanlogin extends BaseModel
 
     public function initialize()
     {
-        // $this->belongsTo(
-        //     'account_id',
-        //     BasepackagesUsersAccounts::class,
-        //     'id'
-        // );
+        $this->belongsTo(
+            'account_id',
+            BasepackagesUsersAccounts::class,
+            'id'
+        );
     }
 }

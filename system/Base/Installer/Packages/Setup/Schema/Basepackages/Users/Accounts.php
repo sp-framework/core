@@ -66,14 +66,6 @@ class Accounts
                             'notNull'       => true,
                         ]
                     ),
-                    // new Column(
-                    //     'can_login',
-                    //     [
-                    //         'type'    => Column::TYPE_VARCHAR,
-                    //         'size'    => 2048,
-                    //         'notNull' => false,
-                    //     ]
-                    // ),
                     new Column(
                         'force_pwreset',
                         [
@@ -81,27 +73,6 @@ class Accounts
                             'notNull'       => false,
                         ]
                     ),
-                    // new Column(
-                    //     'session_ids',
-                    //     [
-                    //         'type'    => Column::TYPE_TEXT,
-                    //         'notNull' => false,
-                    //     ]
-                    // ),
-                    // new Column(
-                    //     'remember_identifier',
-                    //     [
-                    //         'type'    => Column::TYPE_TEXT,
-                    //         'notNull' => false,
-                    //     ]
-                    // ),
-                    // new Column(
-                    //     'remember_token',
-                    //     [
-                    //         'type'    => Column::TYPE_TEXT,
-                    //         'notNull' => false,
-                    //     ]
-                    // ),
                     new Column(
                         'two_fa_status',
                         [
@@ -116,28 +87,7 @@ class Accounts
                             'size'          => 1024,
                             'notNull'       => false
                         ]
-                    ),
-                    // new Column(
-                    //     'agents',
-                    //     [
-                    //         'type'    => Column::TYPE_TEXT,
-                    //         'notNull' => false
-                    //     ]
-                    // ),
-                    // new Column(
-                    //     'notifications_tunnel_id',
-                    //     [
-                    //         'type'    => Column::TYPE_SMALLINTEGER,
-                    //         'notNull' => false
-                    //     ]
-                    // ),
-                    // new Column(
-                    //     'messenger_tunnel_id',
-                    //     [
-                    //         'type'    => Column::TYPE_SMALLINTEGER,
-                    //         'notNull' => false
-                    //     ]
-                    // )
+                    )
                 ],
                 'indexes' => [
                     new Index(

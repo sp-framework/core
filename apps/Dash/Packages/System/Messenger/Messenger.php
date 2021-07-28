@@ -10,6 +10,7 @@ use Phalcon\Storage\SerializerFactory;
 use Ratchet\ConnectionInterface;
 use Ratchet\MessageComponentInterface;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use ZMQContext;
 
 class Messenger extends BasePackage implements MessageComponentInterface
@@ -24,8 +25,14 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
     protected $account;
 
+    protected $accountsObj;
+
+    protected $tunnelsObj;
+
     public function init()
     {
+        $this->tunnelsObj = new BasepackagesUsersAccountsTunnels;
+
         return $this;
     }
 
@@ -99,7 +106,9 @@ class Messenger extends BasePackage implements MessageComponentInterface
             $cookies[trim($cookie[0])] = trim($cookie[1]);
         }
 
-        $this->account = $this->basepackages->accounts->getById($cookies['id']);
+        $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
+
+        $this->account = $this->accountsObj->toArray();
 
         if (!$this->account) {
             return false;
@@ -108,10 +117,20 @@ class Messenger extends BasePackage implements MessageComponentInterface
         $this->account['profile'] = $this->basepackages->profile->getProfile($this->account['id']);
 
         if ($this->checkSession($cookies)) {
-            $this->account['messenger_tunnel_id'] = $conn->resourceId;
+            if (!$this->accountsObj->tunnels) {
+                $newTunnel =
+                    [
+                        'account_id'            => $this->account['id'],
+                        'messenger_tunnel'      => $conn->resourceId
+                    ];
 
-            $this->basepackages->accounts->update($this->account);
 
+                $this->tunnelsObj->assign($newTunnel);
+
+                $this->tunnelsObj->create();
+            } else {
+                $this->accountsObj->tunnels->assign(['messenger_tunnel' => $conn->resourceId])->update();
+            }
             return true;
         }
 
@@ -120,18 +139,12 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
     protected function checkSession($cookies)
     {
-        if (isset($this->account['session_ids'])) {
-            if (!is_array($this->account['session_ids'])) {
-                $apps = Json::decode($this->account['session_ids'], true);
-            }
-
-            foreach ($apps as $appKey => $sessions) {
-                if (in_array($cookies['Bazaari'], $sessions)) {
+        if ($this->accountsObj->sessions) {
+            foreach ($this->accountsObj->sessions as $key => $session) {
+                if ($session->session_id === $cookies['Bazaari']) {
                     return true;
                 }
             }
-        } else {
-            return false;
         }
 
         return false;
@@ -161,7 +174,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
             $this->pushNotification(
                 'messengerNotifications',
-                $account['notifications_tunnel_id'],
+                $this->basepackages->accounts->getModel()->tunnels->notifications_tunnel,
                 null,
                 true,
                 [

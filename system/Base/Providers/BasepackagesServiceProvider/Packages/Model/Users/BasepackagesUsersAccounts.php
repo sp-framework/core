@@ -7,6 +7,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
 
 class BasepackagesUsersAccounts extends BaseModel
@@ -65,7 +66,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->hasManyToMany(
+        $this->hasOneThrough(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
@@ -77,7 +78,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        $this->hasManyToMany(
+        $this->hasOneThrough(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
@@ -91,10 +92,19 @@ class BasepackagesUsersAccounts extends BaseModel
 
         $this->hasOne(
             'id',
+            BasepackagesUsersAccountsTunnels::class,
+            'account_id',
+            [
+                'alias' => 'tunnels'
+            ]
+        );
+
+        $this->hasOne(
+            'id',
             BasepackagesUsersProfiles::class,
             'account_id',
             [
-                'alias' => 'profile'
+                'alias' => 'profiles'
             ]
         );
     }

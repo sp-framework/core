@@ -67,9 +67,13 @@ class Notifications extends BasePackage
 
     protected function pushNotification($notification)
     {
-        $account = $this->basepackages->accounts->getById($notification['account_id']);
+        $account = $this->basepackages->accounts->getModelToUse()::findFirst(['id = ' . $notification['account_id']]);
 
-        if ($account['notifications_tunnel_id']) {
+        if ($account->tunnels) {
+            $tunnels = $account->tunnels->toArray();
+        }
+
+        if ($tunnels['notifications_tunnel']) {
             $count =
                 $this->modelToUse::count(
                     [
@@ -90,7 +94,7 @@ class Notifications extends BasePackage
                 $data =
                     [
                         'type'              => 'systemNotifications',
-                        'to'                => $account['notifications_tunnel_id'],
+                        'to'                => $tunnels['notifications_tunnel'],
                         'response'          => [
                             'responseCode'      => 0,
                             'responseData'      =>
