@@ -16,3 +16,4 @@ repos/*
 system/ThirdParty/vendor/*
 ignore/*
 composer.json
+apps/Dash/Packages/System/Api/CallStats/*
