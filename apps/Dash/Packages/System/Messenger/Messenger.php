@@ -153,8 +153,12 @@ class Messenger extends BasePackage implements MessageComponentInterface
     public function changeStatus(array $data)
     {
         if (isset($data['user'])) {
-            $account = $this->basepackages->accounts->getById($data['user']);
+            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($data['user']);
+
+            $account = $this->accountsObj->toArray();
         } else {
+            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->auth->account()['id']);
+
             $account = $this->auth->account();
         }
 
@@ -174,7 +178,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
             $this->pushNotification(
                 'messengerNotifications',
-                $this->basepackages->accounts->getModel()->tunnels->notifications_tunnel,
+                $this->accountsObj->tunnels->notifications_tunnel,
                 null,
                 true,
                 [
