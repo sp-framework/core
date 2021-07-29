@@ -841,6 +841,7 @@ class Auth
                 if ($agent['client_address'] === $clientAddress &&
                     $agent['user_agent'] === $userAgent &&
                     $agent['session_id'] === $sessionId &&
+                    $agent['account_id'] === $this->account()['id'] &&
                     $agent['verified'] == '1'
                 ) {
                     return true;
@@ -859,6 +860,7 @@ class Auth
                 } else if ($agent['client_address'] === $clientAddress &&
                     $agent['user_agent'] === $userAgent &&
                     $agent['session_id'] === $sessionId &&
+                    $agent['account_id'] === $this->account()['id'] &&
                     $agent['verified'] == '0'
                 ) {
                     if (!$this->email->setup()) {
@@ -876,6 +878,7 @@ class Auth
 
                 $newAgent =
                     [
+                        'account_id'        => $this->account['id'],
                         'session_id'        => $sessionId,
                         'client_address'    => $clientAddress,
                         'user_agent'        => $userAgent,
@@ -897,6 +900,7 @@ class Auth
 
             $newAgent =
                 [
+                    'account_id'        => $this->account['id'],
                     'session_id'        => $sessionId,
                     'client_address'    => $clientAddress,
                     'user_agent'        => $userAgent,
@@ -1008,6 +1012,7 @@ class Auth
                 if ($agent['client_address'] === $clientAddress &&
                     $agent['user_agent'] === $userAgent &&
                     $agent['session_id'] === $sessionId &&
+                    $agent['account_id'] === $this->account()['id'] &&
                     $agent['verified'] == '0'
                 ) {
                     $agentObj->assign(['verified' => '1', 'verification_code' => null])->update();
@@ -1023,6 +1028,7 @@ class Auth
                     }
                 } else if ($agent['client_address'] === $clientAddress &&
                     $agent['user_agent'] === $userAgent &&
+                    $agent['account_id'] === $this->account()['id'] &&
                     $agent['session_id'] === $sessionId &&
                     $agent['verified'] == '1'
                 ) {

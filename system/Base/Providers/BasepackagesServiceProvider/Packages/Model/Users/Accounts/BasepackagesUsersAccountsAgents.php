@@ -9,6 +9,8 @@ class BasepackagesUsersAccountsAgents extends BaseModel
 {
     public $id;
 
+    public $account_id;
+
     public $session_id;
 
     public $client_address;

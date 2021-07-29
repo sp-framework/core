@@ -22,6 +22,13 @@ class Agents
                         ]
                     ),
                     new Column(
+                        'account_id',
+                        [
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true,
+                        ]
+                    ),
+                    new Column(
                         'session_id',
                         [
                             'type'          => Column::TYPE_VARCHAR,
