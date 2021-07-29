@@ -48,13 +48,13 @@ class MessengerComponent extends BaseComponent
                 return;
             }
 
-            $this->messengerPackage->getUnreadMessagesCount();
-
-            $this->addResponse(
-                $this->messengerPackage->packagesData->responseMessage,
-                $this->messengerPackage->packagesData->responseCode,
-                $this->messengerPackage->packagesData->responseData
-            );
+            if ($this->messengerPackage->getUnreadMessagesCount()) {
+                $this->addResponse(
+                    $this->messengerPackage->packagesData->responseMessage,
+                    $this->messengerPackage->packagesData->responseCode,
+                    $this->messengerPackage->packagesData->responseData
+                );
+            }
         } else {
             $this->addResponse('Method Not Allowed', 1);
         }

@@ -546,6 +546,12 @@ var BazMessenger = function() {
             }
         }
 
+        if (!toUser.portrait || (toUser.portrait && toUser.portrait === '')) {
+            toUser.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
+        } else {
+            toUser.portrait =
+                dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + toUser.portrait + '/w/80';
+        }
         $(messages).each(function(index, message) {
             if (message.to_account_id == toUser.user) {
                 messagesHtml +=
@@ -577,8 +583,7 @@ var BazMessenger = function() {
                     '           <span>' + dayjs(message.updated_at, 'YYYY-MM-DD HH:mm:ss').format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
                     '        </span>' +
                     '    </div>' +
-                    '    <img class="direct-chat-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + toUser.portrait +
-                    '/w/80" alt="message user image">' +
+                    '    <img class="direct-chat-img" src="' + toUser.portrait + '" alt="message user image">' +
                     '    <div class="direct-chat-text">' + message.message + '</div>' +
                     '</div>';
             }
@@ -924,6 +929,12 @@ var BazMessenger = function() {
     }
 
     function userNewMessage(data) {
+        if (!data.user.portrait || (data.user.portrait && data.user.portrait === '')) {
+            data.user.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
+        } else {
+            data.user.portrait =
+                dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + data.user.portrait + '/w/80';
+        }
         if ($('#direct-chat-messages-' + data.user.id).length > 0) {
             $('#messenger-loader-' + data.user.id).attr('hidden', true);
             $('#direct-chat-messages-' + data.user.id).append(
@@ -934,8 +945,7 @@ var BazMessenger = function() {
                 '           <span>' + dayjs().format('MMMM Do YYYY, h:mm:ss a') + '</span>' +
                 '        </span>' +
                 '    </div>' +
-                '    <img class="direct-chat-img" src="' + dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' +
-                        $('#messenger-user-' + data.user.id).data('portrait') + '/w/80" alt="message user image">' +
+                '    <img class="direct-chat-img" src="' + data.user.portrait + '" alt="message user image">' +
                 '    <div class="direct-chat-text">' + data.message.message + '</div>' +
                 '</div>'
             );
@@ -1028,7 +1038,7 @@ var BazMessenger = function() {
                 $('#security-token').val(response.token);
             }
             if (response.responseCode == 0) {
-                if (response.responseData.total) {
+                if (response.responseData && response.responseData.total) {
                     if (response.responseData.total < 10) {
                         $('#messenger-button-counter').css({'right': '10px'});
                         $('#messenger-button-counter').html(response.responseData.total);
@@ -1044,7 +1054,7 @@ var BazMessenger = function() {
                     }
                 }
 
-                if (response.responseData.unread_count) {
+                if (response.responseData && response.responseData.unread_count) {
                     for (var user in response.responseData.unread_count) {
                         if (response.responseData.unread_count[user].count > 0) {
                             if (response.responseData.unread_count[user].count < 99) {

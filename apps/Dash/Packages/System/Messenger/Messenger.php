@@ -164,7 +164,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
         $profile = $this->basepackages->profile->getProfile($account['id']);
 
-        if ($profile) {
+        if ($profile && $this->accountsObj->tunnels) {
             if (isset($profile['settings']['messenger'])) {
                 $profile['settings']['messenger']['status'] = $data['status'];
             } else {
@@ -200,7 +200,7 @@ class Messenger extends BasePackage implements MessageComponentInterface
             return;
         }
 
-        $this->addResponse('Could not modify status', 1);
+        $this->addResponse('Could not modify status, messenger service offline.', 1);
     }
 
     protected function initSocket()
@@ -258,33 +258,39 @@ class Messenger extends BasePackage implements MessageComponentInterface
     {
         $conditions =
             [
-                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND unread = 1'
+                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND read = 0'
             ];
 
         $total = $this->modelToUse::count($conditions);
 
-        $membersArr = $this->basepackages->profile->getProfile($this->auth->account()['id'])['settings']['messenger']['members'];
+        $profile = $this->basepackages->profile->getProfile($this->auth->account()['id']);
 
-        $members = [];
+        if (isset($profile['settings']['messenger']['members'])) {
+            $membersArr = $profile['settings']['messenger']['members'];
 
-        foreach ($membersArr['users'] as $key => $memberId) {
-            $members[$key]['id'] = $memberId;
-            $conditions =
-                [
-                    'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $memberId . ' AND unread = 1'
-                ];
+            $members = [];
 
-            $members[$key]['count'] = $this->modelToUse::count($conditions);
+            foreach ($membersArr['users'] as $key => $memberId) {
+                $members[$key]['id'] = $memberId;
+                $conditions =
+                    [
+                        'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $memberId . ' AND read = 0'
+                    ];
+
+                $members[$key]['count'] = $this->modelToUse::count($conditions);
+            }
+        } else {
+            $members = [];
         }
 
-        if ($total >= 0 && $members) {
+        if ($total >= 0 && count($members) > 0) {
             $data['total'] = $total;
 
             $data['unread_count'] = $members;
 
             $this->addResponse('Retrieved messages count.', 0, $data);
-        } else {
-            $this->addResponse('Error retrieving messages count.', 1);
+
+            return true;
         }
     }
 
@@ -292,13 +298,13 @@ class Messenger extends BasePackage implements MessageComponentInterface
     {
         $conditions =
             [
-                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $data['user'] . ' AND unread = 1'
+                'conditions'    => 'to_account_id = ' . $this->auth->account()['id'] . ' AND from_account_id = ' . $data['user'] . ' AND read = 0'
             ];
 
         $messages = $this->getByParams($conditions);
 
         foreach ($messages as $key => $message) {
-            $message['unread'] = 0;
+            $message['read'] = 1;
 
             $this->update($message);
         }
@@ -312,7 +318,9 @@ class Messenger extends BasePackage implements MessageComponentInterface
         $messageData['to_account_id'] = $data['user'];
         $messageData['message'] = $data['message'];
 
-        $toAccount = $this->basepackages->accounts->getById($data['user']);
+        $toAccountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($data['user']);
+
+        $toAccount = $toAccountsObj->toArray();
 
         if ($toAccount) {
             $toProfile = $this->basepackages->profile->getProfile($data['user']);
@@ -321,14 +329,14 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
             if (isset($toProfile['settings']['messenger']['status'])) {
                 if ($toProfile['settings']['messenger']['status'] == 4) {
-                    $messageData['unread'] = 1;
+                    $messageData['read'] = 0;
                     $offline = true;
                 } else if ($toProfile['settings']['messenger']['status'] == 2) {
-                    $messageData['unread'] = 1;
+                    $messageData['read'] = 0;
                 }
             } else {
                 $offline = true;
-                $messageData['unread'] = 1;
+                $messageData['read'] = 0;
             }
         } else {
             $this->addResponse('User not found', 1);
@@ -342,6 +350,8 @@ class Messenger extends BasePackage implements MessageComponentInterface
                 return;
             }
 
+            $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->auth->account()['id']);
+
             $profile = $this->basepackages->profile->getProfile($this->auth->account()['id']);
 
             $userData['id'] = $profile['id'];
@@ -351,8 +361,8 @@ class Messenger extends BasePackage implements MessageComponentInterface
 
             $this->pushNotification(
                 'messengerNotifications',
-                $this->auth->account()['notifications_tunnel_id'],
-                $toAccount['notifications_tunnel_id'],
+                $this->accountsObj->tunnels->notifications_tunnel,
+                $toAccountsObj->tunnels->notifications_tunnel,
                 false,
                 [
                     'responseCode'      => 0,
