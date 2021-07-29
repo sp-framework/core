@@ -41,6 +41,8 @@ class ContractsOAPI
     const HDR_XERO_TENANT_ID = \'xero-tenant-id\';';
         } else if ($this->contract['api_type'] === 'gitea') {
             $const = '';
+        } else if ($this->contract['api_type'] === 'binarylane') {
+            $const = '';
         }
 
         $file .=
@@ -87,6 +89,17 @@ class ContractsOAPI
 
         return $headers;
     }';
+        } else if ($this->contract['api_type'] === 'binarylane') {
+            $headers =
+'    protected function getBinarylaneHeaders()
+    {
+        $headers = [];
+
+        // Add required headers first.
+        $headers[self::HDR_AUTHORIZATION] = \'token \' . $this->getConfig(\'user_access_token\');
+
+        return $headers;
+    }';
         }
 
         $file .= '
@@ -114,6 +127,9 @@ class ContractsOAPI
             $baseRestService = 'XeroRESTService';
         } else if ($this->contract['api_type'] === 'gitea') {
             $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Gitea\GiteaRESTService';
+            $baseRestService = 'GiteaRESTService';
+        } else if ($this->contract['api_type'] === 'binarylane') {
+            $baseRestServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Binarylane\BinarylaneRESTService';
             $baseRestService = 'GiteaRESTService';
         }
 
@@ -203,8 +219,12 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
             foreach ($this->contract['content']['paths'] as $pathKey => $path) {
                 if (is_array($path)) {
                     foreach ($path as $methodKey => $method) {
-                        if (!isset($method['operationId'])) {
+                        if (!isset($method['operationId']) && !isset($method['tags'])) {
                             continue;
+                        } else {
+                            if (isset($method['tags'])) {
+                                $method['operationId'] = $method['tags'][0];
+                            }
                         }
                         $operations[ucfirst($method['operationId'])] = [];
                         $operations[ucfirst($method['operationId'])]['method'] = strtoupper($methodKey);
@@ -247,7 +267,7 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
                     }
                 }
             }
-
+            var_dump($operations);
             return $this->generatePropertyFromArray($operations);
         }
     }
@@ -295,8 +315,12 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
         foreach ($this->contract['content']['paths'] as $pathKey => $path) {
             if (is_array($path)) {
                 foreach ($path as $methodKey => $method) {
-                    if (!isset($method['operationId'])) {
+                    if (!isset($method['operationId']) && !isset($method['tags'])) {
                         continue;
+                    } else {
+                        if (isset($method['tags'])) {
+                            $method['operationId'] = $method['tags'][0];
+                        }
                     }
                     $methods .=
                     '
@@ -487,8 +511,12 @@ class ' . $typeKey . ' extends BaseType
         foreach ($this->contract['content']['paths'] as $pathKey => $path) {
             if (is_array($path)) {
                 foreach ($path as $methodKey => $method) {
-                    if (!isset($method['operationId'])) {
+                    if (!isset($method['operationId']) && !isset($method['tags'])) {
                         continue;
+                    } else {
+                        if (isset($method['tags'])) {
+                            $method['operationId'] = $method['tags'][0];
+                        }
                     }
                     if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
                         $requestParams = [];
@@ -600,8 +628,12 @@ class ' . $operationId . 'RestRequest extends BaseType
         foreach ($this->contract['content']['paths'] as $pathKey => $path) {
             if (is_array($path)) {
                 foreach ($path as $methodKey => $method) {
-                    if (!isset($method['operationId'])) {
+                    if (!isset($method['operationId']) && !isset($method['tags'])) {
                         continue;
+                    } else {
+                        if (isset($method['tags'])) {
+                            $method['operationId'] = $method['tags'][0];
+                        }
                     }
                     $file = '<?php
 
