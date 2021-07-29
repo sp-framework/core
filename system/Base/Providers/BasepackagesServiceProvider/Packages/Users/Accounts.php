@@ -142,6 +142,10 @@ class Accounts extends BasePackage
         if (isset($data['id']) && $data['id'] != 1) {
             if ($this->remove($data['id'])) {
 
+                if ($accountObj->getprofiles()) {
+                    $accountObj->getprofiles()->delete();
+                }
+
                 $this->removeRelatedData($accountObj);
 
                 $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
@@ -157,9 +161,6 @@ class Accounts extends BasePackage
 
     protected function removeRelatedData($accountObj)
     {
-        if ($accountObj->getprofiles()) {
-            $accountObj->getprofiles()->delete();
-        }
         if ($accountObj->getcanlogin()) {
             $accountObj->getcanlogin()->delete();
         }
@@ -168,6 +169,9 @@ class Accounts extends BasePackage
         }
         if ($accountObj->getidentifiers()) {
             $accountObj->getidentifiers()->delete();
+        }
+        if ($accountObj->getagents()) {
+            $accountObj->getagents()->delete();
         }
         if ($accountObj->getsessions()) {
             $accountObj->getsessions()->delete();

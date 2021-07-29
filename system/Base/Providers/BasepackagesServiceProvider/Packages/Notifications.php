@@ -69,7 +69,9 @@ class Notifications extends BasePackage
     {
         $account = $this->basepackages->accounts->getModelToUse()::findFirst(['id = ' . $notification['account_id']]);
 
-        if ($account->tunnels) {
+        if (!$account->tunnels) {
+            return;
+        } else {
             $tunnels = $account->tunnels->toArray();
         }
 
