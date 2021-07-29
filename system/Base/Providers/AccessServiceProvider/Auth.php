@@ -822,8 +822,10 @@ class Auth
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
 
-        if ($this->accounts->getModel()->agents) {
-            $location = $this->accounts->getModel()->agents->toArray();
+        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+
+        if ($accountsObj->agents) {
+            $location = $accountsObj->agents->toArray();
 
             if ($location['client_address'] === $clientAddress &&
                 $location['user_agent'] === $userAgent &&
@@ -890,10 +892,12 @@ class Auth
             $this->setUserFromSession();
         }
 
-        if ($this->accounts->getModel()->agents) {
+        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+
+        if ($accountsObj->agents) {
             $code = $this->secTools->random->base62(12);
 
-            $this->accounts->getModel()->agents->assign(['verification_code' => $code])->update();
+            $accountsObj->agents->assign(['verification_code' => $code])->update();
 
             if ($this->emailVerificationCode($code)) {
                 $this->logger->log
@@ -944,8 +948,10 @@ class Auth
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
 
-        if ($this->accounts->getModel()->agents) {
-            $agent = $this->accounts->getModel()->agents->toArray();
+        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+
+        if ($accountsObj->agents) {
+            $agent = $accountsObj->agents->toArray();
 
             if ($agent['verification_code'] === $data['code']) {
                 if ($agent['client_address'] === $clientAddress &&
@@ -953,7 +959,7 @@ class Auth
                     $agent['session_id'] === $sessionId &&
                     $agent['verified'] == '0'
                 ) {
-                    $this->accounts->getModel()->agents->assign(['verified' => '1', 'verification_code' => null])->update();
+                    $accountsObj->agents->assign(['verified' => '1', 'verification_code' => null])->update();
 
                     $this->packagesData->responseCode = 0;
 
