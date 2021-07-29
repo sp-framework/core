@@ -41,5 +41,6 @@ return
         'Evenement'                                     => __DIR__ . '/../../../ThirdParty/vendor/evenement/evenement/src/Evenement',
         'Symfony\\Polyfill\\Ctype'                      => __DIR__ . '/../../../ThirdParty/vendor/symfony/polyfill-ctype',
         'GO'                                            => __DIR__ . '/../../../ThirdParty/vendor/peppeocchi/php-cron-scheduler/src/GO',
-        'Cron'                                          => __DIR__ . '/../../../ThirdParty/vendor/dragonmantank/cron-expression/src/Cron'
+        'Cron'                                          => __DIR__ . '/../../../ThirdParty/vendor/dragonmantank/cron-expression/src/Cron',
+        'PhpImap'                                       => __DIR__ . '/../../../ThirdParty/vendor/php-imap/php-imap/src/PhpImap'
     ];
