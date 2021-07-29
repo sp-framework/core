@@ -925,8 +925,8 @@
 
                     if (datatableOptions.colTextTruncate) {
                         classes = 'data-' + column.id + ' text-truncate dt-colTextTruncate';
-                    } else {
-                        classes = 'data-' + column.id;
+                    // } else {
+                        // classes = 'data-' + column.id;
                     }
 
                     if (datatableOptions.tableCompact) {

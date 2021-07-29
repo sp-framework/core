@@ -91,7 +91,7 @@ class PurchaseOrders extends BasePackage
                 }
             }
 
-            dump($purchaseOrders);die();
+            var_dump($purchaseOrders);die();
         }
     }
 

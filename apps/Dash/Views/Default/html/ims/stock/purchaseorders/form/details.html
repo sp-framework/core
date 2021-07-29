@@ -80,6 +80,7 @@
                 'fieldHelpTooltipContent'        : 'Reference Orders (Internal, eBay, etc)',
                 'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
@@ -168,11 +169,11 @@
         )}}
     </div>
 </div>
-<div class="row vdivide">
+<div class="row vdivide" id="{{componentId}}-{{sectionId}}-vendor_details" hidden>
     <div class="col">
         <div class="row">
             <div class="col">
-                
+                <!-- htmlmin:ignore -->
                 {% if purchaseOrder['vendor_addresses'] is defined and purchaseOrder['vendor_addresses']|length > 0 %}
                     {% set vendorAddresses = '' %}
                     {% for vendorAddress in purchaseOrder['vendor_addresses'] %}
@@ -218,7 +219,7 @@
                     {% set vendorAddresses = '' %}
                     {% set vendorAddressesHidden = true %}
                 {% endif %}
-                
+                <!-- htmlmin:ignore -->
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -262,7 +263,7 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                
+                <!-- htmlmin:ignore -->
                 {% if purchaseOrder['vendor_contacts'] is defined and purchaseOrder['vendor_contacts']|length > 0 %}
                     {% set vendorContacts = '' %}
                     {% for vendorContact in purchaseOrder['vendor_contacts'] %}
@@ -318,7 +319,7 @@
                     {% set vendorContacts = '' %}
                     {% set vendorContactsHidden = true %}
                 {% endif %}
-                
+                <!-- htmlmin:ignore -->
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -449,6 +450,8 @@ dataCollectionSection =
             placeholder: "SELECT SUPPLIER",
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-vendor_id').on('select2:select', function(e) {
+
+                    $('#{{componentId}}-{{sectionId}}-vendor_details').attr('hidden', false);
                     $('#{{componentId}}-{{sectionId}}-vendor_address_id, ' +
                       '#{{componentId}}-{{sectionId}}-vendor_address_id_error, ' +
                       '#{{componentId}}-{{sectionId}}-vendor_contact_id, ' +

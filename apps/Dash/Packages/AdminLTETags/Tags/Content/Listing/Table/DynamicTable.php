@@ -265,11 +265,6 @@ class DynamicTable
             $this->params["colTextTruncate"] :
             true;
 
-        $this->dtParams["colTextTruncate"] =
-            isset($this->params["colTextTruncate"]) ?
-            $this->params["colTextTruncate"] :
-            true;
-
         $this->content .=
             '<script type="text/javascript">
             if (!window["dataCollection"]["' . $this->params["componentId"] . '"]) {

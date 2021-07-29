@@ -89,26 +89,6 @@ class ContactsComponent extends BaseComponent
             return;
         }
 
-        if ($this->request->isPost()) {
-            $replaceColumns = null;
-                // [
-                //     'is_manufacturer'   => ['html'  =>
-                //         [
-                //             '0' => 'No',
-                //             '1' => 'Yes'
-                //         ]
-                //     ],
-                //     'does_dropship'   => ['html'  =>
-                //         [
-                //             '0' => 'No',
-                //             '1' => 'Yes'
-                //         ]
-                //     ]
-                // ];
-        } else {
-            $replaceColumns = null;
-        }
-
         $controlActions =
             [
                 'actionsToEnable'       =>
@@ -122,12 +102,12 @@ class ContactsComponent extends BaseComponent
             $this->contacts,
             'business/directory/contacts/view',
             null,
-            ['full_name'],
+            ['full_name', 'contact_phone', 'contact_mobile', 'account_email'],
             true,
-            ['full_name'],
+            ['full_name', 'contact_phone', 'contact_mobile', 'account_email'],
             $controlActions,
-            [],
-            $replaceColumns,
+            ['account_email'=>'email','contact_phone'=>'phone', 'contact_mobile'=>'mobile'],
+            null,
             'full_name'
         );
 
