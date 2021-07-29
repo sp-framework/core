@@ -267,7 +267,7 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
                     }
                 }
             }
-            var_dump($operations);
+
             return $this->generatePropertyFromArray($operations);
         }
     }
