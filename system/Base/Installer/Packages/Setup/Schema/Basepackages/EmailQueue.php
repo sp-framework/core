@@ -28,6 +28,13 @@ class EmailQueue
                         ]
                     ),
                     new Column(
+                        'domain_id',
+                        [
+                            'type'    => Column::TYPE_TINYINTEGER,
+                            'notNull' => true,
+                        ]
+                    ),
+                    new Column(
                         'status',
                         [
                             'type'    => Column::TYPE_TINYINTEGER,

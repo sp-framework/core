@@ -20,8 +20,6 @@ abstract class BasePackage extends Controller
 
 	protected $app;
 
-	protected $domain;
-
 	protected $packageName;
 
 	protected $packageNameP;
@@ -980,11 +978,18 @@ abstract class BasePackage extends Controller
 						}
 					}
 
+					if ($this->packageName === 'domains') {
+						$domainId = $this->domain['id'];
+					} else {
+						$domainId = $this->domains->getDomain()['id'];
+					}
+
 					if (isset($subscriptions['email']) && count($subscriptions['email']) > 0) {
 						$this->basepackages->notifications->emailNotification(
 							$subscriptions['email'],
 							$messageTitle,
 							$messageDetails,
+							$domainId,
 							$appId,
 							$aId,
 							$this->auth->account()['id'],

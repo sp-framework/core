@@ -390,6 +390,7 @@ class Accounts extends BasePackage
     protected function emailNewPassword($email, $password)
     {
         $emailData['app_id'] = $this->app['id'];
+        $emailData['domain_id'] = $this->basepackages->domains->getDomain()['id'];
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;

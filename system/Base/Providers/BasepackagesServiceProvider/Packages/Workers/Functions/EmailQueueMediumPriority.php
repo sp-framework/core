@@ -15,7 +15,7 @@ class EmailQueueMediumPriority extends Functions
         return function() use ($thisFunction, $args) {
             $thisFunction->updateJobTask(2, $args);
 
-            $this->basepackages->emailqueue->processqueue(2);
+            $this->basepackages->emailqueue->processQueue(2);
 
             $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
 

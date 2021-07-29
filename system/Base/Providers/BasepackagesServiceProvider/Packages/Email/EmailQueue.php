@@ -15,6 +15,8 @@ class EmailQueue extends BasePackage
 
     public $emailQueue;
 
+    protected $priorityToProcess = null;
+
     public $queueLock = false;
 
     const PRIORITY_HIGH = 1;
@@ -56,77 +58,76 @@ class EmailQueue extends BasePackage
 
     public function processQueue($processPriority = 0)
     {
-        if ($this->queueLock === true) {
+        if ($this->queueLock === true && $processPriority === $this->priorityToProcess) {
             $this->addResponse('Another process is clearing the queue, please wait...', 1);
 
             return;
+        }
+
+        if ($processPriority !== 0) {
+            $this->priorityToProcess = $processPriority;
+        } else {
+            $this->priorityToProcess = self::PRIORITY_LOW;
         }
 
         $this->queueLock = true;
 
         $hadErrors = false;
 
-        if ($processPriority !== 0) {
-            $priorityToProcess = $processPriority;
-        } else {
-            $priorityToProcess = self::PRIORITY_LOW;
-        }
+        $conditions =
+            [
+                'conditions'    => 'status = :status: AND priority = :priority:',
+                'bind'          =>
+                    [
+                        'status'    => self::STATUS_IN_QUEUE,
+                        'priority'  => $this->priorityToProcess
+                    ]
+            ];
 
-        for ($priority = self::PRIORITY_HIGH; $priority <= $priorityToProcess; $priority++) {
-            $conditions =
-                [
-                    'conditions'    => 'status = :status: AND priority = :priority:',
-                    'bind'          =>
-                        [
-                            'status'    => self::STATUS_IN_QUEUE,
-                            'priority'  => $priority
-                        ]
-                ];
+        $queue = $this->getByParams($conditions);
 
-            $queue = $this->getByParams($conditions);
-            if ($queue && is_array($queue) && count($queue) > 0) {
-                foreach ($queue as $key => $queueEmail) {
-                    if (!$this->basepackages->email->setup(null, $queueEmail['app_id'])) {
-                        $queueEmail['status'] = self::STATUS_ERROR;
-                        $queueEmail['logs'] = 'Email Service is not configured or assigned to a domain, please configure email service and try again.';
+        if ($queue && is_array($queue) && count($queue) > 0) {
+            foreach ($queue as $key => $queueEmail) {
+                if (!$this->basepackages->email->setup(null, $queueEmail['domain_id'], $queueEmail['app_id'])) {
+                    $queueEmail['status'] = self::STATUS_ERROR;
+                    $queueEmail['logs'] = 'Email Service is not configured or assigned to a domain, please configure email service and try again.';
+
+                    $this->update($queueEmail);
+
+                    $hadErrors = true;
+                } else {
+                    $queueEmailSettings = $this->basepackages->email->getEmailSettings();
+
+                    $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
+
+                    $queueEmail['to_addresses'] = Json::decode($queueEmail['to_addresses'], true);
+                    if (count($queueEmail['to_addresses']) > 1) {
+                        foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
+                            $this->basepackages->email->setRecipientTo($toAddress, $toAddress);
+                        }
+                    } else {
+                        $this->basepackages->email->setRecipientTo(Arr::first($queueEmail['to_addresses']), Arr::first($queueEmail['to_addresses']));
+                    }
+                    $queueEmail['to_addresses'] = Json::encode($queueEmail['to_addresses']);
+
+                    $this->basepackages->email->setSubject($queueEmail['subject']);
+
+                    if (isset($queueEmail['confidential']) && $queueEmail['confidential'] == 1) {
+                        $queueEmail = $this->decryptBody($queueEmail);
+                        $this->basepackages->email->setBody($queueEmail['body']);
+                        $queueEmail = $this->encryptBody($queueEmail);
+                    } else {
+                        $this->basepackages->email->setBody($queueEmail['body']);
+                    }
+
+                    $logs = $this->basepackages->email->sendNewEmail();
+
+                    if ($logs === true) {
+                        $queueEmail['status'] = self::STATUS_SENT;
+                        $queueEmail['logs'] = 'Sent';
+                        $queueEmail['sent_on'] = date("F j, Y, g:i a");
 
                         $this->update($queueEmail);
-
-                        $hadErrors = true;
-                    } else {
-                        $queueEmailSettings = $this->basepackages->email->getEmailSettings();
-
-                        $this->basepackages->email->setSender($queueEmailSettings['from_address'], $queueEmailSettings['from_address']);
-
-                        $queueEmail['to_addresses'] = Json::decode($queueEmail['to_addresses'], true);
-                        if (count($queueEmail['to_addresses']) > 1) {
-                            foreach ($queueEmail['to_addresses'] as $key => $toAddress) {
-                                $this->basepackages->email->setRecipientTo($toAddress, $toAddress);
-                            }
-                        } else {
-                            $this->basepackages->email->setRecipientTo(Arr::first($queueEmail['to_addresses']), Arr::first($queueEmail['to_addresses']));
-                        }
-                        $queueEmail['to_addresses'] = Json::encode($queueEmail['to_addresses']);
-
-                        $this->basepackages->email->setSubject($queueEmail['subject']);
-
-                        if (isset($queueEmail['confidential']) && $queueEmail['confidential'] == 1) {
-                            $queueEmail = $this->decryptBody($queueEmail);
-                            $this->basepackages->email->setBody($queueEmail['body']);
-                            $queueEmail = $this->encryptBody($queueEmail);
-                        } else {
-                            $this->basepackages->email->setBody($queueEmail['body']);
-                        }
-
-                        $logs = $this->basepackages->email->sendNewEmail();
-
-                        if ($logs === true) {
-                            $queueEmail['status'] = self::STATUS_SENT;
-                            $queueEmail['logs'] = 'Sent';
-                            $queueEmail['sent_on'] = date("F j, Y, g:i a");
-
-                            $this->update($queueEmail);
-                        }
                     }
                 }
             }

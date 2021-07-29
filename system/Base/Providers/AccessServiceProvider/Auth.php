@@ -988,6 +988,7 @@ class Auth
     protected function emailVerificationCode($verificationCode)
     {
         $emailData['app_id'] = $this->app['id'];
+        $emailData['domain_id'] = $this->domains->getDomain()['id'];
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;

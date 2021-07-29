@@ -115,6 +115,7 @@ class Notifications extends BasePackage
         $emailAddresses,
         $notificationTitle,
         $notificationDetails = null,
+        $domainId = null,
         $appId = null,
         $accountId = null,
         $createdBy = 0,
@@ -142,6 +143,7 @@ class Notifications extends BasePackage
             $body .= 'Notification By: System (' . $now . ')<br>';
         }
 
+        $email['domain_id'] = $domainId;
         $email['app_id'] = $appId;
         $email['status'] = 1;
         $email['priority'] = 3;

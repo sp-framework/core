@@ -15,7 +15,7 @@ class EmailQueueHighPriority extends Functions
         return function() use ($thisFunction, $args) {
             $thisFunction->updateJobTask(2, $args);
 
-            $this->basepackages->emailqueue->processqueue(1);
+            $this->basepackages->emailqueue->processQueue(1);
 
             $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
 

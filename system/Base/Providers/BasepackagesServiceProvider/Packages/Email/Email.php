@@ -5,6 +5,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Email;
 use PHPMailer\PHPMailer\Exception;
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailException;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
@@ -45,10 +46,6 @@ class Email extends BasePackage
 
         $this->domain = $this->domains->getDomain();
 
-        if (!$this->domain) {
-            $this->domain = $this->domains->getDefaultAppIdDomain($this->app['id']);
-        }
-
         return $this;
     }
 
@@ -61,7 +58,7 @@ class Email extends BasePackage
         return $this->emailSettings;
     }
 
-    public function setup($emailSettings = null, $appId = null)
+    public function setup($emailSettings = null, $domainId = null, $appId = null)
     {
         $emailservices = new EmailServices;
 
@@ -71,7 +68,15 @@ class Email extends BasePackage
         if ($emailSettings) {
             $this->emailSettings = $emailSettings;
         } else {
-            if (isset($this->domain['apps'][$appId]['email_service']) &&
+            if (!$this->domain && $domainId) {
+                $this->domain = $this->domains->getById($domainId);
+
+                if (!is_array($this->domain['apps']) && $this->domain['apps'] !== '') {
+                    $this->domain['apps'] = Json::decode($this->domain['apps'], true);
+                }
+            }
+
+            if ($this->domain && isset($this->domain['apps'][$appId]['email_service']) &&
                 $this->domain['apps'][$appId]['email_service'] !== ''
             ) {
                 $this->emailSettings =
