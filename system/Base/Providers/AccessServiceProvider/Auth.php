@@ -825,36 +825,68 @@ class Auth
         $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
 
         if ($accountsObj->agents) {
-            $location = $accountsObj->agents->toArray();
+            $agentObj =
+                $accountsObj->agents::findFirst(
+                    [
+                        'conditions'    => 'session_id = :sid:',
+                        'bind'          => [
+                            'sid'       => $sessionId,
+                        ]
+                    ]
+                );
 
-            if ($location['client_address'] === $clientAddress &&
-                $location['user_agent'] === $userAgent &&
-                $location['session_id'] === $sessionId &&
-                $location['verified'] == '1'
-            ) {
-                return true;
-            } else if ($location['session_id'] === $sessionId &&
-                       $location['verified'] == '1'
-            ) {
-                $this->logger->log->emergency('Same session being used by another browser! Probably session hijack!');
+            if ($agentObj) {
+                $agent = $agentObj->toArray();
 
-                $this->account['force_logout'] = '1';
-
-                $this->accounts->update($this->account);
-
-                $this->logout();
-
-                return false;
-            } else if ($location['client_address'] === $clientAddress &&
-                $location['user_agent'] === $userAgent &&
-                $location['session_id'] === $sessionId &&
-                $location['verified'] == '0'
-            ) {
-                if (!$this->email->setup()) {
+                if ($agent['client_address'] === $clientAddress &&
+                    $agent['user_agent'] === $userAgent &&
+                    $agent['session_id'] === $sessionId &&
+                    $agent['verified'] == '1'
+                ) {
                     return true;
+                } else if ($agent['session_id'] === $sessionId &&
+                           $agent['verified'] == '1'
+                ) {
+                    $this->logger->log->emergency('Same session being used by another browser! Probably session hijack!');
+
+                    $this->account['force_logout'] = '1';
+
+                    $this->accounts->update($this->account);
+
+                    $this->logout();
+
+                    return false;
+                } else if ($agent['client_address'] === $clientAddress &&
+                    $agent['user_agent'] === $userAgent &&
+                    $agent['session_id'] === $sessionId &&
+                    $agent['verified'] == '0'
+                ) {
+                    if (!$this->email->setup()) {
+                        return true;
+                    }
+
+                    return false;
+                }
+            } else {
+                if (!$this->email->setup()) {
+                    $verified = 1;
+                } else {
+                    $verified = 0;
                 }
 
-                return false;
+                $newAgent =
+                    [
+                        'session_id'        => $sessionId,
+                        'client_address'    => $clientAddress,
+                        'user_agent'        => $userAgent,
+                        'verified'          => $verified
+                    ];
+
+                $agentsObj = new BasepackagesUsersAccountsAgents;
+
+                $agentsObj->assign($newAgent);
+
+                $agentsObj->create();
             }
         } else {
             if (!$this->email->setup()) {
@@ -895,9 +927,19 @@ class Auth
         $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
 
         if ($accountsObj->agents) {
+            $agentObj =
+                $accountsObj->agents::findFirst(
+                    [
+                        'conditions'    => 'session_id = :sid:',
+                        'bind'          => [
+                            'sid'       => $this->session->getId()
+                        ]
+                    ]
+                );
+
             $code = $this->secTools->random->base62(12);
 
-            $accountsObj->agents->assign(['verification_code' => $code])->update();
+            $agentObj->assign(['verification_code' => $code])->update();
 
             if ($this->emailVerificationCode($code)) {
                 $this->logger->log
@@ -951,7 +993,16 @@ class Auth
         $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
 
         if ($accountsObj->agents) {
-            $agent = $accountsObj->agents->toArray();
+            $agentObj =
+                $accountsObj->agents::findFirst(
+                    [
+                        'conditions'    => 'session_id = :sid:',
+                        'bind'          => [
+                            'sid'       => $sessionId,
+                        ]
+                    ]
+                );
+            $agent = $agentObj->toArray();
 
             if ($agent['verification_code'] === $data['code']) {
                 if ($agent['client_address'] === $clientAddress &&
@@ -959,7 +1010,7 @@ class Auth
                     $agent['session_id'] === $sessionId &&
                     $agent['verified'] == '0'
                 ) {
-                    $accountsObj->agents->assign(['verified' => '1', 'verification_code' => null])->update();
+                    $agentObj->assign(['verified' => '1', 'verification_code' => null])->update();
 
                     $this->packagesData->responseCode = 0;
 
@@ -970,6 +1021,16 @@ class Auth
                     } else {
                         $this->packagesData->redirectUrl = $this->links->url('home');
                     }
+                } else if ($agent['client_address'] === $clientAddress &&
+                    $agent['user_agent'] === $userAgent &&
+                    $agent['session_id'] === $sessionId &&
+                    $agent['verified'] == '1'
+                ) {
+                    $this->packagesData->responseCode = 1;
+
+                    $this->packagesData->responseMessage = 'Session Incorrect... Loggin out.';
+
+                    $this->logout();
                 }
             } else {
                 $this->packagesData->responseCode = 1;
