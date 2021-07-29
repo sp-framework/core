@@ -3,7 +3,6 @@
 namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 
 use Phalcon\Db\Column;
-use Phalcon\Db\Index;
 
 class Agents
 {
@@ -67,16 +66,7 @@ class Agents
                             'notNull'           => false,
                         ]
                     ),
-                ],
-                'indexes' => [
-                    new Index(
-                        'column_UNIQUE',
-                        [
-                            'session_id',
-                        ],
-                        'UNIQUE'
-                    )
-                ],
+                ]
                 'options' => [
                     'TABLE_COLLATION' => 'utf8mb4_general_ci'
                 ]

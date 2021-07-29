@@ -828,9 +828,10 @@ class Auth
             $agentObj =
                 $accountsObj->agents::findFirst(
                     [
-                        'conditions'    => 'session_id = :sid:',
+                        'conditions'    => 'session_id = :sid: AND account_id = :aid:',
                         'bind'          => [
                             'sid'       => $sessionId,
+                            'aid'       => $this->account()['id']
                         ]
                     ]
                 );
@@ -889,7 +890,13 @@ class Auth
 
                 $agentsObj->assign($newAgent);
 
-                $agentsObj->create();
+                try {
+                    $agentsObj->create();
+                } catch (\Exception $e) {
+                    $this->logout();
+
+                    throw $e;
+                }
             }
         } else {
             if (!$this->email->setup()) {
@@ -911,7 +918,13 @@ class Auth
 
             $agentsObj->assign($newAgent);
 
-            $agentsObj->create();
+            try {
+                $agentsObj->create();
+            } catch (\Exception $e) {
+                $this->logout();
+
+                throw $e;
+            }
         }
 
         //If Email is not configured, we cannot send new passcodes.
@@ -934,9 +947,10 @@ class Auth
             $agentObj =
                 $accountsObj->agents::findFirst(
                     [
-                        'conditions'    => 'session_id = :sid:',
+                        'conditions'    => 'session_id = :sid: AND account_id = :aid:',
                         'bind'          => [
-                            'sid'       => $this->session->getId()
+                            'sid'       => $this->session->getId(),
+                            'aid'       => $this->account()['id']
                         ]
                     ]
                 );
@@ -1000,9 +1014,10 @@ class Auth
             $agentObj =
                 $accountsObj->agents::findFirst(
                     [
-                        'conditions'    => 'session_id = :sid:',
+                        'conditions'    => 'session_id = :sid: AND account_id = :aid:',
                         'bind'          => [
                             'sid'       => $sessionId,
+                            'aid'       => $this->account()['id']
                         ]
                     ]
                 );
