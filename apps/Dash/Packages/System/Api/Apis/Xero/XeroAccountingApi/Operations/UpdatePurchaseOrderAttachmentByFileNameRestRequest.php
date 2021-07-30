@@ -7,18 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdatePurchaseOrderAttachmentByFileNameRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'PurchaseOrderID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PurchaseOrderID',
-        ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
-        ],
       ];
 
     public function __construct(array $values = [])

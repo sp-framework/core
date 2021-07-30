@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateBatchPaymentHistoryRecordRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'BatchPaymentID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'BatchPaymentID',
-        ],
       ];
 
     public function __construct(array $values = [])

@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateOrCreatePurchaseOrdersRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'updateOrCreatePurchaseOrders' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+        'PurchaseOrders' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PurchaseOrders',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'PurchaseOrders',
         ],
       ];
 

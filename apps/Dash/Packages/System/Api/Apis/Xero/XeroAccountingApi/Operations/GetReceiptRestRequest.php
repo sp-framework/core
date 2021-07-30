@@ -9,12 +9,15 @@ class GetReceiptRestRequest extends BaseType
     private static $propertyTypes = [
         'ReceiptID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ReceiptID',
         ],
-        'getReceipt' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'unitdp' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'unitdp',
         ],
       ];
 

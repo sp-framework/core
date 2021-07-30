@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Account extends BaseType
+class Account extends XeroType
 {
     private static $propertyTypes = [
         'Code' => [

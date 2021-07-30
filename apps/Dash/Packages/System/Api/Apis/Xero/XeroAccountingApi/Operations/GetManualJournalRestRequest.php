@@ -9,8 +9,8 @@ class GetManualJournalRestRequest extends BaseType
     private static $propertyTypes = [
         'ManualJournalID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ManualJournalID',
         ],
       ];

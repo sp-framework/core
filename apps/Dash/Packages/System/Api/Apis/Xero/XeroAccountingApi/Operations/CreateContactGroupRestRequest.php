@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateContactGroupRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'ContactGroups' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ContactGroups',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'ContactGroups',
+        ],
       ];
 
     public function __construct(array $values = [])

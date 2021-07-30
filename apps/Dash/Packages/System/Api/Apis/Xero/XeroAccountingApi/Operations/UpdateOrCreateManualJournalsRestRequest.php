@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateOrCreateManualJournalsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'updateOrCreateManualJournals' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+        'ManualJournals' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ManualJournals',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'ManualJournals',
         ],
       ];
 

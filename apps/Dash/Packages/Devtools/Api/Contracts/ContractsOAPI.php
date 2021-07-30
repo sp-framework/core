@@ -219,13 +219,14 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
             foreach ($this->contract['content']['paths'] as $pathKey => $path) {
                 if (is_array($path)) {
                     foreach ($path as $methodKey => $method) {
-                        if (!isset($method['operationId']) && !isset($method['tags'])) {
-                            continue;
-                        } else {
-                            if (isset($method['tags'])) {
+                        if (isset($method['tags']) || isset($method['operationId'])) {
+                            if (!isset($method['operationId']) && isset($method['tags'])) {
                                 $method['operationId'] = $method['tags'][0];
                             }
+                        } else {
+                            continue;
                         }
+
                         $operations[ucfirst($method['operationId'])] = [];
                         $operations[ucfirst($method['operationId'])]['method'] = strtoupper($methodKey);
                         $operations[ucfirst($method['operationId'])]['resource'] = ltrim($pathKey, '/');
@@ -258,7 +259,18 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
                                         $operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['required'] = $parameter['required'];
                                     }
                                 } else if (isset($parameter['$ref'])) {
-                                    $operations[ucfirst($method['operationId'])]['params'] = $this->getRefClass($parameter['$ref']);
+                                    // var_dump($operations[ucfirst($method['operationId'])]);
+                                    // var_dump($operations[ucfirst($method['operationId'])]['params']);
+                                    // var_dump($this->getRefClass($parameter['$ref']));
+                                    $paramName = $this->getRefClass($parameter['$ref'], true);
+                                    if ($paramName !== 'summarizeErrors' &&
+                                        $paramName !== 'ifModifiedSince' &&
+                                        $paramName !== 'ContentType' &&
+                                        $paramName !== 'unitdp'
+                                    ) {
+                                        $operations[ucfirst($method['operationId'])]['params'][$paramName] = [];
+                                        $operations[ucfirst($method['operationId'])]['params'][$paramName]['valid'] = ['string'];
+                                    }
                                 }
                             }
                         } else {
@@ -315,13 +327,14 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
         foreach ($this->contract['content']['paths'] as $pathKey => $path) {
             if (is_array($path)) {
                 foreach ($path as $methodKey => $method) {
-                    if (!isset($method['operationId']) && !isset($method['tags'])) {
-                        continue;
-                    } else {
-                        if (isset($method['tags'])) {
+                    if (isset($method['tags']) || isset($method['operationId'])) {
+                        if (!isset($method['operationId']) && isset($method['tags'])) {
                             $method['operationId'] = $method['tags'][0];
                         }
+                    } else {
+                        continue;
                     }
+
                     $methods .=
                     '
 
@@ -419,17 +432,34 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
         foreach ($this->contract['content']['components']['schemas'] as $typeKey => $type) {
             $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
         }
+        foreach ($this->contract['content']['components']['responses'] as $typeKey => $type) {
+            $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
+        }
     }
 
     protected function buildTypesFileContent($typeKey, $type)
     {
+        if ($this->contract['api_type'] === 'ebay') {
+            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Base\Types\BaseType';
+            $baseTypeService = 'BaseType';
+        } else if ($this->contract['api_type'] === 'xero') {
+            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroType';
+            $baseTypeService = 'XeroType';
+        } else if ($this->contract['api_type'] === 'gitea') {
+            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Base\Types\BaseType';
+            $baseTypeService = 'BaseType';
+        } else if ($this->contract['api_type'] === 'binarylane') {
+            $baseTypeServiceNamespace = 'Apps\Dash\Packages\System\Api\Base\Types\BaseType';
+            $baseTypeService = 'BaseType';
+        }
+
         $file = '<?php
 
 namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use ' . $baseTypeServiceNamespace . ';
 
-class ' . $typeKey . ' extends BaseType
+class ' . $typeKey . ' extends ' . $baseTypeService . '
 {';
 
         $propertyTypes = [];
@@ -437,7 +467,11 @@ class ' . $typeKey . ' extends BaseType
         if (isset($type['properties'])) {
             foreach ($type['properties'] as $propertyKey => $property) {
                 $propertyTypes[$propertyKey] = [];
+
                 if (isset($property['type'])) {
+                    if ($property['type'] === 'number') {
+                        $property['type'] = 'double';
+                    }
                     // if ($property['type'] === 'string' || $property['type'] === 'integer') {
                     //     $propertyTypes[$propertyKey]['type'] = $property['type'];
                     //     $propertyTypes[$propertyKey]['repeatable'] = false;
@@ -462,6 +496,14 @@ class ' . $typeKey . ' extends BaseType
                 $propertyTypes[$propertyKey]['attribute'] = false;
                 $propertyTypes[$propertyKey]['elementName'] = $propertyKey;
             }
+        } else if (isset($type['content']['application/json']['schema']['$ref'])) {
+            $propertyName = $this->getRefClass($type['content']['application/json']['schema']['$ref'], true);
+
+            $propertyTypes[$propertyName] = [];
+            $propertyTypes[$propertyName]['type'] = $this->getRefClass($type['content']['application/json']['schema']['$ref']);
+            $propertyTypes[$propertyName]['repeatable'] = true;
+            $propertyTypes[$propertyName]['attribute'] = false;
+            $propertyTypes[$propertyName]['elementName'] = $propertyName;
         }
 
         $file .= '
@@ -487,7 +529,7 @@ class ' . $typeKey . ' extends BaseType
         return $file;
     }
 
-    protected function getRefClass($item)
+    protected function getRefClass($item, $onlyLast = false)
     {
         if (isset($item['items']['$ref'])) {
             $itemArr = explode('/', $item['items']['$ref']);
@@ -503,6 +545,10 @@ class ' . $typeKey . ' extends BaseType
             return $item['additionalProperties']['type'];
         }
 
+        if ($onlyLast) {
+            return Arr::last($itemArr);
+        }
+
         return 'Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Types\\' . Arr::last($itemArr);
     }
 
@@ -511,27 +557,30 @@ class ' . $typeKey . ' extends BaseType
         foreach ($this->contract['content']['paths'] as $pathKey => $path) {
             if (is_array($path)) {
                 foreach ($path as $methodKey => $method) {
-                    if (!isset($method['operationId']) && !isset($method['tags'])) {
-                        continue;
-                    } else {
-                        if (isset($method['tags'])) {
+                    $methodKey = strtolower($methodKey);
+
+                    if (isset($method['tags']) || isset($method['operationId'])) {
+                        if (!isset($method['operationId']) && isset($method['tags'])) {
                             $method['operationId'] = $method['tags'][0];
                         }
+                    } else {
+                        continue;
                     }
-                    if (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0) {
+
+                    if ($methodKey === 'get' &&
+                        (isset($method['parameters']) && is_array($method['parameters']) && count($method['parameters']) > 0)
+                    ) {
                         $requestParams = [];
 
                         foreach ($method['parameters'] as $parameterKey => $parameter) {
-
-                            if (!isset($parameter['name'])) {
-                                $parameter['name'] = $method['operationId'];
-                            }
-
-                            $requestParams[$parameter['name']] = [];
-
                             if (isset($parameter['in']) &&
                                 ($parameter['in'] === 'path' || $parameter['in'] === 'query')
                             ) {
+                                if (!isset($parameter['name'])) {
+                                    $parameter['name'] = $method['operationId'];
+                                }
+
+                                $requestParams[$parameter['name']] = [];
                                 if (isset($parameter['schema']['type'])) {
                                     if ($parameter['schema']['type'] === 'string') {
                                         $requestParams[$parameter['name']]['type'] = $parameter['schema']['type'];
@@ -554,9 +603,22 @@ class ' . $typeKey . ' extends BaseType
                                 $requestParams[$parameter['name']]['attribute'] = false;
                                 $requestParams[$parameter['name']]['elementName'] = $parameter['name'];
                             } else {
-
-                                if (isset($parameter['$ref'])) {
-                                    $requestParams[$parameter['name']]['type'] = $this->getRefClass($parameter['$ref']);
+                                if ($this->contract['api_type'] === 'xero') {
+                                    if (isset($parameter['$ref'])) {
+                                        $refName = $this->getRefClass($parameter['$ref'], true);
+                                        $requestParams[$refName]['type'] = 'string';
+                                        $requestParams[$refName]['attribute'] = false;
+                                        $requestParams[$refName]['repeatable'] = false;
+                                        $requestParams[$refName]['elementName'] = $refName;
+                                    }
+                                } else {
+                                    $requestParams[$parameter['name']] = [];
+                                    if (isset($parameter['$ref'])) {
+                                        $requestParams[$parameter['name']]['type'] = $this->getRefClass($parameter['$ref']);
+                                        $requestParams[$parameter['name']]['attribute'] = false;
+                                        $requestParams[$parameter['name']]['repeatable'] = true;
+                                        $requestParams[$parameter['name']]['elementName'] = $parameter['name'];
+                                    }
                                 }
                             }
 
@@ -564,10 +626,29 @@ class ' . $typeKey . ' extends BaseType
                                 $operations[ucfirst($method['operationId'])]['params'][$parameter['name']]['required'] = $parameter['required'];
                             }
                         }
+                    } else if (isset($method['requestBody']) && is_array($method['requestBody']) && count($method['requestBody']) > 0) {
+                        $requestParams = [];
+                        // if ($this->contract['api_type'] === 'xero') {
+                            if (isset($method['requestBody']['content']['application/json']['schema'])) {
+                                $refName = $this->getRefClass($method['requestBody']['content']['application/json']['schema'], true);
+                                $requestParams[$refName]['type'] = $this->getRefClass($method['requestBody']['content']['application/json']['schema']);
+                                $requestParams[$refName]['attribute'] = false;
+                                $requestParams[$refName]['repeatable'] = true;
+                                $requestParams[$refName]['elementName'] = $refName;
+                            }
+                        // } else {
+                            //FIX THIS FOR OTHER APIs!!! (ebay)
+                            // $requestParams[$parameter['name']] = [];
+                            // if (isset($parameter['$ref'])) {
+                            //     $requestParams[$parameter['name']]['type'] = $this->getRefClass($parameter['$ref']);
+                            //     $requestParams[$parameter['name']]['attribute'] = false;
+                            //     $requestParams[$parameter['name']]['repeatable'] = true;
+                            //     $requestParams[$parameter['name']]['elementName'] = $parameter['name'];
+                            // }
+                        // }
                     } else {
                         $requestParams = [];
                     }
-
                     $this->buildOperationsRequestFileContent(ucfirst($method['operationId']), $requestParams);
                     $this->buildOperationsResponseFileContent();
                 }
@@ -628,13 +709,14 @@ class ' . $operationId . 'RestRequest extends BaseType
         foreach ($this->contract['content']['paths'] as $pathKey => $path) {
             if (is_array($path)) {
                 foreach ($path as $methodKey => $method) {
-                    if (!isset($method['operationId']) && !isset($method['tags'])) {
-                        continue;
-                    } else {
-                        if (isset($method['tags'])) {
+                    if (isset($method['tags']) || isset($method['operationId'])) {
+                        if (!isset($method['operationId']) && isset($method['tags'])) {
                             $method['operationId'] = $method['tags'][0];
                         }
+                    } else {
+                        continue;
                     }
+
                     $file = '<?php
 
 namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_type']) . '\\' . $this->contract['name'] . '\Operations;
@@ -642,19 +724,21 @@ namespace Apps\Dash\Packages\System\Api\Apis\\' . ucfirst($this->contract['api_t
 use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
 use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
 ';
-
         if ($methodKey === 'get') {
-            if (!isset($method['responses']['200']['content']['application/json'])) {
+            if (!isset($method['responses']['200'])) {
                 $file .= '
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
 class ' . ucfirst($method['operationId']) . 'RestResponse extends BaseType';
             } else {
+                if (isset($method['responses']['200']['$ref'])) {
+                    $class = $method['responses']['200']['$ref'];
+                } else if (isset($method['responses']['200']['content']['application/json']['schema']['$ref'])) {
+                    $class = $method['responses']['200']['content']['application/json']['schema']['$ref'];
+                }
                 $file .= '
 class ' . ucfirst($method['operationId']) . 'RestResponse extends \\' .
-                $this->getRefClass(
-                    $method['responses']['200']['content']['application/json']['schema']
-                );
+                $this->getRefClass($class);
             }
         } else {
             $file .= '

@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class JournalLine extends BaseType
+class JournalLine extends XeroType
 {
     private static $propertyTypes = [
         'JournalLineID' => [
@@ -44,19 +44,19 @@ class JournalLine extends BaseType
           'elementName' => 'Description',
         ],
         'NetAmount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'NetAmount',
         ],
         'GrossAmount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'GrossAmount',
         ],
         'TaxAmount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TaxAmount',

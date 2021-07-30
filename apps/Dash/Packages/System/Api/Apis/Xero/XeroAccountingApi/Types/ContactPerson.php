@@ -2,36 +2,36 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class ContactPerson extends BaseType
+class ContactPerson extends XeroType
 {
     private static $propertyTypes = [
-        'FirstName'         => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'FirstName',
+        'FirstName' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'FirstName',
         ],
-        'LastName'          => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'LastName',
+        'LastName' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'LastName',
         ],
-        'EmailAddress'      => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'EmailAddress',
+        'EmailAddress' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'EmailAddress',
         ],
-        'IncludeInEmails'   => [
-            'type'          => 'boolean',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'IncludeInEmails',
+        'IncludeInEmails' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'IncludeInEmails',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

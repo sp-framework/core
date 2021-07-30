@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Allocation extends BaseType
+class Allocation extends XeroType
 {
     private static $propertyTypes = [
         'Invoice' => [
@@ -32,7 +32,7 @@ class Allocation extends BaseType
           'elementName' => 'CreditNote',
         ],
         'Amount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Amount',

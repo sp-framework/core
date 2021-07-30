@@ -7,18 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class DeleteTrackingOptionsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'TrackingCategoryID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'TrackingCategoryID',
-        ],
-        'TrackingOptionID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'TrackingOptionID',
-        ],
       ];
 
     public function __construct(array $values = [])

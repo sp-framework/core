@@ -9,17 +9,21 @@ class GetQuoteAttachmentByIdRestRequest extends BaseType
     private static $propertyTypes = [
         'QuoteID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'QuoteID',
         ],
         'AttachmentID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'AttachmentID',
         ],
-        'contentType' => [
+        'ContentType' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ContentType',
         ],
       ];
 

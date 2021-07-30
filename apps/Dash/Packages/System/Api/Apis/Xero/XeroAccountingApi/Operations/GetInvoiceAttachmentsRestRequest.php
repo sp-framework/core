@@ -9,8 +9,8 @@ class GetInvoiceAttachmentsRestRequest extends BaseType
     private static $propertyTypes = [
         'InvoiceID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'InvoiceID',
         ],
       ];

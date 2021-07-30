@@ -9,17 +9,21 @@ class GetManualJournalAttachmentByFileNameRestRequest extends BaseType
     private static $propertyTypes = [
         'ManualJournalID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ManualJournalID',
         ],
         'FileName' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'FileName',
         ],
-        'contentType' => [
+        'ContentType' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ContentType',
         ],
       ];
 

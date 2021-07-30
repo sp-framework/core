@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateExpenseClaimRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ExpenseClaimID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'ExpenseClaims' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ExpenseClaims',
           'attribute' => false,
-          'elementName' => 'ExpenseClaimID',
+          'repeatable' => true,
+          'elementName' => 'ExpenseClaims',
         ],
       ];
 

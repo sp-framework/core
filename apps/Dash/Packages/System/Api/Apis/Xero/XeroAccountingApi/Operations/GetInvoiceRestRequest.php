@@ -9,12 +9,15 @@ class GetInvoiceRestRequest extends BaseType
     private static $propertyTypes = [
         'InvoiceID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'InvoiceID',
         ],
-        'getInvoice' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'unitdp' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'unitdp',
         ],
       ];
 

@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateAccountRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'Account' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Account',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'Account',
+        ],
       ];
 
     public function __construct(array $values = [])

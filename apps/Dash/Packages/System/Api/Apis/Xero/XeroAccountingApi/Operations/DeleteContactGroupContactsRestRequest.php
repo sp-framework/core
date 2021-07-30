@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class DeleteContactGroupContactsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ContactGroupID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ContactGroupID',
-        ],
       ];
 
     public function __construct(array $values = [])

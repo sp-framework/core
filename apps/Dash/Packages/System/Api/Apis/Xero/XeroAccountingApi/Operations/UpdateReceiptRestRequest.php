@@ -7,14 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateReceiptRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ReceiptID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Receipts' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Receipts',
           'attribute' => false,
-          'elementName' => 'ReceiptID',
-        ],
-        'updateReceipt' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'repeatable' => true,
+          'elementName' => 'Receipts',
         ],
       ];
 

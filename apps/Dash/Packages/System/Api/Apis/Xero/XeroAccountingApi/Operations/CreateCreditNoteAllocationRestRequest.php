@@ -7,14 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateCreditNoteAllocationRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'CreditNoteID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Allocations' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Allocations',
           'attribute' => false,
-          'elementName' => 'CreditNoteID',
-        ],
-        'createCreditNoteAllocation' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'repeatable' => true,
+          'elementName' => 'Allocations',
         ],
       ];
 

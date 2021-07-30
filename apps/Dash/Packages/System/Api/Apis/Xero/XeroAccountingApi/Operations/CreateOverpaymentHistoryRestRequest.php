@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateOverpaymentHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'OverpaymentID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'OverpaymentID',
-        ],
       ];
 
     public function __construct(array $values = [])

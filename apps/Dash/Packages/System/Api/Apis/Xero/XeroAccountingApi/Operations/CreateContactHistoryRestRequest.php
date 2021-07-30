@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateContactHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ContactID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ContactID',
-        ],
       ];
 
     public function __construct(array $values = [])

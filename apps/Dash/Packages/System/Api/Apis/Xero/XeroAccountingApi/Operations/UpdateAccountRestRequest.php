@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateAccountRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'AccountID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Accounts' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Accounts',
           'attribute' => false,
-          'elementName' => 'AccountID',
+          'repeatable' => true,
+          'elementName' => 'Accounts',
         ],
       ];
 

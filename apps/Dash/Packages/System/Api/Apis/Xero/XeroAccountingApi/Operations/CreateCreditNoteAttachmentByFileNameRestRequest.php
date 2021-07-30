@@ -7,21 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateCreditNoteAttachmentByFileNameRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'CreditNoteID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'CreditNoteID',
-        ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
-        ],
-        'createCreditNoteAttachmentByFileName' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\includeOnline',
-        ],
       ];
 
     public function __construct(array $values = [])

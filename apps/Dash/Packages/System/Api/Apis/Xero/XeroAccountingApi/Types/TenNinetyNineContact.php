@@ -2,85 +2,85 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class TenNinetyNineContact extends BaseType
+class TenNinetyNineContact extends XeroType
 {
     private static $propertyTypes = [
         'Box1' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box1',
         ],
         'Box2' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box2',
         ],
         'Box3' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box3',
         ],
         'Box4' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box4',
         ],
         'Box5' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box5',
         ],
         'Box6' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box6',
         ],
         'Box7' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box7',
         ],
         'Box8' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box8',
         ],
         'Box9' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box9',
         ],
         'Box10' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box10',
         ],
         'Box11' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box11',
         ],
         'Box13' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box13',
         ],
         'Box14' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Box14',

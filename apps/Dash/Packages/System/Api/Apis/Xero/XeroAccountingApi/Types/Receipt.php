@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Receipt extends BaseType
+class Receipt extends XeroType
 {
     private static $propertyTypes = [
         'Date' => [
@@ -44,19 +44,19 @@ class Receipt extends BaseType
           'elementName' => 'LineAmountTypes',
         ],
         'SubTotal' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',

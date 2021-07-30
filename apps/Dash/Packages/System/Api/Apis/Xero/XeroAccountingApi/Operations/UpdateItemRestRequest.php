@@ -7,14 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateItemRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ItemID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Items' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Items',
           'attribute' => false,
-          'elementName' => 'ItemID',
-        ],
-        'updateItem' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'repeatable' => true,
+          'elementName' => 'Items',
         ],
       ];
 

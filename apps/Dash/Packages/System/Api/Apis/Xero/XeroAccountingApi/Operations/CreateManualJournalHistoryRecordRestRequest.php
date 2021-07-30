@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateManualJournalHistoryRecordRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ManualJournalID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ManualJournalID',
-        ],
       ];
 
     public function __construct(array $values = [])

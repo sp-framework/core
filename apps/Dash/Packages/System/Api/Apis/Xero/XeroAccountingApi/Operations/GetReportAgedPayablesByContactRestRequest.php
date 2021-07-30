@@ -19,17 +19,17 @@ class GetReportAgedPayablesByContactRestRequest extends BaseType
           'attribute' => false,
           'elementName' => 'date',
         ],
-        'fromDate' => [
+        'FromDate' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'fromDate',
+          'repeatable' => false,
+          'elementName' => 'FromDate',
         ],
-        'toDate' => [
+        'ToDate' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'toDate',
+          'repeatable' => false,
+          'elementName' => 'ToDate',
         ],
       ];
 

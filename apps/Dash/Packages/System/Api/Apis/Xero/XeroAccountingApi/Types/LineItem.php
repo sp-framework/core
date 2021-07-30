@@ -2,90 +2,96 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class LineItem extends BaseType
+class LineItem extends XeroType
 {
     private static $propertyTypes = [
-        'LineItemID'            => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'LineItemID',
+        'LineItemID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'LineItemID',
         ],
-        'Description'           => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Description',
+        'Description' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Description',
         ],
-        'Quantity'              => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Quantity',
+        'Quantity' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Quantity',
         ],
-        'UnitAmount'            => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'UnitAmount',
+        'UnitAmount' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'UnitAmount',
         ],
-        'ItemCode'              => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'ItemCode',
+        'ItemCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'ItemCode',
         ],
-        'AccountCode'           => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AccountCode',
+        'AccountCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AccountCode',
         ],
-        'TaxType'               => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'TaxType',
+        'AccountID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AccountID',
         ],
-        'TaxAmount'             => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'TaxAmount',
+        'TaxType' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TaxType',
         ],
-        'LineAmount'            => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'LineAmount',
+        'TaxAmount' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TaxAmount',
         ],
-        'Tracking'              => [
-            'type'              => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\LineItemTracking',
-            'repeatable'        => true,
-            'attribute'         => false,
-            'elementName'       => 'Tracking',
+        'LineAmount' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'LineAmount',
         ],
-        'DiscountRate'          => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'DiscountRate',
+        'Tracking' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\LineItemTracking',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Tracking',
         ],
-        'DiscountAmount'        => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'DiscountAmount',
+        'DiscountRate' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DiscountRate',
         ],
-        'RepeatingInvoiceID'    => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'RepeatingInvoiceID',
+        'DiscountAmount' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DiscountAmount',
         ],
-    ];
+        'RepeatingInvoiceID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'RepeatingInvoiceID',
+        ],
+      ];
 
     public function __construct(array $values = [])
     {

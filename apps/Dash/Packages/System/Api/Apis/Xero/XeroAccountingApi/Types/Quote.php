@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Quote extends BaseType
+class Quote extends XeroType
 {
     private static $propertyTypes = [
         'QuoteID' => [
@@ -80,31 +80,31 @@ class Quote extends BaseType
           'elementName' => 'CurrencyCode',
         ],
         'CurrencyRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
         ],
         'SubTotal' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
         ],
         'TotalDiscount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalDiscount',

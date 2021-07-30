@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateOrCreateBankTransactionsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'updateOrCreateBankTransactions' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'BankTransactions' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\BankTransactions',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'BankTransactions',
         ],
       ];
 

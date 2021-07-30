@@ -7,21 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateInvoiceAttachmentByFileNameRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'InvoiceID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'InvoiceID',
-        ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
-        ],
-        'createInvoiceAttachmentByFileName' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\includeOnline',
-        ],
       ];
 
     public function __construct(array $values = [])

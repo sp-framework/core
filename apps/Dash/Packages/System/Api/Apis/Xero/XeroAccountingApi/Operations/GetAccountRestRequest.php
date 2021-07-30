@@ -9,8 +9,8 @@ class GetAccountRestRequest extends BaseType
     private static $propertyTypes = [
         'AccountID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'AccountID',
         ],
       ];

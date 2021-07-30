@@ -9,8 +9,8 @@ class GetLinkedTransactionRestRequest extends BaseType
     private static $propertyTypes = [
         'LinkedTransactionID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'LinkedTransactionID',
         ],
       ];

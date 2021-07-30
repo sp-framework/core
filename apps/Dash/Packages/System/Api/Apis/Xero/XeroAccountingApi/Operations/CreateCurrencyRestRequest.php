@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateCurrencyRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'Currency' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Currency',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'Currency',
+        ],
       ];
 
     public function __construct(array $values = [])

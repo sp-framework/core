@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateTaxRateRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'TaxRates' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\TaxRates',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'TaxRates',
+        ],
       ];
 
     public function __construct(array $values = [])

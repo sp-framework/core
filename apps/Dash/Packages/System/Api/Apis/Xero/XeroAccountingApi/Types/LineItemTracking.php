@@ -2,36 +2,36 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class LineItemTracking extends BaseType
+class LineItemTracking extends XeroType
 {
     private static $propertyTypes = [
-        'TrackingCategoryID'        => [
-            'type'                  => 'string',
-            'repeatable'            => false,
-            'attribute'             => false,
-            'elementName'           => 'TrackingCategoryID',
+        'TrackingCategoryID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TrackingCategoryID',
         ],
-        'TrackingOptionID'          => [
-            'type'                  => 'string',
-            'repeatable'            => false,
-            'attribute'             => false,
-            'elementName'           => 'TrackingOptionID',
+        'TrackingOptionID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TrackingOptionID',
         ],
-        'Name'                      => [
-            'type'                  => 'string',
-            'repeatable'            => false,
-            'attribute'             => false,
-            'elementName'           => 'Name',
+        'Name' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Name',
         ],
-        'Option'                    => [
-            'type'                  => 'string',
-            'repeatable'            => false,
-            'attribute'             => false,
-            'elementName'           => 'Option',
+        'Option' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Option',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

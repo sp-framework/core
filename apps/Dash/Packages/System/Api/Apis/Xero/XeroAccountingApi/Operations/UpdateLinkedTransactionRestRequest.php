@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateLinkedTransactionRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'LinkedTransactionID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'LinkedTransactions' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\LinkedTransactions',
           'attribute' => false,
-          'elementName' => 'LinkedTransactionID',
+          'repeatable' => true,
+          'elementName' => 'LinkedTransactions',
         ],
       ];
 

@@ -2,22 +2,22 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class PurchaseOrder extends BaseType
+class PurchaseOrder extends XeroType
 {
     private static $propertyTypes = [
-        'PurchaseOrderID'       => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'PurchaseOrderID',
+        'Contact' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contact',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Contact',
         ],
-        'PurchaseOrderNumber'   => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'PurchaseOrderNumber',
+        'LineItems' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\LineItem',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'LineItems',
         ],
         'DateString'            => [
             'type'              => 'string',
@@ -37,29 +37,77 @@ class PurchaseOrder extends BaseType
             'attribute'         => false,
             'elementName'       => 'DeliveryDate',
         ],
-        'DeliveryDate'          => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'DeliveryDate',
+        'DeliveryDate' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DeliveryDate',
         ],
-        'AttentionTo'           => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AttentionTo',
+        'LineAmountTypes' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'LineAmountTypes',
         ],
-        'Telephone'             => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Telephone',
+        'PurchaseOrderNumber' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PurchaseOrderNumber',
         ],
-        'DeliveryInstructions'  => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'DeliveryInstructions',
+        'Reference' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Reference',
+        ],
+        'BrandingThemeID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'BrandingThemeID',
+        ],
+        'CurrencyCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'CurrencyCode',
+        ],
+        'Status' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Status',
+        ],
+        'SentToContact' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'SentToContact',
+        ],
+        'DeliveryAddress' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DeliveryAddress',
+        ],
+        'AttentionTo' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AttentionTo',
+        ],
+        'Telephone' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Telephone',
+        ],
+        'DeliveryInstructions' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DeliveryInstructions',
         ],
         'HasErrors'             => [
             'type'              => 'boolean',
@@ -85,95 +133,11 @@ class PurchaseOrder extends BaseType
             'attribute'         => false,
             'elementName'       => 'Type',
         ],
-        'CurrencyRate'          => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'CurrencyRate',
-        ],
-        'CurrencyCode'          => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'CurrencyCode',
-        ],
-        'Contact'               => [
-            'type'              => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contact',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Contact',
-        ],
-        'BrandingThemeID'       => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'BrandingThemeID',
-        ],
-        'Status'                => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Status',
-        ],
-        'LineAmountTypes'       => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'LineAmountTypes',
-        ],
-        'LineItems'             => [
-            'type'              => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\LineItem',
-            'repeatable'        => true,
-            'attribute'         => false,
-            'elementName'       => 'LineItems',
-        ],
-        'SubTotal'              => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'SubTotal',
-        ],
-        'TotalTax'              => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'TotalTax',
-        ],
-        'Total'                 => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Total',
-        ],
-        'UpdatedDateUTC'        => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'UpdatedDateUTC',
-        ],
-        'HasAttachments'        => [
-            'type'              => 'boolean',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'HasAttachments',
-        ],
-        'SentToContact'         => [
-            'type'              => 'boolean',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'SentToContact',
-        ],
-        'DeliveryAddress'       => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'DeliveryAddress',
-        ],
-        'ExpectedArrivalDate'   => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'ExpectedArrivalDate',
+        'ExpectedArrivalDate' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'ExpectedArrivalDate',
         ],
         'ExpectedArrivalDateString'=> [
             'type'              => 'string',
@@ -181,37 +145,79 @@ class PurchaseOrder extends BaseType
             'attribute'         => false,
             'elementName'       => 'ExpectedArrivalDateString',
         ],
-        'TotalDiscount'         => [
-            'type'              => 'integer',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'TotalDiscount',
+        'PurchaseOrderID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PurchaseOrderID',
+        ],
+        'CurrencyRate' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'CurrencyRate',
+        ],
+        'SubTotal' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'SubTotal',
+        ],
+        'TotalTax' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TotalTax',
+        ],
+        'Total' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Total',
+        ],
+        'TotalDiscount' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TotalDiscount',
+        ],
+        'HasAttachments' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'HasAttachments',
+        ],
+        'UpdatedDateUTC' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'UpdatedDateUTC',
         ],
         'StatusAttributeString' => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'StatusAttributeString',
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'StatusAttributeString',
         ],
-        'ValidationErrors'      => [
-            'type'              => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ValidationError',
-            'repeatable'        => true,
-            'attribute'         => false,
-            'elementName'       => 'ValidationErrors',
+        'ValidationErrors' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ValidationError',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'ValidationErrors',
         ],
-        'Warnings'              => [
-            'type'              => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ValidationError',
-            'repeatable'        => true,
-            'attribute'         => false,
-            'elementName'       => 'Warnings',
+        'Warnings' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ValidationError',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Warnings',
         ],
-        'Attachments'           => [
-            'type'              => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Attachment',
-            'repeatable'        => true,
-            'attribute'         => false,
-            'elementName'       => 'Attachments',
+        'Attachments' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Attachment',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Attachments',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

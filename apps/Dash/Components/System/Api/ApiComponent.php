@@ -343,9 +343,9 @@ class ApiComponent extends BaseComponent
     public function checkEbayCallStatsAction()
     {
         if ($this->request->isPost()) {
-            // if (!$this->checkCSRF()) {
-            //     return;
-            // }
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $api = $this->apiPackage->useApi($this->postData());
 
@@ -486,9 +486,9 @@ class ApiComponent extends BaseComponent
     public function checkXeroCallStatsAction()
     {
         if ($this->request->isPost()) {
-            // if (!$this->checkCSRF()) {
-            //     return;
-            // }
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $api = $this->apiPackage->useApi($this->postData());
 

@@ -9,17 +9,21 @@ class GetReceiptAttachmentByIdRestRequest extends BaseType
     private static $propertyTypes = [
         'ReceiptID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ReceiptID',
         ],
         'AttachmentID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'AttachmentID',
         ],
-        'contentType' => [
+        'ContentType' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ContentType',
         ],
       ];
 

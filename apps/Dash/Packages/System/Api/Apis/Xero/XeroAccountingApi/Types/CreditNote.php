@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class CreditNote extends BaseType
+class CreditNote extends XeroType
 {
     private static $propertyTypes = [
         'Type' => [
@@ -50,31 +50,31 @@ class CreditNote extends BaseType
           'elementName' => 'LineItems',
         ],
         'SubTotal' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
         ],
         'CISDeduction' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CISDeduction',
         ],
         'CISRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CISRate',
@@ -122,13 +122,13 @@ class CreditNote extends BaseType
           'elementName' => 'SentToContact',
         ],
         'CurrencyRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
         ],
         'RemainingCredit' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'RemainingCredit',
@@ -140,7 +140,7 @@ class CreditNote extends BaseType
           'elementName' => 'Allocations',
         ],
         'AppliedAmount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AppliedAmount',

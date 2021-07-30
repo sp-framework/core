@@ -13,9 +13,9 @@ class GetReportBudgetSummaryRestRequest extends BaseType
           'attribute' => false,
           'elementName' => 'date',
         ],
-        'period' => [
+        'periods' => [
           'attribute' => false,
-          'elementName' => 'period',
+          'elementName' => 'periods',
         ],
         'timeframe' => [
           'attribute' => false,

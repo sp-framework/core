@@ -2,13 +2,13 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class BalanceDetails extends BaseType
+class BalanceDetails extends XeroType
 {
     private static $propertyTypes = [
         'Balance' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Balance',
@@ -20,7 +20,7 @@ class BalanceDetails extends BaseType
           'elementName' => 'CurrencyCode',
         ],
         'CurrencyRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',

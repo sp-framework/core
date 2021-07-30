@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Payment extends BaseType
+class Payment extends XeroType
 {
     private static $propertyTypes = [
         'Invoice' => [
@@ -62,16 +62,22 @@ class Payment extends BaseType
           'elementName' => 'Date',
         ],
         'CurrencyRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
         ],
         'Amount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Amount',
+        ],
+        'BankAmount' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'BankAmount',
         ],
         'Reference' => [
           'type' =>       'string',

@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class PostSetupRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'Setup' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Setup',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'Setup',
+        ],
       ];
 
     public function __construct(array $values = [])

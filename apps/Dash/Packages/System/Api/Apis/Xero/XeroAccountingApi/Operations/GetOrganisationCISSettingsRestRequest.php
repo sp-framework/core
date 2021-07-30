@@ -9,8 +9,8 @@ class GetOrganisationCISSettingsRestRequest extends BaseType
     private static $propertyTypes = [
         'OrganisationID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'OrganisationID',
         ],
       ];

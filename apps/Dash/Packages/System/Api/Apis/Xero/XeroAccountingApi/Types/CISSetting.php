@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class CISSetting extends BaseType
+class CISSetting extends XeroType
 {
     private static $propertyTypes = [
         'CISEnabled' => [
@@ -14,7 +14,7 @@ class CISSetting extends BaseType
           'elementName' => 'CISEnabled',
         ],
         'Rate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Rate',

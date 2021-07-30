@@ -7,14 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateOverpaymentAllocationsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'OverpaymentID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Allocations' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Allocations',
           'attribute' => false,
-          'elementName' => 'OverpaymentID',
-        ],
-        'createOverpaymentAllocations' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'repeatable' => true,
+          'elementName' => 'Allocations',
         ],
       ];
 

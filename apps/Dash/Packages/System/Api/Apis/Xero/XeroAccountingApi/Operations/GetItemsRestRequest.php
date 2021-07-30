@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetItemsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'getItems' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'ifModifiedSince' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ifModifiedSince',
         ],
         'where' => [
           'type' =>       'string',
@@ -21,6 +24,12 @@ class GetItemsRestRequest extends BaseType
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'order',
+        ],
+        'unitdp' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'unitdp',
         ],
       ];
 

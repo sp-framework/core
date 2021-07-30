@@ -2,42 +2,18 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class HistoryRecords extends BaseType
+class HistoryRecords extends XeroType
 {
     private static $propertyTypes = [
-        'Id'                => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Id',
+        'HistoryRecords' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\HistoryRecord',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'HistoryRecords',
         ],
-        'Status'            => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Status',
-        ],
-        'ProviderName'      => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'ProviderName',
-        ],
-        'DateTimeUTC'       => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'DateTimeUTC',
-        ],
-        'HistoryRecords'    => [
-            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\HistoryRecord',
-            'repeatable'    => true,
-            'attribute'     => false,
-            'elementName'   => 'HistoryRecords',
-        ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

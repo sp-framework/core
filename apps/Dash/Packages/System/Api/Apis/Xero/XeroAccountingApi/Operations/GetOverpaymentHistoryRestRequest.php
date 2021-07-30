@@ -9,8 +9,8 @@ class GetOverpaymentHistoryRestRequest extends BaseType
     private static $propertyTypes = [
         'OverpaymentID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'OverpaymentID',
         ],
       ];

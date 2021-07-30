@@ -9,8 +9,8 @@ class GetEmployeeRestRequest extends BaseType
     private static $propertyTypes = [
         'EmployeeID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'EmployeeID',
         ],
       ];

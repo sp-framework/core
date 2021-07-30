@@ -9,17 +9,21 @@ class GetManualJournalAttachmentByIdRestRequest extends BaseType
     private static $propertyTypes = [
         'ManualJournalID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ManualJournalID',
         ],
         'AttachmentID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'AttachmentID',
         ],
-        'contentType' => [
+        'ContentType' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ContentType',
         ],
       ];
 

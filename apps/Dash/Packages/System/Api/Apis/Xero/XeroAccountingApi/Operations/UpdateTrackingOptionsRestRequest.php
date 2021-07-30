@@ -7,17 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateTrackingOptionsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'TrackingCategoryID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'TrackingOption' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\TrackingOption',
           'attribute' => false,
-          'elementName' => 'TrackingCategoryID',
-        ],
-        'TrackingOptionID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'TrackingOptionID',
+          'repeatable' => true,
+          'elementName' => 'TrackingOption',
         ],
       ];
 

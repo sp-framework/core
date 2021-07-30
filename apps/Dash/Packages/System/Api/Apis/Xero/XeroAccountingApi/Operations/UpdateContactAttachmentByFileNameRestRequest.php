@@ -7,18 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateContactAttachmentByFileNameRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ContactID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ContactID',
-        ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
-        ],
       ];
 
     public function __construct(array $values = [])

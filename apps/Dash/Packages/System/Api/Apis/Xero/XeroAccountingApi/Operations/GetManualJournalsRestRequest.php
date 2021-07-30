@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetManualJournalsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'getManualJournals' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ifModifiedSince',
+        'ifModifiedSince' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ifModifiedSince',
         ],
         'where' => [
           'type' =>       'string',

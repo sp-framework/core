@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateTrackingCategoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'TrackingCategory' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\TrackingCategory',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'TrackingCategory',
+        ],
       ];
 
     public function __construct(array $values = [])

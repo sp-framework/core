@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateExpenseClaimsRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'ExpenseClaims' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ExpenseClaims',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'ExpenseClaims',
+        ],
       ];
 
     public function __construct(array $values = [])

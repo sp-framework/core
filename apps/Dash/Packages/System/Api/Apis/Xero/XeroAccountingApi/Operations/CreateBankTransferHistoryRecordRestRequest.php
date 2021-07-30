@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateBankTransferHistoryRecordRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'BankTransferID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'BankTransferID',
-        ],
       ];
 
     public function __construct(array $values = [])

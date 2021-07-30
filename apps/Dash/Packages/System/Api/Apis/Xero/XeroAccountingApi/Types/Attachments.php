@@ -2,43 +2,18 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Attachments extends BaseType
+class Attachments extends XeroType
 {
     private static $propertyTypes = [
-
-        'Attachments'       => [
-            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Attachment',
-            'repeatable'    => true,
-            'attribute'     => false,
-            'elementName'   => 'Attachments',
+        'Attachments' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Attachment',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Attachments',
         ],
-        'Id'                => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Id',
-        ],
-        'Status'            => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Status',
-        ],
-        'ProviderName'      => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'ProviderName',
-        ],
-        'DateTimeUTC'       => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'DateTimeUTC',
-        ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

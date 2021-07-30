@@ -9,8 +9,8 @@ class GetJournalRestRequest extends BaseType
     private static $propertyTypes = [
         'JournalID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'JournalID',
         ],
       ];

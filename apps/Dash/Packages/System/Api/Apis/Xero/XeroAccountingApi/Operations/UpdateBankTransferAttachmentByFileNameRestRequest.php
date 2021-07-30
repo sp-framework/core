@@ -7,18 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateBankTransferAttachmentByFileNameRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'BankTransferID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'BankTransferID',
-        ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
-        ],
       ];
 
     public function __construct(array $values = [])

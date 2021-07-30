@@ -9,8 +9,8 @@ class GetPrepaymentRestRequest extends BaseType
     private static $propertyTypes = [
         'PrepaymentID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'PrepaymentID',
         ],
       ];

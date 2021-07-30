@@ -9,8 +9,8 @@ class GetRepeatingInvoiceRestRequest extends BaseType
     private static $propertyTypes = [
         'RepeatingInvoiceID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'RepeatingInvoiceID',
         ],
       ];

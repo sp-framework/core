@@ -2,36 +2,36 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class ContactGroup extends BaseType
+class ContactGroup extends XeroType
 {
     private static $propertyTypes = [
-        'Name'              => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Name',
+        'Name' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Name',
         ],
-        'Status'            => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Status',
+        'Status' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Status',
         ],
-        'ContactGroupID'    => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'ContactGroupID',
+        'ContactGroupID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'ContactGroupID',
         ],
-        'Contacts'          => [
-            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contact',
-            'repeatable'    => true,
-            'attribute'     => false,
-            'elementName'   => 'Contacts',
+        'Contacts' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contact',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Contacts',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

@@ -9,8 +9,8 @@ class GetExpenseClaimHistoryRestRequest extends BaseType
     private static $propertyTypes = [
         'ExpenseClaimID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ExpenseClaimID',
         ],
       ];

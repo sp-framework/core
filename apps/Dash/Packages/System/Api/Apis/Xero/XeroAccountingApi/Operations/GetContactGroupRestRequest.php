@@ -9,8 +9,8 @@ class GetContactGroupRestRequest extends BaseType
     private static $propertyTypes = [
         'ContactGroupID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ContactGroupID',
         ],
       ];

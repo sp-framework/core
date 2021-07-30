@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateExpenseClaimHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ExpenseClaimID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ExpenseClaimID',
-        ],
       ];
 
     public function __construct(array $values = [])

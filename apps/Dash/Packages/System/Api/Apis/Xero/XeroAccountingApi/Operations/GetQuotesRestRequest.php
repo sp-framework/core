@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetQuotesRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'getQuotes' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ifModifiedSince',
+        'ifModifiedSince' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ifModifiedSince',
         ],
         'DateFrom' => [
           'type' =>       'string',

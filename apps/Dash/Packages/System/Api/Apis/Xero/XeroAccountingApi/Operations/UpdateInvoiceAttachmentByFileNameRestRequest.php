@@ -7,18 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateInvoiceAttachmentByFileNameRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'InvoiceID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'InvoiceID',
-        ],
-        'FileName' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'FileName',
-        ],
       ];
 
     public function __construct(array $values = [])

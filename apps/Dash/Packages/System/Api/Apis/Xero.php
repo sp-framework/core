@@ -320,19 +320,21 @@ class Xero
         return $responseData;
     }
 
-    public function refreshXeroCallStats()
+    public function refreshXeroCallStats($headers = null)
     {
         $this->init();
 
-        $request = new GetUsersRestRequest;
+        if (!$headers) {
+            $request = new GetUsersRestRequest;
 
-        $xeroService = $this->useService('XeroAccountingApi');
+            $xeroService = $this->useService('XeroAccountingApi');
 
-        // $xeroService->setOptionalHeader(['if-modified-since' => '1615808940294']);
+            // $xeroService->setOptionalHeader(['if-modified-since' => '1615808940294']);
 
-        $response = $xeroService->getUsers($request);
+            $response = $xeroService->getUsers($request);
 
-        $headers = $response->getHeaders();
+            $headers = $response->getHeaders();
+        }
 
         $callData = [];
         $callData['rateLimits'] = [];

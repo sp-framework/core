@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateOrCreateEmployeesRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'updateOrCreateEmployees' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+        'Employees' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Employees',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'Employees',
         ],
       ];
 

@@ -9,8 +9,8 @@ class GetBrandingThemeRestRequest extends BaseType
     private static $propertyTypes = [
         'BrandingThemeID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'BrandingThemeID',
         ],
       ];

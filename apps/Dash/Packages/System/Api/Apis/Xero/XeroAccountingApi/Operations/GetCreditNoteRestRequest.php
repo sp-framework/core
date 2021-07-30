@@ -9,12 +9,15 @@ class GetCreditNoteRestRequest extends BaseType
     private static $propertyTypes = [
         'CreditNoteID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'CreditNoteID',
         ],
-        'getCreditNote' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'unitdp' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'unitdp',
         ],
       ];
 

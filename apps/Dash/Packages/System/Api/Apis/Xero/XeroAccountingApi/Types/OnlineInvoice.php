@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class OnlineInvoice extends BaseType
+class OnlineInvoice extends XeroType
 {
     private static $propertyTypes = [
         'OnlineInvoiceUrl' => [

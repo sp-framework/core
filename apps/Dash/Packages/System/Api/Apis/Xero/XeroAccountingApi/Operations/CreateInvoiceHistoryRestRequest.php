@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateInvoiceHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'InvoiceID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'InvoiceID',
-        ],
       ];
 
     public function __construct(array $values = [])

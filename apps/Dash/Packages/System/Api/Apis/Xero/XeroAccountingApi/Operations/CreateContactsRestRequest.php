@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateContactsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'createContacts' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+        'Contacts' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contacts',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'Contacts',
         ],
       ];
 

@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class DeleteAccountRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'AccountID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'AccountID',
-        ],
       ];
 
     public function __construct(array $values = [])

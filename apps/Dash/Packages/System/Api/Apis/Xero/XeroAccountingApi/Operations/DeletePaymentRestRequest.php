@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class DeletePaymentRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'PaymentID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'PaymentDelete' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PaymentDelete',
           'attribute' => false,
-          'elementName' => 'PaymentID',
+          'repeatable' => true,
+          'elementName' => 'PaymentDelete',
         ],
       ];
 

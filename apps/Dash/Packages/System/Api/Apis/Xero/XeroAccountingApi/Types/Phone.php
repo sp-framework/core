@@ -2,36 +2,36 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Phone extends BaseType
+class Phone extends XeroType
 {
     private static $propertyTypes = [
-        'PhoneType'         => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'PhoneType',
+        'PhoneType' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PhoneType',
         ],
-        'PhoneNumber'       => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'PhoneNumber',
+        'PhoneNumber' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PhoneNumber',
         ],
-        'PhoneAreaCode'     => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'PhoneAreaCode',
+        'PhoneAreaCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PhoneAreaCode',
         ],
-        'PhoneCountryCode'  => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'PhoneCountryCode',
+        'PhoneCountryCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PhoneCountryCode',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

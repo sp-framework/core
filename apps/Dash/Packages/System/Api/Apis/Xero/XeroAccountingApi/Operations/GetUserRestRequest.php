@@ -9,8 +9,8 @@ class GetUserRestRequest extends BaseType
     private static $propertyTypes = [
         'UserID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'UserID',
         ],
       ];

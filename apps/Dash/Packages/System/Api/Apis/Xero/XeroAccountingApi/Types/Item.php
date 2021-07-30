@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Item extends BaseType
+class Item extends XeroType
 {
     private static $propertyTypes = [
         'Code' => [
@@ -68,13 +68,13 @@ class Item extends BaseType
           'elementName' => 'IsTrackedAsInventory',
         ],
         'TotalCostPool' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalCostPool',
         ],
         'QuantityOnHand' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'QuantityOnHand',

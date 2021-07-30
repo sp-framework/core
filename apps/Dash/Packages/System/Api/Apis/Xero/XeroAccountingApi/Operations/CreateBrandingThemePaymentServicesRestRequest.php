@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateBrandingThemePaymentServicesRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'BrandingThemeID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'PaymentService' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PaymentService',
           'attribute' => false,
-          'elementName' => 'BrandingThemeID',
+          'repeatable' => true,
+          'elementName' => 'PaymentService',
         ],
       ];
 

@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class ImportSummaryOrganisation extends BaseType
+class ImportSummaryOrganisation extends XeroType
 {
     private static $propertyTypes = [
         'Present' => [

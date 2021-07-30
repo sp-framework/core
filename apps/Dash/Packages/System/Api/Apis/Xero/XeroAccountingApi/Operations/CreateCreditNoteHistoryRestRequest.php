@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateCreditNoteHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'CreditNoteID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'CreditNoteID',
-        ],
       ];
 
     public function __construct(array $values = [])

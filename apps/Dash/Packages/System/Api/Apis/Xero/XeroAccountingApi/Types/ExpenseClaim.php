@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class ExpenseClaim extends BaseType
+class ExpenseClaim extends XeroType
 {
     private static $propertyTypes = [
         'ExpenseClaimID' => [
@@ -44,19 +44,19 @@ class ExpenseClaim extends BaseType
           'elementName' => 'UpdatedDateUTC',
         ],
         'Total' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
         ],
         'AmountDue' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AmountDue',
         ],
         'AmountPaid' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AmountPaid',

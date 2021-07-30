@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Overpayment extends BaseType
+class Overpayment extends XeroType
 {
     private static $propertyTypes = [
         'Type' => [
@@ -44,19 +44,19 @@ class Overpayment extends BaseType
           'elementName' => 'LineItems',
         ],
         'SubTotal' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
@@ -80,13 +80,13 @@ class Overpayment extends BaseType
           'elementName' => 'OverpaymentID',
         ],
         'CurrencyRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
         ],
         'RemainingCredit' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'RemainingCredit',
@@ -98,7 +98,7 @@ class Overpayment extends BaseType
           'elementName' => 'Allocations',
         ],
         'AppliedAmount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AppliedAmount',

@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateCreditNotesRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'createCreditNotes' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'CreditNotes' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\CreditNotes',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'CreditNotes',
         ],
       ];
 

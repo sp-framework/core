@@ -9,17 +9,21 @@ class GetCreditNoteAttachmentByFileNameRestRequest extends BaseType
     private static $propertyTypes = [
         'CreditNoteID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'CreditNoteID',
         ],
         'FileName' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'FileName',
         ],
-        'contentType' => [
+        'ContentType' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ContentType',
         ],
       ];
 

@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreatePrepaymentHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'PrepaymentID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'PrepaymentID',
-        ],
       ];
 
     public function __construct(array $values = [])

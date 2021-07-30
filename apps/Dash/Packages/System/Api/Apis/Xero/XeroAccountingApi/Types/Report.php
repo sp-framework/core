@@ -2,17 +2,11 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Report extends BaseType
+class Report extends XeroType
 {
     private static $propertyTypes = [
-        'ReportID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ReportID',
-        ],
         'ReportName' => [
           'type' =>       'string',
           'repeatable' => false,

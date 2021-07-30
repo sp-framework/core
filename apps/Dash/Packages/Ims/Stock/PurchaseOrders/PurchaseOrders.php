@@ -70,7 +70,10 @@ class PurchaseOrders extends BasePackage
 
             $xeroAccountingApi = $api->useService('XeroAccountingApi');
 
+            // $xeroAccountingApi->setOptionalHeader(['if-modified-since' => '1615808940294']);
+
             $response = $xeroAccountingApi->getPurchaseOrders($request);
+            $api->refreshXeroCallStats($response->getHeaders());
 
             $responseArr = $response->toArray();
 
@@ -91,7 +94,7 @@ class PurchaseOrders extends BasePackage
                 }
             }
 
-            var_dump($purchaseOrders);die();
+            var_dump($responseArr);die();
         }
     }
 

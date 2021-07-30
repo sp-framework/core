@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateQuoteHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'QuoteID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'QuoteID',
-        ],
       ];
 
     public function __construct(array $values = [])

@@ -228,7 +228,6 @@ class Contracts extends BasePackage
         }
 
         $this->contract = $contract;
-
         $this->createServiceDirectories();
 
         if (!$this->contract['wsdl_convert'] || $this->contract['wsdl_convert'] == 0) {

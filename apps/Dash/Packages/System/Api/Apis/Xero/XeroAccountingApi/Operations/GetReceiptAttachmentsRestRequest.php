@@ -9,8 +9,8 @@ class GetReceiptAttachmentsRestRequest extends BaseType
     private static $propertyTypes = [
         'ReceiptID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ReceiptID',
         ],
       ];

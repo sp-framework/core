@@ -2,18 +2,18 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class ContactGroups extends BaseType
+class ContactGroups extends XeroType
 {
     private static $propertyTypes = [
-        'ContactGroups'     => [
-            'type'          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ContactGroup',
-            'repeatable'    => true,
-            'attribute'     => false,
-            'elementName'   => 'ContactGroups',
+        'ContactGroups' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ContactGroup',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'ContactGroups',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

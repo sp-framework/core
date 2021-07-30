@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateReceiptHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ReceiptID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ReceiptID',
-        ],
       ];
 
     public function __construct(array $values = [])

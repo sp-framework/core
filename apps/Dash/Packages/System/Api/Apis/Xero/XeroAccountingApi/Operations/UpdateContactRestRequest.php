@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateContactRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ContactID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Contacts' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Contacts',
           'attribute' => false,
-          'elementName' => 'ContactID',
+          'repeatable' => true,
+          'elementName' => 'Contacts',
         ],
       ];
 

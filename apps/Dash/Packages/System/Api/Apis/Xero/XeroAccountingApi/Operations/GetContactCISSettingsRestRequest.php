@@ -9,8 +9,8 @@ class GetContactCISSettingsRestRequest extends BaseType
     private static $propertyTypes = [
         'ContactID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ContactID',
         ],
       ];

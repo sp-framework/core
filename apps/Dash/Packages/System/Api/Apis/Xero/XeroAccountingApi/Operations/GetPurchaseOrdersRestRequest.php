@@ -7,35 +7,41 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetPurchaseOrdersRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'Status'        => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Status',
+        'ifModifiedSince' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ifModifiedSince',
         ],
-        'DateFrom'      => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'DateFrom',
+        'Status' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Status',
         ],
-        'DateTo'        => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'DateTo',
+        'DateFrom' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DateFrom',
         ],
-        'order'         => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'order',
+        'DateTo' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DateTo',
         ],
-        'page'          => [
-            'attribute'     => false,
-            'elementName'   => 'page',
+        'order' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'order',
         ],
-    ];
+        'page' => [
+          'attribute' => false,
+          'elementName' => 'page',
+        ],
+      ];
 
     public function __construct(array $values = [])
     {

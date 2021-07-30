@@ -7,17 +7,17 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetReportBankSummaryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'fromDate' => [
+        'FromDate' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'fromDate',
+          'repeatable' => false,
+          'elementName' => 'FromDate',
         ],
-        'toDate' => [
+        'ToDate' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'toDate',
+          'repeatable' => false,
+          'elementName' => 'ToDate',
         ],
       ];
 

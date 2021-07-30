@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateItemHistoryRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ItemID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'ItemID',
-        ],
       ];
 
     public function __construct(array $values = [])

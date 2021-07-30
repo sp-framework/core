@@ -7,21 +7,25 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetPurchaseOrderAttachmentByIdRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'PurchaseOrderID'       => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'PurchaseOrderID',
+        'PurchaseOrderID' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'PurchaseOrderID',
         ],
-        'AttachmentID'          => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AttachmentID',
+        'AttachmentID' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'AttachmentID',
         ],
-        'contentType'           => [
+        'ContentType' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ContentType',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

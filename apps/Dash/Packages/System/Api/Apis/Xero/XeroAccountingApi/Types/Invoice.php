@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Invoice extends BaseType
+class Invoice extends XeroType
 {
     private static $propertyTypes = [
         'Type' => [
@@ -74,7 +74,7 @@ class Invoice extends BaseType
           'elementName' => 'CurrencyCode',
         ],
         'CurrencyRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
@@ -104,37 +104,37 @@ class Invoice extends BaseType
           'elementName' => 'PlannedPaymentDate',
         ],
         'CISDeduction' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CISDeduction',
         ],
         'CISRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CISRate',
         ],
         'SubTotal' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
         ],
         'TotalDiscount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalDiscount',
@@ -182,13 +182,13 @@ class Invoice extends BaseType
           'elementName' => 'Overpayments',
         ],
         'AmountDue' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AmountDue',
         ],
         'AmountPaid' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AmountPaid',
@@ -200,7 +200,7 @@ class Invoice extends BaseType
           'elementName' => 'FullyPaidOnDate',
         ],
         'AmountCredited' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AmountCredited',

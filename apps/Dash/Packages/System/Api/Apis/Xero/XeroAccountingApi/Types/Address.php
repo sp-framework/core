@@ -2,72 +2,72 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Address extends BaseType
+class Address extends XeroType
 {
     private static $propertyTypes = [
-        'AddressType'           => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AddressType',
+        'AddressType' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AddressType',
         ],
-        'AddressLine1'          => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AddressLine1',
+        'AddressLine1' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AddressLine1',
         ],
-        'AddressLine2'          => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AddressLine2',
+        'AddressLine2' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AddressLine2',
         ],
-        'AddressLine3'          => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AddressLine3',
+        'AddressLine3' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AddressLine3',
         ],
-        'AddressLine4'          => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AddressLine4',
+        'AddressLine4' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AddressLine4',
         ],
-        'City'                  => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'City',
+        'City' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'City',
         ],
-        'Region'                => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Region',
+        'Region' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Region',
         ],
-        'PostalCode'            => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'PostalCode',
+        'PostalCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PostalCode',
         ],
-        'Country'               => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'Country',
+        'Country' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Country',
         ],
-        'AttentionTo'           => [
-            'type'              => 'string',
-            'repeatable'        => false,
-            'attribute'         => false,
-            'elementName'       => 'AttentionTo',
+        'AttentionTo' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AttentionTo',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

@@ -2,246 +2,246 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Contact extends BaseType
+class Contact extends XeroType
 {
     private static $propertyTypes = [
-        'ContactID'                         => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'ContactID',
+        'ContactID' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'ContactID',
         ],
-        'ContactStatus'                     => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'ContactStatus',
+        'ContactNumber' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'ContactNumber',
         ],
-        'Name'                              => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'Name',
+        'AccountNumber' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AccountNumber',
         ],
-        'FirstName'                         => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'FirstName',
+        'ContactStatus' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'ContactStatus',
         ],
-        'LastName'                          => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'LastName',
+        'Name' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Name',
         ],
-        'ContactNumber'                     => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'ContactNumber',
+        'FirstName' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'FirstName',
         ],
-        'AccountNumber'                     => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'AccountNumber',
+        'LastName' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'LastName',
         ],
-        'EmailAddress'                      => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'EmailAddress',
+        'EmailAddress' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'EmailAddress',
         ],
-        'SkypeUserName'                     => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'SkypeUserName',
+        'SkypeUserName' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'SkypeUserName',
         ],
-        'ContactPersons'                    => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ContactPerson',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'ContactPersons',
+        'ContactPersons' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ContactPerson',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'ContactPersons',
         ],
-        'BankAccountDetails'                => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'BankAccountDetails',
+        'BankAccountDetails' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'BankAccountDetails',
         ],
-        'TaxNumber'                         => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'TaxNumber',
+        'TaxNumber' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TaxNumber',
         ],
-        'AccountsReceivableTaxType'         => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'AccountsReceivableTaxType',
+        'AccountsReceivableTaxType' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AccountsReceivableTaxType',
         ],
-        'AccountsPayableTaxType'            => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'AccountsPayableTaxType',
+        'AccountsPayableTaxType' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'AccountsPayableTaxType',
         ],
-        'Addresses'                         => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Address',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'Addresses',
+        'Addresses' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Address',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Addresses',
         ],
-        'Phones'                            => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Phone',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'Phones',
+        'Phones' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Phone',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Phones',
         ],
-        'IsSupplier'                        => [
-            'type'                          => 'boolean',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'IsSupplier',
+        'IsSupplier' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'IsSupplier',
         ],
-        'IsCustomer'                        => [
-            'type'                          => 'boolean',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'IsCustomer',
+        'IsCustomer' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'IsCustomer',
         ],
-        'DefaultCurrency'                   => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'DefaultCurrency',
+        'DefaultCurrency' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DefaultCurrency',
         ],
-        'XeroNetworkKey'                    => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'XeroNetworkKey',
+        'XeroNetworkKey' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'XeroNetworkKey',
         ],
-        'SalesDefaultAccountCode'           => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'SalesDefaultAccountCode',
+        'SalesDefaultAccountCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'SalesDefaultAccountCode',
         ],
-        'PurchasesDefaultAccountCode'       => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'PurchasesDefaultAccountCode',
+        'PurchasesDefaultAccountCode' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PurchasesDefaultAccountCode',
         ],
-        'SalesTrackingCategories'           => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\SalesTrackingCategory',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'SalesTrackingCategories',
+        'SalesTrackingCategories' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\SalesTrackingCategory',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'SalesTrackingCategories',
         ],
-        'PurchasesTrackingCategories'       => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\SalesTrackingCategory',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'PurchasesTrackingCategories',
+        'PurchasesTrackingCategories' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\SalesTrackingCategory',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'PurchasesTrackingCategories',
         ],
-        'TrackingCategoryName'              => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'TrackingCategoryName',
+        'TrackingCategoryName' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TrackingCategoryName',
         ],
-        'TrackingCategoryOption'            => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'TrackingCategoryOption',
+        'TrackingCategoryOption' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'TrackingCategoryOption',
         ],
-        'PaymentTerms'                      => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PaymentTerm',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'PaymentTerms',
+        'PaymentTerms' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PaymentTerm',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'PaymentTerms',
         ],
-        'UpdatedDateUTC'                    => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'UpdatedDateUTC',
+        'UpdatedDateUTC' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'UpdatedDateUTC',
         ],
-        'ContactGroups'                     => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ContactGroup',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'ContactGroups',
+        'ContactGroups' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ContactGroup',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'ContactGroups',
         ],
-        'Website'                           => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'Website',
+        'Website' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Website',
         ],
-        'BrandingTheme'                     => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\BrandingTheme',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'BrandingTheme',
+        'BrandingTheme' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\BrandingTheme',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'BrandingTheme',
         ],
-        'BatchPayments'                     => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\BatchPaymentDetails',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'BatchPayments',
+        'BatchPayments' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\BatchPaymentDetails',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'BatchPayments',
         ],
-        'Discount'                          => [
-            'type'                          => 'integer',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'Discount',
+        'Discount' => [
+          'type' => 'double',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Discount',
         ],
-        'Balances'                          => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Balances',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'Balances',
+        'Balances' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Balances',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Balances',
         ],
-        'Attachments'                       => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Attachment',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'Attachments',
+        'Attachments' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Attachment',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Attachments',
         ],
-        'HasAttachments'                    => [
-            'type'                          => 'boolean',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'HasAttachments',
+        'HasAttachments' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'HasAttachments',
         ],
-        'ValidationErrors'                  => [
-            'type'                          => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ValidationError',
-            'repeatable'                    => true,
-            'attribute'                     => false,
-            'elementName'                   => 'ValidationErrors',
+        'ValidationErrors' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ValidationError',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'ValidationErrors',
         ],
-        'HasValidationErrors'               => [
-            'type'                          => 'boolean',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'HasValidationErrors',
+        'HasValidationErrors' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'HasValidationErrors',
         ],
-        'StatusAttributeString'             => [
-            'type'                          => 'string',
-            'repeatable'                    => false,
-            'attribute'                     => false,
-            'elementName'                   => 'StatusAttributeString',
+        'StatusAttributeString' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'StatusAttributeString',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

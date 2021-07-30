@@ -5,9 +5,7 @@ namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations;
 use Apps\Dash\Packages\System\Api\Base\Traits\HttpHeadersTrait;
 use Apps\Dash\Packages\System\Api\Base\Traits\StatusCodeTrait;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
-
-class GetRepeatingInvoiceAttachmentByIdRestResponse extends BaseType
+class GetRepeatingInvoiceAttachmentByIdRestResponse extends \Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Attachments
 {
     use StatusCodeTrait;
     use HttpHeadersTrait;

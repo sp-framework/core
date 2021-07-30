@@ -7,14 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreatePrepaymentAllocationsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'PrepaymentID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Allocations' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Allocations',
           'attribute' => false,
-          'elementName' => 'PrepaymentID',
-        ],
-        'createPrepaymentAllocations' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\summarizeErrors',
+          'repeatable' => true,
+          'elementName' => 'Allocations',
         ],
       ];
 

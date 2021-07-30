@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateLinkedTransactionRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'LinkedTransaction' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\LinkedTransaction',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'LinkedTransaction',
+        ],
       ];
 
     public function __construct(array $values = [])

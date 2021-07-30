@@ -9,8 +9,8 @@ class GetBatchPaymentHistoryRestRequest extends BaseType
     private static $propertyTypes = [
         'BatchPaymentID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'BatchPaymentID',
         ],
       ];

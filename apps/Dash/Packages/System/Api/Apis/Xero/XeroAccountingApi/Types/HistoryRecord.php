@@ -2,34 +2,34 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class HistoryRecord extends BaseType
+class HistoryRecord extends XeroType
 {
     private static $propertyTypes = [
-        'Details'           => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Details',
+        'Details' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Details',
         ],
-        'Changes'           => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Changes',
+        'Changes' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Changes',
         ],
-        'User'              => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'User',
+        'User' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'User',
         ],
-        'DateUTC'           => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'DateUTC',
+        'DateUTC' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'DateUTC',
         ],
         'DateUTCString'     => [
             'type'          => 'string',
@@ -37,7 +37,7 @@ class HistoryRecord extends BaseType
             'attribute'     => false,
             'elementName'   => 'DateUTCString',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

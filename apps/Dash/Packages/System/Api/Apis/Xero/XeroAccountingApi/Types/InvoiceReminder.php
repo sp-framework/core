@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class InvoiceReminder extends BaseType
+class InvoiceReminder extends XeroType
 {
     private static $propertyTypes = [
         'Enabled' => [

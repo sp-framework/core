@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class GetInvoicesRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'getInvoices' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'ifModifiedSince' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'ifModifiedSince',
         ],
         'where' => [
           'type' =>       'string',
@@ -53,6 +56,18 @@ class GetInvoicesRestRequest extends BaseType
         'createdByMyApp' => [
           'attribute' => false,
           'elementName' => 'createdByMyApp',
+        ],
+        'unitdp' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'unitdp',
+        ],
+        'summaryOnly' => [
+          'type' =>       'string',
+          'attribute' => false,
+          'repeatable' => false,
+          'elementName' => 'summaryOnly',
         ],
       ];
 

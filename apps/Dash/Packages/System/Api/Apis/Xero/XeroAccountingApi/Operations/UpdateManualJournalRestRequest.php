@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateManualJournalRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'ManualJournalID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'ManualJournals' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\ManualJournals',
           'attribute' => false,
-          'elementName' => 'ManualJournalID',
+          'repeatable' => true,
+          'elementName' => 'ManualJournals',
         ],
       ];
 

@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class Prepayment extends BaseType
+class Prepayment extends XeroType
 {
     private static $propertyTypes = [
         'Type' => [
@@ -44,19 +44,19 @@ class Prepayment extends BaseType
           'elementName' => 'LineItems',
         ],
         'SubTotal' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'SubTotal',
         ],
         'TotalTax' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'TotalTax',
         ],
         'Total' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Total',
@@ -86,13 +86,13 @@ class Prepayment extends BaseType
           'elementName' => 'PrepaymentID',
         ],
         'CurrencyRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'CurrencyRate',
         ],
         'RemainingCredit' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'RemainingCredit',
@@ -103,8 +103,14 @@ class Prepayment extends BaseType
           'attribute' => false,
           'elementName' => 'Allocations',
         ],
+        'Payments' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Payment',
+          'repeatable' => true,
+          'attribute' => false,
+          'elementName' => 'Payments',
+        ],
         'AppliedAmount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'AppliedAmount',

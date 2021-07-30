@@ -7,14 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateCreditNoteRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'CreditNoteID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'CreditNotes' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\CreditNotes',
           'attribute' => false,
-          'elementName' => 'CreditNoteID',
-        ],
-        'updateCreditNote' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+          'repeatable' => true,
+          'elementName' => 'CreditNotes',
         ],
       ];
 

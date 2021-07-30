@@ -9,8 +9,8 @@ class GetItemHistoryRestRequest extends BaseType
     private static $propertyTypes = [
         'ItemID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'ItemID',
         ],
       ];

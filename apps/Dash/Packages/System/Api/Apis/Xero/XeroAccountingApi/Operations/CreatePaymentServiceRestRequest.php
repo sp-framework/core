@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreatePaymentServiceRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'PaymentServices' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PaymentServices',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'PaymentServices',
+        ],
       ];
 
     public function __construct(array $values = [])

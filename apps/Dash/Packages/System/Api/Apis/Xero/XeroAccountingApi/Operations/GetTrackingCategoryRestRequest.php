@@ -9,8 +9,8 @@ class GetTrackingCategoryRestRequest extends BaseType
     private static $propertyTypes = [
         'TrackingCategoryID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'TrackingCategoryID',
         ],
       ];

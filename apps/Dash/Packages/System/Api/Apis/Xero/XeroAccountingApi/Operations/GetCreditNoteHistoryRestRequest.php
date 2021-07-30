@@ -9,8 +9,8 @@ class GetCreditNoteHistoryRestRequest extends BaseType
     private static $propertyTypes = [
         'CreditNoteID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'CreditNoteID',
         ],
       ];

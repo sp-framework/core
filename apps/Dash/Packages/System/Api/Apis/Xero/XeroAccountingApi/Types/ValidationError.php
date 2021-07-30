@@ -2,18 +2,18 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class ValidationError extends BaseType
+class ValidationError extends XeroType
 {
     private static $propertyTypes = [
-        'Message'           => [
-            'type'          => 'string',
-            'repeatable'    => false,
-            'attribute'     => false,
-            'elementName'   => 'Message',
+        'Message' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Message',
         ],
-    ];
+      ];
 
     public function __construct(array $values = [])
     {

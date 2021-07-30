@@ -9,8 +9,8 @@ class GetPaymentRestRequest extends BaseType
     private static $propertyTypes = [
         'PaymentID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'PaymentID',
         ],
       ];

@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class TaxRate extends BaseType
+class TaxRate extends XeroType
 {
     private static $propertyTypes = [
         'Name' => [
@@ -68,13 +68,13 @@ class TaxRate extends BaseType
           'elementName' => 'CanApplyToRevenue',
         ],
         'DisplayTaxRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'DisplayTaxRate',
         ],
         'EffectiveRate' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'EffectiveRate',

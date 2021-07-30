@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class EmailInvoiceRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'InvoiceID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'RequestEmpty' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\RequestEmpty',
           'attribute' => false,
-          'elementName' => 'InvoiceID',
+          'repeatable' => true,
+          'elementName' => 'RequestEmpty',
         ],
       ];
 

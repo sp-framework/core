@@ -2,9 +2,9 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
-use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
 
-class BatchPayment extends BaseType
+class BatchPayment extends XeroType
 {
     private static $propertyTypes = [
         'Account' => [
@@ -62,7 +62,7 @@ class BatchPayment extends BaseType
           'elementName' => 'Date',
         ],
         'Amount' => [
-          'type' => 'integer',
+          'type' => 'double',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Amount',

@@ -9,8 +9,8 @@ class GetBankTransactionAttachmentsRestRequest extends BaseType
     private static $propertyTypes = [
         'BankTransactionID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'BankTransactionID',
         ],
       ];

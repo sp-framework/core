@@ -7,11 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateQuoteRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'QuoteID' => [
-          'type' =>       'string',
-          'repeatable' => false,
+        'Quotes' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Quotes',
           'attribute' => false,
-          'elementName' => 'QuoteID',
+          'repeatable' => true,
+          'elementName' => 'Quotes',
         ],
       ];
 

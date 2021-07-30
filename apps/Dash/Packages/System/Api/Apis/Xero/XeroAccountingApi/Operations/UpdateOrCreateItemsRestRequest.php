@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class UpdateOrCreateItemsRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'updateOrCreateItems' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'Items' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Items',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'Items',
         ],
       ];
 

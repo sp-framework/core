@@ -7,8 +7,11 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateInvoicesRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'createInvoices' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\unitdp',
+        'Invoices' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Invoices',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'Invoices',
         ],
       ];
 

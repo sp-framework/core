@@ -7,6 +7,12 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class CreateBankTransferRestRequest extends BaseType
 {
     private static $propertyTypes = [
+        'BankTransfers' => [
+          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\BankTransfers',
+          'attribute' => false,
+          'repeatable' => true,
+          'elementName' => 'BankTransfers',
+        ],
       ];
 
     public function __construct(array $values = [])

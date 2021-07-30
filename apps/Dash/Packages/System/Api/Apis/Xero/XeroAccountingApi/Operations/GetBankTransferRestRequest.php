@@ -9,8 +9,8 @@ class GetBankTransferRestRequest extends BaseType
     private static $propertyTypes = [
         'BankTransferID' => [
           'type' =>       'string',
-          'repeatable' => false,
           'attribute' => false,
+          'repeatable' => false,
           'elementName' => 'BankTransferID',
         ],
       ];

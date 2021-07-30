@@ -7,12 +7,6 @@ use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 class DeleteLinkedTransactionRestRequest extends BaseType
 {
     private static $propertyTypes = [
-        'LinkedTransactionID' => [
-          'type' =>       'string',
-          'repeatable' => false,
-          'attribute' => false,
-          'elementName' => 'LinkedTransactionID',
-        ],
       ];
 
     public function __construct(array $values = [])
