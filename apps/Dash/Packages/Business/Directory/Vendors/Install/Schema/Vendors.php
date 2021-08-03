@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Business\Directory\Vendors\Install\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Vendors
 {
@@ -120,6 +121,15 @@ class Vendors
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'business_name'
+                    ],
+                    'UNIQUE'
+                )
             ]
         ];
     }

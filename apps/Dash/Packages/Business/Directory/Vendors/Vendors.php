@@ -21,6 +21,12 @@ class Vendors extends BasePackage
      */
     public function addVendor(array $data)
     {
+        if ($this->checkVendorDuplicate($data['business_name'])) {
+            $this->addResponse('Vendor ' . $data['business_name'] . ' already exists.', 1);
+
+            return;
+        }
+
         $data = $this->addBrands($data);
 
         $data = $this->updateContacts($data);
@@ -49,6 +55,12 @@ class Vendors extends BasePackage
      */
     public function updateVendor(array $data)
     {
+        if ($this->checkVendorDuplicate($data['business_name'])) {
+            $this->addResponse('Vendor ' . $data['business_name'] . ' already exists.', 1);
+
+            return;
+        }
+
         $vendor = $this->getById($data['id']);
 
         $data = $this->addBrands($data);
@@ -99,6 +111,19 @@ class Vendors extends BasePackage
         } else {
             $this->addResponse('Error removing vendor.', 1);
         }
+    }
+
+    protected function checkVendorDuplicate($name)
+    {
+        return $this->modelToUse::findFirst(
+            [
+                'conditions'    => 'business_name = :name:',
+                'bind'          =>
+                [
+                    'name'      => $name
+                ]
+            ]
+        );
     }
 
     protected function addBrands(array $data)

@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Business\Entities\Install\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Entities
 {
@@ -40,7 +41,7 @@ class Entities
                     'business_name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 512,
+                        'size'    => 200,
                         'notNull' => true,
                     ]
                 ),
@@ -69,6 +70,15 @@ class Entities
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'business_name'
+                    ],
+                    'UNIQUE'
+                )
             ]
         ];
     }

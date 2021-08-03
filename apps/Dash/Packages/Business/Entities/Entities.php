@@ -16,6 +16,12 @@ class Entities extends BasePackage
 
     public function addEntity(array $data)
     {
+        if ($this->checkEntityDuplicate($data['business_name'])) {
+            $this->addResponse('Entity ' . $data['business_name'] . ' already exists.', 1);
+
+            return;
+        }
+
         $data['package_name'] = $this->packageName;
 
         $data['name'] = $data['business_name'];
@@ -53,6 +59,12 @@ class Entities extends BasePackage
 
     public function updateEntity(array $data)
     {
+        if ($this->checkEntityDuplicate($data['business_name'])) {
+            $this->addResponse('Entity ' . $data['business_name'] . ' already exists.', 1);
+
+            return;
+        }
+
         $data['package_name'] = $this->packageName;
 
         $data['name'] = $data['business_name'];
@@ -113,5 +125,18 @@ class Entities extends BasePackage
 
             $this->packagesData->responseMessage = 'Error removing business entity.';
         }
+    }
+
+    protected function checkEntityDuplicate($name)
+    {
+        return $this->modelToUse::findFirst(
+            [
+                'conditions'    => 'business_name = :name:',
+                'bind'          =>
+                [
+                    'name'      => $name
+                ]
+            ]
+        );
     }
 }
