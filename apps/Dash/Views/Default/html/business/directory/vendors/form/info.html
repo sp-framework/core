@@ -9,6 +9,7 @@
     {% set vendorIsServiceProvider = vendor['is_service_provider'] %}
     {% set vendorDoesJobwork = vendor['does_jobwork'] %}
     {% set vendorBrands = vendor['brands'] %}
+    {% set vendorGroup = vendor['group_id'] %}
 {% else %}
     {% set vendorId = '' %}
     {% set vendorLogo = '' %}
@@ -20,6 +21,7 @@
     {% set vendorIsServiceProvider = '' %}
     {% set vendorDoesJobwork = '' %}
     {% set vendorBrands = '' %}
+    {% set vendorGroup = '' %}
 {% endif %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
@@ -320,6 +322,31 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldBazScan'                   : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'group_id',
+                        'fieldLabel'                            : 'Business Group',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Business Group',
+                        'fieldRequired'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : groups,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : vendorGroup
                     ]
                 )}}
             </div>

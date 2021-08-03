@@ -1,0 +1,57 @@
+{
+    "route"         : "business/directory/groups",
+    "name"          : "Business Groups",
+    "description"   : "List business groups via this component",
+    "app_type"      : "dash",
+    "category"      : "business",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-component-business-admin-groups",
+    "class"         : "Apps\\Dash\\Components\\Business\\Directory\\Groups\\GroupsComponent",
+    "dependencies"  : {
+        "core"          : {
+            "name"      : "Core",
+            "version"   : "0.0.1",
+            "repo"      : "https://.../core"
+        },
+        "components"    : [],
+        "packages"      :
+        [
+            {
+                "name"      : "Groups",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-package-business-admin-groups"
+            }
+        ],
+        "middlewares"   : [],
+        "views"         :
+        [
+            {
+                "name"      : "Default",
+                "version"   : "0.0.1",
+                "repo"      : "https://.../dash-view-default"
+            }
+        ]
+    },
+    "menu"              : {
+        "seq"           : 4,
+        "business"      : {
+            "icon"      : "suitcase",
+            "title"     : "business",
+            "childs"    : {
+                "directory" : {
+                "title"     : "directory",
+                "icon"      : "address-book",
+                "childs"    : {
+                    "groups" : {
+                        "title"     : "groups",
+                        "link"      : "business/directory/groups"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "settings"          : {
+    }
+}

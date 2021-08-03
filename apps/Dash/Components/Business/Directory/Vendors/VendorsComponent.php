@@ -5,6 +5,7 @@ namespace Apps\Dash\Components\Business\Directory\Vendors;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\ABNLookup\ABNLookup;
 use Apps\Dash\Packages\Business\Directory\Contacts\Contacts;
+use Apps\Dash\Packages\Business\Directory\Groups\Groups;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Phalcon\Helper\Json;
@@ -58,6 +59,8 @@ class VendorsComponent extends BaseComponent
         if (isset($this->getData()['viatoken'])) {
             //Token auth and grab remote vendor
         }
+
+        $this->view->groups = $this->usePackage(Groups::class)->getAll()->groups;
 
         if (isset($this->getData()['id'])) {
             $this->view->brands = $this->usePackage(Brands::class)->getAll()->brands;

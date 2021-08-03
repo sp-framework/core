@@ -1,0 +1,35 @@
+{% if group['id'] is defined %}
+    {% set groupId = group['id'] %}
+    {% set title = 'Group (' ~ group['name'] ~ ')' %}
+{% else %}
+    {% set groupId = '' %}
+    {% set title = 'New Group' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'users',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'groups/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : groupId,
+            'addActionUrl'                  : 'business/directory/groups/add',
+            'addSuccessRedirectUrl'         : 'business/directory/groups',
+            'updateActionUrl'               : 'business/directory/groups/update',
+            'updateSuccessRedirectUrl'      : 'business/directory/groups',
+            'cancelActionUrl'               : 'business/directory/groups',
+            'closeActionUrl'                : 'business/directory/groups'
+        ]
+    ]
+)}}

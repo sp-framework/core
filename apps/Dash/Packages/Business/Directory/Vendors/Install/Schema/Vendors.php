@@ -88,6 +88,13 @@ class Vendors
                     ]
                 ),
                 new Column(
+                    'group_id',
+                    [
+                        'type'    => Column::TYPE_SMALLINTEGER,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'product_count',
                     [
                         'type'    => Column::TYPE_INTEGER,

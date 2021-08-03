@@ -26,6 +26,8 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $brands;
 
+    public $group_id;
+
     public $product_count;
 
     public $contact_ids;
