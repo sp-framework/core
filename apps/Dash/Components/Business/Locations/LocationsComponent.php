@@ -3,6 +3,7 @@
 namespace Apps\Dash\Components\Business\Locations;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Dash\Packages\Business\Entities\Entities;
 use Apps\Dash\Packages\Business\Locations\Locations;
 use Apps\Dash\Packages\Hrms\Employees\Employees;
 use System\Base\BaseComponent;
@@ -16,6 +17,8 @@ class LocationsComponent extends BaseComponent
     public function initialize()
     {
         $this->locations = $this->usePackage(Locations::class);
+
+        $this->entities = $this->usePackage(Entities::class);
 
         $this->employees = $this->usePackage(Employees::class);
     }
@@ -62,9 +65,7 @@ class LocationsComponent extends BaseComponent
                 $this->view->geo = false;
             }
 
-            $this->view->responseCode = $this->locations->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->locations->packagesData->responseMessage;
+            $this->view->entities = $this->entities->init()->getAll()->entities;
 
             $this->view->pick('locations/view');
 
@@ -74,25 +75,37 @@ class LocationsComponent extends BaseComponent
         $locations = $this->locations->init();
 
         if ($this->request->isPost()) {
+            $entitiesArr = $this->entities->init()->getAll()->entities;
+
+            foreach ($entitiesArr as $entityKey => $entity) {
+                $entities[$entity['id']] = $entity['business_name'];
+            }
+
             $replaceColumns =
                 [
-                    'inbound_shipping'   => ['html'  =>
-                        [
-                            '0' => 'No',
-                            '1' => 'Yes'
-                        ]
+                    'entity_id'         => [
+                        'html'  => $entities
                     ],
-                    'outbound_shipping'   => ['html'  =>
-                        [
-                            '0' => 'No',
-                            '1' => 'Yes'
-                        ]
+                    'inbound_shipping'   => [
+                        'html'  =>
+                            [
+                                '0' => '<span class="badge badge-danger">No</span>',
+                                '1' => '<span class="badge badge-success">Yes</span>'
+                            ]
                     ],
-                    'can_stock'   => ['html'  =>
-                        [
-                            '0' => 'No',
-                            '1' => 'Yes'
-                        ]
+                    'outbound_shipping'   => [
+                        'html'  =>
+                            [
+                                '0' => '<span class="badge badge-danger">No</span>',
+                                '1' => '<span class="badge badge-success">Yes</span>'
+                            ]
+                    ],
+                    'can_stock'   => [
+                        'html'  =>
+                            [
+                                '0' => '<span class="badge badge-danger">No</span>',
+                                '1' => '<span class="badge badge-success">Yes</span>'
+                            ]
                     ]
                 ];
         } else {
@@ -112,11 +125,11 @@ class LocationsComponent extends BaseComponent
             $locations,
             'business/locations/view',
             null,
-            ['name', 'inbound_shipping', 'outbound_shipping', 'can_stock'],
+            ['name', 'entity_id', 'inbound_shipping', 'outbound_shipping', 'can_stock'],
             true,
-            ['name', 'inbound_shipping', 'outbound_shipping', 'can_stock'],
+            ['name', 'entity_id', 'inbound_shipping', 'outbound_shipping', 'can_stock'],
             $controlActions,
-            null,
+            ['entity_id'=>'entity'],
             $replaceColumns,
             'name'
         );
@@ -137,14 +150,12 @@ class LocationsComponent extends BaseComponent
 
             $this->locations->addLocation($this->postData());
 
-            $this->view->responseCode = $this->locations->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->locations->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->locations->packagesData->responseMessage,
+                $this->locations->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -161,14 +172,12 @@ class LocationsComponent extends BaseComponent
 
             $this->locations->updateLocation($this->postData());
 
-            $this->view->responseCode = $this->locations->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->locations->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->locations->packagesData->responseMessage,
+                $this->locations->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -181,14 +190,12 @@ class LocationsComponent extends BaseComponent
 
             $this->locations->removeLocation($this->postData());
 
-            $this->view->responseCode = $this->locations->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->locations->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->locations->packagesData->responseMessage,
+                $this->locations->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -200,15 +207,12 @@ class LocationsComponent extends BaseComponent
 
             $this->view->locationAddress = $this->locations->packagesData->locationAddress;
 
-            $this->view->responseCode = $this->locations->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->locations->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->locations->packagesData->responseMessage,
+                $this->locations->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
-
     }
 }

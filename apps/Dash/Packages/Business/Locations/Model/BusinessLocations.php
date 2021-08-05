@@ -10,6 +10,8 @@ class BusinessLocations extends BaseModel
 
     public $name;
 
+    public $entity_id;
+
     public $inbound_shipping;
 
     public $delivery_instructions;

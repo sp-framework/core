@@ -1,6 +1,7 @@
 {% if location['id'] is defined %}
     {% set locationId = location['id'] %}
     {% set locationName = location['name'] %}
+    {% set locationEntity = location['entity_id'] %}
     {% set locationDescription = location['description'] %}
     {% set locationInboundShipping = location['inbound_shipping'] %}
     {% set locationDeliveryInstructions = location['delivery_instructions'] %}
@@ -9,6 +10,7 @@
 {% else %}
     {% set locationId = '' %}
     {% set locationName = '' %}
+    {% set locationEntity = '' %}
     {% set locationDescription = '' %}
     {% set locationInboundShipping = '' %}
     {% set locationDeliveryInstructions = '' %}
@@ -77,6 +79,31 @@
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 50,
                 'fieldValue'                     : locationName
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'entity_id',
+                'fieldLabel'                            : 'Business Entity',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Business entity: Select a Business entity from the list below.',
+                'fieldRequired'                         : true,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataSelect2Options'               : entities,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'business_name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : locationEntity
             ]
         )}}
     </div>

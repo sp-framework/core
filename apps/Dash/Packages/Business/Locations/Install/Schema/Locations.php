@@ -23,81 +23,88 @@ class Locations
                 new Column(
                     'name',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'entity_id',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'description',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 4096,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'inbound_shipping',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'delivery_instructions',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 2048,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 2048,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'outbound_shipping',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'can_stock',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'total_stock_qty',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'total_employees',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'primary_contact_employee_id',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'secondary_contact_employee_id',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'address_id',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => true,
                     ]
                 ),
             ],

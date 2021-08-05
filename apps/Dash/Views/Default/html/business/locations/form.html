@@ -148,6 +148,9 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
         '{{componentId}}-{{sectionId}}-name'                            : { },
+        '{{componentId}}-{{sectionId}}-entity_id'                       : {
+            placeholder: 'SELECT BUSINESS ENTITY'
+        },
         '{{componentId}}-{{sectionId}}-description'                     : { },
         '{{componentId}}-{{sectionId}}-inbound_shipping'                : {
             afterInit: function() {

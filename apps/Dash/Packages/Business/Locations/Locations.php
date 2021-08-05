@@ -24,13 +24,9 @@ class Locations extends BasePackage
         if ($this->add($data)) {
             $this->addActivityLog($data);
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' location.';
+            $this->addResponse('Added ' . $data['name'] . ' location.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new location.';
+            $this->addResponse('Error adding new location.', 1);
         }
     }
 
@@ -47,13 +43,9 @@ class Locations extends BasePackage
         if ($this->update($data)) {
             $this->addActivityLog($data, $location, $oldAddress);
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' location.';
+            $this->addResponse('Updated ' . $data['name'] . ' location.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating location.';
+            $this->addResponse('Error updating location.', 1);
         }
     }
 
@@ -78,13 +70,9 @@ class Locations extends BasePackage
         }
 
         if ($this->remove($data['id'])) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Removed location.';
+            $this->addResponse('Removed location.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing location.';
+            $this->addResponse('Error removing location.', 1);
         }
     }
 
