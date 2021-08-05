@@ -59,10 +59,14 @@ class Entities extends BasePackage
 
     public function updateEntity(array $data)
     {
-        if ($this->checkEntityDuplicate($data['business_name'])) {
-            $this->addResponse('Entity ' . $data['business_name'] . ' already exists.', 1);
+        $entity = $this->getById($data['id']);
 
-            return;
+        if ($entity['business_name'] !== $data['business_name']) {
+            if ($this->checkEntityDuplicate($data['business_name'])) {
+                $this->addResponse('Entity ' . $data['business_name'] . ' already exists.', 1);
+
+                return;
+            }
         }
 
         $data['package_name'] = $this->packageName;
