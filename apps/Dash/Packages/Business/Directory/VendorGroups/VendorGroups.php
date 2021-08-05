@@ -1,18 +1,18 @@
 <?php
 
-namespace Apps\Dash\Packages\Business\Directory\Groups;
+namespace Apps\Dash\Packages\Business\Directory\VendorGroups;
 
-use Apps\Dash\Packages\Business\Directory\Groups\Model\BusinessDirectoryGroups;
+use Apps\Dash\Packages\Business\Directory\VendorGroups\Model\BusinessDirectoryVendorGroups;
 use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendors;
 use System\Base\BasePackage;
 
-class Groups extends BasePackage
+class VendorGroups extends BasePackage
 {
-    protected $modelToUse = BusinessDirectoryGroups::class;
+    protected $modelToUse = BusinessDirectoryVendorGroups::class;
 
-    protected $packageName = 'groups';
+    protected $packageName = 'vendorgroups';
 
-    public $groups;
+    public $vendorgroups;
 
     /**
      * @notification(name=add)

@@ -9,7 +9,7 @@
     {% set vendorIsServiceProvider = vendor['is_service_provider'] %}
     {% set vendorDoesJobwork = vendor['does_jobwork'] %}
     {% set vendorBrands = vendor['brands'] %}
-    {% set vendorGroup = vendor['group_id'] %}
+    {% set vendorGroup = vendor['vendor_group_id'] %}
 {% else %}
     {% set vendorId = '' %}
     {% set vendorLogo = '' %}
@@ -342,7 +342,7 @@
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : true,
                         'fieldBazPostOnUpdate'                  : true,
-                        'fieldDataSelect2Options'               : groups,
+                        'fieldDataSelect2Options'               : vendorgroups,
                         'fieldDataSelect2OptionsKey'            : 'id',
                         'fieldDataSelect2OptionsValue'          : 'name',
                         'fieldDataSelect2OptionsArray'          : true,

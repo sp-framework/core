@@ -1,14 +1,14 @@
 <?php
 
-namespace Apps\Dash\Packages\Business\Directory\Groups\Install;
+namespace Apps\Dash\Packages\Business\Directory\VendorGroups\Install;
 
-use Apps\Dash\Packages\Business\Directory\Groups\Install\Schema\Groups as GroupsSchema;
+use Apps\Dash\Packages\Business\Directory\VendorGroups\Install\Schema\VendorGroups as VendorGroupsSchema;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Package extends BasePackage
 {
-    protected $schemaToUse = GroupsSchema::class;
+    protected $schemaToUse = VendorGroupsSchema::class;
 
     public function installPackage(bool $dropTables = false)
     {
@@ -25,9 +25,9 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
-                $this->createTable('business_directory_groups', '', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('business_directory_vendor_groups', '', (new $this->schemaToUse)->columns(), $dropTables);
             } else {
-                $this->createTable('business_directory_groups', '', (new $this->schemaToUse)->columns());
+                $this->createTable('business_directory_vendor_groups', '', (new $this->schemaToUse)->columns());
             }
 
             // $this->registerPackage();

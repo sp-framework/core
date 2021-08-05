@@ -1,20 +1,20 @@
 <?php
 
-namespace Apps\Dash\Components\Business\Directory\Groups;
+namespace Apps\Dash\Components\Business\Directory\Vendorgroups;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
-use Apps\Dash\Packages\Business\Directory\Groups\Groups;
+use Apps\Dash\Packages\Business\Directory\VendorGroups\VendorGroups;
 use System\Base\BaseComponent;
 
-class GroupsComponent extends BaseComponent
+class VendorgroupsComponent extends BaseComponent
 {
     use DynamicTable;
 
-    protected $groups;
+    protected $vendorgroups;
 
     public function initialize()
     {
-        $this->groups = $this->usePackage(Groups::class);
+        $this->vendorgroups = $this->usePackage(VendorGroups::class);
     }
 
     /**
@@ -25,12 +25,12 @@ class GroupsComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
 
-                $group = $this->groups->getById($this->getData()['id']);
+                $group = $this->vendorgroups->getById($this->getData()['id']);
 
                 $this->view->group = $group;
             }
 
-            $this->view->pick('groups/view');
+            $this->view->pick('vendorgroups/view');
 
             return;
         }
@@ -39,14 +39,14 @@ class GroupsComponent extends BaseComponent
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'business/directory/groups',
-                    'remove'    => 'business/directory/groups/remove'
+                    'edit'      => 'business/directory/vendorgroups',
+                    'remove'    => 'business/directory/vendorgroups/remove'
                 ]
             ];
 
         $this->generateDTContent(
-            $this->groups,
-            'business/directory/groups/view',
+            $this->vendorgroups,
+            'business/directory/vendorgroups/view',
             null,
             ['name'],
             true,
@@ -57,7 +57,7 @@ class GroupsComponent extends BaseComponent
             'name'
         );
 
-        $this->view->pick('groups/list');
+        $this->view->pick('vendorgroups/list');
     }
 
     /**
@@ -71,11 +71,11 @@ class GroupsComponent extends BaseComponent
                 return;
             }
 
-            $this->groups->addGroup($this->postData());
+            $this->vendorgroups->addGroup($this->postData());
 
             $this->addResponse(
-                $this->groups->packagesData->responseMessage,
-                $this->groups->packagesData->responseCode
+                $this->vendorgroups->packagesData->responseMessage,
+                $this->vendorgroups->packagesData->responseCode
             );
         } else {
             $this->addResponse(
@@ -96,11 +96,11 @@ class GroupsComponent extends BaseComponent
                 return;
             }
 
-            $this->groups->updateGroup($this->postData());
+            $this->vendorgroups->updateGroup($this->postData());
 
             $this->addResponse(
-                $this->groups->packagesData->responseMessage,
-                $this->groups->packagesData->responseCode
+                $this->vendorgroups->packagesData->responseMessage,
+                $this->vendorgroups->packagesData->responseCode
             );
         } else {
             $this->addResponse(
@@ -117,11 +117,11 @@ class GroupsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->groups->removeGroup($this->postData());
+            $this->vendorgroups->removeGroup($this->postData());
 
             $this->addResponse(
-                $this->groups->packagesData->responseMessage,
-                $this->groups->packagesData->responseCode
+                $this->vendorgroups->packagesData->responseMessage,
+                $this->vendorgroups->packagesData->responseCode
             );
         } else {
             $this->addResponse(

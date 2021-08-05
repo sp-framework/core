@@ -89,7 +89,7 @@ class Vendors
                     ]
                 ),
                 new Column(
-                    'group_id',
+                    'vendor_group_id',
                     [
                         'type'    => Column::TYPE_SMALLINTEGER,
                         'notNull' => true,

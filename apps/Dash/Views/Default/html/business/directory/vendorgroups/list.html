@@ -9,7 +9,7 @@
         'cardHeader'            : true,
         'cardType'              : 'primary',
         'cardIcon'              : 'users',
-        'cardTitle'             : componentName,
+        'cardTitle'             : 'Vendor Groups',
         'cardAdditionalClass'   : 'rounded-0',
         'cardShowTools'         : ['maximize'],
         'dtFilter'              : true,
@@ -24,13 +24,13 @@
                 'buttons'               :
                     {
                         'add-group' : {
-                            'title'                   : 'Add New Business Group',
+                            'title'                   : 'Add New Vendor Group',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'plus',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
-                            'url'                     : links.url('business/directory/groups/q/id/0')
+                            'url'                     : links.url('business/directory/vendorgroups/q/id/0')
                         }
                     }
             },
@@ -45,6 +45,6 @@
         'dtHideIdColumn'        : true,
         'dtNoOfColumnsToShow'   : 6,
         'dtTableCompact'        : true,
-        'dtZeroRecords'         : 'No business groups data available. Add business group by clicking the Add new business group button.'
+        'dtZeroRecords'         : 'No vendor groups data available. Add vendor group by clicking the Add new vendor group button.'
     ]
 )}}

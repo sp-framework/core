@@ -1,10 +1,10 @@
 <?php
 
-namespace Apps\Dash\Packages\Business\Directory\Groups\Install\Schema;
+namespace Apps\Dash\Packages\Business\Directory\VendorGroups\Install\Schema;
 
 use Phalcon\Db\Column;
 
-class Groups
+class VendorGroups
 {
     public function columns()
     {

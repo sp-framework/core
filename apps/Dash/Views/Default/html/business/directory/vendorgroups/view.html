@@ -1,9 +1,9 @@
 {% if group['id'] is defined %}
     {% set groupId = group['id'] %}
-    {% set title = 'Group (' ~ group['name'] ~ ')' %}
+    {% set title = 'Vengor Group (' ~ group['name'] ~ ')' %}
 {% else %}
     {% set groupId = '' %}
-    {% set title = 'New Group' %}
+    {% set title = 'New Vendor Group' %}
 {% endif %}
 
 {{adminltetags.useTag('content',
@@ -20,16 +20,16 @@
         'cardIcon'                      : 'users',
         'cardTitle'                     : title,
         'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'groups/form',
+        'cardBodyInclude'               : 'vendorgroups/form',
         'formButtons'                   :
         [
             'updateButtonId'                : groupId,
-            'addActionUrl'                  : 'business/directory/groups/add',
-            'addSuccessRedirectUrl'         : 'business/directory/groups',
-            'updateActionUrl'               : 'business/directory/groups/update',
-            'updateSuccessRedirectUrl'      : 'business/directory/groups',
-            'cancelActionUrl'               : 'business/directory/groups',
-            'closeActionUrl'                : 'business/directory/groups'
+            'addActionUrl'                  : 'business/directory/vendorgroups/add',
+            'addSuccessRedirectUrl'         : 'business/directory/vendorgroups',
+            'updateActionUrl'               : 'business/directory/vendorgroups/update',
+            'updateSuccessRedirectUrl'      : 'business/directory/vendorgroups',
+            'cancelActionUrl'               : 'business/directory/vendorgroups',
+            'closeActionUrl'                : 'business/directory/vendorgroups'
         ]
     ]
 )}}

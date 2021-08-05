@@ -55,13 +55,15 @@ class Vendors extends BasePackage
      */
     public function updateVendor(array $data)
     {
-        if ($this->checkVendorDuplicate($data['business_name'])) {
-            $this->addResponse('Vendor ' . $data['business_name'] . ' already exists.', 1);
-
-            return;
-        }
-
         $vendor = $this->getById($data['id']);
+
+        if ($data['business_name'] !== $vendor['business_name']) {
+            if ($this->checkVendorDuplicate($data['business_name'])) {
+                $this->addResponse('Vendor ' . $data['business_name'] . ' already exists.', 1);
+
+                return;
+            }
+        }
 
         $data = $this->addBrands($data);
 

@@ -1,8 +1,7 @@
 <?php
 
-namespace Apps\Dash\Components\Business\Directory\Groups\Install;
+namespace Apps\Dash\Components\Business\Directory\Vendorgroups\Install;
 
-use Apps\Dash\Components\Business\Directory\Groups\GroupsComponent;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -10,7 +9,7 @@ class Component extends BaseComponent
 {
     public function installComponent()
     {
-        if ($this->checkComponent(GroupsComponent::class)) {
+        if ($this->checkComponent(VendorgroupsComponent::class)) {
 
             $this->view->responseCode = 1;
 
@@ -24,7 +23,7 @@ class Component extends BaseComponent
 
     protected function registerComponent()
     {
-        $componentPath = '/apps/Dash/Components/Business/Directory/Groups/';
+        $componentPath = '/apps/Dash/Components/Business/Directory/Vendorgroups/';
 
         $jsonFile =
             Json::decode($this->localContent->read($componentPath . '/Install/component.json'), true);
