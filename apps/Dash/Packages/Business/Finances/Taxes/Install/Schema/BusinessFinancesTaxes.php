@@ -1,10 +1,10 @@
 <?php
 
-namespace Apps\Dash\Packages\Filters\Install\Schema;
+namespace Apps\Dash\Packages\Business\Finances\Taxes\Install\Schema;
 
 use Phalcon\Db\Column;
 
-class Taxes
+class BusinessFinancesTaxes
 {
     public function columns()
     {
@@ -29,42 +29,18 @@ class Taxes
                     ]
                 ),
                 new Column(
-                    'conditions',
+                    'tax_group_id',
                     [
-                        'type'    => Column::TYPE_TEXT,
+                        'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'component_id',
+                    'amount',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'size'    => 1,
                         'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'permission',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'size'    => 1,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'is_default',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'size'    => 1,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'shared_ids',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 4096,
-                        'notNull' => false,
                     ]
                 ),
             ],

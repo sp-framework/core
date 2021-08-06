@@ -1,14 +1,14 @@
 <?php
 
-namespace Apps\Dash\Packages\Business\Finances\Taxes\Install;
+namespace Apps\Dash\Packages\Business\Finances\TaxGroups\Install;
 
-use Apps\Dash\Packages\Business\Finances\Taxes\Install\Schema\BusinessFinancesTaxes;
+use Apps\Dash\Packages\Business\Finances\TaxGroups\Install\Schema\BusinessFinancesTaxGroups;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Package extends BasePackage
 {
-    protected $schemaToUse = BusinessFinancesTaxes::class;
+    protected $schemaToUse = BusinessFinancesTaxGroups::class;
 
     public function installPackage(bool $dropTables = false)
     {
@@ -25,9 +25,9 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
-                $this->createTable('business_finances_taxes', '', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('business_finances_tax_groups', '', (new $this->schemaToUse)->columns(), $dropTables);
             } else {
-                $this->createTable('business_finances_taxes', '', (new $this->schemaToUse)->columns());
+                $this->createTable('business_finances_tax_groups', '', (new $this->schemaToUse)->columns());
             }
 
             // $this->registerPackage();

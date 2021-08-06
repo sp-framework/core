@@ -1,21 +1,20 @@
 <?php
 
-namespace Apps\Dash\Components\Business\Finances\Taxes;
+namespace Apps\Dash\Components\Business\Finances\Taxgroups;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Finances\TaxGroups\TaxGroups;
-use Apps\Dash\Packages\Business\Finances\Taxes\Taxes;
 use System\Base\BaseComponent;
 
-class TaxesComponent extends BaseComponent
+class TaxgroupsComponent extends BaseComponent
 {
     use DynamicTable;
 
-    protected $taxesPackage;
+    protected $taxgroupsPackage;
 
     public function initialize()
     {
-        $this->taxesPackage = $this->usePackage(Taxes::class);
+        $this->taxgroupsPackage = $this->usePackage(TaxGroups::class);
     }
 
     /**
@@ -24,16 +23,14 @@ class TaxesComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
-
-            $this->view->taxgroups = $this->usePackage(TaxGroups::class)->getAll()->taxgroups;
-
             if ($this->getData()['id'] != 0) {
-                $tax = $this->taxes->getById($this->getData()['id']);
 
-                $this->view->tax = $tax;
+                $taxGroup = $this->taxgroupsPackage->getById($this->getData()['id']);
+
+                $this->view->taxGroup = $taxGroup;
             }
 
-            $this->view->pick('taxes/view');
+            $this->view->pick('taxgroups/view');
 
             return;
         }
@@ -42,14 +39,14 @@ class TaxesComponent extends BaseComponent
             [
                 'actionsToEnable'       =>
                 [
-                    'edit'      => 'business/finances/taxes',
-                    'remove'    => 'business/finances/taxes/remove'
+                    'edit'      => 'business/finances/taxgroups',
+                    'remove'    => 'business/finances/taxgroups/remove'
                 ]
             ];
 
         $this->generateDTContent(
-            $this->taxesPackage,
-            'business/finances/taxes/view',
+            $this->taxgroupsPackage,
+            'business/finances/taxgroups/view',
             null,
             ['name'],
             true,
@@ -57,10 +54,10 @@ class TaxesComponent extends BaseComponent
             $controlActions,
             null,
             null,
-            'name',
+            'name'
         );
 
-        $this->view->pick('taxes/list');
+        $this->view->pick('taxgroups/list');
     }
 
     /**
@@ -74,11 +71,11 @@ class TaxesComponent extends BaseComponent
                 return;
             }
 
-            $this->taxesPackage->addTax($this->postData());
+            $this->taxgroupsPackage->addTaxGroup($this->postData());
 
             $this->addResponse(
-                $this->taxesPackage->packagesData->responseMessage,
-                $this->taxesPackage->packagesData->responseCode
+                $this->taxgroupsPackage->packagesData->responseMessage,
+                $this->taxgroupsPackage->packagesData->responseCode
             );
         } else {
             $this->addResponse(
@@ -99,11 +96,11 @@ class TaxesComponent extends BaseComponent
                 return;
             }
 
-            $this->taxesPackage->updateTax($this->postData());
+            $this->taxgroupsPackage->updateTaxGroup($this->postData());
 
             $this->addResponse(
-                $this->taxesPackage->packagesData->responseMessage,
-                $this->taxesPackage->packagesData->responseCode
+                $this->taxgroupsPackage->packagesData->responseMessage,
+                $this->taxgroupsPackage->packagesData->responseCode
             );
         } else {
             $this->addResponse(
@@ -120,11 +117,11 @@ class TaxesComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->taxesPackage->removeTax($this->postData());
+            $this->taxgroupsPackage->removeTaxGroup($this->postData());
 
             $this->addResponse(
-                $this->taxesPackage->packagesData->responseMessage,
-                $this->taxesPackage->packagesData->responseCode
+                $this->taxgroupsPackage->packagesData->responseMessage,
+                $this->taxgroupsPackage->packagesData->responseCode
             );
         } else {
             $this->addResponse(
