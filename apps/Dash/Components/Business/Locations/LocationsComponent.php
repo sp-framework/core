@@ -77,8 +77,12 @@ class LocationsComponent extends BaseComponent
         if ($this->request->isPost()) {
             $entitiesArr = $this->entities->init()->getAll()->entities;
 
-            foreach ($entitiesArr as $entityKey => $entity) {
-                $entities[$entity['id']] = $entity['business_name'];
+            if ($entitiesArr) {
+                foreach ($entitiesArr as $entityKey => $entity) {
+                    $entities[$entity['id']] = $entity['business_name'];
+                }
+            } else {
+                $entities = [];
             }
 
             $replaceColumns =
