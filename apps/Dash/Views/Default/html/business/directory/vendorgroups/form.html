@@ -1,11 +1,11 @@
-{% if group['id'] is defined %}
-    {% set groupId = group['id'] %}
-    {% set groupName = group['name'] %}
-    {% set groupDescription = group['description'] %}
+{% if vendorGroup['id'] is defined %}
+    {% set vendorGroupId = vendorGroup['id'] %}
+    {% set vendorGroupName = vendorGroup['name'] %}
+    {% set vendorGroupDescription = vendorGroup['description'] %}
 {% else %}
-    {% set groupId = '' %}
-    {% set groupName = '' %}
-    {% set groupDescription = '' %}
+    {% set vendorGroupId = '' %}
+    {% set vendorGroupName = '' %}
+    {% set vendorGroupDescription = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -28,7 +28,7 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldHidden'                    : true,
                         'fieldDisabled'                  : true,
-                        'fieldValue'                     : groupId
+                        'fieldValue'                     : vendorGroupId
                     ]
                 )}}
             </div>
@@ -52,7 +52,7 @@
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
-                        'fieldValue'                     : groupName
+                        'fieldValue'                     : vendorGroupName
                     ]
                 )}}
             </div>
@@ -77,7 +77,7 @@
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 2048,
                         'fieldTextareaRows'              : 2,
-                        'fieldValue'                     : groupDescription
+                        'fieldValue'                     : vendorGroupDescription
                     ]
                 )}}
             </div>

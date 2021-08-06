@@ -25,9 +25,9 @@ class VendorgroupsComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
 
-                $group = $this->vendorgroups->getById($this->getData()['id']);
+                $vendorGroup = $this->vendorgroups->getById($this->getData()['id']);
 
-                $this->view->group = $group;
+                $this->view->vendorGroup = $vendorGroup;
             }
 
             $this->view->pick('vendorgroups/view');
@@ -71,7 +71,7 @@ class VendorgroupsComponent extends BaseComponent
                 return;
             }
 
-            $this->vendorgroups->addGroup($this->postData());
+            $this->vendorgroups->addVendorGroup($this->postData());
 
             $this->addResponse(
                 $this->vendorgroups->packagesData->responseMessage,
@@ -96,7 +96,7 @@ class VendorgroupsComponent extends BaseComponent
                 return;
             }
 
-            $this->vendorgroups->updateGroup($this->postData());
+            $this->vendorgroups->updateVendorGroup($this->postData());
 
             $this->addResponse(
                 $this->vendorgroups->packagesData->responseMessage,
@@ -117,7 +117,7 @@ class VendorgroupsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->vendorgroups->removeGroup($this->postData());
+            $this->vendorgroups->removeVendorGroup($this->postData());
 
             $this->addResponse(
                 $this->vendorgroups->packagesData->responseMessage,

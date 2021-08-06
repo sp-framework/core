@@ -17,7 +17,7 @@ class VendorGroups extends BasePackage
     /**
      * @notification(name=add)
      */
-    public function addGroup(array $data)
+    public function addVendorGroup(array $data)
     {
         if ($this->add($data)) {
             $this->addActivityLog($data);
@@ -33,18 +33,18 @@ class VendorGroups extends BasePackage
     /**
      * @notification(name=update)
      */
-    public function updateGroup(array $data)
+    public function updateVendorGroup(array $data)
     {
-        $group = $this->getById($data['id']);
+        $vendorGroup = $this->getById($data['id']);
 
-        $group = array_merge($group, $data);
+        $vendorGroup = array_merge($vendorGroup, $data);
 
-        if ($this->update($group)) {
-            $this->addActivityLog($data, $group);
+        if ($this->update($vendorGroup)) {
+            $this->addActivityLog($data, $vendorGroup);
 
-            $this->addResponse('Updated group ' . $group['name']);
+            $this->addResponse('Updated group ' . $vendorGroup['name']);
 
-            $this->addToNotification('update', 'Updated group ' . $group['name']);
+            $this->addToNotification('update', 'Updated group ' . $vendorGroup['name']);
         } else {
             $this->addResponse('Error updating group.', 1);
         }
@@ -55,18 +55,18 @@ class VendorGroups extends BasePackage
      * notification_allowed_methods(email, sms)//Example
      * @notification_allowed_methods(email, sms)
      */
-    public function removeGroup(array $data)
+    public function removeVendorGroup(array $data)
     {
-        $group = $this->getById($data['id']);
+        $vendorGroup = $this->getById($data['id']);
 
         $modelToUse = BusinessDirectoryVendors::class;
 
         $searchVendors =
             $modelToUse::findFirst(
                 [
-                    'conditions'    => 'group_id = :gid:',
+                    'conditions'    => 'vendor_group_id = :gid:',
                     'bind'          => [
-                        'gid'       => $group['id']
+                        'gid'       => $vendorGroup['id']
                     ]
                 ]
             );
@@ -78,9 +78,9 @@ class VendorGroups extends BasePackage
         }
 
         if ($this->remove($data['id'])) {
-            $this->addResponse('Removed group ' . $group['name']);
+            $this->addResponse('Removed group ' . $vendorGroup['name']);
 
-            $this->addToNotification('remove', 'Removed group ' . $group['name']);
+            $this->addToNotification('remove', 'Removed group ' . $vendorGroup['name']);
         } else {
             $this->addResponse('Error removing group.', 1);
         }

@@ -1,6 +1,6 @@
-{% if group['id'] is defined %}
-    {% set groupId = group['id'] %}
-    {% set title = 'Vengor Group (' ~ group['name'] ~ ')' %}
+{% if vendorGroup['id'] is defined %}
+    {% set groupId = vendorGroup['id'] %}
+    {% set title = 'Vengor Group (' ~ vendorGroup['name'] ~ ')' %}
 {% else %}
     {% set groupId = '' %}
     {% set title = 'New Vendor Group' %}
