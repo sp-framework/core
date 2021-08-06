@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\System\Api;
 
 use Apps\Dash\Packages\System\Api\Model\SystemApi;
+use Apps\Dash\Packages\System\Api\Model\SystemApiCalls;
 use Apps\Dash\Packages\System\Api\Model\SystemApiEbay;
 use Apps\Dash\Packages\System\Api\Model\SystemApiGeneric;
 use Apps\Dash\Packages\System\Api\Model\SystemApiXero;
@@ -446,5 +447,43 @@ class Api extends BasePackage
         $callStats[$data['api_id']]['rateLimits'] = $callData['rateLimits'];
 
         $this->localContent->write('apps/Dash/Packages/System/Api/CallStats/' . ucfirst($data['api_type']) . '.json', Json::encode($callStats));
+    }
+
+    public function updateApiCallStats($callMethod, $apiId, $callStats)
+    {
+        $this->modelToUse = SystemApiCalls::class;
+
+        $data['call_method'] = $callMethod;
+        $data['api_id'] = $apiId;
+        $data['call_exec_time'] = $callStats['total_time'];
+        $data['call_response_code'] = $callStats['http_code'];
+        $data['api_id'] = $apiId;
+        $data['call_stats'] = Json::encode($callStats);
+
+        $this->add($data);
+    }
+
+    public function getApiCallMethodStat($callMethod, $apiId)
+    {
+        $api = new SystemApiCalls;
+
+        $methodEntry = $api::findFirst(
+            [
+                'conditions' => 'call_method = :cm: AND api_id = :aid: AND call_response_code = :crc:',
+                'bind'       =>
+                    [
+                        'cm'    => $callMethod,
+                        'aid'   => $apiId,
+                        'crc'   => 200
+                    ]
+            ]
+        );
+
+        if ($methodEntry) {
+
+            $methodEntry = $methodEntry->toArray();
+
+            return \Carbon\Carbon::parse($methodEntry['called_at'])->setTimezone('UTC')->toDateTimeString();
+        }
     }
 }
