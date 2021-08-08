@@ -2,6 +2,7 @@
 
 namespace Apps\Dash\Components\Home;
 
+use Apps\Dash\Components\Business\Directory\VendorGroups\Install\Component as VendorGroupsComponent;
 use Apps\Dash\Components\Devtools\Api\Contracts\Install\Component as ContractsComponent;
 use Apps\Dash\Components\Devtools\Api\Enums\Install\Component as EnumsComponent;
 use Apps\Dash\Components\Hrms\Designations\Install\Component as EmployeesDesignationsComponent;
@@ -18,8 +19,11 @@ use Apps\Dash\Components\System\Messenger\MessengerComponent;
 use Apps\Dash\Packages\Business\ABNLookup\Install\Package as ABNLookupPackage;
 use Apps\Dash\Packages\Business\Channels\Install\Package as ChannelsPackage;
 use Apps\Dash\Packages\Business\Directory\Contacts\Install\Package as ContactsPackage;
+use Apps\Dash\Packages\Business\Directory\VendorGroups\Install\Package as VendorGroupsPackage;
 use Apps\Dash\Packages\Business\Directory\Vendors\Install\Package as VendorsPackage;
 use Apps\Dash\Packages\Business\Entities\Install\Package as EntitiesPackage;
+use Apps\Dash\Packages\Business\Finances\TaxGroups\Install\Package as TaxGroupsPackage;
+use Apps\Dash\Packages\Business\Finances\Taxes\Install\Package as TaxesPackage;
 use Apps\Dash\Packages\Business\Locations\Install\Package as LocationsPackage;
 use Apps\Dash\Packages\Devtools\Api\Contracts\Install\Package as ContractsPackage;
 use Apps\Dash\Packages\Devtools\Api\Enums\Install\Package as EnumsPackage;
@@ -49,6 +53,10 @@ class HomeComponent extends BaseComponent
      */
     public function viewAction()
     {
+        // $vendorsPackage = new VendorsPackage();
+        // $vendorsPackage->installPackage(true);
+        $employeesPackage = new EmployeesPackage();
+        $employeesPackage->installPackage(true);
         // $this->resetTemp();return;
 
         // $this->reset();return;
@@ -94,6 +102,11 @@ class HomeComponent extends BaseComponent
         //
         // $apiPackage = new ApiPackage();
         // $apiPackage->installPackage(true);
+
+        // $vendorgroupsComponent = new VendorGroupsComponent();
+        // $vendorgroupsComponent->installComponent();
+        // $vendorgroupsPackage = new VendorGroupsPackage();
+        // $vendorgroupsPackage->installPackage(true);
     }
 
     protected function reset()
@@ -206,6 +219,21 @@ class HomeComponent extends BaseComponent
         // $messengerComponent->installComponent();
         $messengerPackage = new MessengerPackage();
         $messengerPackage->installPackage(true);
+
+        // $vendorgroupsComponent = new VendorGroupsComponent();
+        // $vendorgroupsComponent->installComponent();
+        $vendorgroupsPackage = new VendorGroupsPackage();
+        $vendorgroupsPackage->installPackage(true);
+
+        // $taxesComponent = new TaxesComponent();
+        // $taxesComponent->installComponent();
+        $taxesPackage = new TaxesPackage();
+        $taxesPackage->installPackage(true);
+
+        // $taxgroupsComponent = new TaxGroupsComponent();
+        // $taxgroupsComponent->installComponent();
+        $taxgroupsPackage = new TaxGroupsPackage();
+        $taxgroupsPackage->installPackage(true);
     }
 
     protected function addStatuses()
