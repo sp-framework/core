@@ -1,3 +1,8 @@
+{% if employee['id'] is defined %}
+    {% set employeesNotes = employee['notes'] %}
+{% else %}
+    {% set employeesNotes = [] %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -67,11 +72,20 @@
                                     'tabInclude'        : 'employees/form/contactdetails',
                                     'tabIncludeParams'  : ['employee' : employee]
                                 ],
+                                'financialdetails'   :
+                                [
+                                    'tabTitle'          : 'Financial Details',
+                                    'tabInclude'        : 'employees/form/financialdetails'
+                                ],
                                 'notes'   :
                                 [
                                     'tabTitle'          : 'Notes',
-                                    'tabInclude'        : 'employees/form/notes',
-                                    'tabIncludeParams'  : ['employee' : employee]
+                                    'tabInclude'        : '../common/notes',
+                                    'tabIncludeParams':
+                                    [
+                                        'notes'         : employeesNotes,
+                                        'packageName'   : 'employees'
+                                    ]
                                 ]
                             ]
                     ]
@@ -113,6 +127,85 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-account_email'                   : {
             afterInit   : function() {
                 dataCollectionSectionForm['autoCompleteAccounts'] =
+                //     new autoComplete({
+                //         data: {
+                //             src: async() => {
+                //                 const url = '{{links.url("hrms/employees/searchAccount")}}';
+
+                //                 var myHeaders = new Headers();
+                //                 myHeaders.append("accept", "application/json");
+
+                //                 var formdata = new FormData();
+                //                 formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_email").value);
+                //                 formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                //                 var requestOptions = {
+                //                     method: 'POST',
+                //                     headers: myHeaders,
+                //                     body: formdata
+                //                 };
+
+                //                 const responseData = await fetch(url, requestOptions);
+
+                //                 const response = await responseData.json();
+
+                //                 if (response.tokenKey && response.token) {
+                //                     $('#security-token').attr('name', response.tokenKey);
+                //                     $('#security-token').val(response.token);
+                //                 }
+                //                 if (response.accounts) {
+                //                     return response.accounts;
+                //                 } else {
+                //                     return [];
+                //                 }
+                //             },
+                //             key: ["email"],
+                //             cache: false
+                //         },
+                //         selector: "#{{componentId}}-{{sectionId}}-account_email",
+                //         threshold : 4,
+                //         debounce: 500,
+                //         searchEngine: "strict",
+                //         resultsList: {
+                //             render: true,
+                //             container: source => {
+                //                 source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_email_list");
+                //                 source.setAttribute("class", "autoComplete_results");
+                //             },
+                //             destination: "#{{componentId}}-{{sectionId}}-account_email",
+                //             position: "afterend",
+                //             element: "div"
+                //         },
+                //         maxResults: 5,
+                //         highlight: true,
+                //         resultItem: {
+                //             content: (data, source) => {
+                //                 source.innerHTML = data.match;
+                //             },
+                //             element: "div"
+                //         },
+                //         noResults: () => {
+                //             const result = document.createElement("li");
+                //             result.setAttribute("class", "autoComplete_result text-danger");
+                //             result.setAttribute("tabindex", "1");
+                //             result.innerHTML = "No search results. Click field help for more information.";
+                //             if (document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list")) {
+                //                 $("#{{componentId}}-{{sectionId}}-account_email_list").empty().append(result);
+                //             } else {
+                //                 $("#{{componentId}}-{{sectionId}}-account_email").parent(".form-group").append(
+                //                     '<div id="{{componentId}}-{{sectionId}}-account_email_list" class="autoComplete_results"></div>'
+                //                 );
+                //                 document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list").appendChild(result);
+                //             }
+                //         },
+                //         onSelection: feedback => {
+                //             $('#{{componentId}}-{{sectionId}}-account_id').val(feedback.selection.value.id);
+                //             $('#{{componentId}}-{{sectionId}}-account_id').attr('value', feedback.selection.value.id);
+                //             $('#{{componentId}}-{{sectionId}}-account_email').blur();
+                //             $('#{{componentId}}-{{sectionId}}-account_email').val(feedback.selection.value.email);
+                //             $('#{{componentId}}-{{sectionId}}-account_email').attr('value', feedback.selection.value.email);
+                //         }
+                // });
                     new autoComplete({
                         data: {
                             src: async() => {
@@ -139,8 +232,9 @@ dataCollectionSection =
                                     $('#security-token').attr('name', response.tokenKey);
                                     $('#security-token').val(response.token);
                                 }
-                                if (response.accounts) {
-                                    return response.accounts;
+
+                                if (response.responseData && response.responseData.accounts) {
+                                    return response.responseData.accounts;
                                 } else {
                                     return [];
                                 }
@@ -149,7 +243,7 @@ dataCollectionSection =
                             cache: false
                         },
                         selector: "#{{componentId}}-{{sectionId}}-account_email",
-                        threshold : 4,
+                        threshold : 3,
                         debounce: 500,
                         searchEngine: "strict",
                         resultsList: {
@@ -160,7 +254,8 @@ dataCollectionSection =
                             },
                             destination: "#{{componentId}}-{{sectionId}}-account_email",
                             position: "afterend",
-                            element: "div"
+                            element: "div",
+                            className: "autoComplete_results"
                         },
                         maxResults: 5,
                         highlight: true,
@@ -175,6 +270,7 @@ dataCollectionSection =
                             result.setAttribute("class", "autoComplete_result text-danger");
                             result.setAttribute("tabindex", "1");
                             result.innerHTML = "No search results. Click field help for more information.";
+
                             if (document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list")) {
                                 $("#{{componentId}}-{{sectionId}}-account_email_list").empty().append(result);
                             } else {
@@ -184,14 +280,14 @@ dataCollectionSection =
                                 document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list").appendChild(result);
                             }
                         },
-                        onSelection: feedback => {
+                        onSelection: (feedback) => {
                             $('#{{componentId}}-{{sectionId}}-account_id').val(feedback.selection.value.id);
                             $('#{{componentId}}-{{sectionId}}-account_id').attr('value', feedback.selection.value.id);
                             $('#{{componentId}}-{{sectionId}}-account_email').blur();
                             $('#{{componentId}}-{{sectionId}}-account_email').val(feedback.selection.value.email);
                             $('#{{componentId}}-{{sectionId}}-account_email').attr('value', feedback.selection.value.email);
                         }
-                });
+                    });
                 // On delete
                 $('#{{componentId}}-{{sectionId}}-account_email').on('input propertychange', function() {
                     $('#{{componentId}}-{{sectionId}}-account_id').val(0);
@@ -306,7 +402,71 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-type_id'                         : {
-            'placeholder' : "SELECT EMPLOYMENT TYPE"
+            'placeholder'   : "SELECT EMPLOYMENT TYPE",
+            afterInit       : function () {
+                $('#{{componentId}}-{{sectionId}}-type_id').on('select2:select', function(e) {
+                    if (e.params.data.id === '2') {
+                        $('#{{componentId}}-{{sectionId}}-contractors').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-contractor_vendor_id').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-contractors').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-contractor_vendor_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-contractor_vendor_id').val('').trigger('change');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contractor_vendor_id'            : {
+            placeholder     : 'SELECT/CREATE CONTRACTOR',
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                    if (response.vendors) {
+                        var vendorsData = [];
+                        for (var item of response.vendors) {
+                            vendorsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: vendorsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 1,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
         },
         '{{componentId}}-{{sectionId}}-hire_date'                       : {
             onChange: function(selectedDates, dateStr, instance) {
@@ -673,7 +833,13 @@ dataCollectionSection =
         //         }
         //     }
         // },
-        '{{componentId}}-{{sectionId}}-additional_notes'                : { },
+        '{{componentId}}-{{sectionId}}-tfn'                             : { },
+        '{{componentId}}-{{sectionId}}-currency'                : {
+            placeholder: 'SELECT CURRENCY'
+        },
+        '{{componentId}}-{{sectionId}}-bsb'                             : { },
+        '{{componentId}}-{{sectionId}}-account_number'                  : { },
+        '{{componentId}}-{{sectionId}}-swift_code'                      : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {
@@ -689,6 +855,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-manager_full_name'           : 'required',
                 '{{componentId}}-{{sectionId}}-type_id'                     : 'required',
                 '{{componentId}}-{{sectionId}}-hire_date'                   : 'required',
+                '{{componentId}}-{{sectionId}}-contractor_vendor_id'        : 'required',
                 '{{componentId}}-{{sectionId}}-work_type_id'                : 'required',
                 '{{componentId}}-{{sectionId}}-contact_location_id'         : 'required',
                 '{{componentId}}-{{sectionId}}-contact_phone'               : 'required',
@@ -702,6 +869,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-designation'                 : 'Please select a designation',
                 '{{componentId}}-{{sectionId}}-manager_full_name'           : 'Please select a manager',
                 '{{componentId}}-{{sectionId}}-type_id'                     : 'Please select employee type',
+                '{{componentId}}-{{sectionId}}-contractor_vendor_id'        : 'Please select contractor company',
                 '{{componentId}}-{{sectionId}}-hire_date'                   : 'Please select hiring date',
                 '{{componentId}}-{{sectionId}}-work_type_id'                : 'Please select work type',
                 '{{componentId}}-{{sectionId}}-contact_location_id'         : 'Please select a location',

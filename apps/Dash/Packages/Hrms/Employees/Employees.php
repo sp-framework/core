@@ -10,7 +10,7 @@ class Employees extends BasePackage
 {
     protected $modelToUse = HrmsEmployees::class;
 
-    protected $packageName = 'hrmsemployees';
+    protected $packageName = 'employees';
 
     public $employees;
 
@@ -39,13 +39,13 @@ class Employees extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['employment_attachments'], null, true);
             }
 
-            $this->packagesData->responseCode = 0;
+            $data['id'] = $this->packagesData->last['id'];
 
-            $this->packagesData->responseMessage = 'Added ' . $data['full_name'] . ' employee';
+            $this->basepackages->notes->addNote($this->packageName, $data);
+
+            $this->addResponse('Added ' . $data['full_name'] . ' employee');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new employee.';
+            $this->addResponse('Error adding new employee.', 1);
         }
     }
 
@@ -95,38 +95,24 @@ class Employees extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['employment_attachments'], $employee['employment_attachments'], true);
             }
 
-            $this->packagesData->responseCode = 0;
+            $this->basepackages->notes->addNote($this->packageName, $data);
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['full_name'] . ' employee';
+            $this->addResponse('Updated ' . $data['full_name'] . ' employee');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating employee.';
+            $this->addResponse('Error updating employee.', 1);
         }
     }
 
     public function removeEmployee(array $data)
     {
         $employee = $this->getById($data['id']);
-        //NEED WORK
-        // if ($employee['product_count'] && (int) $employee['product_count'] > 0) {
-        //     $this->packagesData->responseCode = 1;
-
-        //     $this->packagesData->responseMessage = 'Employee is assigned to ' . $employee['product_count'] . ' products. Error removing employee.';
-
-        //     return false;
-        // }
 
         if ($this->remove($data['id'])) {
             $this->basepackages->storages->changeOrphanStatus(null, $employee['portrait']);
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Removed employee';
+            $this->addResponse('Removed employee');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing employee.';
+            $this->addResponse('Error removing employee.', 1);
         }
     }
 

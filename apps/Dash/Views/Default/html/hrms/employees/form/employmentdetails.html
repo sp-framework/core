@@ -1,5 +1,6 @@
 {% if employee['id'] is defined %}
     {% set employeeType = employee['type_id'] %}
+    {% set employeeContractorVendorId = employee['contractor_vendor_id'] %}
     {% set employeeHireDate = employee['hire_date'] %}
     {% set employeeTerminateDate = employee['terminate_date'] %}
     {% set employeeHireManagerId = employee['hire_manager_id'] %}
@@ -10,6 +11,7 @@
     {% set employeeEmploymentNotes = employee['employment_notes'] %}
 {% else %}
     {% set employeeType = '' %}
+    {% set employeeContractorVendorId = '' %}
     {% set employeeHireDate = '' %}
     {% set employeeTerminateDate = '' %}
     {% set employeeHireManagerId = '' %}
@@ -56,6 +58,35 @@
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
                         'fieldDataSelect2OptionsSelected'      : employeeType
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row" id="{{componentId}}-{{sectionId}}-contractors" hidden>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'contractor_vendor_id',
+                        'fieldLabel'                           : 'Contractor Company',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select or add new contractor',
+                        'fieldRequired'                        : true,
+                        'fieldDisabled'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldDataSelect2Create'               : true,
+                        'fieldDataSelect2Options'              : contractors,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'business_name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeContractorVendorId
                     ]
                 )}}
             </div>

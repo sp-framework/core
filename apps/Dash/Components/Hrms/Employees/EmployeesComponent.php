@@ -3,10 +3,11 @@
 namespace Apps\Dash\Components\Hrms\Employees;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
-use Apps\Dash\Packages\Hrms\Employees\Employees;
-use Apps\Dash\Packages\Hrms\Designations\HrmsDesignations;
-use Apps\Dash\Packages\Hrms\Statuses\HrmsStatuses;
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Business\Locations\Locations;
+use Apps\Dash\Packages\Hrms\Designations\HrmsDesignations;
+use Apps\Dash\Packages\Hrms\Employees\Employees;
+use Apps\Dash\Packages\Hrms\Statuses\HrmsStatuses;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -43,6 +44,8 @@ class EmployeesComponent extends BaseComponent
         $designations = $this->designations->getAll()->hrmsDesignations;
 
         $locations = $this->locations->getAll()->locations;
+
+        $this->view->contractors = $this->usePackage(Vendors::class)->getAll()->vendors;
 
         if (isset($this->getData()['id'])) {
             $this->view->portraitLink = '';
@@ -105,9 +108,20 @@ class EmployeesComponent extends BaseComponent
                     }
                     $employee['employment_attachments'] = $attachments;
                 }
+
+                $employee['notes'] = $this->basepackages->notes->getNotes('employees', $this->getData()['id']);
             } else {
                 $employee = [];
             }
+
+            //Check Geo Locations Dependencies
+            if ($this->basepackages->geoCountries->currencyEnabled()) {
+                $this->view->currency = true;
+            } else {
+                $this->view->currency = false;
+            }
+
+            $this->view->currencies = $this->basepackages->geoCountries->currencyEnabled(true);
 
             $this->view->employee = $employee;
 
@@ -266,15 +280,17 @@ class EmployeesComponent extends BaseComponent
                 $searchAccounts = $this->basepackages->accounts->searchAccountInternal($searchQuery);
 
                 if ($searchAccounts) {
-                    $this->view->responseCode = $this->basepackages->accounts->packagesData->responseCode;
-
-                    $this->view->accounts = $this->basepackages->accounts->packagesData->accounts;
+                    $this->addResponse(
+                        $this->basepackages->accounts->packagesData->responseMessage,
+                        $this->basepackages->accounts->packagesData->responseCode,
+                        ['accounts' => $this->basepackages->accounts->packagesData->accounts]
+                    );
                 }
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
+                $this->addResponse('search query missing', 1);
             }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 

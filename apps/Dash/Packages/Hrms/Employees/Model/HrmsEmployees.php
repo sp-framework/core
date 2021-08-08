@@ -28,6 +28,8 @@ class HrmsEmployees extends BaseModel
 
     public $work_type_id;
 
+    public $contractor_vendor_id;
+
     public $hire_date;
 
     public $terminate_date;
@@ -44,12 +46,9 @@ class HrmsEmployees extends BaseModel
 
     public $contact_address_id;
 
-    // public $skills;
+    public $contact_phone;
 
-    // public $skills_attachments;
-    public $contact_work;
-
-    public $contact_work_ext;
+    public $contact_phone_ext;
 
     public $contact_mobile;
 
@@ -59,5 +58,17 @@ class HrmsEmployees extends BaseModel
 
     public $contact_notes;
 
-    public $additional_notes;
+    public $tfn;
+
+    public $currency;
+
+    public $bsb;
+
+    public $account_number;
+
+    public $swift_code;
+
+    // public $skills;
+
+    // public $skills_attachments;
 }
