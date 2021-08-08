@@ -4,6 +4,7 @@ namespace Apps\Dash\Components\Business\Entities;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\ABNLookup\ABNLookup;
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Business\Entities\Entities;
 use Apps\Dash\Packages\System\Api\Api;
 use System\Base\BaseComponent;
@@ -55,6 +56,8 @@ class EntitiesComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
+            $this->view->accountants = $this->usePackage(Vendors::class)->getAll()->vendors;
+
             $this->view->logoLink = '';
 
             $entitiesArr = $this->entities->getAll()->entities;
@@ -105,6 +108,15 @@ class EntitiesComponent extends BaseComponent
             } else {
                 $this->view->geo = false;
             }
+
+            //Check Geo Locations Dependencies
+            if ($this->basepackages->geoCountries->currencyEnabled()) {
+                $this->view->currency = true;
+            } else {
+                $this->view->currency = false;
+            }
+
+            $this->view->currencies = $this->basepackages->geoCountries->currencyEnabled(true);
 
             $storages = $this->basepackages->storages->getAppStorages();
 

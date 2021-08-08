@@ -171,7 +171,7 @@ class GeoCountries extends BasePackage
         }
     }
 
-    public function isEnabled()
+    public function isEnabled($returnData = false)
     {
         $searchEnabledCountries =
             $this->getByParams(
@@ -184,7 +184,36 @@ class GeoCountries extends BasePackage
             );
 
         if ($searchEnabledCountries) {
+            if ($returnData) {
+                return $searchEnabledCountries;
+            }
+
             return true;
         }
+
+        return [];
+    }
+
+    public function currencyEnabled($returnData = false)
+    {
+        $searchEnabledCurrencies =
+            $this->getByParams(
+                [
+                    'conditions'    => 'currency_enabled = :cEnabled:',
+                    'bind'          => [
+                        'cEnabled'  => 1
+                    ]
+                ]
+            );
+
+        if ($searchEnabledCurrencies) {
+            if ($returnData) {
+                return $searchEnabledCurrencies;
+            }
+
+            return true;
+        }
+
+        return [];
     }
 }

@@ -2,8 +2,10 @@
 
 namespace Apps\Dash\Packages\Business\Entities;
 
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Business\Entities\Model\BusinessEntities;
 use Apps\Dash\Packages\System\Api\Api;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Entities extends BasePackage
@@ -16,6 +18,8 @@ class Entities extends BasePackage
 
     public function addEntity(array $data)
     {
+        $data = $this->addAccountant($data);
+
         if ($this->checkEntityDuplicate($data['business_name'])) {
             $this->addResponse('Entity ' . $data['business_name'] . ' already exists.', 1);
 
@@ -59,6 +63,8 @@ class Entities extends BasePackage
 
     public function updateEntity(array $data)
     {
+        $data = $this->addAccountant($data);
+
         $entity = $this->getById($data['id']);
 
         if ($entity['business_name'] !== $data['business_name']) {
@@ -142,5 +148,35 @@ class Entities extends BasePackage
                 ]
             ]
         );
+    }
+
+    protected function addAccountant(array $data)
+    {
+        $vendorPackage = $this->usePackage(Vendors::class);
+
+        $data['accountant_vendor_id'] = Json::decode($data['accountant_vendor_id'], true);
+
+        if (isset($data['accountant_vendor_id']['newTags']) &&
+            count($data['accountant_vendor_id']['newTags']) > 0
+        ) {
+            foreach ($data['accountant_vendor_id']['newTags'] as $accountant) {
+                $newAccountant = $vendorPackage->add(
+                    [
+                        'abn'                   => '00000000000',
+                        'business_name'         => $accountant,
+                        'is_service_provider'   => '1'
+                    ]
+                );
+                if ($newAccountant) {
+                    $data['accountant_vendor_id'] = $vendorPackage->packagesData->last['id'];
+                } else {
+                    $data['accountant_vendor_id'] = 0;
+                }
+            }
+        } else {
+            $data['accountant_vendor_id'] = $data['accountant_vendor_id']['data'][0];
+        }
+
+        return $data;
     }
 }

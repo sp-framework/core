@@ -50,6 +50,16 @@
                         [
                             'tabTitle'          : 'Address',
                             'tabInclude'        : 'entities/form/address'
+                        ],
+                        'contactdetails'   :
+                        [
+                            'tabTitle'          : 'Contact Details',
+                            'tabInclude'        : 'entities/form/contactdetails'
+                        ],
+                        'financialdetails'   :
+                        [
+                            'tabTitle'          : 'Financial Details',
+                            'tabInclude'        : 'entities/form/financialdetails'
                         ]
                     ]
                 %}
@@ -149,6 +159,9 @@ dataCollectionSection =
 
                 $('#{{componentId}}-{{sectionId}}-abn-search').click(function(e) {
                     e.preventDefault();
+                    $('#{{componentId}}-{{sectionId}}-business_name_list').val(null).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-business_name_list').empty().trigger('change');
+
                     $(this).attr('disabled', true);
                     $(this).children('i').attr('hidden', false);
 
@@ -183,6 +196,9 @@ dataCollectionSection =
                                     text : 'Details for ABN: ' + $('#{{componentId}}-{{sectionId}}-abn').val() + ' found.'
                                 });
 
+                                if (response.businessDetails.businessEntity202001.ASICNumber) {
+                                    $('#{{componentId}}-{{sectionId}}-acn').val(response.businessDetails.businessEntity202001.ASICNumber);
+                                }
 
                                 if (response.businessDetails.businessEntity202001.businessName) {
                                     $('#{{componentId}}-{{sectionId}}-business_name').parent('.form-group').addClass('d-none');
@@ -191,16 +207,20 @@ dataCollectionSection =
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').attr('disabled', false);
                                     $('#{{componentId}}-{{sectionId}}-business_name').val('');
                                     var newOption;
-                                    newOption = new Option(response.businessDetails.businessEntity202001.mainName.organisationName, 0, false, false);
-                                    $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
+                                    if (response.businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
+                                        newOption = new Option(response.businessDetails.businessEntity202001.mainName.organisationName, 0, false, false);
+                                        $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
+                                    }
                                     $.each(response.businessDetails.businessEntity202001.businessName, function(index, businessName) {
                                         newOption = new Option(businessName.organisationName, index + 1, false, false);
                                         $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
                                     });
+                                    $('#{{componentId}}-{{sectionId}}-business_name').val($('#{{componentId}}-{{sectionId}}-business_name_list option:first').text());
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').on('select2:select', function(e) {
-                                        $('#{{componentId}}-{{sectionId}}-business_name').val('');
                                         $('#{{componentId}}-{{sectionId}}-business_name').val(e.params.data.text);
                                         $('#{{componentId}}-{{sectionId}}-business_name').attr('value', e.params.data.text);
+                                        $('#{{componentId}}-{{sectionId}}-business_name').parents('.form-group').removeClass('has-error has-feedback');
+                                        $('#{{componentId}}-{{sectionId}}-business_name-error').remove();
                                     });
                                 } else {
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').parent('.form-group').addClass('d-none');
@@ -280,16 +300,82 @@ dataCollectionSection =
                 }
             }
         },
-        '{{componentId}}-{{sectionId}}-business_name'                    : { },
-        '{{componentId}}-{{sectionId}}-business_name_list'               : {
+        '{{componentId}}-{{sectionId}}-business_name'           : { },
+        '{{componentId}}-{{sectionId}}-business_name_list'      : {
             placeholder : 'SELECT A BUSINESS NAME'
         },
         '{{componentId}}-{{sectionId}}-entity_type'             : {
-            'placeholder' : 'SELECT ENTITY TYPE'
+            placeholder : 'SELECT ENTITY TYPE'
         },
         '{{componentId}}-{{sectionId}}-address_id'              : { },
         '{{componentId}}-{{sectionId}}-api_id'                  : {
             placeholder : 'SELECT XERO API'
+        },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : { },
+        '{{componentId}}-{{sectionId}}-contact_phone_ext'       : { },
+        '{{componentId}}-{{sectionId}}-contact_fax'             : { },
+        '{{componentId}}-{{sectionId}}-contact_other'           : { },
+        '{{componentId}}-{{sectionId}}-email'                   : { },
+        '{{componentId}}-{{sectionId}}-website'                 : { },
+        '{{componentId}}-{{sectionId}}-acn'                     : { },
+        '{{componentId}}-{{sectionId}}-currency'                : {
+            placeholder: 'SELECT CURRENCY'
+        },
+        '{{componentId}}-{{sectionId}}-tfn'                     : { },
+        '{{componentId}}-{{sectionId}}-bsb'                     : { },
+        '{{componentId}}-{{sectionId}}-account_number'          : { },
+        '{{componentId}}-{{sectionId}}-swift_code'              : { },
+        '{{componentId}}-{{sectionId}}-accountant_vendor_id'    : {
+            placeholder     : 'SELECT/CREATE ACCOUNTANT',
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                    if (response.vendors) {
+                        var vendorsData = [];
+                        for (var item of response.vendors) {
+                            vendorsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: vendorsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 1,
+            createTag     : function(params) {
+                var term = $.trim(params.term);
+
+                if (term === '') {
+                    return null;
+                }
+
+                return {
+                    id: term,
+                    text: term,
+                    newTag: true
+                }
+            }
         },
         '{{componentId}}-{{sectionId}}-form'                    : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
@@ -298,28 +384,43 @@ dataCollectionSection =
                 // console.log(validator.errorList);
             },
             rules: {
-                '{{componentId}}-{{sectionId}}-abn'                    : 'required',
-                '{{componentId}}-{{sectionId}}-business_name'          : 'required',
-                '{{componentId}}-{{sectionId}}-business_name_list'     : 'required',
-                '{{componentId}}-{{sectionId}}-entity_type'            : 'required',
-                '{{componentId}}-{{sectionId}}-parent'                 : 'required',
-                '{{componentId}}-{{sectionId}}-street_address'         : 'required',
-                '{{componentId}}-{{sectionId}}-city_name'              : 'required',
-                '{{componentId}}-{{sectionId}}-post_code'              : 'required',
-                '{{componentId}}-{{sectionId}}-state_name'             : 'required',
-                '{{componentId}}-{{sectionId}}-country_name'           : 'required',
+                '{{componentId}}-{{sectionId}}-abn'                     : 'required',
+                '{{componentId}}-{{sectionId}}-business_name'           : 'required',
+                '{{componentId}}-{{sectionId}}-business_name_list'      : 'required',
+                '{{componentId}}-{{sectionId}}-entity_type'             : 'required',
+                '{{componentId}}-{{sectionId}}-parent'                  : 'required',
+                '{{componentId}}-{{sectionId}}-contact_phone'           : 'required',
+                '{{componentId}}-{{sectionId}}-email'                   : {
+                    required                                            : true,
+                    email                                               : true
+                },
+                '{{componentId}}-{{sectionId}}-street_address'          : 'required',
+                '{{componentId}}-{{sectionId}}-city_name'               : 'required',
+                '{{componentId}}-{{sectionId}}-post_code'               : 'required',
+                '{{componentId}}-{{sectionId}}-state_name'              : 'required',
+                '{{componentId}}-{{sectionId}}-country_name'            : 'required',
+                '{{componentId}}-{{sectionId}}-acn'                     : 'required',
+                '{{componentId}}-{{sectionId}}-currency'                : 'required',
+                '{{componentId}}-{{sectionId}}-bsb'                     : 'required',
+                '{{componentId}}-{{sectionId}}-account_number'          : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-abn'                    : 'Please enter abn',
-                '{{componentId}}-{{sectionId}}-business_name'          : 'Please enter business name',
-                '{{componentId}}-{{sectionId}}-business_name_list'     : 'Please select business name',
-                '{{componentId}}-{{sectionId}}-entity_type'            : 'Please select entity type',
-                '{{componentId}}-{{sectionId}}-parent'                 : 'Please select parent business',
-                '{{componentId}}-{{sectionId}}-street_address'         : 'Please enter street address',
-                '{{componentId}}-{{sectionId}}-city_name'              : 'Please enter city',
-                '{{componentId}}-{{sectionId}}-post_code'              : 'Please enter post code',
-                '{{componentId}}-{{sectionId}}-state_name'             : 'Please enter state',
-                '{{componentId}}-{{sectionId}}-country_name'           : 'Please enter country',
+                '{{componentId}}-{{sectionId}}-abn'                     : 'Please enter abn',
+                '{{componentId}}-{{sectionId}}-business_name'           : 'Please enter business name',
+                '{{componentId}}-{{sectionId}}-business_name_list'      : 'Please select business name',
+                '{{componentId}}-{{sectionId}}-entity_type'             : 'Please select entity type',
+                '{{componentId}}-{{sectionId}}-parent'                  : 'Please select parent business',
+                '{{componentId}}-{{sectionId}}-contact_phone'           : 'Please enter business phone',
+                '{{componentId}}-{{sectionId}}-email'                   : 'Please enter business email',
+                '{{componentId}}-{{sectionId}}-street_address'          : 'Please enter street address',
+                '{{componentId}}-{{sectionId}}-city_name'               : 'Please enter city',
+                '{{componentId}}-{{sectionId}}-post_code'               : 'Please enter post code',
+                '{{componentId}}-{{sectionId}}-state_name'              : 'Please enter state',
+                '{{componentId}}-{{sectionId}}-country_name'            : 'Please enter country',
+                '{{componentId}}-{{sectionId}}-acn'                     : 'Please enter acn',
+                '{{componentId}}-{{sectionId}}-currency'                : 'Please select currency',
+                '{{componentId}}-{{sectionId}}-bsb'                     : 'Please enter bsb',
+                '{{componentId}}-{{sectionId}}-account_number'          : 'Please enter account number',
             }
         }
     });
