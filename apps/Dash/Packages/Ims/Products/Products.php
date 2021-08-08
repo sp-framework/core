@@ -566,7 +566,7 @@ class Products extends BasePackage
                 $newManufacturer = $this->manufacturersPackage->add(
                     [
                         'abn'               => '00000000000',
-                        'name'              => $manufacturer,
+                        'business_name'     => $manufacturer,
                         'is_manufacturer'   => '1'
                     ]
                 );

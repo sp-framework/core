@@ -20,7 +20,7 @@ class Functions extends BasePackage
 
     protected function updateJob($status, $args)
     {
-        if ($args['job']) {
+        if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id']);
 
             if ($job['status'] != 4) {
@@ -42,7 +42,7 @@ class Functions extends BasePackage
 
     protected function updateTask($status, $args)
     {
-        if ($args['task']) {
+        if (isset($args['task'])) {
             $task = $this->basepackages->workers->tasks->getById($args['task']['id']);
 
             if ($status == 2) {
@@ -62,7 +62,7 @@ class Functions extends BasePackage
 
     protected function addJobResult($packagesData, $args)
     {
-        if ($args['job']) {
+        if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id']);
 
             $job['result'] = '';
