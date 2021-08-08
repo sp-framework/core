@@ -8,7 +8,7 @@ return
 			"host" 				=> "localhost",
 			"dbname" 			=> "sp",
 			"username" 			=> "sp",
-			"password" 			=> "",
+			"password" 			=> "123",
 			"port" 				=> "3306",
 			"charset" 	 	    => "utf8mb4"
 		],
@@ -29,6 +29,6 @@ return
 			"level"				=> "DEBUG",
 			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,
-			"emergencyEmails"	=> "",
+			"emergencyEmails"	=> "support@bazaari.com.au",
 		]
 	];
