@@ -270,6 +270,7 @@ class ' . $this->contract['name'] . 'BaseService extends ' . $baseRestService . 
                                     ) {
                                         $operations[ucfirst($method['operationId'])]['params'][$paramName] = [];
                                         $operations[ucfirst($method['operationId'])]['params'][$paramName]['valid'] = ['string'];
+                                        $operations[ucfirst($method['operationId'])]['params'][$paramName]['type'] = 'string';
                                     }
                                 }
                             }
@@ -582,7 +583,10 @@ class ' . $typeKey . ' extends ' . $baseTypeService . '
 
                                 $requestParams[$parameter['name']] = [];
                                 if (isset($parameter['schema']['type'])) {
-                                    if ($parameter['schema']['type'] === 'string') {
+                                    if ($parameter['schema']['type'] === 'string' ||
+                                        $parameter['schema']['type'] === 'integer' ||
+                                        $parameter['schema']['type'] === 'boolean'
+                                    ) {
                                         $requestParams[$parameter['name']]['type'] = $parameter['schema']['type'];
                                         $requestParams[$parameter['name']]['repeatable'] = false;
                                     } else if ($parameter['schema']['type'] === 'array') {

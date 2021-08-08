@@ -21,7 +21,8 @@ class HttpHandler extends BasePackage
         'http_errors'     => true,
         'proxy'           => true,
         'timeout'         => true,
-        'verify'          => true
+        'verify'          => true,
+        'on_stats'        => true
     ];
 
     /**

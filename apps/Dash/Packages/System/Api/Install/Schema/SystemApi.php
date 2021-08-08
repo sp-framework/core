@@ -3,10 +3,8 @@
 namespace Apps\Dash\Packages\System\Api\Install\Schema;
 
 use Phalcon\Db\Column;
-use Phalcon\Db\Reference;
-use System\Base\BasePackage;
 
-class SystemApi extends BasePackage
+class SystemApi
 {
     public function columns()
     {
@@ -79,26 +77,6 @@ class SystemApi extends BasePackage
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
             ],
-            // 'references' => [
-            //     new Reference(
-            //         'field_ebay_fk',
-            //         [
-            //             'referencedSchema'      => $this->config->db->dbname,
-            //             'referencedTable'       => 'system_api_ebay',
-            //             'columns'               => ['api_id'],
-            //             'referencedColumns'     => ['id']
-            //         ]
-            //     ),
-            //     new Reference(
-            //         'field_generic_fk',
-            //         [
-            //             'referencedSchema'      => $this->config->db->dbname,
-            //             'referencedTable'       => 'system_api_generic',
-            //             'columns'               => ['api_id'],
-            //             'referencedColumns'     => ['id']
-            //         ]
-            //     )
-            // ]
         ];
     }
 }

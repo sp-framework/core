@@ -8,12 +8,10 @@ use Apps\Dash\Packages\System\Api\Base\Parser\JsonParser;
 use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 use Apps\Dash\Packages\System\Api\Base\UriResolver;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\TransferStats;
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * The base class for every eBay REST service class.
- */
-abstract class BaseRESTService
+class BaseRESTService
 {
     /**
      * @var \DTS\eBaySDK\ConfigurationResolver Resolves configuration options.
@@ -34,6 +32,8 @@ abstract class BaseRESTService
      * @var array Associative array for optionalHeaders
      */
     protected $optionalHeaders = [];
+
+    protected $container;
 
     /**
      * @param array $config Configuration option values.
@@ -117,16 +117,33 @@ abstract class BaseRESTService
         );
 
         $method = $operation['method'];
+
         $body = $this->buildRequestBody($requestValues);
+
         if (count($this->optionalHeaders) > 0) {
             $headers = array_merge($this->optionalHeaders, $this->buildRequestHeaders($body));
         } else {
             $headers = $this->buildRequestHeaders($body);
         }
+
         $responseClass = $operation['responseClass'];
         $debug = $this->getConfig('debug');
         $httpHandler = $this->getConfig('httpHandler');
         $httpOptions = $this->getConfig('httpOptions');
+
+        $apiId = $this->getConfig('api_id');
+
+        $httpOptions['on_stats'] = function (TransferStats $stats) use ($name, $apiId) {
+            $errorCode = null;
+
+            if (!$stats->hasResponse()) {
+                $errorCode = $stats->getHandlerErrorData();
+            }
+
+            $api = new \Apps\Dash\Packages\System\Api\Api;
+
+            $api->updateApiCallStats($name, $apiId, $stats->getHandlerStats(), $errorCode);
+        };
 
         if ($debug !== false) {
             $this->debugRequest($url, $headers, $body);
@@ -137,6 +154,7 @@ abstract class BaseRESTService
         return $httpHandler($request, $httpOptions)->then(
             function (ResponseInterface $res) use ($debug, $responseClass) {
                 $json = $res->getBody()->getContents();
+
                 // var_dump(json_decode($json, true));
                 if ($debug !== false) {
                     $this->debugResponse($json);

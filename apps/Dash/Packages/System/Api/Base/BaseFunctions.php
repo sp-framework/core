@@ -24,7 +24,6 @@ class BaseFunctions
                 return 'array(' . count($value) . ')';
             default:
                 ob_start();
-                var_dump($value);
                 return str_replace('double(', 'float(', rtrim(ob_get_clean()));
         }
     }

@@ -41,6 +41,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -53,6 +54,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -65,6 +67,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -77,6 +80,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -89,11 +93,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -106,11 +112,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -123,11 +131,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -140,11 +150,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -181,6 +193,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -193,6 +206,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -241,6 +255,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -253,6 +268,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -265,6 +281,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -277,11 +294,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -294,11 +313,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -311,11 +332,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -328,11 +351,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -345,6 +370,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -357,6 +383,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -393,6 +420,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -405,6 +433,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -417,11 +446,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -434,11 +465,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -451,11 +484,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -468,11 +503,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -485,6 +522,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -497,6 +535,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -516,6 +555,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -528,6 +568,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -540,6 +581,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -574,6 +616,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -611,6 +654,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -650,6 +694,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -662,6 +707,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -674,6 +720,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -686,11 +733,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -703,11 +752,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -720,11 +771,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -737,11 +790,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -754,6 +809,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -766,6 +822,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -778,6 +835,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -814,6 +872,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -826,6 +885,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -838,6 +898,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -850,6 +911,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -862,11 +924,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'ContactID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -915,6 +979,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -927,6 +992,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -939,6 +1005,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -951,11 +1018,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -968,11 +1037,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -985,11 +1056,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1002,16 +1075,19 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'includeOnline' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1024,6 +1100,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1036,6 +1113,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1048,6 +1126,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1060,6 +1139,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1127,6 +1207,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1163,6 +1244,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1175,6 +1257,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1187,6 +1270,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1199,6 +1283,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1256,6 +1341,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1282,6 +1368,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1294,6 +1381,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1306,6 +1394,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1318,6 +1407,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1330,11 +1420,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1347,11 +1439,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1364,11 +1458,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1381,16 +1477,19 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'includeOnline' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1403,6 +1502,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1415,6 +1515,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1427,6 +1528,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1439,6 +1541,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1489,6 +1592,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1501,6 +1605,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1513,6 +1618,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1525,6 +1631,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1537,6 +1644,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1566,6 +1674,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1622,6 +1731,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1634,6 +1744,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1646,6 +1757,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1694,6 +1806,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1706,6 +1819,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1718,6 +1832,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1730,11 +1845,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1747,11 +1864,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1764,11 +1883,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1781,11 +1902,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1798,6 +1921,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1810,6 +1934,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1836,6 +1961,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1870,6 +1996,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1882,6 +2009,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1894,6 +2022,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1906,6 +2035,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1954,6 +2084,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1966,6 +2097,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1978,6 +2110,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -1990,6 +2123,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2038,6 +2172,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2050,6 +2185,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2062,6 +2198,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2074,6 +2211,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2132,6 +2270,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2144,6 +2283,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2156,6 +2296,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2181,6 +2322,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2193,6 +2335,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2205,6 +2348,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2217,11 +2361,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2234,11 +2380,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2251,11 +2399,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2268,11 +2418,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2351,6 +2503,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2363,6 +2516,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2375,6 +2529,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2387,6 +2542,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2399,6 +2555,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2411,6 +2568,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2423,11 +2581,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2440,11 +2600,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2457,11 +2619,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2474,11 +2638,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2515,6 +2681,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2527,6 +2694,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2539,6 +2707,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2551,11 +2720,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2568,11 +2739,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2585,11 +2758,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2602,11 +2777,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2619,6 +2796,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2631,6 +2809,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2660,6 +2839,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2672,6 +2852,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2684,11 +2865,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'AttachmentID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2701,11 +2884,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2718,11 +2903,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2735,11 +2922,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'FileName' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2752,6 +2941,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2764,6 +2954,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2799,11 +2990,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'ToDate' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2827,11 +3020,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'ToDate' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2886,11 +3081,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'ToDate' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -2957,11 +3154,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'ToDate' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'periods' => [
               'valid' => [
@@ -3103,6 +3302,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -3115,6 +3315,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -3127,6 +3328,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -3139,6 +3341,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -3151,11 +3354,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'TrackingOptionID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -3168,11 +3373,13 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
             'TrackingOptionID' => [
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],
@@ -3202,6 +3409,7 @@ class XeroAccountingApiService extends XeroAccountingApiBaseService
               'valid' => [
                 'string',
               ],
+              'type' =>       'string',
             ],
           ],
         ],

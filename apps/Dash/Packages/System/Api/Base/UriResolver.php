@@ -6,6 +6,8 @@
 
 namespace Apps\Dash\Packages\System\Api\Base;
 
+use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
+
 class UriResolver
 {
     /**
@@ -14,8 +16,10 @@ class UriResolver
     private static $typeMap = [
         'array'     => 'is_array',
         'bool'      => 'is_bool',
+        'boolean'   => 'is_bool',
         'callable'  => 'is_callable',
         'int'       => 'is_int',
+        'integer'   => 'is_int',
         'string'    => 'is_string'
     ];
 
@@ -102,7 +106,7 @@ class UriResolver
             'Invalid uri parameter value provided for "%s". Expected %s, but got %s',
             $name,
             $expected,
-            describeType($provided)
+            BaseFunctions::describeType($provided)
         );
         throw new \InvalidArgumentException($msg);
     }
@@ -162,6 +166,7 @@ class UriResolver
         }
 
         $query = [];
+
         foreach ($paramValues as $param => $value) {
             if (is_array($value)) {
                 $value = join(',', $value);

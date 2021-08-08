@@ -14,6 +14,8 @@ class GetReportTrialBalanceRestRequest extends BaseType
           'elementName' => 'date',
         ],
         'paymentsOnly' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'paymentsOnly',
         ],

@@ -14,10 +14,14 @@ class GetJournalsRestRequest extends BaseType
           'elementName' => 'ifModifiedSince',
         ],
         'offset' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'offset',
         ],
         'paymentsOnly' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'paymentsOnly',
         ],

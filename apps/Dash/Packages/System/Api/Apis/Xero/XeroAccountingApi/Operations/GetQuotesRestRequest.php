@@ -50,6 +50,8 @@ class GetQuotesRestRequest extends BaseType
           'elementName' => 'Status',
         ],
         'page' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'page',
         ],

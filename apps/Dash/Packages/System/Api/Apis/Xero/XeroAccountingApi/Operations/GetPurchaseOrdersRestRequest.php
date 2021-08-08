@@ -38,6 +38,8 @@ class GetPurchaseOrdersRestRequest extends BaseType
           'elementName' => 'order',
         ],
         'page' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'page',
         ],

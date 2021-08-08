@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @internal Handles outputting debug messages.
- */
 namespace Apps\Dash\Packages\System\Api\Base;
 
 class BaseDebugger

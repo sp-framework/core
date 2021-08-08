@@ -46,14 +46,20 @@ class GetInvoicesRestRequest extends BaseType
           'elementName' => 'Statuses',
         ],
         'page' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'page',
         ],
         'includeArchived' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'includeArchived',
         ],
         'createdByMyApp' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'createdByMyApp',
         ],

@@ -14,6 +14,8 @@ class GetReportBalanceSheetRestRequest extends BaseType
           'elementName' => 'date',
         ],
         'periods' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'periods',
         ],
@@ -36,10 +38,14 @@ class GetReportBalanceSheetRestRequest extends BaseType
           'elementName' => 'trackingOptionID2',
         ],
         'standardLayout' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'standardLayout',
         ],
         'paymentsOnly' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'paymentsOnly',
         ],

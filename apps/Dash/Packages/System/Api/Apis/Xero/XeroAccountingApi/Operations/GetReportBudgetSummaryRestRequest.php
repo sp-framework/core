@@ -14,10 +14,14 @@ class GetReportBudgetSummaryRestRequest extends BaseType
           'elementName' => 'date',
         ],
         'periods' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'periods',
         ],
         'timeframe' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'timeframe',
         ],

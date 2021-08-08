@@ -31,10 +31,14 @@ class GetContactsRestRequest extends BaseType
           'elementName' => 'IDs',
         ],
         'page' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'page',
         ],
         'includeArchived' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'includeArchived',
         ],

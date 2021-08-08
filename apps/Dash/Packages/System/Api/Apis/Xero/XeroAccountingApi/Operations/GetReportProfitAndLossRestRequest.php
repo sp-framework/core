@@ -20,6 +20,8 @@ class GetReportProfitAndLossRestRequest extends BaseType
           'elementName' => 'ToDate',
         ],
         'periods' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'periods',
         ],
@@ -54,10 +56,14 @@ class GetReportProfitAndLossRestRequest extends BaseType
           'elementName' => 'trackingOptionID2',
         ],
         'standardLayout' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'standardLayout',
         ],
         'paymentsOnly' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'paymentsOnly',
         ],

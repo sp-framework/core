@@ -8,6 +8,8 @@ class GetLinkedTransactionsRestRequest extends BaseType
 {
     private static $propertyTypes = [
         'page' => [
+          'type' => 'integer',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'page',
         ],

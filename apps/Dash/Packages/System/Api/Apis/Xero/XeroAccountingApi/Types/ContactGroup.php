@@ -31,6 +31,12 @@ class ContactGroup extends XeroType
           'attribute' => false,
           'elementName' => 'Contacts',
         ],
+        'HasValidationErrors' => [
+          'type' => 'boolean',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'HasValidationErrors',
+        ],
       ];
 
     public function __construct(array $values = [])

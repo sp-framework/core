@@ -20,6 +20,8 @@ class GetTrackingCategoriesRestRequest extends BaseType
           'elementName' => 'order',
         ],
         'includeArchived' => [
+          'type' => 'boolean',
+          'repeatable' => false,
           'attribute' => false,
           'elementName' => 'includeArchived',
         ],
