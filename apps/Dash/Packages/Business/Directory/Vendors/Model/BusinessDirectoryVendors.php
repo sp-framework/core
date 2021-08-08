@@ -33,4 +33,14 @@ class BusinessDirectoryVendors extends BaseModel
     public $contact_ids;
 
     public $address_ids;
+
+    public $acn;
+
+    public $currency;
+
+    public $bsb;
+
+    public $account_number;
+
+    public $swift_code;
 }

@@ -126,6 +126,15 @@ class VendorsComponent extends BaseComponent
                 $this->view->geo = false;
             }
 
+            //Check Geo Locations Dependencies
+            if ($this->basepackages->geoCountries->currencyEnabled()) {
+                $this->view->currency = true;
+            } else {
+                $this->view->currency = false;
+            }
+
+            $this->view->currencies = $this->basepackages->geoCountries->currencyEnabled(true);
+
             $storages = $this->basepackages->storages->getAppStorages();
 
             if ($storages && isset($storages['public'])) {

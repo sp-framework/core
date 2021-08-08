@@ -393,28 +393,19 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules       : {
-                '{{componentId}}-{{sectionId}}-account_email'               : 'required',
-                '{{componentId}}-{{sectionId}}-status'                      : 'required',
+                '{{componentId}}-{{sectionId}}-account_email'               : {
+                    required                                                : true,
+                    email                                                   : true
+                },
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'required',
                 '{{componentId}}-{{sectionId}}-last_name'                   : 'required',
-                '{{componentId}}-{{sectionId}}-designation'                 : 'required',
-                '{{componentId}}-{{sectionId}}-type_id'                     : 'required',
-                '{{componentId}}-{{sectionId}}-hire_date'                   : 'required',
-                '{{componentId}}-{{sectionId}}-work_type_id'                : 'required',
-                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'required',
                 '{{componentId}}-{{sectionId}}-contact_phone'               : 'required',
                 '{{componentId}}-{{sectionId}}-contact_mobile'              : 'required'
             },
             messages    : {
-                '{{componentId}}-{{sectionId}}-account_email'               : 'Please select an account',
-                '{{componentId}}-{{sectionId}}-status'                      : 'Please select a status',
+                '{{componentId}}-{{sectionId}}-account_email'               : 'Please enter contact email',
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'Please enter first name',
                 '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name',
-                '{{componentId}}-{{sectionId}}-designation'                 : 'Please select a designation',
-                '{{componentId}}-{{sectionId}}-type_id'                     : 'Please select employee type',
-                '{{componentId}}-{{sectionId}}-hire_date'                   : 'Please select hiring date',
-                '{{componentId}}-{{sectionId}}-work_type_id'                : 'Please select work type',
-                '{{componentId}}-{{sectionId}}-contact_location_id'         : 'Please select a location',
                 '{{componentId}}-{{sectionId}}-contact_phone'               : 'Please enter phone number',
                 '{{componentId}}-{{sectionId}}-contact_mobile'              : 'Please enter mobile number'
             }
