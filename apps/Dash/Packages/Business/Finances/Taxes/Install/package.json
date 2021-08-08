@@ -1,6 +1,6 @@
 {
     "name"          : "Taxes",
-    "display_name"   : "Admin Taxes Package",
+    "display_name"  : "Business Taxes",
     "description"   : "Package for Taxes component",
     "app_type"      : "dash",
     "category"      : "business",

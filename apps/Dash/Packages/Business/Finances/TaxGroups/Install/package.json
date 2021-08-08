@@ -6,7 +6,7 @@
     "category"      : "business",
     "sub_category"  : "admin",
     "version"       : "0.0.1",
-    "repo"          : "https://.../dash-package-business-admin-vendorgroups",
-    "class"         : "Apps\\Dash\\Packages\\Business\\Finances\\TaxeGroups\\TaxeGroups",
+    "repo"          : "https://.../dash-package-business-admin-taxgroups",
+    "class"         : "Apps\\Dash\\Packages\\Business\\Finances\\TaxGroups\\TaxGroups",
     "settings"      : {"componentRoute":"business/finances/taxegroups"}
 }
