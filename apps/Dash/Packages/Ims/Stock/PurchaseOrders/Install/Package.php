@@ -3,9 +3,6 @@
 namespace Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install;
 
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Schema\ImsStockPurchaseOrders;
-use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Schema\ImsStockPurchaseOrdersXero;
-use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Schema\ImsStockPurchaseOrdersXeroContact;
-use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Schema\ImsStockPurchaseOrdersXeroLineitems;
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\PurchaseOrders;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -31,17 +28,11 @@ class Package extends BasePackage
             if ($dropTables) {
                 try {
                     $this->createTable('ims_stock_purchase_orders', '', (new ImsStockPurchaseOrders)->columns(), $dropTables);
-                    $this->createTable('ims_stock_purchase_orders_xero', '', (new ImsStockPurchaseOrdersXero)->columns(), $dropTables);
-                    $this->createTable('ims_stock_purchase_orders_xero_contact', '', (new ImsStockPurchaseOrdersXeroContact)->columns(), $dropTables);
-                    $this->createTable('ims_stock_purchase_orders_xero_lineitems', '', (new ImsStockPurchaseOrdersXeroLineitems)->columns(), $dropTables);
                 } catch (\Exception $e) {
                     var_dump($e);die();
                 }
             } else {
                 $this->createTable('ims_stock_purchase_orders', '', (new ImsStockPurchaseOrders)->columns());
-                $this->createTable('ims_stock_purchase_orders_xero', '', (new ImsStockPurchaseOrdersXero)->columns());
-                $this->createTable('ims_stock_purchase_orders_xero_contact', '', (new ImsStockPurchaseOrdersXeroContact)->columns());
-                $this->createTable('ims_stock_purchase_orders_xero_lineitems', '', (new ImsStockPurchaseOrdersXeroLineitems)->columns());
             }
 
             // $this->registerPackage();

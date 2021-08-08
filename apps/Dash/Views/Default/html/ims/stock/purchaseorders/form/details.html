@@ -173,7 +173,7 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                <!-- htmlmin:ignore -->
+                
                 {% if purchaseOrder['vendor_addresses'] is defined and purchaseOrder['vendor_addresses']|length > 0 %}
                     {% set vendorAddresses = '' %}
                     {% for vendorAddress in purchaseOrder['vendor_addresses'] %}
@@ -219,7 +219,7 @@
                     {% set vendorAddresses = '' %}
                     {% set vendorAddressesHidden = true %}
                 {% endif %}
-                <!-- htmlmin:ignore -->
+                
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -263,7 +263,7 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                <!-- htmlmin:ignore -->
+                
                 {% if purchaseOrder['vendor_contacts'] is defined and purchaseOrder['vendor_contacts']|length > 0 %}
                     {% set vendorContacts = '' %}
                     {% for vendorContact in purchaseOrder['vendor_contacts'] %}
@@ -319,7 +319,7 @@
                     {% set vendorContacts = '' %}
                     {% set vendorContactsHidden = true %}
                 {% endif %}
-                <!-- htmlmin:ignore -->
+                
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,

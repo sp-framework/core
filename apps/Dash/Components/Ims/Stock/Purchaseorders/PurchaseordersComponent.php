@@ -190,7 +190,9 @@ class PurchaseordersComponent extends BaseComponent
 			// 	return;
 			// }
 
-			$this->purchaseOrdersPackage->syncWithXero();
+			$poSync = new \Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\PurchaseOrders;
+
+			$poSync->sync();die();
 
 			$this->view->responseCode = $this->purchaseOrdersPackage->packagesData->responseCode;
 
