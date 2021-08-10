@@ -4,12 +4,12 @@
     {% set vendorBsb = vendor['bsb'] %}
     {% set vendorAccountNumber = vendor['account_number'] %}
     {% set vendorSwiftCode = vendor['swift_code'] %}
-    {% set vendorBillsDueDate = vendor['bills_due_date'] %}
-    {% set vendorBillsDueDateTerm = vendor['bills_due_date_term'] %}
+    {% set vendorBillsDueDay = vendor['bills_due_day'] %}
+    {% set vendorBillsDueDayTerm = vendor['bills_due_day_term'] %}
     {% set vendorBillsTaxEnabled = vendor['bills_tax_enabled'] %}
     {% set vendorBillsTaxId = vendor['bills_tax_id'] %}
-    {% set vendorInvoicesDueDate = vendor['invoices_due_date'] %}
-    {% set vendorInvoicesDueDateTerm = vendor['invoices_due_date_term'] %}
+    {% set vendorInvoicesDueDay = vendor['invoices_due_day'] %}
+    {% set vendorInvoicesDueDayTerm = vendor['invoices_due_day_term'] %}
     {% set vendorInvoicesTaxEnabled = vendor['invoices_tax_enabled'] %}
     {% set vendorInvoicesTaxId = vendor['invoices_tax_id'] %}
     {% set vendorCreditLimitAmount = vendor['credit_limit_amount'] %}
@@ -21,12 +21,12 @@
     {% set vendorBsb = '' %}
     {% set vendorAccountNumber = '' %}
     {% set vendorSwiftCode = '' %}
-    {% set vendorBillsDueDate = '' %}
-    {% set vendorBillsDueDateTerm = '' %}
+    {% set vendorBillsDueDay = '' %}
+    {% set vendorBillsDueDayTerm = '' %}
     {% set vendorBillsTaxEnabled = '' %}
     {% set vendorBillsTaxId = '' %}
-    {% set vendorInvoicesDueDate = '' %}
-    {% set vendorInvoicesDueDateTerm = '' %}
+    {% set vendorInvoicesDueDay = '' %}
+    {% set vendorInvoicesDueDayTerm = '' %}
     {% set vendorInvoicesTaxEnabled = '' %}
     {% set vendorInvoicesTaxId = '' %}
     {% set vendorCreditLimitAmount = '' %}
@@ -164,12 +164,12 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'bills_due_date',
-                'fieldLabel'                     : 'Bills Due Date',
+                'fieldId'                        : 'bills_due_day',
+                'fieldLabel'                     : 'Bills Due Day',
                 'fieldType'                      : 'input',
                 'fieldInputTypeTextFilter'       : 'positiveInt',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Bills Due Date of the vendor',
+                'fieldHelpTooltipContent'        : 'Bills Due Day of the vendor',
                 'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
@@ -177,7 +177,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 3,
-                'fieldValue'                     : vendorBillsDueDate
+                'fieldValue'                     : vendorBillsDueDay
             ]
         )}}
     </div>
@@ -188,11 +188,11 @@
                 'componentName'                         : componentName,
                 'componentId'                           : componentId,
                 'sectionId'                             : sectionId,
-                'fieldId'                               : 'bills_due_date_term',
-                'fieldLabel'                            : 'Bills Due Date Terms',
+                'fieldId'                               : 'bills_due_day_term',
+                'fieldLabel'                            : 'Bills Due Day Terms',
                 'fieldType'                             : 'select2',
                 'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Bills Due Date Terms',
+                'fieldHelpTooltipContent'               : 'Bills Due Day Terms',
                 'fieldRequired'                         : false,
                 'fieldBazScan'                          : true,
                 'fieldBazPostOnCreate'                  : true,
@@ -202,7 +202,7 @@
                 'fieldDataSelect2OptionsKey'            : 'id',
                 'fieldDataSelect2OptionsValue'          : 'name',
                 'fieldDataSelect2OptionsArray'          : true,
-                'fieldDataSelect2OptionsSelected'       : vendorBillsDueDateTerm
+                'fieldDataSelect2OptionsSelected'       : vendorBillsDueDayTerm
             ]
         )}}
     </div>
@@ -295,12 +295,12 @@
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'invoices_due_date',
-                    'fieldLabel'                            : 'Invoices Due Date',
+                    'fieldId'                               : 'invoices_due_day',
+                    'fieldLabel'                            : 'Invoices Due Day',
                     'fieldType'                             : 'input',
                     'fieldInputTypeTextFilter'              : 'positiveInt',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Invoices Due Date of the vendor',
+                    'fieldHelpTooltipContent'               : 'Invoices Due Day of the vendor',
                     'fieldRequired'                         : false,
                     'fieldBazScan'                          : true,
                     'fieldBazJstreeSearch'                  : true,
@@ -308,7 +308,7 @@
                     'fieldBazPostOnUpdate'                  : true,
                     'fieldDataInputMinLength'               : 1,
                     'fieldDataInputMaxLength'               : 3,
-                    'fieldValue'                            : vendorInvoicesDueDate
+                    'fieldValue'                            : vendorInvoicesDueDay
                 ]
             )}}
         </div>
@@ -319,11 +319,11 @@
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'invoices_due_date_term',
-                    'fieldLabel'                            : 'Invoices Due Date Terms',
+                    'fieldId'                               : 'invoices_due_day_term',
+                    'fieldLabel'                            : 'Invoices Due Day Terms',
                     'fieldType'                             : 'select2',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Invoices Due Date Terms',
+                    'fieldHelpTooltipContent'               : 'Invoices Due Day Terms',
                     'fieldRequired'                         : false,
                     'fieldBazScan'                          : true,
                     'fieldBazPostOnCreate'                  : true,
@@ -333,7 +333,7 @@
                     'fieldDataSelect2OptionsKey'            : 'id',
                     'fieldDataSelect2OptionsValue'          : 'name',
                     'fieldDataSelect2OptionsArray'          : true,
-                    'fieldDataSelect2OptionsSelected'       : vendorInvoicesDueDateTerm
+                    'fieldDataSelect2OptionsSelected'       : vendorInvoicesDueDayTerm
                 ]
             )}}
         </div>

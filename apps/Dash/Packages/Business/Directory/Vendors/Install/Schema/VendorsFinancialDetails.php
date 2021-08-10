@@ -68,7 +68,7 @@ class VendorsFinancialDetails
                     ]
                 ),
                 new Column(
-                    'bills_due_date',
+                    'bills_due_day',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 4,
@@ -76,7 +76,7 @@ class VendorsFinancialDetails
                     ]
                 ),
                 new Column(
-                    'bills_due_date_term',
+                    'bills_due_day_term',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 20,
@@ -98,7 +98,7 @@ class VendorsFinancialDetails
                     ]
                 ),
                 new Column(
-                    'invoices_due_date',
+                    'invoices_due_day',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 4,
@@ -106,7 +106,7 @@ class VendorsFinancialDetails
                     ]
                 ),
                 new Column(
-                    'invoices_due_date_term',
+                    'invoices_due_day_term',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 20,
