@@ -2,6 +2,7 @@
 
 namespace Apps\Dash\Packages\Business\Directory\Vendors\Model;
 
+use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendorsFinancialDetails;
 use System\Base\BaseModel;
 
 class BusinessDirectoryVendors extends BaseModel
@@ -14,6 +15,8 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $business_name;
 
+    public $vendor_group_id;
+
     public $is_manufacturer;
 
     public $is_supplier;
@@ -24,9 +27,9 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $does_jobwork;
 
-    public $brands;
+    public $is_b2b_customer;
 
-    public $vendor_group_id;
+    public $brands;
 
     public $product_count;
 
@@ -34,13 +37,15 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $address_ids;
 
-    public $acn;
-
-    public $currency;
-
-    public $bsb;
-
-    public $account_number;
-
-    public $swift_code;
+    public function initialize()
+    {
+        $this->hasOne(
+            'id',
+            BusinessDirectoryVendorsFinancialDetails::class,
+            'vendor_id',
+            [
+                'alias' => 'financial_details'
+            ]
+        );
+    }
 }

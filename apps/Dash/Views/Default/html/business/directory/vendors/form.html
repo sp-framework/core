@@ -358,6 +358,10 @@ dataCollectionSection =
                 }
             }
         },
+        '{{componentId}}-{{sectionId}}-vendor_group_id'         : {
+            placeholder : 'SELECT A BUSINESS GROUP',
+            allowClear  : true
+        },
         '{{componentId}}-{{sectionId}}-business_name'           : { },
         '{{componentId}}-{{sectionId}}-business_name_list'      : {
             placeholder : 'SELECT A BUSINESS NAME',
@@ -368,9 +372,16 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-does_dropship'           : { },
         '{{componentId}}-{{sectionId}}-is_service_provider'     : { },
         '{{componentId}}-{{sectionId}}-does_jobwork'            : { },
-        '{{componentId}}-{{sectionId}}-vendor_group_id'         : {
-            placeholder : 'SELECT A BUSINESS GROUP',
-            allowClear  : true
+        '{{componentId}}-{{sectionId}}-is_b2b_customer'         : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-is_b2b_customer').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-is_b2b_customer')[0].checked === true) {
+                        $('#b2b').attr('hidden', false);
+                    } else {
+                        $('#b2b').attr('hidden', true);
+                    }
+                });
+            }
         },
         '{{componentId}}-{{sectionId}}-brands'                  : {
             'placeholder'   : "VENDOR BRAND(s)",
@@ -431,6 +442,27 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-bsb'                     : { },
         '{{componentId}}-{{sectionId}}-account_number'          : { },
         '{{componentId}}-{{sectionId}}-swift_code'              : { },
+        '{{componentId}}-{{sectionId}}-bills_due_date'          : { },
+        '{{componentId}}-{{sectionId}}-bills_due_date_term'     : {
+            placeholder : 'SELECT BILLS DUE DATE TERM'
+        },
+        '{{componentId}}-{{sectionId}}-bills_tax_enabled'       : { },
+        '{{componentId}}-{{sectionId}}-bills_tax_id'            : {
+            placeholder : 'SELECT BILLS TAX',
+            allowClear  : true
+        },
+        '{{componentId}}-{{sectionId}}-invoices_due_date'       : { },
+        '{{componentId}}-{{sectionId}}-invoices_due_date_term'  : {
+            placeholder : 'SELECT INVOICES DUE DATE TERM'
+        },
+        '{{componentId}}-{{sectionId}}-invoices_tax_enabled'    : { },
+        '{{componentId}}-{{sectionId}}-invoices_tax_id'         : {
+            placeholder : 'SELECT INVOICES TAX',
+            allowClear  : true
+        },
+        '{{componentId}}-{{sectionId}}-credit_limit_amount'     : { },
+        '{{componentId}}-{{sectionId}}-credit_limit_block'      : { },
+        '{{componentId}}-{{sectionId}}-discount'                : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {

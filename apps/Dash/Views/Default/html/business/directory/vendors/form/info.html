@@ -2,26 +2,28 @@
     {% set vendorId = vendor['id'] %}
     {% set vendorLogo = vendor['logo'] %}
     {% set vendorAbn = vendor['abn'] %}
+    {% set vendorGroup = vendor['vendor_group_id'] %}
     {% set vendorBusinessName = vendor['business_name'] %}
     {% set vendorIsManufacturer = vendor['is_manufacturer'] %}
     {% set vendorIsSupplier = vendor['is_supplier'] %}
     {% set vendorDoesDropship = vendor['does_dropship'] %}
     {% set vendorIsServiceProvider = vendor['is_service_provider'] %}
     {% set vendorDoesJobwork = vendor['does_jobwork'] %}
+    {% set vendorB2bCustomer = vendor['is_b2b_customer'] %}
     {% set vendorBrands = vendor['brands'] %}
-    {% set vendorGroup = vendor['vendor_group_id'] %}
 {% else %}
     {% set vendorId = '' %}
     {% set vendorLogo = '' %}
     {% set vendorAbn = '' %}
+    {% set vendorGroup = '' %}
     {% set vendorBusinessName = '' %}
     {% set vendorIsManufacturer = '' %}
     {% set vendorIsSupplier = '' %}
     {% set vendorDoesDropship = '' %}
     {% set vendorIsServiceProvider = '' %}
     {% set vendorDoesJobwork = '' %}
+    {% set vendorB2bCustomer = '' %}
     {% set vendorBrands = '' %}
-    {% set vendorGroup = '' %}
 {% endif %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
@@ -109,6 +111,31 @@
                         'fieldDataInputMinLength'               : 11,
                         'fieldDataInputMaxLength'               : 11,
                         'fieldValue'                            : vendorAbn
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'vendor_group_id',
+                        'fieldLabel'                            : 'Business Group',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Business Group',
+                        'fieldRequired'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : vendorgroups,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : vendorGroup
                     ]
                 )}}
             </div>
@@ -322,27 +349,33 @@
                 )}}
             </div>
             <div class="col">
+                {% if vendorB2bCustomer is defined %}
+                    {% if vendorB2bCustomer == 1 %}
+                        {% set vendorB2bCustomerChecked = true %}
+                    {% else %}
+                        {% set vendorB2bCustomerChecked = false %}
+                    {% endif %}
+                {% else %}
+                    {% set vendorB2bCustomerChecked = false %}
+                {% endif %}
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'vendor_group_id',
-                        'fieldLabel'                            : 'Business Group',
-                        'fieldType'                             : 'select2',
-                        'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Business Group',
-                        'fieldRequired'                         : false,
-                        'fieldBazScan'                          : true,
-                        'fieldBazJstreeSearch'                  : true,
-                        'fieldBazPostOnCreate'                  : true,
-                        'fieldBazPostOnUpdate'                  : true,
-                        'fieldDataSelect2Options'               : vendorgroups,
-                        'fieldDataSelect2OptionsKey'            : 'id',
-                        'fieldDataSelect2OptionsValue'          : 'name',
-                        'fieldDataSelect2OptionsArray'          : true,
-                        'fieldDataSelect2OptionsSelected'       : vendorGroup
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'is_b2b_customer',
+                        'fieldLabel'                     : 'B2B Customer?',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Is vendor a B2B Customer?',
+                        'fieldRequired'                  : false,
+                        'fieldType'                      : 'checkbox',
+                        'fieldCheckboxType'              : 'info',
+                        'fieldCheckboxChecked'           : vendorB2bCustomerChecked,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldBazScan'                   : true
                     ]
                 )}}
             </div>

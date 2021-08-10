@@ -7,6 +7,7 @@ use Apps\Dash\Packages\Business\ABNLookup\ABNLookup;
 use Apps\Dash\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Dash\Packages\Business\Directory\VendorGroups\VendorGroups;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
+use Apps\Dash\Packages\Business\Finances\Taxes\Taxes;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
@@ -60,16 +61,20 @@ class VendorsComponent extends BaseComponent
             //Token auth and grab remote vendor
         }
 
-        $this->view->vendorgroups = $this->usePackage(VendorGroups::class)->getAll()->vendorgroups;
-
         if (isset($this->getData()['id'])) {
+            $this->view->vendorgroups = $this->usePackage(VendorGroups::class)->getAll()->vendorgroups;
+
+            //This should be moved to payments package
+            $this->view->paymentTerms = $this->vendors->getPaymentTerms();
+
             $this->view->brands = $this->usePackage(Brands::class)->getAll()->brands;
 
             $this->view->logoLink = '';
 
-            if ($this->getData()['id'] != 0) {
+            $this->view->taxes = $this->usePackage(Taxes::class)->getAll()->taxes;
 
-                $vendor = $this->vendors->getById($this->getData()['id']);
+            if ($this->getData()['id'] != 0) {
+                $vendor = $this->vendors->getVendorById($this->getData()['id']);
 
                 $vendor['activityLogs'] = $this->vendors->getActivityLogs($this->getData()['id']);
 

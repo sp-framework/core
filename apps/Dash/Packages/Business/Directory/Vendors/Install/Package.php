@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Business\Directory\Vendors\Install;
 
 use Apps\Dash\Packages\Business\Directory\Vendors\Install\Schema\Vendors as VendorsSchema;
+use Apps\Dash\Packages\Business\Directory\Vendors\Install\Schema\VendorsFinancialDetails;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -31,8 +32,10 @@ class Package extends BasePackage
         try {
             if ($dropTables) {
                 $this->createTable('business_directory_vendors', '', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('business_directory_vendors_financial_details', '', (new VendorsFinancialDetails)->columns(), $dropTables);
             } else {
                 $this->createTable('business_directory_vendors', '', (new $this->schemaToUse)->columns());
+                $this->createTable('business_directory_vendors_financial_details', '', (new VendorsFinancialDetails)->columns());
             }
 
             // $this->registerPackage();

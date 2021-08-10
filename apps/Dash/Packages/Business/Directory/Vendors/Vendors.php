@@ -4,6 +4,7 @@ namespace Apps\Dash\Packages\Business\Directory\Vendors;
 
 use Apps\Dash\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendors;
+use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendorsFinancialDetails;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -15,6 +16,22 @@ class Vendors extends BasePackage
     protected $packageName = 'vendors';
 
     public $vendors;
+
+    public function getVendorById(int $id)
+    {
+        $vendorModel = new $this->modelToUse;
+
+        $vendorObj = $vendorModel::findFirstById($id);
+
+        $vendor = $vendorObj->toArray();
+
+        $financialDetailsObj = $vendorObj->getFinancial_details();
+
+        $financialDetails = $financialDetailsObj->toArray();
+        unset($financialDetails['id']);
+
+        return array_merge($vendor, $financialDetails);
+    }
 
     /**
      * @notification(name=add)
@@ -35,6 +52,10 @@ class Vendors extends BasePackage
 
         if ($this->add($data)) {
             $this->basepackages->storages->changeOrphanStatus($data['logo']);
+
+            $data['vendor_id'] = $this->packagesData->last['id'];
+
+            $this->addFinancialDetails($data);
 
             $data['id'] = $this->packagesData->last['id'];
 
@@ -79,6 +100,8 @@ class Vendors extends BasePackage
         }
 
         if ($this->update($data)) {
+            $this->updateFinancialDetails($data);
+
             $this->basepackages->storages->changeOrphanStatus($data['logo'], $vendor['logo']);
 
             $this->basepackages->notes->addNote($this->packageName, $data);
@@ -100,11 +123,17 @@ class Vendors extends BasePackage
      */
     public function removeVendor(array $data)
     {
-        $vendor = $this->getById($data['id']);
         //Check relations before removing.
         //Remove Address
+        //Notes
+        $vendorObj = $this->modelToUse::findFirstById($data['id']);
+
+        $vendor = $vendorObj->toArray();
+
+        $vendorObj->getFinancial_details()->delete();
 
         if ($this->remove($data['id'])) {
+
             $this->basepackages->storages->changeOrphanStatus(null, $vendor['logo']);
 
             $this->addResponse('Removed vendor ' . $vendor['business_name']);
@@ -113,6 +142,41 @@ class Vendors extends BasePackage
         } else {
             $this->addResponse('Error removing vendor.', 1);
         }
+    }
+
+    protected function addFinancialDetails(array $data)
+    {
+        $this->modelToUse = BusinessDirectoryVendorsFinancialDetails::class;
+
+        unset($data['id']);
+
+        $this->add($data);
+
+        $this->modelToUse = BusinessDirectoryVendors::class;
+    }
+
+    protected function updateFinancialDetails(array $data)
+    {
+        $this->modelToUse = BusinessDirectoryVendorsFinancialDetails::class;
+
+        $financialDetailsModel = $this->modelToUse::findFirst(
+            [
+                'conditions'    => 'vendor_id = :vid:',
+                'bind'          => [
+                    'vid'       => $data['id']
+                ]
+            ]
+        );
+
+        if ($financialDetailsModel) {
+            $financialDetails = $financialDetailsModel->toArray();
+
+            $financialDetails = array_merge($financialDetails, $data);
+        }
+
+        $this->update($financialDetails);
+
+        $this->modelToUse = BusinessDirectoryVendors::class;
     }
 
     protected function checkVendorDuplicate($name)
@@ -435,5 +499,28 @@ class Vendors extends BasePackage
         }
 
         $this->update($vendor);
+    }
+
+    public function getPaymentTerms()
+    {
+        return
+            [
+                [
+                    'id'    => 'DAYSAFTERBILLDATE',
+                    'name'  => 'Day(s) after bill date',
+                ],
+                [
+                    'id'    => 'DAYSAFTERBILLMONTH',
+                    'name'  => 'Day(s) after bill month',
+                ],
+                [
+                    'id'    => 'OFCURRENTMONTH',
+                    'name'  => 'Of the current month'
+                ],
+                [
+                    'id'    => 'OFFOLLOWINGMONTH',
+                    'name'  => 'Of the following month'
+                ]
+            ];
     }
 }
