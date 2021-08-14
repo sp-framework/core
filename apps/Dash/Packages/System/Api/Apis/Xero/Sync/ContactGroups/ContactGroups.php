@@ -1,12 +1,13 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups;
 
 use Apps\Dash\Packages\System\Api\Api;
-use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactsRestRequest;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\Model\SystemApiXeroContactGroups;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactGroupsRestRequest;
 use System\Base\BasePackage;
 
-class Contacts extends BasePackage
+class ContactGroups extends BasePackage
 {
     protected $apiPackage;
 
@@ -16,7 +17,7 @@ class Contacts extends BasePackage
     {
         $this->apiPackage = new Api;
 
-        $this->request = new GetContactsRestRequest;
+        $this->request = new GetContactGroupsRestRequest;
 
         $xeroApis = $this->apiPackage->getApiByType('xero', true);
 
@@ -27,7 +28,6 @@ class Contacts extends BasePackage
         } else {
             $this->syncWithXero($apiId);
         }
-        die();
     }
 
     protected function syncWithXero($apiId)
@@ -36,95 +36,46 @@ class Contacts extends BasePackage
 
         $xeroAccountingApi = $api->useService('XeroAccountingApi');
 
-        // $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetContacts', $apiId);
+        $response = $xeroAccountingApi->getContactGroups($this->request);
 
-        // if ($modifiedSince) {
-        //     $xeroAccountingApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
-        // }
+        $api->refreshXeroCallStats($response->getHeaders());
 
-        $page = 1;
+        $responseArr = $response->toArray();
 
-        do {
-            $this->request->page = $page;
-
-            $this->request->includeArchived = true;
-
-            $response = $xeroAccountingApi->getContacts($this->request);
-
-            $api->refreshXeroCallStats($response->getHeaders());
-
-            $responseArr = $response->toArray();
-
-            if ($responseArr['Status'] === 'OK' && isset($responseArr['Contacts'])) {
-                if (count($responseArr['Contacts']) > 0) {
-                    // $this->addUpdateXeroContacts($responseArr['Contacts']);
-                }
-            }
-
-            var_dump($responseArr);
-            $page++;
-        } while (isset($responseArr['Contacts']) && count($responseArr['Contacts']) > 0);
-    }
-
-    protected function addUpdateXeroContacts($contacts)
-    {
-        foreach ($contacts as $contactKey => $contact) {
-            $model = SystemApiXeroContacts::class;
-
-            $xeroContact = $model::findFirst(
-                [
-                    'conditions'    => 'ContactID = :cid:',
-                    'bind'          =>
-                        [
-                            'cid'   => $contact['ContactID']
-                        ]
-                ]
-            );
-
-            $modelToUse = new $model();
-
-            $modelToUse->assign($contact);
-
-            if ($xeroContact->count() === 0) {
-                $modelToUse->create();
-            } else {
-                if ($contact['UpdatedDateUTC'] !== $xeroContact->UpdatedDateUTC) {
-                    $modelToUse->update();
-                }
-            }
-
-            if (isset($contact['Phones']) && count($contact['Phones']) > 0) {
-                $this->addUpdateXeroContactsPhones($contact);
+        if ($responseArr['Status'] === 'OK' && isset($responseArr['ContactGroups'])) {
+            if (count($responseArr['ContactGroups']) > 0) {
+                $this->addUpdateXeroContactGroups($apiId, $responseArr['ContactGroups']);
             }
         }
     }
 
-    protected function addUpdateXeroContactsPhones($contact)
+    protected function addUpdateXeroContactGroups($apiId, $contactGroups)
     {
-        $model = SystemApiXeroContactsPhones::class;
+        foreach ($contactGroups as $contactGroupKey => $contactGroup) {
+            $model = SystemApiXeroContactGroups::class;
 
-        foreach ($contact['Phones'] as $phoneKey => $phone) {
-            $xeroContact = $model::findFirst(
+            $xeroContactGroup = $model::findFirst(
                 [
-                    'conditions'    => 'PurchaseOrderID = :poid: AND ContactID = :cid:',
+                    'conditions'    => 'ContactGroupID = :cgid:',
                     'bind'          =>
                         [
-                            'poid'  => $contact['PurchaseOrderID'],
-                            'cid'   => $contact['ContactID']
+                            'cgid'  => $contactGroup['ContactGroupID']
                         ]
                 ]
             );
 
-            $modelToUse = new $model();
+            $contactGroup['api_id'] = $apiId;
 
-            $contact['PurchaseOrderID'] = $contact['PurchaseOrderID'];
+            if (!$xeroContactGroup) {
+                $modelToUse = new $model();
 
-            $modelToUse->assign($contact);
+                $modelToUse->assign($contactGroup);
 
-            if ($xeroContact->count() === 0) {
                 $modelToUse->create();
             } else {
-                $modelToUse->update();
+                $xeroContactGroup->assign($contactGroup);
+
+                $xeroContactGroup->update();
             }
         }
     }

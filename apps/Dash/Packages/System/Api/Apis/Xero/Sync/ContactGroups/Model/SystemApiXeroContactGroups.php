@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Model;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\Model;
 
 use System\Base\BaseModel;
 

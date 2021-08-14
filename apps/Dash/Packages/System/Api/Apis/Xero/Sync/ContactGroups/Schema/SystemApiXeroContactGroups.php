@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\Schema;
 
 use Phalcon\Db\Column;
 
