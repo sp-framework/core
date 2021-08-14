@@ -14,7 +14,7 @@ class Bill extends XeroType
           'elementName' => 'Day',
         ],
         'Type' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PaymentTermType',
+          'type' => 'string',
           'repeatable' => false,
           'attribute' => false,
           'elementName' => 'Type',

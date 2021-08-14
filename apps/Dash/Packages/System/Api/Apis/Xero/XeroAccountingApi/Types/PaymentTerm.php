@@ -3,21 +3,22 @@
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types;
 
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroType;
+use Apps\Dash\Packages\System\Api\Base\Types\BaseType;
 
-class PaymentTerm extends XeroType
+class PaymentTerm extends BaseType
 {
     private static $propertyTypes = [
-        'Bills' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Bill',
+        'Day' => [
+          'type' => 'integer',
           'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'Bills',
+          'elementName' => 'Day',
         ],
-        'Sales' => [
-          'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Bill',
+        'Type' => [
+          'type' => 'string',
           'repeatable' => false,
           'attribute' => false,
-          'elementName' => 'Sales',
+          'elementName' => 'Type',
         ],
       ];
 

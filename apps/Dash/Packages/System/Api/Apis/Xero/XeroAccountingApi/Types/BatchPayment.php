@@ -9,7 +9,7 @@ class BatchPayment extends XeroType
     private static $propertyTypes = [
         'Account' => [
           'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\Account',
-          'repeatable' => false,
+          'repeatable' => true,
           'attribute' => false,
           'elementName' => 'Account',
         ],
