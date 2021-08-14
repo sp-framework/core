@@ -228,6 +228,7 @@ class BaseType
             if ($info['repeatable']) {
                 if (count($value)) {
                     $array[$name] = [];
+
                     foreach ($value as $property) {
                         $array[$name][] = self::propertyToArrayValue($property);
                     }
@@ -275,6 +276,7 @@ class BaseType
             $value = self::removeNull($value);
             if (!is_null($value)) {
                 $actualValue = self::determineActualValueToAssign($class, $property, $value);
+
                 $this->set($class, $property, $actualValue);
             }
         }
@@ -385,8 +387,9 @@ class BaseType
                 throw new InvalidPropertyTypeException($name, 'Apps\Dash\Packages\System\Api\Apis\Ebay\Types\RepeatableType', $actualType);
             } else {
                 $this->values[$name] = new RepeatableType(get_class($this), $name, $info['type']);
-                foreach ($value as $item) {
-                    $this->values[$name][] = $item;
+
+                foreach ($value as $itemKey => $item) {
+                    $this->values[$name][$itemKey] = $item;
                 }
             }
         }
@@ -634,8 +637,13 @@ class BaseType
 
         if ($info['repeatable'] && is_array($value)) {
             $values = [];
-            foreach ($value as $val) {
-                $values[] = self::actualValue($info, $val);
+
+            foreach ($value as $valKey => $val) {
+                if (is_string($valKey)) {//This was done for Xero Contacts PaymentTerms. (nested array)
+                    $values[$valKey] = self::actualValue($info, $val);
+                } else {
+                    $values[] = self::actualValue($info, $val);
+                }
             }
             return $values;
         }
@@ -665,9 +673,11 @@ class BaseType
         foreach ($types as $type) {
             switch ($type) {
                 case 'integer':
+                case 'int':
                 case 'string':
                 case 'double':
                 case 'boolean':
+                case 'bool':
                 case 'any':
                     return $value;
                 case 'DateTime':

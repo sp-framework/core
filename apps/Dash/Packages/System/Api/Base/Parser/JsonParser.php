@@ -13,6 +13,7 @@ class JsonParser
     public static function parseAndAssignProperties($object, $json)
     {
         $properties = $json !== '' ? json_decode($json, true) : [];
+
         self::assignProperties($object, $properties);
     }
 
@@ -88,9 +89,11 @@ class JsonParser
         foreach ($types as $type) {
             switch ($type) {
                 case 'integer':
+                case 'int':
                 case 'string':
                 case 'double':
                 case 'boolean':
+                case 'bool':
                 case 'any':
                     return $value;
                 case 'DateTime':

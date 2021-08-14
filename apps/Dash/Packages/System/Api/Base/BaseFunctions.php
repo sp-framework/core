@@ -95,9 +95,11 @@ class BaseFunctions
     {
         switch ($type) {
             case 'integer':
+            case 'int':
             case 'string':
             case 'double':
             case 'boolean':
+            case 'bool':
             case 'DateTime':
                 return false;
             default:

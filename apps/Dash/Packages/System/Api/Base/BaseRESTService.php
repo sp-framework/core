@@ -155,7 +155,7 @@ class BaseRESTService
             function (ResponseInterface $res) use ($debug, $responseClass) {
                 $json = $res->getBody()->getContents();
 
-                // var_dump(json_decode($json, true));
+                // var_dump(json_decode($json, true));die();
                 if ($debug !== false) {
                     $this->debugResponse($json);
                 }

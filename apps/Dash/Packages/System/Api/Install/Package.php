@@ -22,14 +22,14 @@ class Package extends BasePackage
     {
         $this->init();
 
-        if (!$dropTables && $this->checkPackage($this->packageToUse)) {
+        // if (!$dropTables && $this->checkPackage($this->packageToUse)) {
 
-            $this->packagesData->responseCode = 1;
+        //     $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Module already installed. Either update or reinstall';
+        //     $this->packagesData->responseMessage = 'Module already installed. Either update or reinstall';
 
-            return;
-        }
+        //     return;
+        // }
 
         try {
             if ($dropTables) {

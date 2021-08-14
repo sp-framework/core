@@ -475,7 +475,8 @@ class Api extends BasePackage
                         'cm'    => $callMethod,
                         'aid'   => $apiId,
                         'crc'   => 200
-                    ]
+                    ],
+                'order'     => 'id desc'
             ]
         );
 
@@ -483,7 +484,11 @@ class Api extends BasePackage
 
             $methodEntry = $methodEntry->toArray();
 
-            return \Carbon\Carbon::parse($methodEntry['called_at'])->setTimezone('UTC')->toDateTimeString();
+            if ($this->apiConfig['api_type'] === 'xero') {
+                return \Carbon\Carbon::parse($methodEntry['called_at'])->setTimezone('UTC')->toDateTimeString();
+            }
+
+            return $methodEntry['called_at'];
         }
     }
 }
