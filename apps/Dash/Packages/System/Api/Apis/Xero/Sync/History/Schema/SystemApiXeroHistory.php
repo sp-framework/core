@@ -1,10 +1,10 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Schema;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Schema;
 
 use Phalcon\Db\Column;
 
-class SystemApiXeroPurchaseOrders
+class SystemApiXeroHistory
 {
     public function columns()
     {
@@ -21,7 +21,7 @@ class SystemApiXeroPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'baz_po_id',
+                    'baz_activity_log_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false
@@ -35,7 +35,7 @@ class SystemApiXeroPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'PurchaseOrderID',
+                    'xero_package',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 50,
@@ -43,7 +43,7 @@ class SystemApiXeroPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'ContactID',
+                    'xero_package_row_id',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 50,
@@ -51,180 +51,43 @@ class SystemApiXeroPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'PurchaseOrderNumber',
+                    'Changes',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => true
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 2048,
+                        'notNull' => false
                     ]
                 ),
                 new Column(
-                    'Date',
+                    'Details',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => true
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 2048,
+                        'notNull' => false
                     ]
                 ),
                 new Column(
-                    'DeliveryDate',
+                    'User',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'AttentionTo',
+                    'DateUTC',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'Telephone',
+                    'DateUTCString',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'DeliveryInstructions',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'HasErrors',
-                    [
-                        'type'          => Column::TYPE_BOOLEAN,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'IsDiscounted',
-                    [
-                        'type'          => Column::TYPE_BOOLEAN,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'Reference',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'Type',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'CurrencyRate',
-                    [
-                        'type'          => Column::TYPE_FLOAT,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'CurrencyCode',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 3,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'BrandingThemeID',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'Status',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
-                        'notNull'       => true,
-                    ]
-                ),
-                new Column(
-                    'LineAmountTypes',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'SubTotal',
-                    [
-                        'type'          => Column::TYPE_FLOAT,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'TotalTax',
-                    [
-                        'type'          => Column::TYPE_FLOAT,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'Total',
-                    [
-                        'type'          => Column::TYPE_FLOAT,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'UpdatedDateUTC',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'HasAttachments',
-                    [
-                        'type'          => Column::TYPE_BOOLEAN,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'DeliveryAddress',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'ExpectedArrivalDate',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'ExpectedArrivalDateString',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -240,21 +103,7 @@ class SystemApiXeroPurchaseOrders
                         'type'          => Column::TYPE_BOOLEAN,
                         'notNull'       => false,
                     ]
-                ),
-                new Column(
-                    'conflict',
-                    [
-                        'type'          => Column::TYPE_BOOLEAN,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'conflict_id',
-                    [
-                        'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => false,
-                    ]
-                ),
+                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

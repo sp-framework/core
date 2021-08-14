@@ -1,22 +1,32 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Model;
 
 use System\Base\BaseModel;
 
-class SystemApiXeroPurchaseOrdersHistoryRecords extends BaseModel
+class SystemApiXeroHistory extends BaseModel
 {
     public $id;
 
-    public $PurchaseOrderID;
+    public $baz_activity_log_id;
 
-    public $Details;
+    public $api_id;
+
+    public $xero_package;
+
+    public $xero_package_row_id;
 
     public $Changes;
+
+    public $Details;
 
     public $User;
 
     public $DateUTC;
 
     public $DateUTCString;
+
+    public $resync_local;
+
+    public $resync_remote;
 }

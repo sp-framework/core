@@ -1,267 +1,69 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History;
 
 use Apps\Dash\Packages\System\Api\Api;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Contacts;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Model\SystemApiXeroContacts;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Model\SystemApiXeroContactsPhones;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrders;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrdersAttachments;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrdersHistoryRecords;
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrdersLineitems;
-use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentsRestRequest;
-use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderHistoryRestRequest;
-use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrdersRestRequest;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Model\SystemApiXeroHistory;
 use System\Base\BasePackage;
 
-class PurchaseOrders extends BasePackage
+class History extends BasePackage
 {
     protected $apiPackage;
 
+    protected $api;
+
+    protected $xeroApi;
+
     protected $request;
 
-    public function sync($apiId = null)
+    public function sync($apiId, $xeroPackage, $xeroPackageRowId, array $historyRecords)
     {
-        $this->apiPackage = new Api;
-
-        $this->request = new GetPurchaseOrdersRestRequest;
-
-        $xeroApis = $this->apiPackage->getApiByType('xero', true);
-
-        foreach ($xeroApis as $key => $xeroApi) {
-            $this->syncWithXero($xeroApi['api_id']);
-        }
+        $this->addUpdateXeroHistory($apiId, $xeroPackage, $xeroPackageRowId, $historyRecords);
     }
 
-    protected function syncWithXero($apiId)
+    public function addUpdateXeroHistory($apiId, $xeroPackage, $xeroPackageRowId, array $historyRecords)
     {
-        $api = $this->apiPackage->useApi(['api_id' => $apiId]);
+        if (count($historyRecords) > 0) {
+            foreach ($historyRecords as $historyRecordKey => $historyRecord) {
+                $model = SystemApiXeroHistory::class;
 
-        $this->syncDependencies($apiId);
-
-        $xeroAccountingApi = $api->useService('XeroAccountingApi');
-
-        $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetPurchaseOrders', $apiId);
-
-        if ($modifiedSince) {
-            $xeroAccountingApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
-        }
-
-        $page = 1;
-
-        do {
-            $this->request->page = $page;
-
-            $response = $xeroAccountingApi->getPurchaseOrders($this->request);
-
-            $api->refreshXeroCallStats($response->getHeaders());
-
-            $responseArr = $response->toArray();
-
-            if ($responseArr['Status'] === 'OK' && isset($responseArr['PurchaseOrders'])) {
-                if (count($responseArr['PurchaseOrders']) > 0) {
-                    foreach ($responseArr['PurchaseOrders'] as $purchaseOrderKey => &$purchaseOrder) {
-                        $purchaseOrder['api_id'] = $xeroApi['id'];
-                        $purchaseOrder['ContactID'] = $purchaseOrder['Contact']['ContactID'];
-                        $purchaseOrder['resync_local'] = 1;
-
-                        if ($purchaseOrder['HasAttachments'] === true) {
-                            $purchaseOrder['Attachments'] =
-                                $this->getPurchaseOrderAttachments($xeroAccountingApi, $purchaseOrder['PurchaseOrderID']);
-                        }
-
-                        $purchaseOrder['HistoryRecords'] =
-                            $this->getPurchaseOrderHistory($xeroAccountingApi, $purchaseOrder['PurchaseOrderID']);
-                    }
-
-                    $this->addUpdateXeroPurchaseOrders($responseArr['PurchaseOrders']);
-                }
-            }
-
-            $page++;
-            var_dump($responseArr);
-        } while (isset($responseArr['PurchaseOrders']) && count($responseArr['PurchaseOrders']) > 0);
-
-    }
-
-    protected function syncDependencies($apiId)
-    {
-        $contacts = new Contacts;
-
-        $contacts->sync($apiId);
-    }
-
-    protected function getPurchaseOrderAttachments($xeroAccountingApi, $purchaseOrderId)
-    {
-        $request = new GetPurchaseOrderAttachmentsRestRequest;
-
-        $request->PurchaseOrderID = $purchaseOrderId;
-
-        $response = $xeroAccountingApi->getPurchaseOrderAttachments($request);
-
-        $responseArr = $response->toArray();
-
-        if ($responseArr['Status'] === 'OK') {
-            return $responseArr['Attachments'];
-        }
-
-        return [];
-    }
-
-    protected function getPurchaseOrderHistory($xeroAccountingApi, $purchaseOrderId)
-    {
-        $request = new GetPurchaseOrderHistoryRestRequest;
-
-        $request->PurchaseOrderID = $purchaseOrderId;
-
-        $response = $xeroAccountingApi->getPurchaseOrderHistory($request);
-
-        $responseArr = $response->toArray();
-
-        if ($responseArr['Status'] === 'OK') {
-            return $responseArr['HistoryRecords'];
-        }
-
-        return [];
-    }
-
-    protected function addUpdateXeroPurchaseOrders(array $purchaseOrders)
-    {
-        foreach ($purchaseOrders as $purchaseOrderKey => $purchaseOrder) {
-            $model = SystemApiXeroPurchaseOrders::class;
-
-            $xeroPo = $model::findFirst(
-                [
-                    'conditions'    => 'PurchaseOrderID = :poid:',
-                    'bind'          =>
-                        [
-                            'poid'  => $purchaseOrder['PurchaseOrderID']
-                        ]
-                ]
-            );
-
-            $modelToUse = new $model();
-
-            if (!$xeroPo) {
-                $modelToUse->assign($purchaseOrder);
-
-                $modelToUse->create();
-            } else if ($xeroPo && $xeroPo->count() > 0) {
-                if ($purchaseOrder['UpdatedDateUTC'] !== $xeroPo->UpdatedDateUTC) {
-                    $modelToUse->assign($purchaseOrder);
-
-                    $modelToUse->update();
-                }
-            }
-
-            $this->addUpdateXeroPurchaseOrderLineItems($purchaseOrder);
-
-            $this->addUpdateXeroPurchaseOrderAttachments($purchaseOrder);
-
-            $this->addUpdateXeroPurchaseOrderHistoryRecords($purchaseOrder);
-        }
-    }
-
-    protected function addUpdateXeroPurchaseOrderLineItems($purchaseOrder)
-    {
-        if (isset($purchaseOrder['LineItems']) && count($purchaseOrder['LineItems']) > 0) {
-            foreach ($purchaseOrder['LineItems'] as $lineItemKey => $lineItem) {
-                $model = SystemApiXeroPurchaseOrdersLineitems::class;
-
-                $xeroPo = $model::findFirst(
+                $xeroHistory = $model::findFirst(
                     [
-                        'conditions'    => 'PurchaseOrderID = :poid: AND LineItemID = :liid:',
+                        'conditions'    => 'xero_package_row_id = :xpri: AND DateUTCString = :dutcs:',
                         'bind'          =>
                             [
-                                'poid'  => $purchaseOrder['PurchaseOrderID'],
-                                'liid'  => $lineItem['LineItemID']
+                                'xpri'  => $xeroPackageRowId,
+                                'dutcs' => $historyRecord['DateUTCString']
                             ]
                     ]
                 );
 
-                $modelToUse = new $model();
+                $historyRecord['api_id'] = $apiId;
+                $historyRecord['xero_package'] = $xeroPackage;
+                $historyRecord['xero_package_row_id'] = $xeroPackageRowId;
 
-                $modelToUse->assign($lineItem);
+                if (!$xeroHistory) {
+                    $modelToUse = new $model();
 
-                if (!$xeroPo) {
-                    $modelToUse->assign($purchaseOrder);
+                    $modelToUse->assign($historyRecord);
 
                     $modelToUse->create();
-                } else if ($xeroPo && $xeroPo->count() > 0) {
-                    $modelToUse->assign($purchaseOrder);
+                } else {
+                    $xeroHistory->assign($historyRecord);
 
-                    $modelToUse->update();
+                    $xeroHistory->update();
                 }
             }
         }
     }
 
-    protected function addUpdateXeroPurchaseOrderAttachments($purchaseOrder)
+    public function reSync()
     {
-        if (isset($purchaseOrder['Attachments']) && count($purchaseOrder['Attachments']) > 0) {
-            foreach ($purchaseOrder['Attachments'] as $attachmentKey => $attachment) {
-                $model = SystemApiXeroPurchaseOrdersAttachments::class;
-
-                $xeroPo = $model::findFirst(
-                    [
-                        'conditions'    => 'PurchaseOrderID = :poid: AND AttachmentID = :aid:',
-                        'bind'          =>
-                            [
-                                'poid'  => $purchaseOrder['PurchaseOrderID'],
-                                'aid'   => $attachment['AttachmentID']
-                            ]
-                    ]
-                );
-
-                $modelToUse = new $model();
-
-                $modelToUse->assign($attachment);
-
-                if (!$xeroPo) {
-                    $modelToUse->assign($purchaseOrder);
-
-                    $modelToUse->create();
-                } else if ($xeroPo && $xeroPo->count() > 0) {
-                    $modelToUse->assign($purchaseOrder);
-
-                    $modelToUse->update();
-                }
-            }
-        }
+        //
     }
 
-    protected function addUpdateXeroPurchaseOrderHistoryRecords($purchaseOrder)
+    public function syncWithLocal()
     {
-        if (isset($purchaseOrder['HistoryRecords']) && count($purchaseOrder['HistoryRecords']) > 0) {
-            foreach ($purchaseOrder['HistoryRecords'] as $historyRecordKey => $historyRecord) {
-                $model = SystemApiXeroPurchaseOrdersHistoryRecords::class;
-
-                $xeroPo = $model::findFirst(
-                    [
-                        'conditions'    => 'PurchaseOrderID = :poid: AND DateUTC = :dutc:',
-                        'bind'          =>
-                            [
-                                'poid'  => $purchaseOrder['PurchaseOrderID'],
-                                'dutc'  => $historyRecord['DateUTC']
-                            ]
-                    ]
-                );
-
-                $modelToUse = new $model();
-
-                $modelToUse->assign($historyRecord);
-
-                if (!$xeroPo) {
-                    $modelToUse->assign($purchaseOrder);
-
-                    $modelToUse->create();
-                } else if ($xeroPo && $xeroPo->count() > 0) {
-                    $modelToUse->assign($purchaseOrder);
-
-                    $modelToUse->update();
-                }
-            }
-        }
+        //
     }
 }
