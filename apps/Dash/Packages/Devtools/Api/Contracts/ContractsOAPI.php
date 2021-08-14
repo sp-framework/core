@@ -433,8 +433,10 @@ class ' . $this->contract['name'] . 'Service extends ' . $this->contract['name']
         foreach ($this->contract['content']['components']['schemas'] as $typeKey => $type) {
             $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
         }
-        foreach ($this->contract['content']['components']['responses'] as $typeKey => $type) {
-            $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
+        if (isset($this->contract['content']['components']['responses'])) {
+            foreach ($this->contract['content']['components']['responses'] as $typeKey => $type) {
+                $this->writeTypesFileContent($typeKey, $this->buildTypesFileContent($typeKey, $type));
+            }
         }
     }
 

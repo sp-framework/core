@@ -2,7 +2,16 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync;
 
-use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroAttachments;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Attachments\Schema\SystemApiXeroAttachments;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\Schema\SystemApiXeroContactGroups;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContacts;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsAddresses;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsContactPersons;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsFinance;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsPhones;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Schema\SystemApiXeroHistory;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Schema\SystemApiXeroPurchaseOrders;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Schema\SystemApiXeroPurchaseOrdersLineitems;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -13,34 +22,43 @@ class Package extends BasePackage
         $this->init();
 
         try {
-            // if ($dropTables) {
+            if ($dropTables) {
                 // Attachments
-                // $this->createTable('system_api_xero_attachments', '', (new SystemApiXeroAttachments)->columns(), $dropTables);
+                $this->createTable('system_api_xero_attachments', '', (new SystemApiXeroAttachments)->columns(), $dropTables);
+                // History
+                $this->createTable('system_api_xero_history', '', (new SystemApiXeroHistory)->columns(), $dropTables);
+                //Contact Groups
+                $this->createTable('system_api_xero_contact_groups', '', (new SystemApiXeroContactGroups)->columns(), $dropTables);
                 //Contacts
-                // $this->createTable('system_api_xero_contacts', '', (new SystemApiXeroContacts)->columns(), $dropTables);
-                // $this->createTable('system_api_xero_contacts_phones', '', (new SystemApiXeroContactsPhones)->columns(), $dropTables);
-                // $this->createTable('system_api_xero_contacts_Addresses', '', (new SystemApiXeroContactsAddresses)->columns(), $dropTables);
-
-                // $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns(), $dropTables);
-                // $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns(), $dropTables);
-                // $this->createTable('system_api_xero_purchase_orders_attachments', '', (new SystemApiXeroPurchaseOrdersAttachments)->columns(), $dropTables);
-                // $this->createTable('system_api_xero_purchase_orders_history_records', '', (new SystemApiXeroPurchaseOrdersHistoryRecords)->columns(), $dropTables);
-            // } else {
-            //     $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns());
-            //     $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns());
-            //     $this->createTable('system_api_xero_purchase_orders_attachments', '', (new SystemApiXeroPurchaseOrdersAttachments)->columns());
-            //     $this->createTable('system_api_xero_purchase_orders_history_records', '', (new SystemApiXeroPurchaseOrdersHistoryRecords)->columns());
-            //     $this->createTable('system_api_xero_contacts', '', (new SystemApiXeroContacts)->columns());
-            //     $this->createTable('system_api_xero_contacts_phones', '', (new SystemApiXeroContactsPhones)->columns());
-            //     $this->createTable('system_api_xero_contacts_Addresses', '', (new SystemApiXeroContactsAddresses)->columns());
-            // }
+                $this->createTable('system_api_xero_contacts_addresses', '', (new SystemApiXeroContactsAddresses)->columns(), $dropTables);
+                $this->createTable('system_api_xero_contacts_phones', '', (new SystemApiXeroContactsPhones)->columns(), $dropTables);
+                $this->createTable('system_api_xero_contacts_contact_persons', '', (new SystemApiXeroContactsContactPersons)->columns(), $dropTables);
+                $this->createTable('system_api_xero_contacts_finance', '', (new SystemApiXeroContactsFinance)->columns(), $dropTables);
+                $this->createTable('system_api_xero_contacts', '', (new SystemApiXeroContacts)->columns(), $dropTables);
+                // Purchase Orders
+                $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns(), $dropTables);
+                $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns(), $dropTables);
+            } else {
+                // Attachments
+                $this->createTable('system_api_xero_attachments', '', (new SystemApiXeroAttachments)->columns());
+                // History
+                $this->createTable('system_api_xero_history', '', (new SystemApiXeroHistory)->columns());
+                //Contact Groups
+                $this->createTable('system_api_xero_contact_groups', '', (new SystemApiXeroContactGroups)->columns());
+                //Contacts
+                $this->createTable('system_api_xero_contacts_addresses', '', (new SystemApiXeroContactsAddresses)->columns());
+                $this->createTable('system_api_xero_contacts_phones', '', (new SystemApiXeroContactsPhones)->columns());
+                $this->createTable('system_api_xero_contacts_contact_persons', '', (new SystemApiXeroContactsContactPersons)->columns());
+                $this->createTable('system_api_xero_contacts_finance', '', (new SystemApiXeroContactsFinance)->columns());
+                $this->createTable('system_api_xero_contacts', '', (new SystemApiXeroContacts)->columns());
+                // Purchase Orders
+                $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns(), $dropTables);
+                $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns(), $dropTables);
+            }
 
             return true;
         } catch (\PDOException $e) {
-
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = $e->getMessage();
+            $this->addResponse($e->getMessage(), 1);
         }
     }
 }

@@ -35,11 +35,6 @@ class XeroFilesApiService extends XeroFilesApiBaseService
           'resource' => 'Files',
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\UploadFileRestResponse',
           'params' => [
-            'FolderId' => [
-              'valid' => [
-                'string',
-              ],
-            ],
           ],
         ],
         'GetFile' => [
@@ -74,6 +69,19 @@ class XeroFilesApiService extends XeroFilesApiBaseService
           'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\DeleteFileRestResponse',
           'params' => [
             'FileId' => [
+              'valid' => [
+                'string',
+              ],
+              'required' => true,
+            ],
+          ],
+        ],
+        'UploadFileToFolder' => [
+          'method' => 'POST',
+          'resource' => 'Files/{FolderId}',
+          'responseClass' => '\Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\UploadFileToFolderRestResponse',
+          'params' => [
+            'FolderId' => [
               'valid' => [
                 'string',
               ],
@@ -272,6 +280,16 @@ class XeroFilesApiService extends XeroFilesApiBaseService
     public function deleteFileAsync(\Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\DeleteFileRestRequest $request)
     {
         return $this->callOperationAsync('DeleteFile', $request);
+    }
+
+    public function uploadFileToFolder(\Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\UploadFileToFolderRestRequest $request)
+    {
+        return $this->uploadFileToFolderAsync($request)->wait();
+    }
+
+    public function uploadFileToFolderAsync(\Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\UploadFileToFolderRestRequest $request)
+    {
+        return $this->callOperationAsync('UploadFileToFolder', $request);
     }
 
     public function getFileContent(\Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\GetFileContentRestRequest $request)

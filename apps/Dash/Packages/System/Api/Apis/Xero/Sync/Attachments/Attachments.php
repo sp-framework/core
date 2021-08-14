@@ -1,22 +1,33 @@
 <?php
 
-namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts;
+namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Attachments;
 
 use Apps\Dash\Packages\System\Api\Api;
-use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactsRestRequest;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Attachments\Model\SystemApiXeroAttachments;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroFilesApi\Operations\GetFilesRestRequest;
 use System\Base\BasePackage;
 
-class Contacts extends BasePackage
+class Attachments extends BasePackage
 {
     protected $apiPackage;
 
+    protected $api;
+
+    protected $xeroApi;
+
     protected $request;
 
-    public function sync($apiId = null)
+    public function sync($apiId = null, $xeroPackage = null, $xeroPackageRowId = null, array $attachments = null)
     {
+        if ($attachments) {
+            $this->addUpdateXeroAttachments($apiId, $xeroPackage, $xeroPackageRowId, $attachments);
+
+            return;
+        }
+
         $this->apiPackage = new Api;
 
-        $this->request = new GetContactsRestRequest;
+        $this->request = new GetFilesRestRequest;
 
         $xeroApis = $this->apiPackage->getApiByType('xero', true);
 
@@ -27,105 +38,59 @@ class Contacts extends BasePackage
         } else {
             $this->syncWithXero($apiId);
         }
-        die();
     }
 
     protected function syncWithXero($apiId)
     {
-        $api = $this->apiPackage->useApi(['api_id' => $apiId]);
+        $this->api = $this->apiPackage->useApi(['api_id' => $apiId]);
 
-        $xeroAccountingApi = $api->useService('XeroAccountingApi');
+        $this->xeroApi = $this->api->useService('XeroFilesApi');
 
-        // $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetContacts', $apiId);
-
-        // if ($modifiedSince) {
-        //     $xeroAccountingApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
-        // }
-
-        $page = 1;
-
-        do {
-            $this->request->page = $page;
-
-            $this->request->includeArchived = true;
-
-            $response = $xeroAccountingApi->getContacts($this->request);
-
-            $api->refreshXeroCallStats($response->getHeaders());
-
-            $responseArr = $response->toArray();
-
-            if ($responseArr['Status'] === 'OK' && isset($responseArr['Contacts'])) {
-                if (count($responseArr['Contacts']) > 0) {
-                    // $this->addUpdateXeroContacts($responseArr['Contacts']);
-                }
-            }
-
-            var_dump($responseArr);
-            $page++;
-        } while (isset($responseArr['Contacts']) && count($responseArr['Contacts']) > 0);
+        //
     }
 
-    protected function addUpdateXeroContacts($contacts)
+    public function addUpdateXeroAttachments($apiId = null, $xeroPackage = null, $xeroPackageRowId = null, array $attachments)
     {
-        foreach ($contacts as $contactKey => $contact) {
-            $model = SystemApiXeroContacts::class;
+        if (count($attachments) > 0) {
+            foreach ($attachments as $attachmentKey => $attachment) {
+                $model = SystemApiXeroAttachments::class;
 
-            $xeroContact = $model::findFirst(
-                [
-                    'conditions'    => 'ContactID = :cid:',
-                    'bind'          =>
-                        [
-                            'cid'   => $contact['ContactID']
-                        ]
-                ]
-            );
+                $xeroAttachment = $model::findFirst(
+                    [
+                        'conditions'    => 'AttachmentID = :aid:',
+                        'bind'          =>
+                            [
+                                'aid'   => $attachment['AttachmentID']
+                            ]
+                    ]
+                );
 
-            $modelToUse = new $model();
+                $attachment['api_id'] = $apiId;
+                $attachment['xero_package'] = $xeroPackage;
+                $attachment['xero_package_row_id'] = $xeroPackageRowId;
 
-            $modelToUse->assign($contact);
+                if (!$xeroAttachment) {
+                    $modelToUse = new $model();
 
-            if ($xeroContact->count() === 0) {
-                $modelToUse->create();
-            } else {
-                if ($contact['UpdatedDateUTC'] !== $xeroContact->UpdatedDateUTC) {
-                    $modelToUse->update();
+                    $modelToUse->assign($attachment);
+
+                    $modelToUse->create();
+                } else {
+                    $xeroAttachment->assign($attachment);
+
+                    $xeroAttachment->update();
                 }
-            }
-
-            if (isset($contact['Phones']) && count($contact['Phones']) > 0) {
-                $this->addUpdateXeroContactsPhones($contact);
             }
         }
     }
 
-    protected function addUpdateXeroContactsPhones($contact)
+    public function reSync()
     {
-        $model = SystemApiXeroContactsPhones::class;
+        //
+    }
 
-        foreach ($contact['Phones'] as $phoneKey => $phone) {
-            $xeroContact = $model::findFirst(
-                [
-                    'conditions'    => 'PurchaseOrderID = :poid: AND ContactID = :cid:',
-                    'bind'          =>
-                        [
-                            'poid'  => $contact['PurchaseOrderID'],
-                            'cid'   => $contact['ContactID']
-                        ]
-                ]
-            );
-
-            $modelToUse = new $model();
-
-            $contact['PurchaseOrderID'] = $contact['PurchaseOrderID'];
-
-            $modelToUse->assign($contact);
-
-            if ($xeroContact->count() === 0) {
-                $modelToUse->create();
-            } else {
-                $modelToUse->update();
-            }
-        }
+    public function syncWithLocal()
+    {
+        //
     }
 }
