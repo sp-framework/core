@@ -91,10 +91,10 @@ class SystemApiXeroContacts
                     ]
                 ),
                 new Column(
-                    'ContactGroupID',
+                    'ContactGroups',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
+                        'size'          => 1024,
                         'notNull'       => false
                     ]
                 ),
@@ -113,14 +113,6 @@ class SystemApiXeroContacts
                     ]
                 ),
                 new Column(
-                    'UpdatedDateUTC',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
-                        'notNull'       => false
-                    ]
-                ),
-                new Column(
                     'HasAttachments',
                     [
                         'type'          => Column::TYPE_BOOLEAN,
@@ -131,6 +123,22 @@ class SystemApiXeroContacts
                     'HasValidationErrors',
                     [
                         'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'UpdatedDateUTC',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'BrandingTheme',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
                         'notNull'       => false
                     ]
                 ),

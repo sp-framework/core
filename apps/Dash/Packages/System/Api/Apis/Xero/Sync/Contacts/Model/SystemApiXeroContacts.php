@@ -14,6 +14,8 @@ class SystemApiXeroContacts extends BaseModel
 
     public $ContactID;
 
+    public $AccountNumber;
+
     public $ContactStatus;
 
     public $Name;
@@ -22,11 +24,21 @@ class SystemApiXeroContacts extends BaseModel
 
     public $LastName;
 
-    public $DefaultCurrency;
+    public $EmailAddress;
+
+    public $ContactGroups;
+
+    public $IsSupplier;
+
+    public $IsCustomer;
+
+    public $HasAttachments;
+
+    public $HasValidationErrors;
 
     public $UpdatedDateUTC;
 
-    public $HasValidationErrors;
+    public $BrandingTheme;
 
     public $resync_local;
 
@@ -35,4 +47,5 @@ class SystemApiXeroContacts extends BaseModel
     public $conflict;
 
     public $conflict_id;
+
 }

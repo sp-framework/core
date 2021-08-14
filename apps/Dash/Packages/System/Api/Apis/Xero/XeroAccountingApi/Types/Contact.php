@@ -165,7 +165,7 @@ class Contact extends XeroType
         ],
         'PaymentTerms' => [
           'type' => 'Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Types\PaymentTerm',
-          'repeatable' => false,
+          'repeatable' => true,
           'attribute' => false,
           'elementName' => 'PaymentTerms',
         ],

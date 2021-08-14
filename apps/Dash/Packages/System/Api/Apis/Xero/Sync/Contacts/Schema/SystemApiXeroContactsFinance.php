@@ -29,18 +29,18 @@ class SystemApiXeroContactsFinance
                     ]
                 ),
                 new Column(
-                    'TaxNumber',
+                    'BankAccountDetails',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
                 new Column(
-                    'BankAccountDetails',
+                    'TaxNumber',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 1024,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
@@ -48,7 +48,7 @@ class SystemApiXeroContactsFinance
                     'AccountsReceivableTaxType',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
@@ -56,7 +56,7 @@ class SystemApiXeroContactsFinance
                     'AccountsPayableTaxType',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
@@ -64,7 +64,7 @@ class SystemApiXeroContactsFinance
                     'SalesDefaultAccountCode',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
@@ -72,7 +72,7 @@ class SystemApiXeroContactsFinance
                     'PurchaseDefaultAccountCode',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 20,
+                        'size'          => 50,
                         'notNull'       => false
                     ]
                 ),
@@ -80,7 +80,71 @@ class SystemApiXeroContactsFinance
                     'DefaultCurrency',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 10,
+                        'size'          => 20,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'Discount',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 20,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'BatchPayments',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'PaymentTermsBillsDay',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 4,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'PaymentTermsBillsType',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'PaymentTermsSalesDay',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 4,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'PaymentTermsSalesType',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'SalesTrackingCategories',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 500,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'PurchasesTrackingCategories',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 500,
                         'notNull'       => false
                     ]
                 ),
