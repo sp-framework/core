@@ -169,12 +169,14 @@ class Vendors extends BasePackage
         );
 
         if ($financialDetailsModel) {
+            unset($data['id']);
+
             $financialDetails = $financialDetailsModel->toArray();
 
             $financialDetails = array_merge($financialDetails, $data);
-        }
 
-        $this->update($financialDetails);
+            $this->update($financialDetails);
+        }
 
         $this->modelToUse = BusinessDirectoryVendors::class;
     }

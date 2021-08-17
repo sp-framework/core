@@ -3,6 +3,8 @@
 namespace Apps\Dash\Packages\Business\Locations;
 
 use Apps\Dash\Packages\Business\Locations\Model\BusinessLocations;
+use Apps\Dash\Packages\Hrms\Employees\Employees;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Locations extends BasePackage
@@ -16,6 +18,8 @@ class Locations extends BasePackage
     public function addLocation(array $data)
     {
         $data['package_name'] = $this->packageName;
+
+        $data = $this->updateEmployees($data);
 
         $this->basepackages->addressbook->addAddress($data);
 
@@ -35,6 +39,8 @@ class Locations extends BasePackage
         $location = $this->getById($data['id']);
 
         $data['package_name'] = $this->packageName;
+
+        $data = $this->updateEmployees($data);
 
         $oldAddress = $this->basepackages->addressbook->getById($data['address_id']);
 
@@ -74,6 +80,28 @@ class Locations extends BasePackage
         } else {
             $this->addResponse('Error removing location.', 1);
         }
+    }
+
+    protected function updateEmployees($data)
+    {
+        if ($data['employee_ids'] !== '') {
+            $data['employee_ids'] = Json::decode($data['employee_ids'], true);
+
+            $employeesIds = [];
+            if (count($data['employee_ids']) > 0) {
+                $employees = $this->usePackage(Employees::class);
+
+                $data['employee_ids'] = msort($data['employee_ids'], 'seq');
+
+                foreach ($data['employee_ids'] as $employeeKey => $employee) {
+                    array_push($employeesIds, $employee['id']);
+                }
+            }
+        }
+
+        $data['employee_ids'] = Json::encode($employeesIds);
+
+        return $data;
     }
 
     protected function addStockQty()

@@ -6,6 +6,7 @@ use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Entities\Entities;
 use Apps\Dash\Packages\Business\Locations\Locations;
 use Apps\Dash\Packages\Hrms\Employees\Employees;
+use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
 class LocationsComponent extends BaseComponent
@@ -41,18 +42,16 @@ class LocationsComponent extends BaseComponent
 
                 $location = array_merge($location, $address);
 
-                if ($location['primary_contact_employee_id'] == 0) {
-                    $location['primary_contact_employee'] = '';
-                } else {
-                    $location['primary_contact_employee'] =
-                        $this->employees->getById($location['primary_contact_employee_id'])['full_name'];
-                }
+                if ($location['employee_ids'] && $location['employee_ids'] !== '') {
+                    $location['employee_ids'] = Json::decode($location['employee_ids'], true);
 
-                if ($location['secondary_contact_employee_id'] == 0) {
-                    $location['secondary_contact_employee'] = '';
-                } else {
-                    $location['secondary_contact_employee'] =
-                        $this->employees->getById($location['secondary_contact_employee_id'])['full_name'];
+                    foreach ($location['employee_ids'] as $employeeKey => $employee) {
+                        if ($this->employees->searchById($employee)) {
+                            $employeeArr = $this->employees->packagesData->employee;
+                        }
+
+                        $location['employee_ids'][$employeeKey] = $employeeArr;
+                    }
                 }
 
                 $this->view->location = $location;

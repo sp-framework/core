@@ -1,93 +1,10 @@
-{% if location['id'] is defined %}
-    {% set locationPrimaryContactEmployeeId = location['primary_contact_employee_id'] %}
-    {% set locationPrimaryContactEmployee = location['primary_contact_employee'] %}
-    {% set locationSecondaryContactEmployeeId = location['secondary_contact_employee_id'] %}
-    {% set locationSecondaryContactEmployee = location['secondary_contact_employee'] %}
-{% else %}
-    {% set locationPrimaryContactEmployeeId = '' %}
-    {% set locationPrimaryContactEmployee = '' %}
-    {% set locationSecondaryContactEmployeeId = '' %}
-    {% set locationSecondaryContactEmployee = '' %}
-{% endif %}
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'primary_contact_employee_id',
-                'fieldLabel'                            : 'Primary Contact Employee ID',
-                'fieldHidden'                           : true,
-                'fieldType'                             : 'input',
-                'fieldBazScan'                          : true,
-                'fieldBazPostOnCreate'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldValue'                            : locationPrimaryContactEmployeeId
-            ]
-        )}}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'primary_contact_employee',
-                'fieldLabel'                            : 'Primary Contact',
-                'fieldType'                             : 'input',
-                'fieldPlaceholder'                      : 'Search employees',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Search primary contact employee responsible for this location.',
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false,
-                'fieldRequired'                         : false,
-                'fieldDataInputMinLength'               : 1,
-                'fieldDataInputMaxLength'               : 100,
-                'fieldValue'                            : locationPrimaryContactEmployee
-            ]
-        )}}
-    </div>
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'secondary_contact_employee_id',
-                'fieldLabel'                            : 'Secondary Contact Employee ID',
-                'fieldHidden'                           : true,
-                'fieldType'                             : 'input',
-                'fieldBazScan'                          : true,
-                'fieldBazPostOnCreate'                  : true,
-                'fieldBazPostOnUpdate'                  : true,
-                'fieldValue'                            : locationSecondaryContactEmployeeId
-            ]
-        )}}
-        {{adminltetags.useTag('fields',
-            [
-                'component'                             : component,
-                'componentName'                         : componentName,
-                'componentId'                           : componentId,
-                'sectionId'                             : sectionId,
-                'fieldId'                               : 'secondary_contact_employee',
-                'fieldLabel'                            : 'Secondary Contact',
-                'fieldType'                             : 'input',
-                'fieldPlaceholder'                      : 'Search employees',
-                'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'Search primary contact employee responsible for this location.',
-                'fieldBazScan'                          : true,
-                'fieldBazJstreeSearch'                  : true,
-                'fieldBazPostOnCreate'                  : false,
-                'fieldBazPostOnUpdate'                  : false,
-                'fieldRequired'                         : false,
-                'fieldDataInputMinLength'               : 1,
-                'fieldDataInputMaxLength'               : 100,
-                'fieldValue'                            : locationSecondaryContactEmployee
-            ]
-        )}}
-    </div>
-</div>
+{{adminltetags.useTag('employees',
+    [
+        'component'                                   : component,
+        'componentName'                               : componentName,
+        'componentId'                                 : componentId,
+        'sectionId'                                   : sectionId,
+        'employeeFieldType'                           : 'multiple',
+        'employee_ids'                                : location['employee_ids']
+    ]
+)}}

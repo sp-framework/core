@@ -87,16 +87,10 @@ class Locations
                     ]
                 ),
                 new Column(
-                    'primary_contact_employee_id',
+                    'employee_ids',
                     [
-                        'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'secondary_contact_employee_id',
-                    [
-                        'type'          => Column::TYPE_INTEGER,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
                         'notNull'       => false,
                     ]
                 ),
