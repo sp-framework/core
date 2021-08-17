@@ -47,5 +47,4 @@ class SystemApiXeroContacts extends BaseModel
     public $conflict;
 
     public $conflict_id;
-
 }

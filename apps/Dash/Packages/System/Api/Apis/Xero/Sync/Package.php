@@ -10,6 +10,10 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroCo
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsFinance;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsPhones;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Schema\SystemApiXeroHistory;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisations;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisationsAddresses;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisationsFinance;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisationsPhones;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Schema\SystemApiXeroPurchaseOrders;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Schema\SystemApiXeroPurchaseOrdersLineitems;
 use Phalcon\Helper\Json;
@@ -23,6 +27,12 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
+                // Organisations
+                $this->createTable('system_api_xero_organisations', '', (new SystemApiXeroOrganisations)->columns(), $dropTables);
+                $this->createTable('system_api_xero_organisations_addresses', '', (new SystemApiXeroOrganisationsAddresses)->columns(), $dropTables);
+                $this->createTable('system_api_xero_organisations_finance', '', (new SystemApiXeroOrganisationsFinance)->columns(), $dropTables);
+                $this->createTable('system_api_xero_organisations_phones', '', (new SystemApiXeroOrganisationsPhones)->columns(), $dropTables);
+                return;
                 // Attachments
                 $this->createTable('system_api_xero_attachments', '', (new SystemApiXeroAttachments)->columns(), $dropTables);
                 // History
@@ -39,6 +49,12 @@ class Package extends BasePackage
                 $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns(), $dropTables);
                 $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns(), $dropTables);
             } else {
+                // Organisations
+                $this->createTable('system_api_xero_organisations', '', (new SystemApiXeroOrganisations)->columns());
+                $this->createTable('system_api_xero_organisations_addresses', '', (new SystemApiXeroOrganisationsAddresses)->columns());
+                $this->createTable('system_api_xero_organisations_finance', '', (new SystemApiXeroOrganisationsFinance)->columns());
+                $this->createTable('system_api_xero_organisations_phones', '', (new SystemApiXeroOrganisationsPhones)->columns());
+                return;
                 // Attachments
                 $this->createTable('system_api_xero_attachments', '', (new SystemApiXeroAttachments)->columns());
                 // History
@@ -52,8 +68,8 @@ class Package extends BasePackage
                 $this->createTable('system_api_xero_contacts_finance', '', (new SystemApiXeroContactsFinance)->columns());
                 $this->createTable('system_api_xero_contacts', '', (new SystemApiXeroContacts)->columns());
                 // Purchase Orders
-                $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns(), $dropTables);
-                $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns(), $dropTables);
+                $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns());
+                $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns());
             }
 
             return true;
