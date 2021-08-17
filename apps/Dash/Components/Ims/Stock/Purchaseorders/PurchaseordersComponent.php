@@ -38,32 +38,9 @@ class PurchaseordersComponent extends BaseComponent
 
 			$this->view->entities = $this->entities->getAll()->entities;
 
-			//Move this to statuses package
-			$this->view->orderStatuses =
-				[
-					'1' 	=> [
-						'id'	=> '1',
-						'name' 	=> 'OPEN',
-					],
-					'2'		=> [
-						'id'	=> '2',
-						'name' 	=> 'PENDING',
-					],
-					'3'		=> [
-						'id'	=> '3',
-						'name' 	=> 'DELIVERED',
-					],
-					'4'		=> [
-						'id'	=> '4',
-						'name' 	=> 'BILLED',
-					],
-					'5'		=> [
-						'id'	=> '5',
-						'name' 	=> 'COMPLETE'
-					]
-				];
+			$this->view->orderStatuses = $this->purchaseOrdersPackage->getOrderStatuses();
 
-			$this->view->suppliers = $this->vendors->getAllManufacturersSuppliers();
+			$this->view->vendors = $this->vendors->getAllSuppliers();
 
 			$this->view->locations = $this->locations->getLocationsByInboundShipping();
 

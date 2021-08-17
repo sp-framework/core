@@ -5,7 +5,7 @@
     {% set purchaseReferenceOrders = purchaseOrder['reference_orders'] %}
     {% set purchaseOrderExpectedDeliveryDate = purchaseOrder['expected_delivery_date'] %}
     {% set purchaseOrderStatus = purchaseOrder['status'] %}
-    {% set purchaseOrderSupplier = purchaseOrder['vendor_id'] %}
+    {% set purchaseOrderVendor = purchaseOrder['vendor_id'] %}
     {% set purchaseOrderStatusDisabled = false %}
 {% else %}
     {% set purchaseOrderId = '' %}
@@ -13,7 +13,7 @@
     {% set purchaseReferenceOrders = '' %}
     {% set purchaseOrderExpectedDeliveryDate = '' %}
     {% set purchaseOrderStatus = '1' %}
-    {% set purchaseOrderSupplier = '' %}
+    {% set purchaseOrderVendor = '' %}
     {% set purchaseOrderStatusDisabled = true %}
 {% endif %}
 <div class="row">
@@ -151,20 +151,20 @@
                 'componentId'                          : componentId,
                 'sectionId'                            : sectionId,
                 'fieldId'                              : 'vendor_id',
-                'fieldLabel'                           : 'Supplier',
+                'fieldLabel'                           : 'Vendor',
                 'fieldType'                            : 'select2',
                 'fieldHelp'                            : true,
-                'fieldHelpTooltipContent'              : 'Select a supplier.',
+                'fieldHelpTooltipContent'              : 'Select a vendor.',
                 'fieldRequired'                        : true,
                 'fieldBazScan'                         : true,
                 'fieldBazPostOnCreate'                 : true,
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldBazJstreeSearch'                 : true,
-                'fieldDataSelect2Options'              : suppliers,
+                'fieldDataSelect2Options'              : vendors,
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'business_name',
                 'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2OptionsSelected'      : purchaseOrderSupplier
+                'fieldDataSelect2OptionsSelected'      : purchaseOrderVendor
             ]
         )}}
     </div>
@@ -173,7 +173,7 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                
+                <!-- htmlmin:ignore -->
                 {% if purchaseOrder['vendor_addresses'] is defined and purchaseOrder['vendor_addresses']|length > 0 %}
                     {% set vendorAddresses = '' %}
                     {% for vendorAddress in purchaseOrder['vendor_addresses'] %}
@@ -219,7 +219,7 @@
                     {% set vendorAddresses = '' %}
                     {% set vendorAddressesHidden = true %}
                 {% endif %}
-                
+                <!-- htmlmin:ignore -->
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -227,7 +227,7 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'vendor_address_id',
-                        'fieldLabel'                     : 'Supplier Billing Address',
+                        'fieldLabel'                     : 'Vendor Billing Address',
                         'fieldType'                      : 'html',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select an address from the given addresses for this supplier.',
@@ -263,7 +263,7 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                
+                <!-- htmlmin:ignore -->
                 {% if purchaseOrder['vendor_contacts'] is defined and purchaseOrder['vendor_contacts']|length > 0 %}
                     {% set vendorContacts = '' %}
                     {% for vendorContact in purchaseOrder['vendor_contacts'] %}
@@ -319,7 +319,7 @@
                     {% set vendorContacts = '' %}
                     {% set vendorContactsHidden = true %}
                 {% endif %}
-                
+                <!-- htmlmin:ignore -->
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -327,7 +327,7 @@
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
                         'fieldId'                        : 'vendor_contact_id',
-                        'fieldLabel'                     : 'Supplier Contact',
+                        'fieldLabel'                     : 'Vendor Contact',
                         'fieldType'                      : 'html',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Select a contact for this supplier.',
@@ -365,47 +365,6 @@
         </div>
     </div>
 </div>
-{#
-    New fields
-
-    Entity
-    Order Reference - internal searchable
-        (view) - Internal order reference + eBay order reference if order received from eBay
-    Expected Delivery Date
-    Status
-        - OPEN
-        - PENDING
-        - DELIVERED
-        - CLOSED
-
-    Creation date - view
-    Delivery date - view
-    Paid date - view
-
-    Supplier
-
-    Product
-        - Supplier SKU
-        - Title
-        - Qty
-        - Unit Price
-        - Tax
-        - Total
-    - Sub Total
-    - Total GST
-    - Total
-
-    Location
-        - Address
-        - Primary Contact (Employee)
-    OR if vendor does dropship && order field is not blank
-    Customer
-
-    Delivery Instructions
-    - editable text (received from location)
-
-    Internal Notes
-#}
 <script>
 /* globals BazContentLoader */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
@@ -447,7 +406,7 @@ dataCollectionSection =
             placeholder: 'SELECT STATUS'
         },
         '{{componentId}}-{{sectionId}}-vendor_id'               : {
-            placeholder: "SELECT SUPPLIER",
+            placeholder: "SELECT VENDOR",
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-vendor_id').on('select2:select', function(e) {
 
@@ -653,6 +612,21 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-vendor_address_id'       : { },
-        '{{componentId}}-{{sectionId}}-vendor_contact_id'       : { }
+        '{{componentId}}-{{sectionId}}-vendor_contact_id'       : { },
+        '{{componentId}}-{{sectionId}}-delivery_type'           : {
+            placeholder: 'SELECT DELIVERY TYPE',
+            afterInit: function() {
+
+            }
+        },
+        '{{componentId}}-{{sectionId}}-entity_location_id'      : {
+            placeholder: 'SELECT ENTITY LOCATION',
+        },
+        '{{componentId}}-{{sectionId}}-customer_id'             : {
+            placeholder: 'SELECT CUSTOMER',
+        },
+        '{{componentId}}-{{sectionId}}-contact_fullname'        : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : { },
+        '{{componentId}}-{{sectionId}}-delivery_notes'          : { }
     });
 </script>

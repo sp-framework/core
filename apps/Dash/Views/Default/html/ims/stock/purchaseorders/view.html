@@ -34,24 +34,25 @@
         'dataDependencies'     :
         [
             [
-                'componentName'      : 'Storages',
-                'componentVar'       : storages,
-                'componentRoute'     : false
+                'componentName'         : 'Storages',
+                'componentVar'          : storages,
+                'componentRoute'        : false
             ],
             [
-                'componentName'      : 'Entities',
-                'componentVar'       : entities,
-                'componentRoute'     : false
+                'componentName'         : 'Entities',
+                'componentVar'          : entities,
+                'componentRoute'        : false
             ],
             [
-                'componentName'      : 'Suppliers',
-                'componentVar'       : suppliers,
-                'componentRoute'     : 'ims/suppliers'
+                'componentName'         : 'Vendors',
+                'componentVar'          : vendors,
+                'componentErrorMessage' : 'Please <a href="' ~ links.url('business/directory/vendors') ~ '" class="contentAjaxLink text-primary">click here</a> to add new vendor (Is Supplier) contact systems administrator for further instructions'
             ],
             [
-                'componentName'      : 'Locations',
-                'componentVar'       : locations,
-                'componentRoute'     : false
+                'componentName'         : 'Locations',
+                'componentVar'          : locations,
+                'componentRoute'        : 'business/locations',
+                'componentErrorMessage' : 'Please <a href="' ~ links.url('business/locations') ~ '" class="contentAjaxLink text-primary">click here</a> to add new location (with Inbound Shipping) contact systems administrator for further instructions'
             ]
         ]
     ]

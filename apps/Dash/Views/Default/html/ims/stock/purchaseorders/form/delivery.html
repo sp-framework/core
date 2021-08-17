@@ -1,0 +1,244 @@
+{% if purchaseOrder['id'] is defined %}
+    {% set purchaseOrderDeliveryType = purchaseOrder['delivery_type'] %}
+    {% set purchaseOrderDeliveryStreetAddress = purchaseOrder['street_address'] %}
+    {% set purchaseOrderDeliveryStreetAddress2 = purchaseOrder['street_address_2'] %}
+    {% set purchaseOrderDeliveryCityId = purchaseOrder['city_id'] %}
+    {% set purchaseOrderDeliveryCity = purchaseOrder['city_name'] %}
+    {% set purchaseOrderDeliveryPostCode = purchaseOrder['post_code'] %}
+    {% set purchaseOrderDeliveryStateId = purchaseOrder['state_id'] %}
+    {% set purchaseOrderDeliveryState = purchaseOrder['state_name'] %}
+    {% set purchaseOrderDeliveryCountryId = purchaseOrder['country_id'] %}
+    {% set purchaseOrderDeliveryCountry = purchaseOrder['country_name'] %}
+    {% set purchaseOrderDeliveryContactFullname = purchaseOrder['contact_fullname'] %}
+    {% set purchaseOrderDeliveryPhone = purchaseOrder['contact_phone'] %}
+    {% set purchaseOrderDeliveryNotes = purchaseOrder['delivery_notes'] %}
+{% else %}
+    {% set purchaseOrderDeliveryType = '' %}
+    {% set purchaseOrderDeliveryStreetAddress = '' %}
+    {% set purchaseOrderDeliveryStreetAddress2 = '' %}
+    {% set purchaseOrderDeliveryCityId = '' %}
+    {% set purchaseOrderDeliveryCity = '' %}
+    {% set purchaseOrderDeliveryPostCode = '' %}
+    {% set purchaseOrderDeliveryStateId = '' %}
+    {% set purchaseOrderDeliveryState = '' %}
+    {% set purchaseOrderDeliveryCountryId = '' %}
+    {% set purchaseOrderDeliveryCountry = '' %}
+    {% set purchaseOrderDeliveryContactFullname = '' %}
+    {% set purchaseOrderDeliveryPhone = '' %}
+    {% set purchaseOrderDeliveryNotes = '' %}
+{% endif %}
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'delivery_type',
+                'fieldLabel'                           : 'Delivery Type',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Select a delivery type of the purchase order.',
+                'fieldRequired'                        : false,
+                'fieldBazScan'                         : true,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldBazJstreeSearch'                 : false,
+                'fieldDataSelect2Options'              :
+                    [
+                        '1'     : [
+                            'id'    : '1',
+                            'name'  : 'TO ENTITY LOCATION'
+                        ],
+                        '2'     : [
+                            'id'    : '2',
+                            'name'  : 'DROPSHIP TO CUSTOMER'
+                        ],
+                        '3'     : [
+                            'id'    : '3',
+                            'name'  : 'ONE TIME DELIVERY ADDRESS'
+                        ]
+                    ],
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : purchaseOrderDeliveryType
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'entity_location_id',
+                'fieldLabel'                                : 'Entity Location',
+                'fieldType'                                 : 'select2',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : "Location of the selected entity",
+                'fieldDisabled'                             : true,
+                'fieldBazScan'                              : true,
+                'fieldBazJstreeSearch'                      : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldDataSelect2Options'                   : [],
+                'fieldDataSelect2OptionsKey'                : 'id',
+                'fieldDataSelect2OptionsValue'              : 'name',
+                'fieldDataSelect2OptionsArray'              : true,
+                'fieldDataSelect2OptionsSelected'           : ''
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'customer_id',
+                'fieldLabel'                                : 'Customer',
+                'fieldType'                                 : 'select2',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : "Customer to dropship the purchase order",
+                'fieldDisabled'                             : true,
+                'fieldBazScan'                              : true,
+                'fieldBazJstreeSearch'                      : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldDataSelect2Options'                   : [],
+                'fieldDataSelect2OptionsKey'                : 'id',
+                'fieldDataSelect2OptionsValue'              : 'name',
+                'fieldDataSelect2OptionsArray'              : true,
+                'fieldDataSelect2OptionsSelected'           : ''
+            ]
+        )}}
+    </div>
+</div>
+<hr>
+<div class="row vdivide">
+    <div class="col">
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                {{adminltetags.useTag('addresses',
+                    [
+                        'component'                                   : component,
+                        'componentName'                               : componentName,
+                        'componentId'                                 : componentId,
+                        'sectionId'                                   : sectionId,
+                        'addressFieldType'                            : 'single',
+                        'includeStreet'                               : true,
+                        'searchType'                                  : 'city',
+                        'streetAddress'                               : purchaseOrderDeliveryStreetAddress,
+                        'streetAddressFieldRequired'                  : true,
+                        'streetAddressFieldBazPostOnCreate'           : true,
+                        'streetAddressFieldBazPostOnUpdate'           : true,
+                        'streetAddress2'                              : purchaseOrderDeliveryStreetAddress2,
+                        'streetAddress2FieldBazPostOnCreate'          : true,
+                        'streetAddress2FieldBazPostOnUpdate'          : true,
+                        'cityId'                                      : purchaseOrderDeliveryCityId,
+                        'cityName'                                    : purchaseOrderDeliveryCity,
+                        'cityFieldRequired'                           : true,
+                        'cityFieldBazPostOnCreate'                    : true,
+                        'cityFieldBazPostOnUpdate'                    : true,
+                        'postCode'                                    : purchaseOrderDeliveryPostCode,
+                        'postCodeFieldRequired'                       : true,
+                        'postCodeFieldBazPostOnCreate'                : true,
+                        'postCodeFieldBazPostOnUpdate'                : true,
+                        'stateId'                                     : purchaseOrderDeliveryStateId,
+                        'stateName'                                   : purchaseOrderDeliveryState,
+                        'stateFieldRequired'                          : true,
+                        'stateFieldBazPostOnCreate'                   : true,
+                        'stateFieldBazPostOnUpdate'                   : true,
+                        'countryId'                                   : purchaseOrderDeliveryCountryId,
+                        'countryName'                                 : purchaseOrderDeliveryCountry,
+                        'countryFieldRequired'                        : true,
+                        'countryFieldBazPostOnCreate'                 : true,
+                        'countryFieldBazPostOnUpdate'                 : true
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_fullname',
+                        'fieldLabel'                     : 'Contact Name',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Contact Full Name',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : purchaseOrderDeliveryContactFullname
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'contact_phone',
+                        'fieldLabel'                     : 'Contact Phone',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Contact Phone number',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : purchaseOrderDeliveryPhone
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'delivery_notes',
+                'fieldLabel'                     : 'Delivery Notes',
+                'fieldType'                      : 'textarea',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Delivery Notes',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 2048,
+                'fieldTextareaRows'              : 2,
+                'fieldValue'                     : purchaseOrderDeliveryNotes
+            ]
+        )}}
+    </div>
+</div>

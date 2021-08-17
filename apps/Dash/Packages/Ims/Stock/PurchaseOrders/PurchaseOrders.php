@@ -16,39 +16,54 @@ class PurchaseOrders extends BasePackage
     public function addPurchaseOrder(array $data)
     {
         if ($this->add($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added purchase order.';
+            $this->addResponse('Added purchase order.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding purchase order.';
+            $this->addResponse('Error adding purchase order.', 1);
         }
     }
 
     public function updatePurchaseOrder(array $data)
     {
         if ($this->update($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated purchase order.';
+            $this->addResponse('Updated purchase order.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating purchase order.';
+            $this->addResponse('Error updating purchase order.', 1);
         }
     }
 
     public function removePurchaseOrder(array $data)
     {
         if ($this->remove($data['id'])) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Removed purchase order.';
+            $this->addResponse('Removed purchase order.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing purchase order.';
+            $this->addResponse('Error removing purchase order.', 1);
         }
+    }
+
+    public function getOrderStatuses()
+    {
+        return
+            [
+                '1'     => [
+                    'id'    => '1',
+                    'name'  => 'DRAFT',
+                ],
+                '2'     => [
+                    'id'    => '2',
+                    'name'  => 'SUBMITTED',
+                ],
+                '3'     => [
+                    'id'    => '3',
+                    'name'  => 'AUTHORISED',
+                ],
+                '4'     => [
+                    'id'    => '4',
+                    'name'  => 'BILLED',
+                ],
+                '5'     => [
+                    'id'    => '5',
+                    'name'  => 'DELETED'
+                ]
+            ];
     }
 }
