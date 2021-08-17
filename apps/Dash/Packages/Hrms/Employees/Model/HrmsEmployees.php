@@ -2,6 +2,9 @@
 
 namespace Apps\Dash\Packages\Hrms\Employees\Model;
 
+use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesContact;
+use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesEmployment;
+use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesFinance;
 use System\Base\BaseModel;
 
 class HrmsEmployees extends BaseModel
@@ -24,51 +27,33 @@ class HrmsEmployees extends BaseModel
 
     public $manager_id;
 
-    public $type_id;
+    public function initialize()
+    {
+        $this->hasOne(
+            'id',
+            HrmsEmployeesEmployment::class,
+            'employee_id',
+            [
+                'alias' => 'employment'
+            ]
+        );
 
-    public $work_type_id;
+        $this->hasOne(
+            'id',
+            HrmsEmployeesContact::class,
+            'employee_id',
+            [
+                'alias' => 'contact'
+            ]
+        );
 
-    public $contractor_vendor_id;
-
-    public $hire_date;
-
-    public $terminate_date;
-
-    public $hire_manager_id;
-
-    public $hire_referrer_id;
-
-    public $employment_attachments;
-
-    public $employment_notes;
-
-    public $contact_location_id;
-
-    public $contact_address_id;
-
-    public $contact_phone;
-
-    public $contact_phone_ext;
-
-    public $contact_mobile;
-
-    public $contact_fax;
-
-    public $contact_other;
-
-    public $contact_notes;
-
-    public $tfn;
-
-    public $currency;
-
-    public $bsb;
-
-    public $account_number;
-
-    public $swift_code;
-
-    // public $skills;
-
-    // public $skills_attachments;
+        $this->hasOne(
+            'id',
+            HrmsEmployeesFinance::class,
+            'employee_id',
+            [
+                'alias' => 'finance'
+            ]
+        );
+    }
 }

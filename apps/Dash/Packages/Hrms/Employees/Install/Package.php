@@ -3,14 +3,15 @@
 namespace Apps\Dash\Packages\Hrms\Employees\Install;
 
 use Apps\Dash\Packages\Hrms\Employees\Employees;
-use Apps\Dash\Packages\Hrms\Employees\Install\Schema\Employees as EmployeesSchema;
+use Apps\Dash\Packages\Hrms\Employees\Install\Schema\HrmsEmployees;
+use Apps\Dash\Packages\Hrms\Employees\Install\Schema\HrmsEmployeesContact;
+use Apps\Dash\Packages\Hrms\Employees\Install\Schema\HrmsEmployeesEmployment;
+use Apps\Dash\Packages\Hrms\Employees\Install\Schema\HrmsEmployeesFinance;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Package extends BasePackage
 {
-    protected $schemaToUse = EmployeesSchema::class;
-
     protected $packageToUse = Employees::class;
 
     public $employees;
@@ -30,9 +31,15 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
-                $this->createTable('hrms_employees', '', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('hrms_employees', '', (new HrmsEmployees)->columns(), $dropTables);
+                $this->createTable('hrms_employees_employment', '', (new HrmsEmployeesEmployment)->columns(), $dropTables);
+                $this->createTable('hrms_employees_contact', '', (new HrmsEmployeesContact)->columns(), $dropTables);
+                $this->createTable('hrms_employees_finance', '', (new HrmsEmployeesFinance)->columns(), $dropTables);
             } else {
-                $this->createTable('hrms_employees', '', (new $this->schemaToUse)->columns());
+                $this->createTable('hrms_employees', '', (new HrmsEmployees)->columns());
+                $this->createTable('hrms_employees_employment', '', (new HrmsEmployeesEmployment)->columns());
+                $this->createTable('hrms_employees_contact', '', (new HrmsEmployeesContact)->columns());
+                $this->createTable('hrms_employees_finance', '', (new HrmsEmployeesFinance)->columns());
             }
 
             // $this->registerPackage();

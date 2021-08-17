@@ -1,5 +1,5 @@
 {% if employee['id'] is defined %}
-    {% set employeeType = employee['type_id'] %}
+    {% set employeeEmploymentType = employee['employment_type_id'] %}
     {% set employeeContractorVendorId = employee['contractor_vendor_id'] %}
     {% set employeeHireDate = employee['hire_date'] %}
     {% set employeeTerminateDate = employee['terminate_date'] %}
@@ -10,7 +10,7 @@
     {% set employeeEmploymentAttachments = employee['employment_attachments'] %}
     {% set employeeEmploymentNotes = employee['employment_notes'] %}
 {% else %}
-    {% set employeeType = '' %}
+    {% set employeeEmploymentType = '' %}
     {% set employeeContractorVendorId = '' %}
     {% set employeeHireDate = '' %}
     {% set employeeTerminateDate = '' %}
@@ -31,7 +31,7 @@
                         'componentName'                  : componentName,
                         'componentId'                    : componentId,
                         'sectionId'                      : sectionId,
-                        'fieldId'                        : 'type_id',
+                        'fieldId'                        : 'employment_type_id',
                         'fieldLabel'                     : 'Employment Type',
                         'fieldType'                      : 'select2',
                         'fieldHelp'                      : true,
@@ -57,7 +57,7 @@
                         'fieldDataSelect2OptionsKey'           : 'id',
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : employeeType
+                        'fieldDataSelect2OptionsSelected'      : employeeEmploymentType
                     ]
                 )}}
             </div>

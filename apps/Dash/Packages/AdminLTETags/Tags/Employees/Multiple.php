@@ -1,6 +1,6 @@
 <?php
 
-namespace Apps\Dash\Packages\AdminLTETags\Tags\Contacts;
+namespace Apps\Dash\Packages\AdminLTETags\Tags\Employees;
 
 use Apps\Dash\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Helper\Json;
@@ -21,11 +21,11 @@ class Multiple
 
     protected $content;
 
-    protected $contactsParams = [];
+    protected $employeesParams = [];
 
     protected $compSecId;
 
-    public function __construct($view, $tag, $links, $escaper, $params, $contactsParams)
+    public function __construct($view, $tag, $links, $escaper, $params, $employeesParams)
     {
         $this->view = $view;
 
@@ -39,11 +39,11 @@ class Multiple
 
         $this->params = $params;
 
-        $this->contactsParams = $contactsParams;
+        $this->employeesParams = $employeesParams;
 
         $this->compSecId = $this->params['componentId'] . '-' . $this->params['sectionId'];
 
-        $this->buildMultipleContactsLayout();
+        $this->buildMultipleEmployeesLayout();
     }
 
     public function getContent()
@@ -51,7 +51,7 @@ class Multiple
         return $this->content;
     }
 
-    protected function buildMultipleContactsLayout()
+    protected function buildMultipleEmployeesLayout()
     {
         $this->content .=
             '<div class="row vdivide">
@@ -64,11 +64,11 @@ class Multiple
                                     'componentName'                  => $this->params['componentName'],
                                     'componentId'                    => $this->params['componentId'],
                                     'sectionId'                      => $this->params['sectionId'],
-                                    'fieldId'                        => 'contact_ids',
-                                    'fieldLabel'                     => 'Contact IDs',
+                                    'fieldId'                        => 'employee_ids',
+                                    'fieldLabel'                     => 'Employee IDs',
                                     'fieldType'                      => 'input',
                                     'fieldHelp'                      => true,
-                                    'fieldHelpTooltipContent'        => 'Contact IDs',
+                                    'fieldHelpTooltipContent'        => 'Employee IDs',
                                     'fieldRequired'                  => false,
                                     'fieldBazScan'                   => false,
                                     'fieldBazPostOnCreate'           => true,
@@ -86,11 +86,11 @@ class Multiple
                                     'componentName'                  => $this->params['componentName'],
                                     'componentId'                    => $this->params['componentId'],
                                     'sectionId'                      => $this->params['sectionId'],
-                                    'fieldId'                        => 'contact_id',
-                                    'fieldLabel'                     => 'Contact ID',
+                                    'fieldId'                        => 'employee_id',
+                                    'fieldLabel'                     => 'Employee ID',
                                     'fieldType'                      => 'input',
                                     'fieldHelp'                      => true,
-                                    'fieldHelpTooltipContent'        => 'Contact ID',
+                                    'fieldHelpTooltipContent'        => 'Employee ID',
                                     'fieldRequired'                  => false,
                                     'fieldBazScan'                   => false,
                                     'fieldBazPostOnCreate'           => false,
@@ -110,11 +110,11 @@ class Multiple
                                     'componentName'                  => $this->params['componentName'],
                                     'componentId'                    => $this->params['componentId'],
                                     'sectionId'                      => $this->params['sectionId'],
-                                    'fieldId'                        => 'search_contacts',
-                                    'fieldLabel'                     => 'Search Contacts/Add New',
+                                    'fieldId'                        => 'search_employees',
+                                    'fieldLabel'                     => 'Search Employees',
                                     'fieldType'                      => 'input',
                                     'fieldHelp'                      => true,
-                                    'fieldHelpTooltipContent'        => 'Search Contact. If contact does not exist, you can fill contact details and the system will add new contact.',
+                                    'fieldHelpTooltipContent'        => 'Search Employee.',
                                     'fieldRequired'                  => false,
                                     'fieldBazScan'                   => true,
                                     'fieldBazPostOnCreate'           => false,
@@ -126,15 +126,15 @@ class Multiple
                             ) .
                         '</div>
                     </div>
-                    <div class="row" id="' . $this->compSecId . '-new-contact">
+                    <div class="row" id="' . $this->compSecId . '-new-employee">
                         <div class="col">' .
-                            $this->adminLTETags->useTag('contacts',
+                            $this->adminLTETags->useTag('employees',
                                 [
                                     'component'                                   => $this->params['component'],
                                     'componentName'                               => $this->params['componentName'],
                                     'componentId'                                 => $this->params['componentId'],
                                     'sectionId'                                   => $this->params['sectionId'],
-                                    'contactFieldType'                            => 'single'
+                                    'employeeFieldType'                            => 'single'
                                 ]
                             ) .
                         '</div>
@@ -150,14 +150,14 @@ class Multiple
                                     'buttonType'                    => 'button',
                                     'buttons'                       =>
                                         [
-                                            'add-contact'       => [
+                                            'add-employee'       => [
                                                 'title'                   => 'Add',
                                                 'size'                    => 'xs',
                                                 'type'                    => 'primary',
                                                 'icon'                    => 'plus',
                                                 'position'                => 'right'
                                             ],
-                                            'cancel-contact'    => [
+                                            'cancel-employee'    => [
                                                 'title'                   => 'Cancel',
                                                 'size'                    => 'xs',
                                                 'type'                    => 'secondary',
@@ -180,11 +180,11 @@ class Multiple
                                         'componentName'             => $this->params['componentName'],
                                         'componentId'               => $this->params['componentId'],
                                         'sectionId'                 => $this->params['sectionId'],
-                                        'fieldId'                   => 'contacts',
-                                        'fieldLabel'                => 'Contacts',
+                                        'fieldId'                   => 'employees',
+                                        'fieldLabel'                => 'Location Contacts',
                                         'fieldType'                 => 'html',
                                         'fieldHelp'                 => true,
-                                        'fieldHelpTooltipContent'   => 'Note: First contact is the list is primary contact',
+                                        'fieldHelpTooltipContent'   => 'Note: First employee is the list is primary employee',
                                         'fieldAdditionalClass'      => 'mb-0',
                                         'fieldRequired'             => false,
                                         'fieldBazScan'              => false,
@@ -193,12 +193,12 @@ class Multiple
                                         'fieldBazPostOnUpdate'      => false
                                     ]
                                 ) .
-                                '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-contacts">';
+                                '<ul class="list-group list-group-sortable" id="' . $this->compSecId . '-sortable-employees">';
 
-                                    if (isset($this->params['contact_ids']) &&
-                                        count($this->params['contact_ids']) > 0
+                                    if (isset($this->params['employee_ids']) &&
+                                        count($this->params['employee_ids']) > 0
                                     ) {
-                                        foreach ($this->params['contact_ids'] as $key => $contact) {
+                                        foreach ($this->params['employee_ids'] as $key => $employee) {
                                             if ($key === 0) {
                                                 $listType = 'success';
                                             } else {
@@ -206,13 +206,13 @@ class Multiple
                                             }
 
                                             $this->content .=
-                                                '<li class="list-group-item list-group-item-' . $listType . '" area-disabled="false" style="cursor: pointer"  data-new="0" data-contact-id="' . $contact['id'] . '">
+                                                '<li class="list-group-item list-group-item-' . $listType . '" area-disabled="false" style="cursor: pointer"  data-new="0" data-employee-id="' . $employee['id'] . '">
                                                     <div class="row">
                                                         <div class="col">
                                                             <i class="fa fa-sort fa-fw handle"></i>
                                                         </div>
                                                         <div class="col">
-                                                            <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 contactDeleteButton">
+                                                            <button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 employeeDeleteButton">
                                                                 <i class="fa fas fa-fw text-xs fa-trash"></i>
                                                             </button>
                                                         </div>
@@ -221,17 +221,17 @@ class Multiple
                                                         <div class="col list-group-item-data">
                                                             <dl class="row mb-0">
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Email</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-email">' . $contact['account_email'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-email">' . $employee['account_id'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Mobile</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-mobile">' . $contact['contact_mobile'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-mobile">' . $employee['contact_mobile'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">First Name</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-first-name">' . $contact['first_name'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-first-name">' . $employee['first_name'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Last Name</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-last-name">' . $contact['last_name'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-last-name">' . $employee['last_name'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Phone</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-state">' . $contact['contact_phone'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-state">' . $employee['contact_phone'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Extension</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-extension">' . $contact['contact_phone_ext'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-extension">' . $employee['contact_phone_ext'] . '</dd>
                                                             </dl>
                                                         </div>
                                                     </div>
@@ -246,10 +246,10 @@ class Multiple
                     </div>
                 </div>' .
 
-                $this->inclContactsJs();
+                $this->inclEmployeesJs();
     }
 
-    protected function inclContactsJs()
+    protected function inclEmployeesJs()
     {
         $inclJs =
             '<script type="text/javascript">
@@ -279,19 +279,19 @@ class Multiple
 
             dataCollectionSection =
                 $.extend(dataCollectionSection, {
-                    "' . $this->compSecId . '-search_contacts"                   : {
+                    "' . $this->compSecId . '-search_employees"                   : {
                         afterInit : function () {
-                            dataCollectionSection["' . $this->compSecId . '-form"]["autoCompleteSearchContacts"] =
+                            dataCollectionSection["' . $this->compSecId . '-form"]["autoCompleteSearchEmployees"] =
                                 new autoComplete({
                                     data: {
                                         src: async() => {
-                                            const url = "' . $this->links->url("business/directory/contacts/searchContactFullName") . '";
+                                            const url = "' . $this->links->url("hrms/employees/searchEmployee") . '";
 
                                             var myHeaders = new Headers();
                                             myHeaders.append("accept", "application/json");
 
                                             var formdata = new FormData();
-                                            formdata.append("search", document.querySelector("#' . $this->compSecId . '-search_contacts").value);
+                                            formdata.append("search", document.querySelector("#' . $this->compSecId . '-search_employees").value);
                                             formdata.append($("#security-token").attr("name"), $("#security-token").val());
 
                                             var requestOptions = {
@@ -308,8 +308,9 @@ class Multiple
                                                 $("#security-token").attr("name", response.tokenKey);
                                                 $("#security-token").val(response.token);
                                             }
-                                            if (response.contacts) {
-                                                return response.contacts;
+
+                                            if (response.responseData && response.responseData.employees) {
+                                                return response.responseData.employees;
                                             } else {
                                                 return [];
                                             }
@@ -317,17 +318,17 @@ class Multiple
                                         key: ["full_name"],
                                         cache: false
                                     },
-                                    selector: "#' . $this->compSecId . '-search_contacts",
-                                    threshold : 4,
+                                    selector: "#' . $this->compSecId . '-search_employees",
+                                    threshold : 3,
                                     debounce: 500,
                                     searchEngine: "strict",
                                     resultsList: {
                                         render: true,
                                         container: source => {
-                                            source.setAttribute("id", "' . $this->compSecId . '-search_contacts_list");
+                                            source.setAttribute("id", "' . $this->compSecId . '-search_employees_list");
                                             source.setAttribute("class", "autoComplete_results");
                                         },
-                                        destination: "#' . $this->compSecId . '-search_contacts",
+                                        destination: "#' . $this->compSecId . '-search_employees",
                                         position: "afterend",
                                         element: "div",
                                         className: "autoComplete_results"
@@ -345,29 +346,31 @@ class Multiple
                                         result.setAttribute("class", "autoComplete_result text-danger");
                                         result.setAttribute("tabindex", "1");
                                         result.innerHTML = "No search results. Click field help for more information.";
-                                        if (document.querySelector("#' . $this->compSecId . '-search_contacts_list")) {
-                                            $("#' . $this->compSecId . '-search_contacts_list").empty().append(result);
+                                        if (document.querySelector("#' . $this->compSecId . '-search_employees_list")) {
+                                            $("#' . $this->compSecId . '-search_employees_list").empty().append(result);
                                         } else {
-                                            $("#' . $this->compSecId . '-search_contacts").parent(".form-group").append(
-                                                \'<div id="' . $this->compSecId . '-search_contacts_list" class="autoComplete_results"></div>\'
+                                            $("#' . $this->compSecId . '-search_employees").parent(".form-group").append(
+                                                \'<div id="' . $this->compSecId . '-search_employees_list" class="autoComplete_results"></div>\'
                                             );
-                                            document.querySelector("#' . $this->compSecId . '-search_contacts_list").appendChild(result);
+                                            document.querySelector("#' . $this->compSecId . '-search_employees_list").appendChild(result);
                                         }
                                     },
                                     onSelection: feedback => {
-                                        $("#' . $this->compSecId . '-contact_id").val(feedback.selection.value.id);
-                                        $("#' . $this->compSecId . '-contact_id").attr("value", feedback.selection.value.id);
-                                        $("#' . $this->compSecId . '-search_contacts").blur();
-                                        $("#' . $this->compSecId . '-search_contacts").val(feedback.selection.value.full_name);
-                                        $("#' . $this->compSecId . '-search_contacts").attr("value", feedback.selection.value.full_name);
+                                        $("#' . $this->compSecId . '-employee_id").val(feedback.selection.value.id);
+                                        $("#' . $this->compSecId . '-employee_id").attr("value", feedback.selection.value.id);
+                                        $("#' . $this->compSecId . '-search_employees").blur();
+                                        $("#' . $this->compSecId . '-search_employees").val(feedback.selection.value.full_name);
+                                        $("#' . $this->compSecId . '-search_employees").attr("value", feedback.selection.value.full_name);
 
-                                        var url = "' . $this->links->url("business/directory/contacts/searchContactId") . '";
+                                        var url = "' . $this->links->url("hrms/employees/searchEmployeeId") . '";
                                         var postData = { };
                                         postData["id"] = feedback.selection.value.id;
                                         postData[$("#security-token").attr("name")] = $("#security-token").val();
 
                                         $.post(url, postData, function(response) {
-                                            toggleContactFields(response);
+                                            if (response.responseData) {
+                                                toggleEmployeeFields(response.responseData);
+                                            }
                                             if (response.tokenKey && response.token) {
                                                 $("#security-token").attr("name", response.tokenKey);
                                                 $("#security-token").val(response.token);
@@ -376,47 +379,45 @@ class Multiple
                                     }
                             });
                             // On delete
-                            $("#' . $this->compSecId . '-search_contacts").on("input propertychange", function() {
-                                $("#' . $this->compSecId . '-contact_id").val("");
-                                toggleContactFields(false);
+                            $("#' . $this->compSecId . '-search_employees").on("input propertychange", function() {
+                                $("#' . $this->compSecId . '-employee_id").val("");
+                                toggleEmployeeFields(false);
                             });
 
-                            $("#' . $this->compSecId . '-search_contacts").focusout(function() {
-                                $("#' . $this->compSecId . '-search_contacts_list").children("li").remove();
+                            $("#' . $this->compSecId . '-search_employees").focusout(function() {
+                                $("#' . $this->compSecId . '-search_employees_list").children("li").remove();
                             });
 
-                            dataCollectionSection["data"]["contact_ids"] = { }
+                            dataCollectionSection["data"]["employee_ids"] = { }
                             initMainButtons();
 
                             function initMainButtons() {
-                                $("#' . $this->compSecId . '-cancel-contact").off();
-                                $("#' . $this->compSecId . '-cancel-contact").click(function(e) {
+                                $("#' . $this->compSecId . '-cancel-employee").off();
+                                $("#' . $this->compSecId . '-cancel-employee").click(function(e) {
                                     e.preventDefault();
-                                    $("#' . $this->compSecId . '-search_contacts").val("");
-                                    toggleContactFields(false);
+                                    $("#' . $this->compSecId . '-search_employees").val("");
+                                    toggleEmployeeFields(false);
                                 });
-                                $("#' . $this->compSecId . '-add-contact").off();
-                                $("#' . $this->compSecId . '-add-contact").click(function(e) {
+                                $("#' . $this->compSecId . '-add-employee").off();
+                                $("#' . $this->compSecId . '-add-employee").click(function(e) {
                                     e.preventDefault();
-                                    $("#' . $this->compSecId . '-search_contacts").val("");
+                                    $("#' . $this->compSecId . '-search_employees").val("");
                                     extractData();
                                 });
                             }
 
-                            function toggleContactFields(data) {
+                            function toggleEmployeeFields(data) {
                                 if (data) {
-                                    $("#' . $this->compSecId . '-contact_id").val(data.contact.id);
-                                    $("#' . $this->compSecId . '-account_email").val(data.contact.account_email);
-                                    $("#' . $this->compSecId . '-contact_mobile").val(data.contact.contact_mobile);
-                                    $("#' . $this->compSecId . '-first_name").val(data.contact.first_name);
-                                    $("#' . $this->compSecId . '-last_name").val(data.contact.last_name);
-                                    $("#' . $this->compSecId . '-contact_phone").val(data.contact.contact_phone);
-                                    $("#' . $this->compSecId . '-contact_phone_ext").val(data.contact.contact_phone_ext);
-                                    $("#' . $this->compSecId . '-account_email").attr("disabled", true);
+                                    $("#' . $this->compSecId . '-employee_id").val(data.employee.id);
+                                    $("#' . $this->compSecId . '-account_id").val(data.employee.account_id);
+                                    $("#' . $this->compSecId . '-contact_mobile").val(data.employee.contact_mobile);
+                                    $("#' . $this->compSecId . '-first_name").val(data.employee.first_name);
+                                    $("#' . $this->compSecId . '-last_name").val(data.employee.last_name);
+                                    $("#' . $this->compSecId . '-contact_phone").val(data.employee.contact_phone);
+                                    $("#' . $this->compSecId . '-contact_phone_ext").val(data.employee.contact_phone_ext);
                                 } else {
-                                    $("#' . $this->compSecId . '-contact_id").val("");
-                                    $("#' . $this->compSecId . '-account_email").val("");
-                                    $("#' . $this->compSecId . '-account_email").attr("disabled", false);
+                                    $("#' . $this->compSecId . '-employee_id").val("");
+                                    $("#' . $this->compSecId . '-account_id").val("");
                                     $("#' . $this->compSecId . '-contact_mobile").val("");
                                     $("#' . $this->compSecId . '-first_name").val("");
                                     $("#' . $this->compSecId . '-last_name").val("");
@@ -426,9 +427,9 @@ class Multiple
                             }
 
                             function extractData() {
-                                if ($("#' . $this->compSecId . '-account_email").val() === "") {
-                                    $("#' . $this->compSecId . '-account_email").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-account_email").focus(function() {
+                                if ($("#' . $this->compSecId . '-account_id").val() === "") {
+                                    $("#' . $this->compSecId . '-account_id").addClass("is-invalid");
+                                    $("#' . $this->compSecId . '-account_id").focus(function() {
                                         $(this).removeClass("is-invalid");
                                     });
                                 } else if ($("#' . $this->compSecId . '-contact_mobile").val() === "") {
@@ -453,12 +454,12 @@ class Multiple
                                     });
                                 } else {
                                     var data = { };
-                                    var contactId, contactNew;
+                                    var employeeId, employeeNew;
 
-                                    data["contact_id"] = $("#' . $this->compSecId . '-contact_id").val();
+                                    data["employee_id"] = $("#' . $this->compSecId . '-employee_id").val();
                                     data["first_name"] = $("#' . $this->compSecId . '-first_name").val();
                                     data["last_name"] = $("#' . $this->compSecId . '-last_name").val();
-                                    data["account_email"] = $("#' . $this->compSecId . '-account_email").val();
+                                    data["account_id"] = $("#' . $this->compSecId . '-account_id").val();
                                     data["contact_mobile"] = $("#' . $this->compSecId . '-contact_mobile").val();
                                     data["contact_phone"] = $("#' . $this->compSecId . '-contact_phone").val();
                                     data["contact_phone_ext"] = $("#' . $this->compSecId . '-contact_phone_ext").val();
@@ -466,7 +467,7 @@ class Multiple
                                     var html =
                                         \'<dl class="row mb-0">\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Email</dt>\' +
-                                            \'<dd class="mb-0 col-sm-8 cla-email">\' + data["account_email"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-email">\' + data["account_id"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Mobile</dt>\' +
                                             \'<dd class="mb-0 col-sm-8 cla-mobile">\' + data["contact_mobile"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">First Name</dt>\' +
@@ -479,30 +480,30 @@ class Multiple
                                             \'<dd class="mb-0 col-sm-8 cla-extension">\' + data["contact_phone_ext"] + \'</dd>\' +
                                         \'</dl>\';
 
-                                    if ($("#' . $this->compSecId . '-sortable-contacts li").length > 0) {
+                                    if ($("#' . $this->compSecId . '-sortable-employees li").length > 0) {
                                         listType = "secondary";
                                     } else {
                                         listType = "success";
                                     }
 
-                                    if (data["contact_id"] === "") {
-                                        contactId = Date.now();
-                                        contactNew = "1";
+                                    if (data["employee_id"] === "") {
+                                        employeeId = Date.now();
+                                        employeeNew = "1";
                                     } else {
-                                        contactId = data["contact_id"];
-                                        contactNew = "0";
+                                        employeeId = data["employee_id"];
+                                        employeeNew = "0";
                                     }
 
                                     var list =
                                         \'<li class="list-group-item list-group-item-\' + listType +
-                                            \'" area-disabled="false" style="cursor: pointer" data-new="\' + contactNew +
-                                            \'" data-contact-id="\' + contactId + \'">\' +
+                                            \'" area-disabled="false" style="cursor: pointer" data-new="\' + employeeNew +
+                                            \'" data-employee-id="\' + employeeId + \'">\' +
                                             \'<div class="row">\' +
                                                 \'<div class="col">\' +
                                                     \'<i class="fa fa-sort fa-fw handle"></i>\' +
                                                 \'</div>\' +
                                                 \'<div class="col">\' +
-                                                    \'<button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 contactDeleteButton">\' +
+                                                    \'<button data-sort-id="" type="button" class="btn btn-xs btn-danger float-right ml-1 employeeDeleteButton">\' +
                                                         \'<i class="fa fas fa-fw text-xs fa-trash"></i>\' +
                                                     \'</button>\' +
                                                 \'</div>\' +
@@ -514,36 +515,32 @@ class Multiple
                                             \'</div>\' +
                                         \'</li>\';
 
-                                    var contactsLi = $("#' . $this->compSecId . '-sortable-contacts li");
+                                    var employeesLi = $("#' . $this->compSecId . '-sortable-employees li");
 
-                                    if (contactsLi.length > 0) {
+                                    if (employeesLi.length > 0) {
                                         var exists = false;
-                                        $(contactsLi).each(function(index, li) {
-                                            var liContactId = $(li).data("contact-id");
-                                            if (liContactId == contactId) {
-                                                PNotify.error({"title" : "Contact with same ID already added!"});
-                                                exists = true;
-                                                return;
-                                            }
+                                        $(employeesLi).each(function(index, li) {
                                             var email = $($(li).find(".cla-email")).html();
 
-                                            if (email.toLowerCase() === data["account_email"].toLowerCase()) {
-                                                PNotify.error({"title" : "Contact with same email already added!"});
+                                            if (email.toLowerCase() === data["account_id"].toLowerCase()) {
+                                                PNotify.error({"title" : "Employee with same email already added!"});
                                                 exists = true;
+
                                                 return;
                                             }
                                         });
+
                                         if (exists === false) {
-                                            $("#' . $this->compSecId . '-sortable-contacts").append(list);
+                                            $("#' . $this->compSecId . '-sortable-employees").append(list);
                                         }
                                     } else {
-                                        $("#' . $this->compSecId . '-sortable-contacts").append(list);
+                                        $("#' . $this->compSecId . '-sortable-employees").append(list);
                                     }
 
-                                    toggleContactFields(false);
-                                    initSortable("' . $this->compSecId . '-sortable-contacts");
+                                    toggleEmployeeFields(false);
+                                    initSortable("' . $this->compSecId . '-sortable-employees");
                                     collectData();
-                                    registerContactButtons();
+                                    registerEmployeeButtons();
                                 }
                             }
 
@@ -551,7 +548,7 @@ class Multiple
                                 var el = document.getElementById(element);
                                 dataCollectionSection["' . $this->compSecId . '-form"]["sortable"] = { };
                                 dataCollectionSection["' . $this->compSecId . '-form"]["sortable"] = Sortable.create(el, {
-                                    dataIdAttr : "data-contact-id",
+                                    dataIdAttr : "data-employee-id",
                                     onEnd: function(e) {
                                         if (e.newIndex === 0) {
                                             $($(e.from).find("li")).each(function(index, li) {
@@ -567,20 +564,20 @@ class Multiple
                             }
 
                             function collectData() {
-                                dataCollectionSection["data"]["contact_ids"] = { };
+                                dataCollectionSection["data"]["employee_ids"] = { };
 
-                                if ($("#' . $this->compSecId . '-sortable-contacts li").length > 0) {
-                                    $("#' . $this->compSecId . '-sortable-contacts li").each(function(index, id) {
+                                if ($("#' . $this->compSecId . '-sortable-employees li").length > 0) {
+                                    $("#' . $this->compSecId . '-sortable-employees li").each(function(index, id) {
                                         var data = { };
                                         data["seq"] = index;
-                                        var contactId;
+                                        var employeeId;
 
                                         $(id).find("dd").each(function(index,dd) {
-                                            contactId = $(dd).parents("li").data("contact-id");
-                                            data["id"] = $(dd).parents("li").data("contact-id");
+                                            employeeId = $(dd).parents("li").data("employee-id");
+                                            data["id"] = $(dd).parents("li").data("employee-id");
                                             data["new"] = $(dd).parents("li").data("new");
                                             if ($(dd).is(".cla-email")) {
-                                                data["account_email"] = $(dd).html();
+                                                data["account_id"] = $(dd).html();
                                             } else if ($(dd).is(".cla-mobile")) {
                                                 data["contact_mobile"] = $(dd).html();
                                             } else if ($(dd).is(".cla-first-name")) {
@@ -594,19 +591,19 @@ class Multiple
                                             }
                                         });
 
-                                        dataCollectionSection["data"]["contact_ids"][contactId] = data;
+                                        dataCollectionSection["data"]["employee_ids"][employeeId] = data;
                                     });
                                 }
                             }
 
-                            function registerContactButtons() {
-                                $(".contactDeleteButton").each(function(index, button) {
+                            function registerEmployeeButtons() {
+                                $(".employeeDeleteButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
 
-                                        var contactsCount = $(this).parents("ul").children("li").length;
+                                        var employeesCount = $(this).parents("ul").children("li").length;
 
-                                        if (contactsCount > 1) {
+                                        if (employeesCount > 1) {
                                             if ($(this).parents("li").is(".list-group-item-success")) {
 
                                                 $($(this).parents("li").siblings("li")[0]).removeClass("list-group-item-secondary");
@@ -625,7 +622,7 @@ class Multiple
                                 initSortable($(ul)[0].id);
                             });
                             collectData();
-                            registerContactButtons();
+                            registerEmployeeButtons();
                         }
                     }
                 });

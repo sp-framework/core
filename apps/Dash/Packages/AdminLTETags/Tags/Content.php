@@ -89,17 +89,23 @@ class Content extends AdminLTETags
                 $hasError = true;
                 $cardContent .=
                     '<div class="callout callout-danger">
-                        <h5>No ' . $error['componentName'] . ' data found!</h5>
-                        <p>Component ' . $this->params['component']['name'] . ' needs data from component ' . $error['componentName'] . '. ';
+                        <h5>No ' . strtolower($error['componentName']) . ' data found!</h5>
+                        <p>';
 
-                if ($error['componentRoute']) {
-                    $cardContent .=
-                        'Please <a href="' . $this->links->url($error['componentRoute']) . '" class="contentAjaxLink text-primary">click here</a> to add new ' . $error['componentName'] . ' or contact systems administrator for further instructions.</p>
-                    </div>';
+                if (isset($error['componentErrorMessage']) && $error['componentErrorMessage'] !== '') {
+                    $cardContent .= $error['componentErrorMessage'] . '</p></div>';
                 } else {
-                    $cardContent .=
-                        'Please contact systems administrator for further instructions.</p>
-                    </div>';
+                    $cardContent .= 'Component ' . $this->params['component']['name'] . ' needs data from component ' . strtolower($error['componentName']) . '. ';
+
+                    if ($error['componentRoute']) {
+                        $cardContent .=
+                            'Please <a href="' . $this->links->url($error['componentRoute']) . '" class="contentAjaxLink text-primary">click here</a> to add new ' . strtolower($error['componentName']) . ' or contact systems administrator for further instructions.</p>
+                        </div>';
+                    } else {
+                        $cardContent .=
+                            'Please contact systems administrator for further instructions.</p>
+                        </div>';
+                    }
                 }
             }
         }

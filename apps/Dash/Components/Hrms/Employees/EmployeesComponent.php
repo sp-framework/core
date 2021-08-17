@@ -43,20 +43,17 @@ class EmployeesComponent extends BaseComponent
 
         $designations = $this->designations->getAll()->hrmsDesignations;
 
-        $locations = $this->locations->getAll()->locations;
-
-        $this->view->contractors = $this->usePackage(Vendors::class)->getAll()->vendors;
-
         if (isset($this->getData()['id'])) {
+            $this->view->contractors = $this->usePackage(Vendors::class)->getAll()->vendors;
+
             $this->view->portraitLink = '';
+
             if ($this->getData()['id'] != 0) {
-                $employee = $this->employees->getById($this->getData()['id']);
+                $employee = $this->employees->getEmployeeById($this->getData()['id']);
 
                 if ($employee['portrait'] && $employee['portrait'] !== '') {
                     $this->view->portraitLink = $this->links->url('system/storages/q/uuid/' . $employee['portrait'] . '/w/200');
                 }
-
-                $employee['account_email'] = $this->basepackages->accounts->getById($employee['account_id'])['email'];
 
                 if ($employee['manager_id'] == 0) {
                     $employee['manager_full_name'] = $employee['full_name'];
@@ -129,7 +126,7 @@ class EmployeesComponent extends BaseComponent
 
             $this->view->designations = $designations;
 
-            $this->view->locations = $locations;
+            $this->view->locations = $this->locations->getAll()->locations;
 
             $this->useStorage('private');
 
@@ -183,11 +180,11 @@ class EmployeesComponent extends BaseComponent
             $this->employees,
             'hrms/employees/view',
             null,
-            ['first_name', 'last_name', 'designation', 'status', 'type_id', 'work_type_id'],
+            ['first_name', 'last_name', 'designation', 'status'],
             true,
-            ['first_name', 'last_name', 'designation', 'status', 'type_id', 'work_type_id'],
+            ['first_name', 'last_name', 'designation', 'status'],
             $controlActions,
-            ['type_id' => 'Type', 'work_type_id' => 'Work Type'],
+            null,
             $replaceColumns,
             'first_name'
         );
@@ -208,14 +205,12 @@ class EmployeesComponent extends BaseComponent
 
             $this->employees->addEmployee($this->postData());
 
-            $this->view->responseCode = $this->employees->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->employees->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->employees->packagesData->responseMessage,
+                $this->employees->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -232,14 +227,12 @@ class EmployeesComponent extends BaseComponent
 
             $this->employees->updateEmployee($this->postData());
 
-            $this->view->responseCode = $this->employees->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->employees->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->employees->packagesData->responseMessage,
+                $this->employees->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -252,14 +245,12 @@ class EmployeesComponent extends BaseComponent
 
             $this->employees->removeEmployee($this->postData());
 
-            $this->view->responseCode = $this->employees->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->employees->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->employees->packagesData->responseMessage,
+                $this->employees->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -280,10 +271,20 @@ class EmployeesComponent extends BaseComponent
                 $searchAccounts = $this->basepackages->accounts->searchAccountInternal($searchQuery);
 
                 if ($searchAccounts) {
+                    $accounts = $this->basepackages->accounts->packagesData->accounts;
+
+                    if (count($accounts) > 0) {
+                        foreach ($accounts as $accountKey => $account) {
+                            if ($this->employees->checkAccount($account['email'])) {
+                                unset($accounts[$accountKey]);
+                            }
+                        }
+                    }
+
                     $this->addResponse(
                         $this->basepackages->accounts->packagesData->responseMessage,
                         $this->basepackages->accounts->packagesData->responseCode,
-                        ['accounts' => $this->basepackages->accounts->packagesData->accounts]
+                        ['accounts' => $accounts]
                     );
                 }
             } else {
@@ -307,15 +308,38 @@ class EmployeesComponent extends BaseComponent
                 $searchEmployees = $this->employees->searchByFullName($searchQuery);
 
                 if ($searchEmployees) {
-                    $this->view->responseCode = $this->employees->packagesData->responseCode;
-
-                    $this->view->employees = $this->employees->packagesData->employees;
+                    $this->addResponse(
+                        $this->employees->packagesData->responseMessage,
+                        $this->employees->packagesData->responseCode,
+                        ['employees' => $this->employees->packagesData->employees]
+                    );
                 }
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
+                $this->addResponse('search query missing', 1);
             }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function searchEmployeeIdAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['id']) {
+                $searchEmployees = $this->employees->searchById($this->postData()['id']);
+
+                if ($searchEmployees) {
+                    $this->addResponse(
+                        $this->employees->packagesData->responseMessage,
+                        $this->employees->packagesData->responseCode,
+                        ['employee' => $this->employees->packagesData->employee]
+                    );
+                }
+            } else {
+                $this->addResponse('search query missing', 1);
+            }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }

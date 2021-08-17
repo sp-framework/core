@@ -123,89 +123,9 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
-        '{{componentId}}-{{sectionId}}-account_id'                      : { },
-        '{{componentId}}-{{sectionId}}-account_email'                   : {
+        '{{componentId}}-{{sectionId}}-account_id'                      : {
             afterInit   : function() {
                 dataCollectionSectionForm['autoCompleteAccounts'] =
-                //     new autoComplete({
-                //         data: {
-                //             src: async() => {
-                //                 const url = '{{links.url("hrms/employees/searchAccount")}}';
-
-                //                 var myHeaders = new Headers();
-                //                 myHeaders.append("accept", "application/json");
-
-                //                 var formdata = new FormData();
-                //                 formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_email").value);
-                //                 formdata.append($('#security-token').attr('name'), $('#security-token').val());
-
-                //                 var requestOptions = {
-                //                     method: 'POST',
-                //                     headers: myHeaders,
-                //                     body: formdata
-                //                 };
-
-                //                 const responseData = await fetch(url, requestOptions);
-
-                //                 const response = await responseData.json();
-
-                //                 if (response.tokenKey && response.token) {
-                //                     $('#security-token').attr('name', response.tokenKey);
-                //                     $('#security-token').val(response.token);
-                //                 }
-                //                 if (response.accounts) {
-                //                     return response.accounts;
-                //                 } else {
-                //                     return [];
-                //                 }
-                //             },
-                //             key: ["email"],
-                //             cache: false
-                //         },
-                //         selector: "#{{componentId}}-{{sectionId}}-account_email",
-                //         threshold : 4,
-                //         debounce: 500,
-                //         searchEngine: "strict",
-                //         resultsList: {
-                //             render: true,
-                //             container: source => {
-                //                 source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_email_list");
-                //                 source.setAttribute("class", "autoComplete_results");
-                //             },
-                //             destination: "#{{componentId}}-{{sectionId}}-account_email",
-                //             position: "afterend",
-                //             element: "div"
-                //         },
-                //         maxResults: 5,
-                //         highlight: true,
-                //         resultItem: {
-                //             content: (data, source) => {
-                //                 source.innerHTML = data.match;
-                //             },
-                //             element: "div"
-                //         },
-                //         noResults: () => {
-                //             const result = document.createElement("li");
-                //             result.setAttribute("class", "autoComplete_result text-danger");
-                //             result.setAttribute("tabindex", "1");
-                //             result.innerHTML = "No search results. Click field help for more information.";
-                //             if (document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list")) {
-                //                 $("#{{componentId}}-{{sectionId}}-account_email_list").empty().append(result);
-                //             } else {
-                //                 $("#{{componentId}}-{{sectionId}}-account_email").parent(".form-group").append(
-                //                     '<div id="{{componentId}}-{{sectionId}}-account_email_list" class="autoComplete_results"></div>'
-                //                 );
-                //                 document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list").appendChild(result);
-                //             }
-                //         },
-                //         onSelection: feedback => {
-                //             $('#{{componentId}}-{{sectionId}}-account_id').val(feedback.selection.value.id);
-                //             $('#{{componentId}}-{{sectionId}}-account_id').attr('value', feedback.selection.value.id);
-                //             $('#{{componentId}}-{{sectionId}}-account_email').blur();
-                //             $('#{{componentId}}-{{sectionId}}-account_email').val(feedback.selection.value.email);
-                //             $('#{{componentId}}-{{sectionId}}-account_email').attr('value', feedback.selection.value.email);
-                //         }
-                // });
                     new autoComplete({
                         data: {
                             src: async() => {
@@ -215,7 +135,7 @@ dataCollectionSection =
                                 myHeaders.append("accept", "application/json");
 
                                 var formdata = new FormData();
-                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_email").value);
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_id").value);
                                 formdata.append($('#security-token').attr('name'), $('#security-token').val());
 
                                 var requestOptions = {
@@ -242,17 +162,17 @@ dataCollectionSection =
                             key: ["email"],
                             cache: false
                         },
-                        selector: "#{{componentId}}-{{sectionId}}-account_email",
+                        selector: "#{{componentId}}-{{sectionId}}-account_id",
                         threshold : 3,
                         debounce: 500,
                         searchEngine: "strict",
                         resultsList: {
                             render: true,
                             container: source => {
-                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_email_list");
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_id_list");
                                 source.setAttribute("class", "autoComplete_results");
                             },
-                            destination: "#{{componentId}}-{{sectionId}}-account_email",
+                            destination: "#{{componentId}}-{{sectionId}}-account_id",
                             position: "afterend",
                             element: "div",
                             className: "autoComplete_results"
@@ -271,31 +191,29 @@ dataCollectionSection =
                             result.setAttribute("tabindex", "1");
                             result.innerHTML = "No search results. Click field help for more information.";
 
-                            if (document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list")) {
-                                $("#{{componentId}}-{{sectionId}}-account_email_list").empty().append(result);
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-account_id_list")) {
+                                $("#{{componentId}}-{{sectionId}}-account_id_list").empty().append(result);
                             } else {
-                                $("#{{componentId}}-{{sectionId}}-account_email").parent(".form-group").append(
-                                    '<div id="{{componentId}}-{{sectionId}}-account_email_list" class="autoComplete_results"></div>'
+                                $("#{{componentId}}-{{sectionId}}-account_id").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-account_id_list" class="autoComplete_results"></div>'
                                 );
-                                document.querySelector("#{{componentId}}-{{sectionId}}-account_email_list").appendChild(result);
+                                document.querySelector("#{{componentId}}-{{sectionId}}-account_id_list").appendChild(result);
                             }
                         },
                         onSelection: (feedback) => {
-                            $('#{{componentId}}-{{sectionId}}-account_id').val(feedback.selection.value.id);
-                            $('#{{componentId}}-{{sectionId}}-account_id').attr('value', feedback.selection.value.id);
-                            $('#{{componentId}}-{{sectionId}}-account_email').blur();
-                            $('#{{componentId}}-{{sectionId}}-account_email').val(feedback.selection.value.email);
-                            $('#{{componentId}}-{{sectionId}}-account_email').attr('value', feedback.selection.value.email);
+                            $('#{{componentId}}-{{sectionId}}-account_id').blur();
+                            $('#{{componentId}}-{{sectionId}}-account_id').val(feedback.selection.value.email);
+                            $('#{{componentId}}-{{sectionId}}-account_id').attr('value', feedback.selection.value.email);
                         }
                     });
                 // On delete
-                $('#{{componentId}}-{{sectionId}}-account_email').on('input propertychange', function() {
-                    $('#{{componentId}}-{{sectionId}}-account_id').val(0);
-                    $('#{{componentId}}-{{sectionId}}-account_id').attr('value', 0);
-                });
+                // $('#{{componentId}}-{{sectionId}}-account_id').on('input propertychange', function() {
+                //     $('#{{componentId}}-{{sectionId}}-account_id').val('');
+                //     $('#{{componentId}}-{{sectionId}}-account_id').attr('value', '');
+                // });
 
-                $('#{{componentId}}-{{sectionId}}-account_email').focusout(function() {
-                    $('#{{componentId}}-{{sectionId}}-account_email_list').children('li').remove();
+                $('#{{componentId}}-{{sectionId}}-account_id').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-account_id_list').children('li').remove();
                 });
             }
         },
@@ -337,8 +255,8 @@ dataCollectionSection =
                                     $('#security-token').attr('name', response.tokenKey);
                                     $('#security-token').val(response.token);
                                 }
-                                if (response.employees) {
-                                    return response.employees;
+                                if (response.responseData && response.responseData.employees) {
+                                    return response.responseData.employees;
                                 } else {
                                     return [];
                                 }
@@ -401,7 +319,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-type_id'                         : {
+        '{{componentId}}-{{sectionId}}-employment_type_id'              : {
             'placeholder'   : "SELECT EMPLOYMENT TYPE",
             afterInit       : function () {
                 $('#{{componentId}}-{{sectionId}}-type_id').on('select2:select', function(e) {
@@ -504,8 +422,8 @@ dataCollectionSection =
                                     $('#security-token').attr('name', response.tokenKey);
                                     $('#security-token').val(response.token);
                                 }
-                                if (response.employees) {
-                                    return response.employees;
+                                if (response.responseData && response.responseData.employees) {
+                                    return response.responseData.employees;
                                 } else {
                                     return [];
                                 }
@@ -598,8 +516,8 @@ dataCollectionSection =
                                     $('#security-token').attr('name', response.tokenKey);
                                     $('#security-token').val(response.token);
                                 }
-                                if (response.employees) {
-                                    return response.employees;
+                                if (response.responseData && response.responseData.employees) {
+                                    return response.responseData.employees;
                                 } else {
                                     return [];
                                 }
@@ -847,7 +765,7 @@ dataCollectionSection =
                 // console.log(validator.errorList);
             },
             rules: {
-                '{{componentId}}-{{sectionId}}-account_email'               : 'required',
+                '{{componentId}}-{{sectionId}}-account_id'                  : 'required',
                 '{{componentId}}-{{sectionId}}-status'                      : 'required',
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'required',
                 '{{componentId}}-{{sectionId}}-last_name'                   : 'required',
@@ -862,7 +780,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-contact_mobile'              : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-account_email'               : 'Please select an account',
+                '{{componentId}}-{{sectionId}}-account_id'                  : 'Please select an account',
                 '{{componentId}}-{{sectionId}}-status'                      : 'Please select a status',
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'Please enter first name',
                 '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name',

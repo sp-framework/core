@@ -2,7 +2,7 @@
     {% set employeePortrait = employee['portrait'] %}
     {% set employeeId = employee['id'] %}
     {% set employeeAccountId = employee['account_id'] %}
-    {% set employeeAccountEmail = employee['account_email'] %}
+    {% set employeeAccountEmailDisabled = true %}
     {% set employeeStatus = employee['status'] %}
     {% set employeeFirstName = employee['first_name'] %}
     {% set employeeLastName = employee['last_name'] %}
@@ -13,7 +13,7 @@
     {% set employeePortrait = '' %}
     {% set employeeId = '' %}
     {% set employeeAccountId = '' %}
-    {% set employeeAccountEmail = '' %}
+    {% set employeeAccountEmailDisabled = false %}
     {% set employeeStatus = '' %}
     {% set employeeFirstName = '' %}
     {% set employeeLastName = '' %}
@@ -74,35 +74,20 @@
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
                         'fieldId'                               : 'account_id',
-                        'fieldLabel'                            : 'Account ID',
-                        'fieldHidden'                           : true,
-                        'fieldType'                             : 'input',
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : true,
-                        'fieldBazPostOnUpdate'                  : true,
-                        'fieldValue'                            : employeeAccountId
-                    ]
-                )}}
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'account_email',
                         'fieldLabel'                            : 'Account ID (Email)',
                         'fieldType'                             : 'input',
-                        'fieldPlaceholder'                      : 'Search Account ID (Email)',
+                        'fieldPlaceholder'                      : 'Search Account ID (Email).',
                         'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Search Account ID (Email)',
+                        'fieldHelpTooltipContent'               : 'Search Account ID (Email).  If the email is already assigned to another employee, it will not show up in the list.',
+                        'fieldDisabled'                         : employeeAccountEmailDisabled,
                         'fieldBazScan'                          : true,
                         'fieldBazJstreeSearch'                  : true,
-                        'fieldBazPostOnCreate'                  : false,
-                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
                         'fieldRequired'                         : true,
                         'fieldDataInputMinLength'               : 1,
                         'fieldDataInputMaxLength'               : 100,
-                        'fieldValue'                            : employeeAccountEmail
+                        'fieldValue'                            : employeeAccountId
                     ]
                 )}}
             </div>

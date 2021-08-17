@@ -295,17 +295,17 @@ class Multiple
                                                                 <div class="col list-group-item-data">
                                                                     <dl class="row mb-0">
                                                                         <dt class="text-uppercase mb-0 col-sm-4">Street Address</dt>
-                                                                        <dd class="text-uppercase mb-0 col-sm-8 cla-street">' . $address['street_address'] . '</dd>
+                                                                        <dd class="mb-0 col-sm-8 cla-street">' . $address['street_address'] . '</dd>
                                                                         <dt class="text-uppercase mb-0 col-sm-4">Street Address 2</dt>
-                                                                        <dd class="text-uppercase mb-0 col-sm-8 cla-street2">' . $address['street_address_2'] . '</dd>
+                                                                        <dd class="mb-0 col-sm-8 cla-street2">' . $address['street_address_2'] . '</dd>
                                                                         <dt class="text-uppercase mb-0 col-sm-4">City</dt>
-                                                                        <dd class="text-uppercase mb-0 col-sm-8 cla-city" data-id="' . $address['city_id'] . '">' . $address['city_name'] . '</dd>
+                                                                        <dd class="mb-0 col-sm-8 cla-city" data-id="' . $address['city_id'] . '">' . $address['city_name'] . '</dd>
                                                                         <dt class="text-uppercase mb-0 col-sm-4">Post Code</dt>
-                                                                        <dd class="text-uppercase mb-0 col-sm-8 cla-postcode">' . $address['post_code'] . '</dd>
+                                                                        <dd class="mb-0 col-sm-8 cla-postcode">' . $address['post_code'] . '</dd>
                                                                         <dt class="text-uppercase mb-0 col-sm-4">State</dt>
-                                                                        <dd class="text-uppercase mb-0 col-sm-8 cla-state" data-id="' . $address['state_id'] . '">' . $address['state_name'] . '</dd>
+                                                                        <dd class="mb-0 col-sm-8 cla-state" data-id="' . $address['state_id'] . '">' . $address['state_name'] . '</dd>
                                                                         <dt class="text-uppercase mb-0 col-sm-4">Country</dt>
-                                                                        <dd class="text-uppercase mb-0 col-sm-8 cla-country" data-id="' . $address['country_id'] . '">' . $address['country_name'] . '</dd>
+                                                                        <dd class="mb-0 col-sm-8 cla-country" data-id="' . $address['country_id'] . '">' . $address['country_name'] . '</dd>
                                                                     </dl>
                                                                 </div>
                                                             </div>
@@ -470,17 +470,17 @@ class Multiple
                                     var html =
                                         \'<dl class="row mb-0">\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Street Address</dt>\' +
-                                            \'<dd class="text-uppercase mb-0 col-sm-8 cla-street">\' + data["street_address"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-street">\' + data["street_address"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Street Address 2</dt>\' +
-                                            \'<dd class="text-uppercase mb-0 col-sm-8 cla-street2">\' + data["street_address_2"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-street2">\' + data["street_address_2"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">City</dt>\' +
-                                            \'<dd class="text-uppercase mb-0 col-sm-8 cla-city" data-id="\' + data["city_id"] + \'">\' + data["city_name"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-city" data-id="\' + data["city_id"] + \'">\' + data["city_name"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Post Code</dt>\' +
-                                            \'<dd class="text-uppercase mb-0 col-sm-8 cla-postcode">\' + data["post_code"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-postcode">\' + data["post_code"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">State</dt>\' +
-                                            \'<dd class="text-uppercase mb-0 col-sm-8 cla-state" data-id="\' + data["state_id"] + \'">\' + data["state_name"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-state" data-id="\' + data["state_id"] + \'">\' + data["state_name"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Country</dt>\' +
-                                            \'<dd class="text-uppercase mb-0 col-sm-8 cla-country" data-id="\' + data["country_id"] + \'">\' + data["country_name"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-country" data-id="\' + data["country_id"] + \'">\' + data["country_name"] + \'</dd>\' +
                                         \'</dl>\';
 
                                     if ($("#' . $this->compSecId . '-sortable-addresses-" + id).length > 0) {
