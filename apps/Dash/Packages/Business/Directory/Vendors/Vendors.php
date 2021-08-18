@@ -336,8 +336,6 @@ class Vendors extends BasePackage
                         unset($contact['new']);
                         unset($contact['seq']);
 
-                        $contact['address_ids'] = Json::encode([]);
-
                         $contacts->addContact($contact);
                     } else {
                         $existingContact = $contacts->getById($contact['id']);
@@ -347,6 +345,8 @@ class Vendors extends BasePackage
                         unset($contact['seq']);
 
                         $contact = array_merge($existingContact, $contact);
+
+                        unset($contact['address_ids']);
 
                         $contacts->updateContact($contact);
                     }
@@ -439,7 +439,7 @@ class Vendors extends BasePackage
 
     public function searchByVendorId($id)
     {
-        $vendor = $this->getById($id);
+        $vendor = $this->getVendorById($id);
 
         if ($vendor) {
             if ($vendor['address_ids'] && $vendor['address_ids'] !== '') {

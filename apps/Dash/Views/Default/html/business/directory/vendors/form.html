@@ -446,23 +446,74 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-bills_due_day_term'      : {
             placeholder : 'SELECT BILLS DUE DATE TERM'
         },
-        '{{componentId}}-{{sectionId}}-bills_tax_enabled'       : { },
+        '{{componentId}}-{{sectionId}}-bills_discount'          : { },
+        '{{componentId}}-{{sectionId}}-bills_tax_enabled'       : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-bills_tax_enabled').click(function() {
+                    var checked = $(this)[0].checked;
+
+                    $('#{{componentId}}-{{sectionId}}-bills_tax_id').val(0).trigger('change');
+
+                    if (checked) {
+                        $('#{{componentId}}-{{sectionId}}-bills_tax_id').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-bills_tax_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-bills_tax_id').parents('.form-group').removeClass('has-error has-feedback');
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-bills_tax_id'            : {
             placeholder : 'SELECT BILLS TAX',
+            allowClear  : true
+        },
+        '{{componentId}}-{{sectionId}}-po_tax_enabled'          : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-po_tax_enabled').click(function() {
+                    var checked = $(this)[0].checked;
+
+                    $('#{{componentId}}-{{sectionId}}-po_tax_id').val(0).trigger('change');
+
+                    if (checked) {
+                        $('#{{componentId}}-{{sectionId}}-po_tax_id').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-po_tax_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-po_tax_id').parents('.form-group').removeClass('has-error has-feedback');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-po_tax_id'               : {
+            placeholder : 'SELECT PURCHASE ORDERS TAX',
             allowClear  : true
         },
         '{{componentId}}-{{sectionId}}-invoices_due_day'        : { },
         '{{componentId}}-{{sectionId}}-invoices_due_day_term'   : {
             placeholder : 'SELECT INVOICES DUE DATE TERM'
         },
-        '{{componentId}}-{{sectionId}}-invoices_tax_enabled'    : { },
+        '{{componentId}}-{{sectionId}}-invoices_tax_enabled'    : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-invoices_tax_enabled').click(function() {
+                    var checked = $(this)[0].checked;
+
+                    $('#{{componentId}}-{{sectionId}}-invoices_tax_id').val(0).trigger('change');
+
+                    if (checked) {
+                        $('#{{componentId}}-{{sectionId}}-invoices_tax_id').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-invoices_tax_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-invoices_tax_id').parents('.form-group').removeClass('has-error has-feedback');
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-invoices_tax_id'         : {
             placeholder : 'SELECT INVOICES TAX',
             allowClear  : true
         },
         '{{componentId}}-{{sectionId}}-credit_limit_amount'     : { },
         '{{componentId}}-{{sectionId}}-credit_limit_block'      : { },
-        '{{componentId}}-{{sectionId}}-discount'                : { },
+        '{{componentId}}-{{sectionId}}-invoice_discount'        : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {
@@ -471,11 +522,17 @@ dataCollectionSection =
             },
             rules: {
                 '{{componentId}}-{{sectionId}}-abn'             : 'required',
-                '{{componentId}}-{{sectionId}}-business_name'   : 'required'
+                '{{componentId}}-{{sectionId}}-business_name'   : 'required',
+                '{{componentId}}-{{sectionId}}-bills_tax_id'    : 'required',
+                '{{componentId}}-{{sectionId}}-po_tax_id'       : 'required',
+                '{{componentId}}-{{sectionId}}-invoices_tax_id' : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-abn'             : 'Please enter abn',
-                '{{componentId}}-{{sectionId}}-business_name'   : 'Please enter vendor business name'
+                '{{componentId}}-{{sectionId}}-business_name'   : 'Please enter vendor business name',
+                '{{componentId}}-{{sectionId}}-bills_tax_id'    : 'Please select tax',
+                '{{componentId}}-{{sectionId}}-po_tax_id'       : 'Please select tax',
+                '{{componentId}}-{{sectionId}}-invoices_tax_id' : 'Please select tax',
             }
         }
     });

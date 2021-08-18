@@ -404,6 +404,7 @@ class Multiple
                                 $("#' . $this->compSecId . '-add-address").attr("hidden", status);
                                 $("#' . $this->compSecId . '-update-address").attr("hidden", status);
                                 if (status === true) {
+                                    $("#' . $this->compSecId . '-address_types").attr("disabled", false);
                                     $("#' . $this->compSecId . '-address_id").val("");
                                     $("#' . $this->compSecId . '-street_address").val("");
                                     $("#' . $this->compSecId . '-street_address_2").val("");

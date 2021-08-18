@@ -21,4 +21,14 @@ class ImsStockPurchaseOrders extends BaseModel
     public $vendor_address_id;
 
     public $vendor_contact_id;
+
+    public $delivery_address_id;
+
+    public $delivery_contact_fullname;
+
+    public $delivery_contact_phone;
+
+    public $delivery_instructions;
+
+    public $attachments;
 }

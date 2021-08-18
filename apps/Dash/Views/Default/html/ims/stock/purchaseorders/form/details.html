@@ -173,7 +173,7 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                <!-- htmlmin:ignore -->
+                
                 {% if purchaseOrder['vendor_addresses'] is defined and purchaseOrder['vendor_addresses']|length > 0 %}
                     {% set vendorAddresses = '' %}
                     {% for vendorAddress in purchaseOrder['vendor_addresses'] %}
@@ -219,7 +219,7 @@
                     {% set vendorAddresses = '' %}
                     {% set vendorAddressesHidden = true %}
                 {% endif %}
-                <!-- htmlmin:ignore -->
+                
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -263,7 +263,7 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                <!-- htmlmin:ignore -->
+                
                 {% if purchaseOrder['vendor_contacts'] is defined and purchaseOrder['vendor_contacts']|length > 0 %}
                     {% set vendorContacts = '' %}
                     {% for vendorContact in purchaseOrder['vendor_contacts'] %}
@@ -319,7 +319,7 @@
                     {% set vendorContacts = '' %}
                     {% set vendorContactsHidden = true %}
                 {% endif %}
-                <!-- htmlmin:ignore -->
+                
                 {{adminltetags.useTag('fields',
                     [
                         'component'                      : component,
@@ -365,268 +365,3 @@
         </div>
     </div>
 </div>
-<script>
-/* globals BazContentLoader */
-var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
-
-if (!window['dataCollection']['{{componentId}}']) {
-    dataCollectionComponent =
-        window['dataCollection']['{{componentId}}'] = { };
-} else {
-    dataCollectionComponent =
-        window['dataCollection']['{{componentId}}'];
-}
-if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
-    dataCollectionSection =
-        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
-} else {
-    dataCollectionSection =
-        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
-}
-if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
-    dataCollectionSectionForm =
-        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
-} else {
-    dataCollectionSectionForm =
-        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
-}
-
-if (!dataCollectionSection["data"]) {
-    dataCollectionSection["data"] = { };
-}
-
-dataCollectionSection =
-    $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-entity_id'               : {
-            placeholder: "SELECT BUSINESS ENTITY"
-        },
-        '{{componentId}}-{{sectionId}}-reference_orders'        : { },
-        '{{componentId}}-{{sectionId}}-expected_delivery_date'  : { },
-        '{{componentId}}-{{sectionId}}-status'                  : {
-            placeholder: 'SELECT STATUS'
-        },
-        '{{componentId}}-{{sectionId}}-vendor_id'               : {
-            placeholder: "SELECT VENDOR",
-            afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-vendor_id').on('select2:select', function(e) {
-
-                    $('#{{componentId}}-{{sectionId}}-vendor_details').attr('hidden', false);
-                    $('#{{componentId}}-{{sectionId}}-vendor_address_id, ' +
-                      '#{{componentId}}-{{sectionId}}-vendor_address_id_error, ' +
-                      '#{{componentId}}-{{sectionId}}-vendor_contact_id, ' +
-                      '#{{componentId}}-{{sectionId}}-vendor_contact_id_error')
-                        .parents('.form-group').addClass('d-none');
-                    $('#{{componentId}}-{{sectionId}}-vendor_address_id').empty();
-                    $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').empty();
-                    $('#{{componentId}}-{{sectionId}}-vendor_contact_id').empty();
-                    $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').empty();
-
-                    var vendorId = e.params.data.id;
-                    var postData = { };
-                    postData[$('#security-token').attr('name')] = $('#security-token').val();
-                    postData['vendorId'] = vendorId;
-
-                    $.post('{{links.url("business/directory/vendors/searchvendorid")}}', postData, function(response) {
-                        if (response.tokenKey && response.token) {
-                            $('#security-token').attr('name', response.tokenKey);
-                            $('#security-token').val(response.token);
-                        }
-
-                        if (response.vendor['address_ids']['2'].length === 0 ||
-                            response.vendor['contact_ids'].length === 0
-                        ) {
-                            if (response.vendor['address_ids']['2'].length === 0) {
-                                $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').parents('.form-group').removeClass('d-none');
-                                $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').append(
-                                    '<div class="callout callout-danger">' +
-                                        '<h5>No billing address found!</h5>' +
-                                        '<p>Vendor has no billing address. Please ' +
-                                        '<a href="{{links.url("business/directory/vendors/q/id/")}}' + vendorId + '" class="contentAjaxLink text-primary">click here</a> to add a new address '+
-                                        'or contact systems administrator for further instructions.</p>' +
-                                    '</div>'
-                                );
-                            }
-
-                            if (response.vendor['contact_ids'].length === 0) {
-                                $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').parents('.form-group').removeClass('d-none');
-                                $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').append(
-                                    '<div class="callout callout-danger">' +
-                                        '<h5>No contact found!</h5>' +
-                                        '<p>Vendor has no contact assigned. Please ' +
-                                        '<a href="{{links.url("business/directory/vendors/q/id/")}}' + vendorId + '" class="contentAjaxLink text-primary">click here</a> to add/assign contact '+
-                                        'or contact systems administrator for further instructions.</p>' +
-                                    '</div>'
-                                );
-                            }
-
-                            BazContentLoader.init();
-
-                            return;
-                        }
-
-                        var addressHtml = '';
-
-                        $(response.vendor['address_ids']['2']).each(function(index, address) {
-                            var checked, addressContent;
-
-                            if (address.is_primary == 1) {
-                                checked = 'checked=""';
-                            } else {
-                                checked = '';
-                            }
-
-                            addressContent =
-                                '<dl class="row mb-0">' +
-                                    '<dt class="col-sm-4">Street Address</dt>' +
-                                    '<dd class="col-sm-8 cla-street mb-0">' + address.street_address + '</dd>' +
-                                    '<dt class="col-sm-4">Street Address 2</dt>' +
-                                    '<dd class="col-sm-8 cla-street2 mb-0">' + address.street_address_2 + '</dd>' +
-                                    '<dt class="col-sm-4">City</dt>' +
-                                    '<dd class="col-sm-8 cla-city mb-0">' + address.city_name + '</dd>' +
-                                    '<dt class="col-sm-4">Post Code</dt>' +
-                                    '<dd class="col-sm-8 cla-postcode mb-0">' + address.post_code + '</dd>' +
-                                    '<dt class="col-sm-4">State</dt>' +
-                                    '<dd class="col-sm-8 cla-state mb-0">' + address.state_name + '</dd>' +
-                                    '<dt class="col-sm-4">Country</dt>' +
-                                    '<dd class="col-sm-8 cla-country mb-0">' + address.country_name + '</dd>' +
-                                '</dl>';
-
-                            addressHtml +=
-                                '<div class="info-box">' +
-                                '    <div class="info-box-content">' +
-                                '        <div class="row">' +
-                                '            <div class="col-md-1">' +
-                                '                <div class="icheck-primary">' +
-                                '                    <input type="radio" id="' + address.id + '" data-value="' + address.id + '" name="{{componentId}}-{{sectionId}}-vendor-addresses" ' + checked + '>' +
-                                '                    <label for="' + address.id + '"></label>' +
-                                '                </div>' +
-                                '            </div>' +
-                                '            <div class="col">' + addressContent + '</div>' +
-                                '        </div>' +
-                                '    </div>' +
-                                '</div>';
-                        });
-
-                        $('#{{componentId}}-{{sectionId}}-vendor_address_id').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-vendor_address_id').empty().append(addressHtml);
-
-                        var contactHtml = '';
-
-                        $(response.vendor['contact_ids']).each(function(index, contact) {
-                            var contactChecked, contactContent;
-
-                            if (index == 0) {
-                                contactChecked = 'checked=""';
-                            } else {
-                                contactChecked = '';
-                            }
-
-                            contactContent =
-                                '<dl class="row mb-0">' +
-                                    '<dt class="col-sm-4">Name</dt>' +
-                                    '<dd class="col-sm-8 cla-name mb-0">' + contact.full_name + '</dd>' +
-                                    '<dt class="col-sm-4">Email</dt>' +
-                                    '<dd class="col-sm-8 cla-email mb-0">' + contact.account_email + '</dd>' +
-                                    '<dt class="col-sm-4">Phone</dt>' +
-                                    '<dd class="col-sm-8 cla-phone mb-0">' + contact.contact_phone;
-
-                                    if (contact.contact_phone_ext !== '') {
-                                        contactContent +=
-                                            ' x' + contact.contact_phone_ext + '</dd>';
-                                    } else {
-                                        contactContent += '</dd>';
-                                    }
-
-                                    if (contact.contact_mobile !== '') {
-                                        contactContent +=
-                                            '<dt class="col-sm-4">Mobile</dt>' +
-                                            '<dd class="col-sm-8 cla-mobile mb-0">' + contact.contact_mobile + '</dd>';
-                                    }
-
-                            contactContent +=
-                                '</dl>';
-
-                            contactHtml +=
-                                '<div class="info-box">' +
-                                '    <div class="info-box-content">' +
-                                '        <div class="row">' +
-                                '            <div class="col-md-1">' +
-                                '                <div class="icheck-primary">' +
-                                '                    <input type="radio" id="' + contact.id + '" data-value="' + contact.id + '" name="{{componentId}}-{{sectionId}}-vendor-contacts" ' + contactChecked + '>' +
-                                '                    <label for="' + contact.id + '"></label>' +
-                                '                </div>' +
-                                '            </div>' +
-                                '            <div class="col">' + contactContent + '</div>' +
-                                '        </div>' +
-                                '    </div>' +
-                                '</div>';
-                        });
-
-                        $('#{{componentId}}-{{sectionId}}-vendor_contact_id').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-vendor_contact_id').empty().append(contactHtml);
-
-                        $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').each(function(index, addressRadio) {
-                            if ($(addressRadio).attr('checked') === 'checked') {
-                                dataCollectionSection["data"]["vendor_address_id"] = $(addressRadio).data('value');
-                            }
-                        });
-                        $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').each(function(index, contactRadio) {
-                            if ($(contactRadio).attr('checked') === 'checked') {
-                                dataCollectionSection["data"]["vendor_contact_id"] = $(contactRadio).data('value');
-                            }
-                        });
-                        $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').off();
-                        $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').click(function() {
-                            dataCollectionSection["data"]["vendor_address_id"] = $(this).data('value');
-                        });
-                        $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').off();
-                        $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').click(function() {
-                            dataCollectionSection["data"]["vendor_contact_id"] = $(this).data('value');
-                        });
-                    }, 'json');
-                });
-
-                if ($('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').length > 0) {
-                    $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').each(function(index, addressInput) {
-                        if ($(addressInput).attr('checked') == 'checked') {
-                            dataCollectionSection["data"]["vendor_address_id"] = $(addressInput).data('value');
-                        }
-                    });
-                    $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').off();
-                    $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').click(function() {
-                        dataCollectionSection["data"]["vendor_address_id"] = $(this).data('value');
-                    });
-                }
-
-                if ($('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').length > 0) {
-                    $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').each(function(index, contactInput) {
-                        if ($(contactInput).attr('checked') == 'checked') {
-                            dataCollectionSection["data"]["vendor_contact_id"] = $(contactInput).data('value');
-                        }
-                    });
-                    $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').off();
-                    $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').click(function() {
-                        dataCollectionSection["data"]["vendor_contact_id"] = $(this).data('value');
-                    });
-                }
-            }
-        },
-        '{{componentId}}-{{sectionId}}-vendor_address_id'       : { },
-        '{{componentId}}-{{sectionId}}-vendor_contact_id'       : { },
-        '{{componentId}}-{{sectionId}}-delivery_type'           : {
-            placeholder: 'SELECT DELIVERY TYPE',
-            afterInit: function() {
-
-            }
-        },
-        '{{componentId}}-{{sectionId}}-entity_location_id'      : {
-            placeholder: 'SELECT ENTITY LOCATION',
-        },
-        '{{componentId}}-{{sectionId}}-customer_id'             : {
-            placeholder: 'SELECT CUSTOMER',
-        },
-        '{{componentId}}-{{sectionId}}-contact_fullname'        : { },
-        '{{componentId}}-{{sectionId}}-contact_phone'           : { },
-        '{{componentId}}-{{sectionId}}-delivery_notes'          : { }
-    });
-</script>

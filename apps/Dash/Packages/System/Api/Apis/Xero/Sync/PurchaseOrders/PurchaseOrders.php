@@ -84,7 +84,6 @@ class PurchaseOrders extends BasePackage
         $organisations = new Organisations;
 
         $organisations->sync($apiId);
-        die();
 
         $contactGroups = new ContactGroups;
 

@@ -62,6 +62,14 @@ class Notes extends AdminLTETags
             $this->notesSettings['lightboxSize'] :
             1200;
 
+        if (isset($this->params['allowedUploads'])) {
+            $this->notesParams['allowedUploads'] = $this->params['allowedUploads'];
+        } else if (isset($this->notesSettings['allowedUploads'])) {
+            $this->notesParams['allowedUploads'] = $this->notesSettings['allowedUploads'];
+        } else {
+            $this->notesParams['allowedUploads'] = true;
+        }
+
         $this->useStorage($this->notesSettings['useStorage']);
 
         $this->content .=
@@ -165,7 +173,7 @@ class Notes extends AdminLTETags
                     </div>';
 
                     //Uploads
-                    if (isset($this->notesSettings['allowedUploads']) && $this->notesSettings['allowedUploads'] === true) {
+                    if (isset($this->notesParams['allowedUploads']) && $this->notesParams['allowedUploads'] === true) {
                         $this->content .=
                             '</div>
                             <div class="col-md-4">' .

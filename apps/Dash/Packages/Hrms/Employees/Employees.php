@@ -91,7 +91,7 @@ class Employees extends BasePackage
 
     public function updateEmployee(array $data)
     {
-        $employee = $this->getById($data['id']);
+        $employee = $this->getEmployeeById($data['id']);
 
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 

@@ -6,15 +6,18 @@
     {% set vendorSwiftCode = vendor['swift_code'] %}
     {% set vendorBillsDueDay = vendor['bills_due_day'] %}
     {% set vendorBillsDueDayTerm = vendor['bills_due_day_term'] %}
+    {% set vendorBillsDiscount = vendor['bills_discount'] %}
     {% set vendorBillsTaxEnabled = vendor['bills_tax_enabled'] %}
     {% set vendorBillsTaxId = vendor['bills_tax_id'] %}
+    {% set vendorPurchaseOrdersTaxEnabled = vendor['po_tax_enabled'] %}
+    {% set vendorPurchaseOrdersTaxId = vendor['po_tax_id'] %}
     {% set vendorInvoicesDueDay = vendor['invoices_due_day'] %}
     {% set vendorInvoicesDueDayTerm = vendor['invoices_due_day_term'] %}
     {% set vendorInvoicesTaxEnabled = vendor['invoices_tax_enabled'] %}
     {% set vendorInvoicesTaxId = vendor['invoices_tax_id'] %}
     {% set vendorCreditLimitAmount = vendor['credit_limit_amount'] %}
     {% set vendorCreditLimitBlock = vendor['credit_limit_block'] %}
-    {% set vendorDiscount = vendor['discount'] %}
+    {% set vendorInvoiceDiscount = vendor['invoice_discount'] %}
 {% else %}
     {% set vendorAcn = '' %}
     {% set vendorCurrency = '' %}
@@ -23,15 +26,18 @@
     {% set vendorSwiftCode = '' %}
     {% set vendorBillsDueDay = '' %}
     {% set vendorBillsDueDayTerm = '' %}
+    {% set vendorBillsDiscount = '' %}
     {% set vendorBillsTaxEnabled = '' %}
     {% set vendorBillsTaxId = '' %}
+    {% set vendorPurchaseOrdersTaxEnabled = '' %}
+    {% set vendorPurchaseOrdersTaxId = '' %}
     {% set vendorInvoicesDueDay = '' %}
     {% set vendorInvoicesDueDayTerm = '' %}
     {% set vendorInvoicesTaxEnabled = '' %}
     {% set vendorInvoicesTaxId = '' %}
     {% set vendorCreditLimitAmount = '' %}
     {% set vendorCreditLimitBlock = '' %}
-    {% set vendorDiscount = '' %}
+    {% set vendorInvoiceDiscount = '' %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -156,6 +162,7 @@
         )}}
     </div>
 </div>
+<hr>
 <div class="row">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -207,14 +214,44 @@
         )}}
     </div>
     <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'bills_discount',
+                'fieldLabel'                            : 'Bills Discount',
+                'fieldType'                             : 'input',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Bills discount from this vendor',
+                'fieldRequired'                         : false,
+                'fieldBazScan'                          : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldInputTypeTextFilter'              : 'positivePercentMax',
+                'fieldGroupPostAddonIcon'               : 'percent',
+                'fieldDataInputMinNumber'               : 0,
+                'fieldDataInputMaxNumber'               : 100,
+                'fieldValue'                            : vendorBillsDiscount
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
         {% if vendorBillsTaxEnabled is defined %}
             {% if vendorBillsTaxEnabled == 1 %}
                 {% set vendorBillsTaxEnabledChecked = true %}
+                {% set vendorBillsTaxDisabled = false %}
             {% else %}
                 {% set vendorBillsTaxEnabledChecked = false %}
+                {% set vendorBillsTaxDisabled = true %}
             {% endif %}
         {% else %}
             {% set vendorBillsTaxEnabledChecked = false %}
+            {% set vendorBillsTaxDisabled = true %}
         {% endif %}
         {{adminltetags.useTag('fields',
             [
@@ -228,7 +265,7 @@
                 'fieldHelpTooltipContent'        : 'Add tax to invoices?',
                 'fieldRequired'                  : false,
                 'fieldType'                      : 'checkbox',
-                'fieldCheckboxType'              : 'warning',
+                'fieldCheckboxType'              : 'info',
                 'fieldCheckboxChecked'           : vendorBillsTaxEnabledChecked,
                 'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
@@ -249,7 +286,8 @@
                 'fieldType'                             : 'select2',
                 'fieldHelp'                             : true,
                 'fieldHelpTooltipContent'               : 'Select Tax to add to bills.',
-                'fieldRequired'                         : false,
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : vendorBillsTaxDisabled,
                 'fieldBazScan'                          : true,
                 'fieldBazPostOnCreate'                  : true,
                 'fieldBazPostOnUpdate'                  : true,
@@ -262,8 +300,77 @@
             ]
         )}}
     </div>
+    <div class="col">
+        {% if vendorPurchaseOrdersTaxEnabled is defined %}
+            {% if vendorPurchaseOrdersTaxEnabled == 1 %}
+                {% set vendorPurchaseOrdersTaxEnabledChecked = true %}
+                {% set vendorPurchaseOrdersTaxDisabled = false %}
+            {% else %}
+                {% set vendorPurchaseOrdersTaxEnabledChecked = false %}
+                {% set vendorPurchaseOrdersTaxDisabled = true %}
+            {% endif %}
+        {% else %}
+            {% set vendorPurchaseOrdersTaxEnabledChecked = false %}
+            {% set vendorPurchaseOrdersTaxDisabled = true %}
+        {% endif %}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'po_tax_enabled',
+                'fieldLabel'                     : 'Add Tax To Purchase Orders?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Add tax to Purchase Orders?',
+                'fieldRequired'                  : false,
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'info',
+                'fieldCheckboxChecked'           : vendorPurchaseOrdersTaxEnabledChecked,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldBazScan'                   : true
+            ]
+        )}}
+    </div>
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'po_tax_id',
+                'fieldLabel'                            : 'Purchase Orders Tax',
+                'fieldType'                             : 'select2',
+                'fieldHelp'                             : true,
+                'fieldHelpTooltipContent'               : 'Select Tax to add to bills.',
+                'fieldRequired'                         : true,
+                'fieldDisabled'                         : vendorPurchaseOrdersTaxDisabled,
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldDataSelect2Options'               : taxes,
+                'fieldDataSelect2OptionsKey'            : 'id',
+                'fieldDataSelect2OptionsValue'          : 'name',
+                'fieldDataSelect2OptionsArray'          : true,
+                'fieldDataSelect2OptionsSelected'       : vendorPurchaseOrdersTaxId
+            ]
+        )}}
+    </div>
 </div>
-<div id="b2b">
+{% if vendorB2bCustomer is defined %}
+    {% if vendorB2bCustomer == 1 %}
+        {% set vendorB2bHidden = '' %}
+    {% else %}
+        {% set vendorB2bHidden = 'hidden' %}
+    {% endif %}
+{% else %}
+    {% set vendorB2bHidden = 'hidden' %}
+{% endif %}
+<div id="b2b" {{vendorB2bHidden}}>
     <hr>
     <div class="row">
         <div class="col">
@@ -338,58 +445,27 @@
             )}}
         </div>
         <div class="col">
-            {% if vendorInvoicesTaxEnabled is defined %}
-                {% if vendorInvoicesTaxEnabled == 1 %}
-                    {% set vendorInvoicesTaxEnabledChecked = true %}
-                {% else %}
-                    {% set vendorInvoicesTaxEnabledChecked = false %}
-                {% endif %}
-            {% else %}
-                {% set vendorInvoicesTaxEnabledChecked = false %}
-            {% endif %}
-            {{adminltetags.useTag('fields',
-                [
-                    'component'                      : component,
-                    'componentName'                  : componentName,
-                    'componentId'                    : componentId,
-                    'sectionId'                      : sectionId,
-                    'fieldId'                        : 'invoices_tax_enabled',
-                    'fieldLabel'                     : 'Add Tax To Invoices?',
-                    'fieldHelp'                      : true,
-                    'fieldHelpTooltipContent'        : 'Add tax to invoices?',
-                    'fieldRequired'                  : false,
-                    'fieldType'                      : 'checkbox',
-                    'fieldCheckboxType'              : 'warning',
-                    'fieldCheckboxChecked'           : vendorInvoicesTaxEnabledChecked,
-                    'fieldBazJstreeSearch'           : true,
-                    'fieldBazPostOnCreate'           : true,
-                    'fieldBazPostOnUpdate'           : true,
-                    'fieldBazScan'                   : true
-                ]
-            )}}
-        </div>
-        <div class="col">
             {{adminltetags.useTag('fields',
                 [
                     'component'                             : component,
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'invoices_tax_id',
-                    'fieldLabel'                            : 'Invoices Tax',
-                    'fieldType'                             : 'select2',
+                    'fieldId'                               : 'invoice_discount',
+                    'fieldLabel'                            : 'Invoice Discount',
+                    'fieldType'                             : 'input',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Select Tax to add to invoices.',
+                    'fieldHelpTooltipContent'               : 'Invoice discount for this vendor',
                     'fieldRequired'                         : false,
                     'fieldBazScan'                          : true,
+                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : true,
                     'fieldBazPostOnUpdate'                  : true,
-                    'fieldBazJstreeSearch'                  : true,
-                    'fieldDataSelect2Options'               : taxes,
-                    'fieldDataSelect2OptionsKey'            : 'id',
-                    'fieldDataSelect2OptionsValue'          : 'name',
-                    'fieldDataSelect2OptionsArray'          : true,
-                    'fieldDataSelect2OptionsSelected'       : vendorInvoicesTaxId
+                    'fieldInputTypeTextFilter'              : 'positivePercentMax',
+                    'fieldGroupPostAddonIcon'               : 'percent',
+                    'fieldDataInputMinNumber'               : 0,
+                    'fieldDataInputMaxNumber'               : 100,
+                    'fieldValue'                            : vendorInvoiceDiscount
                 ]
             )}}
         </div>
@@ -441,8 +517,42 @@
                     'fieldHelpTooltipContent'        : 'Block vendor from generating further invoices beyond credit limit?',
                     'fieldRequired'                  : false,
                     'fieldType'                      : 'checkbox',
-                    'fieldCheckboxType'              : 'warning',
+                    'fieldCheckboxType'              : 'info',
                     'fieldCheckboxChecked'           : vendorCreditLimitBlockChecked,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : true,
+                    'fieldBazPostOnUpdate'           : true,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {% if vendorInvoicesTaxEnabled is defined %}
+                {% if vendorInvoicesTaxEnabled == 1 %}
+                    {% set vendorInvoicesTaxEnabledChecked = true %}
+                    {% set vendorInvoicesTaxDisabled = false %}
+                {% else %}
+                    {% set vendorInvoicesTaxEnabledChecked = false %}
+                    {% set vendorInvoicesTaxDisabled = true %}
+                {% endif %}
+            {% else %}
+                {% set vendorInvoicesTaxEnabledChecked = false %}
+                {% set vendorInvoicesTaxDisabled = true %}
+            {% endif %}
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'invoices_tax_enabled',
+                    'fieldLabel'                     : 'Add Tax To Invoices?',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Add tax to invoices?',
+                    'fieldRequired'                  : false,
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxType'              : 'info',
+                    'fieldCheckboxChecked'           : vendorInvoicesTaxEnabledChecked,
                     'fieldBazJstreeSearch'           : true,
                     'fieldBazPostOnCreate'           : true,
                     'fieldBazPostOnUpdate'           : true,
@@ -457,21 +567,22 @@
                     'componentName'                         : componentName,
                     'componentId'                           : componentId,
                     'sectionId'                             : sectionId,
-                    'fieldId'                               : 'discount',
-                    'fieldLabel'                            : 'Discount',
-                    'fieldType'                             : 'input',
+                    'fieldId'                               : 'invoices_tax_id',
+                    'fieldLabel'                            : 'Invoices Tax',
+                    'fieldType'                             : 'select2',
                     'fieldHelp'                             : true,
-                    'fieldHelpTooltipContent'               : 'Credit Limit of the vendor',
+                    'fieldHelpTooltipContent'               : 'Select Tax to add to invoices.',
                     'fieldRequired'                         : false,
+                    'fieldDisabled'                         : vendorInvoicesTaxDisabled,
                     'fieldBazScan'                          : true,
-                    'fieldBazJstreeSearch'                  : true,
                     'fieldBazPostOnCreate'                  : true,
                     'fieldBazPostOnUpdate'                  : true,
-                    'fieldInputTypeTextFilter'              : 'positivePercentMax',
-                    'fieldGroupPostAddonIcon'               : 'percent',
-                    'fieldDataInputMinNumber'               : 0,
-                    'fieldDataInputMaxNumber'               : 100,
-                    'fieldValue'                            : vendorDiscount
+                    'fieldBazJstreeSearch'                  : true,
+                    'fieldDataSelect2Options'               : taxes,
+                    'fieldDataSelect2OptionsKey'            : 'id',
+                    'fieldDataSelect2OptionsValue'          : 'name',
+                    'fieldDataSelect2OptionsArray'          : true,
+                    'fieldDataSelect2OptionsSelected'       : vendorInvoicesTaxId
                 ]
             )}}
         </div>

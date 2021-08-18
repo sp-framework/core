@@ -1,1 +1,323 @@
-Products
+{% if purchaseOrder['id'] is defined %}
+    {% set productsFormHidden = 'hidden' %}
+    {% set productsFormButtonIcon = 'eye' %}
+    {% set productsFormButtonsHidden = true %}
+{% else %}
+    {% set productsFormHidden = '' %}
+    {% set productsFormButtonIcon = 'eye-slash' %}
+    {% set productsFormButtonsHidden = false %}
+{% endif %}
+<div id="products-form" {{productsFormHidden}}>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'use_vendor_tax',
+                    'fieldLabel'                     : 'Use Vendor Purchase Orders Tax?',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Use tax configured in vendor purchase order settings.',
+                    'fieldRequired'                  : false,
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxType'              : 'info',
+                    'fieldCheckboxChecked'           : '',
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col-md-3">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                            : component,
+                    'componentName'                        : componentName,
+                    'componentId'                          : componentId,
+                    'sectionId'                            : sectionId,
+                    'fieldId'                              : 'product_tax_rate',
+                    'fieldLabel'                           : 'Product Tax Rate',
+                    'fieldType'                            : 'select2',
+                    'fieldHelp'                            : true,
+                    'fieldHelpTooltipContent'              : 'Select a tax rate for the product.',
+                    'fieldRequired'                        : true,
+                    'fieldBazScan'                         : true,
+                    'fieldBazPostOnCreate'                 : true,
+                    'fieldBazPostOnUpdate'                 : true,
+                    'fieldBazJstreeSearch'                 : false,
+                    'fieldDataSelect2Options'              : taxes,
+                    'fieldDataSelect2OptionsKey'           : 'id',
+                    'fieldDataSelect2OptionsValue'         : 'name',
+                    'fieldDataSelect2OptionsArray'         : true,
+                    'fieldDataSelect2OptionsSelected'      : ''
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'use_vendor_discount',
+                    'fieldLabel'                     : 'Use Vendor Bills Discount?',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Use bills discount configured in vendor settings.',
+                    'fieldRequired'                  : false,
+                    'fieldType'                      : 'checkbox',
+                    'fieldCheckboxType'              : 'info',
+                    'fieldCheckboxChecked'           : '',
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldBazScan'                   : true
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'product_discount',
+                    'fieldLabel'                     : 'Product Discount',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Enter Product Discount.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'product_mpn',
+                    'fieldLabel'                     : 'Search/Enter Product MPN',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Search/Enter product MPN. If MPN does not exist, a new product will be created with that MPN.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'product_title',
+                    'fieldLabel'                     : 'Product Title',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Enter Product Title.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 80,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'product_qty',
+                    'fieldLabel'                     : 'Product Quantity',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Enter product Quantity.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'product_unit_price',
+                    'fieldLabel'                     : 'Product Unit Price',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Enter Product Unit Price.',
+                    'fieldRequired'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'product_amount',
+                    'fieldLabel'                     : 'Product Amount',
+                    'fieldType'                      : 'input',
+                    'fieldHelp'                      : true,
+                    'fieldHelpTooltipContent'        : 'Enter Product Amount.',
+                    'fieldRequired'                  : true,
+                    'fieldDisabled'                  : true,
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : false,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false,
+                    'fieldDataInputMinLength'        : 1,
+                    'fieldDataInputMaxLength'        : 50,
+                    'fieldValue'                     : ''
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                     : 'button',
+                    'buttons'                        :
+                        [
+                            'show-hide'          : [
+                                'title'                    : 'Form',
+                                'size'                     : 'xs',
+                                'type'                     : 'info',
+                                'icon'                     : productsFormButtonIcon
+                            ],
+                            'add-product'        : [
+                                'title'                    : 'Add',
+                                'size'                     : 'xs',
+                                'disabled'                 : true,
+                                'hidden'                   : productsFormButtonsHidden,
+                                'type'                     : 'primary',
+                                'icon'                     : 'plus',
+                                'position'                 : 'right'
+                            ],
+                            'cancel-product'     : [
+                                'title'                    : 'Cancel',
+                                'size'                     : 'xs',
+                                'disabled'                 : true,
+                                'hidden'                   : productsFormButtonsHidden,
+                                'type'                     : 'secondary',
+                                'icon'                     : 'times',
+                                'position'                 : 'right'
+                            ]
+                        ]
+                ]
+            )}}
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'products',
+                'fieldLabel'                     : 'Products',
+                'fieldType'                      : 'html',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Purchase Order products',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldRequired'                  : true,
+                'fieldBazScan'                   : false,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <div class="table-responsive p-0" style="height:300px">
+            <table class="table table-head-fixed table-hover text-nowrap">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>MPN</th>
+                        <th>TITLE</th>
+                        <th>TAX RATE</th>
+                        <th>DISCOUNT</th>
+                        <th>QUANTITY</th>
+                        <th>UNIT PRICE</th>
+                        <th>AMOUNT</th>
+                    </tr>
+                </thead>
+                <tbody id="{{componentId}}-{{sectionId}}-sortable-products">
+                    {% if purchaseOrder['products'] is defined and purchaseOrder['products']|length > 0 %}
+                        {% for productKey, product in purchaseOrder['products'] %}
+
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                Add Products...
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<hr>

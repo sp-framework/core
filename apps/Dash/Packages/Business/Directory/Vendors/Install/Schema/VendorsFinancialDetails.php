@@ -84,6 +84,14 @@ class VendorsFinancialDetails
                     ]
                 ),
                 new Column(
+                    'bills_discount',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 3,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'bills_tax_enabled',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
@@ -92,6 +100,20 @@ class VendorsFinancialDetails
                 ),
                 new Column(
                     'bills_tax_id',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'po_tax_enabled',
+                    [
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'po_tax_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => false,
@@ -143,7 +165,7 @@ class VendorsFinancialDetails
                     ]
                 ),
                 new Column(
-                    'discount',
+                    'invoice_discount',
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 3,

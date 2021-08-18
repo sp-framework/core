@@ -298,20 +298,26 @@ class ProductsComponent extends BaseComponent
             if ($this->postData()['search']) {
                 $searchQuery = $this->postData()['search'];
 
+                $completeData = false;
+
+                if (isset($this->postData()['completeData']) && $this->postData()['completeData'] == 'true') {
+                    $completeData = true;
+                }
+
                 if ($field === 'mpn') {
                     if (strlen($searchQuery) < 2) {
                         return;
                     }
-                    $searchProduct = $this->products->searchByMPN($searchQuery);
+                    $searchProduct = $this->products->searchByMPN($searchQuery, $completeData);
                 } else if ($field === 'title') {
                     if (strlen($searchQuery) < 2) {
                         return;
                     }
-                    $searchProduct = $this->products->searchByTitle($searchQuery);
+                    $searchProduct = $this->products->searchByTitle($searchQuery, $completeData);
                 } else if ($field === 'code_ean') {
-                    $searchProduct = $this->products->searchByCodeEAN($searchQuery);
+                    $searchProduct = $this->products->searchByCodeEAN($searchQuery, $completeData);
                 } else if ($field === 'code_sku') {
-                    $searchProduct = $this->products->searchByCodeSKU($searchQuery);
+                    $searchProduct = $this->products->searchByCodeSKU($searchQuery, $completeData);
                 }
 
                 if ($searchProduct) {

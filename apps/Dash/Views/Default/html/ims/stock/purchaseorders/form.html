@@ -1,3 +1,8 @@
+{% if purchaseorder['id'] is defined %}
+    {% set purchaseorderNotes = purchaseorder['notes'] %}
+{% else %}
+    {% set purchaseorderNotes = [] %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -39,6 +44,42 @@
     <div class="col">
         <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
             <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {% set tabsData =
+                    [
+                        'details'   :
+                        [
+                            'tabTitle'          : 'Details',
+                            'tabInclude'        : 'purchaseorders/form/details'
+                        ],
+                        'delivery'   :
+                        [
+                            'tabTitle'          : 'Delivery',
+                            'tabInclude'        : 'purchaseorders/form/delivery'
+                        ],
+                        'products'   :
+                        [
+                            'tabTitle'          : 'Products',
+                            'tabInclude'        : 'purchaseorders/form/products'
+                        ],
+                        'attachments'   :
+                        [
+                            'tabTitle'          : 'Attachments',
+                            'tabInclude'        : 'purchaseorders/form/attachments'
+                        ],
+                        'notes'   :
+                        [
+                            'tabTitle'          : 'Notes',
+                            'tabInclude'        : '../../common/notes',
+                            'tabIncludeParams':
+                            [
+                                'notes'         : purchaseorderNotes,
+                                'packageName'   : 'purchaseorders',
+                                'allowedUploads': false
+                            ]
+                        ]
+                    ]
+                %}
+
                 {{adminltetags.useTag('tabs',
                     [
                         'component'                     : component,
@@ -47,29 +88,7 @@
                         'sectionId'                     : 'main',
                         'tabsId'                        : 'tabs',
                         'tabsStyle'                     : 'card-outline-tabs',
-                        'tabsData'                      :
-                            [
-                                'details'   :
-                                [
-                                    'tabTitle'          : 'Details',
-                                    'tabInclude'        : 'purchaseorders/form/details'
-                                ],
-                                'delivery'   :
-                                [
-                                    'tabTitle'          : 'Delivery',
-                                    'tabInclude'        : 'purchaseorders/form/delivery'
-                                ],
-                                'products'   :
-                                [
-                                    'tabTitle'          : 'Products',
-                                    'tabInclude'        : 'purchaseorders/form/products'
-                                ],
-                                'attachments'   :
-                                [
-                                    'tabTitle'          : 'Attachments',
-                                    'tabInclude'        : 'purchaseorders/form/attachments'
-                                ]
-                            ]
+                        'tabsData'                      : tabsData
                     ]
                 )}}
             </fieldset>
@@ -77,7 +96,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentFieldsValidator autoComplete PNotify */
+/* globals BazContentFieldsValidator autoComplete PNotify BazContentLoader */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -102,20 +121,578 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
 
+var vendor = null;
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                          : { },
+        '{{componentId}}-{{sectionId}}-entity_id'                   : {
+            placeholder: "SELECT BUSINESS ENTITY"
+        },
+        '{{componentId}}-{{sectionId}}-reference_orders'            : { },
+        '{{componentId}}-{{sectionId}}-expected_delivery_date'      : { },
+        '{{componentId}}-{{sectionId}}-status'                      : {
+            placeholder: 'SELECT STATUS'
+        },
+        '{{componentId}}-{{sectionId}}-vendor_id'                   : {
+            placeholder: "SELECT VENDOR",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-vendor_id').on('select2:select', function(e) {
+
+                    $('#{{componentId}}-{{sectionId}}-vendor_details').attr('hidden', false);
+                    $('#{{componentId}}-{{sectionId}}-vendor_address_id, ' +
+                      '#{{componentId}}-{{sectionId}}-vendor_address_id_error, ' +
+                      '#{{componentId}}-{{sectionId}}-vendor_contact_id, ' +
+                      '#{{componentId}}-{{sectionId}}-vendor_contact_id_error')
+                        .parents('.form-group').addClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-vendor_address_id').empty();
+                    $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').empty();
+                    $('#{{componentId}}-{{sectionId}}-vendor_contact_id').empty();
+                    $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').empty();
+
+                    var vendorId = e.params.data.id;
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['vendorId'] = vendorId;
+
+                    $.post('{{links.url("business/directory/vendors/searchvendorid")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        vendor = response.vendor;
+
+                        if (response.vendor['address_ids']['2'].length === 0 ||
+                            response.vendor['contact_ids'].length === 0
+                        ) {
+                            if (response.vendor['address_ids']['2'].length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').parents('.form-group').removeClass('d-none');
+                                $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').append(
+                                    '<div class="callout callout-danger">' +
+                                        '<h5>No billing address found!</h5>' +
+                                        '<p>Vendor has no billing address. Please ' +
+                                        '<a href="{{links.url("business/directory/vendors/q/id/")}}' + vendorId + '" class="contentAjaxLink text-primary">click here</a> to add a new address '+
+                                        'or contact systems administrator for further instructions.</p>' +
+                                    '</div>'
+                                );
+                            }
+
+                            if (response.vendor['contact_ids'].length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').parents('.form-group').removeClass('d-none');
+                                $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').append(
+                                    '<div class="callout callout-danger">' +
+                                        '<h5>No contact found!</h5>' +
+                                        '<p>Vendor has no contact assigned. Please ' +
+                                        '<a href="{{links.url("business/directory/vendors/q/id/")}}' + vendorId + '" class="contentAjaxLink text-primary">click here</a> to add/assign contact '+
+                                        'or contact systems administrator for further instructions.</p>' +
+                                    '</div>'
+                                );
+                            }
+
+                            BazContentLoader.init();
+
+                            return;
+                        }
+
+                        var addressHtml = '';
+
+                        $(response.vendor['address_ids']['2']).each(function(index, address) {
+                            var checked, addressContent;
+
+                            if (address.is_primary == 1) {
+                                checked = 'checked=""';
+                            } else {
+                                checked = '';
+                            }
+
+                            addressContent =
+                                '<dl class="row mb-0">' +
+                                    '<dt class="col-sm-4">Street Address</dt>' +
+                                    '<dd class="col-sm-8 cla-street mb-0">' + address.street_address + '</dd>' +
+                                    '<dt class="col-sm-4">Street Address 2</dt>' +
+                                    '<dd class="col-sm-8 cla-street2 mb-0">' + address.street_address_2 + '</dd>' +
+                                    '<dt class="col-sm-4">City</dt>' +
+                                    '<dd class="col-sm-8 cla-city mb-0">' + address.city_name + '</dd>' +
+                                    '<dt class="col-sm-4">Post Code</dt>' +
+                                    '<dd class="col-sm-8 cla-postcode mb-0">' + address.post_code + '</dd>' +
+                                    '<dt class="col-sm-4">State</dt>' +
+                                    '<dd class="col-sm-8 cla-state mb-0">' + address.state_name + '</dd>' +
+                                    '<dt class="col-sm-4">Country</dt>' +
+                                    '<dd class="col-sm-8 cla-country mb-0">' + address.country_name + '</dd>' +
+                                '</dl>';
+
+                            addressHtml +=
+                                '<div class="info-box">' +
+                                '    <div class="info-box-content">' +
+                                '        <div class="row">' +
+                                '            <div class="col-md-1">' +
+                                '                <div class="icheck-primary">' +
+                                '                    <input type="radio" id="' + address.id + '" data-value="' + address.id + '" name="{{componentId}}-{{sectionId}}-vendor-addresses" ' + checked + '>' +
+                                '                    <label for="' + address.id + '"></label>' +
+                                '                </div>' +
+                                '            </div>' +
+                                '            <div class="col">' + addressContent + '</div>' +
+                                '        </div>' +
+                                '    </div>' +
+                                '</div>';
+                        });
+
+                        $('#{{componentId}}-{{sectionId}}-vendor_address_id').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-vendor_address_id').empty().append(addressHtml);
+
+                        var contactHtml = '';
+
+                        $(response.vendor['contact_ids']).each(function(index, contact) {
+                            var contactChecked, contactContent;
+
+                            if (index == 0) {
+                                contactChecked = 'checked=""';
+                            } else {
+                                contactChecked = '';
+                            }
+
+                            contactContent =
+                                '<dl class="row mb-0">' +
+                                    '<dt class="col-sm-4">Name</dt>' +
+                                    '<dd class="col-sm-8 cla-name mb-0">' + contact.full_name + '</dd>' +
+                                    '<dt class="col-sm-4">Email</dt>' +
+                                    '<dd class="col-sm-8 cla-email mb-0">' + contact.account_email + '</dd>' +
+                                    '<dt class="col-sm-4">Phone</dt>' +
+                                    '<dd class="col-sm-8 cla-phone mb-0">' + contact.contact_phone;
+
+                                    if (contact.contact_phone_ext !== '') {
+                                        contactContent +=
+                                            ' x' + contact.contact_phone_ext + '</dd>';
+                                    } else {
+                                        contactContent += '</dd>';
+                                    }
+
+                                    if (contact.contact_mobile !== '') {
+                                        contactContent +=
+                                            '<dt class="col-sm-4">Mobile</dt>' +
+                                            '<dd class="col-sm-8 cla-mobile mb-0">' + contact.contact_mobile + '</dd>';
+                                    }
+
+                            contactContent +=
+                                '</dl>';
+
+                            contactHtml +=
+                                '<div class="info-box">' +
+                                '    <div class="info-box-content">' +
+                                '        <div class="row">' +
+                                '            <div class="col-md-1">' +
+                                '                <div class="icheck-primary">' +
+                                '                    <input type="radio" id="' + contact.id + '" data-value="' + contact.id + '" name="{{componentId}}-{{sectionId}}-vendor-contacts" ' + contactChecked + '>' +
+                                '                    <label for="' + contact.id + '"></label>' +
+                                '                </div>' +
+                                '            </div>' +
+                                '            <div class="col">' + contactContent + '</div>' +
+                                '        </div>' +
+                                '    </div>' +
+                                '</div>';
+                        });
+
+                        $('#{{componentId}}-{{sectionId}}-vendor_contact_id').parents('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-vendor_contact_id').empty().append(contactHtml);
+
+                        $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').each(function(index, addressRadio) {
+                            if ($(addressRadio).attr('checked') === 'checked') {
+                                dataCollectionSection["data"]["vendor_address_id"] = $(addressRadio).data('value');
+                            }
+                        });
+                        $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').each(function(index, contactRadio) {
+                            if ($(contactRadio).attr('checked') === 'checked') {
+                                dataCollectionSection["data"]["vendor_contact_id"] = $(contactRadio).data('value');
+                            }
+                        });
+                        $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').off();
+                        $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').click(function() {
+                            dataCollectionSection["data"]["vendor_address_id"] = $(this).data('value');
+                        });
+                        $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').off();
+                        $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').click(function() {
+                            dataCollectionSection["data"]["vendor_contact_id"] = $(this).data('value');
+                        });
+                    }, 'json');
+                });
+
+                if ($('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').length > 0) {
+                    $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').each(function(index, addressInput) {
+                        if ($(addressInput).attr('checked') == 'checked') {
+                            dataCollectionSection["data"]["vendor_address_id"] = $(addressInput).data('value');
+                        }
+                    });
+                    $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').off();
+                    $('[name="{{componentId}}-{{sectionId}}-vendor-addresses"]').click(function() {
+                        dataCollectionSection["data"]["vendor_address_id"] = $(this).data('value');
+                    });
+                }
+
+                if ($('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').length > 0) {
+                    $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').each(function(index, contactInput) {
+                        if ($(contactInput).attr('checked') == 'checked') {
+                            dataCollectionSection["data"]["vendor_contact_id"] = $(contactInput).data('value');
+                        }
+                    });
+                    $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').off();
+                    $('[name="{{componentId}}-{{sectionId}}-vendor-contacts"]').click(function() {
+                        dataCollectionSection["data"]["vendor_contact_id"] = $(this).data('value');
+                    });
+                }
+            }
+        },
+        '{{componentId}}-{{sectionId}}-vendor_address_id'           : { },
+        '{{componentId}}-{{sectionId}}-vendor_contact_id'           : { },
+        '{{componentId}}-{{sectionId}}-delivery_type'               : {
+            placeholder: 'SELECT DELIVERY TYPE',
+            afterInit: function() {
+                var employees = { };
+
+                function reset(disabled = true, hidden = false) {
+                    $('#{{componentId}}-{{sectionId}}-entity_location_id').find('option').each(function(index, option) {
+                        if ($(option).attr('value')) {
+                            $(option).remove();
+                        }
+                    });
+                    $('#{{componentId}}-{{sectionId}}-entity_location_id').val(0).trigger('change');
+
+                    $('#{{componentId}}-{{sectionId}}-customer_id').find('option').each(function(index, option) {
+                        if ($(option).attr('value')) {
+                            $(option).remove();
+                        }
+                    });
+                    $('#{{componentId}}-{{sectionId}}-customer_id').val(0).trigger('change');
+
+                    $('#{{componentId}}-{{sectionId}}-contacts').find('option').each(function(index, option) {
+                        if ($(option).attr('value')) {
+                            $(option).remove();
+                        }
+                    });
+                    $('#{{componentId}}-{{sectionId}}-contacts').val(0).trigger('change');
+
+                    $('#{{componentId}}-{{sectionId}}-street_address').val('');
+                    $('#{{componentId}}-{{sectionId}}-street_address_2').val('');
+                    $('#{{componentId}}-{{sectionId}}-city_id').val('');
+                    $('#{{componentId}}-{{sectionId}}-city_name').val('');
+                    $('#{{componentId}}-{{sectionId}}-post_code').val('');
+                    $('#{{componentId}}-{{sectionId}}-state_id').val('');
+                    $('#{{componentId}}-{{sectionId}}-state_name').val('');
+                    $('#{{componentId}}-{{sectionId}}-country_id').val('');
+                    $('#{{componentId}}-{{sectionId}}-country_name').val('');
+                    $('#{{componentId}}-{{sectionId}}-delivery_instructions').val('');
+                    $('#{{componentId}}-{{sectionId}}-contact_fullname').val('');
+                    $('#{{componentId}}-{{sectionId}}-contacts').val(0).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-contact_phone').val('');
+                    $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-city_id').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-state_id').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-country_id').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-delivery_instructions').attr('disabled', disabled);
+                    if (hidden) {
+                        $('#{{componentId}}-{{sectionId}}-contacts').parents('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-contacts').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-contacts').parents('.form-group').removeClass('d-none');
+                    }
+                    $('#{{componentId}}-{{sectionId}}-contact_fullname').attr('disabled', disabled);
+                    $('#{{componentId}}-{{sectionId}}-contact_phone').attr('disabled', disabled);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-delivery_type').on('select2:select', function(e) {
+                    var selection = e.params.data.id;
+
+                    if (selection == 1) {
+                        var entityId = $('#{{componentId}}-{{sectionId}}-entity_id').select2('data')[0].id;
+
+                        if (entityId !== '') {
+                            var postData = { };
+                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+                            postData['entity_id'] = entityId;
+
+                            $.post('{{links.url("business/locations/getLocationsByEntityId")}}', postData, function(response) {
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.responseData && response.responseData.locations) {
+                                    if (response.responseData.locations.length > 0) {
+                                        $.each(response.responseData.locations, function(index, location) {
+                                            var newOption = new Option(location.name, index + 1, false, false);
+                                            $('#{{componentId}}-{{sectionId}}-entity_location_id').append(newOption).trigger('change');
+                                        });
+                                    }
+                                }
+                            }, 'json');
+
+                            $('#{{componentId}}-{{sectionId}}-entity_location_id').attr('disabled', false);
+                            $('#{{componentId}}-{{sectionId}}-customer_id').attr('disabled', true);
+                        } else {
+                            $('#{{componentId}}-{{sectionId}}-delivery_type').val(0).trigger('change');
+                            PNotify.error({"title" : "Please select Business Entity"});
+                            return;
+                        }
+                        reset(true, false);
+                    } else if (selection == 2) {
+                        reset(true, true);
+                        $('#{{componentId}}-{{sectionId}}-entity_location_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-customer_id').attr('disabled', false);
+                    } else if (selection == 3) {
+                        reset(false, true);
+                        $('#{{componentId}}-{{sectionId}}-entity_location_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-customer_id').attr('disabled', true);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-entity_location_id').on('select2:select', function(e) {
+                    var locationId = e.params.data.id;
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['id'] = locationId;
+
+                    $.post('{{links.url("business/locations/getLocationById")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseData && response.responseData.location) {
+                            $('#{{componentId}}-{{sectionId}}-street_address').val(response.responseData.location.address.street_address);
+                            $('#{{componentId}}-{{sectionId}}-street_address_2').val(response.responseData.location.address.street_address_2);
+                            $('#{{componentId}}-{{sectionId}}-city_id').val(response.responseData.location.address.city_id);
+                            $('#{{componentId}}-{{sectionId}}-city_name').val(response.responseData.location.address.city_name);
+                            $('#{{componentId}}-{{sectionId}}-post_code').val(response.responseData.location.address.post_code);
+                            $('#{{componentId}}-{{sectionId}}-state_id').val(response.responseData.location.address.state_id);
+                            $('#{{componentId}}-{{sectionId}}-state_name').val(response.responseData.location.address.state_name);
+                            $('#{{componentId}}-{{sectionId}}-country_id').val(response.responseData.location.address.country_id);
+                            $('#{{componentId}}-{{sectionId}}-country_name').val(response.responseData.location.address.country_name);
+                            $('#{{componentId}}-{{sectionId}}-delivery_instructions').val(response.responseData.location.delivery_instructions);
+
+                            if (response.responseData.location.employees) {
+                                if (Object.keys(response.responseData.location.employees).length > 0) {
+                                    employees = response.responseData.location.employees;
+
+                                    $.each(response.responseData.location.employees, function(index, employee) {
+                                        var newOption = new Option(employee.contact_name, index, false, false);
+
+                                        $('#{{componentId}}-{{sectionId}}-contacts').append(newOption).trigger('change');
+                                    });
+
+                                    $('#{{componentId}}-{{sectionId}}-contacts').attr('disabled', false);
+                                } else {
+                                    employees = [];
+                                }
+                            } else {
+                                employees = [];
+                            }
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-contacts').on('select2:select', function(e) {
+                    var employeeId = e.params.data.id;
+
+                    $('#{{componentId}}-{{sectionId}}-contact_fullname').val(employees[employeeId]['contact_name']);
+                    $('#{{componentId}}-{{sectionId}}-contact_phone').val(employees[employeeId]['contact_phone']);
+
+                    if (employees[employeeId]['contact_phone_ext'] !== '') {
+                        $('#{{componentId}}-{{sectionId}}-contact_phone').val(
+                            employees[employeeId]['contact_phone'] + ' x' + employees[employeeId]['contact_phone_ext']
+                        );
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-entity_location_id'          : {
+            placeholder: 'SELECT ENTITY LOCATION',
+        },
+        '{{componentId}}-{{sectionId}}-customer_id'                 : {
+            placeholder: 'SELECT CUSTOMER',
+        },
+        '{{componentId}}-{{sectionId}}-contacts'                    : {
+            placeholder: 'SELECT LOCATION CONTACT',
+        },
+        '{{componentId}}-{{sectionId}}-contact_fullname'            : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'               : { },
+        '{{componentId}}-{{sectionId}}-delivery_instructions'       : { },
+        '{{componentId}}-{{sectionId}}-product_mpn'                 : {
+            afterInit   : function() {
+                var found = false;
+
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteCodeMPN'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("ims/products/searchProductMpn")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-product_mpn").value);
+                                formdata.append("completeData", 'true');
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+
+                                if (response.products) {
+                                    return response.products;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["code_mpn"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-product_mpn",
+                        threshold : 2,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-product_mpn_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-product_mpn",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + ' - ' + data.value.title;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                        },
+                        onSelection: feedback => {
+                            //eslint-disable-next-line
+                            console.log(feedback);
+                            $('#{{componentId}}-{{sectionId}}-product_mpn').val(feedback.selection.value.code_mpn);
+                            $('#{{componentId}}-{{sectionId}}-product_title').val(feedback.selection.value.title);
+                        }
+                    });
+
+                $('#{{componentId}}-{{sectionId}}-product_mpn').focusout(function() {
+                    if (found) {
+                        $('#{{componentId}}-{{sectionId}}-product_mpn').val('');
+                        $('#{{componentId}}-{{sectionId}}-product_mpn').attr('value', '');
+                    }
+                    $('#{{componentId}}-{{sectionId}}-product_mpn_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-product_title'               : { },
+        '{{componentId}}-{{sectionId}}-use_vendor_tax'              : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-use_vendor_tax').click(function() {
+                    var checked = $(this)[0].checked;
+
+                    if (checked) {
+                        if (!vendor) {
+                            PNotify.error({"title" : "Please select vendor."});
+                            $(this)[0].checked = false;
+                            return;
+                        }
+
+                        if (vendor && vendor['po_tax_enabled'] == '0') {
+                            PNotify.error({"title" : "Vendor Purchase Order Tax not configured."});
+                            $(this)[0].checked = false;
+                            return;
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-product_tax_rate').val(vendor['po_tax_id']).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-product_tax_rate').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-product_tax_rate').val(0).trigger('change');
+                        $('#{{componentId}}-{{sectionId}}-product_tax_rate').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-product_tax_rate'            : {
+            placeholder: "SELECT PRODUCT TAX RATE"
+        },
+        '{{componentId}}-{{sectionId}}-use_vendor_discount'         : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-use_vendor_discount').click(function() {
+                    var checked = $(this)[0].checked;
+
+                    if (checked) {
+                        if (!vendor) {
+                            PNotify.error({"title" : "Please select vendor."});
+                            $(this)[0].checked = false;
+                            return;
+                        }
+
+                        if (vendor && vendor['bills_discount'] === '') {
+                            PNotify.error({"title" : "Vendor Purchase Order discount not configured."});
+                            $(this)[0].checked = false;
+                            return;
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-product_discount').val(vendor['bills_discount']);
+                        $('#{{componentId}}-{{sectionId}}-product_discount').attr('disabled', true);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-product_discount').val('');
+                        $('#{{componentId}}-{{sectionId}}-product_discount').attr('disabled', false);
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-product_discount'            : { },
+        '{{componentId}}-{{sectionId}}-product_qty'                 : { },
+        '{{componentId}}-{{sectionId}}-product_unit_price'          : { },
+        '{{componentId}}-{{sectionId}}-product_amount'              : { },
         '{{componentId}}-{{sectionId}}-form'                        : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules       : {
                 '{{componentId}}-{{sectionId}}-entity_id'           : 'required',
                 '{{componentId}}-{{sectionId}}-status'              : 'required',
                 '{{componentId}}-{{sectionId}}-vendor_id'           : 'required',
+                '{{componentId}}-{{sectionId}}-street_address'      : 'required',
+                '{{componentId}}-{{sectionId}}-city_name'           : 'required',
+                '{{componentId}}-{{sectionId}}-post_code'           : 'required',
+                '{{componentId}}-{{sectionId}}-state_name'          : 'required',
+                '{{componentId}}-{{sectionId}}-country_name'        : 'required',
+                '{{componentId}}-{{sectionId}}-contact_fullname'    : 'required',
+                '{{componentId}}-{{sectionId}}-contact_phone'       : 'required',
             },
             messages    : {
                 '{{componentId}}-{{sectionId}}-entity_id'           : 'Please select a business entity',
                 '{{componentId}}-{{sectionId}}-status'              : 'Please select Order Status',
                 '{{componentId}}-{{sectionId}}-vendor_id'           : 'Please select Supplier',
+                '{{componentId}}-{{sectionId}}-street_address'      : 'Please enter street address',
+                '{{componentId}}-{{sectionId}}-city_name'           : 'Please enter city',
+                '{{componentId}}-{{sectionId}}-post_code'           : 'Please enter post code',
+                '{{componentId}}-{{sectionId}}-state_name'          : 'Please enter state',
+                '{{componentId}}-{{sectionId}}-country_name'        : 'Please enter country',
+                '{{componentId}}-{{sectionId}}-contact_fullname'    : 'Please enter contact name',
+                '{{componentId}}-{{sectionId}}-contact_phone'       : 'Please enter contact phone',
             }
         }
     });

@@ -24,9 +24,15 @@ class BusinessDirectoryVendorsFinancialDetails extends BaseModel
 
     public $bills_due_date_term;
 
+    public $bills_discount;
+
     public $bills_tax_enabled;
 
     public $bills_tax_id;
+
+    public $po_tax_enabled;
+
+    public $po_tax_id;
 
     public $invoices_due_date;
 
@@ -40,5 +46,5 @@ class BusinessDirectoryVendorsFinancialDetails extends BaseModel
 
     public $credit_limit_block;
 
-    public $discount;
+    public $invoice_discount;
 }

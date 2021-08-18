@@ -118,10 +118,57 @@ class Locations extends BasePackage
     {
         $location = $this->getById($data['id']);
 
-        $this->packagesData->locationAddress =
+        if (isset($location['employee_ids']) && $location['employee_ids'] !== '') {
+            $location['employees'] = [];
+
+            $location['employee_ids'] = Json::decode($location['employee_ids'], true);
+
+            if (count($location['employee_ids']) > 0) {
+                foreach ($location['employee_ids'] as $employeeKey => $employee) {
+                    $employees = $this->usePackage(Employees::class);
+
+                    $employeeArr = $employees->getEmployeeById($employee);
+
+                    if ($employeeArr) {
+                        $location['employees'][$employeeArr['id']] =
+                            [
+                                'contact_name'      => $employeeArr['full_name'],
+                                'contact_phone'     => $employeeArr['contact_phone'],
+                                'contact_phone_ext' => $employeeArr['contact_phone_ext'],
+                            ];
+                    }
+                }
+            }
+        }
+        unset($location['employee_ids']);
+
+        $location['address'] =
             $this->basepackages->addressbook->getById($location['address_id']);
 
+        unset($location['address_id']);
+
+        $this->addResponse('Ok', 0, $location);
+
         return true;
+    }
+
+    public function getLocationsByEntityId($data)
+    {
+        $this->getAll();
+
+        $filter =
+            $this->model->filter(
+                function($location) use ($data) {
+                    $location = $location->toArray();
+
+                    if ($location['entity_id'] == $data['entity_id']) {
+
+                        return $location;
+                    }
+                }
+            );
+
+        return $filter;
     }
 
     public function getLocationsByInboundShipping()

@@ -5,6 +5,7 @@ namespace Apps\Dash\Components\Ims\Stock\PurchaseOrders;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Business\Entities\Entities;
+use Apps\Dash\Packages\Business\Finances\Taxes\Taxes;
 use Apps\Dash\Packages\Business\Locations\Locations;
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\PurchaseOrders;
 use Phalcon\Helper\Json;
@@ -27,6 +28,10 @@ class PurchaseordersComponent extends BaseComponent
 		$this->vendors = $this->usePackage(Vendors::class);
 
 		$this->locations = $this->usePackage(Locations::class);
+
+		$this->taxes = $this->usePackage(Taxes::class);
+
+		$this->notes = $this->basepackages->notes;
 	}
 
 	/**
@@ -44,8 +49,14 @@ class PurchaseordersComponent extends BaseComponent
 
 			$this->view->locations = $this->locations->getLocationsByInboundShipping();
 
+			$this->view->taxes = $this->taxes->getAll()->taxes;
+
 			if ($this->getData()['id'] != 0) {
 				$purchaseOrder = $this->purchaseOrdersPackage->getById($this->getData()['id']);
+
+				$purchaseOrder['activityLogs'] = $this->purchaseOrdersPackage->getActivityLogs($this->getData()['id']);
+
+				$purchaseOrder['notes'] = $this->notes->getNotes('vendors', $this->getData()['id']);
 
 				if ($this->vendors->searchByVendorId($purchaseOrder['vendor_id'])) {
 					$purchaseOrder['vendor_addresses'] = $this->vendors->packagesData->vendor['address_ids']['2'];

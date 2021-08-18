@@ -421,7 +421,7 @@ class Products extends BasePackage
         }
     }
 
-    public function searchByMPN(string $mpnQueryString)
+    public function searchByMPN(string $mpnQueryString, $completeData = false)
     {
         $searchProducts =
             $this->getByParams(
@@ -437,8 +437,12 @@ class Products extends BasePackage
             $products = [];
 
             foreach ($searchProducts as $productKey => $productValue) {
-                $products[$productKey]['id'] = $productValue['id'];
-                $products[$productKey]['code_mpn'] = $productValue['code_mpn'];
+                if ($completeData) {
+                    $products[$productKey] = $productValue;
+                } else {
+                    $products[$productKey]['id'] = $productValue['id'];
+                    $products[$productKey]['code_mpn'] = $productValue['code_mpn'];
+                }
             }
 
             $this->packagesData->responseCode = 0;
@@ -449,7 +453,7 @@ class Products extends BasePackage
         }
     }
 
-    public function searchByTitle(string $titleQueryString)
+    public function searchByTitle(string $titleQueryString, $completeData = false)
     {
         $searchProducts =
             $this->getByParams(
@@ -465,8 +469,12 @@ class Products extends BasePackage
             $products = [];
 
             foreach ($searchProducts as $productKey => $productValue) {
-                $products[$productKey]['id'] = $productValue['id'];
-                $products[$productKey]['title'] = $productValue['title'];
+                if ($completeData) {
+                    $products[$productKey] = $productValue;
+                } else {
+                    $products[$productKey]['id'] = $productValue['id'];
+                    $products[$productKey]['title'] = $productValue['title'];
+                }
             }
 
             $this->packagesData->responseCode = 0;
@@ -477,7 +485,7 @@ class Products extends BasePackage
         }
     }
 
-    public function searchByCodeEAN(string $ean)
+    public function searchByCodeEAN(string $ean, $completeData = false)
     {
         $searchProducts =
             $this->getByParams(
@@ -493,7 +501,12 @@ class Products extends BasePackage
             $products = [];
 
             foreach ($searchProducts as $productKey => $productValue) {
-                $products[$productKey] = $productValue;
+                if ($completeData) {
+                    $products[$productKey] = $productValue;
+                } else {
+                    $products[$productKey]['id'] = $productValue['id'];
+                    $products[$productKey]['code_ean'] = $productValue['code_ean'];
+                }
             }
 
             $this->packagesData->responseCode = 0;
@@ -504,7 +517,7 @@ class Products extends BasePackage
         }
     }
 
-    public function searchByCodeSKU(string $sku)
+    public function searchByCodeSKU(string $sku, $completeData = false)
     {
         $searchProducts =
             $this->getByParams(
@@ -520,8 +533,12 @@ class Products extends BasePackage
             $products = [];
 
             foreach ($searchProducts as $productKey => $productValue) {
-                $products[$productKey]['id'] = $productValue['id'];
-                $products[$productKey]['code_sku'] = $productValue['code_sku'];
+                if ($completeData) {
+                    $products[$productKey] = $productValue;
+                } else {
+                    $products[$productKey]['id'] = $productValue['id'];
+                    $products[$productKey]['code_sku'] = $productValue['code_sku'];
+                }
             }
 
             $this->packagesData->responseCode = 0;

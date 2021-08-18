@@ -208,11 +208,26 @@ class LocationsComponent extends BaseComponent
 
             $this->locations->getLocationById($this->postData());
 
-            $this->view->locationAddress = $this->locations->packagesData->locationAddress;
+            $this->addResponse(
+                $this->locations->packagesData->responseMessage,
+                $this->locations->packagesData->responseCode,
+                ['location' => $this->locations->packagesData->responseData]
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function getLocationsByEntityIdAction()
+    {
+        if ($this->request->isPost()) {
+
+            $locations = $this->locations->getLocationsByEntityId($this->postData());
 
             $this->addResponse(
                 $this->locations->packagesData->responseMessage,
-                $this->locations->packagesData->responseCode
+                $this->locations->packagesData->responseCode,
+                ['locations' => $locations]
             );
         } else {
             $this->addResponse('Method Not Allowed', 1);

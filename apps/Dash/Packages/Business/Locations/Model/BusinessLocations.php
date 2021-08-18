@@ -12,6 +12,8 @@ class BusinessLocations extends BaseModel
 
     public $entity_id;
 
+    public $description;
+
     public $inbound_shipping;
 
     public $delivery_instructions;
@@ -24,9 +26,7 @@ class BusinessLocations extends BaseModel
 
     public $total_employees;
 
-    public $user_profile_ids;
+    public $employee_ids;
 
     public $address_id;
-
-    public $notes;
 }

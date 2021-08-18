@@ -22,7 +22,9 @@ class Contacts extends BasePackage
     {
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
-        $data = $this->updateAddresses($data);
+        if (isset($data['address_ids'])) {
+            $data = $this->updateAddresses($data);
+        }
 
         if ($this->add($data)) {
             if (isset($data['portrait'])) {
@@ -46,7 +48,9 @@ class Contacts extends BasePackage
     {
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
-        $data = $this->updateAddresses($data);
+        if (isset($data['address_ids'])) {
+            $data = $this->updateAddresses($data);
+        }
 
         if (isset($data['delete_address_ids']) && $data['delete_address_ids'] !== '') {
             $data['delete_address_ids'] = Json::decode($data['delete_address_ids'], true);

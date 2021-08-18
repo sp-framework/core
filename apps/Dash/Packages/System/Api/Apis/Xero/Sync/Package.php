@@ -32,7 +32,6 @@ class Package extends BasePackage
                 $this->createTable('system_api_xero_organisations_addresses', '', (new SystemApiXeroOrganisationsAddresses)->columns(), $dropTables);
                 $this->createTable('system_api_xero_organisations_finance', '', (new SystemApiXeroOrganisationsFinance)->columns(), $dropTables);
                 $this->createTable('system_api_xero_organisations_phones', '', (new SystemApiXeroOrganisationsPhones)->columns(), $dropTables);
-                return;
                 // Attachments
                 $this->createTable('system_api_xero_attachments', '', (new SystemApiXeroAttachments)->columns(), $dropTables);
                 // History
@@ -54,7 +53,6 @@ class Package extends BasePackage
                 $this->createTable('system_api_xero_organisations_addresses', '', (new SystemApiXeroOrganisationsAddresses)->columns());
                 $this->createTable('system_api_xero_organisations_finance', '', (new SystemApiXeroOrganisationsFinance)->columns());
                 $this->createTable('system_api_xero_organisations_phones', '', (new SystemApiXeroOrganisationsPhones)->columns());
-                return;
                 // Attachments
                 $this->createTable('system_api_xero_attachments', '', (new SystemApiXeroAttachments)->columns());
                 // History
