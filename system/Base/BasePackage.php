@@ -188,11 +188,13 @@ abstract class BasePackage extends Controller
 			foreach ($relationColumns as $relationColumnKey => $relationColumn) {
 				$alias = $relationColumn['relationObj']->getOption('alias');
 
-				$relationRowData = $this->model->{$alias}->toArray();
-				foreach ($relationRowData as $relationRowKey => $relationRow) {
+				if ($this->model->{$alias}) {
+					$relationRowData = $this->model->{$alias}->toArray();
+					foreach ($relationRowData as $relationRowKey => $relationRow) {
 
-					if (in_array($relationRowKey, $relationColumn['requestedColumns'])) {
-						$data[$dataKey][$relationRowKey] = $relationRow;
+						if (in_array($relationRowKey, $relationColumn['requestedColumns'])) {
+							$data[$dataKey][$relationRowKey] = $relationRow;
+						}
 					}
 				}
 			}

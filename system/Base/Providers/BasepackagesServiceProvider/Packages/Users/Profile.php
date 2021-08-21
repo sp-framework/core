@@ -124,9 +124,9 @@ class Profile extends BasePackage
         $data['contact_mobile'] = '0';
 
         if ($this->add($data)) {
-            $this->addResponse('Profile updated');
+            $this->addResponse('Profile added');
         } else {
-            $this->addResponse('Error updating profile.', 1);
+            $this->addResponse('Error adding profile.', 1);
         }
     }
 

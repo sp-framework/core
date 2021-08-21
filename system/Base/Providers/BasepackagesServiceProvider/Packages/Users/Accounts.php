@@ -8,6 +8,7 @@ use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
@@ -35,31 +36,45 @@ class Accounts extends BasePackage
             $account = $accountObj->toArray();
 
             if ($getsecurity) {
-                $account = array_merge($account, $accountObj->getsecurity()->toArray());
+                if ($accountObj->getsecurity()) {
+                    $account = array_merge($account, $accountObj->getsecurity()->toArray());
+                }
             }
 
             if ($getcanlogin) {
-                $account = array_merge($account, $accountObj->getcanlogin()->toArray());
+                if ($accountObj->getcanlogin()) {
+                    $account = array_merge($account, $accountObj->getcanlogin()->toArray());
+                }
             }
 
             if ($getsessions) {
-                $account = array_merge($account, $accountObj->getsessions()->toArray());
+                if ($accountObj->getsessions()) {
+                    $account = array_merge($account, $accountObj->getsessions()->toArray());
+                }
             }
 
             if ($getidentifiers) {
-                $account = array_merge($account, $accountObj->getidentifiers()->toArray());
+                if ($accountObj->getidentifiers()) {
+                    $account = array_merge($account, $accountObj->getidentifiers()->toArray());
+                }
             }
 
             if ($getagents) {
-               $account = array_merge($account, $accountObj->getagents()->toArray());
+                if ($accountObj->getagents()) {
+                   $account = array_merge($account, $accountObj->getagents()->toArray());
+                }
             }
 
             if ($gettunnels) {
-                $account = array_merge($account, $accountObj->gettunnels()->toArray());
+                if ($accountObj->gettunnels()) {
+                    $account = array_merge($account, $accountObj->gettunnels()->toArray());
+                }
             }
 
             if ($getprofiles) {
-                $account = array_merge($account, $accountObj->getprofiles()->toArray());
+                if ($accountObj->getprofiles()) {
+                    $account = array_merge($account, $accountObj->getprofiles()->toArray());
+                }
             }
 
             return $account;
@@ -91,13 +106,27 @@ class Accounts extends BasePackage
 
             $data['password'] = $this->secTools->hashPassword($password);
 
+            if (!isset($data['package_name'])) {
+                $data['package_name'] = 'profiles';
+            }
+            if (!isset($data['package_row_id'])) {
+                $data['package_row_id'] = '0';
+            }
+
             if ($this->add($data)) {
                 $id = $this->packagesData->last['id'];
 
                 $this->addUpdateCanLogin($id, $data['can_login']);
 
                 $data['id'] = $id;
+
+                $this->addUpdateSecurity($id, $data);
+
                 $this->basepackages->profile->addProfile($data);
+
+                $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
+
+                $this->update($data);
 
                 $this->updateRoleAccounts($data['role_id'], $id);
 
@@ -125,7 +154,7 @@ class Accounts extends BasePackage
     {
         $accountObj = $this->modelToUse::findFirstById($data['id']);
 
-        $account = $accountObj->toArray();
+        $account = $this->getAccountById($data['id'], true);
 
         if ($data['override_role'] == 0) {
             $data['permissions'] = Json::encode([]);
@@ -156,6 +185,8 @@ class Accounts extends BasePackage
             if (isset($data['email_new_password']) && $data['email_new_password'] === '1') {
                 $this->emailNewPassword($data['email'], $password);
             }
+
+            $this->addUpdateSecurity($account['id'], $data);
 
             $this->basepackages->profile->updateProfileViaAccount($data);
 
@@ -230,6 +261,27 @@ class Accounts extends BasePackage
         }
         if ($accountObj->getsessions()) {
             $accountObj->getsessions()->delete();
+        }
+    }
+
+    protected function addUpdateSecurity($id, $data)
+    {
+        $securityModel = new BasepackagesUsersAccountsSecurity;
+
+        $account = $securityModel::findFirst(['account_id = ' . $id]);
+
+        $data['account_id'] = $id;
+
+        unset($data['id']);
+
+        if ($account) {
+            $account->assign($data);
+
+            $account->update();
+        } else {
+            $securityModel->assign($data);
+
+            $securityModel->create();
         }
     }
 
@@ -563,7 +615,7 @@ class Accounts extends BasePackage
             $accountObj = $this->modelToUse::findFirstById($uid);
 
             if ($accountObj) {
-                $account = $accountObj->toArray();
+                $account = $this->getAccountById($uid, true);
 
                 $canLoginArr = $accountObj->canlogin->toArray();
 
