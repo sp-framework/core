@@ -19,6 +19,55 @@ class Accounts extends BasePackage
 
     public $accounts;
 
+    public function getAccountById(
+        int $id,
+        $getsecurity = false,
+        $getcanlogin = false,
+        $getsessions = false,
+        $getidentifiers = false,
+        $getagents = false,
+        $gettunnels = false,
+        $getprofiles = false
+    ) {
+        $accountObj = $this->modelToUse::findFirstById($id);
+
+        if ($accountObj) {
+            $account = $accountObj->toArray();
+
+            if ($getsecurity) {
+                $account = array_merge($account, $accountObj->getsecurity()->toArray());
+            }
+
+            if ($getcanlogin) {
+                $account = array_merge($account, $accountObj->getcanlogin()->toArray());
+            }
+
+            if ($getsessions) {
+                $account = array_merge($account, $accountObj->getsessions()->toArray());
+            }
+
+            if ($getidentifiers) {
+                $account = array_merge($account, $accountObj->getidentifiers()->toArray());
+            }
+
+            if ($getagents) {
+               $account = array_merge($account, $accountObj->getagents()->toArray());
+            }
+
+            if ($gettunnels) {
+                $account = array_merge($account, $accountObj->gettunnels()->toArray());
+            }
+
+            if ($getprofiles) {
+                $account = array_merge($account, $accountObj->getprofiles()->toArray());
+            }
+
+            return $account;
+        }
+
+        return null;
+    }
+
     /**
      * @notification(name=add)
      * notification_allowed_methods(email, sms)//Example
@@ -135,6 +184,9 @@ class Accounts extends BasePackage
     {
         $accountObj = $this->modelToUse::findFirstById($data['id']);
 
+        if ($accountObj) {
+
+        }
         $account = $accountObj->toArray();
 
         $this->removeRoleAccount($account['role_id'], $account['id']);
@@ -163,6 +215,9 @@ class Accounts extends BasePackage
     {
         if ($accountObj->getcanlogin()) {
             $accountObj->getcanlogin()->delete();
+        }
+        if ($accountObj->getsecurity()) {
+            $accountObj->getsecurity()->delete();
         }
         if ($accountObj->gettunnels()) {
             $accountObj->gettunnels()->delete();
@@ -256,23 +311,32 @@ class Accounts extends BasePackage
         return false;
     }
 
-    public function checkAccountByEmail(string $email)
+    public function checkAccountByEmail(string $email, $getSecurity = false)
     {
-        $account =
-            $this->getByParams(
-                    [
-                        'conditions'    => 'email = :email:',
-                        'bind'          =>
-                            [
-                                'email'  => $email
-                            ]
-                    ],
-                    false,
-                    false
-                );
+        $accountObj =
+            $this->modelToUse::findFirst(
+                [
+                    'conditions'    => 'email = :email:',
+                    'bind'          =>
+                        [
+                            'email'  => $email
+                        ]
+                ],
+            );
 
-        if ($account) {
-            return $account[0];
+        if ($accountObj) {
+            $account = $accountObj->toArray();
+
+            $security = $accountObj->getsecurity()->toArray();
+
+            unset($security['id']);
+            unset($security['account_id']);
+
+            $account = array_merge($account, $security);
+        }
+
+        if (isset($account)) {
+            return $account;
         } else {
             return false;
         }

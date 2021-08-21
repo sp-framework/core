@@ -13,17 +13,31 @@ class Account
             [
                 'email'                 => $email,
                 'domain'                => explode('@', $email)[1],
+                'package_name'          => 'profiles',
+                'package_row_id'        => '1'
+            ]
+        );
+
+        if ($insertAdmin) {
+            $this->registerAccountSecurity($db->lastInsertId(), $db, $password, $adminRoleId);
+
+            return $db->lastInsertId();
+        } else {
+            return null;
+        }
+    }
+
+    protected function registerAccountSecurity($id, $db, $password, $adminRoleId)
+    {
+        $insertAdmin = $db->insertAsDict(
+            'basepackages_users_accounts_security',
+            [
+                'account_id'            => $id,
                 'password'              => $password,
                 'role_id'               => $adminRoleId,
                 'override_role'         => 0,
                 'permissions'           => Json::encode([])
             ]
         );
-
-        if ($insertAdmin) {
-            return $db->lastInsertId();
-        } else {
-            return null;
-        }
     }
 }

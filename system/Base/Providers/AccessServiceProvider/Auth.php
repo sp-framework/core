@@ -282,7 +282,7 @@ class Auth
 
     protected function checkAccount(array $data, $viaProfile = null)
     {
-        $this->account = $this->accounts->checkAccountByEmail($data['user']);
+        $this->account = $this->accounts->checkAccountByEmail($data['user'], true);
 
         if ($this->account) {
             //New App OR New account via rego
@@ -411,7 +411,7 @@ class Auth
             throw new \Exception('Cannot set account from cookie');
         }
 
-        $this->account = $this->accounts->getById($hasIdentifier['account_id']);
+        $this->account = $this->accounts->getAccountById($hasIdentifier['account_id'], true);
 
         if ($this->account) {
             $this->updateSessionIdForSessionAndIdentifier($hasIdentifier);
@@ -532,7 +532,7 @@ class Auth
     public function setUserFromSession()
     {
         if ($this->session->get($this->getKey())) {
-            $this->account = $this->accounts->getById($this->session->get($this->getKey()));
+            $this->account = $this->accounts->getAccountById($this->session->get($this->getKey()), true);
 
             if (!$this->account) {
                 $this->logger->log->debug($this->account['email'] . ' not found in session for app: ' . $this->app['name']);
@@ -611,7 +611,7 @@ class Auth
             return false;
         }
 
-        $this->account = $this->accounts->checkAccountByEmail($data['user']);
+        $this->account = $this->accounts->checkAccountByEmail($data['user'], true);
 
         if ($this->account) {
             $this->account['force_logout'] = '1';

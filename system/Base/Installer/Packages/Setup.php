@@ -52,6 +52,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Agents;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\CanLogin;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Identifiers;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Security;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Sessions;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Tunnels;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Profiles;
@@ -189,6 +190,7 @@ class Setup
 		$this->db->createTable('basepackages_email_services', $dbName, (new EmailServices)->columns());
 		$this->db->createTable('basepackages_email_queue', $dbName, (new EmailQueue)->columns());
 		$this->db->createTable('basepackages_users_accounts', $dbName, (new Accounts)->columns());
+		$this->db->createTable('basepackages_users_accounts_security', $dbName, (new Security)->columns());
 		$this->db->createTable('basepackages_users_accounts_canlogin', $dbName, (new CanLogin)->columns());
 		$this->db->createTable('basepackages_users_accounts_sessions', $dbName, (new Sessions)->columns());
 		$this->db->createTable('basepackages_users_accounts_identifiers', $dbName, (new Identifiers)->columns());

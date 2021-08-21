@@ -6,6 +6,7 @@ use System\Base\BaseModel;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
@@ -18,41 +19,40 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public $domain;
 
-    public $password;
+    public $package_name;
 
-    public $role_id;
-
-    public $override_role;
-
-    public $permissions;
-
-    public $force_pwreset;
-
-    public $two_fa_status;
-
-    public $two_fa_secret;
+    public $package_row_id;
 
     public function initialize()
     {
-        $this->hasMany(
+        self::$modelRelations['security']['relationObj'] = $this->hasOne(
+            'id',
+            BasepackagesUsersAccountsSecurity::class,
+            'account_id',
+            [
+                'alias'         => 'security'
+            ]
+        );
+
+        self::$modelRelations['canlogin']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesUsersAccountsCanlogin::class,
             'account_id',
             [
-                'alias' => 'canlogin'
+                'alias'         => 'canlogin'
             ]
         );
 
-        $this->hasMany(
+        self::$modelRelations['sessions']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
             [
-                'alias' => 'sessions'
+                'alias'         => 'sessions'
             ]
         );
 
-        $this->hasOneThrough(
+        self::$modelRelations['identifiers']['relationObj'] = $this->hasOneThrough(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
@@ -60,11 +60,11 @@ class BasepackagesUsersAccounts extends BaseModel
             BasepackagesUsersAccountsIdentifiers::class,
             'session_id',
             [
-                'alias' => 'identifiers'
+                'alias'         => 'identifiers'
             ]
         );
 
-        $this->hasOneThrough(
+        self::$modelRelations['agents']['relationObj'] = $this->hasOneThrough(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
@@ -72,26 +72,28 @@ class BasepackagesUsersAccounts extends BaseModel
             BasepackagesUsersAccountsAgents::class,
             'session_id',
             [
-                'alias' => 'agents'
+                'alias'         => 'agents'
             ]
         );
 
-        $this->hasOne(
+        self::$modelRelations['tunnels']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersAccountsTunnels::class,
             'account_id',
             [
-                'alias' => 'tunnels'
+                'alias'         => 'tunnels'
             ]
         );
 
-        $this->hasOne(
+        self::$modelRelations['profiles']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersProfiles::class,
             'account_id',
             [
-                'alias' => 'profiles'
+                'alias'         => 'profiles'
             ]
         );
+
+        parent::initialize();
     }
 }

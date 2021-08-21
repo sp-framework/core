@@ -38,56 +38,20 @@ class Accounts
                         ]
                     ),
                     new Column(
-                        'password',
+                        'package_name',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 2048,
-                            'notNull'       => true,
+                            'size'          => 100,
+                            'notNull'       => true
                         ]
                     ),
                     new Column(
-                        'role_id',
+                        'package_row_id',
                         [
-                            'type'          => Column::TYPE_SMALLINTEGER,
-                            'notNull'       => true,
+                            'type'          => Column::TYPE_INTEGER,
+                            'notNull'       => true
                         ]
                     ),
-                    new Column(
-                        'override_role',
-                        [
-                            'type'          => Column::TYPE_BOOLEAN,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'permissions',
-                        [
-                            'type'          => Column::TYPE_TEXT,
-                            'notNull'       => true,
-                        ]
-                    ),
-                    new Column(
-                        'force_pwreset',
-                        [
-                            'type'          => Column::TYPE_BOOLEAN,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'two_fa_status',
-                        [
-                            'type'          => Column::TYPE_BOOLEAN,
-                            'notNull'       => false,
-                        ]
-                    ),
-                    new Column(
-                        'two_fa_secret',
-                        [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1024,
-                            'notNull'       => false
-                        ]
-                    )
                 ],
                 'indexes' => [
                     new Index(

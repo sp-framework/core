@@ -40,7 +40,7 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public function initialize()
     {
-        $this->hasOne(
+        self::$modelRelations['account']['relationObj'] = $this->hasOne(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id',
@@ -49,7 +49,7 @@ class BasepackagesUsersProfiles extends BaseModel
             ]
         );
 
-        $this->hasOne(
+        self::$modelRelations['addressbook']['relationObj'] = $this->hasOne(
             'contact_address_id',
             BasepackagesAddressBook::class,
             'id',
