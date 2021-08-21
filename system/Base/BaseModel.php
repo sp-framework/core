@@ -6,6 +6,8 @@ use Phalcon\Mvc\Model;
 
 abstract class BaseModel extends Model
 {
+	protected static $modelRelations;
+
 	public function onConstruct()
 	{
 
@@ -14,5 +16,10 @@ abstract class BaseModel extends Model
 	public function initialize()
 	{
 		$this->useDynamicUpdate(true);
+	}
+
+	public function getModelRelations()
+	{
+		return self::$modelRelations;
 	}
 }

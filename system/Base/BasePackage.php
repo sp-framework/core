@@ -137,9 +137,37 @@ abstract class BasePackage extends Controller
 				$parameters = $params;
 			}
 
+			if (isset($parameters['columns']) && count($parameters['columns']) > 0) {
+				$modelMetaData = $this->getModelsMetaData();
+				$modelRelations = $this->getModelsRelations()['modelRelations'];
+
+				$relationColumns = [];
+
+				foreach ($parameters['columns'] as $columnKey => $column) {
+					if (!in_array($column, $modelMetaData['columns'])) {
+						if ($modelRelations) {
+							foreach ($modelRelations as $modelRelationKey => $modelRelation) {
+								if (in_array($column, $modelRelation['columns'])) {
+									if (!isset($relationColumns[$modelRelationKey])) {
+										$relationColumns[$modelRelationKey] = $modelRelation;
+										$relationColumns[$modelRelationKey]['requestedColumns'] = [];
+									}
+									array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
+									unset($parameters['columns'][$columnKey]);
+								}
+							}
+						}
+					}
+				}
+			}
+
 			$this->model = $this->modelToUse::find($parameters);
 
 			$data = $this->getDbData($parameters, $enableCache, 'params');
+
+			if (isset($relationColumns)) {
+				$data = $this->getRelationColumnsData($relationColumns, $data);
+			}
 
 			if ($data) {
 				return $data;
@@ -150,6 +178,27 @@ abstract class BasePackage extends Controller
 		}
 
 		throw new \Exception('getByParams needs parameter condition to be set.');
+	}
+
+	protected function getRelationColumnsData($relationColumns, $data)
+	{
+		foreach ($data as $dataKey => $row) {
+			$this->model = $this->modelToUse::findFirstById($row['id']);
+
+			foreach ($relationColumns as $relationColumnKey => $relationColumn) {
+				$alias = $relationColumn['relationObj']->getOption('alias');
+
+				$relationRowData = $this->model->{$alias}->toArray();
+				foreach ($relationRowData as $relationRowKey => $relationRow) {
+
+					if (in_array($relationRowKey, $relationColumn['requestedColumns'])) {
+						$data[$dataKey][$relationRowKey] = $relationRow;
+					}
+				}
+			}
+		}
+
+		return $data;
 	}
 
 	public function getPaged(array $params = [], bool $resetCache = false, bool $enableCache = true)
@@ -750,13 +799,105 @@ abstract class BasePackage extends Controller
 	protected function getModelsMetaData()
 	{
 		if ($this->modelToUse) {
-			$model = new $this->modelToUse();
+			$model = new $this->modelToUse;
 
-			return $model->getModelsMetaData();
+			$md = [];
+
+			$metadata = $model->getModelsMetaData();
+
+			$md['dataTypes'] = $metadata->getDataTypes($model);
+			$md['number'] = $metadata->getDataTypesNumeric($model);
+			$md['columns'] = $metadata->getAttributes($model);
+
+			return $md;
 		}
 
-		return false;
+		return [];
+	}
 
+	protected function getModelsRelations()
+	{
+		if ($this->modelToUse) {
+			$model = new $this->modelToUse;
+
+			$relations = [];
+			$relations['dataTypes'] = [];
+			$relations['number'] = [];
+			$relations['columns'] = [];
+
+			$relations['modelRelations'] = $model->getModelRelations();
+
+			if ($relations['modelRelations'] && is_array($relations['modelRelations']) && count($relations['modelRelations']) > 0) {
+				foreach ($relations['modelRelations'] as $modelRelationKey => $modelRelation) {
+					$referencedModel = $modelRelation['relationObj']->getReferencedModel();
+
+					$model = new $referencedModel();
+
+					$md = $model->getModelsMetaData();
+
+					$fields = $modelRelation['relationObj']->getFields();
+					$referencedFields = $modelRelation['relationObj']->getReferencedFields();
+					$intermediateFields = $modelRelation['relationObj']->getIntermediateFields();
+
+					$dataTypes = $md->getDataTypes($model);
+					$number = $md->getDataTypesNumeric($model);
+					$columns = $md->getAttributes($model);
+
+					if (is_array($fields)) {
+						foreach ($fields as $fieldKey => $field) {
+							unset($dataTypes[$field]);
+							unset($number[$field]);
+							$key = array_search($field, $columns);
+							unset($columns[$key]);
+						}
+					} else {
+						unset($dataTypes[$fields]);
+						unset($number[$fields]);
+						$key = array_search($fields, $columns);
+						unset($columns[$key]);
+					}
+
+					if (is_array($referencedFields)) {
+						foreach ($referencedFields as $referencedFieldKey => $referencedField) {
+							unset($dataTypes[$referencedField]);
+							unset($number[$referencedField]);
+							$key = array_search($referencedField, $columns);
+							unset($columns[$key]);
+						}
+					} else {
+						unset($dataTypes[$referencedFields]);
+						unset($number[$referencedFields]);
+						$key = array_search($referencedFields, $columns);
+						unset($columns[$key]);
+					}
+
+					if (is_array($intermediateFields)) {
+						foreach ($intermediateFields as $intermediateFieldKey => $intermediateField) {
+							unset($dataTypes[$intermediateField]);
+							unset($number[$intermediateField]);
+							$key = array_search($intermediateField, $columns);
+							unset($columns[$key]);
+						}
+					} else {
+						unset($dataTypes[$intermediateFields]);
+						unset($number[$intermediateFields]);
+						$key = array_search($intermediateFields, $columns);
+						unset($columns[$key]);
+					}
+
+					$relations['dataTypes'] = array_merge($relations['dataTypes'], $dataTypes);
+					$relations['modelRelations'][$modelRelationKey]['dataTypes'] = $dataTypes;
+					$relations['number'] = array_merge($relations['number'], $number);
+					$relations['modelRelations'][$modelRelationKey]['number'] = $number;
+					$relations['columns'] = array_merge($relations['columns'], $columns);
+					$relations['modelRelations'][$modelRelationKey]['columns'] = $columns;
+				}
+			}
+
+			return $relations;
+		}
+
+		return [];
 	}
 
 	public function getModelsColumnMap(array $filter = [])
@@ -765,10 +906,28 @@ abstract class BasePackage extends Controller
 
 		$md = $this->getModelsMetaData();
 
-		if ($md) {
-			$dataTypes = $md->getDataTypes(new $this->modelToUse());
-			$number = $md->getDataTypesNumeric(new $this->modelToUse());
-			$columns = $md->getAttributes(new $this->modelToUse());
+		if (count($md) > 0) {
+			$rmdArr = $this->getModelsRelations();
+
+			if (count($rmdArr) > 0) {
+				foreach ($rmdArr as $rmdKey => $rmd) {
+					if ($rmdKey === 'dataTypes') {
+						if (count($rmd) > 0) {
+							$dataTypes = array_merge($md['dataTypes'], $rmd);
+						}
+					}
+					if ($rmdKey === 'number') {
+						if (count($rmd) > 0) {
+							$number = array_merge($md['number'], $rmd);
+						}
+					}
+					if ($rmdKey === 'columns') {
+						if (count($rmd) > 0) {
+							$columns = array_merge($md['columns'], $rmd);
+						}
+					}
+				}
+			}
 
 			$filteredColumns = [];
 
@@ -800,12 +959,14 @@ abstract class BasePackage extends Controller
 
 		return false;
 	}
+
 	// protected function regenerateCaches(int $id = null)
 	// {
 	// 	if ($id) {
 	// 		$this->get($id);
 	// 	}
 	// }
+
 	public function describe(string $table = null, $indexes = false, $references = false)
 	{
 		if (!$table) {
