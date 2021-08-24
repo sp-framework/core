@@ -1,0 +1,52 @@
+<div class="form-inline">
+    <div class="input-group input-group-sm pt-1" data-widget="sidebar-search" data-min-length="1" data-arrow-sign="/" data-not-found-text="No menu item found!">
+        <input class="form-control form-control-sidebar text-secondary rounded-0 sidebar-search-input" type="search" placeholder="Search menu..." aria-label="Search">
+        <div class="input-group-append">
+            <button class="btn btn-sidebar rounded-0">
+                <i class="fas fa-search fa-fw"></i>
+            </button>
+        </div>
+    </div>
+    <div class="sidebar-search-results"></div>
+</div>
+<script>
+/* globals BazContentLoader */
+$('.sidebar-search-input').on('input propertychange', function() {
+    var val = $('.sidebar-search-input').val();
+
+    if (val !== '') {
+        setTimeout(function() {
+            var links = $('.sidebar-search-results .list-group-item');
+
+            $(links).each(function(index,link) {
+                $(link).off();
+
+                if ($(link).attr('href') === '#') {
+
+                    $(link).click(function(e) {
+                        e.preventDefault();
+
+                        $('.sidebar-search-input').val('');
+                        $('[data-widget="sidebar-search"]').SidebarSearch('close');
+                    });
+
+                    return;
+                }
+
+                $(link).addClass('contentAjaxLink');
+
+                BazContentLoader.init();
+
+                $('body').on('bazContentLoaderInitComplete', function() {
+                    $(link).click(function(e) {
+                        e.preventDefault();
+
+                        $('.sidebar-search-input').val('');
+                        $('[data-widget="sidebar-search"]').SidebarSearch('close');
+                    });
+                });
+            });
+        }, 500);
+    }
+});
+</script>

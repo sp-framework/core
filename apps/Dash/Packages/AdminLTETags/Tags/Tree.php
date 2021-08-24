@@ -124,7 +124,7 @@ class Tree extends AdminLTETags
 
             $this->content .=
                 '<li class="nav-item has-treeview">
-                    <a href="#" class="nav-link">
+                    <a href="/#" class="nav-link">
                         <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
                     <p class="text-uppercase">' . $itemTitle . '
                         <i class="right fa fa-angle-left"></i>
@@ -230,7 +230,7 @@ class Tree extends AdminLTETags
 
                     $this->content .=
                         '<li class="nav-item">
-                            <a class="nav-link contentAjaxLink" href="' . $this->links->url($items['link']) . '">
+                            <a class="nav-link contentAjaxLink" href="/' . $this->init()->app['route'] . '/' . $items['link'] . '">
                                 <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
                                 <p class="text-uppercase">';
 
@@ -255,7 +255,7 @@ class Tree extends AdminLTETags
 
                             $this->content .=
                                 '<li class="nav-item">
-                                    <a class="nav-link contentAjaxLink" href="' . $this->links->url($itemValue['link']) . '">
+                                    <a class="nav-link contentAjaxLink" href="/' . $this->init()->app['route'] . '/' . $itemValue['link'] . '">
                                         <i class="fa fa-fw fa-' . $itemIcon . ' nav-icon"></i>
                                         <p class="text-uppercase">';
 

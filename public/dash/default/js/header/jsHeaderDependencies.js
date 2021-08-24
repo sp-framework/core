@@ -128,11 +128,7 @@ var BazContentLoader = function() {
             });
         });
 
-        $('body').trigger(
-            {
-                'type'     : 'bazContentLoaderInitComplete'
-            }
-        );
+        $('body').trigger('bazContentLoaderInitComplete');
     }
 
     function loadAjax(element, options, popped) {
@@ -538,7 +534,7 @@ var BazCore = function() {
         if ($(currentActiveLocation).parents().is('ul.nav-treeview')) {
             $(currentActiveLocation).addClass('active');
             $(currentActiveLocation).parents('ul.nav-treeview').show();
-            // $(currentActiveLocation).parents('ul.nav-treeview').siblings('a').addClass('active');
+            $(currentActiveLocation).parents('ul.nav-treeview').siblings('a').addClass('active');
             $(currentActiveLocation).parents('li.has-treeview').addClass('menu-open');
             if ($(currentActiveLocation).parents('ul.nav-treeview').length > 1) {
                 $(document).ready(function() {

@@ -4,6 +4,7 @@
         <span class="brand-text font-weight-light">{{appRoute|upper}}</span>
     </a>
     <div class="sidebar">
+        {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/menu/search') %}
         {% include(modules.views.getPhalconViewPath() ~ 'layouts/default/sidebar/menu/view') %}
     </div>
 </aside>

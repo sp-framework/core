@@ -41838,8 +41838,16 @@ a.text-muted:hover {
   font-size: .8rem;
 }
 
-.text-sm .nav-sidebar.nav-child-indent .nav-treeview {
-  padding: 0 !important;
+.sidebar-mini .main-sidebar .nav-child-indent .nav-treeview .nav-link,
+.sidebar-mini-md .main-sidebar .nav-child-indent .nav-treeview .nav-link,
+.sidebar-mini-xs .main-sidebar .nav-child-indent .nav-treeview .nav-link {
+  width: calc(258px - 0.5rem * 2 - 1rem);
+}
+
+.sidebar-mini .main-sidebar .nav-child-indent .nav-treeview .nav-treeview .nav-link,
+.sidebar-mini-md .main-sidebar .nav-child-indent .nav-treeview .nav-treeview .nav-link,
+.sidebar-mini-xs .main-sidebar .nav-child-indent .nav-treeview .nav-treeview .nav-link {
+  width: calc(266px - 0.5rem * 2 - 2rem);
 }
 
 .select2-search--dropdown .select2-search__field,

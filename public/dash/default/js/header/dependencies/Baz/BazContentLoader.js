@@ -113,11 +113,7 @@ var BazContentLoader = function() {
             });
         });
 
-        $('body').trigger(
-            {
-                'type'     : 'bazContentLoaderInitComplete'
-            }
-        );
+        $('body').trigger('bazContentLoaderInitComplete');
     }
 
     function loadAjax(element, options, popped) {

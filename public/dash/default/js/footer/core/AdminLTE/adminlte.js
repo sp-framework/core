@@ -2852,6 +2852,8 @@
         $__default['default'](_this2._element).trigger(collapsedEvent);
         treeviewMenu.find(SELECTOR_OPEN + " > " + SELECTOR_TREEVIEW_MENU).slideUp();
         treeviewMenu.find(SELECTOR_OPEN).removeClass(CLASS_NAME_OPEN);
+        //Fix bug with adminlte not removing multilevel class .menu-is-opening
+        treeviewMenu.find('.' + CLASS_NAME_IS_OPENING).removeClass(CLASS_NAME_IS_OPENING);
       });
     };
 

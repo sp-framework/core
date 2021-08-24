@@ -32,7 +32,7 @@ class Menus extends BasePackage
         $menus = $this->getMenusForApp($appId);
 
         $buildMenu = [];
-        // var_dump($menus);
+
         foreach (msort($menus, 'sequence') as $key => $menu) {
             $menu = Json::decode($menu['menu'], true);
 
@@ -40,8 +40,10 @@ class Menus extends BasePackage
                 $buildMenu = array_replace_recursive($buildMenu, $menu);
             }
         }
-        // dump($buildMenu);die();
-        $this->cacheTools->setCache('menus_' . $appId, $buildMenu);
+
+        if ($this->config->cache->enabled) {
+            $this->cacheTools->setCache('menus_' . $appId, $buildMenu);
+        }
 
         return $buildMenu;
     }
