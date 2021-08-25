@@ -55,6 +55,10 @@ class LocationsComponent extends BaseComponent
                 }
 
                 $this->view->location = $location;
+            } else {
+                $location = [];
+                $location['employee_ids'] = [];
+                $this->view->location = $location;
             }
 
             //Check Geo Locations Dependencies
