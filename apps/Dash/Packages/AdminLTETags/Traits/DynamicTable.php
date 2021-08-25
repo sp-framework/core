@@ -37,7 +37,8 @@ trait DynamicTable {
         if ($this->request->isGet()) {
 
             $table = [];
-            $table['columns'] = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable));
+            $table['columns'] = $this->sortColumns($columnsForTable, $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable)));
+
             if ($dtReplaceColumnsTitle && count($dtReplaceColumnsTitle) > 0) {
                 foreach ($dtReplaceColumnsTitle as $dtReplaceColumnsTitleKey => $dtReplaceColumnsTitleValue) {
                     $table['columns'][$dtReplaceColumnsTitleKey]['name'] = $dtReplaceColumnsTitleValue;
@@ -109,7 +110,12 @@ trait DynamicTable {
 
         } else if ($this->request->isPost()) {
             if (is_callable($dtReplaceColumns)) {
-                $pagedData = $package->getPaged();
+                $pagedData =
+                    $package->getPaged(
+                        [
+                            'columns' => $columnsForTable
+                        ]
+                    );
 
                 $rows = $pagedData->getItems();
 
@@ -215,5 +221,24 @@ trait DynamicTable {
         }
 
         return $rows;
+    }
+
+    protected function sortColumns($columnsForTable, $dbColumns)
+    {
+        $columnsForTable = $this->removeEscapeFromName($columnsForTable);
+
+        $sortedColumns = [];
+
+        $sortedColumns = array_merge(['id' => $dbColumns['id']]);
+
+        foreach ($columnsForTable as $key => $column) {
+            if ($column !== 'id') {
+                if ($dbColumns[$column]) {
+                    $sortedColumns[$column] = $dbColumns[$column];
+                }
+            }
+        }
+
+        return $sortedColumns;
     }
 }
