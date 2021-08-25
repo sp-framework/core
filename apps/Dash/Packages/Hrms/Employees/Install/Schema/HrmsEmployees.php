@@ -31,8 +31,15 @@ class HrmsEmployees
                 new Column(
                     'account_id',
                     [
+                        'type'              => Column::TYPE_INTEGER,
+                        'notNull'           => false,
+                    ]
+                ),
+                new Column(
+                    'account_email',
+                    [
                         'type'              => Column::TYPE_VARCHAR,
-                        'size'              => 100,
+                        'size'              => 50,
                         'notNull'           => true,
                     ]
                 ),

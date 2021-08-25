@@ -75,11 +75,16 @@ class Employees extends BasePackage
 
             $data['employee_id'] = $this->packagesData->last['id'];
 
+            $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
+
+            $data['id'] = $this->packagesData->last['id'];
+
+            $this->update($data);
+
             $this->addEmployeeFinance($data);
             $this->addEmployeeContact($data);
             $this->addEmployeeEmployment($data);
 
-            $data['id'] = $this->packagesData->last['id'];
 
             $this->basepackages->notes->addNote($this->packageName, $data);
 
@@ -131,9 +136,16 @@ class Employees extends BasePackage
         }
 
         if ($this->update($data)) {
+            $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
+
+            $data['id'] = $this->packagesData->last['id'];
+
+            $this->update($data);
+
             $this->updateEmployeeFinance($data);
             $this->updateEmployeeContact($data);
             $this->updateEmployeeEmployment($data);
+
 
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $employee['portrait']);
 
@@ -292,6 +304,44 @@ class Employees extends BasePackage
         }
     }
 
+    protected function addUpdateAccount($data)
+    {
+        $data['package_name'] = 'employees';
+        $data['package_row_id'] = $data['id'];
+
+        unset($data['id']);
+
+        $data['email'] = $data['account_email'];
+
+        if (isset($data['account_id']) &&
+            $data['account_id'] != '' &&
+            $data['account_id'] != '0'
+        ) {
+            $data['id'] = $data['account_id'];
+
+            try {
+                $this->basepackages->accounts->updateAccount($data);
+
+                return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
+            } catch (\Exception $e) {
+                $this->addResponse('Error adding/updating employee account. Please contact administrator', 1);
+            }
+        } else {
+            $data['role_id'] = '0';
+            $data['override_role'] = '0';
+            $data['permissions'] = '[]';
+            $data['can_login'] = '';
+
+            try {
+                $this->basepackages->accounts->addAccount($data);
+
+                return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
+            } catch (\Exception $e) {
+                $this->addResponse('Error adding/updating employee account. Please contact administrator', 1);
+            }
+        }
+    }
+
     public function searchByFullName(string $nameQueryString)
     {
         $searchEmployees =
@@ -310,6 +360,34 @@ class Employees extends BasePackage
             foreach ($searchEmployees as $employeeKey => $employeeValue) {
                 $employees[$employeeKey]['id'] = $employeeValue['id'];
                 $employees[$employeeKey]['full_name'] = $employeeValue['full_name'];
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->employees = $employees;
+
+            return true;
+        }
+    }
+
+    public function searchByEmail(string $nameQueryString)
+    {
+        $searchEmployees =
+            $this->getByParams(
+                [
+                    'conditions'            => 'account_email LIKE :accountEmail:',
+                    'bind'                  => [
+                        'accountEmail'      => '%' . $nameQueryString . '%'
+                    ]
+                ]
+            );
+
+        if (count($searchEmployees) > 0) {
+            $employees = [];
+
+            foreach ($searchEmployees as $employeeKey => $employeeValue) {
+                $employees[$employeeKey]['id'] = $employeeValue['id'];
+                $employees[$employeeKey]['account_email'] = $employeeValue['account_email'];
             }
 
             $this->packagesData->responseCode = 0;

@@ -217,6 +217,86 @@ dataCollectionSection =
                 });
             }
         },
+        '{{componentId}}-{{sectionId}}-account_email'                       : {
+            afterInit   : function() {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("hrms/employees/searchEmployeeEmail")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_email").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+                                if (response.employees) {
+                                    return response.employees;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["account_email"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-account_email",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_email_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-account_email",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + ' - <span class="text-danger">Employee already exists.</span>';
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-account_email').val('');
+                            $('#{{componentId}}-{{sectionId}}-account_email').attr('value', '');
+                            PNotify.error({title:'Employee ' + feedback.selection.value.account_email + ' already exists!'});
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-account_email').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-account_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-account_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-account_email').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-account_email_list').children('li').remove();
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-status'                          : {
             'placeholder' : "SELECT EMPLOYEE STATUS"
         },
@@ -670,13 +750,13 @@ dataCollectionSection =
                             $('#security-token').val(response.token);
                         }
 
-                        if (response.locationAddress) {
-                            $('.cla-street').html(response.locationAddress.street_address);
-                            $('.cla-street2').html(response.locationAddress.street_address_2);
-                            $('.cla-city').html(response.locationAddress.city_name);
-                            $('.cla-postcode').html(response.locationAddress.post_code);
-                            $('.cla-state').html(response.locationAddress.state_name);
-                            $('.cla-country').html(response.locationAddress.country_name);
+                        if (response.responseData.location.address) {
+                            $('.cla-street').html(response.responseData.location.address.street_address);
+                            $('.cla-street2').html(response.responseData.location.address.street_address_2);
+                            $('.cla-city').html(response.responseData.location.address.city_name);
+                            $('.cla-postcode').html(response.responseData.location.address.post_code);
+                            $('.cla-state').html(response.responseData.location.address.state_name);
+                            $('.cla-country').html(response.responseData.location.address.country_name);
                         }
                     }, 'json');
                 }

@@ -180,11 +180,11 @@ class EmployeesComponent extends BaseComponent
             $this->employees,
             'hrms/employees/view',
             null,
-            ['first_name', 'last_name', 'designation', 'status'],
+            ['account_email', 'first_name', 'last_name', 'designation', 'status'],
             true,
-            ['first_name', 'last_name', 'designation', 'status'],
+            ['account_email', 'first_name', 'last_name', 'designation', 'status'],
             $controlActions,
-            null,
+            ['account_email'=>'email'],
             $replaceColumns,
             'first_name'
         );
@@ -319,6 +319,31 @@ class EmployeesComponent extends BaseComponent
             }
         } else {
             $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function searchEmployeeEmailAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 3) {
+                    return;
+                }
+
+                $searchEmployee = $this->employees->searchByEmail($searchQuery);
+
+                if ($searchEmployee) {
+                    $this->view->responseCode = $this->employees->packagesData->responseCode;
+
+                    $this->view->employees = $this->employees->packagesData->employees;
+                }
+            } else {
+                $this->view->responseCode = 1;
+
+                $this->view->responseMessage = 'search query missing';
+            }
         }
     }
 

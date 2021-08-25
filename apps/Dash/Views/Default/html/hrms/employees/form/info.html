@@ -1,8 +1,8 @@
 {% if employee['id'] is defined %}
-    {% set employeePortrait = employee['portrait'] %}
     {% set employeeId = employee['id'] %}
+    {% set employeePortrait = employee['portrait'] %}
     {% set employeeAccountId = employee['account_id'] %}
-    {% set employeeAccountEmailDisabled = true %}
+    {% set employeeAccountEmail = employee['account_email'] %}
     {% set employeeStatus = employee['status'] %}
     {% set employeeFirstName = employee['first_name'] %}
     {% set employeeLastName = employee['last_name'] %}
@@ -10,10 +10,10 @@
     {% set employeeManagerId = employee['manager_id'] %}
     {% set employeeManager = employee['manager_full_name'] %}
 {% else %}
-    {% set employeePortrait = '' %}
     {% set employeeId = '' %}
+    {% set employeePortrait = '' %}
     {% set employeeAccountId = '' %}
-    {% set employeeAccountEmailDisabled = false %}
+    {% set employeeAccountEmail = '' %}
     {% set employeeStatus = '' %}
     {% set employeeFirstName = '' %}
     {% set employeeLastName = '' %}
@@ -74,20 +74,35 @@
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
                         'fieldId'                               : 'account_id',
-                        'fieldLabel'                            : 'Account ID (Email)',
+                        'fieldLabel'                            : 'Account ID',
+                        'fieldHidden'                           : true,
                         'fieldType'                             : 'input',
-                        'fieldPlaceholder'                      : 'Search Account ID (Email).',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : employeeAccountId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_email',
+                        'fieldLabel'                            : 'Email',
+                        'fieldType'                             : 'input',
+                        'fieldPlaceholder'                      : 'Email',
                         'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Search Account ID (Email).  If the email is already assigned to another employee, it will not show up in the list.',
-                        'fieldDisabled'                         : employeeAccountEmailDisabled,
+                        'fieldHelpTooltipContent'               : 'Contact Email address. If field is disabled, it means employee has an account on this system. Only Systems Administrators can change the email address.',
                         'fieldBazScan'                          : true,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : true,
                         'fieldBazPostOnUpdate'                  : true,
                         'fieldRequired'                         : true,
                         'fieldDataInputMinLength'               : 1,
-                        'fieldDataInputMaxLength'               : 100,
-                        'fieldValue'                            : employeeAccountId
+                        'fieldDataInputMaxLength'               : 50,
+                        'fieldValue'                            : employeeAccountEmail
                     ]
                 )}}
             </div>

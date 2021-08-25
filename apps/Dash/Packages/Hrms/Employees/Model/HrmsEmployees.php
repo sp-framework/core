@@ -15,6 +15,8 @@ class HrmsEmployees extends BaseModel
 
     public $account_id;
 
+    public $account_email;
+
     public $status;
 
     public $first_name;
