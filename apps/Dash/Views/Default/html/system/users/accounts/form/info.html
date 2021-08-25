@@ -1,7 +1,6 @@
 {% if account['id'] is defined %}
     {% set accountId = account['id'] %}
     {% set accountEmail = account['email'] %}
-    {% set accountRole = account['role_id'] %}
     {% set accountFirstName = account['profile']['first_name'] %}
     {% set accountLastName = account['profile']['last_name'] %}
 {% else %}

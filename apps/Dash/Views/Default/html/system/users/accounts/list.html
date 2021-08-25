@@ -42,8 +42,17 @@
         'dtStateSave'           : false,
         'dtBordered'            : false,
         'dtHideIdColumn'        : true,
-        'dtNoOfColumnsToShow'   : 6,
+        'dtNoOfColumnsToShow'   : 8,
         'dtTableCompact'        : true,
         'dtZeroRecords'         : 'No accounts data available. Add account by clicking the Add new account button.'
     ]
 )}}
+<script>
+/* globals Swal PNotify BazContentLoader BazNotifications */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    BazContentLoader.init();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    BazContentLoader.init();
+}
+</script>

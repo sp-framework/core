@@ -37,43 +37,71 @@ class Accounts extends BasePackage
 
             if ($getsecurity) {
                 if ($accountObj->getsecurity()) {
-                    $account = array_merge($account, $accountObj->getsecurity()->toArray());
+                    $relationData = $accountObj->getsecurity()->toArray();
+
+                    unset($relationData['id']);
+
+                    $account = array_merge($account, $relationData);
                 }
             }
 
             if ($getcanlogin) {
                 if ($accountObj->getcanlogin()) {
-                    $account = array_merge($account, $accountObj->getcanlogin()->toArray());
+                    $relationData = $accountObj->getcanlogin()->toArray();
+
+                    unset($relationData['id']);
+
+                    $account = array_merge($account, $relationData);
                 }
             }
 
             if ($getsessions) {
                 if ($accountObj->getsessions()) {
-                    $account = array_merge($account, $accountObj->getsessions()->toArray());
+                    $relationData = $accountObj->getsessions()->toArray();
+
+                    unset($relationData['id']);
+
+                    $account = array_merge($account, $relationData);
                 }
             }
 
             if ($getidentifiers) {
                 if ($accountObj->getidentifiers()) {
-                    $account = array_merge($account, $accountObj->getidentifiers()->toArray());
+                    $relationData = $accountObj->getidentifiers()->toArray();
+
+                    unset($relationData['id']);
+
+                    $account = array_merge($account, $relationData);
                 }
             }
 
             if ($getagents) {
                 if ($accountObj->getagents()) {
-                   $account = array_merge($account, $accountObj->getagents()->toArray());
+                    $relationData = $accountObj->getagents()->toArray();
+
+                    unset($relationData['id']);
+
+                    $account = array_merge($account, $relationData);
                 }
             }
 
             if ($gettunnels) {
                 if ($accountObj->gettunnels()) {
-                    $account = array_merge($account, $accountObj->gettunnels()->toArray());
+                    $relationData = $accountObj->gettunnels()->toArray();
+
+                    unset($relationData['id']);
+
+                    $account = array_merge($account, $relationData);
                 }
             }
 
             if ($getprofiles) {
                 if ($accountObj->getprofiles()) {
-                    $account = array_merge($account, $accountObj->getprofiles()->toArray());
+                    $relationData = $accountObj->getprofiles()->toArray();
+
+                    unset($relationData['id']);
+
+                    $account = array_merge($account, $relationData);
                 }
             }
 
@@ -95,13 +123,25 @@ class Accounts extends BasePackage
         $data['domain'] = explode('@', $data['email'])[1];
 
         if ($this->checkAccountByEmail($data['email'])) {
+            if (isset($data['package_name']) && $data['package_name'] !== 'profiles') {
+
+                $account = $this->checkAccountByEmail($data['email']);
+
+                $account = array_merge($account, $data);
+
+                $this->updateAccount($account);
+
+                $this->packagesData->last = $account;
+
+                return;
+            }
+
             $this->addResponse('Account for ID: ' . $data['email'] . ' already exists!', 1);
 
             return;
         }
 
         if ($this->validateData($data)) {
-
             $password = $this->generateNewPassword();
 
             $data['password'] = $this->secTools->hashPassword($password);
@@ -122,23 +162,31 @@ class Accounts extends BasePackage
 
                 $this->addUpdateSecurity($id, $data);
 
-                $this->basepackages->profile->addProfile($data);
+                if ($data['package_name'] === 'profiles') {
+                    $this->basepackages->profile->addProfile($data);
 
-                $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
+                    $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
 
-                $this->update($data);
+                    $this->update($data);
+                }
 
-                $this->updateRoleAccounts($data['role_id'], $id);
-
-                if ($data['email_new_password'] === '1') {
+                if (isset($data['email_new_password']) &&
+                    $data['email_new_password'] == '1'
+                ) {
                     $this->emailNewPassword($data['email'], $password);
                 }
 
-                $this->addActivityLog($data);
+                if (isset($data['role_id']) &&
+                    $data['role_id'] != '0'
+                ) {
+                    $this->updateRoleAccounts($data['role_id'], $id);
+
+                    $this->addActivityLog($data);
+
+                    $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
+                }
 
                 $this->addResponse('Added new account for ID: ' . $data['email'], 0, null, true);
-
-                $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
             }
         } else {
             $this->addResponse('Error adding account.', 1);
@@ -156,7 +204,9 @@ class Accounts extends BasePackage
 
         $account = $this->getAccountById($data['id'], true);
 
-        if ($data['override_role'] == 0) {
+        if (!isset($data['override_role']) ||
+            $data['override_role'] == 0
+        ) {
             $data['permissions'] = Json::encode([]);
         }
 
@@ -177,7 +227,6 @@ class Accounts extends BasePackage
         }
 
         if ($this->update($data)) {
-
             if (isset($data['can_login'])) {
                 $this->addUpdateCanLogin($data['id'], $data['can_login']);
             }
@@ -186,20 +235,26 @@ class Accounts extends BasePackage
                 $this->emailNewPassword($data['email'], $password);
             }
 
-            $this->addUpdateSecurity($account['id'], $data);
+            if (isset($account['package_name']) && $account['package_name'] === 'profiles') {
+                $this->basepackages->profile->updateProfileViaAccount($data);
+            }
 
-            $this->basepackages->profile->updateProfileViaAccount($data);
+            if (isset($data['role_id']) &&
+                $data['role_id'] != '0'
+            ) {
+                $this->addUpdateSecurity($account['id'], $data);
 
-            $this->updateRoleAccounts($data['role_id'], $data['id'], $account['role_id']);
+                $this->updateRoleAccounts($data['role_id'], $data['id'], $account['role_id']);
 
-            $this->addActivityLog($data);
+                $this->addActivityLog($data);
+
+                $this->addToNotification('add', 'Updated account for ID: ' . $data['email']);
+            }
 
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
-            $this->addToNotification('add', 'Updated account for ID: ' . $data['email']);
-
             if (isset($data['force_logout']) && $data['force_logout'] === '1') {
-                $this->removeRelatedData($accountObj);
+                $this->removeRelatedData($accountObj, false, false);
             }
         } else {
             $this->addResponse('Error updating account.', 1);
@@ -216,51 +271,84 @@ class Accounts extends BasePackage
         $accountObj = $this->modelToUse::findFirstById($data['id']);
 
         if ($accountObj) {
+            $account = $accountObj->toArray();
 
-        }
-        $account = $accountObj->toArray();
+            $relationData = $accountObj->getsecurity()->toArray();
 
-        $this->removeRoleAccount($account['role_id'], $account['id']);
+            unset($relationData['id']);
 
-        if (isset($data['id']) && $data['id'] != 1) {
-            if ($this->remove($data['id'])) {
+            $account = array_merge($account, $relationData);
 
-                if ($accountObj->getprofiles()) {
-                    $accountObj->getprofiles()->delete();
+            if (isset($account['role_id']) && $account['role_id'] != '0') {
+                $this->removeRoleAccount($account['role_id'], $account['id']);
+            }
+
+            if (isset($data['id']) && $data['id'] != 1) {
+                if ($this->remove($data['id'])) {
+
+                    if ($accountObj->getprofiles()) {
+                        $accountObj->getprofiles()->delete();
+                    }
+
+                    $this->removeRelatedData($accountObj);
+
+                    $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
+
+                    $this->addResponse('Removed account for ID: ' . $account['email']);
+                } else {
+                    $this->addResponse('Error removing account.', 1);
                 }
-
-                $this->removeRelatedData($accountObj);
-
-                $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
-
-                $this->addResponse('Removed account for ID: ' . $account['email']);
             } else {
-                $this->addResponse('Error removing account.', 1);
+                $this->addResponse('Cannot remove default account.', 1);
             }
         } else {
-            $this->addResponse('Cannot remove default account.', 1);
+            $this->addResponse('Error removing account.', 1);
         }
     }
 
-    protected function removeRelatedData($accountObj)
-    {
-        if ($accountObj->getcanlogin()) {
-            $accountObj->getcanlogin()->delete();
+    public function removeRelatedData(
+        $accountObj,
+        $security = true,
+        $canlogin = true,
+        $sessions = true,
+        $identifiers = true,
+        $agents = true,
+        $tunnels = true
+    ) {
+        if ($security) {
+            if ($accountObj->getsecurity()) {
+                $accountObj->getsecurity()->delete();
+            }
         }
-        if ($accountObj->getsecurity()) {
-            $accountObj->getsecurity()->delete();
+
+        if ($canlogin) {
+            if ($accountObj->getcanlogin()) {
+                $accountObj->getcanlogin()->delete();
+            }
         }
-        if ($accountObj->gettunnels()) {
-            $accountObj->gettunnels()->delete();
+
+        if ($sessions) {
+            if ($accountObj->getsessions()) {
+                $accountObj->getsessions()->delete();
+            }
         }
-        if ($accountObj->getidentifiers()) {
-            $accountObj->getidentifiers()->delete();
+
+        if ($identifiers) {
+            if ($accountObj->getidentifiers()) {
+                $accountObj->getidentifiers()->delete();
+            }
         }
-        if ($accountObj->getagents()) {
-            $accountObj->getagents()->delete();
+
+        if ($agents) {
+            if ($accountObj->getagents()) {
+                $accountObj->getagents()->delete();
+            }
         }
-        if ($accountObj->getsessions()) {
-            $accountObj->getsessions()->delete();
+
+        if ($tunnels) {
+            if ($accountObj->gettunnels()) {
+                $accountObj->gettunnels()->delete();
+            }
         }
     }
 
@@ -289,36 +377,36 @@ class Accounts extends BasePackage
     {
         if ($canLogin !== '') {
             $canLogin = Json::decode($canLogin, true);
-        }
 
-        if (count($canLogin) > 0) {
-            foreach ($canLogin as $app => $allowed) {
-                $canloginModel = new BasepackagesUsersAccountsCanlogin;
-                $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app = "' . $app . '"']);
+            if (count($canLogin) > 0) {
+                foreach ($canLogin as $app => $allowed) {
+                    $canloginModel = new BasepackagesUsersAccountsCanlogin;
+                    $permission = $canloginModel::findFirst(['account_id = ' . $id . ' AND app = "' . $app . '"']);
 
-                if ($permission) {
-                    if ($allowed === true) {
-                        $updatePermission['allowed'] = '1';
+                    if ($permission) {
+                        if ($allowed === true) {
+                            $updatePermission['allowed'] = '1';
+                        } else {
+                            $updatePermission['allowed'] = '0';
+                        }
+
+                        $permission->assign($updatePermission);
+
+                        $permission->update();
                     } else {
-                        $updatePermission['allowed'] = '0';
+                        $newPermission['account_id'] = $id;
+                        $newPermission['app'] = $app;
+
+                        if ($allowed === true) {
+                            $newPermission['allowed'] = '1';
+                        } else {
+                            $newPermission['allowed'] = '0';
+                        }
+
+                        $canloginModel->assign($newPermission);
+
+                        $canloginModel->create();
                     }
-
-                    $permission->assign($updatePermission);
-
-                    $permission->update();
-                } else {
-                    $newPermission['account_id'] = $id;
-                    $newPermission['app'] = $app;
-
-                    if ($allowed === true) {
-                        $newPermission['allowed'] = '1';
-                    } else {
-                        $newPermission['allowed'] = '0';
-                    }
-
-                    $canloginModel->assign($newPermission);
-
-                    $canloginModel->create();
                 }
             }
         }
@@ -379,12 +467,14 @@ class Accounts extends BasePackage
         if ($accountObj) {
             $account = $accountObj->toArray();
 
-            $security = $accountObj->getsecurity()->toArray();
+            if ($accountObj->getsecurity()) {
+                $security = $accountObj->getsecurity()->toArray();
 
-            unset($security['id']);
-            unset($security['account_id']);
+                unset($security['id']);
+                unset($security['account_id']);
 
-            $account = array_merge($account, $security);
+                $account = array_merge($account, $security);
+            }
         }
 
         if (isset($account)) {
@@ -506,7 +596,7 @@ class Accounts extends BasePackage
     protected function emailNewPassword($email, $password)
     {
         $emailData['app_id'] = $this->app['id'];
-        $emailData['domain_id'] = $this->basepackages->domains->getDomain()['id'];
+        $emailData['domain_id'] = $this->domains->getDomain()['id'];
         $emailData['status'] = 1;
         $emailData['priority'] = 1;
         $emailData['confidential'] = 1;
@@ -535,6 +625,7 @@ class Accounts extends BasePackage
                 $this->basepackages->roles->update($oldRole);
             }
         }
+
         $role = $this->basepackages->roles->getById($rid);
 
         if ($role['accounts']) {
@@ -552,6 +643,7 @@ class Accounts extends BasePackage
 
     protected function removeRoleAccount(int $rid, int $id)
     {
+        var_dump($rid, $id);
         $role = $this->basepackages->roles->getById($rid);
 
         $role['accounts'] = Json::decode($role['accounts'], true);
@@ -658,8 +750,33 @@ class Accounts extends BasePackage
                 $this->packagesData->acls = Json::encode($acls);
 
                 $account['permissions'] = Json::encode($permissions);
+                if ($account['package_name'] === 'profiles') {
+                    $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
+                } else if ($account['package_name'] === 'contacts') {
+                    $contactsPackage = $this->init()->checkPackage('Apps\Dash\Packages\Business\Directory\Contacts\Contacts');
 
-                $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
+                    if ($contactsPackage) {
+                        $contactsPackage = $this->usePackage(\Apps\Dash\Packages\Business\Directory\Contacts\Contacts::class);
+                    }
+
+                    $contact = $contactsPackage->getById($account['package_row_id']);
+
+                    if ($contact) {
+                        $account['profile'] = $contact;
+                    }
+                } else if ($account['package_name'] === 'customers') {
+                    $customersPackage = $this->init()->checkPackage('Apps\Dash\Packages\Crms\Customers\Customers');
+
+                    if ($customersPackage) {
+                        $customersPackage = $this->usePackage(\Apps\Dash\Packages\Crms\Customers\Customers::class);
+                    }
+
+                    $customer = $customersPackage->getById($account['package_row_id']);
+
+                    if ($customer) {
+                        $account['profile'] = $customer;
+                    }
+                }
 
                 $this->packagesData->account = $account;
 
