@@ -923,10 +923,18 @@
                         disabled = true;
                     }
 
+                    //Bug with responsive datatable plugin. If the column has mobile keyword, the column is automatically converted into responsive.
+                    var columnid;
+                    if (column.id.search(/mobile/g) !== -1) {
+                        columnid = column.id.replace(/mobile/i, 'mobil');//Just change the keyword to something else.
+                    } else {
+                        columnid = column.id
+                    }
+
                     if (datatableOptions.colTextTruncate) {
-                        classes = 'data-' + column.id + ' text-truncate dt-colTextTruncate';
-                    // } else {
-                        // classes = 'data-' + column.id;
+                        classes = 'data-' + columnid + ' text-truncate dt-colTextTruncate';
+                    } else {
+                        classes = 'data-' + columnid;
                     }
 
                     if (datatableOptions.tableCompact) {
@@ -1590,17 +1598,17 @@
                                             datatableOptions.paginationCounters.limit,
                                             query
                                         );
+
+                                        if (dataCollection[componentId][sectionId]['afterRowRemove']) {
+                                            dataCollection[componentId][sectionId]['afterRowRemove']();
+                                        }
                                     }
                                 });
                             }
                         });
                     });
                 });
-                $('body').trigger(
-                    {
-                        'type'     : 'sectionWithListingEventsRegistered'
-                    }
-                );
+                $('body').trigger('sectionWithListingEventsRegistered');
             }
 
             _proto._updateCounters = function() {
