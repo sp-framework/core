@@ -111,6 +111,12 @@ class DynamicTable
             false;
         $compact = $this->dtParams["dtTableCompact"] === true ? ' compact ' : '';
 
+        $this->dtParams["dtResponsive"] =
+            isset($this->params["dtResponsive"]) ?
+            $this->params["dtResponsive"] :
+            true;
+        $responsive = $this->dtParams["dtResponsive"] === true ? ' dt-responsive ' : '';
+
         $this->content .=
             '<div class="row">
                 <div class="col">
@@ -121,7 +127,7 @@ class DynamicTable
                             </div>
                         </div>
                     </div>
-                    <table id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-table" class="table ' . $this->dtParams['dtStriped'] . ' ' . $this->dtParams['dtBordered'] . $compact . ' dt-responsive" width="100%" cellspacing="0">
+                    <table id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-table" class="table ' . $this->dtParams['dtStriped'] . ' ' . $this->dtParams['dtBordered'] . $compact . $responsive . '" width="100%" cellspacing="0">
                         <tbody></tbody>
                     </table>
                 </div>
@@ -208,11 +214,6 @@ class DynamicTable
         $this->dtParams["dtSearching"] =
             isset($this->params["dtSearching"]) ?
             $this->params["dtSearching"] :
-            true;
-
-        $this->dtParams["dtResponsive"] =
-            isset($this->params["dtResponsive"]) ?
-            $this->params["dtResponsive"] :
             true;
 
         $this->dtParams["dtPaging"] =
