@@ -1,0 +1,35 @@
+{% if customerGroup['id'] is defined %}
+    {% set groupId = customerGroup['id'] %}
+    {% set title = 'Customer Group (' ~ customerGroup['name'] ~ ')' %}
+{% else %}
+    {% set groupId = '' %}
+    {% set title = 'New Customer Group' %}
+{% endif %}
+
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'users',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'customergroups/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : groupId,
+            'addActionUrl'                  : 'crms/customergroups/add',
+            'addSuccessRedirectUrl'         : 'crms/customergroups',
+            'updateActionUrl'               : 'crms/customergroups/update',
+            'updateSuccessRedirectUrl'      : 'crms/customergroups',
+            'cancelActionUrl'               : 'crms/customergroups',
+            'closeActionUrl'                : 'crms/customergroups'
+        ]
+    ]
+)}}

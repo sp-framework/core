@@ -1,0 +1,12 @@
+{
+    "name"          : "CustomerGroups",
+    "display_name"  : "Customer Groups",
+    "description"   : "Package for Crms Customer Groups component",
+    "app_type"      : "dash",
+    "category"      : "crms",
+    "sub_category"  : "admin",
+    "version"       : "0.0.1",
+    "repo"          : "https://.../dash-package-crms-customergroups",
+    "class"         : "Apps\\Dash\\Packages\\Crms\\CustomerGroups\\CustomerGroups",
+    "settings"      : {"componentRoute":"crms/customergroups"}
+}
