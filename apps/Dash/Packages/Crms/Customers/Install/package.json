@@ -1,12 +1,12 @@
 {
     "name"          : "Customers",
-    "display_name"   : "CRMS Customers",
-    "description"   : "Customer Relationship Management System (CRMS) Package for managing customers via customers component",
+    "display_name"  : "Customers",
+    "description"   : "Package for Crms Customers component",
     "app_type"      : "dash",
-    "category"      : "business",
-    "sub_category"  : "crms",
+    "category"      : "crms",
+    "sub_category"  : "admin",
     "version"       : "0.0.1",
-    "repo"          : "https://.../dash-package-business-crms-customers",
+    "repo"          : "https://.../dash-package-crms-customers",
     "class"         : "Apps\\Dash\\Packages\\Crms\\Customers\\Customers",
-    "settings"      : { }
+    "settings"      : {"componentRoute":"crms/customers"}
 }

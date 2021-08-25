@@ -1,0 +1,368 @@
+{% if customer['id'] is defined %}
+    {% set customerNotes = customer['notes'] %}
+{% else %}
+    {% set customerNotes = [] %}
+{% endif %}
+<div class="row vdivide">
+    <div class="col-md-2">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'form-fields',
+                'fieldLabel'                                : 'Form Fields',
+                'fieldType'                                 : 'jstree',
+                'fieldHelp'                                 : true,
+                'fieldHelpTooltipContent'                   : 'Form Fields',
+                'fieldRequired'                             : false,
+                'fieldBazScan'                              : true,
+                'fieldJstreeSearch'                         : true,
+                'fieldBazPostOnCreate'                      : false,
+                'fieldBazPostOnUpdate'                      : false,
+                'fieldJstreeDataSrcArr'                     : [],
+                'fieldJstreeAdd'                            : false,
+                'fieldJstreeEdit'                           : false,
+                'fieldJstreeExpand'                         : true,
+                'fieldJstreeCollapse'                       : true,
+                'fieldJstreeFirstOpen'                      : true,
+                'fieldJstreeAllOpen'                        : false,
+                'fieldJstreeToggleAllChildren'              : false,
+                'fieldJstreeIncludeRootInPath'              : false,
+                'fieldJstreeSelectEndNodeOnly'              : false,
+                'fieldJstreeShowDots'                       : false,
+                'fieldJstreeDoubleClickToggle'              : true,
+                'fieldJstreeMultiple'                       : false,
+                'fieldJstreeSearchCaseSensitive'            : false,
+                'fieldJstreeSearchShowOnlyMatches'          : false,
+                'fieldJstreeSearchShowOnlyMatchesChildren'  : false,
+                'fieldJstreeHideJstreeIcons'                : false
+            ]
+        )}}
+    </div>
+    <div class="col">
+        <form autocomplete="off" data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+            <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+                {{adminltetags.useTag('tabs',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : 'main',
+                        'tabsId'                        : 'tabs',
+                        'tabsStyle'                     : 'card-outline-tabs',
+                        'tabsData'                      :
+                            [
+                                'info'   :
+                                [
+                                    'tabTitle'          : 'Info',
+                                    'tabInclude'        : 'customers/form/info',
+                                    'tabIncludeParams'  : ['customer': customer]
+                                ],
+                                'contactdetails'   :
+                                [
+                                    'tabTitle'          : 'Contact Details',
+                                    'tabInclude'        : 'customers/form/contactdetails',
+                                    'tabIncludeParams'  : ['customer': customer]
+                                ],
+                                'financialdetails'   :
+                                [
+                                    'tabTitle'          : 'Financial Details',
+                                    'tabInclude'        : 'customers/form/financialdetails',
+                                    'tabIncludeParams'  : ['customer': customer]
+                                ],
+                                'addresses'   :
+                                [
+                                    'tabTitle'          : 'Addresses',
+                                    'tabInclude'        : 'customers/form/addresses',
+                                    'tabIncludeParams'  : ['customer': customer]
+                                ],
+                                'notes'   :
+                                [
+                                    'tabTitle'          : 'Notes',
+                                    'tabInclude'        : '../common/notes',
+                                    'tabIncludeParams':
+                                    [
+                                        'notes'         : customerNotes,
+                                        'packageName'   : 'customers'
+                                    ]
+                                ]
+                            ]
+                    ]
+                )}}
+            </fieldset>
+        </form>
+    </div>
+</div>
+<script>
+/* globals BazContentFieldsValidator PNotify autoComplete dataCollectionSection*/
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                                  : { },
+        '{{componentId}}-{{sectionId}}-account_id'                          : { },
+        '{{componentId}}-{{sectionId}}-account_email'                       : {
+            afterInit   : function() {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("crms/customers/searchCustomerEmail")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-account_email").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+                                if (response.customers) {
+                                    return response.customers;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["account_email"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-account_email",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-account_email_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-account_email",
+                            position: "afterend",
+                            element: "div",
+                            className: "autoComplete_results"
+                        },
+                        maxResults: 5,
+                        highlight: true,
+                        resultItem: {
+                            content: (data, source) => {
+                                source.innerHTML = data.match + ' - <span class="text-danger">Customer already exists.</span>';
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {
+                        },
+                        onSelection: feedback => {
+                            $('#{{componentId}}-{{sectionId}}-account_email').val('');
+                            $('#{{componentId}}-{{sectionId}}-account_email').attr('value', '');
+                            PNotify.error({title:'Customer ' + feedback.selection.value.account_email + ' already exists!'});
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-account_email').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-account_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-account_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-account_email').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-account_email_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-customer_group_id'                   : {
+            placeholder : 'SELECT A CUSTOMER GROUP',
+            allowClear  : true
+        },
+        '{{componentId}}-{{sectionId}}-first_name'                          : { },
+        '{{componentId}}-{{sectionId}}-last_name'                           : { },
+        '{{componentId}}-{{sectionId}}-job_title'                           : { },
+        '{{componentId}}-{{sectionId}}-contact_source'                      : {
+            'placeholder' : "SELECT CONTACT SOURCE",
+            afterInit     : function() {
+                $('#{{componentId}}-{{sectionId}}-contact_source').on('select2:select', function(e) {
+                    var sourceId = e.params.data.id;
+                    $('#{{componentId}}-{{sectionId}}-contact_source_details').val('');
+                    $('#{{componentId}}-{{sectionId}}-referrer_full_name').val('');
+                    $('#{{componentId}}-{{sectionId}}-contact_referrer_id').val('');
+
+                    if (sourceId == 'contact_referrer') {
+                        $('#{{componentId}}-{{sectionId}}-contact_source_details').parent('.form-group').addClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-referrer_full_name').parent('.form-group').removeClass('d-none');
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-contact_source_details').parent('.form-group').removeClass('d-none');
+                        $('#{{componentId}}-{{sectionId}}-referrer_full_name').parent('.form-group').addClass('d-none');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_source_details'              : { },
+        '{{componentId}}-{{sectionId}}-contact_referrer_id'                 : { },
+        '{{componentId}}-{{sectionId}}-referrer_full_name'                  : {
+            afterInit   : function() {
+                dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteAccounts'] =
+                    new autoComplete({
+                        data: {
+                            src: async() => {
+                                const url = '{{links.url("crms/customers/searchCustomerFullName")}}';
+
+                                var myHeaders = new Headers();
+                                myHeaders.append("accept", "application/json");
+
+                                var formdata = new FormData();
+                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-referrer_full_name").value);
+                                formdata.append($('#security-token').attr('name'), $('#security-token').val());
+
+                                var requestOptions = {
+                                    method: 'POST',
+                                    headers: myHeaders,
+                                    body: formdata
+                                };
+
+                                const responseData = await fetch(url, requestOptions);
+
+                                const response = await responseData.json();
+
+                                if (response.tokenKey && response.token) {
+                                    $('#security-token').attr('name', response.tokenKey);
+                                    $('#security-token').val(response.token);
+                                }
+                                if (response.customers) {
+                                    return response.customers;
+                                } else {
+                                    return [];
+                                }
+                            },
+                            key: ["full_name"],
+                            cache: false
+                        },
+                        selector: "#{{componentId}}-{{sectionId}}-referrer_full_name",
+                        threshold : 4,
+                        debounce: 500,
+                        searchEngine: "strict",
+                        resultsList: {
+                            render: true,
+                            /* if set to false, add an eventListener to the selector for event type
+                               "autoComplete" to handle the result */
+                            container: source => {
+                                source.setAttribute("id", "{{componentId}}-{{sectionId}}-referrer_full_name_list");
+                                source.setAttribute("class", "autoComplete_results");
+                            },
+                            destination: "#{{componentId}}-{{sectionId}}-referrer_full_name",
+                            position: "afterend",
+                            element: "div"
+                        },
+                        maxResults: 5,                         // Max. number of rendered results | (Optional)
+                        highlight: true,                       // Highlight matching results      | (Optional)
+                        resultItem: {                          // Rendered result item            | (Optional)
+                            content: (data, source) => {
+                                source.innerHTML = data.match;
+                            },
+                            element: "div"
+                        },
+                        noResults: () => {                     // Action script on noResults      | (Optional)
+                            const result = document.createElement("li");
+                            result.setAttribute("class", "autoComplete_result text-danger");
+                            result.setAttribute("tabindex", "1");
+                            result.innerHTML = "No search results. Click field help for more information.";
+                            if (document.querySelector("#{{componentId}}-{{sectionId}}-referrer_full_name_list")) {
+                                $("#{{componentId}}-{{sectionId}}-referrer_full_name_list").empty().append(result);
+                            } else {
+                                $("#{{componentId}}-{{sectionId}}-referrer_full_name").parent(".form-group").append(
+                                    '<div id="{{componentId}}-{{sectionId}}-referrer_full_name_list" class="autoComplete_results"></div>'
+                                );
+                                document.querySelector("#{{componentId}}-{{sectionId}}-referrer_full_name_list").appendChild(result);
+                            }
+                        },
+                        onSelection: feedback => {             // Action script onSelection event | (Optional)
+                            $('#{{componentId}}-{{sectionId}}-contact_referrer_id').val(feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-contact_referrer_id').attr('value', feedback.selection.value.id);
+                            $('#{{componentId}}-{{sectionId}}-referrer_full_name').blur();
+                            $('#{{componentId}}-{{sectionId}}-referrer_full_name').val(feedback.selection.value.full_name);
+                            $('#{{componentId}}-{{sectionId}}-referrer_full_name').attr('value', feedback.selection.value.full_name);
+                        }
+                });
+                // On delete
+                $('#{{componentId}}-{{sectionId}}-referrer_full_name').on('input propertychange', function() {
+                    $('#{{componentId}}-{{sectionId}}-contact_referrer_id').val(0);
+                    $('#{{componentId}}-{{sectionId}}-contact_referrer_id').attr('value', 0);
+                });
+
+                $('#{{componentId}}-{{sectionId}}-referrer_full_name').focusout(function() {
+                    $('#{{componentId}}-{{sectionId}}-referrer_full_name_list').children('li').remove();
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_phone'                       : { },
+        '{{componentId}}-{{sectionId}}-contact_phone_ext'                   : { },
+        '{{componentId}}-{{sectionId}}-contact_mobile'                      : { },
+        '{{componentId}}-{{sectionId}}-contact_secondary_email'             : { },
+        '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'        : { },
+        '{{componentId}}-{{sectionId}}-contact_other'                       : { },
+        '{{componentId}}-{{sectionId}}-contact_notes'                       : { },
+        '{{componentId}}-{{sectionId}}-acn'                                 : { },
+        '{{componentId}}-{{sectionId}}-currency'                            : {
+            placeholder: 'SELECT CURRENCY'
+        },
+        '{{componentId}}-{{sectionId}}-bsb'                                 : { },
+        '{{componentId}}-{{sectionId}}-account_number'                      : { },
+        '{{componentId}}-{{sectionId}}-swift_code'                          : { },
+        '{{componentId}}-{{sectionId}}-invoices_due_day'                    : { },
+        '{{componentId}}-{{sectionId}}-invoices_due_day_term'               : {
+            placeholder : 'SELECT INVOICES DUE DATE TERM'
+        },
+        '{{componentId}}-{{sectionId}}-invoices_tax_enabled'                : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-invoices_tax_enabled').click(function() {
+                    var checked = $(this)[0].checked;
+
+                    $('#{{componentId}}-{{sectionId}}-invoices_tax_id').val(0).trigger('change');
+
+                    if (checked) {
+                        $('#{{componentId}}-{{sectionId}}-invoices_tax_id').attr('disabled', false);
+                    } else {
+                        $('#{{componentId}}-{{sectionId}}-invoices_tax_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-invoices_tax_id').parents('.form-group').removeClass('has-error has-feedback');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-invoices_tax_id'                     : {
+            placeholder : 'SELECT INVOICES TAX',
+            allowClear  : true
+        },
+        '{{componentId}}-{{sectionId}}-credit_limit_amount'                 : { },
+        '{{componentId}}-{{sectionId}}-credit_limit_block'                  : { },
+        '{{componentId}}-{{sectionId}}-invoice_discount'                    : { },
+        '{{componentId}}-{{sectionId}}-form'                                : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules       : {
+                '{{componentId}}-{{sectionId}}-account_email'               : {
+                    required                                                : true,
+                    email                                                   : true
+                },
+                '{{componentId}}-{{sectionId}}-first_name'                  : 'required',
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'required',
+                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'required'
+            },
+            messages    : {
+                '{{componentId}}-{{sectionId}}-account_email'               : 'Please enter customer email',
+                '{{componentId}}-{{sectionId}}-first_name'                  : 'Please enter first name',
+                '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name',
+                '{{componentId}}-{{sectionId}}-contact_mobile'              : 'Please enter mobile number'
+            }
+        }
+    });
+</script>

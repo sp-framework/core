@@ -1,25 +1,24 @@
 <?php
 
-namespace Apps\Dash\Packages\Customers\Install;
+namespace Apps\Dash\Packages\Crms\Customers\Install;
 
-use Apps\Dash\Packages\Customers\Customers;
-use Apps\Dash\Packages\Customers\Install\Schema\Customers as CustomersSchema;
+use Apps\Dash\Packages\Crms\Customers\Customers;
+use Apps\Dash\Packages\Crms\Customers\Install\Schema\CrmsCustomers;
+use Apps\Dash\Packages\Crms\Customers\Install\Schema\CrmsCustomersFinancialDetails;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class Package extends BasePackage
 {
-    protected $schemaToUse = CustomersSchema::class;
-
     protected $packageToUse = Customers::class;
 
-    public $customers;
+    public $suppliers;
 
     public function installPackage(bool $dropTables = false)
     {
         $this->init();
 
-        if ($this->checkPackage($this->packageToUse)) {
+        if (!$dropTables && $this->checkPackage($this->packageToUse)) {
 
             $this->packagesData->responseCode = 1;
 
@@ -30,9 +29,11 @@ class Package extends BasePackage
 
         try {
             if ($dropTables) {
-                $this->createTable('customers', '', (new $this->schemaToUse)->columns(), $dropTables);
+                $this->createTable('crms_customers', '', (new CrmsCustomers)->columns(), $dropTables);
+                $this->createTable('crms_customers_financial_details', '', (new CrmsCustomersFinancialDetails)->columns(), $dropTables);
             } else {
-                $this->createTable('customers', '', (new $this->schemaToUse)->columns());
+                $this->createTable('crms_customers', '', (new CrmsCustomers)->columns());
+                $this->createTable('crms_customers_financial_details', '', (new CrmsCustomersFinancialDetails)->columns());
             }
 
             // $this->registerPackage();
@@ -49,7 +50,7 @@ class Package extends BasePackage
 
     protected function registerPackage()
     {
-        $packagePath = '/apps/Ecom/Dash/Packages/Customers/';
+        $packagePath = '/apps/Dash/Packages/Ims/Suppliers/';
 
         $jsonFile =
             Json::decode($this->localContent->read($packagePath . '/Install/package.json'), true);
@@ -60,11 +61,11 @@ class Package extends BasePackage
 
         $jsonFile['display_name'] = $jsonFile['displayName'];
         $jsonFile['settings'] = Json::encode($jsonFile['settings']);
-        $jsonFile['apps'] = Json::encode([$this->init()->app['id'] => ['installed' => true]]);
+        $jsonFile['apps'] = Json::encode([$this->init()->app['id'] => ['enabled' => true]]);
         $jsonFile['files'] = Json::encode($this->getInstalledFiles($packagePath));
 
         $this->modules->packages->add($jsonFile);
-        $this->logger->log->info('Package ' . $jsonFile['display_name'] . ' installed successfully on app ' . $this->app['name']);
+        $this->logger->log->info('Package ' . $jsonFile['display_name'] . ' enabled successfully on app ' . $this->app['name']);
     }
 
     public function updatePackage()

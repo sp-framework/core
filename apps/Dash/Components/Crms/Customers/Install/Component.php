@@ -1,8 +1,8 @@
 <?php
 
-namespace Apps\Dash\Components\Users\Customers\Install;
+namespace Apps\Dash\Components\Business\Directory\Vendors\Install;
 
-use Apps\Dash\Components\Users\Customers\CustomersComponent;
+use Apps\Dash\Components\Business\Directory\Vendors\VendorsComponent;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -10,7 +10,7 @@ class Component extends BaseComponent
 {
     public function installComponent()
     {
-        if ($this->checkComponent(CustomersComponent::class)) {
+        if ($this->checkComponent(VendorsComponent::class)) {
 
             $this->view->responseCode = 1;
 
@@ -24,7 +24,7 @@ class Component extends BaseComponent
 
     protected function registerComponent()
     {
-        $componentPath = '/apps/Dash/Components/Users/Customers/';
+        $componentPath = '/apps/Dash/Components/Business/Directory/Vendors/';
 
         $jsonFile =
             Json::decode($this->localContent->read($componentPath . '/Install/component.json'), true);
