@@ -19,9 +19,7 @@ class ExceptionHandlers extends BaseComponent
 	{
 		if ($this->request->getBestAccept() === 'application/json') {
 
-			$this->view->responseCode = 1;
-
-			$this->view->responseMessage = 'Permission Denied!';
+			$this->addResponse('Permission Denied!', 1);
 
 			return $this->sendJson();
 		}
@@ -35,9 +33,7 @@ class ExceptionHandlers extends BaseComponent
 	{
 		if ($this->request->getBestAccept() === 'application/json') {
 
-			$this->view->responseCode = 1;
-
-			$this->view->responseMessage = 'Not Found!';
+			$this->addResponse($exception->getMessage(), 1);
 
 			return $this->sendJson();
 		}
@@ -51,9 +47,7 @@ class ExceptionHandlers extends BaseComponent
 	{
 		if ($this->request->getBestAccept() === 'application/json') {
 
-			$this->view->responseCode = 1;
-
-			$this->view->responseMessage = 'Not Found!';
+			$this->addResponse($exception->getMessage(), 1);
 
 			return $this->sendJson();
 		}
@@ -63,14 +57,14 @@ class ExceptionHandlers extends BaseComponent
 		return $this->view->partial('notFound');
 	}
 
-	public function handleValidationException()
+	public function handleValidationException($exception)
 	{
 		$this->session->set([
-			'errors' => $e->getErrors(),
-			'old' => $e->getOldInput(),
+			'errors' => $exception->getErrors(),
+			'old' => $exception->getOldInput(),
 		]);
 
-		return redirect($e->getPath());
+		return redirect($exception->getPath());
 	}
 
 	public function handleCsrfTokenException()

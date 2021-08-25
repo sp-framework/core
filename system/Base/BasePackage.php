@@ -102,8 +102,11 @@ abstract class BasePackage extends Controller
 			if ($data) {
 				return $data;
 			} else {
-				// return false;
-				throw new IdNotFoundException('Not Found', 1);
+				if ($this->config->debug) {
+					throw new IdNotFoundException($this->packageName . ' - ID ' . $id . ' Not Found!', 1);
+				}
+
+				return false;
 			}
 		}
 
@@ -165,15 +168,18 @@ abstract class BasePackage extends Controller
 
 			$data = $this->getDbData($parameters, $enableCache, 'params');
 
-			if (isset($relationColumns)) {
+			if ($data && isset($relationColumns)) {
 				$data = $this->getRelationColumnsData($relationColumns, $data);
 			}
 
 			if ($data) {
 				return $data;
 			} else {
+				if ($this->config->debug) {
+					throw new IdNotFoundException($this->packageName . ' - Data not Found!', 1);
+				}
+
 				return false;
-				// throw new IdNotFoundException('Not Found', 1);
 			}
 		}
 
