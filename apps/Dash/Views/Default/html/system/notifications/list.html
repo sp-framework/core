@@ -44,7 +44,7 @@
         'dtSelectAll'           : true,
         'dtBordered'            : false,
         'dtHideIdColumn'        : true,
-        'dtNoOfColumnsToShow'   : 6,
+        'dtNoOfColumnsToShow'   : 8,
         'dtTableCompact'        : true,
         'dtPrimaryButtons'      :
             {
@@ -133,7 +133,6 @@ function mark() {
     $('#{{componentId}}-listing-mark').attr('disabled', true);
 
     var selected, count, ids, url, task, selectedFilter;
-
 
     $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').off();
     $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').click(function(e) {
@@ -310,6 +309,11 @@ function initFuncs() {
     $('.rowAccess').each(function(index,row) {
         $(this).addClass('contentAjaxLink');
     });
+
+    window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['afterRowRemove'] =
+        function() {
+            BazNotifications.getNotificationsCount();
+        }
 }
 
 $('#{{componentId}}-listing-mute').click(function(e) {

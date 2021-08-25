@@ -118,11 +118,18 @@ class NotificationsComponent extends BaseComponent
             $this->notifications,
             'system/notifications/view',
             $conditions,
-            ['[notification_title]', '[notification_details]', 'package_row_id', 'created_by', 'read'],
+            ['package_row_id', 'read', '[notification_title]', '[notification_details]', 'created_by', 'created_at', 'package_name', 'archive'],
             true,
-            ['[notification_title]', '[notification_details]', 'package_row_id', 'created_by', 'read'],
+            ['package_row_id', 'read', '[notification_title]', '[notification_details]', 'created_by', 'created_at', 'package_name', 'archive'],
             null,
-            ['package_row_id' => 'link', 'notification_title' => 'notification', 'notification_details' => 'details', 'created_by' => 'User (at)', 'read' => 'actions'],
+            [
+                'package_row_id'        => 'link',
+                'notification_title'    => 'notification',
+                'notification_details'  => 'details',
+                'created_by'            => 'User',
+                'read'                  => 'actions',
+                'archive'               => 'Archived'
+            ],
             $replaceColumns,
             'notification_title',
             null,
@@ -190,9 +197,9 @@ class NotificationsComponent extends BaseComponent
             $profile = $this->basepackages->profile->getProfile($data['created_by']);
 
             if ($profile) {
-                $data['created_by'] = $profile['full_name'] . ' (' . $data['created_at'] . ')';
+                $data['created_by'] = $profile['full_name'];
             } else {
-                $data['created_by'] = 'System (' . $data['created_at'] . ')';
+                $data['created_by'] = 'System';
             }
         }
 
@@ -236,8 +243,9 @@ class NotificationsComponent extends BaseComponent
                     <i class="mr-1 fas fa-fw fa-xs fa-save"></i>
                     <span class="text-xs"> Archive</span>
                 </a>';
-        } else {
-            $data['archive'] = '';
+            $data['archive'] = 'No';
+        } else if ($data['archive'] == 1) {
+            $data['archive'] = 'Yes';
         }
 
         return $data;
