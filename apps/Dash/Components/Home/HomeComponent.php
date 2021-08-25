@@ -25,6 +25,8 @@ use Apps\Dash\Packages\Business\Entities\Install\Package as EntitiesPackage;
 use Apps\Dash\Packages\Business\Finances\TaxGroups\Install\Package as TaxGroupsPackage;
 use Apps\Dash\Packages\Business\Finances\Taxes\Install\Package as TaxesPackage;
 use Apps\Dash\Packages\Business\Locations\Install\Package as LocationsPackage;
+use Apps\Dash\Packages\Crms\CustomerGroups\Install\Package as CustomerGroupsPackage;
+use Apps\Dash\Packages\Crms\Customers\Install\Package as CustomersPackage;
 use Apps\Dash\Packages\Devtools\Api\Contracts\Install\Package as ContractsPackage;
 use Apps\Dash\Packages\Devtools\Api\Enums\Install\Package as EnumsPackage;
 use Apps\Dash\Packages\Hrms\Designations\HrmsDesignations;
@@ -53,11 +55,7 @@ class HomeComponent extends BaseComponent
      */
     public function viewAction()
     {
-        // $vendorsPackage = new VendorsPackage();
-        // $vendorsPackage->installPackage(true);
-        $employeesPackage = new EmployeesPackage();
-        $employeesPackage->installPackage(true);
-        // $this->resetTemp();return;
+        $this->resetTemp();return;
 
         // $this->reset();return;
 
@@ -107,6 +105,10 @@ class HomeComponent extends BaseComponent
         // $vendorgroupsComponent->installComponent();
         // $vendorgroupsPackage = new VendorGroupsPackage();
         // $vendorgroupsPackage->installPackage(true);
+        // $contactsPackage = new ContactsPackage();
+        // $contactsPackage->installPackage(true);
+        // $customersPackage = new CustomersPackage();
+        // $customersPackage->installPackage(true);
     }
 
     protected function reset()
@@ -161,10 +163,6 @@ class HomeComponent extends BaseComponent
         // For Installing Contacts
         $contactsPackage = new ContactsPackage();
         $contactsPackage->installPackage(true);
-
-        // For Installing Vendors
-        $vendorsPackage = new VendorsPackage();
-        $vendorsPackage->installPackage(true);
 
         // For Installing Skills
         // $skillsComponent = new SkillsComponent();
@@ -225,6 +223,10 @@ class HomeComponent extends BaseComponent
         $vendorgroupsPackage = new VendorGroupsPackage();
         $vendorgroupsPackage->installPackage(true);
 
+        // For Installing Vendors
+        $vendorsPackage = new VendorsPackage();
+        $vendorsPackage->installPackage(true);
+
         // $taxesComponent = new TaxesComponent();
         // $taxesComponent->installComponent();
         $taxesPackage = new TaxesPackage();
@@ -234,6 +236,13 @@ class HomeComponent extends BaseComponent
         // $taxgroupsComponent->installComponent();
         $taxgroupsPackage = new TaxGroupsPackage();
         $taxgroupsPackage->installPackage(true);
+
+        $vendorgroupsPackage = new CustomerGroupsPackage();
+        $vendorgroupsPackage->installPackage(true);
+
+        // For Installing Customers
+        $customersPackage = new CustomersPackage();
+        $customersPackage->installPackage(true);
     }
 
     protected function addStatuses()
