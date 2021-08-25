@@ -102,10 +102,6 @@ abstract class BasePackage extends Controller
 			if ($data) {
 				return $data;
 			} else {
-				if ($this->config->debug) {
-					throw new IdNotFoundException($this->packageName . ' - ID ' . $id . ' Not Found!', 1);
-				}
-
 				return false;
 			}
 		}
