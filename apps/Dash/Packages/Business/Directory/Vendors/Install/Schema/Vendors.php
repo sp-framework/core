@@ -95,6 +95,14 @@ class Vendors
                     ]
                 ),
                 new Column(
+                    'b2b_account_managers',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'brands',
                     [
                         'type'          => Column::TYPE_VARCHAR,

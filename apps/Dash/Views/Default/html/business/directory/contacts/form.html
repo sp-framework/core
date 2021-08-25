@@ -1,3 +1,8 @@
+{% if contact['id'] is defined %}
+    {% set contactNotes = contact['notes'] %}
+{% else %}
+    {% set contactNotes = [] %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -70,8 +75,12 @@
                                 'notes'   :
                                 [
                                     'tabTitle'          : 'Notes',
-                                    'tabInclude'        : 'contacts/form/notes',
-                                    'tabIncludeParams'  : ['contact': contact]
+                                    'tabInclude'        : '../../common/notes',
+                                    'tabIncludeParams':
+                                    [
+                                        'notes'         : contactNotes,
+                                        'packageName'   : 'contacts'
+                                    ]
                                 ]
                             ]
                     ]
@@ -168,6 +177,44 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-first_name'                      : { },
+        '{{componentId}}-{{sectionId}}-vendor_id'                       : {
+            placeholder: 'SELECT VENDOR',
+            'ajax'          : {
+                url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                    if (response.vendors) {
+                        var vendorsData = [];
+                        for (var item of response.vendors) {
+                            vendorsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: vendorsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
+        },
         '{{componentId}}-{{sectionId}}-last_name'                       : { },
         '{{componentId}}-{{sectionId}}-contact_manager_id'              : { },
         '{{componentId}}-{{sectionId}}-manager_full_name'               : {
@@ -389,7 +436,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
         '{{componentId}}-{{sectionId}}-contact_other'                   : { },
         '{{componentId}}-{{sectionId}}-contact_notes'                   : { },
-        '{{componentId}}-{{sectionId}}-internal_notes'                  : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules       : {
@@ -397,6 +443,7 @@ dataCollectionSection =
                     required                                                : true,
                     email                                                   : true
                 },
+                '{{componentId}}-{{sectionId}}-vendor_id'                   : 'required',
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'required',
                 '{{componentId}}-{{sectionId}}-last_name'                   : 'required',
                 '{{componentId}}-{{sectionId}}-contact_phone'               : 'required',
@@ -404,6 +451,7 @@ dataCollectionSection =
             },
             messages    : {
                 '{{componentId}}-{{sectionId}}-account_email'               : 'Please enter contact email',
+                '{{componentId}}-{{sectionId}}-vendor_id'                   : 'Please select a vendor',
                 '{{componentId}}-{{sectionId}}-first_name'                  : 'Please enter first name',
                 '{{componentId}}-{{sectionId}}-last_name'                   : 'Please enter last name',
                 '{{componentId}}-{{sectionId}}-contact_phone'               : 'Please enter phone number',

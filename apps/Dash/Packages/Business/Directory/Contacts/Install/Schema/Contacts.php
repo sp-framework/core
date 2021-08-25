@@ -44,6 +44,13 @@ class Contacts
                     ]
                 ),
                 new Column(
+                    'vendor_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'first_name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
@@ -176,14 +183,13 @@ class Contacts
                         'notNull' => false,
                     ]
                 ),
-                new Column(
-                    'internal_notes',
+                new Column(//Encrypted text field with CC information of the customer. The key is with customer and cannot be viewed even if the data is stolen.
+                    'cc_details',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 2048,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TEXT,
+                        'notNull'       => false,
                     ]
-                )
+                ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

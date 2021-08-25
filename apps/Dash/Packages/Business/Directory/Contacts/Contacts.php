@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Business\Directory\Contacts;
 
 use Apps\Dash\Packages\Business\Directory\Contacts\Model\BusinessDirectoryContacts;
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -14,6 +15,19 @@ class Contacts extends BasePackage
     protected $packageName = 'contacts';
 
     public $contacts;
+
+    public function getContactById(int $id)
+    {
+        $contactModel = new $this->modelToUse;
+
+        $contactObj = $contactModel::findFirstById($id);
+
+        $contact = $contactObj->toArray();
+
+        unset($contact['cc_details']);
+
+        return $contact;
+    }
 
     /**
      * @notification(name=add)
@@ -31,13 +45,19 @@ class Contacts extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['portrait']);
             }
 
-            $this->packagesData->responseCode = 0;
+            $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
 
-            $this->packagesData->responseMessage = 'Added ' . $data['full_name'] . ' contact';
+            $data['id'] = $this->packagesData->last['id'];
+
+            $this->update($data);
+
+            $this->basepackages->notes->addNote($this->packageName, $data);
+
+            $this->addResponse('Added ' . $data['full_name'] . ' contact');
+
+            $this->addToNotification('add', 'Added new contact ' . $data['full_name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new contact.';
+            $this->addResponse('Error adding new contact.', 1);
         }
     }
 
@@ -46,6 +66,10 @@ class Contacts extends BasePackage
      */
     public function updateContact(array $data)
     {
+        $contact = $this->getById($data['id']);
+
+        $data['account_id'] = $contact['account_id'];
+
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
         if (isset($data['address_ids'])) {
@@ -59,20 +83,22 @@ class Contacts extends BasePackage
             }
         }
 
-        $contact = $this->getById($data['id']);
-
         if ($this->update($data)) {
             if (isset($data['portrait'])) {
                 $this->basepackages->storages->changeOrphanStatus($data['portrait'], $contact['portrait']);
             }
 
-            $this->packagesData->responseCode = 0;
+            $data['account_id'] = $this->addUpdateAccount($data);
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['full_name'] . ' contact';
+            $this->update($data);
+
+            $this->basepackages->notes->addNote($this->packageName, $data);
+
+            $this->addResponse('Updated ' . $data['full_name'] . ' contact');
+
+            $this->addToNotification('update', 'Updated contact ' . $data['full_name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating contact.';
+            $this->addResponse('Error updating contact.', 1);
         }
     }
 
@@ -90,13 +116,55 @@ class Contacts extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus(null, $contact['portrait']);
             }
 
-            $this->packagesData->responseCode = 0;
+            $this->basepackages->accounts->removeAccount(['id' => $contact['account_id']]);
 
-            $this->packagesData->responseMessage = 'Removed contact';
+            $this->addResponse('Removed contact');
         } else {
-            $this->packagesData->responseCode = 1;
+            $this->addResponse('Error removing contact.', 1);
+        }
+    }
 
-            $this->packagesData->responseMessage = 'Error removing contact.';
+    protected function addUpdateAccount($data)
+    {
+        $vendors = $this->usePackage(Vendors::class);
+
+        $vendorArr = $vendors->getById($data['vendor_id']);
+
+        if ($vendorArr['is_b2b_customer'] == '1') {
+            $data['package_name'] = 'contacts';
+            $data['package_row_id'] = $data['id'];
+
+            unset($data['id']);
+
+            $data['email'] = $data['account_email'];
+
+            if (isset($data['account_id']) &&
+                $data['account_id'] != '' &&
+                $data['account_id'] != '0'
+            ) {
+                $data['id'] = $data['account_id'];
+
+                try {
+                    $this->basepackages->accounts->updateAccount($data);
+
+                    return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
+                } catch (\Exception $e) {
+                    $this->addResponse('Error adding/updating contact account. Please contact administrator', 1);
+                }
+            } else {
+                $data['role_id'] = '0';
+                $data['override_role'] = '0';
+                $data['permissions'] = '[]';
+                $data['can_login'] = '';
+
+                try {
+                    $this->basepackages->accounts->addAccount($data);
+
+                    return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
+                } catch (\Exception $e) {
+                    $this->addResponse('Error adding/updating contact account. Please contact administrator', 1);
+                }
+            }
         }
     }
 
@@ -219,5 +287,40 @@ class Contacts extends BasePackage
         foreach ($ids as $id) {
             $this->basepackages->addressbook->removeAddress(['id' => $id]);
         }
+    }
+
+    public function getContactSources()
+    {
+        return
+            [
+                [
+                    'id'            => 'phone_call',
+                    'name'          => 'Phone Call'
+                ],
+                [
+                    'id'            => 'email',
+                    'name'          => 'Email'
+                ],
+                [
+                    'id'            => 'website',
+                    'name'          => 'Website'
+                ],
+                [
+                    'id'            => 'tv',
+                    'name'          => 'Tv'
+                ],
+                [
+                    'id'            => 'radio',
+                    'name'          => 'Radio'
+                ],
+                [
+                    'id'            => 'walk_ins',
+                    'name'          => 'Walk Ins'
+                ],
+                [
+                    'id'            => 'contact_referrer',
+                    'name'          => 'Contact Referrer'
+                ]
+            ];
     }
 }

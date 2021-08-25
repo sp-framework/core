@@ -73,8 +73,13 @@ class VendorsComponent extends BaseComponent
 
             $this->view->taxes = $this->usePackage(Taxes::class)->getAll()->taxes;
 
+            $this->view->b2bAccountManagers = [];
+
             if ($this->getData()['id'] != 0) {
+
                 $vendor = $this->vendors->getVendorById($this->getData()['id']);
+
+                $this->view->b2bAccountManagers = $vendor['b2bAccountManagers'];
 
                 $vendor['activityLogs'] = $this->vendors->getActivityLogs($this->getData()['id']);
 
@@ -229,14 +234,12 @@ class VendorsComponent extends BaseComponent
 
             $this->vendors->addVendor($this->postData());
 
-            $this->view->responseCode = $this->vendors->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->vendors->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->vendors->packagesData->responseMessage,
+                $this->vendors->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -253,14 +256,12 @@ class VendorsComponent extends BaseComponent
 
             $this->vendors->updateVendor($this->postData());
 
-            $this->view->responseCode = $this->vendors->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->vendors->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->vendors->packagesData->responseMessage,
+                $this->vendors->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -273,14 +274,12 @@ class VendorsComponent extends BaseComponent
 
             $this->vendors->removeVendor($this->postData());
 
-            $this->view->responseCode = $this->vendors->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->vendors->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->vendors->packagesData->responseMessage,
+                $this->vendors->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -327,26 +326,6 @@ class VendorsComponent extends BaseComponent
 
                 $this->view->responseMessage = 'vendor id missing';
             }
-        }
-    }
-
-    public function addNoteAction()
-    {
-        if ($this->request->isPost()) {
-            if (!$this->checkCSRF()) {
-                return;
-            }
-
-            $this->vendors->addNote($this->postData());
-
-            $this->view->responseCode = $this->vendors->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->vendors->packagesData->responseMessage;
-
-        } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
         }
     }
 }

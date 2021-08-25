@@ -366,23 +366,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-business_name_list'      : {
             placeholder : 'SELECT A BUSINESS NAME',
         },
-        '{{componentId}}-{{sectionId}}-type'                    : { },
-        '{{componentId}}-{{sectionId}}-is_manufacturer'         : { },
-        '{{componentId}}-{{sectionId}}-is_supplier'             : { },
-        '{{componentId}}-{{sectionId}}-does_dropship'           : { },
-        '{{componentId}}-{{sectionId}}-is_service_provider'     : { },
-        '{{componentId}}-{{sectionId}}-does_jobwork'            : { },
-        '{{componentId}}-{{sectionId}}-is_b2b_customer'         : {
-            afterInit: function() {
-                $('#{{componentId}}-{{sectionId}}-is_b2b_customer').click(function() {
-                    if ($('#{{componentId}}-{{sectionId}}-is_b2b_customer')[0].checked === true) {
-                        $('#b2b').attr('hidden', false);
-                    } else {
-                        $('#b2b').attr('hidden', true);
-                    }
-                });
-            }
-        },
         '{{componentId}}-{{sectionId}}-brands'                  : {
             'placeholder'   : "VENDOR BRAND(s)",
             'tags'          : true,
@@ -434,6 +417,64 @@ dataCollectionSection =
                     newTag: true
                 }
             }
+        },
+        '{{componentId}}-{{sectionId}}-is_manufacturer'         : { },
+        '{{componentId}}-{{sectionId}}-is_supplier'             : { },
+        '{{componentId}}-{{sectionId}}-does_dropship'           : { },
+        '{{componentId}}-{{sectionId}}-is_service_provider'     : { },
+        '{{componentId}}-{{sectionId}}-does_jobwork'            : { },
+        '{{componentId}}-{{sectionId}}-is_b2b_customer'         : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-is_b2b_customer').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-is_b2b_customer')[0].checked === true) {
+                        $('#b2b').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-b2b_account_managers').parents('.form-group').removeClass('d-none');
+                    } else {
+                        $('#b2b').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-b2b_account_managers').parents('.form-group').addClass('d-none');
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-b2b_account_managers'    : {
+            'placeholder'   : "B2B ACCOUNT MANAGER(s)",
+            'tags'          : true,
+            'ajax'          : {
+                url         : "{{links.url('hrms/employees/searchEmployee')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+
+                    if (response.responseData && response.responseData.employees) {
+                        var employeesData = [];
+                        for (var item of response.responseData.employees) {
+                            employeesData.push({
+                                'id' : item['id'],
+                                'text' : item['full_name']
+                            });
+                        }
+
+                        return {
+                            results: employeesData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2
         },
         '{{componentId}}-{{sectionId}}-acn'                     : { },
         '{{componentId}}-{{sectionId}}-currency'                : {

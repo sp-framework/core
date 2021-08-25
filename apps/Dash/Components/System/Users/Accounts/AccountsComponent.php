@@ -3,6 +3,9 @@
 namespace Apps\Dash\Components\System\Users\Accounts;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
+use Apps\Dash\Packages\Business\Directory\Contacts\Contacts;
+use Apps\Dash\Packages\Crms\Customers\Customers;
+use Apps\Dash\Packages\Hrms\Employees\Employees;
 use System\Base\BaseComponent;
 
 class AccountsComponent extends BaseComponent
@@ -18,6 +21,12 @@ class AccountsComponent extends BaseComponent
         $this->accounts = $this->basepackages->accounts;
 
         $this->roles = $this->basepackages->roles;
+
+        $this->contacts = $this->usePackage(Contacts::class);
+
+        $this->employees = $this->usePackage(Employees::class);
+
+        $this->customers = $this->usePackage(Customers::class);
     }
 
     /**
@@ -55,15 +64,14 @@ class AccountsComponent extends BaseComponent
         }
 
         if ($this->request->isPost()) {
-            $rolesIdToName = [];
-            foreach ($this->roles->getAll()->roles as $roleKey => $roleValue) {
-                $rolesIdToName[$roleValue['id']] = $roleValue['name'] . ' (' . $roleValue['id'] . ')';
-            }
-
             $replaceColumns =
-                [
-                    'role_id' => ['html'  => $rolesIdToName]
-                ];
+                function ($dataArr) {
+                    if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                        return $this->replaceColumns($dataArr);
+                    }
+
+                    return $dataArr;
+                };
         } else {
             $replaceColumns = null;
         }
@@ -81,16 +89,112 @@ class AccountsComponent extends BaseComponent
             $this->accounts,
             'system/users/accounts/view',
             null,
-            ['email', 'role_id', 'first_name', 'last_name'],
+            ['package_row_id', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
             true,
-            ['email', 'role_id', 'first_name', 'last_name'],
+            ['package_row_id', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
             $controlActions,
-            ['role_id' => 'role (ID)'],
+            ['role_id' => 'role (ID)', 'package_name' => 'Used By', 'package_row_id' => 'link'],
             $replaceColumns,
             'email'
         );
 
         $this->view->pick('accounts/list');
+    }
+
+    protected function replaceColumns($dataArr)
+    {
+        $rolesArr = $this->roles->getAll()->roles;
+
+        foreach ($rolesArr as $key => $role) {
+            $roles[$role['id']] = $role;
+        }
+
+        foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->formatRoles($data, $roles);
+
+            if ($data['package_name'] === 'profiles') {
+                $data['package_row_id'] = '-';
+                $data['package_name'] = '-';
+            } else if ($data['package_name'] === 'contacts') {
+                $data = $this->getContactsData($data, $dataKey);
+            } else if ($data['package_name'] === 'employees') {
+                $data = $this->getEmployeesData($data, $dataKey);
+            } else if ($data['package_name'] === 'customers') {
+                $data = $this->getCustomersData($data, $dataKey);
+            }
+
+            $data['package_name'] = ucfirst($data['package_name']);
+        }
+
+        return $dataArr;
+    }
+
+    protected function formatRoles($data, $roles)
+    {
+        if ($data['role_id'] == '0') {
+            $data['role_id'] = 'Not Assigned';
+        } else {
+            $data['role_id'] = $roles[$data['role_id']]['name'] . ' (' . $data['role_id'] . ')';
+        }
+
+        return $data;
+    }
+
+    protected function getContactsData($data, $rowId = null)
+    {
+        $contact = $this->contacts->getById($data['package_row_id']);
+
+        if ($contact) {
+            $data['first_name'] = $contact['first_name'];
+            $data['last_name'] = $contact['last_name'];
+
+            if (isset($rowId)) {
+                $data['package_row_id'] =
+                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('business/directory/contacts/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
+                        <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                    </a>';
+            }
+        }
+
+        return $data;
+    }
+
+    protected function getEmployeesData($data, $rowId = null)
+    {
+        $employee = $this->employees->getById($data['package_row_id']);
+
+        if ($employee) {
+            $data['first_name'] = $employee['first_name'];
+            $data['last_name'] = $employee['last_name'];
+
+            if (isset($rowId)) {
+                $data['package_row_id'] =
+                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('hrms/employees/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
+                        <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                    </a>';
+            }
+        }
+
+        return $data;
+    }
+
+    protected function getCustomersData($data, $rowId = null)
+    {
+        $customer = $this->customers->getById($data['package_row_id']);
+
+        if ($customer) {
+            $data['first_name'] = $customer['first_name'];
+            $data['last_name'] = $customer['last_name'];
+
+            if (isset($rowId)) {
+                $data['package_row_id'] =
+                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('crms/customers/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
+                        <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                    </a>';
+            }
+        }
+
+        return $data;
     }
 
     /**

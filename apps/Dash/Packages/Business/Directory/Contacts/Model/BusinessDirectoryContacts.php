@@ -12,13 +12,25 @@ class BusinessDirectoryContacts extends BaseModel
 
     public $account_id;
 
+    public $account_email;
+
+    public $vendor_id;
+
     public $first_name;
 
     public $last_name;
 
     public $full_name;
 
-    public $contact_address_ids;
+    public $job_title;
+
+    public $contact_manager_id;
+
+    public $contact_source;
+
+    public $contact_source_details;
+
+    public $contact_referrer_id;
 
     public $contact_phone;
 
@@ -28,7 +40,15 @@ class BusinessDirectoryContacts extends BaseModel
 
     public $contact_fax;
 
+    public $contact_secondary_email;
+
+    public $cc_emails_to_secondary_email;
+
     public $contact_other;
 
     public $contact_notes;
+
+    public $address_ids;
+
+    public $cc_details;
 }

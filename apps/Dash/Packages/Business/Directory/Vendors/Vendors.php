@@ -5,6 +5,7 @@ namespace Apps\Dash\Packages\Business\Directory\Vendors;
 use Apps\Dash\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendors;
 use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendorsFinancialDetails;
+use Apps\Dash\Packages\Hrms\Employees\Employees;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -24,6 +25,24 @@ class Vendors extends BasePackage
         $vendorObj = $vendorModel::findFirstById($id);
 
         $vendor = $vendorObj->toArray();
+
+        $vendor['b2bAccountManagers'] = [];
+
+        if ($vendor['b2b_account_managers'] !== '') {
+            $vendor['b2b_account_managers'] = Json::decode($vendor['b2b_account_managers'], true);
+
+            if (count($vendor['b2b_account_managers']) > 0) {
+
+                $employees = $this->usePackage(Employees::class);
+
+                foreach ($vendor['b2b_account_managers'] as $employeeKey => $employee) {
+                    if ($employees->searchById($employee)) {
+                        $vendor['b2bAccountManagers'][$employeeKey]['id'] = $employees->packagesData->employee['id'];
+                        $vendor['b2bAccountManagers'][$employeeKey]['full_name'] = $employees->packagesData->employee['full_name'];
+                    }
+                }
+            }
+        }
 
         $financialDetailsObj = $vendorObj->getFinancial_details();
 
@@ -46,11 +65,17 @@ class Vendors extends BasePackage
 
         $data = $this->addBrands($data);
 
+        $data = $this->addB2bAccountManagers($data);
+
         $data = $this->updateContacts($data);
 
         $data = $this->updateAddresses($data);
 
         if ($this->add($data)) {
+            if ($data['is_b2b_customer'] == '0') {
+                $this->disableVendorContactAccounts($data['id']);
+            }
+
             $this->basepackages->storages->changeOrphanStatus($data['logo']);
 
             $data['vendor_id'] = $this->packagesData->last['id'];
@@ -88,6 +113,8 @@ class Vendors extends BasePackage
 
         $data = $this->addBrands($data);
 
+        $data = $this->addB2bAccountManagers($data);
+
         $data = $this->updateContacts($data);
 
         $data = $this->updateAddresses($data);
@@ -100,6 +127,10 @@ class Vendors extends BasePackage
         }
 
         if ($this->update($data)) {
+            if ($data['is_b2b_customer'] == '0') {
+                $this->disableVendorContactAccounts($data['id']);
+            }
+
             $this->updateFinancialDetails($data);
 
             $this->basepackages->storages->changeOrphanStatus($data['logo'], $vendor['logo']);
@@ -141,6 +172,37 @@ class Vendors extends BasePackage
             $this->addToNotification('remove', 'Removed vendor ' . $vendor['business_name']);
         } else {
             $this->addResponse('Error removing vendor.', 1);
+        }
+    }
+
+    protected function disableVendorContactAccounts($vendorId)
+    {
+        $contactsPackage = $this->usePackage(Contacts::class);
+
+        $condition =
+            [
+                'conditions'    => 'vendor_id = :vid:',
+                'bind'          =>
+                    [
+                        'vid'   => $vendorId
+                    ]
+            ];
+
+        $contacts = $contactsPackage->getByParams($condition);
+
+        if ($contacts && count($contacts) > 0) {
+            foreach ($contacts as $contactKey => $contact) {
+                if ($contact['account_id'] !== '0') {
+
+                    $accountObj = new \System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
+
+                    $account = $accountObj::findFirstById($contact['account_id']);
+
+                    if ($account) {
+                        $this->basepackages->accounts->removeRelatedData($account, false);
+                    }
+                }
+            }
         }
     }
 
@@ -212,6 +274,15 @@ class Vendors extends BasePackage
         }
 
         $data['brands'] = Json::encode($data['brands']['data']);
+
+        return $data;
+    }
+
+    protected function addB2bAccountManagers(array $data)
+    {
+        $data['b2b_account_managers'] = Json::decode($data['b2b_account_managers'], true);
+
+        $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']['data']);
 
         return $data;
     }

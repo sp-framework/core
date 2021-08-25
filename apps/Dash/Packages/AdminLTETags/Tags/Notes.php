@@ -90,7 +90,7 @@ class Notes extends AdminLTETags
                                     'fieldHelpTooltipContent'               => 'Select Note Type',
                                     'fieldRequired'                         => false,
                                     'fieldBazScan'                          => true,
-                                    'fieldBazJstreeSearch'                  => false,
+                                    'fieldBazJstreeSearch'                  => true,
                                     'fieldBazPostOnCreate'                  => true,
                                     'fieldBazPostOnUpdate'                  => true,
                                     'fieldDataSelect2Options'               => $this->notesSettings['noteTypes'],
@@ -109,13 +109,13 @@ class Notes extends AdminLTETags
                                     'componentId'                           => $this->params['componentId'],
                                     'sectionId'                             => $this->params['sectionId'],
                                     'fieldId'                               => 'note_app_visibility',
-                                    'fieldLabel'                            => 'Note App Visibility',
+                                    'fieldLabel'                            => 'App Visibility',
                                     'fieldType'                             => 'select2',
                                     'fieldHelp'                             => true,
-                                    'fieldHelpTooltipContent'               => 'Select note app visibility. Visible on all apps if none selected.',
+                                    'fieldHelpTooltipContent'               => 'Select app visibility. Visible on all apps if none selected.',
                                     'fieldRequired'                         => false,
                                     'fieldBazScan'                          => true,
-                                    'fieldBazJstreeSearch'                  => false,
+                                    'fieldBazJstreeSearch'                  => true,
                                     'fieldBazPostOnCreate'                  => true,
                                     'fieldBazPostOnUpdate'                  => true,
                                     'fieldDataSelect2Multiple'              => true,
@@ -141,7 +141,7 @@ class Notes extends AdminLTETags
                                     'fieldHelpTooltipContent'               => 'Only you can access the note.',
                                     'fieldRequired'                         => false,
                                     'fieldBazScan'                          => true,
-                                    'fieldBazJstreeSearch'                  => false,
+                                    'fieldBazJstreeSearch'                  => true,
                                     'fieldBazPostOnCreate'                  => true,
                                     'fieldBazPostOnUpdate'                  => true
                                 ]
@@ -164,7 +164,7 @@ class Notes extends AdminLTETags
                                     'fieldHelpTooltipContent'               => 'Note content',
                                     'fieldRequired'                         => false,
                                     'fieldBazScan'                          => true,
-                                    'fieldBazJstreeSearch'                  => false,
+                                    'fieldBazJstreeSearch'                  => true,
                                     'fieldBazPostOnCreate'                  => true,
                                     'fieldBazPostOnUpdate'                  => true
                                 ]
@@ -191,7 +191,7 @@ class Notes extends AdminLTETags
                                         'fieldHelp'                     => true,
                                         'fieldHelpTooltipContent'       => 'Max: 5 attachments.',
                                         'fieldBazScan'                  => true,
-                                        'fieldBazJstreeSearch'          => false,
+                                        'fieldBazJstreeSearch'          => true,
                                         'fieldBazPostOnCreate'          => true,
                                         'fieldBazPostOnUpdate'          => true,
                                         'maxAttachments'                => 5,
@@ -462,7 +462,7 @@ class Notes extends AdminLTETags
                         placeholder : "SELECT NOTE TYPE"
                     },
                     "' . $this->compSecId . '-note_app_visibility"          : {
-                        placeholder : "SELECT NOTE APP VISIBILITY"
+                        placeholder : "SELECT APP VISIBILITY"
                     },
                     "' . $this->compSecId . '-is_private"                   : {
                     },

@@ -3,6 +3,7 @@
     {% set contactId = contact['id'] %}
     {% set contactAccountId = contact['account_id'] %}
     {% set contactAccountEmail = contact['account_email'] %}
+    {% set contactVendorId = contact['vendor_id'] %}
     {% set contactFirstName = contact['first_name'] %}
     {% set contactLastName = contact['last_name'] %}
     {% set contactJobTitle = contact['job_title'] %}
@@ -17,6 +18,7 @@
     {% set contactId = '' %}
     {% set contactAccountId = '' %}
     {% set contactAccountEmail = '' %}
+    {% set contactVendorId = '' %}
     {% set contactFirstName = '' %}
     {% set contactLastName = '' %}
     {% set contactJobTitle = '' %}
@@ -107,8 +109,33 @@
                         'fieldBazPostOnUpdate'                  : true,
                         'fieldRequired'                         : true,
                         'fieldDataInputMinLength'               : 1,
-                        'fieldDataInputMaxLength'               : 100,
+                        'fieldDataInputMaxLength'               : 50,
                         'fieldValue'                            : contactAccountEmail
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'vendor_id',
+                        'fieldLabel'                           : 'Vendor',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select the vendor for this account.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : vendor,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'business_name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : contactVendorId
                     ]
                 )}}
             </div>
@@ -230,62 +257,25 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'contact_source',
-                        'fieldLabel'                     : 'Contact Source',
-                        'fieldType'                      : 'select2',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Source where you got the contact information from.',
-                        'fieldRequired'                  : false,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataSelect2Options'        :
-                            [
-                                'phone_call'            :
-                                    [
-                                        'id'            : 'phone_call',
-                                        'name'          : 'Phone Call'
-                                    ],
-                                'email'            :
-                                    [
-                                        'id'            : 'email',
-                                        'name'          : 'Email'
-                                    ],
-                                'website'            :
-                                    [
-                                        'id'            : 'website',
-                                        'name'          : 'Website'
-                                    ],
-                                'tv'            :
-                                    [
-                                        'id'            : 'tv',
-                                        'name'          : 'Tv'
-                                    ],
-                                'radio'            :
-                                    [
-                                        'id'            : 'radio',
-                                        'name'          : 'Radio'
-                                    ],
-                                'walk_ins'            :
-                                    [
-                                        'id'            : 'walk_ins',
-                                        'name'          : 'Walk Ins'
-                                    ],
-                                'contact_referrer'            :
-                                    [
-                                        'id'            : 'contact_referrer',
-                                        'name'          : 'Contact Referrer'
-                                    ]
-                            ],
-                        'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'name',
-                        'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : contactSource
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'contact_source',
+                        'fieldLabel'                            : 'Contact Source',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Source where you got the contact information from.',
+                        'fieldRequired'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataSelect2Options'               : contactSources,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : contactSource
                     ]
                 )}}
             </div>

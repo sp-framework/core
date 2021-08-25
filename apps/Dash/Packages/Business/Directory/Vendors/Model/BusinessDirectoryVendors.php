@@ -29,6 +29,8 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $is_b2b_customer;
 
+    public $b2b_account_managers;
+
     public $brands;
 
     public $product_count;
