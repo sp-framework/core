@@ -4,7 +4,7 @@ namespace Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Schema;
 
 use Phalcon\Db\Column;
 
-class ImsStockPurchaseOrders
+class ImsStockPurchaseOrdersProducts
 {
     public function columns()
     {
@@ -21,93 +21,113 @@ class ImsStockPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'entity_id',
+                    'purchase_order_id',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_INTEGER,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'reference_orders',
+                    'seq',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
-                        'notNull' => false
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true
                     ]
                 ),
                 new Column(
-                    'expected_delivery_date',
+                    'mpn',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 12,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'product_title',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'use_vendor_tax',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'tax',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'tax_rate',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'use_vendor_discount',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'product_discount',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
                         'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'status',
-                    [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'vendor_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'vendor_address_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'vendor_contact_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'delivery_address_id',
-                    [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
-                    ]
-                ),
-                new Column(
-                    'delivery_contact_fullname',
+                    'product_discount_rate',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
-                        'notNull' => true,
+                        'size'    => 20,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(
-                    'delivery_contact_phone',
+                    'product_qty',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
+                        'size'    => 20,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'delivery_instructions',
+                    'product_unit_price',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 2048,
-                        'notNull'       => false,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'attachments',
+                    'product_unit_price_incl_tax',
                     [
-                        'type'              => Column::TYPE_VARCHAR,
-                        'size'              => 2048,
-                        'notNull'           => false,
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 10,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'product_amount',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => true,
                     ]
                 ),
             ],

@@ -44,6 +44,10 @@ class Vendors extends BasePackage
             }
         }
 
+        $contacts = $this->usePackage(Contacts::class);
+
+        $vendor['contact_ids'] = $contacts->searchByVendorId($vendor['id']);
+
         $financialDetailsObj = $vendorObj->getFinancial_details();
 
         $financialDetails = $financialDetailsObj->toArray();
@@ -67,18 +71,16 @@ class Vendors extends BasePackage
 
         $data = $this->addB2bAccountManagers($data);
 
-        $data = $this->updateContacts($data);
+        // $data = $this->updateContacts($data);
 
         $data = $this->updateAddresses($data);
 
         if ($this->add($data)) {
-            if ($data['is_b2b_customer'] == '0') {
-                $this->disableVendorContactAccounts($data['id']);
-            }
-
             $this->basepackages->storages->changeOrphanStatus($data['logo']);
 
             $data['vendor_id'] = $this->packagesData->last['id'];
+
+            // $this->updateContacts($data);
 
             $this->addFinancialDetails($data);
 
@@ -115,7 +117,7 @@ class Vendors extends BasePackage
 
         $data = $this->addB2bAccountManagers($data);
 
-        $data = $this->updateContacts($data);
+        // $data = $this->updateContacts($data);
 
         $data = $this->updateAddresses($data);
 
@@ -130,6 +132,10 @@ class Vendors extends BasePackage
             if ($data['is_b2b_customer'] == '0') {
                 $this->disableVendorContactAccounts($data['id']);
             }
+
+            $data['vendor_id'] = $data['id'];
+
+            // $this->updateContacts($data);
 
             $this->updateFinancialDetails($data);
 
@@ -262,18 +268,22 @@ class Vendors extends BasePackage
 
         $data['brands'] = Json::decode($data['brands'], true);
 
-        if (isset($data['brands']['newTags']) &&
-            count($data['brands']['newTags']) > 0
-        ) {
-            foreach ($data['brands']['newTags'] as $brand) {
-                $newBrand = $brands->add(['name' => $brand]);
-                if ($newBrand) {
-                    array_push($data['brands']['data'], $brands->packagesData->last['id']);
+        if (isset($data['brands']['data'])) {
+            if (isset($data['brands']['newTags']) &&
+                count($data['brands']['newTags']) > 0
+            ) {
+                foreach ($data['brands']['newTags'] as $brand) {
+                    $newBrand = $brands->add(['name' => $brand]);
+                    if ($newBrand) {
+                        array_push($data['brands']['data'], $brands->packagesData->last['id']);
+                    }
                 }
             }
-        }
 
-        $data['brands'] = Json::encode($data['brands']['data']);
+            $data['brands'] = Json::encode($data['brands']['data']);
+        } else {
+            $data['brands'] = Json::encode($data['brands']);
+        }
 
         return $data;
     }
@@ -282,7 +292,11 @@ class Vendors extends BasePackage
     {
         $data['b2b_account_managers'] = Json::decode($data['b2b_account_managers'], true);
 
-        $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']['data']);
+        if (isset($data['b2b_account_managers']['data'])) {
+            $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']['data']);
+        } else {
+            $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']);
+        }
 
         return $data;
     }
@@ -389,48 +403,50 @@ class Vendors extends BasePackage
         return $filter;
     }
 
-    protected function updateContacts($data)
-    {
-        if ($data['contact_ids'] !== '') {
-            $data['contact_ids'] = Json::decode($data['contact_ids'], true);
+    // protected function updateContacts($data)
+    // {
+    //     if ($data['contact_ids'] !== '') {
+    //         $data['contact_ids'] = Json::decode($data['contact_ids'], true);
 
-            $contactsIds = [];
-            if (count($data['contact_ids']) > 0) {
-                $contacts = $this->usePackage(Contacts::class);
+    //         $contactsIds = [];
+    //         if (count($data['contact_ids']) > 0) {
+    //             $contacts = $this->usePackage(Contacts::class);
 
-                $data['contact_ids'] = msort($data['contact_ids'], 'seq');
+    //             $data['contact_ids'] = msort($data['contact_ids'], 'seq');
 
-                foreach ($data['contact_ids'] as $contactKey => $contact) {
-                    if ($contact['new'] == 1) {
+    //             foreach ($data['contact_ids'] as $contactKey => $contact) {
+    //                 $contact['vendor_id'] = $data['vendor_id'];
 
-                        unset($contact['id']);
-                        unset($contact['new']);
-                        unset($contact['seq']);
+    //                 if ($contact['new'] == 1) {
 
-                        $contacts->addContact($contact);
-                    } else {
-                        $existingContact = $contacts->getById($contact['id']);
+    //                     unset($contact['id']);
+    //                     unset($contact['new']);
+    //                     unset($contact['seq']);
 
-                        unset($contact['id']);
-                        unset($contact['new']);
-                        unset($contact['seq']);
+    //                     $contacts->addContact($contact);
+    //                 } else {
+    //                     $existingContact = $contacts->getById($contact['id']);
 
-                        $contact = array_merge($existingContact, $contact);
+    //                     unset($contact['id']);
+    //                     unset($contact['new']);
+    //                     unset($contact['seq']);
 
-                        unset($contact['address_ids']);
+    //                     $contact = array_merge($existingContact, $contact);
 
-                        $contacts->updateContact($contact);
-                    }
+    //                     unset($contact['address_ids']);
 
-                    array_push($contactsIds, $contacts->packagesData->last['id']);
-                }
-            }
-        }
+    //                     $contacts->updateContact($contact);
+    //                 }
 
-        $data['contact_ids'] = Json::encode($contactsIds);
+    //                 array_push($contactsIds, $contacts->packagesData->last['id']);
+    //             }
+    //         }
+    //     }
 
-        return $data;
-    }
+    //     $data['contact_ids'] = Json::encode($contactsIds);
+
+    //     return $data;
+    // }
 
     protected function updateAddresses($data)
     {
@@ -492,7 +508,37 @@ class Vendors extends BasePackage
                 ]
             );
 
-        if (count($searchVendors) > 0) {
+        if ($searchVendors && count($searchVendors) > 0) {
+            $vendors = [];
+
+            foreach ($searchVendors as $vendorKey => $vendorValue) {
+                $vendors[$vendorKey]['id'] = $vendorValue['id'];
+                $vendors[$vendorKey]['name'] = $vendorValue['business_name'];
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->vendors = $vendors;
+
+            return true;
+        }
+    }
+
+    public function searchSuppliersManufacturersByName(string $nameQueryString)
+    {
+        $searchVendors =
+            $this->getByParams(
+                [
+                    'conditions'            => 'business_name LIKE :aBusinessName: AND is_supplier = :iss: AND is_manufacturer = :ism:',
+                    'bind'                  => [
+                        'aBusinessName'     => '%' . $nameQueryString . '%',
+                        'iss'               => '1',
+                        'ism'               => '1'
+                    ]
+                ]
+            );
+
+        if ($searchVendors && count($searchVendors) > 0) {
             $vendors = [];
 
             foreach ($searchVendors as $vendorKey => $vendorValue) {
@@ -528,17 +574,17 @@ class Vendors extends BasePackage
                 }
             }
 
-            if ($vendor['contact_ids'] && $vendor['contact_ids'] !== '') {
-                $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
+            // if ($vendor['contact_ids'] && $vendor['contact_ids'] !== '') {
+            //     $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
 
-                $contacts = $this->usePackage(Contacts::class);
+            //     $contacts = $this->usePackage(Contacts::class);
 
-                foreach ($vendor['contact_ids'] as $contactKey => $contact) {
-                    $contactArr = $contacts->getById($contact);
+            //     foreach ($vendor['contact_ids'] as $contactKey => $contact) {
+            //         $contactArr = $contacts->getById($contact);
 
-                    $vendor['contact_ids'][$contactKey] = $contactArr;
-                }
-            }
+            //         $vendor['contact_ids'][$contactKey] = $contactArr;
+            //     }
+            // }
 
             $this->packagesData->responseCode = 0;
 

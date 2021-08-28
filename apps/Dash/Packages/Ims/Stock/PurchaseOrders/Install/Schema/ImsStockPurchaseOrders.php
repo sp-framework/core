@@ -28,19 +28,11 @@ class ImsStockPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'reference_orders',
+                    'references',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
                         'notNull' => false
-                    ]
-                ),
-                new Column(
-                    'expected_delivery_date',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 12,
-                        'notNull' => false,
                     ]
                 ),
                 new Column(
@@ -72,14 +64,57 @@ class ImsStockPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'delivery_address_id',
+                    'delivery_date',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 12,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'delivery_type',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'entity_location_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'location_contact_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'customer_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'customer_address_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'address_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'notNull' => true,
                     ]
                 ),
                 new Column(
-                    'delivery_contact_fullname',
+                    'contact_fullname',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
@@ -87,11 +122,43 @@ class ImsStockPurchaseOrders
                     ]
                 ),
                 new Column(
-                    'delivery_contact_phone',
+                    'contact_phone',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 15,
                         'notNull' => true,
+                    ]
+                ),
+                new Column(
+                    'total_quantity',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'total_tax',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'total_discount',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'total_amount',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 20,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(

@@ -221,7 +221,7 @@ class Multiple
                                                         <div class="col list-group-item-data">
                                                             <dl class="row mb-0">
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Email</dt>
-                                                                <dd class="mb-0 col-sm-8 cla-email">' . $employee['account_id'] . '</dd>
+                                                                <dd class="mb-0 col-sm-8 cla-email">' . $employee['account_email'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">Mobile</dt>
                                                                 <dd class="mb-0 col-sm-8 cla-mobile">' . $employee['contact_mobile'] . '</dd>
                                                                 <dt class="text-uppercase mb-0 col-sm-4">First Name</dt>
@@ -409,7 +409,7 @@ class Multiple
                             function toggleEmployeeFields(data) {
                                 if (data) {
                                     $("#' . $this->compSecId . '-employee_id").val(data.employee.id);
-                                    $("#' . $this->compSecId . '-account_id").val(data.employee.account_id);
+                                    $("#' . $this->compSecId . '-account_email").val(data.employee.account_email);
                                     $("#' . $this->compSecId . '-contact_mobile").val(data.employee.contact_mobile);
                                     $("#' . $this->compSecId . '-first_name").val(data.employee.first_name);
                                     $("#' . $this->compSecId . '-last_name").val(data.employee.last_name);
@@ -417,7 +417,7 @@ class Multiple
                                     $("#' . $this->compSecId . '-contact_phone_ext").val(data.employee.contact_phone_ext);
                                 } else {
                                     $("#' . $this->compSecId . '-employee_id").val("");
-                                    $("#' . $this->compSecId . '-account_id").val("");
+                                    $("#' . $this->compSecId . '-account_email").val("");
                                     $("#' . $this->compSecId . '-contact_mobile").val("");
                                     $("#' . $this->compSecId . '-first_name").val("");
                                     $("#' . $this->compSecId . '-last_name").val("");
@@ -427,9 +427,9 @@ class Multiple
                             }
 
                             function extractData() {
-                                if ($("#' . $this->compSecId . '-account_id").val() === "") {
-                                    $("#' . $this->compSecId . '-account_id").addClass("is-invalid");
-                                    $("#' . $this->compSecId . '-account_id").focus(function() {
+                                if ($("#' . $this->compSecId . '-account_email").val() === "") {
+                                    $("#' . $this->compSecId . '-account_email").addClass("is-invalid");
+                                    $("#' . $this->compSecId . '-account_email").focus(function() {
                                         $(this).removeClass("is-invalid");
                                     });
                                 } else if ($("#' . $this->compSecId . '-contact_mobile").val() === "") {
@@ -459,7 +459,7 @@ class Multiple
                                     data["employee_id"] = $("#' . $this->compSecId . '-employee_id").val();
                                     data["first_name"] = $("#' . $this->compSecId . '-first_name").val();
                                     data["last_name"] = $("#' . $this->compSecId . '-last_name").val();
-                                    data["account_id"] = $("#' . $this->compSecId . '-account_id").val();
+                                    data["account_email"] = $("#' . $this->compSecId . '-account_email").val();
                                     data["contact_mobile"] = $("#' . $this->compSecId . '-contact_mobile").val();
                                     data["contact_phone"] = $("#' . $this->compSecId . '-contact_phone").val();
                                     data["contact_phone_ext"] = $("#' . $this->compSecId . '-contact_phone_ext").val();
@@ -467,7 +467,7 @@ class Multiple
                                     var html =
                                         \'<dl class="row mb-0">\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Email</dt>\' +
-                                            \'<dd class="mb-0 col-sm-8 cla-email">\' + data["account_id"] + \'</dd>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-email">\' + data["account_email"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Mobile</dt>\' +
                                             \'<dd class="mb-0 col-sm-8 cla-mobile">\' + data["contact_mobile"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">First Name</dt>\' +
@@ -522,7 +522,7 @@ class Multiple
                                         $(employeesLi).each(function(index, li) {
                                             var email = $($(li).find(".cla-email")).html();
 
-                                            if (email.toLowerCase() === data["account_id"].toLowerCase()) {
+                                            if (email.toLowerCase() === data["account_email"].toLowerCase()) {
                                                 PNotify.error({"title" : "Employee with same email already added!"});
                                                 exists = true;
 
@@ -577,7 +577,7 @@ class Multiple
                                             data["id"] = $(dd).parents("li").data("employee-id");
                                             data["new"] = $(dd).parents("li").data("new");
                                             if ($(dd).is(".cla-email")) {
-                                                data["account_id"] = $(dd).html();
+                                                data["account_email"] = $(dd).html();
                                             } else if ($(dd).is(".cla-mobile")) {
                                                 data["contact_mobile"] = $(dd).html();
                                             } else if ($(dd).is(".cla-first-name")) {

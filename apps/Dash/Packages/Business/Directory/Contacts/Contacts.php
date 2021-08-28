@@ -51,6 +51,8 @@ class Contacts extends BasePackage
 
             $this->update($data);
 
+            // $this->updateVendorContacts($data);
+
             $this->basepackages->notes->addNote($this->packageName, $data);
 
             $this->addResponse('Added ' . $data['full_name'] . ' contact');
@@ -92,6 +94,8 @@ class Contacts extends BasePackage
 
             $this->update($data);
 
+            // $this->updateVendorContacts($data, $contact);
+
             $this->basepackages->notes->addNote($this->packageName, $data);
 
             $this->addResponse('Updated ' . $data['full_name'] . ' contact');
@@ -116,11 +120,64 @@ class Contacts extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus(null, $contact['portrait']);
             }
 
+            $this->updateVendorContacts($data);
+
             $this->basepackages->accounts->removeAccount(['id' => $contact['account_id']]);
 
             $this->addResponse('Removed contact');
         } else {
             $this->addResponse('Error removing contact.', 1);
+        }
+    }
+
+    protected function updateVendorContacts($data, $contact = null)
+    {
+        $vendors = $this->usePackage(Vendors::class);
+
+        if ($contact) {
+            if ($contact['vendor_id'] === $data['vendor_id']) {
+                return;
+            } else {
+                $vendorObj = $vendors->getModelToUse()::findFirstById($contact['vendor_id']);
+
+                if ($vendorObj) {
+                    $vendor = $vendorObj->toArray();
+
+                    $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
+
+                    if (in_array($contact['id'], $vendor['contact_ids'])) {
+                        $key = array_keys($vendor['contact_ids'], $contact['id']);
+
+                        if ($key) {
+                            array_splice($vendor['contact_ids'], $key[0], 1);
+                        }
+
+                        $vendor['contact_ids'] = Json::encode($vendor['contact_ids']);
+
+                        $vendorObj->assign($vendor);
+
+                        $vendorObj->update();
+                    }
+                }
+
+                $vendorObj = $vendors->getModelToUse()::findFirstById($data['vendor_id']);
+
+                if ($vendorObj) {
+                    $vendor = $vendorObj->toArray();
+
+                    $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
+
+                    if (!in_array($contact['id'], $vendor['contact_ids'])) {
+                        array_push($vendor['contact_ids'], $data['id']);
+
+                        $vendor['contact_ids'] = Json::encode($vendor['contact_ids']);
+
+                        $vendorObj->assign($vendor);
+
+                        $vendorObj->update();
+                    }
+                }
+            }
         }
     }
 
@@ -180,7 +237,7 @@ class Contacts extends BasePackage
                 ]
             );
 
-        if (count($searchContacts) > 0) {
+        if ($searchContacts && count($searchContacts) > 0) {
             $contacts = [];
 
             foreach ($searchContacts as $contactKey => $contactValue) {
@@ -208,7 +265,7 @@ class Contacts extends BasePackage
                 ]
             );
 
-        if (count($searchContacts) > 0) {
+        if ($searchContacts && count($searchContacts) > 0) {
             $contacts = [];
 
             foreach ($searchContacts as $contactKey => $contactValue) {
@@ -222,6 +279,29 @@ class Contacts extends BasePackage
 
             return true;
         }
+    }
+
+    public function searchByVendorId(int $vendorId)
+    {
+        $searchContacts =
+            $this->getByParams(
+                [
+                    'conditions'        => 'vendor_id = :vid:',
+                    'bind'              => [
+                        'vid'           => $vendorId
+                    ]
+                ]
+            );
+
+        if ($searchContacts && count($searchContacts) > 0) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->contacts = $searchContacts;
+
+            return $searchContacts;
+        }
+
+        return [];
     }
 
     public function searchById($id)

@@ -1,4 +1,6 @@
 {% if purchaseOrder['id'] is defined %}
+    {% set purchaseOrderDeliveryDate = purchaseOrder['delivery_date'] %}
+    {% set purchaseOrderDeliveryType = purchaseOrder['delivery_type'] %}
     {% set purchaseOrderDeliveryStreetAddress = purchaseOrder['street_address'] %}
     {% set purchaseOrderDeliveryStreetAddress2 = purchaseOrder['street_address_2'] %}
     {% set purchaseOrderDeliveryCityId = purchaseOrder['city_id'] %}
@@ -12,6 +14,8 @@
     {% set purchaseOrderDeliveryPhone = purchaseOrder['contact_phone'] %}
     {% set purchaseOrderDeliveryInstructions = purchaseOrder['delivery_instructions'] %}
 {% else %}
+    {% set purchaseOrderDeliveryDate = '' %}
+    {% set purchaseOrderDeliveryType = '' %}
     {% set purchaseOrderDeliveryStreetAddress = '' %}
     {% set purchaseOrderDeliveryStreetAddress2 = '' %}
     {% set purchaseOrderDeliveryCityId = '' %}
@@ -25,7 +29,104 @@
     {% set purchaseOrderDeliveryPhone = '' %}
     {% set purchaseOrderDeliveryInstructions = '' %}
 {% endif %}
+{% if purchaseOrderDeliveryType == '1' %}
+    {% set entityLocationDisabled = false %}
+    {% set customerDisabled = true %}
+    {% set locationOneoffDetails = '' %}
+    {% set customerDetails = 'hidden=""' %}
+    {% set locationContactIdDisabled = false %}
+    {% set locationContactIdHidden = false %}
+    {% set purchaseOrderDeliveryContactFullnameDisabled = true %}
+    {% set purchaseOrderDeliveryContactPhoneDisabled = true %}
+    {% set purchaseOrderEntityLocationId = purchaseOrder['entity_location_id'] %}
+    {% set purchaseOrderLocationContactId = purchaseOrder['location_contact_id'] %}
+    {% set purchaseOrderCustomerId = '' %}
+    {% set streetAddressFieldDisabled = true %}
+    {% set streetAddress2FieldDisabled = true %}
+    {% set cityFieldDisabled = true %}
+    {% set postCodeFieldDisabled = true %}
+    {% set stateFieldDisabled = true %}
+    {% set countryFieldDisabled = true %}
+{% elseif purchaseOrderDeliveryType == '2' %}
+    {% set entityLocationDisabled = true %}
+    {% set customerDisabled = false %}
+    {% set locationOneoffDetails = 'hidden=""' %}
+    {% set customerDetails = '' %}
+    {% set locationContactIdDisabled = true %}
+    {% set locationContactIdHidden = true %}
+    {% set purchaseOrderDeliveryContactFullnameDisabled = false %}
+    {% set purchaseOrderDeliveryContactPhoneDisabled = false %}
+    {% set purchaseOrderEntityLocationId = '' %}
+    {% set purchaseOrderLocationContactId = '' %}
+    {% set purchaseOrderCustomerId = purchaseOrder['customer_id'] %}
+    {% set streetAddressFieldDisabled = true %}
+    {% set streetAddress2FieldDisabled = true %}
+    {% set cityFieldDisabled = true %}
+    {% set postCodeFieldDisabled = true %}
+    {% set stateFieldDisabled = true %}
+    {% set countryFieldDisabled = true %}
+{% elseif purchaseOrderDeliveryType == '3' %}
+    {% set entityLocationDisabled = true %}
+    {% set customerDisabled = true %}
+    {% set locationOneoffDetails = '' %}
+    {% set customerDetails = 'hidden=""' %}
+    {% set locationContactIdDisabled = true %}
+    {% set locationContactIdHidden = true %}
+    {% set purchaseOrderDeliveryContactFullnameDisabled = false %}
+    {% set purchaseOrderDeliveryContactPhoneDisabled = false %}
+    {% set purchaseOrderEntityLocationId = '' %}
+    {% set purchaseOrderLocationContactId = '' %}
+    {% set purchaseOrderCustomerId = '' %}
+    {% set streetAddressFieldDisabled = false %}
+    {% set streetAddress2FieldDisabled = false %}
+    {% set cityFieldDisabled = false %}
+    {% set postCodeFieldDisabled = false %}
+    {% set stateFieldDisabled = false %}
+    {% set countryFieldDisabled = false %}
+{% else %}
+    {% set entityLocationDisabled = true %}
+    {% set customerDisabled = true %}
+    {% set locationOneoffDetails = '' %}
+    {% set customerDetails = 'hidden=""' %}
+    {% set locationContactIdDisabled = true %}
+    {% set locationContactIdHidden = true %}
+    {% set purchaseOrderDeliveryContactFullnameDisabled = true %}
+    {% set purchaseOrderDeliveryContactPhoneDisabled = true %}
+    {% set purchaseOrderEntityLocationId = '' %}
+    {% set purchaseOrderLocationContactId = '' %}
+    {% set purchaseOrderCustomerId = '' %}
+    {% set streetAddressFieldDisabled = true %}
+    {% set streetAddress2FieldDisabled = true %}
+    {% set cityFieldDisabled = true %}
+    {% set postCodeFieldDisabled = true %}
+    {% set stateFieldDisabled = true %}
+    {% set countryFieldDisabled = true %}
+{% endif %}
 <div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'delivery_date',
+                'fieldLabel'                     : 'Expected Delivery Date',
+                'fieldType'                      : 'flatpickr',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Expected delivery date for the purchase order.',
+                'fieldFlatpickrClearButton'      : true,
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMinLength'        : 1,
+                'fieldDataInputMaxLength'        : 10,
+                'fieldValue'                     : purchaseOrderDeliveryDate
+            ]
+        )}}
+    </div>
     <div class="col">
         {{adminltetags.useTag('fields',
             [
@@ -38,11 +139,11 @@
                 'fieldType'                            : 'select2',
                 'fieldHelp'                            : true,
                 'fieldHelpTooltipContent'              : 'Select a delivery type of the purchase order.',
-                'fieldRequired'                        : false,
+                'fieldRequired'                        : true,
                 'fieldBazScan'                         : true,
-                'fieldBazPostOnCreate'                 : false,
-                'fieldBazPostOnUpdate'                 : false,
-                'fieldBazJstreeSearch'                 : false,
+                'fieldBazPostOnCreate'                 : true,
+                'fieldBazPostOnUpdate'                 : true,
+                'fieldBazJstreeSearch'                 : true,
                 'fieldDataSelect2Options'              :
                     [
                         '1'     : [
@@ -61,7 +162,7 @@
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'name',
                 'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2OptionsSelected'      : ''
+                'fieldDataSelect2OptionsSelected'      : purchaseOrderDeliveryType
             ]
         )}}
     </div>
@@ -77,16 +178,38 @@
                 'fieldType'                                 : 'select2',
                 'fieldHelp'                                 : true,
                 'fieldHelpTooltipContent'                   : "Location of the selected entity",
-                'fieldDisabled'                             : true,
+                'fieldRequired'                             : true,
+                'fieldDisabled'                             : entityLocationDisabled,
                 'fieldBazScan'                              : true,
                 'fieldBazJstreeSearch'                      : true,
-                'fieldBazPostOnCreate'                      : false,
-                'fieldBazPostOnUpdate'                      : false,
-                'fieldDataSelect2Options'                   : [],
+                'fieldBazPostOnCreate'                      : true,
+                'fieldBazPostOnUpdate'                      : true,
+                'fieldDataSelect2Options'                   : locations,
                 'fieldDataSelect2OptionsKey'                : 'id',
                 'fieldDataSelect2OptionsValue'              : 'name',
                 'fieldDataSelect2OptionsArray'              : true,
-                'fieldDataSelect2OptionsSelected'           : ''
+                'fieldDataSelect2OptionsSelected'           : purchaseOrderEntityLocationId
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                                 : component,
+                'componentName'                             : componentName,
+                'componentId'                               : componentId,
+                'sectionId'                                 : sectionId,
+                'fieldId'                                   : 'location_address_id',
+                'fieldLabel'                                : 'Location Address',
+                'fieldType'                                 : 'input',
+                'fieldHelp'                                 : true,
+                'fieldDisabled'                             : true,
+                'fieldHidden'                               : true,
+                'fieldHelpTooltipContent'                   : 'Location Address',
+                'fieldRequired'                             : true,
+                'fieldBazScan'                              : true,
+                'fieldBazJstreeSearch'                      : true,
+                'fieldBazPostOnCreate'                      : true,
+                'fieldBazPostOnUpdate'                      : true,
+                'fieldValue'                                : ''
             ]
         )}}
     </div>
@@ -102,23 +225,24 @@
                 'fieldType'                                 : 'select2',
                 'fieldHelp'                                 : true,
                 'fieldHelpTooltipContent'                   : "Customer to dropship the purchase order",
-                'fieldDisabled'                             : true,
+                'fieldRequired'                             : true,
+                'fieldDisabled'                             : customerDisabled,
                 'fieldBazScan'                              : true,
                 'fieldBazJstreeSearch'                      : true,
-                'fieldBazPostOnCreate'                      : false,
-                'fieldBazPostOnUpdate'                      : false,
-                'fieldDataSelect2Options'                   : [],
+                'fieldBazPostOnCreate'                      : true,
+                'fieldBazPostOnUpdate'                      : true,
+                'fieldDataSelect2Options'                   : purchaseOrder['customer'],
                 'fieldDataSelect2OptionsKey'                : 'id',
-                'fieldDataSelect2OptionsValue'              : 'name',
+                'fieldDataSelect2OptionsValue'              : 'full_name',
                 'fieldDataSelect2OptionsArray'              : true,
-                'fieldDataSelect2OptionsSelected'           : ''
+                'fieldDataSelect2OptionsSelected'           : purchaseOrderCustomerId
             ]
         )}}
     </div>
 </div>
 <hr>
 <div class="row vdivide">
-    <div class="col">
+    <div class="col" id="{{componentId}}-{{sectionId}}-location_oneoff_details" {{locationOneoffDetails}}>
         <div class="row">
             <div class="col-md-12 col-sm-12">
                 {{adminltetags.useTag('addresses',
@@ -132,40 +256,126 @@
                         'searchType'                                  : 'city',
                         'streetAddress'                               : purchaseOrderDeliveryStreetAddress,
                         'streetAddressFieldRequired'                  : true,
-                        'streetAddressFieldDisabled'                  : true,
+                        'streetAddressFieldDisabled'                  : streetAddressFieldDisabled,
                         'streetAddressFieldBazPostOnCreate'           : true,
                         'streetAddressFieldBazPostOnUpdate'           : true,
                         'streetAddress2'                              : purchaseOrderDeliveryStreetAddress2,
                         'streetAddress2FieldBazPostOnCreate'          : true,
                         'streetAddress2FieldBazPostOnUpdate'          : true,
-                        'streetAddress2FieldDisabled'                 : true,
+                        'streetAddress2FieldDisabled'                 : streetAddress2FieldDisabled,
                         'cityId'                                      : purchaseOrderDeliveryCityId,
                         'cityName'                                    : purchaseOrderDeliveryCity,
                         'cityFieldRequired'                           : true,
-                        'cityFieldDisabled'                           : true,
+                        'cityFieldDisabled'                           : cityFieldDisabled,
                         'cityFieldBazPostOnCreate'                    : true,
                         'cityFieldBazPostOnUpdate'                    : true,
                         'postCode'                                    : purchaseOrderDeliveryPostCode,
                         'postCodeFieldRequired'                       : true,
-                        'postCodeFieldDisabled'                       : true,
+                        'postCodeFieldDisabled'                       : postCodeFieldDisabled,
                         'postCodeFieldBazPostOnCreate'                : true,
                         'postCodeFieldBazPostOnUpdate'                : true,
                         'stateId'                                     : purchaseOrderDeliveryStateId,
                         'stateName'                                   : purchaseOrderDeliveryState,
                         'stateFieldRequired'                          : true,
-                        'stateFieldDisabled'                          : true,
+                        'stateFieldDisabled'                          : stateFieldDisabled,
                         'stateFieldBazPostOnCreate'                   : true,
                         'stateFieldBazPostOnUpdate'                   : true,
                         'countryId'                                   : purchaseOrderDeliveryCountryId,
                         'countryName'                                 : purchaseOrderDeliveryCountry,
                         'countryFieldRequired'                        : true,
-                        'countryFieldDisabled'                        : true,
+                        'countryFieldDisabled'                        : countryFieldDisabled,
                         'countryFieldBazPostOnCreate'                 : true,
                         'countryFieldBazPostOnUpdate'                 : true
                     ]
                 )}}
             </div>
         </div>
+    </div>
+    <div class="col" id="{{componentId}}-{{sectionId}}-customer_details" {{customerDetails}}>
+        
+        {% if purchaseOrder['customer_addresses'] is defined and purchaseOrder['customer_addresses']|length > 0 %}
+            {% set customerAddresses = '' %}
+            {% for customerAddress in purchaseOrder['customer_addresses'] %}
+                {% if customerAddress['id'] == purchaseOrder['customer_address_id'] %}
+                    {% set addressChecked = 'checked=""' %}
+                {% else %}
+                    {% set addressChecked = '' %}
+                {% endif %}
+                {% set addressContent =
+                    '<dl class="row mb-0">
+                        <dt class="col-sm-4">Street Address</dt>
+                        <dd class="col-sm-8 cla-street mb-0">' ~ customerAddress['street_address'] ~ '</dd>
+                        <dt class="col-sm-4">Street Address 2</dt>
+                        <dd class="col-sm-8 cla-street2 mb-0">' ~ customerAddress['street_address_2'] ~ '</dd>
+                        <dt class="col-sm-4">City</dt>
+                        <dd class="col-sm-8 cla-city mb-0">' ~ customerAddress['city_name'] ~ '</dd>
+                        <dt class="col-sm-4">Post Code</dt>
+                        <dd class="col-sm-8 cla-postcode mb-0">' ~ customerAddress['post_code'] ~ '</dd>
+                        <dt class="col-sm-4">State</dt>
+                        <dd class="col-sm-8 cla-state mb-0">' ~ customerAddress['state_name'] ~ '</dd>
+                        <dt class="col-sm-4">Country</dt>
+                        <dd class="col-sm-8 cla-country mb-0">' ~ customerAddress['country_name'] ~ '</dd>
+                    </dl>'
+                %}
+                {% set customerAddresses = customerAddresses ~
+                    '<div class="info-box">
+                        <div class="info-box-content">
+                            <div class="row">
+                                <div class="col-md-1">
+                                    <div class="icheck-primary">
+                                        <input type="radio" id="' ~ customerAddress['id'] ~ '" data-value="' ~ customerAddress['id'] ~ '" name="' ~ componentId ~ '-' ~ sectionId ~ '-customer-addresses" ' ~ addressChecked ~ '>
+                                        <label for="' ~ customerAddress['id'] ~ '"></label>
+                                    </div>
+                                </div>
+                                <div class="col">' ~ addressContent ~ '</div>
+                            </div>
+                        </div>
+                    </div>'
+                %}
+            {% endfor %}
+            {% set customerAddressesHidden = false %}
+        {% else %}
+            {% set customerAddresses = '' %}
+            {% set customerAddressesHidden = true %}
+        {% endif %}
+        
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'customer_address_id',
+                'fieldLabel'                     : 'Customer Shipping Address',
+                'fieldType'                      : 'html',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Select an address from the given addresses for this customer.',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHidden'                    : customerAddressesHidden,
+                'fieldHtmlContent'               : customerAddresses,
+                'fieldBazScan'                   : true,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'customer_address_id_error',
+                'fieldLabel'                     : 'Address Error',
+                'fieldType'                      : 'html',
+                'fieldAdditionalClass'           : 'mb-0',
+                'fieldHidden'                    : true,
+                'fieldBazScan'                   : false,
+                'fieldBazJstreeSearch'           : false,
+                'fieldBazPostOnCreate'           : false,
+                'fieldBazPostOnUpdate'           : false
+            ]
+        )}}
     </div>
     <div class="col">
         <div class="row">
@@ -176,23 +386,23 @@
                         'componentName'                        : componentName,
                         'componentId'                          : componentId,
                         'sectionId'                            : sectionId,
-                        'fieldId'                              : 'contacts',
+                        'fieldId'                              : 'location_contact_id',
                         'fieldLabel'                           : 'Location Contacts',
                         'fieldType'                            : 'select2',
                         'fieldHelp'                            : true,
                         'fieldHelpTooltipContent'              : 'Select a contact for this location.',
-                        'fieldRequired'                        : false,
-                        'fieldHidden'                          : true,
-                        'fieldDisabled'                        : true,
+                        'fieldRequired'                        : true,
+                        'fieldHidden'                          : locationContactIdHidden,
+                        'fieldDisabled'                        : locationContactIdDisabled,
                         'fieldBazScan'                         : true,
-                        'fieldBazPostOnCreate'                 : false,
-                        'fieldBazPostOnUpdate'                 : false,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
                         'fieldBazJstreeSearch'                 : false,
-                        'fieldDataSelect2Options'              : [],
+                        'fieldDataSelect2Options'              : employees,
                         'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsValue'         : 'full_name',
                         'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : ''
+                        'fieldDataSelect2OptionsSelected'      : purchaseOrderLocationContactId
                     ]
                 )}}
             </div>
@@ -201,24 +411,24 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'contact_fullname',
-                        'fieldLabel'                     : 'Contact Name',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldDisabled'                  : true,
-                        'fieldHelpTooltipContent'        : 'Contact Full Name',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
-                        'fieldValue'                     : purchaseOrderDeliveryContactFullname
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'contact_fullname',
+                        'fieldLabel'                            : 'Contact Name',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldDisabled'                         : purchaseOrderDeliveryContactFullnameDisabled,
+                        'fieldHelpTooltipContent'               : 'Contact Full Name',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 50,
+                        'fieldValue'                            : purchaseOrderDeliveryContactFullname
                     ]
                 )}}
             </div>
@@ -227,24 +437,24 @@
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'contact_phone',
-                        'fieldLabel'                     : 'Contact Phone',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldDisabled'                  : true,
-                        'fieldHelpTooltipContent'        : 'Contact Phone number',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazJstreeSearch'           : true,
-                        'fieldBazPostOnCreate'           : true,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
-                        'fieldValue'                     : purchaseOrderDeliveryPhone
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'contact_phone',
+                        'fieldLabel'                            : 'Contact Phone',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldDisabled'                         : purchaseOrderDeliveryContactPhoneDisabled,
+                        'fieldHelpTooltipContent'               : 'Contact Phone number',
+                        'fieldRequired'                         : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 15,
+                        'fieldValue'                            : purchaseOrderDeliveryPhone
                     ]
                 )}}
             </div>
@@ -263,7 +473,7 @@
                 'fieldLabel'                     : 'Delivery Instructions',
                 'fieldType'                      : 'textarea',
                 'fieldHelp'                      : true,
-                'fieldDisabled'                  : true,
+                'fieldDisabled'                  : false,
                 'fieldHelpTooltipContent'        : 'Delivery Instructions',
                 'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,

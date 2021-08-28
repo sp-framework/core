@@ -117,14 +117,14 @@ class Vendors
                         'notNull'       => false,
                     ]
                 ),
-                new Column(
-                    'contact_ids',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 100,
-                        'notNull'       => false,
-                    ]
-                ),
+                // new Column(
+                //     'contact_ids',
+                //     [
+                //         'type'          => Column::TYPE_VARCHAR,
+                //         'size'          => 100,
+                //         'notNull'       => false,
+                //     ]
+                // ),
                 new Column(
                     'address_ids',
                     [
@@ -132,7 +132,55 @@ class Vendors
                         'size'          => 100,
                         'notNull'       => false,
                     ]
-                )
+                ),
+                new Column(
+                    'contact_phone',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 15,
+                        'notNull'       => true,
+                    ]
+                ),
+                new Column(
+                    'contact_phone_ext',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'contact_fax',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 15,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'contact_other',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 15,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'website',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 512,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'email',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 100,
+                        'notNull'       => true,
+                    ]
+                ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

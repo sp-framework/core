@@ -55,7 +55,7 @@ class HomeComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $this->resetTemp();return;
+        // $this->resetTemp();return;
 
         // $this->reset();return;
 
@@ -95,8 +95,8 @@ class HomeComponent extends BaseComponent
         //
         // $purchaseOrdersComponent = new PurchaseOrdersComponent();
         // $purchaseOrdersComponent->installComponent();
-        // $purchaseOrdersPackage = new PurchaseOrdersPackage();
-        // $purchaseOrdersPackage->installPackage(true);
+        $purchaseOrdersPackage = new PurchaseOrdersPackage();
+        $purchaseOrdersPackage->installPackage(true);
         //
         // $apiPackage = new ApiPackage();
         // $apiPackage->installPackage(true);

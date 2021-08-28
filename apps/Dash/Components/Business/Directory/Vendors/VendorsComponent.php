@@ -100,17 +100,17 @@ class VendorsComponent extends BaseComponent
                     }
                 }
 
-                if ($vendor['contact_ids'] && $vendor['contact_ids'] !== '') {
-                    $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
+                // if ($vendor['contact_ids'] && $vendor['contact_ids'] !== '') {
+                //     $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
 
-                    $contacts = $this->usePackage(Contacts::class);
+                //     $contacts = $this->usePackage(Contacts::class);
 
-                    foreach ($vendor['contact_ids'] as $contactKey => $contact) {
-                        $contactArr = $contacts->getById($contact);
+                //     foreach ($vendor['contact_ids'] as $contactKey => $contact) {
+                //         $contactArr = $contacts->getById($contact);
 
-                        $vendor['contact_ids'][$contactKey] = $contactArr;
-                    }
-                }
+                //         $vendor['contact_ids'][$contactKey] = $contactArr;
+                //     }
+                // }
 
                 $storages = $this->basepackages->storages;
 
@@ -125,7 +125,7 @@ class VendorsComponent extends BaseComponent
                 $this->view->vendor = $vendor;
             } else {
                 $vendor = [];
-                $vendor['contact_ids'] = [];
+                // $vendor['contact_ids'] = [];
                 $vendor['address_ids'] = [];
                 $this->view->vendor = $vendor;
             }
@@ -301,9 +301,30 @@ class VendorsComponent extends BaseComponent
                     $this->view->vendors = $this->vendors->packagesData->vendors;
                 }
             } else {
-                $this->view->responseCode = 1;
+                $this->addResponse('search query missing', 1);
+            }
+        }
+    }
 
-                $this->view->responseMessage = 'search query missing';
+    public function searchSupplierManufacturerNameAction()
+    {
+        if ($this->request->isPost()) {
+            if ($this->postData()['search']) {
+                $searchQuery = $this->postData()['search'];
+
+                if (strlen($searchQuery) < 1) {
+                    return;
+                }
+
+                $searchVendor = $this->vendors->searchSuppliersManufacturersByName($searchQuery);
+
+                if ($searchVendor) {
+                    $this->view->responseCode = $this->vendors->packagesData->responseCode;
+
+                    $this->view->vendors = $this->vendors->packagesData->vendors;
+                }
+            } else {
+                $this->addResponse('search query missing', 1);
             }
         }
     }
@@ -322,9 +343,7 @@ class VendorsComponent extends BaseComponent
                     $this->view->vendor = $this->vendors->packagesData->vendor;
                 }
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'vendor id missing';
+                $this->addResponse('vendor id missing', 1);
             }
         }
     }

@@ -89,7 +89,7 @@ class Notes extends BasePackage
         if (isset($data['note_type']) && isset($data['note'])) {
             if ($data['note_type'] != 0 && $data['note_type'] != '') {
 
-                if ($data['note'] === '' && $data['note_attachments'] === '[]') {
+                if ($data['note'] === '') {
                     return;//Nothing to add
                 }
 

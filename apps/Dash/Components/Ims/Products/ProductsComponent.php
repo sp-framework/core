@@ -210,21 +210,18 @@ class ProductsComponent extends BaseComponent
     public function addAction()
     {
         if ($this->request->isPost()) {
-
             if (!$this->checkCSRF()) {
                 return;
             }
 
             $this->products->addProduct($this->postData());
 
-            $this->view->responseCode = $this->products->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->products->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->products->packagesData->responseMessage,
+                $this->products->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -234,21 +231,18 @@ class ProductsComponent extends BaseComponent
     public function updateAction()
     {
         if ($this->request->isPost()) {
-
             if (!$this->checkCSRF()) {
                 return;
             }
 
             $this->products->updateProduct($this->postData());
 
-            $this->view->responseCode = $this->products->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->products->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->products->packagesData->responseMessage,
+                $this->products->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -258,17 +252,18 @@ class ProductsComponent extends BaseComponent
     public function removeAction()
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
 
             $this->products->removeProduct($this->postData());
 
-            $this->view->responseCode = $this->products->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->products->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->products->packagesData->responseMessage,
+                $this->products->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -295,6 +290,10 @@ class ProductsComponent extends BaseComponent
     protected function search($field)
     {
         if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
             if ($this->postData()['search']) {
                 $searchQuery = $this->postData()['search'];
 
@@ -330,6 +329,8 @@ class ProductsComponent extends BaseComponent
 
                 $this->view->responseMessage = 'search query missing';
             }
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }

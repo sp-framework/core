@@ -521,16 +521,17 @@ var BazCore = function() {
 
     //Menu
     function openMenu() {
-        var currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + dataCollection.env.currentRoute + '"].nav-link');
+        var currentActiveLocation = $('a[href="/' + dataCollection.env.currentRoute + '"].nav-link');
 
         if (currentActiveLocation.length === 0) {
             if (dataCollection.env['parentComponentId']) {
                 currentActiveLocation =
-                    $('a[href="' + dataCollection.env.rootPath + dataCollection.env['parentComponentId'].replace(/-/g, '/') + '"]');
+                    $('a[href="/' + dataCollection.env['parentComponentId'].replace(/-/g, '/') + '"]');
             } else {
                 currentActiveLocation = $('a[href="' + dataCollection.env.rootPath + '/"]');
             }
         }
+
         if ($(currentActiveLocation).parents().is('ul.nav-treeview')) {
             $(currentActiveLocation).addClass('active');
             $(currentActiveLocation).parents('ul.nav-treeview').show();

@@ -51,10 +51,10 @@
                             'tabTitle'          : 'Info',
                             'tabInclude'        : 'vendors/form/info'
                         ],
-                        'contacts'   :
+                        'contactdetails'   :
                         [
-                            'tabTitle'          : 'Contacts',
-                            'tabInclude'        : 'vendors/form/contacts'
+                            'tabTitle'          : 'Contact Details',
+                            'tabInclude'        : 'vendors/form/contactdetails'
                         ],
                         'addresses'   :
                         [
@@ -476,6 +476,12 @@ dataCollectionSection =
             },
             minimumInputLength : 2
         },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : { },
+        '{{componentId}}-{{sectionId}}-contact_phone_ext'       : { },
+        '{{componentId}}-{{sectionId}}-contact_fax'             : { },
+        '{{componentId}}-{{sectionId}}-contact_other'           : { },
+        '{{componentId}}-{{sectionId}}-email'                   : { },
+        '{{componentId}}-{{sectionId}}-website'                 : { },
         '{{componentId}}-{{sectionId}}-acn'                     : { },
         '{{componentId}}-{{sectionId}}-currency'                : {
             placeholder: 'SELECT CURRENCY'
@@ -564,6 +570,11 @@ dataCollectionSection =
             rules: {
                 '{{componentId}}-{{sectionId}}-abn'             : 'required',
                 '{{componentId}}-{{sectionId}}-business_name'   : 'required',
+                '{{componentId}}-{{sectionId}}-contact_phone'           : 'required',
+                '{{componentId}}-{{sectionId}}-email'                   : {
+                    required                                            : true,
+                    email                                               : true
+                },
                 '{{componentId}}-{{sectionId}}-bills_tax_id'    : 'required',
                 '{{componentId}}-{{sectionId}}-po_tax_id'       : 'required',
                 '{{componentId}}-{{sectionId}}-invoices_tax_id' : 'required',
@@ -571,6 +582,8 @@ dataCollectionSection =
             messages: {
                 '{{componentId}}-{{sectionId}}-abn'             : 'Please enter abn',
                 '{{componentId}}-{{sectionId}}-business_name'   : 'Please enter vendor business name',
+                '{{componentId}}-{{sectionId}}-contact_phone'   : 'Please enter vendor business phone',
+                '{{componentId}}-{{sectionId}}-email'           : 'Please enter vendor business email',
                 '{{componentId}}-{{sectionId}}-bills_tax_id'    : 'Please select tax',
                 '{{componentId}}-{{sectionId}}-po_tax_id'       : 'Please select tax',
                 '{{componentId}}-{{sectionId}}-invoices_tax_id' : 'Please select tax',

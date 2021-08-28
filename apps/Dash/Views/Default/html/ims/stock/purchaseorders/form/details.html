@@ -2,19 +2,19 @@
 {% if purchaseOrder['id'] is defined %}
     {% set purchaseOrderId = purchaseOrder['id'] %}
     {% set purchaseOrderEntity = purchaseOrder['entity_id'] %}
-    {% set purchaseReferenceOrders = purchaseOrder['reference_orders'] %}
-    {% set purchaseOrderExpectedDeliveryDate = purchaseOrder['expected_delivery_date'] %}
+    {% set purchaseReferences = purchaseOrder['references'] %}
     {% set purchaseOrderStatus = purchaseOrder['status'] %}
     {% set purchaseOrderVendor = purchaseOrder['vendor_id'] %}
     {% set purchaseOrderStatusDisabled = false %}
+    {% set purchaseOrderVendorDetailsHidden = '' %}
 {% else %}
     {% set purchaseOrderId = '' %}
     {% set purchaseOrderEntity = '' %}
-    {% set purchaseReferenceOrders = '' %}
-    {% set purchaseOrderExpectedDeliveryDate = '' %}
+    {% set purchaseReferences = '' %}
     {% set purchaseOrderStatus = '1' %}
     {% set purchaseOrderVendor = '' %}
     {% set purchaseOrderStatusDisabled = true %}
+    {% set purchaseOrderVendorDetailsHidden = 'hidden=""' %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -73,11 +73,11 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'reference_orders',
-                'fieldLabel'                     : 'Reference Orders',
+                'fieldId'                        : 'references',
+                'fieldLabel'                     : 'References',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Reference Orders (Internal, eBay, etc)',
+                'fieldHelpTooltipContent'        : 'References (Internal, eBay, etc)',
                 'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
@@ -85,33 +85,7 @@
                 'fieldBazPostOnUpdate'           : true,
                 'fieldDataInputMinLength'        : 1,
                 'fieldDataInputMaxLength'        : 100,
-                'fieldValue'                     : purchaseReferenceOrders
-            ]
-        )}}
-    </div>
-</div>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'expected_delivery_date',
-                'fieldLabel'                     : 'Expected Delivery Date',
-                'fieldType'                      : 'flatpickr',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Expected delivery date for the purchase order.',
-                'fieldFlatpickrClearButton'      : true,
-                'fieldRequired'                  : false,
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 10,
-                'fieldValue'                     : purchaseOrderExpectedDeliveryDate
+                'fieldValue'                     : purchaseReferences
             ]
         )}}
     </div>
@@ -169,7 +143,7 @@
         )}}
     </div>
 </div>
-<div class="row vdivide" id="{{componentId}}-{{sectionId}}-vendor_details" hidden>
+<div class="row vdivide" id="{{componentId}}-{{sectionId}}-vendor_details" {{purchaseOrderVendorDetailsHidden}}>
     <div class="col">
         <div class="row">
             <div class="col">
@@ -264,57 +238,97 @@
         <div class="row">
             <div class="col">
                 
-                {% if purchaseOrder['vendor_contacts'] is defined and purchaseOrder['vendor_contacts']|length > 0 %}
+                {% if purchaseOrder['id'] is defined %}
                     {% set vendorContacts = '' %}
-                    {% for vendorContact in purchaseOrder['vendor_contacts'] %}
-                        {% if vendorContact['id'] == purchaseOrder['vendor_contact_id'] %}
-                            {% set contactChecked = 'checked=""' %}
-                        {% else %}
-                            {% set contactChecked = '' %}
-                        {% endif %}
+                    {% if purchaseOrder['vendor_contact_id'] is defined and purchaseOrder['vendor_contact_id'] == 0 %}
+                        {% set contactChecked = 'checked=""' %}
+                    {% else %}
+                        {% set contactChecked = '' %}
+                    {% endif %}
+                    {% set contactContent =
+                        '<dl class="row mb-0">
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8 cla-email mb-0">' ~ purchaseOrder['vendor']['email'] ~ '</dd>
+                            <dt class="col-sm-4">Phone</dt>
+                            <dd class="col-sm-8 cla-phone mb-0">' ~ purchaseOrder['vendor']['contact_phone']
+                    %}
 
-                        {% set contactContent =
-                            '<dl class="row mb-0">
-                                <dt class="col-sm-4">Name</dt>
-                                <dd class="col-sm-8 cla-name mb-0">' ~ vendorContact['full_name'] ~ '</dd>
-                                <dt class="col-sm-4">Email</dt>
-                                <dd class="col-sm-8 cla-email mb-0">' ~ vendorContact['account_email'] ~ '</dd>
-                                <dt class="col-sm-4">Phone</dt>
-                                <dd class="col-sm-8 cla-phone mb-0">' ~ vendorContact['contact_phone']
-                        %}
+                    {% if purchaseOrder['vendor']['contact_phone_ext'] !== '' %}
+                        {% set contactContent = contactContent ~ ' x' ~ purchaseOrder['vendor']['contact_phone_ext'] ~ '</dd>' %}
+                    {% else %}
+                        {% set contactContent = contactContent ~ '</dd>' %}
+                    {% endif %}
 
-                        {% if vendorContact['contact_phone_ext'] !== '' %}
-                            {% set contactContent = contactContent ~ ' x' ~ vendorContact['contact_phone_ext'] ~ '</dd>' %}
-                        {% else %}
-                            {% set contactContent = contactContent ~ '</dd>' %}
-                        {% endif %}
-
-                        {% if vendorContact['contact_mobile'] !== '' %}
-                            {% set contactContent =
-                                contactContent ~
-                                    '<dt class="col-sm-4">Mobile</dt>
-                                    <dd class="col-sm-8 cla-mobile mb-0">' ~ vendorContact['contact_mobile'] ~ '</dd>'
-                            %}
-                        {% endif %}
-
-                        {% set contactContent = contactContent ~ '</dl>' %}
-                        {% set vendorContacts = vendorContacts ~
-                            '<div class="info-box">
-                                <div class="info-box-content">
-                                    <div class="row">
-                                        <div class="col-md-1">
-                                            <div class="icheck-primary">
-                                                <input type="radio" id="' ~ vendorContact['id'] ~ '" data-value="' ~ vendorContact['id'] ~ '" name="' ~ componentId ~ '-' ~ sectionId ~ '-vendor-contacts" ' ~ contactChecked ~ '>
-                                                <label for="' ~ vendorContact['id'] ~ '"></label>
-                                            </div>
+                    {% set contactContent = contactContent ~ '</dl>' %}
+                    {% set vendorContacts = vendorContacts ~
+                        '<div class="info-box">
+                            <div class="info-box-content">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <div class="icheck-primary">
+                                            <input type="radio" id="0" data-value="0" name="' ~ componentId ~ '-' ~ sectionId ~ '-vendor-contacts" ' ~ contactChecked ~ '>
+                                            <label for="0"></label>
                                         </div>
-                                        <div class="col">' ~ contactContent ~ '</div>
                                     </div>
+                                    <div class="col">' ~ contactContent ~ '</div>
                                 </div>
-                            </div>'
-                        %}
-                    {% endfor %}
-                    {% set vendorContactsHidden = false %}
+                            </div>
+                        </div>'
+                    %}
+                    {% if purchaseOrder['vendor_contacts'] is defined and purchaseOrder['vendor_contacts']|length > 0 %}
+                        {% for vendorContact in purchaseOrder['vendor_contacts'] %}
+                            {% if vendorContact['id'] == purchaseOrder['vendor_contact_id'] %}
+                                {% set contactChecked = 'checked=""' %}
+                            {% else %}
+                                {% set contactChecked = '' %}
+                            {% endif %}
+
+                            {% set contactContent =
+                                '<dl class="row mb-0">
+                                    <dt class="col-sm-4">Name</dt>
+                                    <dd class="col-sm-8 cla-name mb-0">' ~ vendorContact['full_name'] ~ '</dd>
+                                    <dt class="col-sm-4">Email</dt>
+                                    <dd class="col-sm-8 cla-email mb-0">' ~ vendorContact['account_email'] ~ '</dd>
+                                    <dt class="col-sm-4">Phone</dt>
+                                    <dd class="col-sm-8 cla-phone mb-0">' ~ vendorContact['contact_phone']
+                            %}
+
+                            {% if vendorContact['contact_phone_ext'] !== '' %}
+                                {% set contactContent = contactContent ~ ' x' ~ vendorContact['contact_phone_ext'] ~ '</dd>' %}
+                            {% else %}
+                                {% set contactContent = contactContent ~ '</dd>' %}
+                            {% endif %}
+
+                            {% if vendorContact['contact_mobile'] !== '' %}
+                                {% set contactContent =
+                                    contactContent ~
+                                        '<dt class="col-sm-4">Mobile</dt>
+                                        <dd class="col-sm-8 cla-mobile mb-0">' ~ vendorContact['contact_mobile'] ~ '</dd>'
+                                %}
+                            {% endif %}
+
+                            {% set contactContent = contactContent ~ '</dl>' %}
+                            {% set vendorContacts = vendorContacts ~
+                                '<div class="info-box">
+                                    <div class="info-box-content">
+                                        <div class="row">
+                                            <div class="col-md-1">
+                                                <div class="icheck-primary">
+                                                    <input type="radio" id="' ~ vendorContact['id'] ~ '" data-value="' ~ vendorContact['id'] ~ '" name="' ~ componentId ~ '-' ~ sectionId ~ '-vendor-contacts" ' ~ contactChecked ~ '>
+                                                    <label for="' ~ vendorContact['id'] ~ '"></label>
+                                                </div>
+                                            </div>
+                                            <div class="col">' ~ contactContent ~ '</div>
+                                        </div>
+                                    </div>
+                                </div>'
+                            %}
+                        {% endfor %}
+                        {% set vendorContactsHidden = false %}
+                    {% else %}
+                        {% set vendorContacts = '' %}
+                        {% set vendorContactsHidden = true %}
+                    {% endif %}
                 {% else %}
                     {% set vendorContacts = '' %}
                     {% set vendorContactsHidden = true %}

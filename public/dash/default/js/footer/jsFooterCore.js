@@ -3671,7 +3671,17 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                         //         }
                         //     });
                         // } else {
-                            that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                            if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']) {
+                                if (dataCollection[componentId][sectionId][sectionId + '-form']['onSubmit']()) {
+                                    that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                                } else {
+                                    $(mainButton).attr('disabled', false);
+                                    $(mainButton).children('i').attr('hidden', true);
+                                }
+                            } else {
+                                that._runAjax(mainButton, $(mainButton).attr('actionurl'), $.param(that._sectionToObj()));
+                            }
+
                         // }
                     }
                 });
@@ -3831,12 +3841,10 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                             if ($(bazScanField).data('bazpostoncreate') === true ||
                                 $(bazScanField).data('bazpostonupdate') === true ||
                                 $(bazScanField).data('bazdevpost') === true) {
-                                dataCollection[componentId][sectionId]['data'][extractComponentId] = [];
+                                dataCollection[componentId][sectionId]['data'][extractComponentId] = { };
                                 $(bazScanField).find('span').each(function(i,v) {
                                     var thisCounterId = $(v).parent('div')[0].id;
-                                    var counterObject = { };
-                                    counterObject[thisCounterId] = $(v).html();
-                                    dataCollection[componentId][sectionId]['data'][extractComponentId].push(counterObject);
+                                    dataCollection[componentId][sectionId]['data'][extractComponentId][thisCounterId] = $(v).html();
                                 });
                             }
                         }

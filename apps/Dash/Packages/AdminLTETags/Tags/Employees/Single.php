@@ -77,7 +77,7 @@ class Single
                         'componentName'                         => $this->params['componentName'],
                         'componentId'                           => $this->params['componentId'],
                         'sectionId'                             => $this->params['sectionId'],
-                        'fieldId'                               => 'account_id',
+                        'fieldId'                               => 'account_email',
                         'fieldLabel'                            => 'Email',
                         'fieldType'                             => 'input',
                         'fieldPlaceholder'                      => 'Email',
@@ -265,7 +265,7 @@ class Single
     protected function inclEmailMobileJs()
     {
         return
-            '"' . $this->compSecId . '-account_id"           : { },
+            '"' . $this->compSecId . '-account_email"        : { },
             "' . $this->compSecId . '-contact_mobile"        : { },';
     }
 

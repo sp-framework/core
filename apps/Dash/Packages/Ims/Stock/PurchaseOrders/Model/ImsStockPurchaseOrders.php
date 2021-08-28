@@ -2,6 +2,7 @@
 
 namespace Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model;
 
+use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model\ImsStockPurchaseOrdersProducts;
 use System\Base\BaseModel;
 
 class ImsStockPurchaseOrders extends BaseModel
@@ -10,9 +11,7 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public $entity_id;
 
-    public $reference_orders;
-
-    public $expected_delivery_date;
+    public $references;
 
     public $status;
 
@@ -22,13 +21,45 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public $vendor_contact_id;
 
-    public $delivery_address_id;
+    public $delivery_date;
 
-    public $delivery_contact_fullname;
+    public $delivery_type;
 
-    public $delivery_contact_phone;
+    public $entity_location_id;
+
+    public $location_contact_id;
+
+    public $customer_id;
+
+    public $customer_address_id;
+
+    public $address_id;
+
+    public $contact_fullname;
+
+    public $contact_phone;
+
+    public $total_quantity;
+
+    public $total_tax;
+
+    public $total_discount;
+
+    public $total_amount;
 
     public $delivery_instructions;
 
     public $attachments;
+
+    public function initialize()
+    {
+        $this->hasMany(
+            'id',
+            ImsStockPurchaseOrdersProducts::class,
+            'purchase_order_id',
+            [
+                'alias' => 'products'
+            ]
+        );
+    }
 }

@@ -35,6 +35,8 @@ class Customers extends BasePackage
             $customer = array_merge($customer, $financialDetails);
         }
 
+        $this->packagesData->customer = $customer;
+
         return $customer;
     }
 
@@ -179,6 +181,8 @@ class Customers extends BasePackage
     {
         $this->modelToUse = CrmsCustomersFinancialDetails::class;
 
+        $data['customer_id'] = $data['id'];
+
         unset($data['id']);
 
         $this->add($data);
@@ -238,7 +242,7 @@ class Customers extends BasePackage
                     if (is_array($addressType) && count($addressType) > 0) {
                         foreach ($addressType as $addressKey => $address) {
 
-                            $address['name'] = $data['business_name'];
+                            $address['name'] = $data['full_name'];
                             $address['address_type'] = $addressTypeKey;
                             $address['package_name'] = $this->packageName;
 
@@ -324,6 +328,34 @@ class Customers extends BasePackage
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->customers = $customers;
+
+            return true;
+        }
+    }
+
+    public function searchByCustomerId($id)
+    {
+        $customer = $this->getCustomerById($id);
+
+        if ($customer) {
+            if ($customer['address_ids'] && $customer['address_ids'] !== '') {
+                $customer['address_ids'] = Json::decode($customer['address_ids'], true);
+
+                foreach ($customer['address_ids'] as $addressTypeKey => $addressType) {
+                    if (is_array($addressType) && count($addressType) > 0) {
+                        foreach ($addressType as $addressKey => $address) {
+                            $customer['address_ids'][$addressTypeKey][$addressKey] =
+                                $this->basepackages->addressbook->getById($address);
+                        }
+                    }
+                    $customer['address_ids'][$addressTypeKey] =
+                        msort($customer['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
+                }
+            }
+
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->customer = $customer;
 
             return true;
         }
