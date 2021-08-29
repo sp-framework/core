@@ -1,6 +1,6 @@
 {
     "route"         : "hrms/skills",
-    "name"          : "HRMS Skills",
+    "name"          : "Skills",
     "description"   : "Manage skills via this component",
     "app_type"      : "dash",
     "category"      : "business",

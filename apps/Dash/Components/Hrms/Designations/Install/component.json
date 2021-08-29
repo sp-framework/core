@@ -1,6 +1,6 @@
 {
     "route"         : "hrms/designations",
-    "name"          : "HRMS Designations",
+    "name"          : "Designations",
     "description"   : "Manage designations via this component",
     "app_type"      : "dash",
     "category"      : "business",

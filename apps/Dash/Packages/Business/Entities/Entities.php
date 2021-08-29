@@ -16,6 +16,32 @@ class Entities extends BasePackage
 
     public $entities;
 
+    public function getAll(bool $resetCache = false, bool $enableCache = true)
+    {
+        if ($enableCache && $this->config->cache->enabled) {
+            $parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+        } else {
+            $parameters = [];
+        }
+
+        if (!$this->{$this->packageName} || $resetCache) {
+
+            $this->model = $this->modelToUse::find($parameters);
+
+            $entities = $this->model->toArray();
+
+            foreach ($entities as $entityKey => &$entity) {
+                if ($entity['settings'] !== '') {
+                    $entity['settings'] = Json::decode($entity['settings'], true);
+                }
+            }
+
+            $this->{$this->packageName} = $entities;
+        }
+
+        return $this;
+    }
+
     public function addEntity(array $data)
     {
         $data = $this->addAccountant($data);

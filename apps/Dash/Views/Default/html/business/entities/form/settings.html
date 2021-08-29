@@ -1,0 +1,182 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                             : component,
+                'componentName'                         : componentName,
+                'componentId'                           : componentId,
+                'sectionId'                             : sectionId,
+                'fieldId'                               : 'settings',
+                'fieldLabel'                            : 'Prefix & Sequencing',
+                'fieldLabelLegend'                      : true,
+                'fieldHidden'                           : false,
+                'fieldType'                             : 'html',
+                'fieldBazScan'                          : true,
+                'fieldBazPostOnCreate'                  : true,
+                'fieldBazPostOnUpdate'                  : true,
+                'fieldBazJstreeSearch'                  : true,
+                'fieldHtmlContent'                      : 'Prefixes can be changed for different packages that use this entity. You can change the next entry sequence number. Any changes will only apply to new entries.<br>Note: For prefix, you can add year, month, date using %Y%, %m%, %d%. Example: INV-%Y%-%m%-%d%- would result in INV-2021-01-01-'
+            ]
+        )}}
+    </div>
+</div>
+<div class="row vdivide">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'packages',
+                        'fieldLabel'                            : 'Packages',
+                        'fieldType'                             : 'select2',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Package',
+                        'fieldRequired'                         : false,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false,
+                        'fieldBazJstreeSearch'                  : false,
+                        'fieldDataSelect2Options'               : packages,
+                        'fieldDataSelect2OptionsKey'            : 'id',
+                        'fieldDataSelect2OptionsValue'          : 'display_name',
+                        'fieldDataSelect2OptionsArray'          : true,
+                        'fieldDataSelect2OptionsSelected'       : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'package_prefix',
+                        'fieldLabel'                     : 'Prefix',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Prefix',
+                        'fieldRequired'                  : false,
+                        'fieldDisabled'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 20,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'next_seq_number',
+                        'fieldLabel'                     : 'Next Sequence Number',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Next Sequence Number',
+                        'fieldInputTypeTextFilter'       : 'positiveInt',
+                        'fieldRequired'                  : false,
+                        'fieldDisabled'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : false,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldValue'                     : ''
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('buttons',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'buttonType'                     : 'button',
+                        'buttons'                        :
+                            [
+                                'update'        : [
+                                    'title'                    : 'Update',
+                                    'size'                     : 'xs',
+                                    'type'                     : 'primary',
+                                    'disabled'                 : true,
+                                    'icon'                     : 'plus',
+                                    'position'                 : 'right'
+                                ],
+                                'cancel'        : [
+                                    'title'                    : 'Cancel',
+                                    'size'                     : 'xs',
+                                    'type'                     : 'secondary',
+                                    'disabled'                 : true,
+                                    'icon'                     : 'times',
+                                    'position'                 : 'right'
+                                ]
+                            ]
+                    ]
+                )}}
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="table-responsive p-0" style="height:300px">
+            <table id="{{componentId}}-{{sectionId}}-prefix-table" class="table table-head-fixed table-hover table-striped table-sm text-nowrap">
+                <thead>
+                    <tr>
+                        <th>PACKAGE</th>
+                        <th>PREFIX</th>
+                        <th>NEXT SEQUENCE NUMBER</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for packageKey, package in packages %}
+                        {% set packageName = package['display_name'] %}
+
+                        {% if entity['settings']['prefix-seq'][package['name']] is defined %}
+                            {% if entity['settings']['prefix-seq'][package['name']]['prefix'] is defined %}
+                                {% set packagePrefixName = entity['settings']['prefix-seq'][package['name']]['prefix'] %}
+                            {% else %}
+                                {% set packagePrefixName = package['prefix'] %}
+                            {% endif %}
+                            {% if entity['settings']['prefix-seq'][package['name']]['next_seq_number'] is defined %}
+                                {% set packageNextSeqNumber = entity['settings']['prefix-seq'][package['name']]['next_seq_number'] %}
+                            {% else %}
+                                {% set packageNextSeqNumber = package['next_seq_number'] %}
+                            {% endif %}
+                        {% else %}
+                            {% set packagePrefixName = package['prefix'] %}
+                            {% set packageNextSeqNumber = package['next_seq_number'] %}
+                        {% endif %}
+
+                        <tr class="pre_seq" id="{{package['name']}}" data-id="{{package['id']}}">
+                            <td class="package_name">
+                                {{packageName}}
+                            </td>
+                            <td class="prefix">
+                                {{packagePrefixName}}
+                            </td>
+                            <td class="next_seq_number">
+                                {{packageNextSeqNumber}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

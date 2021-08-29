@@ -1,6 +1,6 @@
 {
 	"route"			: "ims/stock/purchaseorders",
-	"name"			: "IMS Purchase Orders",
+	"name"			: "Purchase Orders",
 	"description"	: "Generate and manage purchase orders via this component",
 	"app_type"      : "dash",
 	"category"      : "business",

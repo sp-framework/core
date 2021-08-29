@@ -45,4 +45,6 @@ class BusinessEntities extends BaseModel
     public $swift_code;
 
     public $accountant_vendor_id;
+
+    public $settings;
 }

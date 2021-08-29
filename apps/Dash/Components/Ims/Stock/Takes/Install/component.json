@@ -1,6 +1,6 @@
 {
 	"route"			: "ims/stock/takes",
-	"name"			: "IMS Stock Takes",
+	"name"			: "Stock Takes",
 	"description"	: "Adjust Stocks via this component",
 	"app_type"      : "dash",
 	"category"      : "business",

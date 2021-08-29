@@ -56,6 +56,8 @@ class EntitiesComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
+            $this->view->packages = $this->getPackages();
+
             $this->view->accountants = $this->usePackage(Vendors::class)->getAll()->vendors;
 
             $this->view->logoLink = '';
@@ -238,5 +240,73 @@ class EntitiesComponent extends BaseComponent
 
             $this->view->responseMessage = 'Method Not Allowed';
         }
+    }
+
+    protected function getPackages()
+    {
+        $prefixPackages =
+            [
+                'Bills'                     =>
+                    [
+                        'prefix'            => 'BIL-',
+                        'next_seq_number'   => '1'
+                    ],
+                'ExpensesVouchers'          =>
+                    [
+                        'prefix'            => 'EEV-',
+                        'next_seq_number'   => '1'
+                    ],
+                'Invoices'                  =>
+                    [
+                        'prefix'            => 'INV-',
+                        'next_seq_number'   => '1'
+                    ],
+                'CreditNotes'               =>
+                    [
+                        'prefix'            => 'CRN-',
+                        'next_seq_number'   => '1'
+                    ],
+                'JobWorks'                  =>
+                    [
+                        'prefix'            => 'JOW-',
+                        'next_seq_number'   => '1'
+                    ],
+                'SalesOrders'               =>
+                    [
+                        'prefix'            => 'SAO-',
+                        'next_seq_number'   => '1'
+                    ],
+                'PurchaseOrders'            =>
+                    [
+                        'prefix'            => 'PUO-',
+                        'next_seq_number'   => '1'
+                    ],
+                'Quotes'                    =>
+                    [
+                        'prefix'            => 'QUO-',
+                        'next_seq_number'   => '1'
+                    ],
+                'ShippingOrders'            =>
+                    [
+                        'prefix'            => 'SHO-',
+                        'next_seq_number'   => '1'
+                    ],
+                'Employees'                 =>
+                    [
+                        'prefix'            => 'EMP-',
+                        'next_seq_number'   => '1'
+                    ]
+            ];
+
+        $packages = [];
+
+        foreach ($this->modules->packages->packages as $packageKey => $package) {
+            if (isset($prefixPackages[$package['name']])) {
+                $package = array_merge($package, $prefixPackages[$package['name']]);
+                array_push($packages, $package);
+            }
+        }
+
+        return $packages;
     }
 }

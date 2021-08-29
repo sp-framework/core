@@ -1,6 +1,7 @@
 {% if employee['id'] is defined %}
     {% set employeeId = employee['id'] %}
     {% set employeePortrait = employee['portrait'] %}
+    {% set employeeEntityId = employee['entity_id'] %}
     {% set employeeAccountId = employee['account_id'] %}
     {% set employeeAccountEmail = employee['account_email'] %}
     {% set employeeStatus = employee['status'] %}
@@ -12,6 +13,7 @@
 {% else %}
     {% set employeeId = '' %}
     {% set employeePortrait = '' %}
+    {% set employeeEntityId = '' %}
     {% set employeeAccountId = '' %}
     {% set employeeAccountEmail = '' %}
     {% set employeeStatus = '' %}
@@ -103,6 +105,31 @@
                         'fieldDataInputMinLength'               : 1,
                         'fieldDataInputMaxLength'               : 50,
                         'fieldValue'                            : employeeAccountEmail
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'entity_id',
+                        'fieldLabel'                           : 'Business Entity',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select a business entity that is placing the purchase order.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldDataSelect2Options'              : entities,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'business_name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeEntityId
                     ]
                 )}}
             </div>

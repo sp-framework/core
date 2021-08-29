@@ -1,6 +1,6 @@
 {
 	"route"			: "ims/stock/adjustments",
-	"name"			: "IMS Stock Adjustments",
+	"name"			: "Stock Adjustments",
 	"description"	: "Adjust Stocks via this component",
 	"app_type"      : "dash",
 	"category"      : "business",

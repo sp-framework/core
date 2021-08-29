@@ -1168,4 +1168,93 @@ abstract class BasePackage extends Controller
 	{
 		//Only if debug is enabled.
 	}
+
+	protected function addRefId($data)
+	{
+		if (!isset($data['ref_id'])) {
+			$data['ref_id'] = null;
+		}
+
+		if (!$data['ref_id'] || $data['ref_id'] === '') {
+			if (isset($data['entity_id'])) {
+				$packageName = Arr::last($this->getClassName());
+
+				$entitiesPackage = new \Apps\Dash\Packages\Business\Entities\Entities;
+
+				$entities = $entitiesPackage->getAll()->entities;
+
+				if ($entities && count($entities) > 1) {
+					foreach ($entities as $entityKey => $entity) {
+						if ($entity['id'] === $data['entity_id']) {
+							$entityId = $entityKey;
+							break;
+						}
+					}
+				} else {
+					$entityId = 0;
+				}
+
+				if ($entities[$entityId]) {
+					$settings = $entities[$entityId]['settings'];
+
+					if (isset($settings['prefix-seq'][$packageName])) {
+						$settings = $settings['prefix-seq'][$packageName];
+
+						$model = new $this->modelToUse;
+
+						$table = $model->getSource();
+
+						if ($settings['prefix'] !== '') {
+							$settings['prefix'] = explode('%', $settings['prefix']);
+
+							$prefixValue = '';
+							foreach ($settings['prefix'] as $prefix) {
+								if ($prefix === 'Y') {
+									$prefixValue .= date('Y');
+								} else if ($prefix === 'm') {
+									$prefixValue .= date('m');
+								} else if ($prefix === 'd') {
+									$prefixValue .= date('d');
+								} else {
+									$prefixValue .= $prefix;
+								}
+							}
+
+							$currentId = (int) $data['id'];
+
+							if (isset($settings['next_seq_number'])) {
+								$nextSeqNumber = (int) $settings['next_seq_number'];
+
+								if ($nextSeqNumber > 0) {
+
+									if ($nextSeqNumber > $currentId) {
+										$prefixValue .= $nextSeqNumber;
+
+										$sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
+
+										$this->db->execute($sql, [$nextSeqNumber, $currentId]);
+
+
+										$data['id'] = $nextSeqNumber;
+									} else {
+										$prefixValue .= $currentId;
+									}
+								} else {
+									$prefixValue .= $currentId;
+								}
+							} else {
+								$prefixValue .= $currentId;
+							}
+
+							$sql = "UPDATE `{$table}` SET `ref_id` = ? WHERE `{$table}`.`id` = ?";
+
+							$this->db->execute($sql, [$prefixValue, $data['id']]);
+						}
+					}
+				}
+			}
+		}
+
+		return $data;
+	}
 }

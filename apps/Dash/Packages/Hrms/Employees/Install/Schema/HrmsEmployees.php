@@ -21,6 +21,21 @@ class HrmsEmployees
                     ]
                 ),
                 new Column(
+                    'ref_id',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'entity_id',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => true,
+                    ]
+                ),
+                new Column(
                     'portrait',
                     [
                         'type'              => Column::TYPE_VARCHAR,

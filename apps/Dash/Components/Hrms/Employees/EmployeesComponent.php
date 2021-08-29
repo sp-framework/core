@@ -4,6 +4,7 @@ namespace Apps\Dash\Components\Hrms\Employees;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
+use Apps\Dash\Packages\Business\Entities\Entities;
 use Apps\Dash\Packages\Business\Locations\Locations;
 use Apps\Dash\Packages\Hrms\Designations\HrmsDesignations;
 use Apps\Dash\Packages\Hrms\Employees\Employees;
@@ -27,6 +28,8 @@ class EmployeesComponent extends BaseComponent
     {
         $this->employees = $this->usePackage(Employees::class);
 
+        $this->entities = $this->usePackage(Entities::class);
+
         $this->statuses = $this->usePackage(HrmsStatuses::class);
 
         $this->designations = $this->usePackage(HrmsDesignations::class);
@@ -45,6 +48,8 @@ class EmployeesComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             $this->view->contractors = $this->usePackage(Vendors::class)->getAll()->vendors;
+
+            $this->view->entities = $this->entities->getAll()->entities;
 
             $this->view->portraitLink = '';
 
@@ -180,11 +185,11 @@ class EmployeesComponent extends BaseComponent
             $this->employees,
             'hrms/employees/view',
             null,
-            ['account_email', 'first_name', 'last_name', 'designation', 'status'],
+            ['ref_id', 'account_email', 'first_name', 'last_name', 'designation', 'status'],
             true,
-            ['account_email', 'first_name', 'last_name', 'designation', 'status'],
+            ['ref_id', 'account_email', 'first_name', 'last_name', 'designation', 'status'],
             $controlActions,
-            ['account_email'=>'email'],
+            ['ref_id' => 'Employee Id', 'account_email'=>'email'],
             $replaceColumns,
             'first_name'
         );

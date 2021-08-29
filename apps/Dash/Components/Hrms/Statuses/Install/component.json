@@ -1,6 +1,6 @@
 {
     "route"         : "hrms/statuses",
-    "name"          : "HRMS Statuses",
+    "name"          : "Statuses",
     "description"   : "Manage statuses via this component",
     "app_type"      : "dash",
     "category"      : "business",

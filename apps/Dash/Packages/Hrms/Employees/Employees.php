@@ -67,6 +67,10 @@ class Employees extends BasePackage
             $data['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
         }
         if ($this->add($data)) {
+            $data['id'] = $this->packagesData->last['id'];
+
+            $data = $this->addRefId($data);
+
             $this->basepackages->storages->changeOrphanStatus($data['portrait']);
 
             if ($data['employment_attachments'] !== '') {
@@ -136,6 +140,8 @@ class Employees extends BasePackage
         }
 
         if ($this->update($data)) {
+            $data = $this->addRefId($data);
+
             $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
 
             $data['id'] = $this->packagesData->last['id'];

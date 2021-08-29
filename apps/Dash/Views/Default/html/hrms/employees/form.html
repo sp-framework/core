@@ -217,7 +217,7 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-account_email'                       : {
+        '{{componentId}}-{{sectionId}}-account_email'                   : {
             afterInit   : function() {
                 dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteAccounts'] =
                     new autoComplete({
@@ -296,6 +296,9 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-account_email_list').children('li').remove();
                 });
             }
+        },
+        '{{componentId}}-{{sectionId}}-entity_id'                       : {
+            placeholder: "SELECT BUSINESS ENTITY"
         },
         '{{componentId}}-{{sectionId}}-status'                          : {
             'placeholder' : "SELECT EMPLOYEE STATUS"

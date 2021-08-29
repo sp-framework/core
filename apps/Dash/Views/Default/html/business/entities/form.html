@@ -60,6 +60,11 @@
                         [
                             'tabTitle'          : 'Financial Details',
                             'tabInclude'        : 'entities/form/financialdetails'
+                        ],
+                        'settings'   :
+                        [
+                            'tabTitle'          : 'Settings',
+                            'tabInclude'        : 'entities/form/settings'
                         ]
                     ]
                 %}
@@ -377,6 +382,74 @@ dataCollectionSection =
                 }
             }
         },
+        '{{componentId}}-{{sectionId}}-settings'                : { },
+        '{{componentId}}-{{sectionId}}-packages'                : {
+            placeholder: 'SELECT PACKAGE',
+            afterInit: function() {
+                var packageId;
+
+                $('#{{componentId}}-{{sectionId}}-packages').on('select2:select', function(e) {
+                    packageId = e.params.data.id;
+
+                    $('#{{componentId}}-{{sectionId}}-cancel, #{{componentId}}-{{sectionId}}-update').attr('disabled', false);
+                    $('#{{componentId}}-{{sectionId}}-package_prefix, #{{componentId}}-{{sectionId}}-next_seq_number').attr('disabled', false);
+
+                    $('.pre_seq').each(function(index, tr) {
+                        if ($(tr).data('id') == packageId) {
+                            $('#{{componentId}}-{{sectionId}}-package_prefix').val($(tr).children('.prefix').html().trim());
+                            $('#{{componentId}}-{{sectionId}}-next_seq_number').val($(tr).children('.next_seq_number').html().trim());
+                        }
+                    });
+                });
+
+                $('#{{componentId}}-{{sectionId}}-cancel, #{{componentId}}-{{sectionId}}-update').click(function(e) {
+                    e.preventDefault();
+
+                    $('#{{componentId}}-{{sectionId}}-cancel, #{{componentId}}-{{sectionId}}-update').attr('disabled', true);
+                    $('#{{componentId}}-{{sectionId}}-package_prefix, #{{componentId}}-{{sectionId}}-next_seq_number').attr('disabled', true);
+
+                    if ($(this)[0].id === '{{componentId}}-{{sectionId}}-update') {
+                        $('.pre_seq').each(function(index, tr) {
+                            if ($(tr).data('id') == packageId) {
+                                $(tr).children('.prefix').html($('#{{componentId}}-{{sectionId}}-package_prefix').val());
+                                $(tr).children('.next_seq_number').html($('#{{componentId}}-{{sectionId}}-next_seq_number').val());
+                            }
+                        });
+                    }
+
+                    reset();
+                });
+
+                function reset() {
+                    $('#{{componentId}}-{{sectionId}}-packages').val(0).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-package_prefix').val('');
+                    $('#{{componentId}}-{{sectionId}}-next_seq_number').val('');
+
+                    collectData();
+                }
+
+                function collectData() {
+                    dataCollectionSection["data"]['settings'] = { };
+                    dataCollectionSection["data"]['settings']["prefix-seq"] = { };
+
+                    $('.pre_seq').each(function(index, preseq) {
+                        var id = $(preseq)[0].id;
+
+                        var data = { };
+                        data['package_name'] = id;
+                        data['prefix'] = $('#' + id + ' .prefix').html().trim();
+                        data['next_seq_number'] = $('#' + id + ' .next_seq_number').html().trim();
+
+                        dataCollectionSection["data"]['settings']["prefix-seq"][id] = data;
+
+                    });
+                }
+
+                collectData();
+            }
+        },
+        '{{componentId}}-{{sectionId}}-package_prefix'          : { },
+        '{{componentId}}-{{sectionId}}-next_seq_number'         : { },
         '{{componentId}}-{{sectionId}}-form'                    : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {

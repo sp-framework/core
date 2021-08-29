@@ -24,47 +24,47 @@ class Entities
                 new Column(
                     'logo',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 1024,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'abn',
                     [
-                        'type'    => Column::TYPE_BIGINTEGER,
-                        'size'    => 11,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_BIGINTEGER,
+                        'size'          => 11,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'business_name',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 200,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 200,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'entity_type',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 10,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'address_id',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'api_id',
                     [
-                        'type'    => Column::TYPE_INTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
@@ -167,6 +167,13 @@ class Entities
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'settings',
+                    [
+                        'type'          => Column::TYPE_TEXT,
+                        'notNull'       => true,
                     ]
                 ),
             ],

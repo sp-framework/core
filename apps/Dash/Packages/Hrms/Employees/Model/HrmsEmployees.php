@@ -11,6 +11,10 @@ class HrmsEmployees extends BaseModel
 {
     public $id;
 
+    public $ref_id;
+
+    public $entity_id;
+
     public $portrait;
 
     public $account_id;
