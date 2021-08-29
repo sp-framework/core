@@ -75,7 +75,7 @@ class PurchaseordersComponent extends BaseComponent
 
 				$purchaseOrder['activityLogs'] = $this->purchaseOrdersPackage->getActivityLogs($this->getData()['id']);
 
-				$purchaseOrder['notes'] = $this->notes->getNotes('vendors', $this->getData()['id']);
+				$purchaseOrder['notes'] = $this->notes->getNotes('purchaseorders', $this->getData()['id']);
 
 				if ($this->vendors->searchByVendorId($purchaseOrder['vendor_id'])) {
 					$vendor = $this->vendors->packagesData->vendor;
@@ -170,13 +170,13 @@ class PurchaseordersComponent extends BaseComponent
 			$this->purchaseOrdersPackage,
 			'ims/stock/purchaseorders/view',
 			null,
-			['status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
+			['ref_id', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
 			true,
-			['status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
+			['ref_id', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
 			$controlActions,
-			['vendor_id' => 'vendor'],
+			['ref_id' => 'PO#', 'vendor_id' => 'vendor'],
 			$replaceColumns,
-			'id'
+			'ref_id'
 		);
 
 		$this->view->pick('purchaseorders/list');

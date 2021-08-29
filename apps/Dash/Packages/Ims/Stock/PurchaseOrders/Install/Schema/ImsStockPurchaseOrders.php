@@ -21,6 +21,14 @@ class ImsStockPurchaseOrders
                     ]
                 ),
                 new Column(
+                    'ref_id',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'entity_id',
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
@@ -93,6 +101,13 @@ class ImsStockPurchaseOrders
                     ]
                 ),
                 new Column(
+                    'location_address_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'customer_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
@@ -104,6 +119,13 @@ class ImsStockPurchaseOrders
                     [
                         'type'    => Column::TYPE_INTEGER,
                         'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'one_off_address_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => true,
                     ]
                 ),
                 new Column(

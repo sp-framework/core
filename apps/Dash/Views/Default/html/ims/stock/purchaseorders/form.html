@@ -691,27 +691,23 @@ dataCollectionSection =
                                 '</dl>';
 
                             addressHtml +=
-                                '<div class="col-md-6">' +
-                                    '<div class="info-box">' +
-                                    '    <div class="info-box-content">' +
-                                    '        <div class="row">' +
-                                    '            <div class="col-md-1">' +
-                                    '                <div class="icheck-primary">' +
-                                    '                    <input type="radio" id="' + address.id + '" data-value="' + address.id + '" name="{{componentId}}-{{sectionId}}-customer-addresses" ' + checked + '>' +
-                                    '                    <label for="' + address.id + '"></label>' +
-                                    '                </div>' +
-                                    '            </div>' +
-                                    '            <div class="col">' + addressContent + '</div>' +
-                                    '        </div>' +
-                                    '    </div>' +
-                                    '</div>' +
+                                '<div class="info-box">' +
+                                '    <div class="info-box-content">' +
+                                '        <div class="row">' +
+                                '            <div class="col-md-1">' +
+                                '                <div class="icheck-primary">' +
+                                '                    <input type="radio" id="' + address.id + '" data-value="' + address.id + '" name="{{componentId}}-{{sectionId}}-customer-addresses" ' + checked + '>' +
+                                '                    <label for="' + address.id + '"></label>' +
+                                '                </div>' +
+                                '            </div>' +
+                                '            <div class="col">' + addressContent + '</div>' +
+                                '        </div>' +
+                                '    </div>' +
                                 '</div>';
                         });
 
                         $('#{{componentId}}-{{sectionId}}-customer_address_id').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-customer_address_id').empty().append(
-                            '<div class="row">' + addressHtml + '</div>'
-                        );
+                        $('#{{componentId}}-{{sectionId}}-customer_address_id').empty().append(addressHtml);
 
                         $('[name="{{componentId}}-{{sectionId}}-customer-addresses"]').each(function(index, addressRadio) {
                             if ($(addressRadio).attr('checked') === 'checked') {

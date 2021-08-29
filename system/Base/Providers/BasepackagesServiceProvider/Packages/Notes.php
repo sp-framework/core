@@ -237,6 +237,11 @@ class Notes extends BasePackage
         return [];
     }
 
+    public function removeNotes($packageName, $packageRowId)
+    {
+        //
+    }
+
     protected function extractData(array $data)
     {
         $columns = array_keys($this->getModelsColumnMap());

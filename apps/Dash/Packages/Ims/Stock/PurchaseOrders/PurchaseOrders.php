@@ -42,6 +42,10 @@ class PurchaseOrders extends BasePackage
         $data = $this->getTotals($data);
 
         if ($this->add($data)) {
+            $data['id'] = $this->packagesData->last['id'];
+
+            $data = $this->addRefId($data);
+
             if ($data['attachments'] !== '') {
                 $this->basepackages->storages->changeOrphanStatus($data['attachments'], null, true);
             }
@@ -50,7 +54,7 @@ class PurchaseOrders extends BasePackage
                 $data['products'] = Json::decode($data['products'], true);
 
                 foreach ($data['products'] as $productKey => $product) {
-                    $product['purchase_order_id'] = $this->packagesData->last['id'];
+                    $product['purchase_order_id'] = $data['id'];
 
                     $this->addPurchaseOrderProducts($product);
                 }
@@ -58,7 +62,11 @@ class PurchaseOrders extends BasePackage
 
             $this->basepackages->notes->addNote($this->packageName, $data);
 
+            $this->addActivityLog($data);
+
             $this->addResponse('Added purchase order.');
+
+            $this->addToNotification('add', 'Added new purchase order ' . $data['id']);
         } else {
             $this->addResponse('Error adding purchase order.', 1);
         }
@@ -73,6 +81,8 @@ class PurchaseOrders extends BasePackage
         $data = $this->getTotals($data);
 
         if ($this->update($data)) {
+            $data = $this->addRefId($data);
+
             if (isset($data['attachments']) && $data['attachments'] !== '') {
                 $this->basepackages->storages->changeOrphanStatus($data['attachments'], $purchaseOrder['attachments'], true);
             }
@@ -81,7 +91,7 @@ class PurchaseOrders extends BasePackage
                 $data['products'] = Json::decode($data['products'], true);
 
                 foreach ($data['products'] as $productKey => $product) {
-                    $product['purchase_order_id'] = $purchaseOrder['id'];
+                    $product['purchase_order_id'] = $data['id'];
 
                     $this->addPurchaseOrderProducts($product);
                 }
@@ -94,6 +104,12 @@ class PurchaseOrders extends BasePackage
                     $this->removePurchaseOrderProducts($mpn);
                 }
             }
+
+            $this->basepackages->notes->addNote($this->packageName, $data);
+
+            $this->addActivityLog($data, $purchaseOrder);
+
+            $this->addToNotification('update', 'Updated purchase order ' . $data['id']);
 
             $this->addResponse('Updated purchase order.');
         } else {
@@ -119,19 +135,11 @@ class PurchaseOrders extends BasePackage
     protected function updateAddress(array $data, $purchaseOrder = null)
     {
         if ($data['delivery_type'] == '1') {
-            if ($purchaseOrder) {
-                $data['address_id'] = $purchaseOrder['address_id'];
-            } else {
-                $data['address_id'] = $data['location_address_id'];
-            }
+            $data['address_id'] = $data['location_address_id'];
         } else if ($data['delivery_type'] == '2') {
-            if ($purchaseOrder) {
-                $data['address_id'] = $purchaseOrder['address_id'];
-            } else {
-                $data['address_id'] = $data['customer_address_id'];
-            }
+            $data['address_id'] = $data['customer_address_id'];
         } else if ($data['delivery_type'] == '3') {
-            if (!$addressId) {
+            if (!$purchaseOrder['one_off_address_id'] || $purchaseOrder['one_off_address_id'] == '0') {
                 $address = $data;
                 $address['name'] = $data['contact_fullname'];
                 $address['package_name'] = $this->packageName;
@@ -140,15 +148,16 @@ class PurchaseOrders extends BasePackage
                 $this->basepackages->addressbook->addAddress($address);
 
                 $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
+                $data['one_off_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
             } else {
                 $address = $data;
                 $address['name'] = $data['contact_fullname'];
                 $address['package_name'] = $this->packageName;
-                $address['id'] = $data['address_id'];
+                $address['id'] = $purchaseOrder['one_off_address_id'];
 
                 $this->basepackages->addressbook->updateAddress($address);
 
-                $data['address_id'] = $purchaseOrder['address_id'];
+                $data['address_id'] = $purchaseOrder['one_off_address_id'];
             }
         }
 

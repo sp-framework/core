@@ -413,10 +413,15 @@ class Notes extends AdminLTETags
                         <h6 class="timeline-header text-secondary">' .  $title . '</h6>
                         <div class="timeline-body">' . $notes['note'] . '</div>';
 
-            $this->content .=
-                        '<div class="timeline-footer chocolat-parent">' . $footer . '</div>
-                    </div>
+            if ($notes['note_attachments'] && is_array($notes['note_attachments']) && count($notes['note_attachments']) > 0) {
+                $this->content .=
+                            '<div class="timeline-footer chocolat-parent">' . $footer . '</div>';
+            } else {
+                $this->content .=
+                    '</div>
                 </div>';
+
+            }
         }
 
         $this->content .=

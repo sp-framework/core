@@ -9,6 +9,8 @@ class ImsStockPurchaseOrders extends BaseModel
 {
     public $id;
 
+    public $ref_id;
+
     public $entity_id;
 
     public $references;
@@ -29,9 +31,13 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public $location_contact_id;
 
+    public $location_address_id;
+
     public $customer_id;
 
     public $customer_address_id;
+
+    public $one_off_address_id;
 
     public $address_id;
 
