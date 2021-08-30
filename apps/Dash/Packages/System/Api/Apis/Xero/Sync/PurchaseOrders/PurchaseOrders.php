@@ -26,7 +26,15 @@ class PurchaseOrders extends BasePackage
 
     protected $request;
 
-    public function sync($apiId = null)
+    protected $addCounter = 0;
+
+    protected $addedIds = [];
+
+    protected $updateCounter = 0;
+
+    protected $updatedIds = [];
+
+    public function sync($apiId = null, $parameters = null)
     {
         $this->apiPackage = new Api;
 
@@ -34,27 +42,54 @@ class PurchaseOrders extends BasePackage
 
         $xeroApis = $this->apiPackage->getApiByType('xero', true);
 
-        if (!$apiId) {
-            foreach ($xeroApis as $key => $xeroApi) {
-                $this->syncWithXero($xeroApi['api_id']);
+        if ($xeroApis && count($xeroApis) > 0) {
+            if (!$apiId) {
+                foreach ($xeroApis as $key => $xeroApi) {
+                    $this->syncWithXero($xeroApi['api_id'], $parameters);
+                }
+            } else {
+                $this->syncWithXero($apiId, $parameters);
             }
+
+            $this->addResponse(
+                'Sync Ok. Added: ' . $this->addCounter . '. Updated: ' . $this->updateCounter . '.',
+                0,
+                [
+                    'addedIds' => $this->addedIds, 'updatedIds' => $this->updatedIds
+                ]
+            );
         } else {
-            $this->syncWithXero($apiId);
+            $this->addResponse('Sync Error. No API Configuration Found', 1);
         }
     }
 
-    protected function syncWithXero($apiId)
+    protected function syncWithXero($apiId, $parameters = null)
     {
         $this->api = $this->apiPackage->useApi(['api_id' => $apiId]);
 
-        $this->syncDependencies($apiId);
+        $this->syncDependencies($apiId, $parameters);
 
         $this->xeroApi = $this->api->useService('XeroAccountingApi');
 
-        $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetPurchaseOrders', $apiId);
-
+        if ($parameters && isset($parameters[$apiId]['PurchaseOrders']['modifiedSince'])) {
+            $modifiedSince = $parameters[$apiId]['PurchaseOrders']['modifiedSince'];
+        } else {
+            $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetPurchaseOrders', $apiId);
+        }
         if ($modifiedSince) {
             $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
+        }
+
+        if ($parameters && isset($parameters[$apiId]['PurchaseOrders']['dateFrom'])) {
+            $this->request->DateFrom = $parameters[$apiId]['PurchaseOrders']['dateFrom'];
+        }
+
+        if ($parameters && isset($parameters[$apiId]['PurchaseOrders']['dateTo'])) {
+            $this->request->DateTo = $parameters[$apiId]['PurchaseOrders']['dateTo'];
+        }
+
+        if ($parameters && isset($parameters[$apiId]['PurchaseOrders']['status'])) {
+            $this->request->Status = $parameters[$apiId]['PurchaseOrders']['status'];
         }
 
         $page = 1;
@@ -80,7 +115,7 @@ class PurchaseOrders extends BasePackage
         } while (isset($responseArr['PurchaseOrders']) && count($responseArr['PurchaseOrders']) > 0);
     }
 
-    protected function syncDependencies($apiId)
+    protected function syncDependencies($apiId, $parameters)
     {
         $organisations = new Organisations;
 
@@ -92,7 +127,7 @@ class PurchaseOrders extends BasePackage
 
         $contacts = new Contacts;
 
-        $contacts->sync($apiId);
+        $contacts->sync($apiId, $parameters);
 
         $items = new Items;
 
@@ -163,13 +198,21 @@ class PurchaseOrders extends BasePackage
 
                 $modelToUse->create();
 
+                $this->addCounter = $this->addCounter + 1;
+
+                array_push($this->addedIds, $purchaseOrder['PurchaseOrderID']);
+
                 $thisPo = $modelToUse->toArray();
             } else {
                 if ($purchaseOrder['UpdatedDateUTC'] !== $xeroPo->UpdatedDateUTC) {
 
-                    $modelToUse->assign($this->jsonData($purchaseOrder));
+                    $xeroPo->assign($this->jsonData($purchaseOrder));
 
-                    $modelToUse->update();
+                    $xeroPo->update();
+
+                    $this->updateCounter = $this->updateCounter + 1;
+
+                    array_push($this->updatedIds, $purchaseOrder['PurchaseOrderID']);
 
                     $thisPo = $xeroPo->toArray();
                 } else {

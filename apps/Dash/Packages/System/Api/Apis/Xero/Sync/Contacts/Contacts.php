@@ -25,7 +25,7 @@ class Contacts extends BasePackage
 
     protected $request;
 
-    public function sync($apiId = null)
+    public function sync($apiId = null, $parameters = null)
     {
         $this->apiPackage = new Api;
 
@@ -35,20 +35,24 @@ class Contacts extends BasePackage
 
         if (!$apiId) {
             foreach ($xeroApis as $key => $xeroApi) {
-                $this->syncWithXero($xeroApi['api_id']);
+                $this->syncWithXero($xeroApi['api_id'], $parameters);
             }
         } else {
-            $this->syncWithXero($apiId);
+            $this->syncWithXero($apiId, $parameters);
         }
     }
 
-    protected function syncWithXero($apiId)
+    protected function syncWithXero($apiId, $parameters = null)
     {
         $this->api = $this->apiPackage->useApi(['api_id' => $apiId]);
 
         $this->xeroApi = $this->api->useService('XeroAccountingApi');
 
-        $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetContacts', $apiId);
+        if ($parameters && isset($parameters[$apiId]['Contacts']['modifiedSince'])) {
+            $modifiedSince = $parameters[$apiId]['Contacts']['modifiedSince'];
+        } else {
+            $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetContacts', $apiId);
+        }
 
         if ($modifiedSince) {
             $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);

@@ -26,6 +26,8 @@ class Package extends BasePackage
     {
         $this->init();
 
+        // $this->installSyncTasks();return;
+
         try {
             if ($dropTables) {
                 // Organisations
@@ -79,5 +81,53 @@ class Package extends BasePackage
         } catch (\PDOException $e) {
             $this->addResponse($e->getMessage(), 1);
         }
+    }
+
+    protected function installSyncTasks()
+    {
+        $availableFunctions = array_keys($this->basepackages->workers->tasks->getAllFunctions());
+
+        $functionsDir = $this->basepackages->workers->tasks->getFunctionsDir();
+
+        $schedules = $this->basepackages->workers->schedules->schedules;
+
+        // $this->addClassFile($functionsDir);
+
+        var_dump($availableFunctions, $functionsDir, $schedules);die();
+    }
+
+    protected function addClassFile($functionsDir)
+    {
+        $file =
+'<?php
+
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Functions;
+
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Functions;
+
+class SyncXeroPo extends Functions
+{
+    public $funcName = "Sync Xero Purchase Orders";
+
+    public function run(array $args = [])
+    {
+        $thisFunction = $this;
+
+        return function() use ($thisFunction, $args) {
+            $thisFunction->updateJobTask(2, $args);
+
+            $this->basepackages->emailqueue->processQueue(1);
+
+            $this->addJobResult($this->basepackages->emailqueue->packagesData, $args);
+
+            $thisFunction->updateJobTask(3, $args);
+        };
+    }
+}';
+
+        $this->localContent->write(
+            $functionsDir . 'SyncXeroPo.php',
+            $file
+        );
     }
 }
