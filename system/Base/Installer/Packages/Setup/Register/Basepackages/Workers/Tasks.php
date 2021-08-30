@@ -25,10 +25,23 @@ class Tasks
         //Email High Priority
         $taskEntry =
             [
-                'name'              => 'Email (High Priority)',
+                'name'              => 'Email (High Priority Business Hours)',
                 'description'       => 'High priority emails like password recovery emails.',
                 'function'          => 'emailqueuehighpriority',
-                'schedule_id'       => 1,
+                'schedule_id'       => 4,
+                'priority'          => 10,
+                'enabled'           => 1,
+                'type'              => 0,
+            ];
+        array_push($taskArr, $taskEntry);
+
+        //Email High Priority
+        $taskEntry =
+            [
+                'name'              => 'Email (High Priority Hourly)',
+                'description'       => 'High priority emails like password recovery emails.',
+                'function'          => 'emailqueuehighpriority',
+                'schedule_id'       => 2,
                 'priority'          => 10,
                 'enabled'           => 1,
                 'type'              => 0,
@@ -41,7 +54,7 @@ class Tasks
                 'name'              => 'Email (Medium Priority)',
                 'description'       => 'Medium priority emails like notification emails.',
                 'function'          => 'emailqueuemediumpriority',
-                'schedule_id'       => 2,
+                'schedule_id'       => 3,
                 'priority'          => 5,
                 'enabled'           => 1,
                 'type'              => 0,
@@ -54,7 +67,7 @@ class Tasks
                 'name'              => 'Email (Low Priority)',
                 'description'       => 'Low priority emails.',
                 'function'          => 'emailqueuelowpriority',
-                'schedule_id'       => 4,
+                'schedule_id'       => 5,
                 'priority'          => 1,
                 'enabled'           => 1,
                 'type'              => 0,

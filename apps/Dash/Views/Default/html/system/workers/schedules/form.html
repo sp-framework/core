@@ -17,6 +17,11 @@
 {% set everyxminutesHidden = 'hidden' %}
 {% set everyxminutesMinutes = '2' %}
 
+{% set everyxminutesbetweenHidden = 'hidden' %}
+{% set everyxminutesbetweenMinutes = '1' %}
+{% set everyxminutesbetweenStart = '00:00' %}
+{% set everyxminutesbetweenEnd = '00:00' %}
+
 {% set hourlyHidden = 'hidden' %}
 {% set hourlyMinutes = '00' %}
 
@@ -40,6 +45,11 @@
 {% elseif scheduleScheduleType === 'everyxminutes' %}
     {% set everyxminutesHidden = '' %}
     {% set everyxminutesMinutes = schedule['schedule']['params']['minutes'] %}
+{% elseif scheduleScheduleType === 'everyxminutesbetween' %}
+    {% set everyxminutesbetweenHidden = '' %}
+    {% set everyxminutesbetweenMinutes = schedule['schedule']['params']['minutes'] %}
+    {% set everyxminutesbetweenStart = schedule['schedule']['params']['start'] %}
+    {% set everyxminutesbetweenEnd = schedule['schedule']['params']['end'] %}
 {% elseif scheduleScheduleType === 'hourly' %}
     {% set hourlyHidden = '' %}
     {% set hourlyMinutes = schedule['schedule']['params']['hourly_minutes'] %}
@@ -183,9 +193,15 @@
                                     ],
                                 'everyxminutes' :
                                     [
-                                        'title'          : 'Every X Minute',
+                                        'title'          : 'Every X Minutes',
                                         'type'           : 'warning',
                                         'dataValue'      : 'everyxminutes'
+                                    ],
+                                'everyxminutesbetween' :
+                                    [
+                                        'title'          : 'Every X Minutes Between',
+                                        'type'           : 'warning',
+                                        'dataValue'      : 'everyxminutesbetween'
                                     ],
                                 'hourly' :
                                     [
@@ -223,31 +239,111 @@
                 </div>
             </div>
             <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyxminutes" {{everyxminutesHidden}}>
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
-                        'fieldId'                               : 'everyxminutes_minutes',
-                        'fieldLabel'                            : 'Minutes',
-                        'fieldType'                             : 'input',
-                        'fieldInputTypeTextFilter'              : 'positiveInt',
-                        'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Minutes between 2 and 1440 (24 Hours)',
-                        'fieldRequired'                         : true,
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : true,
-                        'fieldBazPostOnUpdate'                  : true,
-                        'fieldBazJstreeSearch'                  : true,
-                        'fieldDataInputMinNumber'               : 2,
-                        'fieldDataInputMaxNumber'               : 1440,
-                        'fieldValue'                            : everyxminutesMinutes
-                    ]
-                )}}
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutes_minutes',
+                                'fieldLabel'                            : 'Minutes',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Minutes between 2 and 1339 (24 Hours)',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 2,
+                                'fieldDataInputMaxNumber'               : 1339,
+                                'fieldValue'                            : everyxminutesMinutes
+                            ]
+                        )}}
+                    </div>
+                </div>
                 <div class="callout callout-warning">
-                    <h5>Every X Minute</h5>
-                    <p>Task with this schedule will run every <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutes-span">2</span> minutes from the moment it starts.</p>
+                    <h5>Every X Minutes</h5>
+                    <p>Task with this schedule will run every <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutes-span">{{everyxminutesMinutes}}</span> minutes from the moment it starts.</p>
+                </div>
+            </div>
+            <div class="col schedules" id="{{componentId}}-{{sectionId}}-everyxminutes-between" {{everyxminutesbetweenHidden}}>
+                <div class="row">
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutesbetween_minutes',
+                                'fieldLabel'                            : 'Minutes',
+                                'fieldType'                             : 'input',
+                                'fieldInputTypeTextFilter'              : 'positiveInt',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Minutes between 0 and 59 (1 Hour)',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldDataInputMinNumber'               : 0,
+                                'fieldDataInputMaxNumber'               : 59,
+                                'fieldValue'                            : everyxminutesbetweenMinutes
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutesbetween_start',
+                                'fieldLabel'                            : 'Between Start Time',
+                                'fieldType'                             : 'flatpickr',
+                                'fieldFlatpickrClearButton'             : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Between Start Time',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldValue'                            : everyxminutesbetweenStart
+                            ]
+                        )}}
+                    </div>
+                    <div class="col">
+                        {{adminltetags.useTag('fields',
+                            [
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'everyxminutesbetween_end',
+                                'fieldLabel'                            : 'Between End Time',
+                                'fieldType'                             : 'flatpickr',
+                                'fieldFlatpickrClearButton'             : true,
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Between End Time',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldBazJstreeSearch'                  : true,
+                                'fieldValue'                            : everyxminutesbetweenEnd
+                            ]
+                        )}}
+                    </div>
+                </div>
+                <div class="callout callout-warning">
+                    <h5>Every X Minutes Between</h5>
+                    <p>Task with this schedule will run every <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutesbetween-span">{{everyxminutesbetweenMinutes}}</span> minutes between <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutesbetween_start-span">{{everyxminutesbetweenStart}}</span> and <span class="text-warning" id="{{componentId}}-{{sectionId}}-everyxminutesbetween_end-span">{{everyxminutesbetweenEnd}}</span>.</p>
                 </div>
             </div>
             <div class="col schedules" id="{{componentId}}-{{sectionId}}-hourly" {{hourlyHidden}}>
@@ -331,7 +427,7 @@
                 </div>
                 <div class="callout callout-info">
                     <h5>Daily</h5>
-                    <p>Task with this schedule will run every day. If hour and minutes are specified the task will run daily at <span class="text-info" id="{{componentId}}-{{sectionId}}-hourly-hour-span">00</span>:<span class="text-info" id="{{componentId}}-{{sectionId}}-hourly-minutes-span">00</span> hour.</p>
+                    <p>Task with this schedule will run every day. If hour and minutes are specified the task will run daily at <span class="text-info" id="{{componentId}}-{{sectionId}}-hourly-hour-span">{{dailyHours}}</span>:<span class="text-info" id="{{componentId}}-{{sectionId}}-hourly-minutes-span">{{dailyMinutes}}</span> hour.</p>
                 </div>
             </div>
             <div class="col schedules" id="{{componentId}}-{{sectionId}}-weekly" {{weeklyHidden}}>
@@ -339,62 +435,25 @@
                     <div class="col">
                         {{adminltetags.useTag('fields',
                             [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'weekly_days',
-                                'fieldLabel'                     : 'Days',
-                                'fieldType'                      : 'select2',
-                                'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Days of the week.',
-                                'fieldRequired'                  : true,
-                                'fieldBazScan'                   : true,
-                                'fieldBazPostOnCreate'           : true,
-                                'fieldBazPostOnUpdate'           : true,
-                                'fieldDataSelect2Multiple'       : true,
-                                'fieldDataSelect2Options'        :
-                                    {
-                                        '0'            :
-                                            {
-                                                'id'            : '0',
-                                                'name'          : 'Sunday'
-                                            },
-                                        '1'            :
-                                            {
-                                                'id'            : '1',
-                                                'name'          : 'Monday'
-                                            },
-                                        '2'            :
-                                            {
-                                                'id'            : '2',
-                                                'name'          : 'Tuesday'
-                                            },
-                                        '3'            :
-                                            {
-                                                'id'            : '3',
-                                                'name'          : 'Wednesday'
-                                            },
-                                        '4'            :
-                                            {
-                                                'id'            : '4',
-                                                'name'          : 'Thursday'
-                                            },
-                                        '5'            :
-                                            {
-                                                'id'            : '5',
-                                                'name'          : 'Friday'
-                                            },
-                                        '6'            :
-                                            {
-                                                'id'            : '6',
-                                                'name'          : 'Saturday'
-                                            }
-                                    },
-                                'fieldDataSelect2OptionsKey'           : 'id',
-                                'fieldDataSelect2OptionsValue'         : 'name',
-                                'fieldDataSelect2OptionsArray'         : true,
-                                'fieldDataSelect2OptionsSelected'      : weeklyDays
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'weekly_days',
+                                'fieldLabel'                            : 'Days',
+                                'fieldType'                             : 'select2',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Days of the week.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataSelect2Multiple'              : true,
+                                'fieldDataSelect2Options'               : weekdays,
+                                'fieldDataSelect2OptionsKey'            : 'id',
+                                'fieldDataSelect2OptionsValue'          : 'name',
+                                'fieldDataSelect2OptionsArray'          : true,
+                                'fieldDataSelect2OptionsSelected'       : weeklyDays
                             ]
                         )}}
                     </div>
@@ -451,7 +510,7 @@
                 </div>
                 <div class="callout callout-info">
                     <h5>Weekly</h5>
-                    <p>Task with this schedule will run on <span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-days-span">Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday</span> at <span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-hour-span">00</span>:<span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-minutes-span">00</span> hour.</p>
+                    <p>Task with this schedule will run on <span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-days-span">Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday</span> at <span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-hour-span">{{weeklyHours}}</span>:<span class="text-info" id="{{componentId}}-{{sectionId}}-weekly-minutes-span">{{weeklyMinutes}}</span> hour.</p>
                 </div>
             </div>
             <div class="col schedules" id="{{componentId}}-{{sectionId}}-monthly" {{monthlyHidden}}>
@@ -459,87 +518,25 @@
                     <div class="col">
                         {{adminltetags.useTag('fields',
                             [
-                                'component'                      : component,
-                                'componentName'                  : componentName,
-                                'componentId'                    : componentId,
-                                'sectionId'                      : sectionId,
-                                'fieldId'                        : 'monthly_months',
-                                'fieldLabel'                     : 'Months',
-                                'fieldType'                      : 'select2',
-                                'fieldHelp'                      : true,
-                                'fieldHelpTooltipContent'        : 'Months of the year.',
-                                'fieldRequired'                  : true,
-                                'fieldBazScan'                   : true,
-                                'fieldBazPostOnCreate'           : true,
-                                'fieldBazPostOnUpdate'           : true,
-                                'fieldDataSelect2Multiple'       : true,
-                                'fieldDataSelect2Options'        :
-                                    {
-                                        '1'            :
-                                            {
-                                                'id'            : '1',
-                                                'name'          : 'January'
-                                            },
-                                        '2'            :
-                                            {
-                                                'id'            : '2',
-                                                'name'          : 'February'
-                                            },
-                                        '3'            :
-                                            {
-                                                'id'            : '3',
-                                                'name'          : 'March'
-                                            },
-                                        '4'            :
-                                            {
-                                                'id'            : '4',
-                                                'name'          : 'April'
-                                            },
-                                        '5'            :
-                                            {
-                                                'id'            : '5',
-                                                'name'          : 'May'
-                                            },
-                                        '6'            :
-                                            {
-                                                'id'            : '6',
-                                                'name'          : 'June'
-                                            },
-                                        '7'            :
-                                            {
-                                                'id'            : '7',
-                                                'name'          : 'July'
-                                            },
-                                        '8'            :
-                                            {
-                                                'id'            : '8',
-                                                'name'          : 'August'
-                                            },
-                                        '9'            :
-                                            {
-                                                'id'            : '9',
-                                                'name'          : 'September'
-                                            },
-                                        '10'           :
-                                            {
-                                                'id'            : '10',
-                                                'name'          : 'October'
-                                            },
-                                        '11'           :
-                                            {
-                                                'id'            : '11',
-                                                'name'          : 'November'
-                                            },
-                                        '12'           :
-                                            {
-                                                'id'            : '12',
-                                                'name'          : 'December'
-                                            }
-                                    },
-                                'fieldDataSelect2OptionsKey'           : 'id',
-                                'fieldDataSelect2OptionsValue'         : 'name',
-                                'fieldDataSelect2OptionsArray'         : true,
-                                'fieldDataSelect2OptionsSelected'      : monthlyMonths
+                                'component'                             : component,
+                                'componentName'                         : componentName,
+                                'componentId'                           : componentId,
+                                'sectionId'                             : sectionId,
+                                'fieldId'                               : 'monthly_months',
+                                'fieldLabel'                            : 'Months',
+                                'fieldType'                             : 'select2',
+                                'fieldHelp'                             : true,
+                                'fieldHelpTooltipContent'               : 'Months of the year.',
+                                'fieldRequired'                         : true,
+                                'fieldBazScan'                          : true,
+                                'fieldBazPostOnCreate'                  : true,
+                                'fieldBazPostOnUpdate'                  : true,
+                                'fieldDataSelect2Multiple'              : true,
+                                'fieldDataSelect2Options'               : months,
+                                'fieldDataSelect2OptionsKey'            : 'id',
+                                'fieldDataSelect2OptionsValue'          : 'name',
+                                'fieldDataSelect2OptionsArray'          : true,
+                                'fieldDataSelect2OptionsSelected'       : monthlyMonths
                             ]
                         )}}
                     </div>
@@ -654,32 +651,65 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-id'                      : { },
-        '{{componentId}}-{{sectionId}}-name'                    : { },
-        '{{componentId}}-{{sectionId}}-description'             : { },
-        '{{componentId}}-{{sectionId}}-type'                    : { },
-        '{{componentId}}-{{sectionId}}-everyxminutes_minutes'   : { },
-        '{{componentId}}-{{sectionId}}-hourly_minutes'          : { },
-        '{{componentId}}-{{sectionId}}-daily_hours'             : { },
-        '{{componentId}}-{{sectionId}}-daily_minutes'           : { },
-        '{{componentId}}-{{sectionId}}-weekly_days'             : {
+        '{{componentId}}-{{sectionId}}-id'                                      : { },
+        '{{componentId}}-{{sectionId}}-name'                                    : { },
+        '{{componentId}}-{{sectionId}}-description'                             : { },
+        '{{componentId}}-{{sectionId}}-type'                                    : { },
+        '{{componentId}}-{{sectionId}}-everyxminutes_minutes'                   : { },
+        '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'            : { },
+        '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'              : {
+            enableTime          : true,
+            noCalendar          : true,
+            dateFormat          : "H:i",
+            altFormat           : "H:i",
+            time_24hr           : true,
+            minuteIncrement     : 1,
+            defaultDate         : "{{everyxminutesbetweenStart}}",
+            onChange            : function(selectedDates, dateStr, instance) {
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-everyxminutesbetween_end']
+                    .flatpickr.setDate(dateStr, true, "H:i");
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-everyxminutesbetween_end']
+                    .flatpickr.set("minTime", dateStr);
+                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween_start-span').html(dateStr);
+            }
+        },
+        '{{componentId}}-{{sectionId}}-everyxminutesbetween_end'                : {
+            enableTime          : true,
+            noCalendar          : true,
+            dateFormat          : "H:i",
+            altFormat           : "H:i",
+            time_24hr           : true,
+            minuteIncrement     : 1,
+            defaultDate         : "{{everyxminutesbetweenEnd}}",
+            onChange            : function(selectedDates, dateStr, instance) {
+                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween_end-span').html(dateStr);
+            }
+        },
+        '{{componentId}}-{{sectionId}}-hourly_minutes'                          : { },
+        '{{componentId}}-{{sectionId}}-daily_hours'                             : { },
+        '{{componentId}}-{{sectionId}}-daily_minutes'                           : { },
+        '{{componentId}}-{{sectionId}}-weekly_days'                             : {
             placeholder: 'SELECT DAYS'
         },
-        '{{componentId}}-{{sectionId}}-weekly_hours'            : { },
-        '{{componentId}}-{{sectionId}}-weekly_minutes'          : { },
-        '{{componentId}}-{{sectionId}}-monthly_months'          : {
+        '{{componentId}}-{{sectionId}}-weekly_hours'                            : { },
+        '{{componentId}}-{{sectionId}}-weekly_minutes'                          : { },
+        '{{componentId}}-{{sectionId}}-monthly_months'                          : {
             placeholder: 'SELECT MONTHS'
         },
-        '{{componentId}}-{{sectionId}}-monthly_day'             : { },
-        '{{componentId}}-{{sectionId}}-monthly_hours'           : { },
-        '{{componentId}}-{{sectionId}}-monthly_minutes'         : { },
-        '{{componentId}}-{{sectionId}}-schedule'                : {
+        '{{componentId}}-{{sectionId}}-monthly_day'                             : { },
+        '{{componentId}}-{{sectionId}}-monthly_hours'                           : { },
+        '{{componentId}}-{{sectionId}}-monthly_minutes'                         : { },
+        '{{componentId}}-{{sectionId}}-schedule'                                : {
             afterInit : function() {
                 $('#{{componentId}}-{{sectionId}}-schedule').click(function() {
-                    if ($(this).find('input[type=radio]:checked').data('value') == 'everyminute') {
+                    initSchedules();
+                });
+
+                function initSchedules() {
+                    if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyminute') {
                         $('.schedules').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-everyminute').attr('hidden', false);
-                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'everyxminutes') {
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyxminutes') {
                         $('.schedules').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-everyxminutes').attr('hidden', false);
 
@@ -690,7 +720,18 @@ dataCollectionSection =
                                 $('#{{componentId}}-{{sectionId}}-everyxminutes-span').html($('#{{componentId}}-{{sectionId}}-everyxminutes_minutes').val());
                             }
                         });
-                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'hourly') {
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'everyxminutesbetween') {
+                        $('.schedules').attr('hidden', true);
+                        $('#{{componentId}}-{{sectionId}}-everyxminutes-between').attr('hidden', false);
+
+                        $('#{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes').on('input propertychange', function() {
+                            if ($('#{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes').val().length === 0) {
+                                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween-span').html('X');
+                            } else {
+                                $('#{{componentId}}-{{sectionId}}-everyxminutesbetween-span').html($('#{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes').val());
+                            }
+                        });
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'hourly') {
                         $('.schedules').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-hourly').attr('hidden', false);
 
@@ -705,7 +746,7 @@ dataCollectionSection =
                                 }
                             }
                         });
-                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'daily') {
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'daily') {
                         $('.schedules').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-daily').attr('hidden', false);
 
@@ -730,19 +771,18 @@ dataCollectionSection =
                                 }
                             }
                         });
-                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'weekly') {
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'weekly') {
                         $('.schedules').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-weekly').attr('hidden', false);
 
                         $('#{{componentId}}-{{sectionId}}-weekly_days').change('select2:change', function(e) {
-                            var days = $('#{{componentId}}-{{sectionId}}-weekly_days').val();
+                            var selectedDays = $('#{{componentId}}-{{sectionId}}-weekly_days').val();
+                            var days = [];
 
-                            function capitalizeFirstLetter(string) {
-                                return string.charAt(0).toUpperCase() + string.slice(1);
-                            }
-
-                            $(days).each(function(index, day) {
-                                days[index] = capitalizeFirstLetter(day);
+                            $('#{{componentId}}-{{sectionId}}-weekly_days').children('option').each(function(index, day) {
+                                if (selectedDays.includes($(day).val())) {
+                                    days.push($(day).text());
+                                }
                             });
 
                             $('#{{componentId}}-{{sectionId}}-weekly-days-span').html(days.join(', '));
@@ -769,22 +809,20 @@ dataCollectionSection =
                                 }
                             }
                         });
-                    } else if ($(this).find('input[type=radio]:checked').data('value') == 'monthly') {
+                    } else if ($('#{{componentId}}-{{sectionId}}-schedule').find('input[type=radio]:checked').data('value') == 'monthly') {
                         $('.schedules').attr('hidden', true);
                         $('#{{componentId}}-{{sectionId}}-monthly').attr('hidden', false);
 
                         $('#{{componentId}}-{{sectionId}}-monthly_months').change('select2:change', function(e) {
-                            var days = $('#{{componentId}}-{{sectionId}}-monthly_months').val();
+                            var selectedMonths = $('#{{componentId}}-{{sectionId}}-monthly_months').val();
+                            var months = [];
 
-                            function capitalizeFirstLetter(string) {
-                                return string.charAt(0).toUpperCase() + string.slice(1);
-                            }
-
-                            $(days).each(function(index, day) {
-                                days[index] = capitalizeFirstLetter(day);
+                            $('#{{componentId}}-{{sectionId}}-monthly_months').children('option').each(function(index, month) {
+                                if (selectedMonths.includes($(month).val())) {
+                                    months.push($(month).text());
+                                }
                             });
-
-                            $('#{{componentId}}-{{sectionId}}-monthly-months-span').html(days.join(', '));
+                            $('#{{componentId}}-{{sectionId}}-monthly-months-span').html(months.join(', '));
                         });
 
                         $('#{{componentId}}-{{sectionId}}-monthly_day, #{{componentId}}-{{sectionId}}-monthly_hours, #{{componentId}}-{{sectionId}}-monthly_minutes').on('input propertychange', function() {
@@ -819,15 +857,46 @@ dataCollectionSection =
                             }
                         });
                     }
-                });
+                }
+
+                initSchedules();
             }
         },
-        '{{componentId}}-{{sectionId}}-form'                    : {
+        '{{componentId}}-{{sectionId}}-form'                                    : {
+            ignore      : ':submit, :reset, :image, :hidden, .ignore, .cr-slider',
             rules: {
-                '{{componentId}}-{{sectionId}}-name'                    : 'required',
+                '{{componentId}}-{{sectionId}}-name'                            : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutes_minutes'           : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'    : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'      : 'required',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_end'        : 'required',
+                '{{componentId}}-{{sectionId}}-hourly_minutes'                  : 'required',
+                '{{componentId}}-{{sectionId}}-daily_hours'                     : 'required',
+                '{{componentId}}-{{sectionId}}-daily_minutes'                   : 'required',
+                '{{componentId}}-{{sectionId}}-weekly_days'                     : 'required',
+                '{{componentId}}-{{sectionId}}-weekly_hours'                    : 'required',
+                '{{componentId}}-{{sectionId}}-weekly_minutes'                  : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_months'                  : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_day'                     : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_hours'                   : 'required',
+                '{{componentId}}-{{sectionId}}-monthly_minutes'                 : 'required'
             },
             messages: {
-                '{{componentId}}-{{sectionId}}-name'                    : 'Please enter schedule name',
+                '{{componentId}}-{{sectionId}}-name'                            : 'Please enter schedule name',
+                '{{componentId}}-{{sectionId}}-everyxminutes_minutes'           : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_minutes'    : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_start'      : 'Please select start time',
+                '{{componentId}}-{{sectionId}}-everyxminutesbetween_end'        : 'Please select end time',
+                '{{componentId}}-{{sectionId}}-hourly_minutes'                  : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-daily_hours'                     : 'Please enter hours',
+                '{{componentId}}-{{sectionId}}-daily_minutes'                   : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-weekly_days'                     : 'Please select days',
+                '{{componentId}}-{{sectionId}}-weekly_hours'                    : 'Please enter hours',
+                '{{componentId}}-{{sectionId}}-weekly_minutes'                  : 'Please enter minutes',
+                '{{componentId}}-{{sectionId}}-monthly_months'                  : 'Please select months',
+                '{{componentId}}-{{sectionId}}-monthly_day'                     : 'Please enter day',
+                '{{componentId}}-{{sectionId}}-monthly_hours'                   : 'Please enter hours',
+                '{{componentId}}-{{sectionId}}-monthly_minutes'                 : 'Please enter minutes',
             }
         }
     });

@@ -47,3 +47,53 @@
         'dtZeroRecords'         : 'No task available. Add by clicking the Add new task button.'
     ]
 )}}
+<script>
+/* globals Swal PNotify BazContentLoader BazNotifications */
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
+    initFuncs();
+    BazContentLoader.init();
+}
+window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
+    initFuncs();
+    BazContentLoader.init();
+}
+
+function initFuncs() {
+    $('.rowForceNextRun').each(function(index,row) {
+        $(row).off();
+        $(row).click(function(e) {
+            e.preventDefault();
+
+            var thisButton = this;
+            var url = $(this).attr('href');
+
+            var dataToSend = { };
+            dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
+            dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            $.ajax({
+                url         : url,
+                method      : 'post',
+                dataType    : 'json',
+                data        : dataToSend,
+                success     : function(response) {
+                    if (response.responseCode === 0) {
+                        window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['BazContentSectionWithListing']._filterRunAjax();
+                        PNotify.success({
+                            title           : response.responseMessage,
+                        });
+                    } else {
+                        PNotify.error({
+                            title           : response.responseMessage,
+                        });
+                    }
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }
+            });
+        });
+    });
+}
+</script>

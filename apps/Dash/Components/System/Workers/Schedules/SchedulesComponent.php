@@ -23,6 +23,10 @@ class SchedulesComponent extends BaseComponent
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
+            $this->view->weekdays = $this->schedules->getWeekdays();
+
+            $this->view->months = $this->schedules->getMonths();
+
             if ($this->getData()['id'] != 0) {
                 $schedule = $this->schedules->getById($this->getData()['id']);
 

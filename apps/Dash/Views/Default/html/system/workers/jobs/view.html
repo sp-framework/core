@@ -5,6 +5,8 @@
         {% set cardType = 'danger' %}
     {% elseif job['status'] == 3 %}
         {% set cardType = 'success' %}
+    {% else %}
+        {% set cardType = 'secondary' %}
     {% endif %}
     {{adminltetags.useTag('content',
         [

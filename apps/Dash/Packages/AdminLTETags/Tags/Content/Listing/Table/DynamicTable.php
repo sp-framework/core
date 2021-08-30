@@ -554,6 +554,8 @@ class DynamicTable
                 } else {
                     $additionControlButtonLink = $additionControlButton['link'] . '/id/' . $columns['id'];
                 }
+            } else {
+                $additionControlButtonLink = $additionControlButton['link'];
             }
 
             $controlButtons = array_merge($controlButtons,

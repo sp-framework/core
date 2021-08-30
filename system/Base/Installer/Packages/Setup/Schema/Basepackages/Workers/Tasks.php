@@ -110,6 +110,13 @@ class Tasks
                         ]
                     ),
                     new Column(
+                        'force_next_run',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
                         'email',
                         [
                             'type'          => Column::TYPE_VARCHAR,

@@ -1,5 +1,9 @@
 {% if job['id'] is defined %}
-    {% set jobResult = job['result'] %}
+    {% if job['result'] is defined and job['result'] !== '' %}
+        {% set jobResult = job['result'] %}
+    {% else %}
+        {% set jobResult = 'No Result!' %}
+    {% endif %}
     <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
         <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
             <div class="row">

@@ -115,6 +115,11 @@ class Schedules extends BasePackage
         } else if ($data['schedule'] === 'everyxminutes') {
             $objData['schedule']['type'] = $data['schedule'];
             $objData['schedule']['params']['minutes'] = $data['everyxminutes_minutes'];
+        } else if ($data['schedule'] === 'everyxminutesbetween') {
+            $objData['schedule']['type'] = $data['schedule'];
+            $objData['schedule']['params']['minutes'] = $data['everyxminutesbetween_minutes'];
+            $objData['schedule']['params']['start'] = $data['everyxminutesbetween_start'];
+            $objData['schedule']['params']['end'] = $data['everyxminutesbetween_end'];
         } else if ($data['schedule'] === 'hourly') {
             $objData['schedule']['type'] = $data['schedule'];
             $objData['schedule']['params']['hourly_minutes'] = $data['hourly_minutes'];
@@ -158,5 +163,114 @@ class Schedules extends BasePackage
             );
 
         return $filter[0];
+    }
+
+    public function getWeekdays()
+    {
+        return
+            [
+                '0'                 =>
+                    [
+                        'id'        => '0',
+                        'name'      => 'Sunday'
+                    ],
+                '1'                 =>
+                    [
+                        'id'        => '1',
+                        'name'      => 'Monday'
+                    ],
+                '2'                 =>
+                    [
+                        'id'        => '2',
+                        'name'      => 'Tuesday'
+                    ],
+                '3'                 =>
+                    [
+                        'id'        => '3',
+                        'name'      => 'Wednesday'
+                    ],
+                '4'                 =>
+                    [
+                        'id'        => '4',
+                        'name'      => 'Thursday'
+                    ],
+                '5'                 =>
+                    [
+                        'id'        => '5',
+                        'name'      => 'Friday'
+                    ],
+                '6'                 =>
+                    [
+                        'id'        => '6',
+                        'name'      => 'Saturday'
+                    ]
+            ];
+    }
+
+    public function getMonths()
+    {
+        return
+            [
+                '1'                 =>
+                    [
+                        'id'        => '1',
+                        'name'      => 'January'
+                    ],
+                '2'                 =>
+                    [
+                        'id'        => '2',
+                        'name'      => 'February'
+                    ],
+                '3'                 =>
+                    [
+                        'id'        => '3',
+                        'name'      => 'March'
+                    ],
+                '4'                 =>
+                    [
+                        'id'        => '4',
+                        'name'      => 'April'
+                    ],
+                '5'                 =>
+                    [
+                        'id'        => '5',
+                        'name'      => 'May'
+                    ],
+                '6'                 =>
+                    [
+                        'id'        => '6',
+                        'name'      => 'June'
+                    ],
+                '7'                 =>
+                    [
+                        'id'        => '7',
+                        'name'      => 'July'
+                    ],
+                '8'                 =>
+                    [
+                        'id'        => '8',
+                        'name'      => 'August'
+                    ],
+                '9'                 =>
+                    [
+                        'id'        => '9',
+                        'name'      => 'September'
+                    ],
+                '10'                =>
+                    [
+                        'id'        => '10',
+                        'name'      => 'October'
+                    ],
+                '11'                =>
+                    [
+                        'id'        => '11',
+                        'name'      => 'November'
+                    ],
+                '12'                =>
+                    [
+                        'id'        => '12',
+                        'name'      => 'December'
+                    ]
+            ];
     }
 }

@@ -11,6 +11,8 @@ class TasksComponent extends BaseComponent
 
     protected $tasks;
 
+    protected $schedules;
+
     public function initialize()
     {
         $this->tasks = $this->basepackages->workers->tasks;
@@ -21,14 +23,14 @@ class TasksComponent extends BaseComponent
      */
     public function viewAction()
     {
-        $schedules = $this->basepackages->workers->schedules->schedules;
+        $this->schedules = $this->basepackages->workers->schedules->schedules;
 
         if (isset($this->getData()['id'])) {
             $functions = $this->tasks->getAllFunctions();
 
             $this->view->functions = $functions;
 
-            $this->view->schedules = $schedules;
+            $this->view->schedules = $this->schedules;
 
             if ($this->getData()['id'] != 0) {
                 $task = $this->tasks->getById($this->getData()['id']);
@@ -49,12 +51,6 @@ class TasksComponent extends BaseComponent
                 ]
             ];
 
-        $schedulesArr = [];
-
-        foreach ($schedules as $scheduleKey => $schedule) {
-            $schedulesArr[$schedule['id']] = $schedule['name'];
-        }
-
         $replaceColumns =
             function ($dataArr) {
                 if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
@@ -74,6 +70,18 @@ class TasksComponent extends BaseComponent
                 ]
             ];
 
+        $dtAdditionControlButtons =
+            [
+                'buttons'                   => [
+                    'forcenextrun'          => [
+                        'title'             => 'Force Next Run',
+                        'icon'              => 'forward',
+                        'additionalClass'   => 'rowForceNextRun',
+                        'link'              => '/' . $this->app['route'] . '/system/workers/tasks/forceNextRun'
+                    ]
+                ]
+            ];
+
         $this->generateDTContent(
             $this->tasks,
             'system/workers/tasks/view',
@@ -84,7 +92,8 @@ class TasksComponent extends BaseComponent
             $controlActions,
             ['schedule_id' => 'schedule'],
             $replaceColumns,
-            'name'
+            'name',
+            $dtAdditionControlButtons
         );
 
         $this->view->pick('tasks/list');
@@ -92,7 +101,14 @@ class TasksComponent extends BaseComponent
 
     protected function replaceColumns($dataArr)
     {
+        $schedulesArr = [];
+
+        foreach ($this->schedules as $scheduleKey => $schedule) {
+            $schedulesArr[$schedule['id']] = $schedule['name'];
+        }
+
         foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->formatSchedule($dataKey, $data, $schedulesArr);
             $data = $this->formatStatus($dataKey, $data);
             $data = $this->formatPreviousRun($dataKey, $data);
             $data = $this->formatNextRun($dataKey, $data);
@@ -100,6 +116,13 @@ class TasksComponent extends BaseComponent
         }
 
         return $dataArr;
+    }
+
+    protected function formatSchedule($rowId, $data, $schedulesArr)
+    {
+        $data['schedule_id'] = $schedulesArr[$data['schedule_id']];
+
+        return $data;
     }
 
     protected function formatEnabled($rowId, $data)
@@ -200,6 +223,21 @@ class TasksComponent extends BaseComponent
         if ($this->request->isPost()) {
 
             $this->tasks->removeTask($this->postData());
+
+            $this->addResponse(
+                $this->tasks->packagesData->responseMessage,
+                $this->tasks->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function forceNextRunAction()
+    {
+        if ($this->request->isPost()) {
+
+            $this->tasks->forceNextRun($this->postData());
 
             $this->addResponse(
                 $this->tasks->packagesData->responseMessage,

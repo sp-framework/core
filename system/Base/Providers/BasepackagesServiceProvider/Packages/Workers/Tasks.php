@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
+use Carbon\Carbon;
 use League\Flysystem\StorageAttributes;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
@@ -16,6 +17,11 @@ class Tasks extends BasePackage
     protected $functionsDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Workers/Functions/';
 
     public $tasks;
+
+    public function getFunctionsDir()
+    {
+        return $this->functionsDir;
+    }
 
     public function init(bool $resetCache = false)
     {
@@ -113,24 +119,20 @@ class Tasks extends BasePackage
         }
     }
 
-    public function runTask(int $id)
+    public function forceNextRun(array $data)
     {
-        //This method will be called via CRON every minute.
-        //Taskes that have next_run > current Unix Time will be executed as per their priority.
-        //Priorities are set as numbers from 1-10 with 1 being the lowest priority and 10 being the highest.
-        //Taskes can be registered to run at certain intervals.
-        //Example: Run Email Queue with High priority - Priority set to 10 and process run every minute.
-        // $logger = $this->logger;
+        $task = $this->getById($data['id']);
 
-        // var_dump($this->scheduler);
+        $time = Carbon::now();
 
-        // $this->scheduler->call(
-        //     function () {
-        //         echo 'Iran';
-        //     }
-        // )->inForeground();
+        $task['force_next_run'] = '1';
+        $task['next_run'] = $time->addMinute()->startOfMinute()->format('Y-m-d H:i:s');
 
-        // $this->scheduler->work([0,10,20,30,40,50]);
+        if ($this->update($task)) {
+            $this->addResponse($task['name'] . ' scheduled with worker for next run.');
+        } else {
+            $this->addResponse('Error scheduling task with worker.', 1);
+        }
     }
 
     public function getEnabledTasks()
@@ -140,12 +142,18 @@ class Tasks extends BasePackage
                 function($function) {
                     $function = $function->toArray();
 
-                    if ($function['enabled'] == 1) {
+                    if ($function['force_next_run'] == 1) {
+                        $function['org_schedule_id'] = $function['schedule_id'];
+                        $function['schedule_id'] = 1;//Make it minute so it can be picked by the scheduler for next run
+                        return $function;
+                    } else if ($function['enabled'] == 1) {
                         return $function;
                     }
                 }
             );
 
-        return $filter;
+        $sorted = msort($filter, 'priority', SORT_REGULAR, SORT_DESC);
+
+        return $sorted;
     }
 }

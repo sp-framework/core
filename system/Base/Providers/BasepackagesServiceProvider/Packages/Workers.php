@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
+use Carbon\Carbon;
 use GO\Scheduler;
 use GO\Traits\Interval;
 use Phalcon\Helper\Arr;
@@ -100,7 +101,9 @@ class Workers extends BasePackage
                 if ($schedule['type'] === 'everyminute') {
                     $this->scheduleEveryMinute($task, $schedule, $class);
                 } else if ($schedule['type'] === 'everyxminutes') {
-                    $this->scheduleEveryXMinute($task, $schedule, $class);
+                    $this->scheduleEveryXMinutes($task, $schedule, $class);
+                } else if ($schedule['type'] === 'everyxminutesbetween') {
+                    $this->scheduleEveryXMinutesBetween($task, $schedule, $class);
                 } else if ($schedule['type'] === 'hourly') {
                     $this->scheduleHourly($task, $schedule, $class);
                 } else if ($schedule['type'] === 'daily') {
@@ -119,8 +122,8 @@ class Workers extends BasePackage
             }
         }
 
-        // die();
         // var_dump($this->scheduledJobs);
+        // die();
         // var_dump($this->worker);
         // var_dump($this->scheduler);
         $this->scheduler->run();
@@ -166,7 +169,16 @@ class Workers extends BasePackage
 
         $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
 
-        if ($task['next_run'] !== $nextRun) {
+        if ($task['force_next_run'] && $task['force_next_run'] == '1') {
+            $task['force_next_run'] = null;
+            $task['next_run'] = 'Calculating Next Run...';
+
+            if (isset($task['org_schedule_id'])) {
+                $task['schedule_id'] = $task['org_schedule_id'];
+            }
+
+            $this->tasks->update($task);
+        } else if ($task['next_run'] !== $nextRun) {
             $task['next_run'] = $nextRun;
             $this->tasks->update($task);
         }
@@ -186,9 +198,86 @@ class Workers extends BasePackage
         )->everyminute();
     }
 
-    protected function scheduleEveryXMinute($task, $schedule, $class)
+    protected function scheduleEveryXMinutes($task, $schedule, $class)
     {
         $shouldSchedule = $this->shouldSchedule($task, $schedule);
+
+        if ($shouldSchedule) {
+            $newJob = $this->addNewJob($task, $schedule, $shouldSchedule);
+
+            $args =
+                [
+                    'job'   => $newJob,
+                    'task'  => $task
+                ];
+
+            $this->scheduler->call(
+                (new $class)->run($args),
+                [],
+                $task['id'] . '-' . $schedule['type']
+            )->everyminute(
+                (int) $schedule['params']['minutes']
+            );
+        }
+    }
+
+    protected function scheduleEveryXMinutesBetween($task, $schedule, $class)
+    {
+        $currentHour = (int) date("H");
+        $currentMinute = (int) date("i");
+        $startTime = explode(':', $schedule['params']['start']);
+        $startHour = (int) $startTime[0];
+        $startMinute = (int) $startTime[1];
+        $endTime = explode(':', $schedule['params']['end']);
+        $endHour = (int) $endTime[0];
+        $endMinute = (int) $endTime[1];
+
+        $betweenHour = false;
+        $betweenMinutes = false;
+
+        if ($currentHour >= $startHour && $currentHour < $endHour) {
+            $betweenHour = true;
+        }
+
+        if ($betweenHour) {
+            if ($endMinute > 0) {
+                if ($currentMinute >= $startMinute || $currentMinute <= $endMinute) {
+                    $betweenMinutes = true;
+                }
+            } else {
+                if ($currentMinute >= $startMinute) {
+                    $betweenMinutes = true;
+                }
+            }
+        }
+
+        if ($betweenHour && $betweenMinutes) {
+            $shouldSchedule = $this->shouldSchedule($task, $schedule);
+        } else {
+            if ($currentHour >= $endHour) {
+                $tomorrow = (Carbon::now()->addDay());
+
+                $nextRun = $tomorrow->format('Y-m-d') . ' ' .  $schedule['params']['start'] . ':00';
+
+                if ($task['next_run'] !== $nextRun) {
+                    $task['next_run'] = $nextRun;
+
+                    $this->tasks->update($task);
+                }
+            } else if ($currentHour < $startHour) {
+                $today = Carbon::now();
+
+                $nextRun = $today->format('Y-m-d') . ' ' .  $schedule['params']['start'] . ':00';
+
+                if ($task['next_run'] !== $nextRun) {
+                    $task['next_run'] = $nextRun;
+
+                    $this->tasks->update($task);
+                }
+            }
+
+            $shouldSchedule = false;
+        }
 
         if ($shouldSchedule) {
             $newJob = $this->addNewJob($task, $schedule, $shouldSchedule);
@@ -298,7 +387,9 @@ class Workers extends BasePackage
     //Only Schedule if less than 1 minute so its schedules for next run.
     protected function shouldSchedule($task, $schedule)
     {
-        if ($schedule['type'] === 'everyxminutes') {
+        if ($schedule['type'] === 'everyxminutes' ||
+            $schedule['type'] === 'everyxminutesbetween'
+        ) {
             $this->cron =
                 $this->everyminute(
                     (int) $schedule['params']['minutes']
@@ -351,7 +442,6 @@ class Workers extends BasePackage
 
                         $nextRun = $this->cron->getNextRunDate()->format('Y-m-d H:i:s');
                     } else {
-                        var_dump((int) Arr::last($schedule['params']['weekly_days']));
                         $dayOfWeekKey = array_search($this->dayOfWeek, $schedule['params']['weekly_days']);
 
                         $nextKey = prefix_get_next_key_array($schedule['params']['weekly_days'], $dayOfWeekKey);
@@ -416,8 +506,6 @@ class Workers extends BasePackage
             $this->tasks->update($task);
         }
 
-        // var_dump($this->cron->isDue());
-        // if ($secsLeft <= 60) {
         if ($this->cron->isDue()) {
             if ($task['status'] != 1) {
                 $task['status'] = 1;
