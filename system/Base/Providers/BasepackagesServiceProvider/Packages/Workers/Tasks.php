@@ -126,6 +126,7 @@ class Tasks extends BasePackage
         $time = Carbon::now();
 
         $task['force_next_run'] = '1';
+        $task['status'] = '1';
         $task['next_run'] = $time->addMinute()->startOfMinute()->format('Y-m-d H:i:s');
 
         if ($this->update($task)) {
@@ -146,7 +147,7 @@ class Tasks extends BasePackage
                         $function['org_schedule_id'] = $function['schedule_id'];
                         $function['schedule_id'] = 1;//Make it minute so it can be picked by the scheduler for next run
                         return $function;
-                    } else if ($function['enabled'] == 1) {
+                    } else if ($function['enabled'] == 1 && $function['status'] != 2) {
                         return $function;
                     }
                 }

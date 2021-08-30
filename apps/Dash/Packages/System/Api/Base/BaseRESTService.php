@@ -155,26 +155,20 @@ class BaseRESTService
             function (ResponseInterface $res) use ($debug, $responseClass) {
                 $json = $res->getBody()->getContents();
 
-                // var_dump(json_decode($json, true));
+                // var_dump($json, json_decode($json, true));die();
                 if ($debug !== false) {
                     $this->debugResponse($json);
                 }
 
-                $responseArr = json_decode($json, true);
+                $response = new $responseClass(
+                    $json !== '' ? json_decode($json, true) : [],
+                    $res->getStatusCode(),
+                    $res->getHeaders()
+                );
 
-                if ($responseArr && is_array($responseArr)) {
-                    $response = new $responseClass(
-                        $json !== '' ? json_decode($json, true) : [],
-                        $res->getStatusCode(),
-                        $res->getHeaders()
-                    );
+                JsonParser::parseAndAssignProperties($response, $json);
 
-                    JsonParser::parseAndAssignProperties($response, $json);
-
-                    return $response;
-                }
-
-                return false;
+                return $response;
             }
         );
     }

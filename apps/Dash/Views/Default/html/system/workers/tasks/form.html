@@ -3,6 +3,7 @@
     {% set taskName = task['name'] %}
     {% set taskFunction = task['function'] %}
     {% set taskDescription = task['description'] %}
+    {% set taskParameters = task['parameters'] %}
     {% set taskPriority = task['priority'] %}
     {% set taskSchedule = task['schedule_id'] %}
     {% if task['enabled'] == 1 %}
@@ -15,6 +16,7 @@
     {% set taskName = '' %}
     {% set taskFunction = '' %}
     {% set taskDescription = '' %}
+    {% set taskParameters = '' %}
     {% set taskPriority = '' %}
     {% set taskSchedule = '' %}
     {% set taskEnableChecked = false %}
@@ -101,7 +103,6 @@
                         'fieldId'                        : 'description',
                         'fieldLabel'                     : 'Description',
                         'fieldType'                      : 'textarea',
-                        'fieldDataMaxLength'             : 1024,
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Description',
                         'fieldRequired'                  : false,
@@ -112,6 +113,29 @@
                         'fieldDataInputMaxLength'        : 1024,
                         'fieldTextareaRows'              : 2,
                         'fieldValue'                     : taskDescription
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'parameters',
+                        'fieldLabel'                     : 'Function Parameters',
+                        'fieldType'                      : 'textarea',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Function Parameters that can be passed to the function in Json Format.',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMaxLength'        : 4096,
+                        'fieldTextareaRows'              : 2,
+                        'fieldValue'                     : taskParameters
                     ]
                 )}}
             </div>
@@ -224,6 +248,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-name'                    : { },
         '{{componentId}}-{{sectionId}}-enabled'                 : { },
         '{{componentId}}-{{sectionId}}-description'             : { },
+        '{{componentId}}-{{sectionId}}-parameters'              : { },
         '{{componentId}}-{{sectionId}}-priority'                : { },
         '{{componentId}}-{{sectionId}}-schedule_id'             : {
             placeholder : "SELECT SCHEDULE"

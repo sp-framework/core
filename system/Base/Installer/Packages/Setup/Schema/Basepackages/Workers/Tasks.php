@@ -117,6 +117,13 @@ class Tasks
                         ]
                     ),
                     new Column(
+                        'parameters',
+                        [
+                            'type'          => Column::TYPE_TEXT,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
                         'email',
                         [
                             'type'          => Column::TYPE_VARCHAR,

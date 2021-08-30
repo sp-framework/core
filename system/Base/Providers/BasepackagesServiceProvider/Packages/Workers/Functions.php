@@ -79,7 +79,7 @@ class Functions extends BasePackage
             }
 
             if (isset($packagesData->responseData)) {
-                $job['result'] .= 'Data: ' . Json::encode($packagesData->responseData) . '<br>';
+                $job['result'] .= 'Data: ' . Json::encode($packagesData->responseData);
             }
 
             $this->basepackages->workers->jobs->update($job);

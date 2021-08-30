@@ -34,6 +34,8 @@ class BasepackagesWorkersTasks extends BaseModel
 
     public $force_next_run;
 
+    public $parameters;
+
     public $email;
 
     public $result;
