@@ -7,6 +7,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Attachments\Attachments;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\ContactGroups;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Contacts;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\History;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Items\Items;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Organisations;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrders;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrdersLineitems;
@@ -53,7 +54,7 @@ class PurchaseOrders extends BasePackage
         $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetPurchaseOrders', $apiId);
 
         if ($modifiedSince) {
-            // $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
+            $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
         }
 
         $page = 1;
@@ -92,6 +93,10 @@ class PurchaseOrders extends BasePackage
         $contacts = new Contacts;
 
         $contacts->sync($apiId);
+
+        $items = new Items;
+
+        $items->sync($apiId);
     }
 
     protected function getPurchaseOrderAttachments($purchaseOrderId)

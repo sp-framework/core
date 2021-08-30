@@ -10,6 +10,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroCo
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsFinance;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Schema\SystemApiXeroContactsPhones;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Schema\SystemApiXeroHistory;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Items\Schema\SystemApiXeroItems;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisations;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisationsAddresses;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisationsFinance;
@@ -47,6 +48,8 @@ class Package extends BasePackage
                 // Purchase Orders
                 $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns(), $dropTables);
                 $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns(), $dropTables);
+                //Items
+                $this->createTable('system_api_xero_items', '', (new SystemApiXeroItems)->columns(), $dropTables);
             } else {
                 // Organisations
                 $this->createTable('system_api_xero_organisations', '', (new SystemApiXeroOrganisations)->columns());
@@ -68,6 +71,8 @@ class Package extends BasePackage
                 // Purchase Orders
                 $this->createTable('system_api_xero_purchase_orders', '', (new SystemApiXeroPurchaseOrders)->columns());
                 $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns());
+                //Items
+                $this->createTable('system_api_xero_items', '', (new SystemApiXeroItems)->columns());
             }
 
             return true;

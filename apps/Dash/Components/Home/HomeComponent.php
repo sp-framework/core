@@ -42,6 +42,7 @@ use Apps\Dash\Packages\Ims\Specifications\Install\Package as SpecificationsPacka
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Package as PurchaseOrdersPackage;
 use Apps\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
 use Apps\Dash\Packages\System\Api\Api;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Package as XeroSyncPackage;
 use Apps\Dash\Packages\System\Api\Ebay\Taxonomy\Install\Package as TaxonomyPackage;
 use Apps\Dash\Packages\System\Api\Install\Package as ApiPackage;
 use Apps\Dash\Packages\System\Messenger\Install\Package as MessengerPackage;
@@ -95,11 +96,13 @@ class HomeComponent extends BaseComponent
         //
         // $purchaseOrdersComponent = new PurchaseOrdersComponent();
         // $purchaseOrdersComponent->installComponent();
-        $purchaseOrdersPackage = new PurchaseOrdersPackage();
-        $purchaseOrdersPackage->installPackage(true);
+        // $purchaseOrdersPackage = new PurchaseOrdersPackage();
+        // $purchaseOrdersPackage->installPackage(true);
         //
         // $apiPackage = new ApiPackage();
         // $apiPackage->installPackage(true);
+        // $xeroSyncPackage = new XeroSyncPackage();
+        // $xeroSyncPackage->installPackage(true);
 
         // $vendorgroupsComponent = new VendorGroupsComponent();
         // $vendorgroupsComponent->installComponent();
