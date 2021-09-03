@@ -24,36 +24,55 @@ class Vendors extends BasePackage
 
         $vendorObj = $vendorModel::findFirstById($id);
 
-        $vendor = $vendorObj->toArray();
+        if ($vendorObj) {
+            $vendor = $vendorObj->toArray();
 
-        $vendor['b2bAccountManagers'] = [];
+            if ($vendor['address_ids'] && $vendor['address_ids'] !== '') {
+                $vendor['address_ids'] = Json::decode($vendor['address_ids'], true);
 
-        if ($vendor['b2b_account_managers'] !== '') {
-            $vendor['b2b_account_managers'] = Json::decode($vendor['b2b_account_managers'], true);
+                foreach ($vendor['address_ids'] as $addressTypeKey => $addressType) {
+                    if (is_array($addressType) && count($addressType) > 0) {
+                        foreach ($addressType as $addressKey => $address) {
+                            $vendor['address_ids'][$addressTypeKey][$addressKey] =
+                                $this->basepackages->addressbook->getById($address);
+                        }
+                    }
+                    $vendor['address_ids'][$addressTypeKey] =
+                        msort($vendor['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
+                }
+            }
 
-            if (count($vendor['b2b_account_managers']) > 0) {
+            $vendor['b2bAccountManagers'] = [];
 
-                $employees = $this->usePackage(Employees::class);
+            if ($vendor['b2b_account_managers'] && $vendor['b2b_account_managers'] !== '') {
+                $vendor['b2b_account_managers'] = Json::decode($vendor['b2b_account_managers'], true);
 
-                foreach ($vendor['b2b_account_managers'] as $employeeKey => $employee) {
-                    if ($employees->searchById($employee)) {
-                        $vendor['b2bAccountManagers'][$employeeKey]['id'] = $employees->packagesData->employee['id'];
-                        $vendor['b2bAccountManagers'][$employeeKey]['full_name'] = $employees->packagesData->employee['full_name'];
+                if (count($vendor['b2b_account_managers']) > 0) {
+
+                    $employees = $this->usePackage(Employees::class);
+
+                    foreach ($vendor['b2b_account_managers'] as $employeeKey => $employee) {
+                        if ($employees->searchById($employee)) {
+                            $vendor['b2bAccountManagers'][$employeeKey]['id'] = $employees->packagesData->employee['id'];
+                            $vendor['b2bAccountManagers'][$employeeKey]['full_name'] = $employees->packagesData->employee['full_name'];
+                        }
                     }
                 }
             }
+
+            $contacts = $this->usePackage(Contacts::class);
+
+            $vendor['contact_ids'] = $contacts->searchByVendorId($vendor['id']);
+
+            $financialDetailsObj = $vendorObj->getFinancial_details();
+
+            $financialDetails = $financialDetailsObj->toArray();
+            unset($financialDetails['id']);
+
+            return array_merge($vendor, $financialDetails);
         }
 
-        $contacts = $this->usePackage(Contacts::class);
-
-        $vendor['contact_ids'] = $contacts->searchByVendorId($vendor['id']);
-
-        $financialDetailsObj = $vendorObj->getFinancial_details();
-
-        $financialDetails = $financialDetailsObj->toArray();
-        unset($financialDetails['id']);
-
-        return array_merge($vendor, $financialDetails);
+        return false;
     }
 
     /**
@@ -71,16 +90,12 @@ class Vendors extends BasePackage
 
         $data = $this->addB2bAccountManagers($data);
 
-        // $data = $this->updateContacts($data);
-
         $data = $this->updateAddresses($data);
 
         if ($this->add($data)) {
             $this->basepackages->storages->changeOrphanStatus($data['logo']);
 
             $data['vendor_id'] = $this->packagesData->last['id'];
-
-            // $this->updateContacts($data);
 
             $this->addFinancialDetails($data);
 
@@ -117,8 +132,6 @@ class Vendors extends BasePackage
 
         $data = $this->addB2bAccountManagers($data);
 
-        // $data = $this->updateContacts($data);
-
         $data = $this->updateAddresses($data);
 
         if (isset($data['delete_address_ids']) && $data['delete_address_ids'] !== '') {
@@ -134,8 +147,6 @@ class Vendors extends BasePackage
             }
 
             $data['vendor_id'] = $data['id'];
-
-            // $this->updateContacts($data);
 
             $this->updateFinancialDetails($data);
 
@@ -167,7 +178,9 @@ class Vendors extends BasePackage
 
         $vendor = $vendorObj->toArray();
 
-        $vendorObj->getFinancial_details()->delete();
+        if ($vendorObj->getFinancial_details()) {
+            $vendorObj->getFinancial_details()->delete();
+        }
 
         if ($this->remove($data['id'])) {
 
@@ -179,6 +192,18 @@ class Vendors extends BasePackage
         } else {
             $this->addResponse('Error removing vendor.', 1);
         }
+    }
+
+    /**
+     * @notification(name=error)
+     */
+    public function errorVendor($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Contact has errors, contact administrator!';
+        }
+
+        $this->addToNotification('error', $messageTitle, $messageDetails, null, $id);
     }
 
     protected function disableVendorContactAccounts($vendorId)
@@ -212,7 +237,7 @@ class Vendors extends BasePackage
         }
     }
 
-    protected function addFinancialDetails(array $data)
+    public function addFinancialDetails(array $data)
     {
         $this->modelToUse = BusinessDirectoryVendorsFinancialDetails::class;
 
@@ -223,7 +248,7 @@ class Vendors extends BasePackage
         $this->modelToUse = BusinessDirectoryVendors::class;
     }
 
-    protected function updateFinancialDetails(array $data)
+    public function updateFinancialDetails(array $data)
     {
         $this->modelToUse = BusinessDirectoryVendorsFinancialDetails::class;
 
@@ -231,13 +256,15 @@ class Vendors extends BasePackage
             [
                 'conditions'    => 'vendor_id = :vid:',
                 'bind'          => [
-                    'vid'       => $data['id']
+                    'vid'       => $data['vendor_id']
                 ]
             ]
         );
 
         if ($financialDetailsModel) {
-            unset($data['id']);
+            if (isset($data['id'])) {
+                unset($data['id']);
+            }
 
             $financialDetails = $financialDetailsModel->toArray();
 
@@ -249,7 +276,7 @@ class Vendors extends BasePackage
         $this->modelToUse = BusinessDirectoryVendors::class;
     }
 
-    protected function checkVendorDuplicate($name)
+    public function checkVendorDuplicate($name)
     {
         return $this->modelToUse::findFirst(
             [
@@ -403,52 +430,7 @@ class Vendors extends BasePackage
         return $filter;
     }
 
-    // protected function updateContacts($data)
-    // {
-    //     if ($data['contact_ids'] !== '') {
-    //         $data['contact_ids'] = Json::decode($data['contact_ids'], true);
-
-    //         $contactsIds = [];
-    //         if (count($data['contact_ids']) > 0) {
-    //             $contacts = $this->usePackage(Contacts::class);
-
-    //             $data['contact_ids'] = msort($data['contact_ids'], 'seq');
-
-    //             foreach ($data['contact_ids'] as $contactKey => $contact) {
-    //                 $contact['vendor_id'] = $data['vendor_id'];
-
-    //                 if ($contact['new'] == 1) {
-
-    //                     unset($contact['id']);
-    //                     unset($contact['new']);
-    //                     unset($contact['seq']);
-
-    //                     $contacts->addContact($contact);
-    //                 } else {
-    //                     $existingContact = $contacts->getById($contact['id']);
-
-    //                     unset($contact['id']);
-    //                     unset($contact['new']);
-    //                     unset($contact['seq']);
-
-    //                     $contact = array_merge($existingContact, $contact);
-
-    //                     unset($contact['address_ids']);
-
-    //                     $contacts->updateContact($contact);
-    //                 }
-
-    //                 array_push($contactsIds, $contacts->packagesData->last['id']);
-    //             }
-    //         }
-    //     }
-
-    //     $data['contact_ids'] = Json::encode($contactsIds);
-
-    //     return $data;
-    // }
-
-    protected function updateAddresses($data)
+    public function updateAddresses($data)
     {
         if ($data['address_ids'] !== '') {
             $data['address_ids'] = Json::decode($data['address_ids'], true);
@@ -559,39 +541,16 @@ class Vendors extends BasePackage
         $vendor = $this->getVendorById($id);
 
         if ($vendor) {
-            if ($vendor['address_ids'] && $vendor['address_ids'] !== '') {
-                $vendor['address_ids'] = Json::decode($vendor['address_ids'], true);
-
-                foreach ($vendor['address_ids'] as $addressTypeKey => $addressType) {
-                    if (is_array($addressType) && count($addressType) > 0) {
-                        foreach ($addressType as $addressKey => $address) {
-                            $vendor['address_ids'][$addressTypeKey][$addressKey] =
-                                $this->basepackages->addressbook->getById($address);
-                        }
-                    }
-                    $vendor['address_ids'][$addressTypeKey] =
-                        msort($vendor['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
-                }
-            }
-
-            // if ($vendor['contact_ids'] && $vendor['contact_ids'] !== '') {
-            //     $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
-
-            //     $contacts = $this->usePackage(Contacts::class);
-
-            //     foreach ($vendor['contact_ids'] as $contactKey => $contact) {
-            //         $contactArr = $contacts->getById($contact);
-
-            //         $vendor['contact_ids'][$contactKey] = $contactArr;
-            //     }
-            // }
-
             $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Vendor Found';
 
             $this->packagesData->vendor = $vendor;
 
             return true;
         }
+
+        $this->addResponse('Vendor with id ' . $id . ' not found', 1);
     }
 
     public function addProductCount(int $id)

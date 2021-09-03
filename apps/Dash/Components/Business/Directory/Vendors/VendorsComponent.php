@@ -85,33 +85,6 @@ class VendorsComponent extends BaseComponent
 
                 $vendor['notes'] = $this->notes->getNotes('vendors', $this->getData()['id']);
 
-                if ($vendor['address_ids'] && $vendor['address_ids'] !== '') {
-                    $vendor['address_ids'] = Json::decode($vendor['address_ids'], true);
-
-                    foreach ($vendor['address_ids'] as $addressTypeKey => $addressType) {
-                        if (is_array($addressType) && count($addressType) > 0) {
-                            foreach ($addressType as $addressKey => $address) {
-                                $vendor['address_ids'][$addressTypeKey][$addressKey] =
-                                    $this->basepackages->addressbook->getById($address);
-                            }
-                        }
-                        $vendor['address_ids'][$addressTypeKey] =
-                            msort($vendor['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
-                    }
-                }
-
-                // if ($vendor['contact_ids'] && $vendor['contact_ids'] !== '') {
-                //     $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
-
-                //     $contacts = $this->usePackage(Contacts::class);
-
-                //     foreach ($vendor['contact_ids'] as $contactKey => $contact) {
-                //         $contactArr = $contacts->getById($contact);
-
-                //         $vendor['contact_ids'][$contactKey] = $contactArr;
-                //     }
-                // }
-
                 $storages = $this->basepackages->storages;
 
                 if ($vendor['logo'] && $vendor['logo'] !== '') {
@@ -337,11 +310,9 @@ class VendorsComponent extends BaseComponent
 
                 $searchVendor = $this->vendors->searchByVendorId($vendorId);
 
-                if ($searchVendor) {
-                    $this->view->responseCode = $this->vendors->packagesData->responseCode;
+                $this->view->responseCode = $this->vendors->packagesData->responseCode;
 
-                    $this->view->vendor = $this->vendors->packagesData->vendor;
-                }
+                $this->view->vendor = $this->vendors->packagesData->vendor;
             } else {
                 $this->addResponse('vendor id missing', 1);
             }

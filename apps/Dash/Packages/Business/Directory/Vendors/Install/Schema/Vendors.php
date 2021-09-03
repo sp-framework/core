@@ -117,14 +117,6 @@ class Vendors
                         'notNull'       => false,
                     ]
                 ),
-                // new Column(
-                //     'contact_ids',
-                //     [
-                //         'type'          => Column::TYPE_VARCHAR,
-                //         'size'          => 100,
-                //         'notNull'       => false,
-                //     ]
-                // ),
                 new Column(
                     'address_ids',
                     [
@@ -137,7 +129,7 @@ class Vendors
                     'contact_phone',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
+                        'size'          => 20,
                         'notNull'       => true,
                     ]
                 ),
@@ -153,7 +145,7 @@ class Vendors
                     'contact_fax',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
+                        'size'          => 20,
                         'notNull'       => false,
                     ]
                 ),
@@ -161,7 +153,7 @@ class Vendors
                     'contact_other',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
+                        'size'          => 100,
                         'notNull'       => false,
                     ]
                 ),

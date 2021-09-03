@@ -166,7 +166,7 @@
     )}}
 </div>
 <script>
-/* globals BazContentFieldsValidator PNotify */
+/* globals BazContentFieldsValidator PNotify Inputmask */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -476,9 +476,19 @@ dataCollectionSection =
             },
             minimumInputLength : 2
         },
-        '{{componentId}}-{{sectionId}}-contact_phone'           : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_phone'));
+            }
+        },
         '{{componentId}}-{{sectionId}}-contact_phone_ext'       : { },
-        '{{componentId}}-{{sectionId}}-contact_fax'             : { },
+        '{{componentId}}-{{sectionId}}-contact_fax'             : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_fax'));
+            }
+        },
         '{{componentId}}-{{sectionId}}-contact_other'           : { },
         '{{componentId}}-{{sectionId}}-email'                   : { },
         '{{componentId}}-{{sectionId}}-website'                 : { },
@@ -565,15 +575,15 @@ dataCollectionSection =
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {
                 //eslint-disable-next-line
-                console.log(validator.errorList);
+                // console.log(validator.errorList);
             },
             rules: {
                 '{{componentId}}-{{sectionId}}-abn'             : 'required',
                 '{{componentId}}-{{sectionId}}-business_name'   : 'required',
-                '{{componentId}}-{{sectionId}}-contact_phone'           : 'required',
-                '{{componentId}}-{{sectionId}}-email'                   : {
-                    required                                            : true,
-                    email                                               : true
+                '{{componentId}}-{{sectionId}}-contact_phone'   : 'required',
+                '{{componentId}}-{{sectionId}}-email'           : {
+                    required                                    : true,
+                    email                                       : true
                 },
                 '{{componentId}}-{{sectionId}}-bills_tax_id'    : 'required',
                 '{{componentId}}-{{sectionId}}-po_tax_id'       : 'required',

@@ -24,7 +24,7 @@ class VendorsFinancialDetails
                     'vendor_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => false,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
