@@ -8,7 +8,7 @@ class SystemApiXeroHistory extends BaseModel
 {
     public $id;
 
-    public $baz_activity_log_id;
+    public $baz_note_id;
 
     public $api_id;
 

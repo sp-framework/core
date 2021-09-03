@@ -21,7 +21,7 @@ class SystemApiXeroHistory
                     ]
                 ),
                 new Column(
-                    'baz_activity_log_id',
+                    'baz_note_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false
