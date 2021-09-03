@@ -39,6 +39,7 @@
     {% set purchaseOrderDeliveryContactFullnameDisabled = true %}
     {% set purchaseOrderDeliveryContactPhoneDisabled = true %}
     {% set purchaseOrderEntityLocationId = purchaseOrder['entity_location_id'] %}
+    {% set purchaseOrderLocationAddressId = purchaseOrder['location_address_id'] %}
     {% set purchaseOrderLocationContactId = purchaseOrder['location_contact_id'] %}
     {% set purchaseOrderCustomerId = '' %}
     {% set streetAddressFieldDisabled = true %}
@@ -57,6 +58,7 @@
     {% set purchaseOrderDeliveryContactFullnameDisabled = false %}
     {% set purchaseOrderDeliveryContactPhoneDisabled = false %}
     {% set purchaseOrderEntityLocationId = '' %}
+    {% set purchaseOrderLocationAddressId = '' %}
     {% set purchaseOrderLocationContactId = '' %}
     {% set purchaseOrderCustomerId = purchaseOrder['customer_id'] %}
     {% set streetAddressFieldDisabled = true %}
@@ -75,6 +77,7 @@
     {% set purchaseOrderDeliveryContactFullnameDisabled = false %}
     {% set purchaseOrderDeliveryContactPhoneDisabled = false %}
     {% set purchaseOrderEntityLocationId = '' %}
+    {% set purchaseOrderLocationAddressId = '' %}
     {% set purchaseOrderLocationContactId = '' %}
     {% set purchaseOrderCustomerId = '' %}
     {% set streetAddressFieldDisabled = false %}
@@ -209,7 +212,7 @@
                 'fieldBazJstreeSearch'                      : true,
                 'fieldBazPostOnCreate'                      : true,
                 'fieldBazPostOnUpdate'                      : true,
-                'fieldValue'                                : ''
+                'fieldValue'                                : purchaseOrderLocationAddressId
             ]
         )}}
     </div>

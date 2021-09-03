@@ -2,7 +2,8 @@
 
 namespace Apps\Dash\Packages\Ims\Stock\PurchaseOrders;
 
-use Apps\Dash\Packages\Business\Finances\Taxes\Taxes;
+use Apps\Dash\Packages\Business\Finances\TaxGroups\Model\BusinessFinancesTaxGroups;
+use Apps\Dash\Packages\Business\Finances\Taxes\Model\BusinessFinancesTaxes;
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model\ImsStockPurchaseOrders;
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model\ImsStockPurchaseOrdersProducts;
 use Phalcon\Helper\Json;
@@ -173,9 +174,17 @@ class PurchaseOrders extends BasePackage
     protected function updateAddress(array $data, $purchaseOrder = null)
     {
         if ($data['delivery_type'] == '1') {
-            $data['address_id'] = $data['location_address_id'];
+            if ($purchaseOrder) {
+                $data['address_id'] = $purchaseOrder['location_address_id'];
+            } else {
+                $data['address_id'] = $data['location_address_id'];
+            }
         } else if ($data['delivery_type'] == '2') {
-            $data['address_id'] = $data['customer_address_id'];
+            if ($purchaseOrder) {
+                $data['address_id'] = $purchaseOrder['customer_address_id'];
+            } else {
+                $data['address_id'] = $data['customer_address_id'];
+            }
         } else if ($data['delivery_type'] == '3') {
             if (!$purchaseOrder['one_off_address_id'] || $purchaseOrder['one_off_address_id'] == '0') {
                 $address = $data;
@@ -312,18 +321,37 @@ class PurchaseOrders extends BasePackage
     public function calculateProductAmount(&$product)
     {
         if (isset($product['product_tax_rate']) && $product['product_tax_rate'] !== '') {
-            $taxPackage = $this->usePackage(Taxes::class);
+            $taxGroupsModel = new BusinessFinancesTaxGroups;
 
-            $tax = $taxPackage->getById($product['product_tax_rate']);
+            $taxGroupObj = $taxGroupsModel::findFirstById($product['product_tax_rate']);
 
-            if ($tax) {
-                $taxAmount = (float) $tax['amount'];
-                $taxName = $tax['name'];
+            $taxAmount = 0;
+
+            if ($taxGroupObj) {
+                $taxModel = new BusinessFinancesTaxes;
+
+                $taxObj = $taxModel::findByTaxGroupId($taxGroupObj->id);
+
+                if ($taxObj) {
+                    if ($taxObj->count() > 0) {
+                        foreach ($taxObj as $taxObjAmount) {
+                            if ((int) $taxObjAmount->amount !== 0) {
+                                $taxAmount = $taxAmount + (int) $taxObjAmount->amount;
+                            }
+                        }
+                    }
+                } else {
+                    $this->addResponse('Tax group has no tax assigned.', 1);
+
+                    return;
+                }
             } else {
-                $this->addResponse('Tax rate not found', 1);
+                $this->addResponse('Tax group not found.', 1);
 
                 return;
             }
+
+            $taxName = $taxGroupObj->name;
         } else {
             $this->addResponse('Tax rate needed.', 1);
 

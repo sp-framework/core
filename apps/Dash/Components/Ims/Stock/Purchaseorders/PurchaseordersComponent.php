@@ -5,7 +5,7 @@ namespace Apps\Dash\Components\Ims\Stock\PurchaseOrders;
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Business\Entities\Entities;
-use Apps\Dash\Packages\Business\Finances\Taxes\Taxes;
+use Apps\Dash\Packages\Business\Finances\TaxGroups\TaxGroups;
 use Apps\Dash\Packages\Business\Locations\Locations;
 use Apps\Dash\Packages\Crms\Customers\Customers;
 use Apps\Dash\Packages\Hrms\Employees\Employees;
@@ -31,7 +31,7 @@ class PurchaseordersComponent extends BaseComponent
 
 		$this->locations = $this->usePackage(Locations::class);
 
-		$this->taxes = $this->usePackage(Taxes::class);
+		$this->taxGroups = $this->usePackage(TaxGroups::class);
 
 		$this->notes = $this->basepackages->notes;
 	}
@@ -51,7 +51,7 @@ class PurchaseordersComponent extends BaseComponent
 
 			$this->view->locations = $this->locations->getLocationsByInboundShipping();
 
-			$this->view->taxes = $this->taxes->getAll()->taxes;
+			$this->view->taxGroups = $this->taxGroups->getAll()->taxgroups;
 
 			if ($this->getData()['id'] != 0) {
 				$purchaseOrder = $this->purchaseOrdersPackage->getPurchaseOrderById($this->getData()['id']);
@@ -189,13 +189,33 @@ class PurchaseordersComponent extends BaseComponent
 
 	protected function getAddress($purchaseOrder)
 	{
-		$address = $this->basepackages->addressbook->getById($purchaseOrder['address_id']);
-		unset($address['id']);
-		unset($address['name']);
-		unset($address['address_type']);
-		unset($address['is_primary']);
+		if ($purchaseOrder['address_id'] && $purchaseOrder['address_id'] !== '0') {
+			$address = $this->basepackages->addressbook->getById($purchaseOrder['address_id']);
 
-		$purchaseOrder = array_merge($purchaseOrder, $address);
+			if ($address) {
+				unset($address['id']);
+				unset($address['name']);
+				unset($address['address_type']);
+				unset($address['is_primary']);
+
+				$purchaseOrder = array_merge($purchaseOrder, $address);
+			}
+		} else {
+			$purchaseOrder = array_merge(
+				$purchaseOrder,
+				[
+					'street_address' => '',
+					'street_address_2' => '',
+					'city_id' => '',
+					'city_name' => '',
+					'post_code' => '',
+					'state_id' => '',
+					'state_name' => '',
+					'country_id' => '',
+					'country_name' => '',
+				]
+			);
+		}
 
 		return $purchaseOrder;
 	}
