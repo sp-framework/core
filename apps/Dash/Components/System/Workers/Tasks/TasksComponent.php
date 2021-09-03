@@ -86,9 +86,9 @@ class TasksComponent extends BaseComponent
             $this->tasks,
             'system/workers/tasks/view',
             null,
-            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run'],
+            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run', 'force_next_run'],
             true,
-            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run'],
+            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run', 'force_next_run'],
             $controlActions,
             ['schedule_id' => 'schedule'],
             $replaceColumns,
@@ -113,6 +113,7 @@ class TasksComponent extends BaseComponent
             $data = $this->formatPreviousRun($dataKey, $data);
             $data = $this->formatNextRun($dataKey, $data);
             $data = $this->formatEnabled($dataKey, $data);
+            $data = $this->formatForceNextRun($dataKey, $data);
         }
 
         return $dataArr;
@@ -125,12 +126,24 @@ class TasksComponent extends BaseComponent
         return $data;
     }
 
-    protected function formatEnabled($rowId, $data)
+    protected function formatStatus($rowId, $data)
     {
+        if ($data['status'] == '0') {
+            $data['status'] = '-';
+        } else if ($data['status'] == '1') {
+            $data['status'] = '<span class="badge badge-secondary text-uppercase">Scheduled</span>';
+        } else if ($data['status'] == '2') {
+            $data['status'] = '<span class="badge badge-info text-uppercase">Running...</span>';
+        } else if ($data['status'] == '3') {
+            $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
+        }
+
+        if ($data['force_next_run'] == '1') {
+            return $data;
+        }
+
         if ($data['enabled'] == '0') {
-            $data['enabled'] = '<span class="badge badge-secondary text-uppercase">No</span>';
-        } else if ($data['enabled'] == '1') {
-            $data['enabled'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+            $data['status'] = '-';
         }
 
         return $data;
@@ -147,6 +160,10 @@ class TasksComponent extends BaseComponent
 
     protected function formatNextRun($rowId, $data)
     {
+        if ($data['force_next_run'] == '1') {
+            return $data;
+        }
+
         if (!$data['next_run'] || $data['next_run'] == '0' || $data['enabled'] == '0') {
             $data['next_run'] = '-';
         }
@@ -154,20 +171,29 @@ class TasksComponent extends BaseComponent
         return $data;
     }
 
-    protected function formatStatus($rowId, $data)
+    protected function formatEnabled($rowId, $data)
     {
-        if ($data['enabled'] == '0') {
-            $data['status'] = '-';
+        if ($data['force_next_run']) {
+            $data['enabled'] = '<span class="badge badge-warning text-uppercase">Yes</span>';
+
+            return $data;
         }
 
-        if ($data['status'] == '0') {
-            $data['status'] = '-';
-        } else if ($data['status'] == '1') {
-            $data['status'] = '<span class="badge badge-secondary text-uppercase">Scheduled</span>';
-        } else if ($data['status'] == '2') {
-            $data['status'] = '<span class="badge badge-info text-uppercase">Running...</span>';
-        } else if ($data['status'] == '3') {
-            $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
+        if ($data['enabled'] == '0') {
+            $data['enabled'] = '<span class="badge badge-secondary text-uppercase">No</span>';
+        } else if ($data['enabled'] == '1') {
+            $data['enabled'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+        }
+
+        return $data;
+    }
+
+    protected function formatForceNextRun($rowId, $data)
+    {
+        if ($data['force_next_run'] == '1') {
+            $data['force_next_run'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+        } else if (!$data['force_next_run'] || $data['force_next_run'] == '0') {
+            $data['force_next_run'] = '<span class="badge badge-secondary text-uppercase">No</span>';
         }
 
         return $data;
