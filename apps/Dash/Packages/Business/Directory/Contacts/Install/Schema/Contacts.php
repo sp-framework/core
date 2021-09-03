@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Business\Directory\Contacts\Install\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class Contacts
 {
@@ -116,7 +117,7 @@ class Contacts
                     'contact_phone',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
+                        'size'    => 20,
                         'notNull' => true,
                     ]
                 ),
@@ -132,7 +133,7 @@ class Contacts
                     'contact_mobile',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
+                        'size'    => 20,
                         'notNull' => true,
                     ]
                 ),
@@ -140,7 +141,7 @@ class Contacts
                     'contact_fax',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
+                        'size'    => 20,
                         'notNull' => false,
                     ]
                 ),
@@ -163,15 +164,7 @@ class Contacts
                     'contact_other',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
-                    'contact_notes',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 2048,
+                        'size'    => 100,
                         'notNull' => false,
                     ]
                 ),
@@ -193,6 +186,15 @@ class Contacts
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'account_email'
+                    ],
+                    'UNIQUE'
+                )
             ]
         ];
     }

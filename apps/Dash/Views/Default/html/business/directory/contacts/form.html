@@ -90,7 +90,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentFieldsValidator PNotify autoComplete dataCollectionSection*/
+/* globals BazContentFieldsValidator PNotify autoComplete dataCollectionSection Inputmask */
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -428,14 +428,28 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-contact_phone'                   : { },
-        '{{componentId}}-{{sectionId}}-contact_phone_ext'               : { },
-        '{{componentId}}-{{sectionId}}-contact_mobile'                  : { },
-        '{{componentId}}-{{sectionId}}-contact_fax'                     : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_phone'));
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_phone_ext'       : { },
+        '{{componentId}}-{{sectionId}}-contact_fax'             : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_fax'));
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_mobile'                  : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_mobile'));
+            }
+        },
         '{{componentId}}-{{sectionId}}-contact_secondary_email'         : { },
         '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
         '{{componentId}}-{{sectionId}}-contact_other'                   : { },
-        '{{componentId}}-{{sectionId}}-contact_notes'                   : { },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules       : {

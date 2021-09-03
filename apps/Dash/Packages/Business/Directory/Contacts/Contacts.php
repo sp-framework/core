@@ -34,6 +34,12 @@ class Contacts extends BasePackage
      */
     public function addContact(array $data)
     {
+        if ($this->checkContactDuplicate($data['account_email'])) {
+            $this->addResponse('Contact ' . $data['account_email'] . ' already exists.', 1);
+
+            return;
+        }
+
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
         if (isset($data['address_ids'])) {
@@ -69,6 +75,14 @@ class Contacts extends BasePackage
     public function updateContact(array $data)
     {
         $contact = $this->getById($data['id']);
+
+        if ($data['account_email'] !== $contact['account_email']) {
+            if ($this->checkVendorDuplicate($data['account_email'])) {
+                $this->addResponse('Contact ' . $data['account_email'] . ' already exists.', 1);
+
+                return;
+            }
+        }
 
         $data['account_id'] = $contact['account_id'];
 
@@ -124,10 +138,37 @@ class Contacts extends BasePackage
 
             $this->basepackages->accounts->removeAccount(['id' => $contact['account_id']]);
 
+            $this->addToNotification('remove', 'Removed contact ' . $contact['full_name']);
+
             $this->addResponse('Removed contact');
         } else {
             $this->addResponse('Error removing contact.', 1);
         }
+    }
+
+    /**
+     * @notification(name=error)
+     */
+    public function errorContact($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Contact has errors, contact administrator!';
+        }
+
+        $this->addToNotification('error', $messageTitle, $messageDetails, null, $id);
+    }
+
+    public function checkContactDuplicate($email)
+    {
+        return $this->modelToUse::findFirst(
+            [
+                'conditions'    => 'account_email = :email:',
+                'bind'          =>
+                [
+                    'email'     => $email
+                ]
+            ]
+        );
     }
 
     protected function updateVendorContacts($data, $contact = null)

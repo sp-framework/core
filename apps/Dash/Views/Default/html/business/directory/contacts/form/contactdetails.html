@@ -36,7 +36,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 20,
                         'fieldValue'                     : contactPhone
                     ]
                 )}}
@@ -59,7 +59,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 10,
                         'fieldValue'                     : contactPhoneExt
                     ]
                 )}}
@@ -82,7 +82,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 20,
                         'fieldValue'                     : contactMobile
                     ]
                 )}}
@@ -107,7 +107,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 20,
                         'fieldValue'                     : contactFax
                     ]
                 )}}
@@ -130,7 +130,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : contactOther
                     ]
                 )}}
@@ -153,7 +153,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 50,
+                        'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : contactSecondaryEmail
                     ]
                 )}}
@@ -190,32 +190,5 @@
                 )}}
             </div>
         </div>
-    </div>
-</div>
-<hr>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'contact_notes',
-                'fieldLabel'                     : 'Contact Notes',
-                'fieldType'                      : 'textarea',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Contact Notes',
-                'fieldRequired'                  : false,
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 2048,
-                'fieldTextareaRows'              : 2,
-                'fieldValue'                     : contactNotes
-            ]
-        )}}
     </div>
 </div>
