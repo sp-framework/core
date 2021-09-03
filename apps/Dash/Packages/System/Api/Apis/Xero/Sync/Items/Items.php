@@ -84,6 +84,10 @@ class Items extends BasePackage
             } else {
                 if ($item['UpdatedDateUTC'] !== $xeroItem->UpdatedDateUTC) {
 
+                    if ($xeroItem->baz_product_id) {
+                        $item['resync_local'] = '1';
+                    }
+
                     $xeroItem->assign($this->jsonData($item));
 
                     $xeroItem->update();
