@@ -120,7 +120,11 @@ class Notes extends BasePackage
                     $note['package_row_id'] = $data['package_row_id'];
                 }
 
-                $note['is_private'] = $data['is_private'];
+                if (isset($data['is_private'])) {
+                    $note['is_private'] = $data['is_private'];
+                } else {
+                    $note['is_private'] = '0';
+                }
 
                 $note['note'] = $data['note'];
 

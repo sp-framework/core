@@ -60,6 +60,10 @@ class ActivityLogs extends BasePackage
 
         $log['package_row_id'] = $dataId;
 
+        if (isset($data['created_at'])) {
+            $log['created_at'] = $data['created_at'];
+        }
+
         $log['log'] = Json::encode($data);
 
         if ($this->add($log)) {

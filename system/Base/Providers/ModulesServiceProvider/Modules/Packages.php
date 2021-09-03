@@ -28,7 +28,7 @@ class Packages extends BasePackage
 					$package = $package->toArray();
 					$package['apps'] = Json::decode($package['apps'], true);
 					if (isset($package['apps'][$appId])) {
-						if ($package['name'] === ucfirst($name) &&
+						if (strtolower($package['name']) === strtolower($name) &&
 							$package['apps'][$appId]['enabled'] === true
 						) {
 							return $package;
