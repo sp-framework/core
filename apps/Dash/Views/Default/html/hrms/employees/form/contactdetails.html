@@ -230,7 +230,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 20,
                         'fieldValue'                     : employeeContactPhone
                     ]
                 )}}
@@ -253,7 +253,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 10,
                         'fieldValue'                     : employeeContactPhoneExt
                     ]
                 )}}
@@ -278,7 +278,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 20,
                         'fieldValue'                     : employeeContactMobile
                     ]
                 )}}
@@ -303,7 +303,7 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 20,
                         'fieldValue'                     : employeeContactFax
                     ]
                 )}}
@@ -326,38 +326,11 @@
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
-                        'fieldDataInputMaxLength'        : 15,
+                        'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : employeeContactOther
                     ]
                 )}}
             </div>
         </div>
-    </div>
-</div>
-<hr>
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'contact_notes',
-                'fieldLabel'                     : 'Contact Notes',
-                'fieldType'                      : 'textarea',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Contact Notes',
-                'fieldRequired'                  : false,
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataInputMinLength'        : 1,
-                'fieldDataInputMaxLength'        : 2048,
-                'fieldTextareaRows'              : 2,
-                'fieldValue'                     : employeeContactNotes
-            ]
-        )}}
     </div>
 </div>

@@ -52,7 +52,7 @@ class HrmsEmployeesContact
                     'contact_phone',
                     [
                         'type'              => Column::TYPE_VARCHAR,
-                        'size'              => 15,
+                        'size'              => 20,
                         'notNull'           => true,
                     ]
                 ),
@@ -68,7 +68,7 @@ class HrmsEmployeesContact
                     'contact_mobile',
                     [
                         'type'              => Column::TYPE_VARCHAR,
-                        'size'              => 15,
+                        'size'              => 20,
                         'notNull'           => true,
                     ]
                 ),
@@ -76,7 +76,7 @@ class HrmsEmployeesContact
                     'contact_fax',
                     [
                         'type'              => Column::TYPE_VARCHAR,
-                        'size'              => 15,
+                        'size'              => 20,
                         'notNull'           => false,
                     ]
                 ),
@@ -84,15 +84,7 @@ class HrmsEmployeesContact
                     'contact_other',
                     [
                         'type'              => Column::TYPE_VARCHAR,
-                        'size'              => 15,
-                        'notNull'           => false,
-                    ]
-                ),
-                new Column(
-                    'contact_notes',
-                    [
-                        'type'              => Column::TYPE_VARCHAR,
-                        'size'              => 2048,
+                        'size'              => 100,
                         'notNull'           => false,
                     ]
                 )

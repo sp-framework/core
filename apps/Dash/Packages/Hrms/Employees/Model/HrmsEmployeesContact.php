@@ -25,6 +25,4 @@ class HrmsEmployeesContact extends BaseModel
     public $contact_fax;
 
     public $contact_other;
-
-    public $contact_notes;
 }
