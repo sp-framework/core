@@ -153,22 +153,27 @@ class BaseRESTService
 
         return $httpHandler($request, $httpOptions)->then(
             function (ResponseInterface $res) use ($debug, $responseClass) {
-                $json = $res->getBody()->getContents();
+                if (isset($res->getHeaders()['Content-Type']) &&
+                    strpos($res->getHeaders()['Content-Type'][0], 'application/json') !== false
+                ) {
+                    $json = $res->getBody()->getContents();
+                    // var_dump(json_decode($json, true));
+                    if ($debug !== false) {
+                        $this->debugResponse($json);
+                    }
 
-                // var_dump($json, json_decode($json, true));die();
-                if ($debug !== false) {
-                    $this->debugResponse($json);
+                    $response = new $responseClass(
+                        $json !== '' ? json_decode($json, true) : [],
+                        $res->getStatusCode(),
+                        $res->getHeaders()
+                    );
+
+                    JsonParser::parseAndAssignProperties($response, $json);
+
+                    return $response;
+                } else {
+                    return $res;
                 }
-
-                $response = new $responseClass(
-                    $json !== '' ? json_decode($json, true) : [],
-                    $res->getStatusCode(),
-                    $res->getHeaders()
-                );
-
-                JsonParser::parseAndAssignProperties($response, $json);
-
-                return $response;
             }
         );
     }
