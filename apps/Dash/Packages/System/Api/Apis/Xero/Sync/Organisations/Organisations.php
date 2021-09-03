@@ -85,6 +85,10 @@ class Organisations extends BasePackage
 
                     $thisOrganisation = $modelToUse->toArray();
                 } else {
+                    if ($xeroOrganisation->baz_entity_id) {
+                        $organisation['resync_local'] = '1';
+                    }
+
                     $xeroOrganisation->assign($this->jsonData($organisation));
 
                     $xeroOrganisation->update();
