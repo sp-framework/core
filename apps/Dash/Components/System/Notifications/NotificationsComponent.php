@@ -133,13 +133,14 @@ class NotificationsComponent extends BaseComponent
             $this->notifications,
             'system/notifications/view',
             $conditions,
-            ['package_row_id', 'read', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
+            ['package_row_id', 'read', '[notification_type]', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
             true,
-            ['package_row_id', 'read', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
+            ['package_row_id', 'read', '[notification_type]', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
             null,
             [
                 'package_row_id'        => 'link',
                 'notification_title'    => 'notification',
+                'notification_type'     => 'type',
                 'notification_details'  => 'details',
                 'created_by'            => 'User',
                 'read'                  => 'actions',
@@ -180,6 +181,7 @@ class NotificationsComponent extends BaseComponent
     protected function replaceColumns($dataArr)
     {
         foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->generateType($dataKey, $data);
             $data = $this->generateUserInfo($dataKey, $data);
             $data = $this->generateLinkButton($dataKey, $data);
             $data = $this->generateReadButton($dataKey, $data);
@@ -189,6 +191,19 @@ class NotificationsComponent extends BaseComponent
         }
 
         return $dataArr;
+    }
+
+    protected function generateType($rowId, $data)
+    {
+        if ($data['notification_type'] === '0') {
+            $data['notification_type'] = '<span class="badge badge-info text-uppercase">INFO</span>';
+        } else if ($data['notification_type'] === '1') {
+            $data['notification_type'] = '<span class="badge badge-warning text-uppercase">WARNING</span>';
+        } else if ($data['notification_type'] === '2') {
+            $data['notification_type'] = '<span class="badge badge-danger text-uppercase">ERROR</span>';
+        }
+
+        return $data;
     }
 
     protected function packageLinks()

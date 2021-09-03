@@ -94,17 +94,30 @@ var BazNotifications = function() {
     }
 
     function updateCounter(response) {
-        if (response.responseData.count === 0) {
+        var notificationCount = 0;
+
+        if (response.responseData.count.error > 0) {
+            notificationCount = response.responseData.count.error;
+            $('#notifications-button-counter').removeClass('badge-info badge-warning').addClass('badge-danger');
+        } else if (response.responseData.count.warning > 0) {
+            $('#notifications-button-counter').removeClass('badge-info badge-danger').addClass('badge-warning');
+            notificationCount = response.responseData.count.warning;
+        } else {
+            $('#notifications-button-counter').removeClass('badge-warning badge-danger').addClass('badge-info');
+            notificationCount = response.responseData.count.total;
+        }
+
+        if (notificationCount === 0) {
             $('#notifications-button-counter').html('');
-        } else if (response.responseData.count < 10) {
+        } else if (notificationCount < 10) {
             $('#notifications-button-counter').css({'right': '10px'});
-            $('#notifications-button-counter').html(response.responseData.count);
+            $('#notifications-button-counter').html(notificationCount);
             shakeNotificationsButton();
-        } else if (response.responseData.count < 99) {
+        } else if (notificationCount < 99) {
             $('#notifications-button-counter').css({'right': '5px'});
-            $('#notifications-button-counter').html(response.responseData.count);
+            $('#notifications-button-counter').html(notificationCount);
             shakeNotificationsButton();
-        } else if (response.responseData.count > 99) {
+        } else if (notificationCount > 99) {
             $('#notifications-button-counter').css({'right': 0});
             $('#notifications-button-counter').html('99+');
             shakeNotificationsButton();

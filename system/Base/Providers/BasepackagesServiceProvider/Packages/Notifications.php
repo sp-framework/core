@@ -51,7 +51,7 @@ class Notifications extends BasePackage
         }
 
         $newNotification = [];
-        $newNotification['notificationType'] = $notificationType;
+        $newNotification['notification_type'] = $notificationType;
         $newNotification['app_id'] = $appId;
         $newNotification['account_id'] = $accountId;
         $newNotification['created_by'] = $createdBy;
@@ -126,6 +126,7 @@ class Notifications extends BasePackage
         $packageRowId = null,
         $notificationType = 0
     ) {
+        //Do something with notificationType when we have Templates for email.
         if (!$notificationTitle) {
             throw new \Exception('Notification title missing');
         }
@@ -171,24 +172,53 @@ class Notifications extends BasePackage
 
         $notifications = $this->getNotificationsCount($type);
 
+        $total = 0;
+        $info = 0;
+        $warning = 0;
+        $error = 0;
+
         if ($notifications && is_array($notifications)) {
-            $notificationsCount = count($notifications);
+            $total = count($notifications);
         } else {
-            $notificationsCount = 0;
+            $total = 0;
         }
 
-        $this->addResponse('Ok', 0, ['count' => $notificationsCount, 'mute' => $isMute]);
+        if ($total > 0) {
+            foreach ($notifications as $notification) {
+                if ($notification['notification_type'] == '0') {
+                    $info = $info + 1;
+                } else if ($notification['notification_type'] == '1') {
+                    $warning = $warning + 1;
+                } else if ($notification['notification_type'] == '2') {
+                    $error = $error + 1;
+                }
+            }
+        }
+
+        $this->addResponse(
+            'Ok',
+            0,
+            [
+                'count' =>
+                    [
+                        'total'     => $total,
+                        'info'      => $info,
+                        'warning'   => $warning,
+                        'error'     => $error
+                    ],
+                'mute'  => $isMute
+            ]
+        );
     }
 
-    protected function getNotificationsCount($type = 0)
+    protected function getNotificationsCount()
     {
         return $this->getByParams(
                 [
                     'conditions'    =>
-                        '[notification_type] = :type: AND app_id = :appId: AND account_id = :aId: AND read = :read: AND archive = :archive:',
+                        'app_id = :appId: AND account_id = :aId: AND read = :read: AND archive = :archive:',
                     'bind'          =>
                         [
-                            'type'          => $type,
                             'appId'         => $this->apps->getAppInfo()['id'],
                             'aId'           => $this->auth->account()['id'],
                             'read'          => 0,

@@ -1127,6 +1127,14 @@ abstract class BasePackage extends Controller
 				}
 
 				foreach ($package['notification_subscriptions'] as $appId => $subscriptions) {
+					if ($subscriptionType === 'add' || $subscriptionType === 'update' || $subscriptionType === 'remove') {
+						$notificationType = '0';
+					} else if ($subscriptionType === 'warning') {
+						$notificationType = '1';
+					} else if ($subscriptionType === 'error') {
+						$notificationType = '2';
+					}
+
 					if (isset($subscriptions[$subscriptionType]) &&
 						is_array($subscriptions[$subscriptionType]) &&
 						count($subscriptions[$subscriptionType]) > 0
@@ -1140,7 +1148,7 @@ abstract class BasePackage extends Controller
 								$this->auth->account()['id'],
 								$package['name'],
 								$packageRowId,
-								0
+								$notificationType
 							);
 						}
 					}
@@ -1162,7 +1170,7 @@ abstract class BasePackage extends Controller
 							$this->auth->account()['id'],
 							$package['name'],
 							$packageRowId,
-							0
+							$notificationType
 						);
 					}
 				}
