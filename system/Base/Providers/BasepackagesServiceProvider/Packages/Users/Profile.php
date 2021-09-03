@@ -401,22 +401,28 @@ class Profile extends BasePackage
 
                         if ($methods) {
                             foreach ($methods as $annotation) {
+                                $thisSubscriptions = [];
                                 $notification_action = $annotation->getAll('notification')[0]->getArguments();
                                 $notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
+
                                 if (count($notification_allowed_methods) > 0) {
                                     $notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
                                 }
+
                                 $subscriptions[$notification_action['name']] = $notification_action['name'];
+                                $thisSubscriptions[$notification_action['name']] = $notification_action['name'];
 
                                 if (count($notification_allowed_methods) > 0) {
                                     foreach ($notification_allowed_methods as $allowedMethodKey => $allowedMethod) {
                                         $subscriptions[$allowedMethod] = $allowedMethod;
+                                        $thisSubscriptions[$allowedMethod] = $allowedMethod;
                                     }
                                 }
 
                                 if (isset($package['notification_subscriptions'][$app['id']])) {
-                                    foreach ($subscriptions as $subscriptionKey => $subscriptionValue) {
+                                    foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
                                         if (isset($package['notification_subscriptions'][$app['id']][$subscriptionValue])) {
+
                                             if ($subscriptionValue === 'email' || $subscriptionValue === 'sms') {
                                                 if (isset($package['notification_subscriptions'][$app['id']][$subscriptionValue][$account['id']])) {
                                                     $notifications[$app['id']][$package['id']][$subscriptionValue] = 1;
@@ -435,7 +441,7 @@ class Profile extends BasePackage
                                         }
                                     }
                                 } else {
-                                    foreach ($subscriptions as $subscriptionKey => $subscriptionValue) {
+                                    foreach ($thisSubscriptions as $subscriptionKey => $subscriptionValue) {
                                         $notifications[$app['id']][$package['id']][$subscriptionValue] = 0;
                                     }
                                 }
