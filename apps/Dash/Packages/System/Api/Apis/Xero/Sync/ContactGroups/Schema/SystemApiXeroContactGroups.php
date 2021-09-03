@@ -28,7 +28,7 @@ class SystemApiXeroContactGroups
                     ]
                 ),
                 new Column(
-                    'baz_directory_group_id',
+                    'baz_vendor_group_id',
                     [
                         'type'          => Column::TYPE_SMALLINTEGER,
                         'notNull'       => false
