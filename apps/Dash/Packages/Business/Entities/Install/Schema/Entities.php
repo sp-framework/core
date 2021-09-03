@@ -71,7 +71,7 @@ class Entities
                     'contact_phone',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
+                        'size'          => 20,
                         'notNull'       => true,
                     ]
                 ),
@@ -87,7 +87,7 @@ class Entities
                     'contact_fax',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
+                        'size'          => 20,
                         'notNull'       => false,
                     ]
                 ),
@@ -95,7 +95,7 @@ class Entities
                     'contact_other',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
+                        'size'          => 100,
                         'notNull'       => false,
                     ]
                 ),
@@ -103,7 +103,7 @@ class Entities
                     'website',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 512,
+                        'size'          => 1024,
                         'notNull'       => false,
                     ]
                 ),
