@@ -24,6 +24,21 @@ class PurchaseOrders extends BasePackage
 
         $purchaseOrder = $purchaseOrderObj->toArray();
 
+        if (isset($purchaseOrder['attachments']) && $purchaseOrder['attachments'] !== '') {
+            $purchaseOrder['attachments'] = Json::decode($purchaseOrder['attachments'], true);
+
+            foreach ($purchaseOrder['attachments'] as $attachmentKey => &$attachment) {
+                $attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
+
+                if ($attachmentInfo) {
+                    if ($attachmentInfo['links']) {
+                        $attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
+                    }
+                    $attachment = $attachmentInfo;
+                }
+            }
+        }
+
         $productsObj = $purchaseOrderObj->getProducts();
 
         if ($productsObj) {
@@ -35,6 +50,9 @@ class PurchaseOrders extends BasePackage
         return $purchaseOrder;
     }
 
+    /**
+     * @notification(name=add)
+     */
     public function addPurchaseOrder(array $data)
     {
         $data = $this->updateAddress($data);
@@ -72,6 +90,9 @@ class PurchaseOrders extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     */
     public function updatePurchaseOrder(array $data)
     {
         $purchaseOrder = $this->getById($data['id']);
@@ -117,6 +138,9 @@ class PurchaseOrders extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=remove)
+     */
     public function removePurchaseOrder(array $data)
     {
         $purchaseOrderObj = $this->modelToUse::findFirstById($data['id']);
@@ -127,9 +151,23 @@ class PurchaseOrders extends BasePackage
             $purchaseOrderObj->delete();
 
             $this->addResponse('Removed purchase order.');
+
+            $this->addToNotification('remove', 'Removed purchase order ' . $data['id']);
         } else {
             $this->addResponse('Error removing purchase order.', 1);
         }
+    }
+
+    /**
+     * @notification(name=error)
+     */
+    public function errorPurchaseOrder($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Purchase order has errors, contact administrator!';
+        }
+
+        $this->addToNotification('error', $messageTitle, $messageDetails, null, $id);
     }
 
     protected function updateAddress(array $data, $purchaseOrder = null)

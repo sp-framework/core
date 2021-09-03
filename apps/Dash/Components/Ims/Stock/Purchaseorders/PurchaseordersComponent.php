@@ -58,21 +58,6 @@ class PurchaseordersComponent extends BaseComponent
 
 				$purchaseOrder = $this->getAddress($purchaseOrder);
 
-				if (isset($purchaseOrder['attachments']) && $purchaseOrder['attachments'] !== '') {
-					$purchaseOrder['attachments'] = Json::decode($purchaseOrder['attachments'], true);
-
-					foreach ($purchaseOrder['attachments'] as $attachmentKey => &$attachment) {
-						$attachmentInfo = $this->basepackages->storages->getFileInfo($attachment);
-
-						if ($attachmentInfo) {
-							if ($attachmentInfo['links']) {
-								$attachmentInfo['links'] = Json::decode($attachmentInfo['links'], true);
-							}
-							$attachment = $attachmentInfo;
-						}
-					}
-				}
-
 				$purchaseOrder['activityLogs'] = $this->purchaseOrdersPackage->getActivityLogs($this->getData()['id']);
 
 				$purchaseOrder['notes'] = $this->notes->getNotes('purchaseorders', $this->getData()['id']);
@@ -88,7 +73,7 @@ class PurchaseordersComponent extends BaseComponent
 					$purchaseOrder['vendor_contacts'] = $this->vendors->packagesData->vendor['contact_ids'];
 				}
 
-				if ($purchaseOrder['entity_location_id'] !== '0') {
+				if ($purchaseOrder['entity_location_id'] && $purchaseOrder['entity_location_id'] !== '0') {
 					$locations[] = $this->locations->getById($purchaseOrder['entity_location_id']);
 
 					if ($locations[0]['employee_ids'] !== '') {
@@ -114,7 +99,7 @@ class PurchaseordersComponent extends BaseComponent
 
 				$this->view->employees = $employees;
 
-				if ($purchaseOrder['customer_id'] !== '0') {
+				if ($purchaseOrder['customer_id'] && $purchaseOrder['customer_id'] !== '0') {
 					$customers = $this->usePackage(Customers::class);
 
 					if ($customers->searchByCustomerId($purchaseOrder['customer_id'])) {

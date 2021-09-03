@@ -253,7 +253,7 @@
                             <dd class="col-sm-8 cla-phone mb-0">' ~ purchaseOrder['vendor']['contact_phone']
                     %}
 
-                    {% if purchaseOrder['vendor']['contact_phone_ext'] !== '' %}
+                    {% if purchaseOrder['vendor']['contact_phone_ext'] is defined and purchaseOrder['vendor']['contact_phone_ext'] !== '' %}
                         {% set contactContent = contactContent ~ ' x' ~ purchaseOrder['vendor']['contact_phone_ext'] ~ '</dd>' %}
                     {% else %}
                         {% set contactContent = contactContent ~ '</dd>' %}
@@ -293,7 +293,7 @@
                                     <dd class="col-sm-8 cla-phone mb-0">' ~ vendorContact['contact_phone']
                             %}
 
-                            {% if vendorContact['contact_phone_ext'] !== '' %}
+                            {% if vendorContact['contact_phone_ext'] is defined and vendorContact['contact_phone_ext'] !== '' %}
                                 {% set contactContent = contactContent ~ ' x' ~ vendorContact['contact_phone_ext'] ~ '</dd>' %}
                             {% else %}
                                 {% set contactContent = contactContent ~ '</dd>' %}

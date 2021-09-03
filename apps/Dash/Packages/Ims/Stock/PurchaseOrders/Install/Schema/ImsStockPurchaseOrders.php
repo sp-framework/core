@@ -125,7 +125,7 @@ class ImsStockPurchaseOrders
                     'one_off_address_id',
                     [
                         'type'    => Column::TYPE_INTEGER,
-                        'notNull' => true,
+                        'notNull' => false,
                     ]
                 ),
                 new Column(

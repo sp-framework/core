@@ -96,7 +96,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentFieldsValidator autoComplete PNotify BazContentLoader Sortable */
+/* globals BazContentFieldsValidator autoComplete PNotify BazContentLoader Sortable Inputmask */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -277,7 +277,7 @@ dataCollectionSection =
                                 '<dt class="col-sm-4">Phone</dt>' +
                                 '<dd class="col-sm-8 cla-phone mb-0">' + response.vendor.contact_phone;
 
-                                if (response.vendor.contact_phone_ext !== '') {
+                                if (response.vendor.contact_phone_ext && response.vendor.contact_phone_ext !== '') {
                                     contactContent +=
                                         ' x' + response.vendor.contact_phone_ext + '</dd>';
                                 } else {
@@ -312,7 +312,7 @@ dataCollectionSection =
                                     '<dt class="col-sm-4">Phone</dt>' +
                                     '<dd class="col-sm-8 cla-phone mb-0">' + contact.contact_phone;
 
-                                    if (contact.contact_phone_ext !== '') {
+                                    if (contact.contact_phone_ext && contact.contact_phone_ext !== '') {
                                         contactContent +=
                                             ' x' + contact.contact_phone_ext + '</dd>';
                                     } else {
@@ -576,7 +576,7 @@ dataCollectionSection =
                     $('#{{componentId}}-{{sectionId}}-contact_fullname').val(employees[employeeId]['contact_name']);
                     $('#{{componentId}}-{{sectionId}}-contact_phone').val(employees[employeeId]['contact_phone']);
 
-                    if (employees[employeeId]['contact_phone_ext'] !== '') {
+                    if (employees[employeeId]['contact_phone_ext'] && employees[employeeId]['contact_phone_ext'] !== '') {
                         $('#{{componentId}}-{{sectionId}}-contact_phone').val(
                             employees[employeeId]['contact_phone'] + ' x' + employees[employeeId]['contact_phone_ext']
                         );
@@ -742,7 +742,12 @@ dataCollectionSection =
             placeholder: 'SELECT LOCATION CONTACT',
         },
         '{{componentId}}-{{sectionId}}-contact_fullname'            : { },
-        '{{componentId}}-{{sectionId}}-contact_phone'               : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'           : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_phone'));
+            }
+        },
         '{{componentId}}-{{sectionId}}-delivery_instructions'       : { },
         '{{componentId}}-{{sectionId}}-use_vendor_tax'              : {
             afterInit: function() {
