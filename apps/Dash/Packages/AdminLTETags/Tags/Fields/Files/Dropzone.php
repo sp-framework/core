@@ -240,7 +240,7 @@ class Dropzone
                     <div class="col">
                         <ul class="list-group" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-sortable-attachments">';
 
-                            if (count($this->params['attachments']) > 0) {
+                            if ($this->params['attachments'] && count($this->params['attachments']) > 0) {
                                 $this->content .=
                                     '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-' . $this->params['fieldId'] . '-nodata" hidden>
                                         <div class="row">
