@@ -56,7 +56,7 @@
                     <span id="notifications-button-counter" class="badge badge-info navbar-badge"></span>
                 </a>
             </li>
-            <li id="profile-dropdown" class="nav-item dropdown">
+            <li id="profile-dropdown" class="nav-item dropdown text-uppercase">
                 {% if auth.account() %}
                     {% set profile = auth.account()['profile'] %}
                     <a id="profile-portrait" class="nav-link" data-toggle="dropdown" href="#" aria-expanded="true">
@@ -74,7 +74,8 @@
                         <a href="{{links.url('system/users/profile')}}" id="profile" class="dropdown-item contentAjaxLink">
                             <i class="fa fa-fw fa-id-card mr-2"></i> Profile
                         </a>
-                        <a href="{{links.url('auth/logout')}}" id="logout" class="dropdown-item">
+                        <div class="dropdown-divider"></div>
+                        <a href="{{links.url('auth/logout')}}" id="logout" class="dropdown-item text-danger">
                             <i class="fa fa-fw fa-sign-out-alt mr-2"></i> Logout
                         </a>
                     </div>
