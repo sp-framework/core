@@ -90,6 +90,7 @@ class Counters
                 $hasDataValue = 'data-value="' . $counter['value'] . '"';
             } else {
                 $counterValue = 0;
+                $hasDataValue = 'data-value="0"';
             }
 
             if (isset($counter['type'])) {
