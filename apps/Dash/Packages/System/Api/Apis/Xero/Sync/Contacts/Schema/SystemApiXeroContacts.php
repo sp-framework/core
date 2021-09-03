@@ -83,6 +83,14 @@ class SystemApiXeroContacts
                     ]
                 ),
                 new Column(
+                    'Website',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 1024,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'EmailAddress',
                     [
                         'type'          => Column::TYPE_VARCHAR,

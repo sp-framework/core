@@ -24,6 +24,8 @@ class SystemApiXeroContacts extends BaseModel
 
     public $LastName;
 
+    public $Website;
+
     public $EmailAddress;
 
     public $ContactGroups;
