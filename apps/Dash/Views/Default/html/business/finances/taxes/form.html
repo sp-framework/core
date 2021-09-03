@@ -97,7 +97,7 @@
                         'fieldType'                             : 'select2',
                         'fieldHelp'                             : true,
                         'fieldHelpTooltipContent'               : 'Tax Group',
-                        'fieldRequired'                         : false,
+                        'fieldRequired'                         : true,
                         'fieldBazScan'                          : true,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : true,
@@ -177,10 +177,12 @@ dataCollectionSection =
             rules: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'required',
                 '{{componentId}}-{{sectionId}}-amount'                  : 'required',
+                '{{componentId}}-{{sectionId}}-tax_group_id'            : 'required',
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'                    : 'Please enter Tax name',
                 '{{componentId}}-{{sectionId}}-amount'                  : 'Please enter Tax amount',
+                '{{componentId}}-{{sectionId}}-tax_group_id'            : 'Please select Tax Group',
             }
         }
     });

@@ -121,13 +121,6 @@ class SystemApiXeroPurchaseOrdersLineitems
                     ]
                 ),
                 new Column(
-                    'DiscountAmount',
-                    [
-                        'type'    => Column::TYPE_FLOAT,
-                        'notNull' => false,
-                    ]
-                ),
-                new Column(
                     'LineAmount',
                     [
                         'type'    => Column::TYPE_FLOAT,

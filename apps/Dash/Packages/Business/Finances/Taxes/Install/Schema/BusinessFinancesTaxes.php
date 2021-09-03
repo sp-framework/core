@@ -32,7 +32,7 @@ class BusinessFinancesTaxes
                     'tax_group_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
-                        'notNull'       => false,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(

@@ -4,6 +4,7 @@ namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders;
 
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Business\Entities\Model\BusinessEntities;
+use Apps\Dash\Packages\Business\Finances\TaxGroups\Model\BusinessFinancesTaxGroups;
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model\ImsStockPurchaseOrdersProducts;
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\PurchaseOrders as ImsPurchaseOrders;
 use Apps\Dash\Packages\System\Api\Api;
@@ -250,9 +251,6 @@ class PurchaseOrders extends BasePackage
                 $thisPo = $modelToUse->toArray();
             } else {
                 // if ($purchaseOrder['UpdatedDateUTC'] !== $xeroPo->UpdatedDateUTC) {
-                    if ($xeroPo->PurchaseOrderNumber !== 'PO-0007') {
-                        continue;
-                    }
                     if ($xeroPo->baz_po_id) {
                         $purchaseOrder['resync_local'] = '1';
                     }
@@ -344,6 +342,8 @@ class PurchaseOrders extends BasePackage
             if (!$xeroPoLineItem) {
                 $modelToUse = new $model();
 
+                $lineItem['PurchaseOrderID'] = $purchaseOrder['PurchaseOrderID'];
+
                 $modelToUse->assign($this->jsonData($lineItem));
 
                 $modelToUse->create();
@@ -379,10 +379,6 @@ class PurchaseOrders extends BasePackage
             if ($pos && count($pos) > 0) {
                 foreach ($pos as $poKey => $po) {
                     $this->errors = [];
-
-                    if ($po['PurchaseOrderNumber'] !== 'PO-0007') {
-                        continue;
-                    }
 
                     $productsModel = SystemApiXeroPurchaseOrdersLineitems::class;
 
@@ -471,11 +467,15 @@ class PurchaseOrders extends BasePackage
             }
         }
 
-        $purchaseOrder['delivery_date'] =
-            (\DateTime::createFromFormat(
-                "U",
-                str_replace('/Date(', '', str_replace('000+0000)/', '', $po['DeliveryDate']))
-            ))->format('Y-m-d');
+        $dDate = \DateTime::createFromFormat("U",str_replace('/Date(', '', str_replace('000+0000)/', '', $po['DeliveryDate'])));
+
+        if ($dDate) {
+            $dDate = $dDate->format('Y-m-d');
+        } else {
+            $dDate = '';
+        }
+
+        $purchaseOrder['delivery_date'] = $dDate;
 
         $purchaseOrder['delivery_type'] = '3';
 
@@ -494,10 +494,23 @@ class PurchaseOrders extends BasePackage
         }
 
         if ($po['baz_po_id'] && $po['baz_po_id'] != '0') {
-            if ($this->poPackage->update($purchaseOrder)) {
-                $purchaseOrder = $this->poPackage->packagesData->last;
+            if ($this->poPackage->getById($po['baz_po_id'])) {
+
+                $purchaseOrder = array_merge($this->poPackage->getById($po['baz_po_id']), $purchaseOrder);
+
+                if ($this->poPackage->update($purchaseOrder)) {
+                    $purchaseOrder = $this->poPackage->packagesData->last;
+                } else {
+                    $this->errors = array_merge($this->errors, ['Could not update purchase order data - ' . $po['AttentionTo']]);
+                }
             } else {
-                $this->errors = array_merge($this->errors, ['Could not update purchase order data - ' . $po['AttentionTo']]);
+                if ($this->poPackage->add($purchaseOrder)) {
+                    $purchaseOrder = $this->poPackage->packagesData->last;
+
+                    $this->poPackage->addRefId($purchaseOrder);
+                } else {
+                    $this->errors = array_merge($this->errors, ['Could not add purchase order data - ' . $po['AttentionTo']]);
+                }
             }
         } else {
             if ($this->poPackage->add($purchaseOrder)) {
@@ -834,34 +847,103 @@ class PurchaseOrders extends BasePackage
 
     protected function generatePurchaseOrderProducts($po, $purchaseOrderId)
     {
-        var_dump($po, $purchaseOrderId);die();
-
         foreach ($po['products'] as $productKey => $product) {
-            $newItem['PurchaseOrderID'] = $product['PurchaseOrderID'];
-            $newItem['LineItemID'] = $product['LineItemID'];
-            $newItem['Description'] = $product['Description'];
-            $newItem['Quantity'] = $product['Quantity'];
-            $newItem['UnitAmount'] = $product['UnitAmount'];
-            $newItem['ItemCode'] = $product['ItemCode'];
-            $newItem['AccountID'] = $product['AccountID'];
-            $newItem['AccountCode'] = $product['AccountCode'];
-            $newItem['Tracking'] = $product['Tracking'];
-            $newItem['TaxType'] = $product['TaxType'];
-            $newItem['RepeatingInvoiceID'] = $product['RepeatingInvoiceID'];
-            $newItem['TaxAmount'] = $product['TaxAmount'];
-            $newItem['DiscountRate'] = $product['DiscountRate'];
-            $newItem['DiscountAmount'] = $product['DiscountAmount'];
-            $newItem['LineAmount'] = $product['LineAmount'];
+            $newItem['purchase_order_id'] = $purchaseOrderId;
+            $newItem['seq'] = $productKey;
+
+            if (!$product['ItemCode'] || $product['ItemCode'] === '') {
+                $newItem['mpn'] = '0000';
+                $this->errors = array_merge($this->errors, ['Product MPN missing for purchase order - ' . $purchaseOrderId]);
+            } else {
+                $newItem['mpn'] = $product['ItemCode'];
+            }
+
+            if ($product['Description'] === '') {
+                $newItem['product_title'] = '000';
+                $this->errors = array_merge($this->errors, ['Product Title missing for purchase order - ' . $purchaseOrderId]);
+            } else {
+                $newItem['product_title'] = $product['Description'];
+            }
+
+            $newItem['use_vendor_tax'] = 'false';
+
+            $newItem['tax'] = '0';
+            $newItem['tax_rate'] = '0';
+
+            $taxGroupsModel = new BusinessFinancesTaxGroups;
+
+            if ($product['TaxType'] === 'OUTPUT') {
+                $taxGroupObj = $taxGroupsModel::findFirstByName('GST on Income');
+                $newItem['tax'] = 'GST on Income';
+            } else if ($product['TaxType'] === 'INPUT') {
+                $taxGroupObj = $taxGroupsModel::findFirstByName('GST on Expenses');
+                $newItem['tax'] = 'GST on Expenses';
+            } else if ($product['TaxType'] === 'EXEMPTEXPENSES') {
+                $taxGroupObj = $taxGroupsModel::findFirstByName('GST Free Expenses');
+                $newItem['tax'] = 'GST Free Expenses';
+            } else if ($product['TaxType'] === 'EXEMPTOUTPUT') {
+                $taxGroupObj = $taxGroupsModel::findFirstByName('GST Free Income');
+                $newItem['tax'] = 'GST Free Income';
+            } else if ($product['TaxType'] === 'BASEXCLUDED') {
+                $taxGroupObj = $taxGroupsModel::findFirstByName('BAS Excluded');
+                $newItem['tax'] = 'BAS Excluded';
+            } else if ($product['TaxType'] === 'GSTONIMPORTS') {
+                $taxGroupObj = $taxGroupsModel::findFirstByName('GST on Imports');
+                $newItem['tax'] = 'GST on Imports';
+            }
+
+            if ($taxGroupObj) {
+                $newItem['tax_rate'] = $taxGroupObj->id;
+            }
+
+            if ($newItem['tax_rate'] === '0') {
+                $this->errors = array_merge($this->errors, ['Tax missing for a product purchase order - ' . $purchaseOrderId]);
+            }
+
+            $newItem['use_vendor_discount'] = 'false';
+            $newItem['product_discount_rate'] = $product['DiscountRate'];
+
+            if ($product['DiscountRate'] && $product['DiscountRate'] !== '') {
+                $newItem['product_discount'] = $product['DiscountRate'] . '%';
+            }
+
+            $newItem['product_qty'] = $product['Quantity'];
+
+            $newItem['product_unit_price'] = $product['UnitAmount'];
+
+            $newItem['product_amount'] = $product['LineAmount'];
+
+            if ($po['LineAmountTypes'] === '') {
+                $newItem['product_unit_price_incl_tax'] = 'true';
+            } else {
+                $newItem['product_unit_price_incl_tax'] = 'false';
+            }
+
+            $poProductModel = ImsStockPurchaseOrdersProducts::class;
+
+            $poProductObj = $poProductModel::findFirst(
+                [
+                    'conditions'    => 'purchase_order_id = :poid: AND mpn = :mpn:',
+                    'bind'          =>
+                        [
+                            'mpn'   => $newItem['mpn'],
+                            'poid'  => $newItem['purchase_order_id']
+                        ]
+                ]
+            );
+
+            if ($poProductObj) {
+                $poProductObj->assign($newItem);
+
+                $poProductObj->update();
+            } else {
+                $newProductObj = new $poProductModel;
+
+                $newProductObj->assign($newItem);
+
+                $newProductObj->create();
+            }
         }
-
-        $model = ImsStockPurchaseOrdersProducts::class;
-
-        if (isset($data['id'])) {
-            $this->update($data);
-        } else {
-            $this->add($data);
-        }
-
     }
 
     protected function addPurchaseOrderHistory($po, $purchaseOrder)

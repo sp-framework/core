@@ -1256,6 +1256,8 @@ abstract class BasePackage extends Controller
 							$sql = "UPDATE `{$table}` SET `ref_id` = ? WHERE `{$table}`.`id` = ?";
 
 							$this->db->execute($sql, [$prefixValue, $data['id']]);
+
+							$data['ref_id'] = $prefixValue;
 						}
 					}
 				}

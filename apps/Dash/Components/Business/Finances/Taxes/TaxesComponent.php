@@ -27,12 +27,12 @@ class TaxesComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $this->view->taxgroups = $taxgroupsArr;
-
                 $tax = $this->taxesPackage->getById($this->getData()['id']);
 
                 $this->view->tax = $tax;
             }
+
+            $this->view->taxgroups = $taxgroupsArr;
 
             $this->view->pick('taxes/view');
 

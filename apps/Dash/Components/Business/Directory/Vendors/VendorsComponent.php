@@ -7,7 +7,7 @@ use Apps\Dash\Packages\Business\ABNLookup\ABNLookup;
 use Apps\Dash\Packages\Business\Directory\Contacts\Contacts;
 use Apps\Dash\Packages\Business\Directory\VendorGroups\VendorGroups;
 use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
-use Apps\Dash\Packages\Business\Finances\Taxes\Taxes;
+use Apps\Dash\Packages\Business\Finances\TaxGroups\TaxGroups;
 use Apps\Dash\Packages\Ims\Brands\Brands;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
@@ -71,7 +71,7 @@ class VendorsComponent extends BaseComponent
 
             $this->view->logoLink = '';
 
-            $this->view->taxes = $this->usePackage(Taxes::class)->getAll()->taxes;
+            $this->view->taxGroups = $this->usePackage(TaxGroups::class)->getAll()->taxgroups;
 
             $this->view->b2bAccountManagers = [];
 

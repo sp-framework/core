@@ -34,7 +34,5 @@ class SystemApiXeroPurchaseOrdersLineitems extends BaseModel
 
     public $DiscountRate;
 
-    public $DiscountAmount;
-
     public $LineAmount;
 }
