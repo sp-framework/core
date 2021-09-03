@@ -12,6 +12,8 @@ class SyncXeroPo extends Functions
 
     public function run(array $args = [])
     {
+        set_time_limit(300);
+
         $thisFunction = $this;
 
         return function() use ($thisFunction, $args) {
@@ -37,17 +39,27 @@ class SyncXeroPo extends Functions
                     return;
                 }
             }
-            set_time_limit(300);
 
             $poSync = new PurchaseOrders;
 
-            $poSync->sync(null, $args['task']['parameters']);
+            try {
+                $poSync->sync(null, $args['task']['parameters']);
 
-            $this->addJobResult($poSync->packagesData, $args);
+                $this->addJobResult($poSync->packagesData, $args);
+            } catch (\Exception $e) {
+
+                $thisFunction->packagesData->responseCode = 1;
+
+                $thisFunction->packagesData->responseMessage = $e->getMessage();
+
+                $this->addJobResult($thisFunction->packagesData, $args);
+
+                $thisFunction->updateJobTask(4, $args);
+
+                return;
+            }
 
             $thisFunction->updateJobTask(3, $args);
-
-            set_time_limit(30);
         };
     }
 }
