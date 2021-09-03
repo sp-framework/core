@@ -32,16 +32,12 @@ class Storages extends BasePackage
     {
         $data = $this->extractSelectData($data);
 
-        $add = $this->add($data);
+        if ($this->add($data)) {
+            $this->addResponse('Storage Added');
 
-        if ($add) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Storage Added';
+            $this->addToNotification('add', 'Added new storage ' . $data['name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error Adding Storage';
+            $this->addResponse('Error Adding Storage', 1);
         }
     }
 
@@ -54,16 +50,12 @@ class Storages extends BasePackage
     {
         $data = $this->extractSelectData($data);
 
-        $update = $this->update($data);
+        if ($this->update($data)) {
+            $this->addResponse('Storage Updated');
 
-        if ($update) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Storage Updated';
+            $this->addToNotification('update', 'Updated storage ' . $data['name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error Updating Storage';
+            $this->addResponse('Error Updating Storage', 1);
         }
     }
 
@@ -86,16 +78,20 @@ class Storages extends BasePackage
      */
     public function removeStorage(array $data)
     {
-        $remove = $this->remove($data['id']);
+        if ($data['id'] == '1' || $data['id'] == '2') {
+            $this->addResponse('Cannot remove system storages', 1);
 
-        if ($remove) {
-            $this->packagesData->responseCode = 0;
+            return;
+        }
 
-            $this->packagesData->responseMessage = 'Storage Removed';
+        $storage = $this->getById($data['id']);
+
+        if ($this->remove($data['id'])) {
+            $this->addResponse('Storage Removed');
+
+            $this->addToNotification('remove', 'Removed storage ' . $storage['name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error Removing Storage';
+            $this->addResponse('Error Removing Storage', 1);
         }
     }
 
@@ -144,12 +140,18 @@ class Storages extends BasePackage
         return false;
     }
 
-    public function storeFile()
+    public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null)
     {
         if (isset($this->request->getPost()['storagetype'])) {
             if ($this->request->getPost()['storagetype'] === 'public') {
                 $public = true;
             } else if ($this->request->getPost()['storagetype'] === 'private') {
+                $public = false;
+            }
+        } else if ($type) {
+            if ($type === 'public') {
+                $public = true;
+            } else if ($type === 'private') {
                 $public = false;
             }
         } else {
@@ -159,7 +161,7 @@ class Storages extends BasePackage
         $this->initStorage($public);
 
         if ($this->storage) {
-            if ($this->storage->store()) {
+            if ($this->storage->store($directory, $file, $fileName, $size, $mimeType)) {
                 $storageData = $this->storage->packagesData->storageData;
 
                 $fileInfo = $this->storage->getFileInfo($storageData['uuid']);
@@ -199,16 +201,12 @@ class Storages extends BasePackage
 
                 return true;
             } else {
-                $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
-
-                $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
+                $this->addResponse($this->storage->packagesData->responseMessage, $this->storage->packagesData->responseCode);
 
                 return false;
             }
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Storage not configured, contact administrator';
+            $this->addResponse('Storage not configured, contact administrator', 1);
 
             return false;
         }
@@ -239,15 +237,11 @@ class Storages extends BasePackage
         }
 
         if ($this->storage->removeFile($uuid, $purge)) {
-            $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
-
-            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
+            $this->addResponse($this->storage->packagesData->responseMessage, $this->storage->packagesData->responseCode);
 
             return true;
         } else {
-            $this->packagesData->responseCode = $this->storage->packagesData->responseCode;
-
-            $this->packagesData->responseMessage = $this->storage->packagesData->responseMessage;
+            $this->addResponse($this->storage->packagesData->responseMessage, $this->storage->packagesData->responseCode);
 
             return false;
         }

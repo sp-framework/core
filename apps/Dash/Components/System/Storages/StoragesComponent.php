@@ -93,9 +93,11 @@ class StoragesComponent extends BaseComponent
             if ($this->storages->storeFile()) {
                 $this->view->storageData = $this->storages->packagesData->storageData;
             }
-            $this->view->responseCode = $this->storages->packagesData->responseCode;
 
-            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
+            $this->addResponse(
+                $this->storages->packagesData->responseMessage,
+                $this->storages->packagesData->responseCode
+            );
 
             return;
         }
@@ -107,14 +109,12 @@ class StoragesComponent extends BaseComponent
 
             $this->storages->addStorage($this->postData());
 
-            $this->view->responseCode = $this->storages->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->storages->packagesData->responseMessage,
+                $this->storages->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -130,14 +130,12 @@ class StoragesComponent extends BaseComponent
 
             $this->storages->updateStorage($this->postData());
 
-            $this->view->responseCode = $this->storages->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->storages->packagesData->responseMessage,
+                $this->storages->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -150,14 +148,15 @@ class StoragesComponent extends BaseComponent
 
             $this->storages->removeFile($this->postData()['uuid']);
 
-            $this->view->responseCode = $this->storages->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->storages->packagesData->responseMessage;
+            $this->addResponse(
+                $this->storages->packagesData->responseMessage,
+                $this->storages->packagesData->responseCode
+            );
 
             return;
         }
 
-        if ($this->app['id'] === 1) {
+        if ($this->app['id'] == '1') {
             if ($this->request->isPost()) {
                 if (!$this->checkCSRF()) {
                     return;
@@ -165,14 +164,12 @@ class StoragesComponent extends BaseComponent
 
                 $this->storages->removeStorage($this->postData());
 
-                $this->view->responseCode = $this->storages->packagesData->responseCode;
-
-                $this->view->responseMessage = $this->storages->packagesData->responseMessage;
-
+                $this->addResponse(
+                    $this->storages->packagesData->responseMessage,
+                    $this->storages->packagesData->responseCode
+                );
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'Method Not Allowed';
+                $this->addResponse('Method Not Allowed', 1);
             }
         }
     }

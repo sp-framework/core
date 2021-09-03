@@ -3,6 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
 
 use Phalcon\Helper\Json;
+use Phalcon\Http\Message\UploadedFile;
 use Phalcon\Image\Adapter\Imagick;
 use Phalcon\Image\Enum;
 use System\Base\BasePackage;
@@ -117,9 +118,9 @@ class Local extends BasePackage
         return $this;
     }
 
-    public function store()
+    public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null)
     {
-        if (!$this->request->hasFiles()) {
+        if (!$file && !$this->request->hasFiles()) {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = 'File(s) Not Provided';
@@ -127,60 +128,66 @@ class Local extends BasePackage
             return false;
         }
 
-        $this->directory = $this->request->getPost()['directory'] ?? null;
+        if (isset($this->request->getPost()['directory'])) {
+            $this->directory = $this->request->getPost()['directory'];
+        } else if ($directory) {
+            $this->directory = $directory;
+        } else {
+            $this->directory = null;
+        }
 
         $storageData = [];
 
-        foreach ($this->request->getUploadedFiles() as $key => $file) {
+        if ($file && $fileName && $size && $mimeType) {
+            //Put file contents in a temp location
+            $tempFile = tempnam(sys_get_temp_dir(), '');
+            file_put_contents($tempFile, $file);
 
-            $this->file = $file;
+            $this->file = new UploadedFile(
+                $tempFile,
+                $size,
+                UPLOAD_ERR_OK,
+                $fileName
+            );
 
-            $this->fileName =
-                isset($this->request->getPost()['fileName']) ?
-                $this->request->getPost()['fileName'] :
-                $this->file->getName();
+            $this->fileName = $fileName;
 
-            $this->fileSize = $this->file->getSize();
+            $this->fileSize = $size;
 
-            $this->mimeType = $this->file->getRealType();
+            $this->mimeType = $mimeType;
 
             $this->generateUUID();
 
-            if (in_array($this->mimeType, $this->imageMimeTypes)) {
-                if (isset($this->storage['max_image_file_size']) &&
-                    $this->fileSize > $this->storage['max_image_file_size']
-                ) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'File ' . $this->fileName . ' exceeds allowed file size.';
-
-                    return false;
-                }
-
-                $this->storeImage();
-
-            } else if (in_array($this->mimeType, $this->fileMimeTypes)) {
-                if (isset($this->storage['max_data_file_size']) &&
-                    $this->fileSize > $this->storage['max_data_file_size']
-                ) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'File ' . $this->fileName . ' exceeds allowed file size.';
-
-                    return false;
-                }
-
-                $this->storeFile();
-
-            } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'File Type Not Accepted';
-
+            if (!$this->processStore()) {
                 return false;
             }
 
             $storageData['uuid'] = $this->uuid;
+            $storageData['id'] = $this->packagesData->last['id'];
+
+        } else if ($this->request->getUploadedFiles()) {
+
+            foreach ($this->request->getUploadedFiles() as $key => $file) {
+                $this->file = $file;
+
+                $this->fileName =
+                    isset($this->request->getPost()['fileName']) ?
+                    $this->request->getPost()['fileName'] :
+                    $this->file->getName();
+
+                $this->fileSize = $this->file->getSize();
+
+                $this->mimeType = $this->file->getRealType();
+
+                $this->generateUUID();
+
+                if (!$this->processStore()) {
+                    return false;
+                }
+
+                $storageData['uuid'] = $this->uuid;
+                $storageData['id'] = $this->packagesData->last['id'];
+            }
         }
 
         $this->packagesData->responseCode = 0;
@@ -190,6 +197,47 @@ class Local extends BasePackage
         $this->packagesData->responseMessage = 'File(s) Uploaded';
 
         return true;
+    }
+
+    protected function processStore()
+    {
+        if (in_array($this->mimeType, $this->imageMimeTypes)) {
+            if (isset($this->storage['max_image_file_size']) &&
+                $this->fileSize > $this->storage['max_image_file_size']
+            ) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'File ' . $this->fileName . ' exceeds allowed file size.';
+
+                return false;
+            }
+
+            $this->storeImage();
+
+            return true;
+
+        } else if (in_array($this->mimeType, $this->fileMimeTypes)) {
+            if (isset($this->storage['max_data_file_size']) &&
+                $this->fileSize > $this->storage['max_data_file_size']
+            ) {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'File ' . $this->fileName . ' exceeds allowed file size.';
+
+                return false;
+            }
+
+            $this->storeFile();
+
+            return true;
+
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'File Type Not Accepted';
+
+            return false;
+        }
     }
 
     protected function storeImage()
