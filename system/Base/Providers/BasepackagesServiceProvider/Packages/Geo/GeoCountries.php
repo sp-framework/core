@@ -14,7 +14,7 @@ class GeoCountries extends BasePackage
 
     public $geoCountries;
 
-    public function searchCountries(string $countryQueryString)
+    public function searchCountries(string $countryQueryString, $all = false)
     {
         $searchCountries =
             $this->getByParams(
@@ -31,6 +31,11 @@ class GeoCountries extends BasePackage
 
             foreach ($searchCountries as $countryKey => $countryValue) {
                 $country = $this->getById($countryValue['id']);
+
+                if ($all) {
+                    $countries[$countryKey] = $countryValue;
+                    continue;
+                }
 
                 if ($country['enabled'] == 1 && $country['installed'] == 1) {
                     $countries[$countryKey] = $countryValue;
@@ -53,6 +58,9 @@ class GeoCountries extends BasePackage
     public function addCountry(array $data)
     {
         if ($this->add($data)) {
+
+            $this->updateSeq();
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' country';
@@ -61,6 +69,27 @@ class GeoCountries extends BasePackage
 
             $this->packagesData->responseMessage = 'Error adding new country.';
         }
+    }
+
+    protected function updateSeq()
+    {
+        $totalCountries = $this->modelToUse::find();
+
+        if ($totalCountries) {
+            $lastCountryId = (int) $totalCountries->getLast()->id;
+
+            if ($lastCountryId > 1000) {
+                return;
+            }
+        }
+
+        $model = new $this->modelToUse;
+
+        $table = $model->getSource();
+
+        $sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
+
+        $this->db->execute($sql, [1001, $this->packagesData->last['id']]);
     }
 
     /**

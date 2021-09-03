@@ -21,6 +21,9 @@ class GeoCities extends BasePackage
     public function addCity(array $data)
     {
         if ($this->add($data)) {
+
+            $this->updateSeq();
+
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' city';
@@ -29,6 +32,27 @@ class GeoCities extends BasePackage
 
             $this->packagesData->responseMessage = 'Error adding new city.';
         }
+    }
+
+    protected function updateSeq()
+    {
+        $totalCities = $this->modelToUse::find();
+
+        if ($totalCities) {
+            $lastCityId = (int) $totalCities->getLast()->id;
+
+            if ($lastCityId > 100000) {
+                return;
+            }
+        }
+
+        $model = new $this->modelToUse;
+
+        $table = $model->getSource();
+
+        $sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
+
+        $this->db->execute($sql, [100001, $this->packagesData->last['id']]);
     }
 
     /**
