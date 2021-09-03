@@ -14,7 +14,7 @@ class BusinessFinancesTaxGroups
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_INTEGER,
+                        'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,

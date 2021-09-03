@@ -14,7 +14,7 @@ class BusinessFinancesTaxes
                 new Column(
                     'id',
                     [
-                        'type'          => Column::TYPE_TINYINTEGER,
+                        'type'          => Column::TYPE_SMALLINTEGER,
                         'notNull'       => true,
                         'autoIncrement' => true,
                         'primary'       => true,
@@ -23,26 +23,34 @@ class BusinessFinancesTaxes
                 new Column(
                     'name',
                     [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 50,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'tax_group_id',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'amount',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'size'    => 1,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => true,
                     ]
                 ),
+                new Column(
+                    'description',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 2048,
+                        'notNull'       => false,
+                    ]
+                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

@@ -17,6 +17,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiX
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Schema\SystemApiXeroOrganisationsPhones;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Schema\SystemApiXeroPurchaseOrders;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Schema\SystemApiXeroPurchaseOrdersLineitems;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\TaxRates\Schema\SystemApiXeroTaxRates;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -52,6 +53,8 @@ class Package extends BasePackage
                 $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns(), $dropTables);
                 //Items
                 $this->createTable('system_api_xero_items', '', (new SystemApiXeroItems)->columns(), $dropTables);
+                //TaxRates
+                $this->createTable('system_api_xero_tax_rates', '', (new SystemApiXeroTaxRates)->columns(), $dropTables);
             } else {
                 // Organisations
                 $this->createTable('system_api_xero_organisations', '', (new SystemApiXeroOrganisations)->columns());
@@ -75,6 +78,8 @@ class Package extends BasePackage
                 $this->createTable('system_api_xero_purchase_orders_lineitems', '', (new SystemApiXeroPurchaseOrdersLineitems)->columns());
                 //Items
                 $this->createTable('system_api_xero_items', '', (new SystemApiXeroItems)->columns());
+                //TaxRates
+                $this->createTable('system_api_xero_tax_rates', '', (new SystemApiXeroTaxRates)->columns());
             }
 
             return true;

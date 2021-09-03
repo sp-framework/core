@@ -23,12 +23,13 @@ class TaxesComponent extends BaseComponent
      */
     public function viewAction()
     {
+        $taxgroupsArr = $this->usePackage(TaxGroups::class)->getAll()->taxgroups;
+
         if (isset($this->getData()['id'])) {
-
-            $this->view->taxgroups = $this->usePackage(TaxGroups::class)->getAll()->taxgroups;
-
             if ($this->getData()['id'] != 0) {
-                $tax = $this->taxes->getById($this->getData()['id']);
+                $this->view->taxgroups = $taxgroupsArr;
+
+                $tax = $this->taxesPackage->getById($this->getData()['id']);
 
                 $this->view->tax = $tax;
             }
@@ -47,16 +48,30 @@ class TaxesComponent extends BaseComponent
                 ]
             ];
 
+        $taxGroups = [];
+
+        foreach ($taxgroupsArr as $key => $taxGroup) {
+            $taxGroups[$taxGroup['id']] = $taxGroup['name'];
+        }
+
+        $replaceColumns =
+            [
+                'tax_group_id'  =>
+                    [
+                        'html' => $taxGroups
+                    ]
+                ];
+
         $this->generateDTContent(
             $this->taxesPackage,
             'business/finances/taxes/view',
             null,
-            ['name'],
+            ['name', 'amount', 'tax_group_id'],
             true,
-            ['name'],
+            ['name', 'amount', 'tax_group_id'],
             $controlActions,
-            null,
-            null,
+            ['tax_group_id' => 'Tax Group'],
+            $replaceColumns,
             'name',
         );
 

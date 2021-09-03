@@ -13,4 +13,6 @@ class BusinessFinancesTaxes extends BaseModel
     public $tax_group_id;
 
     public $amount;
+
+    public $description;
 }

@@ -17,6 +17,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Items\Items;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Organisations;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrders;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrdersLineitems;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\TaxRates\TaxRates;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentByIdRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentsRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderHistoryRestRequest;
@@ -172,6 +173,10 @@ class PurchaseOrders extends BasePackage
         $items = new Items;
 
         $items->sync($apiId);
+
+        $taxRates = new TaxRates;
+
+        $taxRates->sync($apiId);
     }
 
     protected function getPurchaseOrderAttachments($purchaseOrderId)
