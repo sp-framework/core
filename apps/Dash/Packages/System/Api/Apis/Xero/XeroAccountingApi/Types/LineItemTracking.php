@@ -31,6 +31,12 @@ class LineItemTracking extends XeroType
           'attribute' => false,
           'elementName' => 'Option',
         ],
+        'Options' => [
+          'type' =>       'string',
+          'repeatable' => false,
+          'attribute' => false,
+          'elementName' => 'Options',
+        ],
       ];
 
     public function __construct(array $values = [])

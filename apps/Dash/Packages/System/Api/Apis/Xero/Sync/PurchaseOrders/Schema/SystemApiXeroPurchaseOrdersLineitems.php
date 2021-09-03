@@ -67,10 +67,26 @@ class SystemApiXeroPurchaseOrdersLineitems
                     ]
                 ),
                 new Column(
-                    'AmountCode',
+                    'AccountID',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 50,
+                        'notNull' => false
+                    ]
+                ),
+                new Column(
+                    'AccountCode',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 50,
+                        'notNull' => false
+                    ]
+                ),
+                new Column(
+                    'Tracking',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 2048,
                         'notNull' => false
                     ]
                 ),

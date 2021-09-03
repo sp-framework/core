@@ -6,31 +6,35 @@ use System\Base\BaseModel;
 
 class SystemApiXeroPurchaseOrdersLineitems extends BaseModel
 {
-    public $idl;
+    public $id;
 
-    public $PurchaseOrderIDl;
+    public $PurchaseOrderID;
 
-    public $LineItemIDl;
+    public $LineItemID;
 
-    public $Descriptionl;
+    public $Description;
 
-    public $Quantityl;
+    public $Quantity;
 
-    public $UnitAmountl;
+    public $UnitAmount;
 
-    public $ItemCodel;
+    public $ItemCode;
 
-    public $AmountCodel;
+    public $AccountID;
 
-    public $TaxTypel;
+    public $AccountCode;
 
-    public $RepeatingInvoiceIDl;
+    public $Tracking;
 
-    public $TaxAmountl;
+    public $TaxType;
 
-    public $DiscountRatel;
+    public $RepeatingInvoiceID;
 
-    public $DiscountAmountl;
+    public $TaxAmount;
 
-    public $LineAmountl;
+    public $DiscountRate;
+
+    public $DiscountAmount;
+
+    public $LineAmount;
 }

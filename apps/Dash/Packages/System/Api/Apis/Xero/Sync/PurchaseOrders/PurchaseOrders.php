@@ -2,22 +2,35 @@
 
 namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders;
 
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
+use Apps\Dash\Packages\Business\Entities\Model\BusinessEntities;
+use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model\ImsStockPurchaseOrdersProducts;
+use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\PurchaseOrders as ImsPurchaseOrders;
 use Apps\Dash\Packages\System\Api\Api;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Attachments\Attachments;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Attachments\Model\SystemApiXeroAttachments;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\ContactGroups;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Contacts;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Model\SystemApiXeroContacts;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\History;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Items\Items;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Organisations;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrders;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrdersLineitems;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentByIdRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderAttachmentsRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrderHistoryRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetPurchaseOrdersRestRequest;
+use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
 class PurchaseOrders extends BasePackage
 {
+    protected $poPackage;
+
+    protected $vendorPackage;
+
     protected $apiPackage;
 
     protected $api;
@@ -34,9 +47,19 @@ class PurchaseOrders extends BasePackage
 
     protected $updatedIds = [];
 
+    protected $errors = [];
+
+    protected $errorIds = [];
+
+    protected $responseData = [];
+
+    protected $responseMessage = '';
+
     public function sync($apiId = null, $parameters = null)
     {
         $this->apiPackage = new Api;
+
+        // $this->syncWithLocal();return;
 
         $this->request = new GetPurchaseOrdersRestRequest;
 
@@ -51,12 +74,25 @@ class PurchaseOrders extends BasePackage
                 $this->syncWithXero($apiId, $parameters);
             }
 
-            $this->addResponse(
-                'Sync Ok. Added: ' . $this->addCounter . '. Updated: ' . $this->updateCounter . '.',
-                0,
+            $this->syncWithLocal();
+
+            $this->responseData = array_merge($this->responseData,
                 [
-                    'addedIds' => $this->addedIds, 'updatedIds' => $this->updatedIds
+                    'purchaseOrders' =>
+                        [
+                            'addedIds' => $this->addedIds,
+                            'updatedIds' => $this->updatedIds
+                        ]
                 ]
+            );
+
+            $this->responseMessage =
+                $this->responseMessage . ' ' . 'Purchase Orders Sync Ok. Added: ' . $this->addCounter . '. Updated: ' . $this->updateCounter . '.';
+
+            $this->addResponse(
+                $this->responseMessage,
+                0,
+                $this->responseData
             );
         } else {
             $this->addResponse('Sync Error. No API Configuration Found', 1);
@@ -77,7 +113,7 @@ class PurchaseOrders extends BasePackage
             $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetPurchaseOrders', $apiId);
         }
         if ($modifiedSince) {
-            $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
+            // $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
         }
 
         if ($parameters && isset($parameters[$apiId]['PurchaseOrders']['dateFrom'])) {
@@ -128,6 +164,10 @@ class PurchaseOrders extends BasePackage
         $contacts = new Contacts;
 
         $contacts->sync($apiId, $parameters);
+
+        $this->responseData = array_merge($this->responseData, ['contacts' => $contacts->packagesData->responseData]);
+
+        $this->responseMessage .= $contacts->packagesData->responseMessage;
 
         $items = new Items;
 
@@ -204,7 +244,13 @@ class PurchaseOrders extends BasePackage
 
                 $thisPo = $modelToUse->toArray();
             } else {
-                if ($purchaseOrder['UpdatedDateUTC'] !== $xeroPo->UpdatedDateUTC) {
+                // if ($purchaseOrder['UpdatedDateUTC'] !== $xeroPo->UpdatedDateUTC) {
+                    if ($xeroPo->PurchaseOrderNumber !== 'PO-0007') {
+                        continue;
+                    }
+                    if ($xeroPo->baz_po_id) {
+                        $purchaseOrder['resync_local'] = '1';
+                    }
 
                     $xeroPo->assign($this->jsonData($purchaseOrder));
 
@@ -215,9 +261,9 @@ class PurchaseOrders extends BasePackage
                     array_push($this->updatedIds, $purchaseOrder['PurchaseOrderID']);
 
                     $thisPo = $xeroPo->toArray();
-                } else {
-                    continue;
-                }
+                // } else {
+                //     continue;
+                // }
             }
 
             if (isset($purchaseOrder['LineItems']) && count($purchaseOrder['LineItems']) > 0) {
@@ -248,35 +294,573 @@ class PurchaseOrders extends BasePackage
 
     protected function addUpdateXeroPurchaseOrderLineItems($purchaseOrder)
     {
-        if (isset($purchaseOrder['LineItems']) && count($purchaseOrder['LineItems']) > 0) {
-            foreach ($purchaseOrder['LineItems'] as $lineItemKey => $lineItem) {
-                $model = SystemApiXeroPurchaseOrdersLineitems::class;
+        $model = SystemApiXeroPurchaseOrdersLineitems::class;
 
-                $xeroPo = $model::findFirst(
+        $poLineItems = [];
+
+        foreach ($purchaseOrder['LineItems'] as $lineItemKey => $lineItem) {
+            array_push($poLineItems, $lineItem['LineItemID']);
+        }
+
+        $xeroPoLineItem = $model::find(
+            [
+                'conditions'    => 'PurchaseOrderID = :poid:',
+                'bind'          =>
                     [
-                        'conditions'    => 'PurchaseOrderID = :poid: AND LineItemID = :liid:',
-                        'bind'          =>
-                            [
-                                'poid'  => $purchaseOrder['PurchaseOrderID'],
-                                'liid'  => $lineItem['LineItemID']
-                            ]
+                        'poid'  => $purchaseOrder['PurchaseOrderID']
                     ]
-                );
+            ]
+        );
 
-                $modelToUse = new $model();
+        if ($xeroPoLineItem) {
+            $xeroPoLineItemArr = $xeroPoLineItem->toArray();
 
-                $modelToUse->assign($lineItem);
+            foreach ($xeroPoLineItemArr as $xPLineItem) {
+                if (!in_array($xPLineItem['LineItemID'], $poLineItems)) {
+                    $itemObj = $model::findFirstByLineItemID($xPLineItem['LineItemID']);
 
-                if (!$xeroPo) {
-                    $modelToUse->assign($purchaseOrder);
-
-                    $modelToUse->create();
-                } else if ($xeroPo && $xeroPo->count() > 0) {
-                    $modelToUse->assign($purchaseOrder);
-
-                    $modelToUse->update();
+                    $itemObj->delete();
                 }
             }
         }
+
+        foreach ($purchaseOrder['LineItems'] as $lineItemKey => $lineItem) {
+            $xeroPoLineItem = $model::findFirst(
+                [
+                    'conditions'    => 'PurchaseOrderID = :poid: AND LineItemID = :liid:',
+                    'bind'          =>
+                        [
+                            'poid'  => $purchaseOrder['PurchaseOrderID'],
+                            'liid'  => $lineItem['LineItemID']
+                        ]
+                ]
+            );
+
+            if (!$xeroPoLineItem) {
+                $modelToUse = new $model();
+
+                $modelToUse->assign($this->jsonData($lineItem));
+
+                $modelToUse->create();
+            } else {
+                $xeroPoLineItem->assign($this->jsonData($lineItem));
+
+                $xeroPoLineItem->update();
+            }
+        }
+    }
+
+    public function syncWithLocal()
+    {
+        $model = SystemApiXeroPurchaseOrders::class;
+
+        $xeroPo = $model::find(
+            [
+                'conditions'    => 'baz_po_id IS NULL OR resync_local = :rl:',
+                'bind'          =>
+                    [
+                        'rl'    => '1',
+                    ]
+            ]
+        );
+
+        if ($xeroPo) {
+            $this->poPackage = $this->usePackage(ImsPurchaseOrders::class);
+
+            $this->vendorPackage = $this->usePackage(Vendors::class);
+
+            $pos = $xeroPo->toArray();
+
+            if ($pos && count($pos) > 0) {
+                foreach ($pos as $poKey => $po) {
+                    $this->errors = [];
+
+                    if ($po['PurchaseOrderNumber'] !== 'PO-0007') {
+                        continue;
+                    }
+
+                    $productsModel = SystemApiXeroPurchaseOrdersLineitems::class;
+
+                    $poProducts = $productsModel::find(
+                        [
+                            'conditions'    => 'PurchaseOrderID = :poid:',
+                            'bind'          =>
+                                [
+                                    'poid'  => $po['PurchaseOrderID']
+                                ]
+                        ]
+                    );
+
+                    if ($poProducts) {
+                        $po['products'] = $poProducts->toArray();
+                    }
+
+                    $this->generatePoData($po);
+
+                    if (count($this->errors) > 0) {
+                        $this->poPackage->errorPurchaseOrder('Errors in purchase orders. Please fix them ASAP.', Json::encode($this->errors));
+                    }
+                }
+            }
+        }
+    }
+
+    protected function generatePoData(array $po)
+    {
+        $purchaseOrder = [];
+
+        $entityModel = BusinessEntities::class;
+
+        $entity = $entityModel::findFirst(
+            [
+                'conditions'    => 'api_id = :aid:',
+                'bind'          =>
+                    [
+                        'aid'   => $po['api_id']
+                    ]
+            ]
+        );
+
+        if ($entity) {
+            $purchaseOrder['entity_id'] = $entity->id;
+        } else {
+            $purchaseOrder['entity_id'] = '0';
+        }
+
+        $purchaseOrder['references'] = $po['PurchaseOrderNumber'] . ',' . $po['Reference'];
+
+        $purchaseOrder['status'] = $this->getOrderStatusId($po['Status']);
+
+        $model = SystemApiXeroContacts::class;
+
+        $xeroContactObj = $model::findFirst(
+            [
+                'conditions'    => 'ContactID = :cid:',
+                'bind'          =>
+                    [
+                        'cid'   => $po['ContactID']
+                    ]
+            ]
+        );
+
+        $purchaseOrder['vendor_id'] = '0';
+        $purchaseOrder['vendor_address_id'] = '0';
+        $purchaseOrder['vendor_contact_id'] = '0';
+
+        if ($xeroContactObj) {
+            $xeroContact = $xeroContactObj->toArray();
+
+            if ($xeroContact['baz_vendor_id'] &&
+                $xeroContact['baz_vendor_id'] !== '' &&
+                $xeroContact['baz_vendor_id'] != '0'
+            ) {
+                $vendor = $this->vendorPackage->getVendorById($xeroContact['baz_vendor_id']);
+
+                if ($vendor) {
+                    $purchaseOrder['vendor_id'] = $xeroContact['baz_vendor_id'];
+
+                    if ($vendor['address_ids']['2'] && count($vendor['address_ids']['2']) > 0) {
+                        $purchaseOrder['vendor_address_id'] = $vendor['address_ids']['2']['0']['id'];
+                    }
+                }
+            }
+        }
+
+        $purchaseOrder['delivery_date'] =
+            (\DateTime::createFromFormat(
+                "U",
+                str_replace('/Date(', '', str_replace('000+0000)/', '', $po['DeliveryDate']))
+            ))->format('Y-m-d');
+
+        $purchaseOrder['delivery_type'] = '3';
+
+        $purchaseOrder['address_id'] = $this->addPoAddress($po, $purchaseOrder);
+        $purchaseOrder['contact_fullname'] = $po['AttentionTo'];
+        $purchaseOrder['contact_phone'] = $po['Telephone'];
+
+        $purchaseOrder['total_tax'] = $po['TotalTax'];
+        $purchaseOrder['total_amount'] = $po['Total'];
+        $purchaseOrder['delivery_instructions'] = $po['DeliveryInstructions'];
+
+        if ($po['HasAttachments'] == '1') {
+            $purchaseOrder['attachments'] = Json::encode($this->addPoAttachments($po, $purchaseOrder));
+        } else {
+            $purchaseOrder['attachments'] = Json::encode([]);
+        }
+
+        if ($po['baz_po_id'] && $po['baz_po_id'] != '0') {
+            if ($this->poPackage->update($purchaseOrder)) {
+                $purchaseOrder = $this->poPackage->packagesData->last;
+            } else {
+                $this->errors = array_merge($this->errors, ['Could not update purchase order data - ' . $po['AttentionTo']]);
+            }
+        } else {
+            if ($this->poPackage->add($purchaseOrder)) {
+                $purchaseOrder = $this->poPackage->packagesData->last;
+
+                $this->poPackage->addRefId($purchaseOrder);
+            } else {
+                $this->errors = array_merge($this->errors, ['Could not add purchase order data - ' . $po['AttentionTo']]);
+            }
+        }
+
+        if ($purchaseOrder['entity_id'] === '0') {
+            $this->errors = array_merge($this->errors, ['Entity missing for purchase order - ' . $purchaseOrder['id']]);
+        }
+        if ($purchaseOrder['vendor_id'] === '0') {
+            $this->errors = array_merge($this->errors, ['Vendor missing for purchase order - ' . $purchaseOrder['id']]);
+        } else if ($purchaseOrder['vendor_contact_id'] === '0') {
+            $this->errors = array_merge($this->errors, ['Vendor contact missing for purchase order - ' . $purchaseOrder['id']]);
+        }
+
+        if ($po['products'] && count($po['products']) > 0) {
+            $this->generatePurchaseOrderProducts($po, $purchaseOrder['id']);
+        } else {
+            $this->errors = array_merge($this->errors, ['Products missing for purchase order - ' . $purchaseOrder['id']]);
+        }
+
+        $this->addPurchaseOrderHistory($po, $purchaseOrder);
+
+        $po['baz_po_id'] = $purchaseOrder['id'];
+
+        $model = SystemApiXeroPurchaseOrders::class;
+
+        $xeroPurchaseOrder = $model::findFirst(
+            [
+                'conditions'    => 'PurchaseOrderID = :poid:',
+                'bind'          =>
+                    [
+                        'poid'  => $po['PurchaseOrderID']
+                    ]
+            ]
+        );
+
+        $xeroPurchaseOrder->assign($this->jsonData($po));
+
+        $xeroPurchaseOrder->update();
+    }
+
+    protected function getOrderStatusId($poStatus)
+    {
+        $statuses = $this->poPackage->getOrderStatuses();
+
+        foreach ($statuses as $statusKey => $status) {
+            if ($status['name'] === $poStatus) {
+                return $status['id'];
+            }
+        };
+
+        return '1';//default DRAFT
+    }
+
+    protected function addPoAddress($po, $purchaseOrder)
+    {
+        $po['DeliveryAddress'] = explode(PHP_EOL, trim($po['DeliveryAddress']));
+
+        if (!is_array($po['DeliveryAddress']) ||
+            count($po['DeliveryAddress']) === 0
+        ) {
+            return '0';
+        }
+
+        $poPostCodeKey = null;
+        $poPostCode = null;
+
+        foreach ($po['DeliveryAddress'] as $addressKey => $addressLine) {
+            if ((int) $addressLine !== 0) {
+                $poPostCodeKey = $addressKey;
+                $poPostCode = $addressLine;
+            }
+        }
+
+        if (!$poPostCodeKey) {
+            return '0';
+        }
+
+        if ($poPostCodeKey === Arr::last($po['DeliveryAddress'])) {
+            $poCountry = null;
+        } else if ($poPostCodeKey === array_key_last($po['DeliveryAddress']) - 1) {
+            $poCountry = Arr::last($po['DeliveryAddress']);
+        } else {
+            return '0';
+        }
+
+        $poState = $po['DeliveryAddress'][$poPostCodeKey - 1];
+        $poCityKey = $poPostCodeKey - 2;
+        $poCity = $po['DeliveryAddress'][$poCityKey];
+
+        if ($poCityKey === 1) {
+            $street_address = $po['DeliveryAddress'][0];
+            $street_address_2 = '';
+        } else if ($poCityKey === 2) {
+            $street_address = $po['DeliveryAddress'][0];
+            $street_address_2 = $po['DeliveryAddress'][1];
+        } else if ($poCityKey > 2) {
+            $street_address = $po['DeliveryAddress'][0];
+            $street_address_2 = $po['DeliveryAddress'][1];
+            $street_address_2 = $street_address_2 . ' ' . $po['DeliveryAddress'][2];
+        }
+
+        if (!$poCity && !$poState && !$Country) {
+            return '0';
+        }
+
+        $found = false;
+
+        if ($this->basepackages->geoCities->searchCities($poCity)) {
+            $cityData = $this->basepackages->geoCities->packagesData->cities;
+            if (count($cityData) > 0) {
+                foreach ($cityData as $cityKey => $city) {
+                    if (strtolower($city['name']) === strtolower($poCity)) {
+                        $found = true;
+
+                        $newAddress['city_id'] = $city['id'];
+                        $newAddress['city_name'] = $city['name'];
+                        $newAddress['state_id'] = $city['state_id'];
+                        $newAddress['state_name'] = $city['state_name'];
+                        $newAddress['country_id'] = $city['country_id'];
+                        $newAddress['country_name'] = $city['country_name'];
+                    }
+
+                    if ($found) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!$found) {
+            //Country
+            $foundCountry = null;
+
+            if ($this->basepackages->geoCountries->searchCountries($address['Country'], true)) {
+                $countryData = $this->basepackages->geoCountries->packagesData->countries;
+
+                if (count($countryData) > 0) {
+                    foreach ($countryData as $countryKey => $country) {
+                        if (strtolower($country['name']) === strtolower($address['Country'])) {
+                            $foundCountry = $country;
+                            $vendor['currency'] = $country['currency'];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!$foundCountry) {
+                $newCountry['name'] = $address['Country'];
+                $newCountry['installed'] = '1';
+                $newCountry['enabled'] = '1';
+                $newCountry['user_added'] = '1';
+
+                if ($this->basepackages->geoCountries->add($newCountry)) {
+                    $newAddress['country_id'] = $this->basepackages->geoCountries->packagesData->last['id'];
+                    $newAddress['country_name'] = $newCountry['name'];
+                } else {
+
+                    $this->errors = array_merge($this->errors, ['Could not add country data.']);
+                }
+            } else {
+                //We check if country is installed or not, if not, we install and enable it
+                if ($foundCountry['installed'] != '1') {
+                    $foundCountry['enabled'] = '1';
+
+                    $this->basepackages->geoCountries->installCountry($foundCountry);
+                } else if ($foundCountry['enabled'] != '1') {
+                    $foundCountry['enabled'] = '1';
+
+                    $this->basepackages->geoCountries->update($foundCountry);
+                }
+
+                $newAddress['country_id'] = $foundCountry['id'];
+                $newAddress['country_name'] = $foundCountry['name'];
+            }
+
+            //State (Region in Xero Address)
+            $foundState = null;
+
+            if ($this->basepackages->geoStates->searchStatesByCode($address['Region'], true)) {
+                $stateData = $this->basepackages->geoStates->packagesData->states;
+
+                if (count($stateData) > 0) {
+                    foreach ($stateData as $stateKey => $state) {
+                        if (strtolower($state['state_code']) === strtolower($address['Region'])) {
+                            $foundState = $state;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!$foundState) {
+                $newState['name'] = $address['Region'];
+                $newState['state_code'] = substr($address['Region'], 0, 3);
+                $newState['user_added'] = '1';
+                $newState['country_id'] = $newAddress['country_id'];
+
+                if ($this->basepackages->geoStates->add($newState)) {
+                    $newAddress['state_id'] = $this->basepackages->geoStates->packagesData->last['id'];
+                    $newAddress['state_name'] = $newState['name'];
+                } else {
+
+                    $this->errors = array_merge($this->errors, ['Could not add state data.']);
+                }
+            } else {
+                $newAddress['state_id'] = $foundState['id'];
+                $newAddress['state_name'] = $foundState['name'];
+            }
+
+            //New City
+            $newCity['name'] = $address['City'];
+            $newCity['state_id'] = $newAddress['state_id'];
+            $newCity['country_id'] = $newAddress['country_id'];
+            $newCity['user_added'] = '1';
+
+            if ($this->basepackages->geoCities->add($newCity)) {
+                $newAddress['city_id'] = $this->basepackages->geoCities->packagesData->last['id'];
+                $newAddress['city_name'] = $newCity['name'];
+            } else {
+
+                $this->errors = array_merge($this->errors, ['Could not add city data.']);
+            }
+        }
+
+        $newAddress['seq'] = 0;
+        $newAddress['new'] = 1;
+        $newAddress['name'] = $po['AttentionTo'];
+        $newAddress['package_name'] = 'purchaseorders';
+        $newAddress['attention_to'] = $po['AttentionTo'];
+        $newAddress['street_address'] = $street_address;
+        $newAddress['street_address_2'] = $street_address_2;
+
+        $this->errors = array_merge($this->errors, ['We have tried to match the delivery address. Still, please check address and verify with Xero PO.']);
+
+        $this->basepackages->addressbook->addAddress($newAddress);
+
+        if ($this->basepackages->addressbook->packagesData->last) {
+            return $this->basepackages->addressbook->packagesData->last['id'];
+        }
+
+        return '0';
+    }
+
+    protected function addPoAttachments($po, $purchaseOrder)
+    {
+        $model = SystemApiXeroAttachments::class;
+
+        $xeroAttachment = $model::find(
+            [
+                'conditions'    => 'baz_storage_local_id IS NULL AND xero_package = :xp: AND xero_package_row_id = :xpri:',
+                'bind'          =>
+                    [
+                        'xp'    => 'purchaseorders',
+                        'xpri'  => $po['PurchaseOrderID']
+                    ]
+            ]
+        );
+
+        if ($xeroAttachment) {
+            $attachments = $xeroAttachment->toArray();
+
+            if (count($attachments) > 0) {
+
+                $request = new GetPurchaseOrderAttachmentByIdRestRequest;
+
+                $poAttachments = [];
+
+                foreach ($attachments as $attachmentKey => $attachment) {
+                    $request->PurchaseOrderID = $attachment['xero_package_row_id'];
+
+                    $request->AttachmentID = $attachment['AttachmentID'];
+
+                    $response = $this->xeroApi->getPurchaseOrderAttachmentById($request);
+
+                    if ($response) {
+                        if ($response->getStatusCode() === 200) {
+                            $storageId = $this->addAttachmentToStorage($attachment, $po, $purchaseOrder, $response);
+
+                            if ($storageId) {
+
+                                array_push($poAttachments, $storageId['uuid']);
+
+                                $xA = $model::findFirst(
+                                    [
+                                        'conditions'    => 'AttachmentID = :aid:',
+                                        'bind'          =>
+                                            [
+                                                'aid'   => $attachment['AttachmentID']
+                                            ]
+                                    ]
+                                );
+
+                                if ($xA) {
+                                    $xA->baz_storage_local_id = $storageId['id'];
+
+                                    $xA->update();
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return $poAttachments;
+            }
+        }
+
+        return [];
+    }
+
+    protected function addAttachmentToStorage($attachment, $po, $purchaseOrder, $response)
+    {
+        if ($this->basepackages->storages->storeFile(
+                'private',
+                'purchaseorders',
+                $response->getBody()->getContents(),
+                $attachment['FileName'],
+                $attachment['ContentLength'],
+                $attachment['MimeType'],
+            )
+        ) {
+            return $this->basepackages->storages->packagesData->storageData;
+        }
+
+        return false;
+    }
+
+    protected function generatePurchaseOrderProducts($po, $purchaseOrderId)
+    {
+        var_dump($po, $purchaseOrderId);die();
+
+        foreach ($po['products'] as $productKey => $product) {
+            $newItem['PurchaseOrderID'] = $product['PurchaseOrderID'];
+            $newItem['LineItemID'] = $product['LineItemID'];
+            $newItem['Description'] = $product['Description'];
+            $newItem['Quantity'] = $product['Quantity'];
+            $newItem['UnitAmount'] = $product['UnitAmount'];
+            $newItem['ItemCode'] = $product['ItemCode'];
+            $newItem['AccountID'] = $product['AccountID'];
+            $newItem['AccountCode'] = $product['AccountCode'];
+            $newItem['Tracking'] = $product['Tracking'];
+            $newItem['TaxType'] = $product['TaxType'];
+            $newItem['RepeatingInvoiceID'] = $product['RepeatingInvoiceID'];
+            $newItem['TaxAmount'] = $product['TaxAmount'];
+            $newItem['DiscountRate'] = $product['DiscountRate'];
+            $newItem['DiscountAmount'] = $product['DiscountAmount'];
+            $newItem['LineAmount'] = $product['LineAmount'];
+        }
+
+        $model = ImsStockPurchaseOrdersProducts::class;
+
+        if (isset($data['id'])) {
+            $this->update($data);
+        } else {
+            $this->add($data);
+        }
+
+    }
+
+    protected function addPurchaseOrderHistory($po, $purchaseOrder)
+    {
+        //
     }
 }
