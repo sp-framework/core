@@ -1,0 +1,130 @@
+{% if notification['id'] is defined %}
+    {% set notificationResult = '' %}
+    {% if notification['notification_title'] is defined and notification['notification_title'] !== '' %}
+        {% set notificationResult = notificationResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code">Title: ' ~ notification['notification_title'] ~ '</div><br>' %}
+    {% else %}
+        {% set notificationResult = notificationResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code">Title: -</div><br>' %}
+    {% endif %}
+    {% if notification['created_by'] is defined and notification['created_by'] !== '' %}
+        {% set notificationResult = notificationResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message">User: ' ~ notification['created_by'] ~ '</div><br>' %}
+    {% else %}
+        {% set notificationResult = notificationResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message">User: -</div><br>' %}
+    {% endif %}
+    {% if notification['package_row_id'] is defined and notification['package_row_id'] != '0' %}
+        {% set notificationResult = notificationResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message">Link: ' ~ notification['package_row_id'] ~ '</div><br>' %}
+    {% endif %}
+    {% if notification['notification_details'] is defined and notification['notification_details'] !== '' %}
+        {% set notificationResult = notificationResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data">Details: ' ~ notification['notification_details'] ~ '</div>' %}
+    {% else %}
+        {% set notificationResult = notificationResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data">Details: -</div>' %}
+    {% endif %}
+    <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('fields',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'fieldId'                        : 'result',
+                            'fieldLabel'                     : 'Result',
+                            'fieldType'                      : 'html',
+                            'fieldHelp'                      : true,
+                            'fieldHelpTooltipContent'        : 'Result of the notification',
+                            'fieldRequired'                  : false,
+                            'fieldBazScan'                   : true,
+                            'fieldHtmlAdditionalClass'       : 'border p-3',
+                            'fieldHtmlContent'               : notificationResult
+                        ]
+                    )}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'buttonType'                     : 'button',
+                            'buttons'                        :
+                                [
+                                    'format'          : [
+                                        'title'                    : 'Format Data',
+                                        'size'                     : 'xs',
+                                        'type'                     : 'info',
+                                        'icon'                     : 'magic'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
+        </fieldset>
+    </form>
+    <script>
+/* globals BazHelpers */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-result'                  : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-format').click(function(e) {
+                    e.preventDefault();
+
+                    var html = '{{notification["notification_details"]}}';
+                    var regex = /{.*}/g;
+                    var found = html.match(regex);
+                    if (!found) {
+                        regex = /\[.*\]/g;
+                        found = html.match(regex);
+                    }
+                    if (found) {
+                        //eslint-disable-next-line
+                        var data = found[0].replaceAll('\"', '"');
+
+                        var obj = JSON.parse(data);
+
+                        if (obj) {
+                            $('#{{componentId}}-{{sectionId}}-data').html('Data: ' + BazHelpers.createHtmlList({'obj': obj}));
+                            $(this).attr('hidden', true);
+                        }
+                    }
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            rules: {
+            },
+            messages: {
+            }
+        }
+    });
+</script>
+{% endif %}

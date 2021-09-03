@@ -98,6 +98,21 @@ class NotificationsComponent extends BaseComponent
 
     public function viewAction()
     {
+        if (isset($this->getData()['id'])) {
+            if ($this->getData()['id'] != 0) {
+                $notification = $this->notifications->getById($this->getData()['id']);
+
+                $notification = $this->generateUserInfo($notification['id'], $notification);
+                $notification = $this->generateLinkButton($notification['id'], $notification);
+
+                $this->view->notification = $notification;
+            }
+
+            $this->view->pick('notifications/view');
+
+            return;
+        }
+
         $conditions =
             [
                 'conditions'    =>
@@ -118,9 +133,9 @@ class NotificationsComponent extends BaseComponent
             $this->notifications,
             'system/notifications/view',
             $conditions,
-            ['package_row_id', 'read', '[notification_title]', '[notification_details]', 'created_by', 'created_at', 'package_name', 'archive'],
+            ['package_row_id', 'read', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
             true,
-            ['package_row_id', 'read', '[notification_title]', '[notification_details]', 'created_by', 'created_at', 'package_name', 'archive'],
+            ['package_row_id', 'read', '[notification_details]', '[notification_title]', 'created_by', 'created_at', 'package_name', 'archive'],
             null,
             [
                 'package_row_id'        => 'link',
@@ -170,6 +185,7 @@ class NotificationsComponent extends BaseComponent
             $data = $this->generateReadButton($dataKey, $data);
             $data = $this->generateArchiveButton($dataKey, $data);
             $data = $this->generateRemoveButton($dataKey, $data);
+            $data = $this->generateDetailsButton($dataKey, $data);
         }
 
         return $dataArr;
@@ -211,7 +227,7 @@ class NotificationsComponent extends BaseComponent
         if ($data['package_row_id']) {
             if (array_key_exists($data['package_name'], $this->packageLinks())) {
                 $data['package_row_id'] =
-                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url($this->packageLinks()[$data['package_name']] . '/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase">
+                    '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url($this->packageLinks()[$data['package_name']] . '/q/id/' . $data['package_row_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
                         <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
                     </a>';
             }
@@ -224,9 +240,8 @@ class NotificationsComponent extends BaseComponent
     {
         if ($data['read'] == 0 && $data['archive'] == 0) {
             $data['read'] =
-                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-markread-' . $rowId . '" href="' . $this->links->url('system/notifications/markRead/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-info btn-xs rowMarkRead text-uppercase">
-                    <i class="mr-1 fas fa-fw fa-xs fa-eye"></i>
-                    <span class="text-xs"> Mark Read</span>
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-markread-' . $rowId . '" href="' . $this->links->url('system/notifications/markRead/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-info btn-xs rowMarkRead text-uppercase">
+                    <i class="fas fa-fw fa-xs fa-eye"></i>
                 </a>';
         } else {
             $data['read'] = '';
@@ -239,9 +254,8 @@ class NotificationsComponent extends BaseComponent
     {
         if ($data['archive'] == 0) {
             $data['read'] .=
-                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-markarchive-' . $rowId . '" href="' . $this->links->url('system/notifications/markArchive/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-primary btn-xs rowArchive text-uppercase">
-                    <i class="mr-1 fas fa-fw fa-xs fa-save"></i>
-                    <span class="text-xs"> Archive</span>
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-markarchive-' . $rowId . '" href="' . $this->links->url('system/notifications/markArchive/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-primary btn-xs rowArchive text-uppercase">
+                    <i class="fas fa-fw fa-xs fa-save"></i>
                 </a>';
             $data['archive'] = 'No';
         } else if ($data['archive'] == 1) {
@@ -254,10 +268,21 @@ class NotificationsComponent extends BaseComponent
     protected function generateRemoveButton($rowId, $data)
     {
         $data['read'] .=
-            '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-remove-__control-' . $rowId . '" href="' . $this->links->url('system/notifications/remove/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 pl-2 pr-2 text-white btn btn-danger btn-xs rowRemove text-uppercase" data-notificationtextfromcolumn="notification_title">
-                <i class="mr-1 fas fa-fw fa-xs fa-trash"></i>
-                <span class="text-xs"> Remove</span>
+            '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-remove-__control-' . $rowId . '" href="' . $this->links->url('system/notifications/remove/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-danger btn-xs rowRemove text-uppercase" data-notificationtextfromcolumn="notification_title">
+                <i class="fas fa-fw fa-xs fa-trash"></i>
             </a>';
+
+        return $data;
+    }
+
+    protected function generateDetailsButton($rowId, $data)
+    {
+        if ($data['notification_details'] !== '') {
+            $data['notification_details'] =
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-view-__control-' . $rowId . '" href="' . $this->links->url('system/notifications/q/id/' . $data['id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="ml-1 mr-1 text-white btn btn-primary btn-xs rowView text-uppercase contentAjaxLink" data-notificationtextfromcolumn="notification_title">
+                    <i class="fas fa-fw fa-xs fa-eye"></i>
+                </a>';
+        }
 
         return $data;
     }

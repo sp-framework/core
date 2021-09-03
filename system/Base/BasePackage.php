@@ -1092,6 +1092,8 @@ abstract class BasePackage extends Controller
 				} else {
 					$this->packagesData->responseData = ['id' => $this->packagesData->last['id']];
 				}
+			} else {
+				$this->packagesData->responseData = [];
 			}
 		}
 
@@ -1100,16 +1102,20 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null)
+	protected function addToNotification($subscriptionType, $messageTitle, $messageDetails = null, $package = null, $packageRowId = null)
 	{
+		if (!$this->app) {
+			$this->app = $this->apps->getAppInfo();
+		}
+
 		if (!$package) {
 			$package = $this->checkPackage($this->packageName);
 		}
 
 		if ($package) {
-			if (isset($this->packagesData->last)) {
+			if (!$packageRowId && isset($this->packagesData->last)) {
 				$packageRowId = $this->packagesData->last['id'];
-			} else {
+			} else if (!$packageRowId) {
 				$packageRowId = null;
 			}
 
@@ -1161,6 +1167,8 @@ abstract class BasePackage extends Controller
 					}
 				}
 			}
+		} else {
+			throw new \Exception('Package ' . $this->packageName . ' for notification not found');
 		}
 	}
 
@@ -1233,7 +1241,6 @@ abstract class BasePackage extends Controller
 										$sql = "UPDATE `{$table}` SET `id` = ? WHERE `{$table}`.`id` = ?";
 
 										$this->db->execute($sql, [$nextSeqNumber, $currentId]);
-
 
 										$data['id'] = $nextSeqNumber;
 									} else {

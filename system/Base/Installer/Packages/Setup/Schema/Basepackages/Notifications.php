@@ -76,15 +76,14 @@ class Notifications
                         'notification_title',
                         [
                             'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 1024,
+                            'size'    => 4096,
                             'notNull' => true
                         ]
                     ),
                     new Column(
                         'notification_details',
                         [
-                            'type'    => Column::TYPE_VARCHAR,
-                            'size'    => 4096,
+                            'type'    => Column::TYPE_TEXT,
                             'notNull' => false
                         ]
                     ),

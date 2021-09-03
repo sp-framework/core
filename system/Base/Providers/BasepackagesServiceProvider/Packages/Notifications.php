@@ -46,6 +46,10 @@ class Notifications extends BasePackage
             throw new \Exception('Notification title missing');
         }
 
+        if ($notificationDetails && is_array($notificationDetails)) {
+            $notificationDetails = Json::encode($notificationDetails);
+        }
+
         $newNotification = [];
         $newNotification['notificationType'] = $notificationType;
         $newNotification['app_id'] = $appId;
@@ -74,7 +78,6 @@ class Notifications extends BasePackage
         } else {
             $tunnels = $account->tunnels->toArray();
         }
-
         if ($tunnels['notifications_tunnel']) {
             $count =
                 $this->modelToUse::count(
