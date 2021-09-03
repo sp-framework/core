@@ -51,6 +51,14 @@ class Book
                     ]
                 ),
                 new Column(
+                    'attention_to',
+                    [
+                        'type'    => Column::TYPE_VARCHAR,
+                        'size'    => 100,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'street_address',
                     [
                         'type'    => Column::TYPE_VARCHAR,

@@ -84,19 +84,100 @@ class Book extends BasePackage
 
     protected function addNewGeoLocation($data)
     {
-        //If Cities/States/Countries Id is received as 0, we create a new one and then assign proper ids.
-        //New Id's can start from a large number to avoid any conflict.
-        // if ($data['city_id'] == 0) {
-        //     if ($data['country_id'] == 0) {
-        //         $newCountry = [];//New Country
-        //     }
+        return $data;
+        //Need to finish this.
+        $foundCountry = null;
 
-        //     if ($data['state_id'] == 0) {
-        //         $newState = [];//New state
-        //     }
+        if ($this->basepackages->geoCountries->searchCountries($address['Country'], true)) {
+            $countryData = $this->basepackages->geoCountries->packagesData->countries;
 
-        //     $newCity = [];//New City
-        // }
+            if (count($countryData) > 0) {
+                foreach ($countryData as $countryKey => $country) {
+                    if (strtolower($country['name']) === strtolower($address['Country'])) {
+                        $foundCountry = $country;
+                        $vendor['currency'] = $country['currency'];
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!$foundCountry) {
+            $newCountry['name'] = $address['Country'];
+            $newCountry['installed'] = '1';
+            $newCountry['enabled'] = '1';
+            $newCountry['user_added'] = '1';
+
+            if ($this->basepackages->geoCountries->add($newCountry)) {
+                $newAddress['country_id'] = $this->basepackages->geoCountries->packagesData->last['id'];
+                $newAddress['country_name'] = $newCountry['name'];
+            } else {
+
+                $this->errors = array_merge($this->errors, ['Could not add country data.']);
+            }
+        } else {
+            //We check if country is installed or not, if not, we install and enable it
+            if ($foundCountry['installed'] != '1') {
+                $foundCountry['enabled'] = '1';
+
+                $this->basepackages->geoCountries->installCountry($foundCountry);
+            } else if ($foundCountry['enabled'] != '1') {
+                $foundCountry['enabled'] = '1';
+
+                $this->basepackages->geoCountries->update($foundCountry);
+            }
+
+            $newAddress['country_id'] = $foundCountry['id'];
+            $newAddress['country_name'] = $foundCountry['name'];
+        }
+
+        //State (Region in Xero Address)
+        $foundState = null;
+
+        if ($this->basepackages->geoStates->searchStatesByCode($address['Region'], true)) {
+            $stateData = $this->basepackages->geoStates->packagesData->states;
+
+            if (count($stateData) > 0) {
+                foreach ($stateData as $stateKey => $state) {
+                    if (strtolower($state['state_code']) === strtolower($address['Region'])) {
+                        $foundState = $state;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!$foundState) {
+            $newState['name'] = $address['Region'];
+            $newState['state_code'] = substr($address['Region'], 0, 3);
+            $newState['user_added'] = '1';
+            $newState['country_id'] = $newAddress['country_id'];
+
+            if ($this->basepackages->geoStates->add($newState)) {
+                $newAddress['state_id'] = $this->basepackages->geoStates->packagesData->last['id'];
+                $newAddress['state_name'] = $newState['name'];
+            } else {
+
+                $this->errors = array_merge($this->errors, ['Could not add state data.']);
+            }
+        } else {
+            $newAddress['state_id'] = $foundState['id'];
+            $newAddress['state_name'] = $foundState['name'];
+        }
+
+        //New City
+        $newCity['name'] = $address['City'];
+        $newCity['state_id'] = $newAddress['state_id'];
+        $newCity['country_id'] = $newAddress['country_id'];
+        $newCity['user_added'] = '1';
+
+        if ($this->basepackages->geoCities->add($newCity)) {
+            $newAddress['city_id'] = $this->basepackages->geoCities->packagesData->last['id'];
+            $newAddress['city_name'] = $newCity['name'];
+        } else {
+
+            $this->errors = array_merge($this->errors, ['Could not add city data.']);
+        }
 
         return $data;
     }

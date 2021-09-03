@@ -54,6 +54,11 @@ class Single
 
     protected function buildSingleAddressData()
     {
+        $this->addressesParams['attentionToFieldLabel'] =
+            isset($this->params['attentionToFieldLabel']) ?
+            $this->params['attentionToFieldLabel'] :
+            'Attention To';
+
         $this->addressesParams['streetAddressFieldLabel'] =
             isset($this->params['streetAddressFieldLabel']) ?
             $this->params['streetAddressFieldLabel'] :
@@ -84,11 +89,11 @@ class Single
             $this->params['countryFieldLabel'] :
             'Country';
 
-        $this->addressesParams['streetAddressFieldHidden'] =
-            isset($this->params['streetAddressFieldHidden']) &&
-                $this->params['streetAddressFieldHidden'] === true ?
+        $this->addressesParams['attentionToFieldHidden'] =
+            isset($this->params['attentionToFieldHidden']) &&
+                $this->params['attentionToFieldHidden'] === true ?
             true :
-            false ;
+            false;
 
         $this->addressesParams['streetAddressFieldHidden'] =
             isset($this->params['streetAddressFieldHidden']) &&
@@ -126,11 +131,11 @@ class Single
             true :
             false;
 
-        $this->addressesParams['streetAddressFieldDisabled'] =
-            isset($this->params['streetAddressFieldDisabled']) &&
-                $this->params['streetAddressFieldDisabled'] === true ?
+        $this->addressesParams['attentionToFieldDisabled'] =
+            isset($this->params['attentionToFieldDisabled']) &&
+                $this->params['attentionToFieldDisabled'] === true ?
             true :
-            false ;
+            false;
 
         $this->addressesParams['streetAddressFieldDisabled'] =
             isset($this->params['streetAddressFieldDisabled']) &&
@@ -168,6 +173,12 @@ class Single
             true :
             false;
 
+        $this->addressesParams['attentionToFieldRequired'] =
+            isset($this->params['attentionToFieldRequired']) &&
+                $this->params['attentionToFieldRequired'] === true ?
+            true :
+            false;
+
         $this->addressesParams['streetAddressFieldRequired'] =
             isset($this->params['streetAddressFieldRequired']) &&
                 $this->params['streetAddressFieldRequired'] === false ?
@@ -201,6 +212,18 @@ class Single
         $this->addressesParams['countryFieldRequired'] =
             isset($this->params['countryFieldRequired']) &&
                 $this->params['countryFieldRequired'] === false ?
+            false :
+            true;
+
+        $this->addressesParams['attentionToFieldBazPostOnCreate'] =
+            isset($this->params['attentionToFieldBazPostOnCreate']) &&
+                $this->params['attentionToFieldBazPostOnCreate'] === false ?
+            false :
+            true;
+
+        $this->addressesParams['attentionToFieldBazPostOnUpdate'] =
+            isset($this->params['attentionToFieldBazPostOnUpdate']) &&
+                $this->params['attentionToFieldBazPostOnUpdate'] === false ?
             false :
             true;
 
@@ -279,6 +302,10 @@ class Single
 
     protected function buildSingleAddressLayout()
     {
+        if (isset($this->params['includeAttentionTo']) && $this->params['includeAttentionTo'] === true) {
+            $this->content .= $this->inclAttentionTo();
+        }
+
         if (isset($this->params['includeStreet']) && $this->params['includeStreet'] === true) {
             $this->content .= $this->inclStreet();
         }
@@ -338,6 +365,38 @@ class Single
             $this->content .=
                 '});</script>';
         }
+    }
+
+    protected function inclAttentionTo()
+    {
+        return
+            '<div class="row">
+                <div class="col">' .
+                    $this->adminLTETags->useTag('fields',
+                        [
+                            'component'                             => $this->params['component'],
+                            'componentName'                         => $this->params['componentName'],
+                            'componentId'                           => $this->params['componentId'],
+                            'sectionId'                             => $this->params['sectionId'],
+                            'fieldId'                               => 'attention_to',
+                            'fieldLabel'                            => $this->addressesParams['attentionToFieldLabel'],
+                            'fieldType'                             => 'input',
+                            'fieldHelp'                             => true,
+                            'fieldHelpTooltipContent'               => $this->addressesParams['attentionToFieldLabel'],
+                            'fieldHidden'                           => $this->addressesParams['attentionToFieldHidden'],
+                            'fieldDisabled'                         => $this->addressesParams['attentionToFieldDisabled'],
+                            'fieldRequired'                         => $this->addressesParams['attentionToFieldRequired'],
+                            'fieldBazScan'                          => true,
+                            'fieldBazJstreeSearch'                  => true,
+                            'fieldBazPostOnCreate'                  => $this->addressesParams['attentionToFieldBazPostOnCreate'],
+                            'fieldBazPostOnUpdate'                  => $this->addressesParams['attentionToFieldBazPostOnUpdate'],
+                            'fieldDataInputMinLength'               => 1,
+                            'fieldDataInputMaxLength'               => 100,
+                            'fieldValue'                            => $this->params['attentionTo']
+                        ]
+                    ) .
+                '</div>
+            </div>';
     }
 
     protected function inclStreet()
@@ -601,7 +660,8 @@ class Single
 
         if (isset($this->params['includeStreet']) && $this->params['includeStreet'] === true) {
             $baseJs .=
-                '"' . $this->compSecId . '-street_address"      : { },
+                '"' . $this->compSecId . '-attention_to"        : { },
+                "' . $this->compSecId . '-street_address"       : { },
                 "' . $this->compSecId . '-street_address_2"     : { },';
         }
 

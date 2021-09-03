@@ -87,42 +87,42 @@ class Multiple
                         <div class="col">' .
                             $this->adminLTETags->useTag('fields',
                                 [
-                                    'component'                      => $this->params['component'],
-                                    'componentName'                  => $this->params['componentName'],
-                                    'componentId'                    => $this->params['componentId'],
-                                    'sectionId'                      => $this->params['sectionId'],
-                                    'fieldId'                        => 'address_ids',
-                                    'fieldLabel'                     => 'Address IDs',
-                                    'fieldType'                      => 'input',
-                                    'fieldHelp'                      => true,
-                                    'fieldHelpTooltipContent'        => 'Address IDs',
-                                    'fieldRequired'                  => false,
-                                    'fieldBazScan'                   => false,
-                                    'fieldBazPostOnCreate'           => true,
-                                    'fieldBazPostOnUpdate'           => true,
-                                    'fieldHidden'                    => true,
-                                    'fieldDisabled'                  => true,
-                                    'fieldValue'                     => ''
+                                    'component'                             => $this->params['component'],
+                                    'componentName'                         => $this->params['componentName'],
+                                    'componentId'                           => $this->params['componentId'],
+                                    'sectionId'                             => $this->params['sectionId'],
+                                    'fieldId'                               => 'address_ids',
+                                    'fieldLabel'                            => 'Address IDs',
+                                    'fieldType'                             => 'input',
+                                    'fieldHelp'                             => true,
+                                    'fieldHelpTooltipContent'               => 'Address IDs',
+                                    'fieldRequired'                         => false,
+                                    'fieldBazScan'                          => false,
+                                    'fieldBazPostOnCreate'                  => true,
+                                    'fieldBazPostOnUpdate'                  => true,
+                                    'fieldHidden'                           => true,
+                                    'fieldDisabled'                         => true,
+                                    'fieldValue'                            => ''
                                 ]
                             ) .
                             $this->adminLTETags->useTag('fields',
                                 [
-                                    'component'                      => $this->params['component'],
-                                    'componentName'                  => $this->params['componentName'],
-                                    'componentId'                    => $this->params['componentId'],
-                                    'sectionId'                      => $this->params['sectionId'],
-                                    'fieldId'                        => 'delete_address_ids',
-                                    'fieldLabel'                     => 'Delete Address IDs',
-                                    'fieldType'                      => 'input',
-                                    'fieldHelp'                      => true,
-                                    'fieldHelpTooltipContent'        => 'Delete Address IDs',
-                                    'fieldRequired'                  => false,
-                                    'fieldBazScan'                   => false,
-                                    'fieldBazPostOnCreate'           => true,
-                                    'fieldBazPostOnUpdate'           => true,
-                                    'fieldHidden'                    => true,
-                                    'fieldDisabled'                  => true,
-                                    'fieldValue'                     => ''
+                                    'component'                             => $this->params['component'],
+                                    'componentName'                         => $this->params['componentName'],
+                                    'componentId'                           => $this->params['componentId'],
+                                    'sectionId'                             => $this->params['sectionId'],
+                                    'fieldId'                               => 'delete_address_ids',
+                                    'fieldLabel'                            => 'Delete Address IDs',
+                                    'fieldType'                             => 'input',
+                                    'fieldHelp'                             => true,
+                                    'fieldHelpTooltipContent'               => 'Delete Address IDs',
+                                    'fieldRequired'                         => false,
+                                    'fieldBazScan'                          => false,
+                                    'fieldBazPostOnCreate'                  => true,
+                                    'fieldBazPostOnUpdate'                  => true,
+                                    'fieldHidden'                           => true,
+                                    'fieldDisabled'                         => true,
+                                    'fieldValue'                            => ''
                                 ]
                             ) .
                         '</div>
@@ -131,22 +131,22 @@ class Multiple
                         <div class="col">' .
                             $this->adminLTETags->useTag('fields',
                                 [
-                                    'component'                      => $this->params['component'],
-                                    'componentName'                  => $this->params['componentName'],
-                                    'componentId'                    => $this->params['componentId'],
-                                    'sectionId'                      => $this->params['sectionId'],
-                                    'fieldId'                        => 'address_id',
-                                    'fieldLabel'                     => 'Address ID',
-                                    'fieldType'                      => 'input',
-                                    'fieldHelp'                      => true,
-                                    'fieldHelpTooltipContent'        => 'Address ID',
-                                    'fieldRequired'                  => false,
-                                    'fieldBazScan'                   => false,
-                                    'fieldBazPostOnCreate'           => false,
-                                    'fieldBazPostOnUpdate'           => false,
-                                    'fieldHidden'                    => true,
-                                    'fieldDisabled'                  => true,
-                                    'fieldValue'                     => ''
+                                    'component'                             => $this->params['component'],
+                                    'componentName'                         => $this->params['componentName'],
+                                    'componentId'                           => $this->params['componentId'],
+                                    'sectionId'                             => $this->params['sectionId'],
+                                    'fieldId'                               => 'address_id',
+                                    'fieldLabel'                            => 'Address ID',
+                                    'fieldType'                             => 'input',
+                                    'fieldHelp'                             => true,
+                                    'fieldHelpTooltipContent'               => 'Address ID',
+                                    'fieldRequired'                         => false,
+                                    'fieldBazScan'                          => false,
+                                    'fieldBazPostOnCreate'                  => false,
+                                    'fieldBazPostOnUpdate'                  => false,
+                                    'fieldHidden'                           => true,
+                                    'fieldDisabled'                         => true,
+                                    'fieldValue'                            => ''
                                 ]
                             ) .
                         '</div>
@@ -161,7 +161,12 @@ class Multiple
                                     'sectionId'                                   => $this->params['sectionId'],
                                     'addressFieldType'                            => 'single',
                                     'includeStreet'                               => $this->params['includeStreet'],
+                                    'includeAttentionTo'                          => $this->params['includeAttentionTo'],
                                     'searchType'                                  => $this->params['searchType'],
+                                    'attentionTo'                                 => $this->params['attentionTo'],
+                                    'attentionToFieldDisabled'                    => $this->params['attentionToFieldDisabled'],
+                                    'attentionToFieldBazPostOnCreate'             => $this->params['attentionToFieldBazPostOnCreate'],
+                                    'attentionToFieldBazPostOnUpdate'             => $this->params['attentionToFieldBazPostOnUpdate'],
                                     'streetAddress'                               => $this->params['streetAddress'],
                                     'streetAddressFieldDisabled'                  => $this->params['streetAddressFieldDisabled'],
                                     'streetAddressFieldBazPostOnCreate'           => $this->params['streetAddressFieldBazPostOnCreate'],
@@ -294,6 +299,8 @@ class Multiple
                                                             <div class="row">
                                                                 <div class="col list-group-item-data">
                                                                     <dl class="row mb-0">
+                                                                        <dt class="text-uppercase mb-0 col-sm-4">Attention To</dt>
+                                                                        <dd class="mb-0 col-sm-8 cla-attentionTo">' . $address['attention_to'] . '</dd>
                                                                         <dt class="text-uppercase mb-0 col-sm-4">Street Address</dt>
                                                                         <dd class="mb-0 col-sm-8 cla-street">' . $address['street_address'] . '</dd>
                                                                         <dt class="text-uppercase mb-0 col-sm-4">Street Address 2</dt>
@@ -391,6 +398,7 @@ class Multiple
 
                             function toggleAddressFields(status, update = false) {
                                 $("#' . $this->compSecId . '-address_id").attr("disabled", status);
+                                $("#' . $this->compSecId . '-attention_to").attr("disabled", status);
                                 $("#' . $this->compSecId . '-street_address").attr("disabled", status);
                                 $("#' . $this->compSecId . '-street_address_2").attr("disabled", status);
                                 $("#' . $this->compSecId . '-city_id").attr("disabled", status);
@@ -406,6 +414,7 @@ class Multiple
                                 if (status === true) {
                                     $("#' . $this->compSecId . '-address_types").attr("disabled", false);
                                     $("#' . $this->compSecId . '-address_id").val("");
+                                    $("#' . $this->compSecId . '-attention_to").val("");
                                     $("#' . $this->compSecId . '-street_address").val("");
                                     $("#' . $this->compSecId . '-street_address_2").val("");
                                     $("#' . $this->compSecId . '-city_id").val("");
@@ -458,6 +467,7 @@ class Multiple
                                     var addressId, addressNew;
 
                                     data["address_id"] = $("#' . $this->compSecId . '-address_id").val();
+                                    data["attention_to"] = $("#' . $this->compSecId . '-attention_to").val();
                                     data["street_address"] = $("#' . $this->compSecId . '-street_address").val();
                                     data["street_address_2"] = $("#' . $this->compSecId . '-street_address_2").val();
                                     data["city_id"] = $("#' . $this->compSecId . '-city_id").val();
@@ -470,6 +480,8 @@ class Multiple
 
                                     var html =
                                         \'<dl class="row mb-0">\' +
+                                            \'<dt class="text-uppercase mb-0 col-sm-4">Attention To</dt>\' +
+                                            \'<dd class="mb-0 col-sm-8 cla-attentionTo">\' + data["attention_to"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Street Address</dt>\' +
                                             \'<dd class="mb-0 col-sm-8 cla-street">\' + data["street_address"] + \'</dd>\' +
                                             \'<dt class="text-uppercase mb-0 col-sm-4">Street Address 2</dt>\' +
@@ -572,7 +584,10 @@ class Multiple
                                             $(id).find("dd").each(function(index,dd) {
                                                 addressId = $(dd).parents("li").data("address-id");
                                                 data["new"] = $(dd).parents("li").data("new");
-                                                if ($(dd).is(".cla-street")) {
+
+                                                if ($(dd).is(".cla-attentionTo")) {
+                                                    data["attention_to"] = $(dd).html();
+                                                } else if ($(dd).is(".cla-street")) {
                                                     data["street_address"] = $(dd).html();
                                                 } else if ($(dd).is(".cla-street2")) {
                                                     data["street_address_2"] = $(dd).html();
@@ -613,7 +628,9 @@ class Multiple
                                             $("#' . $this->compSecId . '-address_types").trigger("change");
                                             $("#' . $this->compSecId . '-address_types").attr("disabled", true);
 
-                                            if ($(dd).is(".cla-street")) {
+                                            if ($(dd).is(".cla-attentionTo")) {
+                                                $("#' . $this->compSecId . '-attention_to").val($(dd).html());
+                                            } else if ($(dd).is(".cla-street")) {
                                                 $("#' . $this->compSecId . '-street_address").val($(dd).html());
                                             } else if ($(dd).is(".cla-street2")) {
                                                 $("#' . $this->compSecId . '-street_address_2").val($(dd).html());
