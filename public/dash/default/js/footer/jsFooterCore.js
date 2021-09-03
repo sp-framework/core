@@ -3068,14 +3068,15 @@ var BazHelpers = function() {
         output += '<ul>';
         Object.keys(obj).forEach(function(k) {
             if (typeof obj[k] == "object" && obj[k] !== null){
-                output += '<li class="text-uppercase">' + k + ' => ';
+                output += '<li>' + k + ' : ';
                 output += bazCreateHtmlList(obj[k]);
                 output += '</li>';
             } else {
-                output += '<li>' + k + ' => ' + obj[k] + '</li>';
+                output += '<li>' + k + ' : ' + obj[k] + '</li>';
             }
         });
         output += '</ul>';
+
         return output;
     }
 

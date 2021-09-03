@@ -20,5 +20,9 @@ class BasepackagesWorkersJobs extends BaseModel
 
     public $execution_time;
 
-    public $result;
+    public $response_code;
+
+    public $response_message;
+
+    public $response_data;
 }

@@ -64,7 +64,22 @@ class Jobs
                         ]
                     ),
                     new Column(
-                        'result',
+                        'response_code',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'response_message',
+                        [
+                            'type'          => Column::TYPE_VARCHAR,
+                            'size'          => 4096,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
+                        'response_data',
                         [
                             'type'          => Column::TYPE_TEXT,
                             'notNull'       => false,

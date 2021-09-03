@@ -1,8 +1,19 @@
 {% if job['id'] is defined %}
-    {% if job['result'] is defined and job['result'] !== '' %}
-        {% set jobResult = job['result'] %}
+    {% set jobResult = '' %}
+    {% if job['response_code'] is defined and job['response_code'] !== '' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code">Code: ' ~ job['response_code'] ~ '</div><br>' %}
     {% else %}
-        {% set jobResult = 'No Result!' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-code">Code: -</div><br>' %}
+    {% endif %}
+    {% if job['response_message'] is defined and job['response_message'] !== '' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message">Message: ' ~ job['response_message'] ~ '</div><br>' %}
+    {% else %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-message">Message: -</div><br>' %}
+    {% endif %}
+    {% if job['response_data'] is defined and job['response_data'] !== '' %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data">Data: ' ~ job['response_data'] ~ '</div>' %}
+    {% else %}
+        {% set jobResult = jobResult ~ '<div id="' ~ componentId ~ '-' ~ sectionId ~ '-data">Data: -</div>' %}
     {% endif %}
     <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
         <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -27,10 +38,32 @@
                     )}}
                 </div>
             </div>
+            <div class="row">
+                <div class="col">
+                    {{adminltetags.useTag('buttons',
+                        [
+                            'component'                      : component,
+                            'componentName'                  : componentName,
+                            'componentId'                    : componentId,
+                            'sectionId'                      : sectionId,
+                            'buttonType'                     : 'button',
+                            'buttons'                        :
+                                [
+                                    'format'          : [
+                                        'title'                    : 'Format Data',
+                                        'size'                     : 'xs',
+                                        'type'                     : 'info',
+                                        'icon'                     : 'magic'
+                                    ]
+                                ]
+                        ]
+                    )}}
+                </div>
+            </div>
         </fieldset>
     </form>
     <script>
-/* globals PNotify */
+/* globals BazHelpers */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -57,7 +90,26 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
-        '{{componentId}}-{{sectionId}}-result'                  : { },
+        '{{componentId}}-{{sectionId}}-result'                  : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-format').click(function(e) {
+                    e.preventDefault();
+
+                    var html = '{{job["response_data"]}}';
+                    var regex = /{.*}/g;
+                    var found = html.match(regex);
+                    //eslint-disable-next-line
+                    var data = found[0].replaceAll('\"', '"');
+
+                    var obj = JSON.parse(data);
+
+                    if (obj) {
+                        $('#{{componentId}}-{{sectionId}}-data').html('Data: ' + BazHelpers.createHtmlList({'obj': obj}));
+                        $(this).attr('hidden', true);
+                    }
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
             },

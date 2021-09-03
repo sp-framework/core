@@ -102,10 +102,14 @@ class JobsComponent extends BaseComponent
 
     protected function formatWorker($rowId, $data)
     {
-        $worker = $this->basepackages->workers->workers->getById($data['worker_id']);
+        if ($data['worker_id'] != '0') {
+            $worker = $this->basepackages->workers->workers->getById($data['worker_id']);
 
-        if ($worker) {
-            $data['worker_id'] = $worker['name'];
+            if ($worker) {
+                $data['worker_id'] = $worker['name'];
+            }
+        } else {
+            $data['worker_id'] = '-';
         }
 
         return $data;

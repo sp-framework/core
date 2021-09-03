@@ -65,21 +65,19 @@ class Functions extends BasePackage
         if (isset($args['job'])) {
             $job = $this->basepackages->workers->jobs->getById($args['job']['id']);
 
-            $job['result'] = '';
-
             if (isset($packagesData->responseCode)) {
-                $job['result'] .= 'Code: ' . $packagesData->responseCode . '<br>';
+                $job['response_code'] = $packagesData->responseCode;
                 if ($packagesData->responseCode != 0) {
                     $job['status'] = 4;
                 }
             }
 
             if (isset($packagesData->responseMessage)) {
-                $job['result'] .= 'Message: ' . $packagesData->responseMessage . '<br>';
+                $job['response_message'] = $packagesData->responseMessage;
             }
 
             if (isset($packagesData->responseData)) {
-                $job['result'] .= 'Data: ' . Json::encode($packagesData->responseData);
+                $job['response_data'] = Json::encode($packagesData->responseData);
             }
 
             $this->basepackages->workers->jobs->update($job);
