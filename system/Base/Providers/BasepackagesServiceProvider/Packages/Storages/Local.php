@@ -121,9 +121,7 @@ class Local extends BasePackage
     public function store($directory = null, $file = null, $fileName = null, $size = null, $mimeType = null)
     {
         if (!$file && !$this->request->hasFiles()) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'File(s) Not Provided';
+            $this->addResponse('File(s) Not Provided', 1);
 
             return false;
         }
@@ -190,11 +188,9 @@ class Local extends BasePackage
             }
         }
 
-        $this->packagesData->responseCode = 0;
-
         $this->packagesData->storageData = $storageData;
 
-        $this->packagesData->responseMessage = 'File(s) Uploaded';
+        $this->addResponse('File(s) Uploaded');
 
         return true;
     }
@@ -205,9 +201,7 @@ class Local extends BasePackage
             if (isset($this->storage['max_image_file_size']) &&
                 $this->fileSize > $this->storage['max_image_file_size']
             ) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'File ' . $this->fileName . ' exceeds allowed file size.';
+                $this->addResponse('File ' . $this->fileName . ' exceeds allowed file size.', 1);
 
                 return false;
             }
@@ -220,9 +214,7 @@ class Local extends BasePackage
             if (isset($this->storage['max_data_file_size']) &&
                 $this->fileSize > $this->storage['max_data_file_size']
             ) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'File ' . $this->fileName . ' exceeds allowed file size.';
+                $this->addResponse('File ' . $this->fileName . ' exceeds allowed file size.', 1);
 
                 return false;
             }
@@ -232,9 +224,7 @@ class Local extends BasePackage
             return true;
 
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'File Type Not Accepted';
+            $this->addResponse('File Type Not Accepted', 1);
 
             return false;
         }
@@ -448,9 +438,7 @@ class Local extends BasePackage
                 if (in_array($this->width, $this->allowedImageSizes)) {
                     $this->getSizedImage($file[0], $this->width);
                 } else {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Requested Width not registered with system.';
+                    $this->addResponse('Requested Width not registered with system.', 1);
 
                     return false;
                 }
@@ -458,9 +446,7 @@ class Local extends BasePackage
                 if (in_array($width, $this->allowedImageSizes)) {
                     $this->getSizedImage($file[0], $width);
                 } else {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Requested Width not registered with system.';
+                    $this->addResponse('Requested Width not registered with system.', 1);
 
                     return false;
                 }
@@ -495,12 +481,10 @@ class Local extends BasePackage
         $this->update($file);
     }
 
-    public function removeFile($uuid, $purge = false)
+    public function removeFile($uuid, $purge)
     {
         if (!$uuid) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Please provide UUID';
+            $this->addResponse('Please provide UUID', 1);
 
             return false;
         }
@@ -539,32 +523,24 @@ class Local extends BasePackage
                     );
 
                 if (!$fileRemovedFromDB) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error deleting file from DB';
+                    $this->addResponse('Error deleting file from DB', 1);
 
                     return true;
                 }
 
                 if (!$fileDeleted) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error deleting file from location';
+                    $this->addResponse('Error deleting file from location', 1);
 
                     return true;
                 }
 
                 if (!$fileCacheDeleted) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Error deleting file from cache';
+                    $this->addResponse('Error deleting file from cache', 1);
 
                     return true;
                 }
 
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'File purged from DB, Location and cache';
+                $this->addResponse('File purged from DB, Location and cache');
 
                 return true;
 
@@ -576,19 +552,19 @@ class Local extends BasePackage
                 );
 
                 if (!$fileRemovedFromDB) {
-                    $this->packagesData->responseCode = 1;
-                    $this->packagesData->responseMessage = 'Error deleting file from DB';
+                    $this->addResponse('Error deleting file from DB', 1);
+
                     return true;
                 }
 
                 if (!$fileDeleted) {
-                    $this->packagesData->responseCode = 1;
-                    $this->packagesData->responseMessage = 'Error deleting file from location';
+                    $this->addResponse('Error deleting file from location', 1);
+
                     return true;
                 }
 
-                $this->packagesData->responseCode = 0;
-                $this->packagesData->responseMessage = 'File removed from DB, Location and cache';
+                $this->addResponse('File removed from DB, Location and cache');
+
                 return true;
             }
         } else if ($file && count($file) === 0) {
@@ -603,20 +579,17 @@ class Local extends BasePackage
             );
 
             if ($fileImageDeleted || $fileDataDeleted || $fileCacheDeleted) {
-                $this->packagesData->responseCode = 0;
-                $this->packagesData->responseMessage = 'File not found in DB, but in location/cache. Files removed from location/cache.';
+                $this->addResponse('File not found in DB, but in location/cache. Files removed from location/cache.');
+
                 return true;
             }
 
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Incorrect UUID, Not in DB and/or location/cache.';
+            $this->addResponse('Incorrect UUID, Not in DB and/or location/cache.', 1);
 
             return true;
         }
-        $this->packagesData->responseCode = 1;
 
-        $this->packagesData->responseMessage = 'Incorrect UUID, Not in DB and/or location/cache.';
+        $this->addResponse('Incorrect UUID, Not in DB and/or location/cache.', 1);
 
         return true;
     }
@@ -687,46 +660,64 @@ class Local extends BasePackage
         }
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false)
+    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null)
     {
         if ($array) {
             if ($oldUUID) {
                 $olduuids = Json::decode($oldUUID, true);
 
                 foreach ($olduuids as $olduuidKey => $olduuid) {
-                    $this->flipOrphanStatus($olduuid, 1);
+                    if (!$status) {
+                        $status = 1;
+                    }
+
+                    $this->flipOrphanStatus($olduuid, $status);
                 }
             }
 
             if ($newUUID) {
                 $uuids = Json::decode($newUUID, true);
                 foreach ($uuids as $uuidKey => $newuuid) {
-                    $this->flipOrphanStatus($newuuid, 0);
+                    if (!$status) {
+                        $status = 0;
+                    }
+
+                    $this->flipOrphanStatus($newuuid, $status);
                 }
             }
-
         } else {
             if ($oldUUID) {
-                $this->flipOrphanStatus($oldUUID, 1);
+                    if (!$status) {
+                        $status = 1;
+                    }
+
+                $this->flipOrphanStatus($oldUUID, $status);
             }
 
             if ($newUUID) {
-                $this->flipOrphanStatus($newUUID, 0);
+                    if (!$status) {
+                        $status = 0;
+                    }
+
+                $this->flipOrphanStatus($newUUID, $status);
             }
         }
     }
 
     protected function flipOrphanStatus($uuid, $status)
     {
+        if ($status === 0) {
+            $marked = 'unmarked';
+        } else if ($status === 1) {
+            $marked = 'marked';
+        }
         $file = $this->getFileInfo($uuid);
 
         if ($file && count($file) === 1) {
             $file[0]['orphan'] = $status;
 
             if ($this->update($file[0])) {
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'UUID is now marked orphan';
+                $this->addResponse('UUID: ' . $uuid . ' is now ' . $marked . ' orphan');
 
                 return true;
             }
@@ -739,74 +730,11 @@ class Local extends BasePackage
     {
         // @todo orphan also needs to search whole DB for uploads_data and compare with files table.
         // We need to make a backup of orphans and keep them zipped in a directory. Take database snapshot as json in it. This way we can recover it if something important is lost.
-        $dataDirContents = $this->fileStorage->listContents('/data', true);
-
-        $dataDirFiles = [];
-
-        foreach ($dataDirContents as $dataDirContentsKey => $dataDirContentsValue) {
-            if ($dataDirContentsValue['type'] === 'file') {
-                array_push($dataDirFiles, $dataDirContentsValue);
-            }
-        }
-
-        $dbDataDirFiles = [];
-
-        $dbDataDirContents = $this->db->getRepository(StorageFiles::class)->findAll();
-
-        foreach ($dbDataDirContents as $dbDataDirContentsKey => $dbDataDirContentsValue) {
-            $objToArr = $dbDataDirContentsValue->getAllArr();
-            array_push($dbDataDirFiles, $objToArr['uuid']);
-        }
-
-        $count = 0;
-
-        foreach ($dataDirFiles as $file) {
-            if (!in_array($file['filename'], $dbDataDirFiles)) {
-                $file['path'] = str_replace("data/", "/", $file['path']);
-                $count = $count + 1;
-                $this->fileStorage->remove('data' . $file['path']);
-                $this->fileStorage->removeDir('cache' . $file['path']);
-                $this->recursiveDeleteEmptyFolders('data' . $file['path']);
-                $this->recursiveDeleteEmptyFolders('cache' . $file['path']);
-            }
-        }
-
-        if ($count > 0) {
-            $this->packagesData->responseMessage = $count . ' file(s) removed from location and cache';
-        } else if ($count === 0) {
-            $this->packagesData->responseMessage = 'No orphan files found!';
-        }
-        $this->packagesData->responseCode = 0;
-
-        return $this->view->render($this->response, '', $this->templateData);
     }
 
     public function clearCache()
     {
         //@todo move this to settings
         //@todo - add method to check all image uuids in db and clean files db
-        $twigCache = $this->twigFileStorage->listContents('/', true);
-        $cacheDirContents = $this->fileStorage->listContents('/cache', true);
-
-        if (count($twigCache) > 0) {
-            foreach ($twigCache as $twigCacheKey => $twigCacheValue) {
-                if ($twigCacheValue['type'] === 'dir') {
-                    $this->twigFileStorage->removeDir($twigCacheValue['path']);
-                }
-            }
-        }
-        if (count($cacheDirContents) > 0) {
-            foreach ($cacheDirContents as $cacheDirKey => $cacheDirValue) {
-                if ($cacheDirValue['type'] === 'dir') {
-                    $this->fileStorage->removeDir($cacheDirValue['path']);
-                }
-            }
-        }
-
-
-        $this->packagesData->responseMessage = 'Cleared HTML & Image Cache!';
-        $this->packagesData->responseCode = 0;
-
-        return $this->view->render($this->response, '', $this->templateData);
     }
 }

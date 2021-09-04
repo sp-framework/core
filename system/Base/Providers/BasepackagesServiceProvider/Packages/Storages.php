@@ -142,23 +142,7 @@ class Storages extends BasePackage
 
     public function storeFile($type = null, $directory = null, $file = null, $fileName = null, $size = null, $mimeType = null)
     {
-        if (isset($this->request->getPost()['storagetype'])) {
-            if ($this->request->getPost()['storagetype'] === 'public') {
-                $public = true;
-            } else if ($this->request->getPost()['storagetype'] === 'private') {
-                $public = false;
-            }
-        } else if ($type) {
-            if ($type === 'public') {
-                $public = true;
-            } else if ($type === 'private') {
-                $public = false;
-            }
-        } else {
-            $public = true;
-        }
-
-        $this->initStorage($public);
+        $this->initStorage($this->checkPublic($type));
 
         if ($this->storage) {
             if ($this->storage->store($directory, $file, $fileName, $size, $mimeType)) {
@@ -212,31 +196,11 @@ class Storages extends BasePackage
         }
     }
 
-    public function removeFile(string $uuid)
+    public function removeFile(string $uuid, $type = null, $purge = null)
     {
-        if (isset($this->request->getPost()['storagetype'])) {
-            if ($this->request->getPost()['storagetype'] === 'public') {
-                $public = true;
-            } else if ($this->request->getPost()['storagetype'] === 'private') {
-                $public = false;
-            }
-        } else {
-            $public = true;
-        }
+        $this->initStorage($this->checkPublic($type));
 
-        $this->initStorage($public);
-
-        if (isset($this->request->getPost()['purge'])) {
-            if ($this->request->getPost()['purge'] == 'true') {
-                $purge = true;
-            } else {
-                $purge = true;
-            }
-        } else {
-            $purge = false;
-        }
-
-        if ($this->storage->removeFile($uuid, $purge)) {
+        if ($this->storage->removeFile($uuid, $this->checkPurge($purge))) {
             $this->addResponse($this->storage->packagesData->responseMessage, $this->storage->packagesData->responseCode);
 
             return true;
@@ -288,13 +252,47 @@ class Storages extends BasePackage
         return $this->storage;
     }
 
+    protected function checkPublic($type = null)
+    {
+        $public = true;
+
+        if (isset($this->request->getPost()['storagetype'])) {
+            if ($this->request->getPost()['storagetype'] === 'private') {
+                $public = false;
+            }
+        } else if ($type) {
+            if ($type === 'private') {
+                $public = false;
+            }
+        }
+
+        return $public;
+    }
+
+    protected function checkPurge($purge = null)
+    {
+        $shouldPurge = false;
+
+        if (isset($this->request->getPost()['purge'])) {
+            if ($this->request->getPost()['purge'] == 'true') {
+                $shouldPurge = true;
+            }
+        } else if ($purge !== null) {
+            if ($purge === true) {
+                $shouldPurge = true;
+            }
+        }
+
+        return $shouldPurge;
+    }
+
     public function getPublicLink($uuid, $width = null)
     {
         return $this->initStorage()->getPublicLink($uuid, $width);
     }
 
-    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false)
+    public function changeOrphanStatus(string $newUUID = null, string $oldUUID = null, bool $array = false, $status = null)
     {
-        return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array);
+        return $this->initStorage()->changeOrphanStatus($newUUID, $oldUUID, $array, $status);
     }
 }
