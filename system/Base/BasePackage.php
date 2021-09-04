@@ -1110,6 +1110,8 @@ abstract class BasePackage extends Controller
 
 		if (!$package) {
 			$package = $this->checkPackage($this->packageName);
+		} else if ($package && is_string($package)) {
+			$package = $this->checkPackage($package);
 		}
 
 		if ($package) {
