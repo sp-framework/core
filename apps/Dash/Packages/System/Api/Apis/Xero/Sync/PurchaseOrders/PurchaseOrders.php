@@ -14,6 +14,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\ContactGroups;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Contacts;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Model\SystemApiXeroContacts;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\History;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Model\SystemApiXeroHistory;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Items\Items;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Organisations;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrders;
@@ -399,7 +400,7 @@ class PurchaseOrders extends BasePackage
                     $this->generatePoData($po);
 
                     if (count($this->errors) > 0) {
-                        $this->poPackage->errorPurchaseOrder('Errors in purchase orders. Please fix them ASAP.', Json::encode($this->errors));
+                        $this->poPackage->errorPurchaseOrder('Errors in purchase orders. Please check details for more information.', Json::encode($this->errors));
                     }
                 }
             }
@@ -815,6 +816,8 @@ class PurchaseOrders extends BasePackage
                                     $xA->baz_storage_local_id = $storageId['id'];
 
                                     $xA->update();
+
+                                    $this->basepackages->storages->changeOrphanStatus($storageId['uuid'], null, false, 0);
                                 }
                             }
                         }
@@ -948,6 +951,59 @@ class PurchaseOrders extends BasePackage
 
     protected function addPurchaseOrderHistory($po, $purchaseOrder)
     {
-        //
+        $model = SystemApiXeroHistory::class;
+
+        $xeroHistory = $model::find(
+            [
+                'conditions'    => 'baz_note_id IS NULL AND xero_package = :xp: AND xero_package_row_id = :xpri:',
+                'bind'          =>
+                    [
+                        'xp'    => 'purchaseorders',
+                        'xpri'  => $po['PurchaseOrderID']
+                    ]
+            ]
+        );
+
+        if ($xeroHistory) {
+            $histories = $xeroHistory->toArray();
+
+            if (count($histories) > 0) {
+                foreach ($histories as $historyKey => $history) {
+
+                    $note = $this->addHistoryToNote($history, $purchaseOrder);
+
+                    if ($note) {
+                        $xH = $model::findFirstById($history['id']);
+
+                        if ($xH) {
+                            $xH->baz_note_id = $note['id'];
+
+                            $xH->update();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected function addHistoryToNote($history, $purchaseOrder)
+    {
+        $newNote['package_row_id'] = $purchaseOrder['id'];
+        $newNote['note_type'] = '1';
+        $newNote['note_app_visibility']['data'] = [];
+        $newNote['is_private'] = '0';
+        $newNote['note'] =
+            'Added via Xero API.' .
+            '<br>Change Type: ' . $history['Changes'] .
+            '<br>Created At: ' . \DateTime::createFromFormat('Y-m-d\TH:i:s', $history['DateUTCString'])->format('Y-m-d H:i:s') .
+            '<br>Details: ' . $history['Details'];
+
+        $this->basepackages->notes->addNote('purchaseorders', $newNote);
+
+        if ($this->basepackages->notes->packagesData->last) {
+            return $this->basepackages->notes->packagesData->last;
+        }
+
+        return false;
     }
 }
