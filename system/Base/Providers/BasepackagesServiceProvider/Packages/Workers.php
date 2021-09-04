@@ -47,16 +47,6 @@ class Workers extends BasePackage
     {
         $this->workers = (new WorkersWorkers())->init();
 
-        $idleWorkers = $this->workers->getIdleWorkers();
-
-        if ($idleWorkers && count($idleWorkers) > 0) {
-            $this->idleWorkers = $idleWorkers;
-        } else {
-            $this->logger->log->alert('No Workers available at ' . date('Y-m-d H:i:s'));
-
-            return false;//We quite as there are no available workers.
-        }
-
         $this->schedules = (new Schedules())->init();
 
         $this->tasks = (new Tasks())->init();
@@ -91,18 +81,19 @@ class Workers extends BasePackage
         // 3 - Success
         // 4 - Error
 
+
+        if (!$this->checkIdleWorkers()) {
+            $this->logger->log->alert('No Workers available at ' . date('Y-m-d H:i:s'));
+
+            return false;//We quite as there are no available workers.
+        }
+
         $enabledTasks = $this->tasks->getEnabledTasks();
 
         $availableFunctions = array_keys($this->tasks->getAllFunctions());
 
         foreach ($enabledTasks as $taskKey => $task) {
             if (in_array($task['function'], $availableFunctions)) {
-                if (isset($this->idleWorkers[$taskKey])) {
-                    $this->worker = $this->idleWorkers[$taskKey];
-                } else {
-                    $this->worker['id'] = 0;
-                }
-
                 $schedule = $this->schedules->getSchedulesSchedule($task['schedule_id']);
 
                 $class = 'System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Workers\\Functions\\' . ucfirst($task['function']);
@@ -162,6 +153,8 @@ class Workers extends BasePackage
                 // $this->jobs->updateJob($this->scheduledJobs[$id]);
             }
         }
+
+        $this->releaseWorkers();
     }
 
     protected function scheduleEveryMinute($task, $schedule, $class)
@@ -444,6 +437,8 @@ class Workers extends BasePackage
 
     protected function addToScheduler($task, $schedule, $class, $nextRun)
     {
+        $this->checkIdleWorkers();
+
         $newJob = $this->addNewJob($task, $schedule);
 
         if ($newJob['worker_id'] == '0') {
@@ -458,6 +453,11 @@ class Workers extends BasePackage
             $this->jobs->updateJob($newJob);
 
             return;
+        } else {
+            $updateWorker = $this->worker;
+            $updateWorker['status'] = '1';
+
+            $this->workers->updateWorker($updateWorker);
         }
 
         $args =
@@ -564,5 +564,47 @@ class Workers extends BasePackage
         }
 
         return true;
+    }
+
+
+    protected function checkIdleWorkers()
+    {
+        $this->workers = (new WorkersWorkers())->init();
+
+        $idleWorkers = $this->workers->init()->getIdleWorkers();
+
+        if ($idleWorkers && count($idleWorkers) > 0) {
+            $this->idleWorkers = $idleWorkers;
+
+            $this->worker = $this->idleWorkers[0];
+
+            return true;
+        }
+
+        $this->idleWorkers = [];
+
+        $this->worker['id'] = 0;
+
+        return false;
+    }
+
+    protected function releaseWorkers()
+    {
+        if (count($this->scheduledJobs) > 0) {
+            foreach ($this->scheduledJobs as $scheduledJob) {
+                if ($scheduledJob['worker_id'] &&
+                    $scheduledJob['worker_id'] != '' &&
+                    $scheduledJob['worker_id'] != '0'
+                ) {
+                    $worker = $this->workers->getById($scheduledJob['worker_id']);
+
+                    if ($worker) {
+                        $worker['status'] = 0;
+
+                        $this->workers->updateWorker($worker);
+                    }
+                }
+            }
+        }
     }
 }

@@ -98,15 +98,19 @@ dataCollectionSection =
                     var html = '{{job["response_data"]}}';
                     var regex = /{.*}/g;
                     var found = html.match(regex);
-                    //eslint-disable-next-line
-                    var data = found[0].replaceAll('\"', '"');
 
-                    var obj = JSON.parse(data);
+                    if (found) {
+                        //eslint-disable-next-line
+                        var data = found[0].replaceAll('\"', '"');
 
-                    if (obj) {
-                        $('#{{componentId}}-{{sectionId}}-data').html('Data: ' + BazHelpers.createHtmlList({'obj': obj}));
-                        $(this).attr('hidden', true);
+                        var obj = JSON.parse(data);
+
+                        if (obj) {
+                            $('#{{componentId}}-{{sectionId}}-data').html('Data: ' + BazHelpers.createHtmlList({'obj': obj}));
+                        }
                     }
+
+                    $(this).attr('hidden', true);
                 });
             }
         },
