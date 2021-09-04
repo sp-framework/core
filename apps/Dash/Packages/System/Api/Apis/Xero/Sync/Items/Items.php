@@ -4,7 +4,6 @@ namespace Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Items;
 
 use Apps\Dash\Packages\System\Api\Api;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Items\Model\SystemApiXeroItems;
-use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetItemsRestRequest;
 use System\Base\BasePackage;
 

@@ -98,7 +98,7 @@ class PurchaseOrders extends BasePackage
                 $this->responseData
             );
         } else {
-            $this->addResponse('Sync Error. No API Configuration Found', 1);
+            $this->addResponse('Sync Error. No API Configuration Found. Please disable this task or configure the API.', 1);
         }
     }
 
@@ -116,7 +116,7 @@ class PurchaseOrders extends BasePackage
             $modifiedSince = $this->apiPackage->getApiCallMethodStat('GetPurchaseOrders', $apiId);
         }
         if ($modifiedSince) {
-            // $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
+            $this->xeroApi->setOptionalHeader(['If-Modified-Since' => $modifiedSince]);
         }
 
         if ($parameters && isset($parameters[$apiId]['PurchaseOrders']['dateFrom'])) {
@@ -189,11 +189,15 @@ class PurchaseOrders extends BasePackage
 
         $response = $this->xeroApi->getPurchaseOrderAttachments($request);
 
-        $responseArr = $response->toArray();
+        if ($response) {
+            $this->api->refreshXeroCallStats($response->getHeaders());
 
-        if (isset($responseArr['Status']) && $responseArr['Status'] === 'OK') {
-            if (isset($responseArr['Attachments'])) {
-                return $responseArr['Attachments'];
+            $responseArr = $response->toArray();
+
+            if (isset($responseArr['Status']) && $responseArr['Status'] === 'OK') {
+                if (isset($responseArr['Attachments'])) {
+                    return $responseArr['Attachments'];
+                }
             }
         }
 
@@ -208,11 +212,15 @@ class PurchaseOrders extends BasePackage
 
         $response = $this->xeroApi->getPurchaseOrderHistory($request);
 
-        $responseArr = $response->toArray();
+        if ($response) {
+            $this->api->refreshXeroCallStats($response->getHeaders());
 
-        if (isset($responseArr['Status']) && $responseArr['Status'] === 'OK') {
-            if (isset($responseArr['HistoryRecords'])) {
-                return $responseArr['HistoryRecords'];
+            $responseArr = $response->toArray();
+
+            if (isset($responseArr['Status']) && $responseArr['Status'] === 'OK') {
+                if (isset($responseArr['HistoryRecords'])) {
+                    return $responseArr['HistoryRecords'];
+                }
             }
         }
 
@@ -508,7 +516,7 @@ class PurchaseOrders extends BasePackage
                 if ($this->poPackage->add($purchaseOrder)) {
                     $purchaseOrder = $this->poPackage->packagesData->last;
 
-                    $this->poPackage->addRefId($purchaseOrder);
+                    $purchaseOrder = $this->poPackage->addRefId($purchaseOrder);
                 } else {
                     $this->errors = array_merge($this->errors, ['Could not add purchase order data - ' . $po['AttentionTo']]);
                 }
@@ -517,7 +525,7 @@ class PurchaseOrders extends BasePackage
             if ($this->poPackage->add($purchaseOrder)) {
                 $purchaseOrder = $this->poPackage->packagesData->last;
 
-                $this->poPackage->addRefId($purchaseOrder);
+                $purchaseOrder = $this->poPackage->addRefId($purchaseOrder);
             } else {
                 $this->errors = array_merge($this->errors, ['Could not add purchase order data - ' . $po['AttentionTo']]);
             }
@@ -533,7 +541,13 @@ class PurchaseOrders extends BasePackage
         }
 
         if ($po['products'] && count($po['products']) > 0) {
-            $this->generatePurchaseOrderProducts($po, $purchaseOrder['id']);
+            $totalQty = $this->generatePurchaseOrderProducts($po, $purchaseOrder['id']);
+
+            if ($totalQty) {
+                $purchaseOrder['total_quantity'] = $totalQty;
+
+                $this->poPackage->update($purchaseOrder);
+            }
         } else {
             $this->errors = array_merge($this->errors, ['Products missing for purchase order - ' . $purchaseOrder['id']]);
         }
@@ -620,7 +634,7 @@ class PurchaseOrders extends BasePackage
             $street_address_2 = $street_address_2 . ' ' . $po['DeliveryAddress'][2];
         }
 
-        if (!$poCity && !$poState && !$Country) {
+        if (!$poCity && !$poState && !$poCountry) {
             return '0';
         }
 
@@ -652,12 +666,12 @@ class PurchaseOrders extends BasePackage
             //Country
             $foundCountry = null;
 
-            if ($this->basepackages->geoCountries->searchCountries($address['Country'], true)) {
+            if ($this->basepackages->geoCountries->searchCountries($poCountry, true)) {
                 $countryData = $this->basepackages->geoCountries->packagesData->countries;
 
                 if (count($countryData) > 0) {
                     foreach ($countryData as $countryKey => $country) {
-                        if (strtolower($country['name']) === strtolower($address['Country'])) {
+                        if (strtolower($country['name']) === strtolower($poCountry)) {
                             $foundCountry = $country;
                             $vendor['currency'] = $country['currency'];
                             break;
@@ -667,7 +681,7 @@ class PurchaseOrders extends BasePackage
             }
 
             if (!$foundCountry) {
-                $newCountry['name'] = $address['Country'];
+                $newCountry['name'] = $poCountry;
                 $newCountry['installed'] = '1';
                 $newCountry['enabled'] = '1';
                 $newCountry['user_added'] = '1';
@@ -698,12 +712,12 @@ class PurchaseOrders extends BasePackage
             //State (Region in Xero Address)
             $foundState = null;
 
-            if ($this->basepackages->geoStates->searchStatesByCode($address['Region'], true)) {
+            if ($this->basepackages->geoStates->searchStatesByCode($poState, true)) {
                 $stateData = $this->basepackages->geoStates->packagesData->states;
 
                 if (count($stateData) > 0) {
                     foreach ($stateData as $stateKey => $state) {
-                        if (strtolower($state['state_code']) === strtolower($address['Region'])) {
+                        if (strtolower($state['state_code']) === strtolower($poState)) {
                             $foundState = $state;
                             break;
                         }
@@ -712,8 +726,8 @@ class PurchaseOrders extends BasePackage
             }
 
             if (!$foundState) {
-                $newState['name'] = $address['Region'];
-                $newState['state_code'] = substr($address['Region'], 0, 3);
+                $newState['name'] = $poState;
+                $newState['state_code'] = substr($poState, 0, 3);
                 $newState['user_added'] = '1';
                 $newState['country_id'] = $newAddress['country_id'];
 
@@ -730,7 +744,7 @@ class PurchaseOrders extends BasePackage
             }
 
             //New City
-            $newCity['name'] = $address['City'];
+            $newCity['name'] = $poCity;
             $newCity['state_id'] = $newAddress['state_id'];
             $newCity['country_id'] = $newAddress['country_id'];
             $newCity['user_added'] = '1';
@@ -795,6 +809,8 @@ class PurchaseOrders extends BasePackage
                     $response = $this->xeroApi->getPurchaseOrderAttachmentById($request);
 
                     if ($response) {
+                        $this->api->refreshXeroCallStats($response->getHeaders());
+
                         if ($response->getStatusCode() === 200) {
                             $storageId = $this->addAttachmentToStorage($attachment, $po, $purchaseOrder, $response);
 
@@ -850,6 +866,8 @@ class PurchaseOrders extends BasePackage
 
     protected function generatePurchaseOrderProducts($po, $purchaseOrderId)
     {
+        $totalQty = 0;
+
         foreach ($po['products'] as $productKey => $product) {
             $newItem['purchase_order_id'] = $purchaseOrderId;
             $newItem['seq'] = $productKey;
@@ -911,6 +929,7 @@ class PurchaseOrders extends BasePackage
             }
 
             $newItem['product_qty'] = $product['Quantity'];
+            $totalQty = $totalQty + (int) $product['Quantity'];
 
             $newItem['product_unit_price'] = $product['UnitAmount'];
 
@@ -947,6 +966,8 @@ class PurchaseOrders extends BasePackage
                 $newProductObj->create();
             }
         }
+
+        return $totalQty;
     }
 
     protected function addPurchaseOrderHistory($po, $purchaseOrder)

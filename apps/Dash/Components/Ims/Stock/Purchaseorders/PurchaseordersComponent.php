@@ -180,8 +180,10 @@ class PurchaseordersComponent extends BaseComponent
 		}
 
 		foreach ($dataArr as $dataKey => &$data) {
-			$data['vendor_id'] = $vendors[$data['vendor_id']]['business_name'];
-			$data['status'] = $orderStatuses[$data['status']]['name'];
+			if ($data['vendor_id'] != '0') {
+				$data['vendor_id'] = $vendors[$data['vendor_id']]['business_name'];
+				$data['status'] = $orderStatuses[$data['status']]['name'];
+			}
 		}
 
 		return $dataArr;

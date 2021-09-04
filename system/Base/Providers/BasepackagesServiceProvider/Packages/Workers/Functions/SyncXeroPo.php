@@ -19,9 +19,11 @@ class SyncXeroPo extends Functions
         return function() use ($thisFunction, $args) {
             $thisFunction->updateJobTask(2, $args);
 
+            $parameters = null;
+
             if (isset($args['task']['parameters']) && $args['task']['parameters'] !== '') {
                 try {
-                    $args['task']['parameters'] = Json::decode($args['task']['parameters'], true);
+                    $parameters = Json::decode($args['task']['parameters'], true);
                 } catch (\Exception $e) {
 
                     if ($e->getMessage() === "json_decode error: Syntax error") {
@@ -43,7 +45,7 @@ class SyncXeroPo extends Functions
             $poSync = new PurchaseOrders;
 
             try {
-                $poSync->sync(null, $args['task']['parameters']);
+                $poSync->sync(null, $parameters);
 
                 $this->addJobResult($poSync->packagesData, $args);
             } catch (\Exception $e) {
