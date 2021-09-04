@@ -945,6 +945,8 @@ class Contacts extends BasePackage
                                     $xA->baz_storage_local_id = $storageId['id'];
 
                                     $xA->update();
+
+                                    $this->basepackages->storages->changeOrphanStatus($storageId['uuid'], null, false, 0);
                                 }
                             }
                         }
@@ -1001,7 +1003,7 @@ class Contacts extends BasePackage
             if (count($histories) > 0) {
                 foreach ($histories as $historyKey => $history) {
 
-                    $note = $this->addHistoryToNote($history, $contact, $vendor);
+                    $note = $this->addHistoryToNote($history, $vendor);
 
                     if ($note) {
                         $xH = $model::findFirstById($history['id']);
@@ -1017,7 +1019,7 @@ class Contacts extends BasePackage
         }
     }
 
-    protected function addHistoryToNote($history, $contact, $vendor)
+    protected function addHistoryToNote($history, $vendor)
     {
         $newNote['package_row_id'] = $vendor['id'];
         $newNote['note_type'] = '1';
