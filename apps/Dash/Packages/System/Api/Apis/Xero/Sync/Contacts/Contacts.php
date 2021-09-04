@@ -226,6 +226,8 @@ class Contacts extends BasePackage
 
         $response = $this->xeroApi->getContactAttachments($request);
 
+        $this->api->refreshXeroCallStats($response->getHeaders());
+
         $responseArr = $response->toArray();
 
         if (isset($responseArr['Status']) && $responseArr['Status'] === 'OK') {
@@ -244,6 +246,8 @@ class Contacts extends BasePackage
         $request->ContactID = $contactId;
 
         $response = $this->xeroApi->getContactHistory($request);
+
+        $this->api->refreshXeroCallStats($response->getHeaders());
 
         $responseArr = $response->toArray();
 
@@ -479,7 +483,7 @@ class Contacts extends BasePackage
                     $this->generateVendorData($contact);
 
                     if (count($this->errors) > 0) {
-                        $this->vendorsPackage->errorVendor('Errors in vendors. Please fix them ASAP.', Json::encode($this->errors));
+                        $this->vendorsPackage->errorVendor('Errors in vendors. Please check details for more information.', Json::encode($this->errors));
                     }
                 }
             }
@@ -927,6 +931,8 @@ class Contacts extends BasePackage
                     $response = $this->xeroApi->getContactAttachmentById($request);
 
                     if ($response) {
+                        $this->api->refreshXeroCallStats($response->getHeaders());
+
                         if ($response->getStatusCode() === 200) {
                             $storageId = $this->addAttachmentToStorage($attachment, $contact, $vendor, $response);
 
