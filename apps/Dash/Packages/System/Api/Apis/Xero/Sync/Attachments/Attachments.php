@@ -46,6 +46,7 @@ class Attachments extends BasePackage
 
         $this->xeroApi = $this->api->useService('XeroFilesApi');
 
+        // $this->api->refreshXeroCallStats($response->getHeaders());
         //
     }
 
