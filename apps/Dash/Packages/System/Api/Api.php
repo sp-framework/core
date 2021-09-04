@@ -104,6 +104,9 @@ class Api extends BasePackage
         return $data;
     }
 
+    /**
+     * @notification(name=add)
+     */
     public function addApi(array $data)
     {
         $data['api_type'] = strtolower($data['api_type']);
@@ -159,6 +162,9 @@ class Api extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=update)
+     */
     public function updateApi(array $data)
     {
         $data['api_type'] = strtolower($data['api_type']);
@@ -214,6 +220,9 @@ class Api extends BasePackage
         }
     }
 
+    /**
+     * @notification(name=remove)
+     */
     public function removeApi(array $data)
     {
         $api = $this->getById($data['id']);
@@ -248,6 +257,30 @@ class Api extends BasePackage
 
             $this->packagesData->responseMessage = 'Error removing API.';
         }
+    }
+
+    /**
+     * @notification(name=warning)
+     */
+    public function warningApi($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Api has warnings, contact administrator!';
+        }
+
+        $this->addToNotification('warning', $messageTitle, $messageDetails, 'api', $id);
+    }
+
+    /**
+     * @notification(name=error)
+     */
+    public function errorApi($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Api has errors, contact administrator!';
+        }
+
+        $this->addToNotification('error', $messageTitle, $messageDetails, 'api', $id);
     }
 
     public function useApi(array $data)

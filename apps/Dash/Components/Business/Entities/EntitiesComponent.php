@@ -89,21 +89,26 @@ class EntitiesComponent extends BaseComponent
                     $this->view->logoLink = $storages->getPublicLink($this->view->entity['logo'], 200);
                 }
 
-                $apis = $this->apiPackage->getApiByType('xero', false);
+                $apiArr = $this->apiPackage->getApiByType('xero', false);
+
+                $apis = [];
+
+                foreach ($apiArr as $api) {
+                    $apis[$api['id']] = $api;
+                }
 
                 if (isset($entity['api_id']) &&
                     ($entity['api_id'] !== '' && $entity['api_id'] != 0)
                 ) {
-                    $thisEntitiesApi = [$this->apiPackage->getById($entity['api_id'])];
+                    $thisEntitiesApi[$entity['api_id']] = $this->apiPackage->getById($entity['api_id']);
 
-                    $this->view->apis = array_merge($apis, $thisEntitiesApi);
+                    $this->view->apis = array_replace($apis, $thisEntitiesApi);
                 } else {
                     $this->view->apis = $apis;
                 }
             } else {
                 $this->view->apis = $this->apiPackage->getApiByType('xero', false);
             }
-
             //Check Geo Locations Dependencies
             if ($this->basepackages->geoCountries->isEnabled()) {
                 $this->view->geo = true;

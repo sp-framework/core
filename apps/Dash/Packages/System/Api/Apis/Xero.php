@@ -7,6 +7,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\GetUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\OAuth\Types\RefreshUserTokenRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetUsersRestRequest;
 use Apps\Dash\Packages\System\Api\Base\BaseFunctions;
+use Apps\Dash\Packages\System\Api\Model\SystemApi;
 use Phalcon\Helper\Json;
 use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
@@ -339,11 +340,11 @@ class Xero
         $callData = [];
         $callData['rateLimits'] = [];
         $callData['rateLimits']['appMinLimit'] = 10000;
-        $callData['rateLimits']['appMinLimit-remaining'] = $headers['X-AppMinLimit-Remaining'][0];
+        $callData['rateLimits']['appMinLimit-remaining'] = (int) $headers['X-AppMinLimit-Remaining'][0];
         $callData['rateLimits']['minLimit'] = 60;
-        $callData['rateLimits']['minLimit-remaining'] = $headers['X-MinLimit-Remaining'][0];
+        $callData['rateLimits']['minLimit-remaining'] = (int) $headers['X-MinLimit-Remaining'][0];
         $callData['rateLimits']['dayLimit'] = 5000;
-        $callData['rateLimits']['dayLimit-remaining'] = $headers['X-DayLimit-Remaining'][0];
+        $callData['rateLimits']['dayLimit-remaining'] = (int) $headers['X-DayLimit-Remaining'][0];
 
         if (isset($headers['Retry-After'])) {
             $retryAfter = (int) $headers['Retry-After'][0] + time();
@@ -352,6 +353,35 @@ class Xero
 
         $this->api->setApiCallStats($this->apiConfig, $callData);
 
-        return $this->api->getApiCallStats($this->apiConfig);
+        $getApiCallStats = $this->api->getApiCallStats($this->apiConfig);
+
+        if ($getApiCallStats['rateLimits']['minLimit-remaining'] <= 5) {
+            $this->api->warningApi(
+                'Xero API Per Minute Call Limit for ' . $this->apiConfig['name'] . ' reached below 5. API call requests have been put to sleep for 5 seconds.'
+            );
+
+            sleep(5);
+        }
+
+        if ($getApiCallStats['rateLimits']['dayLimit-remaining'] <= 25) {
+            $apiModel = new SystemApi;
+
+            $api = $apiModel::findFirstById($this->apiConfig['id']);
+
+            if ($api) {
+                $this->apiConfig['in_use'] = 0;
+                $this->apiConfig['used_by'] = 'ERROR: Disabled due to Error limit reach. To Re-enable assign to Entity again.';
+
+                $api->assign($this->apiConfig);
+
+                $api->update();
+            }
+
+            $this->api->errorApi(
+                'Xero API Per Day Call Limit for ' .
+                $this->apiConfig['name'] .
+                ' reached below 25. API has been disabled for the rest of the day and need to be enabled again on limit reset.'
+            );
+        }
     }
 }
