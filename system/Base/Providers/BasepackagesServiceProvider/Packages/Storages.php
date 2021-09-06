@@ -130,6 +130,11 @@ class Storages extends BasePackage
         return $this->initStorage($public)->get($getData);
     }
 
+    public function getFileById($id, $public = true)
+    {
+        return $this->initStorage($public)->getById($id);
+    }
+
     public function getFileInfo($uuid)
     {
         $fileInfo = $this->initStorage(false)->getFileInfo($uuid);
