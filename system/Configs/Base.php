@@ -26,6 +26,7 @@ return
 		"logs"			=>
 		[
 			"enabled"			=> true,
+			"exceptions"		=> true,
 			"level"				=> "DEBUG",
 			"service"			=> "streamLogs", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,

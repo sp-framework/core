@@ -97,6 +97,7 @@ return
 		"logs"			=>
 		[
 			"enabled"			=> true,
+			"exceptions"		=> true,
 			"level"				=> "' . $logLevel . '",
 			"service"			=> "' . $this->coreJson['settings']['logs']['service'] . '", //streamLogs (/var/log/debug.log) OR dbLogs (table = logs)
 			"email"				=> false,
