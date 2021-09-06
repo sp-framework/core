@@ -51,6 +51,13 @@ class ImsStockPurchaseOrders
                     ]
                 ),
                 new Column(
+                    'sent',
+                    [
+                        'type'    => Column::TYPE_TINYINTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
                     'vendor_id',
                     [
                         'type'    => Column::TYPE_INTEGER,

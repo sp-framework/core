@@ -17,6 +17,8 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public $status;
 
+    public $sent;
+
     public $vendor_id;
 
     public $vendor_address_id;

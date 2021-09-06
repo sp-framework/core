@@ -155,9 +155,9 @@ class PurchaseordersComponent extends BaseComponent
 			$this->purchaseOrdersPackage,
 			'ims/stock/purchaseorders/view',
 			null,
-			['ref_id', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
+			['ref_id', 'sent', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
 			true,
-			['ref_id', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
+			['ref_id', 'sent', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
 			$controlActions,
 			['ref_id' => 'PO#', 'vendor_id' => 'vendor'],
 			$replaceColumns,
@@ -183,6 +183,12 @@ class PurchaseordersComponent extends BaseComponent
 			if ($data['vendor_id'] != '0') {
 				$data['vendor_id'] = $vendors[$data['vendor_id']]['business_name'];
 				$data['status'] = $orderStatuses[$data['status']]['name'];
+			}
+
+			if ($data['sent'] == '1') {
+				$data['sent'] = '<span class="badge badge-success text-uppercase">Yes</span>';
+			} else {
+				$data['sent'] = '<span class="badge badge-secondary text-uppercase">No</span>';
 			}
 		}
 
