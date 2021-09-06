@@ -62,8 +62,6 @@ class PurchaseOrders extends BasePackage
     {
         $this->apiPackage = new Api;
 
-        // $this->syncWithLocal();return;
-
         $this->request = new GetPurchaseOrdersRestRequest;
 
         $xeroApis = $this->apiPackage->getApiByType('xero', true);
@@ -259,7 +257,7 @@ class PurchaseOrders extends BasePackage
 
                 $thisPo = $modelToUse->toArray();
             } else {
-                // if ($purchaseOrder['UpdatedDateUTC'] !== $xeroPo->UpdatedDateUTC) {
+                if ($purchaseOrder['UpdatedDateUTC'] !== $xeroPo->UpdatedDateUTC) {
                     if ($xeroPo->baz_po_id) {
                         $purchaseOrder['resync_local'] = '1';
                     }
@@ -273,9 +271,9 @@ class PurchaseOrders extends BasePackage
                     array_push($this->updatedIds, $purchaseOrder['PurchaseOrderID']);
 
                     $thisPo = $xeroPo->toArray();
-                // } else {
-                //     continue;
-                // }
+                } else {
+                    continue;
+                }
             }
 
             if (isset($purchaseOrder['LineItems']) && count($purchaseOrder['LineItems']) > 0) {
@@ -419,6 +417,13 @@ class PurchaseOrders extends BasePackage
     {
         $purchaseOrder = [];
 
+        if ($po['baz_po_id'] && $po['baz_po_id'] != '0') {
+            if ($this->poPackage->getById($po['baz_po_id'])) {
+
+                $purchaseOrder = $this->poPackage->getById($po['baz_po_id']);
+            }
+        }
+
         $entityModel = BusinessEntities::class;
 
         $entity = $entityModel::findFirst(
@@ -495,6 +500,11 @@ class PurchaseOrders extends BasePackage
         $purchaseOrder['total_tax'] = $po['TotalTax'];
         $purchaseOrder['total_amount'] = $po['Total'];
         $purchaseOrder['delivery_instructions'] = $po['DeliveryInstructions'];
+        if ($po['SentToContact']) {
+            $purchaseOrder['sent'] = $po['SentToContact'];
+        } else {
+            $purchaseOrder['sent'] = '0';
+        }
 
         if ($po['HasAttachments'] == '1') {
             $purchaseOrder['attachments'] = Json::encode($this->addPoAttachments($po, $purchaseOrder));
@@ -555,6 +565,7 @@ class PurchaseOrders extends BasePackage
         $this->addPurchaseOrderHistory($po, $purchaseOrder);
 
         $po['baz_po_id'] = $purchaseOrder['id'];
+        $po['resync_local'] = null;
 
         $model = SystemApiXeroPurchaseOrders::class;
 
@@ -779,11 +790,15 @@ class PurchaseOrders extends BasePackage
 
     protected function addPoAttachments($po, $purchaseOrder)
     {
+        if (isset($purchaseOrder['attachments']) && !is_array($purchaseOrder['attachments']) && $purchaseOrder['attachments'] !== '') {
+            $purchaseOrder['attachments'] = Json::decode($purchaseOrder['attachments'], true);
+        }
+
         $model = SystemApiXeroAttachments::class;
 
         $xeroAttachment = $model::find(
             [
-                'conditions'    => 'baz_storage_local_id IS NULL AND xero_package = :xp: AND xero_package_row_id = :xpri:',
+                'conditions'    => 'xero_package = :xp: AND xero_package_row_id = :xpri:',
                 'bind'          =>
                     [
                         'xp'    => 'purchaseorders',
@@ -796,12 +811,27 @@ class PurchaseOrders extends BasePackage
             $attachments = $xeroAttachment->toArray();
 
             if (count($attachments) > 0) {
-
                 $request = new GetPurchaseOrderAttachmentByIdRestRequest;
 
                 $poAttachments = [];
 
                 foreach ($attachments as $attachmentKey => $attachment) {
+                    if ($attachment['baz_storage_local_id'] && $attachment['baz_storage_local_id'] != '0') {
+                        $file = $this->basepackages->storages->getFileById($attachment['baz_storage_local_id']);
+
+                        $uuid = null;
+
+                        if ($file) {
+                            $uuid = $file['uuid'];
+                            if ($uuid !== '') {
+                                if (in_array($uuid, $purchaseOrder['attachments'])) {
+                                    continue;
+                                }
+                            }
+                        }
+
+                    }
+
                     $request->PurchaseOrderID = $attachment['xero_package_row_id'];
 
                     $request->AttachmentID = $attachment['AttachmentID'];

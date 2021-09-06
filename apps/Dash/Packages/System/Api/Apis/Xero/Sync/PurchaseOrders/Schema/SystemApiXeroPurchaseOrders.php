@@ -113,6 +113,13 @@ class SystemApiXeroPurchaseOrders
                     ]
                 ),
                 new Column(
+                    'SentToContact',
+                    [
+                        'type'          => Column::TYPE_BOOLEAN,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
                     'Reference',
                     [
                         'type'          => Column::TYPE_VARCHAR,

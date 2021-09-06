@@ -29,7 +29,11 @@ class SyncXeroPo extends Functions
                     if ($e->getMessage() === "json_decode error: Syntax error") {
                         $thisFunction->packagesData->responseMessage = 'Task parameters format is incorrect. Make sure the format is json.';
                     } else {
-                        $thisFunction->packagesData->responseMessage = $e->getMessage();
+                        $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
+                    }
+
+                    if ($this->config->logs->exceptions) {
+                        $this->logger->logExceptions->debug($e);
                     }
 
                     $thisFunction->packagesData->responseCode = 1;
@@ -52,7 +56,11 @@ class SyncXeroPo extends Functions
 
                 $thisFunction->packagesData->responseCode = 1;
 
-                $thisFunction->packagesData->responseMessage = $e->getMessage();
+                $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
+
+                if ($this->config->logs->exceptions) {
+                    $this->logger->logExceptions->debug($e);
+                }
 
                 $this->addJobResult($thisFunction->packagesData, $args);
 

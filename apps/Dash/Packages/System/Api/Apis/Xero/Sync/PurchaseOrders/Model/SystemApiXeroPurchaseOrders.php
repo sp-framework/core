@@ -32,6 +32,8 @@ class SystemApiXeroPurchaseOrders extends BaseModel
 
     public $IsDiscounted;
 
+    public $SentToContact;
+
     public $Reference;
 
     public $Type;
