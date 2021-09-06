@@ -160,9 +160,18 @@ class TaxRates extends BasePackage
         } else {
             $tGId = $taxGroup->id;
         }
+
         if (is_array($xTaxGroup['TaxComponents']) && count($xTaxGroup['TaxComponents']) > 0) {
             $this->generateTaxData($xTaxGroup, $tGId);
         }
+
+        $model = SystemApiXeroTaxRates::class;
+
+        $xeroTaxRates = $model::findFirstById($xTaxGroup['id']);
+
+        $xeroTaxRates->baz_tax_group_id = $tGId;
+
+        $xeroTaxRates->update();
     }
 
     protected function generateTaxData($xTaxGroup, $tGId)
