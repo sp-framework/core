@@ -798,6 +798,7 @@ class Contacts extends BasePackage
         $this->addContactHistory($contact, $vendor);
 
         $contact['baz_vendor_id'] = $vendor['id'];
+        $contact['resync_local'] = null;
 
         $model = SystemApiXeroContacts::class;
 
@@ -1038,7 +1039,7 @@ class Contacts extends BasePackage
             '<br>Details: ' . $history['Details'];
 
         $this->basepackages->notes->addNote('vendors', $newNote);
-
+        var_dump($this->basepackages->notes->packagesData);
         if ($this->basepackages->notes->packagesData->last) {
             return $this->basepackages->notes->packagesData->last;
         }

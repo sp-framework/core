@@ -383,5 +383,7 @@ class Xero
                 ' reached below 25. API has been disabled for the rest of the day and need to be enabled again on limit reset.'
             );
         }
+
+        return $getApiCallStats;
     }
 }
