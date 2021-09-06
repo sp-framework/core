@@ -907,9 +907,17 @@ abstract class BasePackage extends Controller
 		$md = $this->getModelsMetaData();
 
 		if (count($md) > 0) {
+			$filteredColumns = [];
+			$dataTypes = [];
+			$number = [];
+
 			$rmdArr = $this->getModelsRelations();
 
-			if (count($rmdArr) > 0) {
+			if ($rmdArr &&
+				count($rmdArr['dataTypes']) > 0 &&
+				count($rmdArr['number']) > 0 &&
+				count($rmdArr['columns']) > 0
+			) {
 				foreach ($rmdArr as $rmdKey => $rmd) {
 					if ($rmdKey === 'dataTypes') {
 						if (count($rmd) > 0) {
@@ -929,32 +937,32 @@ abstract class BasePackage extends Controller
 				}
 			}
 
-			$filteredColumns = [];
-
 			if (count($filter) > 0) {
 				foreach ($columns as $column) {
 					if (in_array($column, $filter)) {
 						array_push($filteredColumns, $column);
 					}
 				}
-			} else {
-				$filteredColumns = $columns;
 			}
 
-			foreach ($filteredColumns as $filteredColumn) {
-				$metadata[$filteredColumn]['id'] = $filteredColumn;
-				$metadata[$filteredColumn]['name'] = str_replace('_', ' ', $filteredColumn);
+			if (count($filteredColumns) > 0) {
+				foreach ($filteredColumns as $filteredColumn) {
+					$metadata[$filteredColumn]['id'] = $filteredColumn;
+					$metadata[$filteredColumn]['name'] = str_replace('_', ' ', $filteredColumn);
 
-				if (isset($number[$filteredColumn]) && $number[$filteredColumn] === true) {
-					$metadata[$filteredColumn]['data']['number'] = 'true';
-				} else {
-					$metadata[$filteredColumn]['data']['number'] = 'false';
+					if (isset($number[$filteredColumn]) && $number[$filteredColumn] === true) {
+						$metadata[$filteredColumn]['data']['number'] = 'true';
+					} else {
+						$metadata[$filteredColumn]['data']['number'] = 'false';
+					}
+
+					$metadata[$filteredColumn]['data']['dataType'] = $dataTypes[$filteredColumn];
 				}
 
-				$metadata[$filteredColumn]['data']['dataType'] = $dataTypes[$filteredColumn];
+				return $metadata;
 			}
 
-			return $metadata;
+			return $md['columns'];
 		}
 
 		return false;
@@ -1147,7 +1155,7 @@ abstract class BasePackage extends Controller
 								$messageDetails,
 								$appId,
 								$aId,
-								$this->auth->account()['id'],
+								null,
 								$package['name'],
 								$packageRowId,
 								$notificationType
@@ -1155,13 +1163,19 @@ abstract class BasePackage extends Controller
 						}
 					}
 
-					if ($this->packageName === 'domains') {
-						$domainId = $this->domain['id'];
-					} else {
-						$domainId = $this->domains->getDomain()['id'];
-					}
-
 					if (isset($subscriptions['email']) && count($subscriptions['email']) > 0) {
+						$domainId = '1';//Default Domain for system generated Notifications (like API)
+
+						if ($this->packageName === 'domains') {
+							if ($this->domain) {
+								$domainId = $this->domain['id'];
+							}
+						} else {
+							if ($this->domains && $this->domains->getDomain()) {
+								$domainId = $this->domains->getDomain()['id'];
+							}
+						}
+
 						$this->basepackages->notifications->emailNotification(
 							$subscriptions['email'],
 							$messageTitle,
@@ -1169,7 +1183,7 @@ abstract class BasePackage extends Controller
 							$domainId,
 							$appId,
 							$aId,
-							$this->auth->account()['id'],
+							null,
 							$package['name'],
 							$packageRowId,
 							$notificationType

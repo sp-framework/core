@@ -37,7 +37,7 @@ class Notifications extends BasePackage
         $notificationDetails = null,
         $appId = null,
         $accountId = null,
-        $createdBy = 0,
+        $createdBy = null,
         $packageName = null,
         $packageRowId = null,
         $notificationType = 0
@@ -54,7 +54,11 @@ class Notifications extends BasePackage
         $newNotification['notification_type'] = $notificationType;
         $newNotification['app_id'] = $appId;
         $newNotification['account_id'] = $accountId;
-        $newNotification['created_by'] = $createdBy;
+        if ($createdBy) {
+            $newNotification['created_by'] = $createdBy;
+        } else {
+            $newNotification['created_by'] = '0';
+        }
         $newNotification['package_name'] = $packageName;
         $newNotification['package_row_id'] = $packageRowId;
         $newNotification['notification_title'] = $notificationTitle;

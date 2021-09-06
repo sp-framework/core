@@ -104,9 +104,9 @@ class Notes extends BasePackage
 
                 $note['note_type'] = $data['note_type'];
 
-                $account = $this->auth->account();
+                if (isset($this->auth)) {
+                    $account = $this->auth->account();
 
-                if ($account) {
                     $note['account_id'] = $account['id'];//User
                 } else {
                     $note['account_id'] = 0;//System
