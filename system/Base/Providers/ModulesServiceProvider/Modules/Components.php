@@ -79,7 +79,7 @@ class Components extends BasePackage
 
 					if (isset($component['apps'][$appId])) {
 						if ($component['apps'][$appId]['enabled'] === true &&
-							$component['name'] === ucfirst($name)
+							strtolower($component['name']) === strtolower($name)
 						) {
 							return $component;
 						}
