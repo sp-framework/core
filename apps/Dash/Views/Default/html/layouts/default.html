@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -32,7 +32,12 @@ if (!window.dataCollection) {
     dataCollection.env.httpScheme = '{{request.getScheme()}}';
     dataCollection.env.httpHost = '{{request.getHttpHost()}}';
     dataCollection.env.rootPath = '{{request.getScheme()}}' + '://' + '{{request.getHttpHost()}}' + '/';
-    dataCollection.env.appRoute = "{{apps.getAppInfo()['route']}}";
+    var exclusive = "{{domains.domain['exclusive_to_default_app']}}";
+    if (exclusive == '1') {
+        dataCollection.env.appRoute = "";
+    } else {
+        dataCollection.env.appRoute = "{{apps.getAppInfo()['route']}}";
+    }
     dataCollection.env.jsPath =
         dataCollection.env.rootPath +
         "{{apps.getAppInfo()['app_type']}}" + '/' +
@@ -90,3 +95,4 @@ if (localStorage.getItem('bazDevMode') === null) {
         </div>
     </body>
 </html>
+<!-- htmlmin:ignore -->

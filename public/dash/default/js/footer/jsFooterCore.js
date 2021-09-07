@@ -9569,6 +9569,7 @@ var BazNotifications = function() {
     var dataCollection;
     var initialized = false;
     var pullNotifications = false;
+    var appRoute;
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -9580,9 +9581,16 @@ var BazNotifications = function() {
 
         dataCollection = window.dataCollection;
 
+        if (dataCollection.env.appRoute !== '') {
+            appRoute = dataCollection.env.appRoute + '/'
+        } else {
+            appRoute = '';
+        }
+
         if (initialConnection) {
             serviceOnline();
         }
+
     }
 
     function serviceOnline() {
@@ -9609,7 +9617,7 @@ var BazNotifications = function() {
 
     //Notifications
     function getNotificationsCount() {
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
+        var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -9777,6 +9785,7 @@ var BazMessenger = function() {
     var dataCollection;
     var messengerButonIconColor = $('#messenger-button-icon').data('iconcolor');
     var initialized = false;
+    var appRoute;
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -9790,6 +9799,12 @@ var BazMessenger = function() {
 
         dataCollection = window.dataCollection;
 
+        if (dataCollection.env.appRoute !== '') {
+            appRoute = dataCollection.env.appRoute + '/'
+        } else {
+            appRoute = '';
+        }
+
         dataCollection.env.wsTunnels.messenger.emojiPicker = new EmojiPicker({
             emojiable_selector: '[data-emojiable=true]',
             assetsPath: '/dash/default/images/emoji-picker/',
@@ -9800,7 +9815,7 @@ var BazMessenger = function() {
             new autoComplete({
                 data: {
                     src: async() => {
-                        const url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/searchAccount';
+                        const url = dataCollection.env.rootPath + appRoute + 'system/messenger/searchAccount';
 
                         var myHeaders = new Headers();
                         myHeaders.append("accept", "application/json");
@@ -9929,7 +9944,7 @@ var BazMessenger = function() {
                 $('#messenger-windows').remove();
             }
 
-            var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/changestatus';
+            var url = dataCollection.env.rootPath + appRoute + 'system/messenger/changestatus';
 
             var postData = { };
             postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -9988,7 +10003,7 @@ var BazMessenger = function() {
             e.preventDefault();
 
             var thisButton = this;
-            var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/changesettings';
+            var url = dataCollection.env.rootPath + appRoute + 'system/messenger/changesettings';
 
             var dataToSend = { };
             dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
@@ -10017,7 +10032,7 @@ var BazMessenger = function() {
             e.preventDefault();
 
             var thisButton = this;
-            var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/changesettings';
+            var url = dataCollection.env.rootPath + appRoute + 'system/messenger/changesettings';
 
             var dataToSend = { };
             dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
@@ -10244,7 +10259,7 @@ var BazMessenger = function() {
         });
 
         //Get Messages from Server for user.user
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/getmessages';
+        var url = dataCollection.env.rootPath + appRoute + 'system/messenger/getmessages';
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -10309,7 +10324,7 @@ var BazMessenger = function() {
             toUser.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
         } else {
             toUser.portrait =
-                dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + toUser.portrait + '/w/80';
+                dataCollection.env.rootPath + appRoute + 'system/storages/q/uuid/' + toUser.portrait + '/w/80';
         }
         $(messages).each(function(index, message) {
             if (message.to_account_id == toUser.user) {
@@ -10366,7 +10381,7 @@ var BazMessenger = function() {
             $('#messenger-messages-load-more-' + toUser.user).click(function(e) {
                 e.preventDefault();
 
-                var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/getmessages';
+                var url = dataCollection.env.rootPath + appRoute + 'system/messenger/getmessages';
 
                 var postData = { };
                 postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -10411,7 +10426,7 @@ var BazMessenger = function() {
             user.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
         } else {
             user.portrait =
-                dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + user.portrait + '/w/80';
+                dataCollection.env.rootPath + appRoute + 'system/storages/q/uuid/' + user.portrait + '/w/80';
         }
 
         var newUser =
@@ -10432,7 +10447,7 @@ var BazMessenger = function() {
 
         initListeners();
 
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/addusertomembersusers';
+        var url = dataCollection.env.rootPath + appRoute + 'system/messenger/addusertomembersusers';
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -10464,10 +10479,10 @@ var BazMessenger = function() {
         postData['message'] = message;
 
         if (action === 'add') {
-            url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/add';
+            url = dataCollection.env.rootPath + appRoute + 'system/messenger/add';
         } else if (action === 'update') {
             postData['id'] = $('.messenger-send-' + user.user).data('msgid');
-            url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/update';
+            url = dataCollection.env.rootPath + appRoute + 'system/messenger/update';
         }
 
 
@@ -10581,7 +10596,7 @@ var BazMessenger = function() {
                 }
             }).then((result) => {
                 if (result.value) {
-                    var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/remove';
+                    var url = dataCollection.env.rootPath + appRoute + 'system/messenger/remove';
 
                     var postData = { };
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -10692,7 +10707,7 @@ var BazMessenger = function() {
             data.user.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
         } else {
             data.user.portrait =
-                dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/storages/q/uuid/' + data.user.portrait + '/w/80';
+                dataCollection.env.rootPath + appRoute + 'system/storages/q/uuid/' + data.user.portrait + '/w/80';
         }
         if ($('#direct-chat-messages-' + data.user.id).length > 0) {
             $('#messenger-loader-' + data.user.id).attr('hidden', true);
@@ -10786,7 +10801,7 @@ var BazMessenger = function() {
 
     //Get Unread Messages Count
     function getUnreadMessagesCount() {
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/getUnreadMessagesCount';
+        var url = dataCollection.env.rootPath + appRoute + 'system/messenger/getUnreadMessagesCount';
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();
@@ -10836,7 +10851,7 @@ var BazMessenger = function() {
     }
 
     function markAllMessagesRead(user) {
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/messenger/markAllMessagesRead';
+        var url = dataCollection.env.rootPath + appRoute + 'system/messenger/markAllMessagesRead';
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();

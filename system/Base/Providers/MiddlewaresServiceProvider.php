@@ -24,7 +24,11 @@ class MiddlewaresServiceProvider extends Injectable
                     try {
                         $mw = (new $middleware['class']())->process();
                     } catch (\Exception $e) {
-                        continue;
+                        if ($this->config->logs->exceptions) {
+                            $this->logger->logExceptions->debug($e);
+                        }
+
+                        throw $e;
                     }
 
                     //If there is a redirect or null returned from process

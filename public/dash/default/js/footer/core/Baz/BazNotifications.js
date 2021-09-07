@@ -18,6 +18,7 @@ var BazNotifications = function() {
     var dataCollection;
     var initialized = false;
     var pullNotifications = false;
+    var appRoute;
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -29,9 +30,16 @@ var BazNotifications = function() {
 
         dataCollection = window.dataCollection;
 
+        if (dataCollection.env.appRoute !== '') {
+            appRoute = dataCollection.env.appRoute + '/'
+        } else {
+            appRoute = '';
+        }
+
         if (initialConnection) {
             serviceOnline();
         }
+
     }
 
     function serviceOnline() {
@@ -58,7 +66,7 @@ var BazNotifications = function() {
 
     //Notifications
     function getNotificationsCount() {
-        var url = dataCollection.env.rootPath + dataCollection.env.appRoute + '/system/notifications/fetchNewNotificationsCount';
+        var url = dataCollection.env.rootPath + appRoute + 'system/notifications/fetchNewNotificationsCount';
 
         var postData = { };
         postData[$('#security-token').attr('name')] = $('#security-token').val();

@@ -15,6 +15,8 @@ class Acl extends BaseMiddleware
 
     protected $controller;
 
+    protected $actions = ['view', 'add', 'update', 'remove'];
+
     protected $action;
 
     protected $account;
@@ -52,12 +54,11 @@ class Acl extends BaseMiddleware
         $aclFileDir =
             'var/storage/cache/' .
             $this->app['app_type'] . '/' .
-            // $this->app['category'] . '/' .
-            // $this->app['sub_category'] . '/' .
             $this->app['route'] . '/acls/';
 
-        $this->setControllerAndAction();
-
+        if (!$this->setControllerAndAction()) {
+            return true;
+        }
         if ($this->account && $this->account['override_role'] === '1') {
             $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
@@ -65,11 +66,11 @@ class Acl extends BaseMiddleware
 
                 $this->acl = unserialize($this->localContent->read($aclFileDir . $this->accountEmail . $this->account['id']));
             } else {
-
                 $this->acl->addRole(
                     new Role($this->accountEmail, 'User Override Role')
                 );
-                // $permissions = Json::decode($this->account['permissions'], true);
+
+                $permissions = Json::decode($this->account['permissions'], true);
 
                 $this->generateComponentsArr();
 
@@ -154,13 +155,14 @@ class Acl extends BaseMiddleware
                 unset($url[Arr::lastKey($url)]);
             }
 
-            if (isset($this->domain['exclusive_to_default_app']) &&
-                $this->domain['exclusive_to_default_app'] == 1
-            ) {
-                if ($url[0] === $this->app['route']) {
-                    unset($url[0]);
-                }
-            }
+            // if (isset($this->domain['exclusive_to_default_app']) &&
+            //     $this->domain['exclusive_to_default_app'] == 1
+            // ) {
+            //     if ($url[0] === $this->app['route']) {
+            //         unset($url[0]);
+            //     }
+            // }
+            unset($url[0]);
 
             $componentRoute = implode('/', $url);
 
@@ -172,7 +174,15 @@ class Acl extends BaseMiddleware
 
         $this->controllerRoute = $component['route'];
 
-        $this->action = strtolower(str_replace('Action', '', $this->dispatcher->getActiveMethod()));
+        $action = strtolower(str_replace('Action', '', $this->dispatcher->getActiveMethod()));
+
+        if (!in_array($action, $this->actions)) {
+            return false;
+        }
+
+        $this->action = $action;
+
+        return true;
     }
 
     protected function buildAndTestAcl($roleName, $componentKey, $permission, $fullAccess = null)
@@ -205,8 +215,6 @@ class Acl extends BaseMiddleware
                 base_path(
                     'var/storage/cache/' .
                     $this->app['app_type'] . '/' .
-                    // $this->app['category'] . '/' .
-                    // $this->app['sub_category'] . '/' .
                     $this->app['route'] . '/acls/'
                 )
             )
@@ -216,8 +224,6 @@ class Acl extends BaseMiddleware
                     base_path(
                         'var/storage/cache/' .
                         $this->app['app_type'] . '/' .
-                        // $this->app['category'] . '/' .
-                        // $this->app['sub_category'] . '/' .
                         $this->app['route'] . '/acls/'
                     ), 0777, true
                 )
