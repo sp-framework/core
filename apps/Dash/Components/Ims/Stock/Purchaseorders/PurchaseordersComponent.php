@@ -42,7 +42,6 @@ class PurchaseordersComponent extends BaseComponent
 	public function viewAction()
 	{
 		if (isset($this->getData()['id'])) {
-
 			$this->view->entities = $this->entities->getAll()->entities;
 
 			$this->view->orderStatuses = $this->purchaseOrdersPackage->getOrderStatuses();
@@ -128,15 +127,21 @@ class PurchaseordersComponent extends BaseComponent
 		}
 
 		$controlActions =
-			[
-				// 'disableActionsForIds'  => [1],
-				// 'includeQ'				=> true,
-				'actionsToEnable'       =>
-				[
-					'edit'      => 'ims/stock/purchaseorders/',
-					'remove'    => 'ims/stock/purchaseorders/remove/'
-				]
-			];
+			function ($dataArr) {
+				if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+					return $this->replaceControlActions($dataArr, $this->view);
+				}
+
+				return $dataArr;
+			};
+			// [
+			// 	// 'disableActionsForIds'  => [1],
+			// 	// 'includeQ'				=> true,
+			// 	'actionsToEnable'       =>
+			// 	[
+			// 		'edit'      => 'ims/stock/purchaseorders/'
+			// 	]
+			// ];
 
 		if ($this->request->isPost()) {
 			$replaceColumns =
@@ -151,10 +156,15 @@ class PurchaseordersComponent extends BaseComponent
 			$replaceColumns = null;
 		}
 
+		$conditions =
+			[
+				'order'         => 'id desc'
+			];
+
 		$this->generateDTContent(
 			$this->purchaseOrdersPackage,
 			'ims/stock/purchaseorders/view',
-			null,
+			$conditions,
 			['ref_id', 'sent', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
 			true,
 			['ref_id', 'sent', 'status', 'vendor_id', 'references', 'total_quantity', 'total_amount', 'delivery_date'],
@@ -165,6 +175,19 @@ class PurchaseordersComponent extends BaseComponent
 		);
 
 		$this->view->pick('purchaseorders/list');
+	}
+
+	protected function replaceControlActions($dataArr, $view)
+	{
+		foreach ($dataArr as $dataKey => &$data) {
+			if ($data['sent'] === '<span class="badge badge-success text-uppercase">Yes</span>') {
+				$data['__control'] = ['view' => $this->links->url('ims/stock/purchaseorders/q/id/' . $data['id'])];
+			} else {
+				$data['__control'] = ['edit' => $this->links->url('ims/stock/purchaseorders/q/id/' . $data['id'])];
+			}
+		}
+
+		return $dataArr;
 	}
 
 	protected function replaceColumns($dataArr)

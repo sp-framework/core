@@ -3,6 +3,13 @@
 {% else %}
     {% set purchaseOrderNotes = [] %}
 {% endif %}
+{% if purchaseOrder['xero'] is defined %}
+    {% set apiTabHidden = false %}
+    {% set apiTabJstree = 'true' %}
+{% else %}
+    {% set apiTabHidden = true %}
+    {% set apiTabJstree = 'false' %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-2">
         {{adminltetags.useTag('fields',
@@ -76,6 +83,13 @@
                                 'packageName'   : 'purchaseorders',
                                 'allowedUploads': false
                             ]
+                        ],
+                        'api'   :
+                        [
+                            'tabTitle'          : 'Xero Api',
+                            'tabInclude'        : 'purchaseorders/form/api',
+                            'tabHidden'         : apiTabHidden,
+                            'tabDataAttributes' : ['jstree' : apiTabJstree]
                         ]
                     ]
                 %}
@@ -131,7 +145,29 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                          : { },
         '{{componentId}}-{{sectionId}}-entity_id'                   : {
-            placeholder: "SELECT BUSINESS ENTITY"
+            placeholder: "SELECT BUSINESS ENTITY",
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-entity_id').on('select2:select', function(e) {
+                    var entityId = e.params.data.id;
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['entityId'] = entityId;
+
+                    $.post('{{links.url("business/entities/searchentityid")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.entity) {
+                            if (response.entity.api_id && response.entity.api_id != '0') {
+                                $('a.nav-link').last().parents('.nav-item').attr('hidden', false);//Make sure XeroAPI tab is last.
+                                $('#{{componentId}}-{{sectionId}}-tabs-api').attr('hidden', false)
+                            }
+                        }
+                    }, 'json');
+                });
+            }
         },
         '{{componentId}}-{{sectionId}}-references'                  : { },
         '{{componentId}}-{{sectionId}}-status'                      : {
@@ -1289,6 +1325,9 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-products'                    : { },
         '{{componentId}}-{{sectionId}}-products_remove_mpns'        : { },
+        '{{componentId}}-{{sectionId}}-sync_with_xero'              : { },
+        '{{componentId}}-{{sectionId}}-xero_purchase_order_id'      : { },
+        '{{componentId}}-{{sectionId}}-xero_purchase_order_updated' : { },
         '{{componentId}}-{{sectionId}}-form'                        : {
             onSubmit    : function() {
                 if ($('.product').length === 0) {

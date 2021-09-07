@@ -205,4 +205,23 @@ class Entities extends BasePackage
 
         return $data;
     }
+
+    public function searchByEntityId($id)
+    {
+        $entity = $this->getById($id);
+
+        if ($entity) {
+            $this->packagesData->responseCode = 0;
+
+            $this->packagesData->responseMessage = 'Entity Found';
+
+            $this->packagesData->entity = $entity;
+
+            return true;
+        }
+
+        $this->addResponse('Entity with id ' . $id . ' not found', 1);
+
+        return false;
+    }
 }

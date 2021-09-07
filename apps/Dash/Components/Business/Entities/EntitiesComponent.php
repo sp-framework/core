@@ -314,4 +314,31 @@ class EntitiesComponent extends BaseComponent
 
         return $packages;
     }
+
+    public function searchEntityIdAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            if ($this->postData()['entityId']) {
+
+                $entityId = $this->postData()['entityId'];
+
+                $searchEntity = $this->entities->searchByEntityId($entityId);
+
+                if ($searchEntity) {
+                    $this->view->entity = $this->entities->packagesData->entity;
+                }
+
+                $this->addResponse(
+                    $this->entities->packagesData->responseMessage,
+                    $this->entities->packagesData->responseCode
+                );
+            } else {
+                $this->addResponse('vendor id missing', 1);
+            }
+        }
+    }
 }

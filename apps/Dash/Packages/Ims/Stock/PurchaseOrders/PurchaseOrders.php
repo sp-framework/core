@@ -46,6 +46,24 @@ class PurchaseOrders extends BasePackage
             $purchaseOrder['products'] = $productsObj->toArray();
         }
 
+        if ($purchaseOrderObj->getXero()) {
+            $purchaseOrder['xero'] = $purchaseOrderObj->getXero()->toArray();
+
+            $dateStr = str_replace('/Date(', '', str_replace('+0000)/', '', $purchaseOrder['xero']['UpdatedDateUTC']));
+
+            $dDate = \DateTime::createFromFormat("U", substr($dateStr, 0, -3));
+
+            if ($dDate) {
+                $dDate = $dDate->format('Y-m-d H:i:s');
+            } else {
+                $dDate = '';
+            }
+
+            $purchaseOrder['xero']['UpdatedDateUTC'] = $dDate;
+        } else {
+            $purchaseOrder['xero'] = [];
+        }
+
         $this->packagesData->purchaseOrder = $purchaseOrder;
 
         return $purchaseOrder;

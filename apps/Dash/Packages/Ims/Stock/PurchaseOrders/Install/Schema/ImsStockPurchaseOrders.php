@@ -53,7 +53,21 @@ class ImsStockPurchaseOrders
                 new Column(
                     'sent',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'approver_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => false,
+                    ]
+                ),
+                new Column(
+                    'approved',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
                         'notNull' => false,
                     ]
                 ),
@@ -204,6 +218,13 @@ class ImsStockPurchaseOrders
                         'type'              => Column::TYPE_VARCHAR,
                         'size'              => 2048,
                         'notNull'           => false,
+                    ]
+                ),
+                new Column(
+                    'sync_with_xero',
+                    [
+                        'type'    => Column::TYPE_BOOLEAN,
+                        'notNull' => false,
                     ]
                 ),
             ],

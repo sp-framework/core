@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model;
 
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model\ImsStockPurchaseOrdersProducts;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\Model\SystemApiXeroPurchaseOrders;
 use System\Base\BaseModel;
 
 class ImsStockPurchaseOrders extends BaseModel
@@ -18,6 +19,10 @@ class ImsStockPurchaseOrders extends BaseModel
     public $status;
 
     public $sent;
+
+    public $approved;
+
+    public $approver_id;
 
     public $vendor_id;
 
@@ -59,6 +64,8 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public $attachments;
 
+    public $sync_with_xero;
+
     public function initialize()
     {
         $this->hasMany(
@@ -69,5 +76,18 @@ class ImsStockPurchaseOrders extends BaseModel
                 'alias' => 'products'
             ]
         );
+
+        $apiPackage = $this->init()->checkPackage('\Apps\Dash\Packages\System\Api\Api');
+
+        if ($apiPackage) {
+            $this->hasOne(
+                'id',
+                SystemApiXeroPurchaseOrders::class,
+                'baz_po_id',
+                [
+                    'alias' => 'xero'
+                ]
+            );
+        }
     }
 }

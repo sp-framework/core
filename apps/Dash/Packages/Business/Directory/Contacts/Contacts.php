@@ -77,7 +77,7 @@ class Contacts extends BasePackage
         $contact = $this->getById($data['id']);
 
         if ($data['account_email'] !== $contact['account_email']) {
-            if ($this->checkVendorDuplicate($data['account_email'])) {
+            if ($this->checkContactDuplicate($data['account_email'])) {
                 $this->addResponse('Contact ' . $data['account_email'] . ' already exists.', 1);
 
                 return;
