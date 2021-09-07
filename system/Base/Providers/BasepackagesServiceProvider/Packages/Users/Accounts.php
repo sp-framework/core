@@ -776,6 +776,18 @@ class Accounts extends BasePackage
                     if ($customer) {
                         $account['profile'] = $customer;
                     }
+                } else if ($account['package_name'] === 'employees') {
+                    $employeesPackage = $this->init()->checkPackage('Apps\Dash\Packages\Hrms\Employees\Employees');
+
+                    if ($employeesPackage) {
+                        $employeesPackage = $this->usePackage(\Apps\Dash\Packages\Hrms\Employees\Employees::class);
+                    }
+
+                    $employee = $employeesPackage->getById($account['package_row_id']);
+
+                    if ($employee) {
+                        $account['profile'] = $employee;
+                    }
                 }
 
                 $this->packagesData->account = $account;
