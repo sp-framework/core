@@ -3631,10 +3631,18 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
             _proto._initSectionButtonsAndActions = function _initSectionButtonsAndActions() {
                 if ($('#' + sectionId + '-id').val() === '') {
                     $('#' + sectionId + ' .card-footer button.addData').attr('hidden', false);
-                    $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
+                    if ($('#' + sectionId + ' .card-footer button.addData').length === 1) {
+                        $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
+                    } else {
+                        $('#' + sectionId + ' .card-footer button.closeForm').attr('hidden', false);
+                    }
                 } else if ('#' + sectionId + ' .card-footer button.updateData') {
                     $('#' + sectionId + ' .card-footer button.updateData').attr('hidden', false);
-                    $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
+                    if ($('#' + sectionId + ' .card-footer button.updateData').length === 1) {
+                        $('#' + sectionId + ' .card-footer button.cancelForm').attr('hidden', false);
+                    } else {
+                        $('#' + sectionId + ' .card-footer button.closeForm').attr('hidden', false);
+                    }
                 }
 
                 $('#' + sectionId + ' .card-footer button.closeForm, #' + sectionId + ' .card-footer button.cancelForm').click(function(e) {

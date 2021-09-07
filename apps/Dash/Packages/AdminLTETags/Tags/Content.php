@@ -141,16 +141,25 @@ class Content extends AdminLTETags
     {
         $sectionForm = '';
 
-        $this->params['cardFooterContent'] =
-            $this->useTag('buttons',
+        if (isset($this->params['formSecondaryButtons']) && is_array($this->params['formSecondaryButtons'])) {
+            $formSecondaryButtons = $this->params['formSecondaryButtons'];
+        } else {
+            $formSecondaryButtons = [];
+        }
+
+        if (isset($this->params['formButtons']) && is_array($this->params['formButtons'])) {
+            $formButtons =
                 [
                     'componentId'            => $this->params['componentId'],
                     'sectionId'              => $this->params['sectionId'],
                     'buttonLabel'            => false,
                     'buttonType'             => 'sectionWithFormButtons',
-                    'formButtons'            => $this->params['formButtons']
-                ]
-            );
+                    'formButtons'            => $this->params['formButtons'],
+                    'formSecondaryButtons'   => $formSecondaryButtons
+                ];
+
+            $this->params['cardFooterContent'] = $this->useTag('buttons', $formButtons);
+        }
 
         $sectionForm .=
             '<section id="' . $this->compSecId . '" class="sectionWithForm">' .

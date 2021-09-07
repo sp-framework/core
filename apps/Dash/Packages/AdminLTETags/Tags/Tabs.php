@@ -201,6 +201,11 @@ class Tabs extends AdminLTETags
                 $tabTitle['tabTitle'] :
                 'Title Missing';
 
+            $tabHidden =
+                isset($tabTitle['tabHidden']) && $tabTitle['tabHidden'] === true ?
+                ' hidden=""' :
+                '';
+
             if (isset($this->params['tabActiveOnInit'])) {
                 if ($tabTitleKey === $this->params['tabActiveOnInit']) {
                     $aria = 'aria-selected="true"';
@@ -218,7 +223,7 @@ class Tabs extends AdminLTETags
             }
 
             if ($horizontal) {
-                $content .= '<li class="nav-item">';
+                $content .= '<li class="nav-item" ' . $tabHidden . '>';
             }
             $content .=
                 '<a class="nav-link text-uppercase ' . $active . '" data-toggle="pill" href="#' . $this->tabsParams['tabsId'] . '-' . $tabTitleKey . '" role="tab" aria-controls="' . $this->tabsParams['tabsId'] . '-' . $tabTitleKey . '" ' . $aria . ' ' . $tabDataAttributes . '>' . $title . '</a>';
@@ -252,8 +257,13 @@ class Tabs extends AdminLTETags
                     $active = '';
                 }
 
+                $tabHidden =
+                    isset($tabLinkData['tabHidden']) && $tabLinkData['tabHidden'] === true ?
+                    ' hidden=""' :
+                    '';
+
                 $content .=
-                    '<div class="tab-pane fade ' . $active . '" id="'. $this->tabsParams['tabsId'] . '-' . $tabLinkKey . '" role="tabpanel" aria-labelledby="'. $this->tabsParams['tabsId'] . '-' . $tabLinkKey . '-tab" ' . $aria . '>';
+                    '<div class="tab-pane fade ' . $active . '" id="'. $this->tabsParams['tabsId'] . '-' . $tabLinkKey . '" role="tabpanel" aria-labelledby="'. $this->tabsParams['tabsId'] . '-' . $tabLinkKey . '-tab" ' . $aria . $tabHidden . '>';
 
                 if (isset($tabLinkData['tabInclude']) && isset($tabLinkData['tabIncludeParams'])) {
                     $content .=

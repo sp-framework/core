@@ -13,11 +13,11 @@ trait DynamicTable {
         array $columnsForTable = [],
         $withFilter = true,
         array $columnsForFilter = [],
-        array $controlActions = null,
+        $controlActions = null,
         array $dtReplaceColumnsTitle = null,
         $dtReplaceColumns = null,
         string $dtNotificationTextFromColumn = null,
-        array $dtAdditionControlButtons = null,
+        $dtAdditionControlButtons = null,
         bool $dtAdditionControlButtonsBeforeControlButtons = false,
         int $componentId = null
     ) {
@@ -133,8 +133,13 @@ trait DynamicTable {
                 $rows = $pagedData->getItems();
             }
 
+            if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {
+                $dtAdditionControlButtons = $dtAdditionControlButtons($rows);
+            }
 
-            if ($controlActions) {
+            if ($controlActions && is_callable($controlActions)) {
+                $rows = $controlActions($rows);
+            } else if ($controlActions) {
                 // add control action to each row
                 foreach($rows as &$row) {
                     $actions = [];

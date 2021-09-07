@@ -48,6 +48,39 @@ class SectionWithFormButtons
 
     protected function generateContent()
     {
+        $this->content .= '<div class="row">';
+
+        if (isset($this->params['formSecondaryButtons']) && is_array($this->params['formSecondaryButtons']) && count($this->params['formSecondaryButtons']) > 0) {
+            $this->content .= '<div class="col">';
+
+            $this->content .= $this->adminLTETags->useTag('buttons', $this->params['formSecondaryButtons']);
+
+            $this->content .= '</div>';
+        }
+
+        if (isset($this->params['formButtons']) && is_array($this->params['formButtons'])) {
+            $this->content .= '<div class="col">';
+
+            $this->generateFormButtonsContent();
+
+            $this->content .= '</div>';
+        }
+    }
+
+    protected function generateFormButtonsContent()
+    {
+        if (isset($this->params['formButtons']['canAdd'])) {
+            $this->buttonParams['canAdd'] = $this->params['formButtons']['canAdd'];
+        } else {
+            $this->buttonParams['canAdd'] = true;
+        }
+
+        if (isset($this->params['formButtons']['canUpdate'])) {
+            $this->buttonParams['canUpdate'] = $this->params['formButtons']['canUpdate'];
+        } else {
+            $this->buttonParams['canUpdate'] = true;
+        }
+
         if (isset($this->params['formButtons']['addActionUrl']) ||
             isset($this->params['formButtons']['updateActionUrl']) ||
             isset($this->params['formButtons']['closeActionUrl'])
@@ -116,7 +149,7 @@ class SectionWithFormButtons
 
         $buttonsArr = [];
 
-        if (isset($this->buttonParams['addActionUrl'])) {
+        if ($this->buttonParams['canAdd'] && isset($this->buttonParams['addActionUrl'])) {
             $buttonsArr =
                 array_merge(
                     $buttonsArr,
@@ -140,7 +173,7 @@ class SectionWithFormButtons
                 );
         }
 
-        if (isset($this->buttonParams['updateActionUrl'])) {
+        if ($this->buttonParams['canUpdate'] && isset($this->buttonParams['updateActionUrl'])) {
             $buttonsArr =
                 array_merge(
                     $buttonsArr,
