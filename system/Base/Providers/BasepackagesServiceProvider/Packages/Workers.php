@@ -82,11 +82,11 @@ class Workers extends BasePackage
         // 4 - Error
 
 
-        if (!$this->checkIdleWorkers()) {
-            $this->logger->log->alert('No Workers available at ' . date('Y-m-d H:i:s'));
+        // if (!$this->checkIdleWorkers()) {
+        //     $this->logger->log->alert('No Workers available at ' . date('Y-m-d H:i:s'));
 
-            return false;//We quite as there are no available workers.
-        }
+        //     return false;//We quite as there are no available workers.
+        // }
 
         $enabledTasks = $this->tasks->getEnabledTasks();
 
@@ -165,7 +165,11 @@ class Workers extends BasePackage
 
         if ($task['force_next_run'] && $task['force_next_run'] == '1') {
             $task['force_next_run'] = null;
-            $task['next_run'] = 'Calculating Next Run...';
+            if ($task['is_on_demand'] && $task['is_on_demand'] == '1') {
+                $task['next_run'] = '-';
+            } else {
+                $task['next_run'] = 'Calculating Next Run...';
+            }
 
             if (isset($task['org_schedule_id'])) {
                 $task['schedule_id'] = $task['org_schedule_id'];

@@ -1,25 +1,40 @@
 {% if task['id'] is defined %}
     {% set taskId = task['id'] %}
     {% set taskName = task['name'] %}
+    {% if task['is_on_demand'] == 1 %}
+        {% set taskIsOnDemandChecked = true %}
+    {% else %}
+        {% set taskIsOnDemandChecked = false %}
+    {% endif %}
     {% set taskFunction = task['function'] %}
     {% set taskDescription = task['description'] %}
     {% set taskParameters = task['parameters'] %}
     {% set taskPriority = task['priority'] %}
     {% set taskSchedule = task['schedule_id'] %}
+    {% set taskScheduleDisabled = false %}
     {% if task['enabled'] == 1 %}
         {% set taskEnableChecked = true %}
     {% else %}
         {% set taskEnableChecked = false %}
     {% endif %}
+    {% set taskEnableDisabled = false %}
+    {% if taskIsOnDemandChecked === true %}
+        {% set taskEnableChecked = false %}
+        {% set taskEnableDisabled = true %}
+        {% set taskScheduleDisabled = true %}
+    {% endif %}
 {% else %}
     {% set taskId = '' %}
     {% set taskName = '' %}
+    {% set taskIsOnDemandChecked = false %}
     {% set taskFunction = '' %}
     {% set taskDescription = '' %}
     {% set taskParameters = '' %}
     {% set taskPriority = '' %}
     {% set taskSchedule = '' %}
     {% set taskEnableChecked = false %}
+    {% set taskEnableDisabled = false %}
+    {% set taskScheduleDisabled = false %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -77,12 +92,34 @@
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
+                        'fieldId'                               : 'is_on_demand',
+                        'fieldLabel'                            : 'Run On Demand?',
+                        'fieldType'                             : 'checkbox',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : "Check if the task is executed via scheduler or on demand.",
+                        'fieldRequired'                         : true,
+                        'fieldCheckboxType'                     : 'success',
+                        'fieldCheckboxChecked'                  : taskIsOnDemandChecked,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
                         'fieldId'                               : 'enabled',
                         'fieldLabel'                            : 'Enabled',
                         'fieldType'                             : 'checkbox',
                         'fieldHelp'                             : true,
                         'fieldHelpTooltipContent'               : "Task enabled?",
                         'fieldRequired'                         : true,
+                        'fieldDisabled'                         : taskEnableDisabled,
                         'fieldCheckboxType'                     : 'success',
                         'fieldCheckboxChecked'                  : taskEnableChecked,
                         'fieldBazScan'                          : true,
@@ -178,6 +215,7 @@
                         'fieldHelp'                             : true,
                         'fieldHelpTooltipContent'               : "Select a schedule for the task.",
                         'fieldRequired'                         : true,
+                        'fieldDisabled'                         : taskScheduleDisabled,
                         'fieldBazScan'                          : true,
                         'fieldBazPostOnCreate'                  : true,
                         'fieldBazPostOnUpdate'                  : true,
@@ -246,6 +284,22 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-name'                    : { },
+        '{{componentId}}-{{sectionId}}-is_on_demand'            : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-is_on_demand').click(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-is_on_demand')[0].checked === true) {
+                        $('#{{componentId}}-{{sectionId}}-schedule_id').attr('disabled', true);
+                        $('#{{componentId}}-{{sectionId}}-enabled').attr('disabled', true);
+                    } else if ($('#{{componentId}}-{{sectionId}}-is_on_demand')[0].checked === false) {
+                        $('#{{componentId}}-{{sectionId}}-schedule_id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-enabled').attr('disabled', false);
+                    }
+
+                    $('#{{componentId}}-{{sectionId}}-schedule_id').val(0).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-enabled')[0].checked = false;
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-enabled'                 : { },
         '{{componentId}}-{{sectionId}}-description'             : { },
         '{{componentId}}-{{sectionId}}-parameters'              : { },

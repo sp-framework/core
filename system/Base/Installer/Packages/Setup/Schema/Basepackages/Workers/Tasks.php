@@ -48,7 +48,7 @@ class Tasks
                         'schedule_id',
                         [
                             'type'          => Column::TYPE_SMALLINTEGER,
-                            'notNull'       => true,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
@@ -66,10 +66,17 @@ class Tasks
                         ]
                     ),
                     new Column(
+                        'is_on_demand',
+                        [
+                            'type'          => Column::TYPE_TINYINTEGER,
+                            'notNull'       => false,
+                        ]
+                    ),
+                    new Column(
                         'priority',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,
-                            'notNull'       => true,
+                            'notNull'       => false,
                         ]
                     ),
                     new Column(
@@ -86,7 +93,7 @@ class Tasks
                             'notNull'       => false,
                         ]
                     ),
-                    new Column(
+                    new Column(//0 - system 1 - user
                         'type',
                         [
                             'type'          => Column::TYPE_TINYINTEGER,

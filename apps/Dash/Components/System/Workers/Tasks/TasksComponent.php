@@ -86,11 +86,11 @@ class TasksComponent extends BaseComponent
             $this->tasks,
             'system/workers/tasks/view',
             null,
-            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run', 'force_next_run'],
+            ['name', 'is_on_demand', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run', 'force_next_run'],
             true,
-            ['name', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run', 'force_next_run'],
+            ['name', 'is_on_demand', 'schedule_id', 'priority', 'enabled', 'status', 'previous_run', 'next_run', 'force_next_run'],
             $controlActions,
-            ['schedule_id' => 'schedule'],
+            ['schedule_id' => 'schedule', 'is_on_demand' => 'Runs On Demand'],
             $replaceColumns,
             'name',
             $dtAdditionControlButtons
@@ -121,7 +121,17 @@ class TasksComponent extends BaseComponent
 
     protected function formatSchedule($rowId, $data, $schedulesArr)
     {
-        $data['schedule_id'] = $schedulesArr[$data['schedule_id']];
+        if ($data['is_on_demand'] && $data['is_on_demand'] == '1') {
+            $data['is_on_demand'] = '<span class="badge badge-info text-uppercase">Yes</span>';
+        } else {
+            $data['is_on_demand'] = '-';
+        }
+
+        if ($data['schedule_id']) {
+            $data['schedule_id'] = $schedulesArr[$data['schedule_id']];
+        } else {
+            $data['schedule_id'] = '-';
+        }
 
         return $data;
     }

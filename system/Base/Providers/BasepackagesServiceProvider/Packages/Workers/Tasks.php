@@ -52,8 +52,12 @@ class Tasks extends BasePackage
                     $functions[$function->packageName]['func'] = $function->packageName;
                     $functions[$function->packageName]['name'] = $function->funcName;
 
-                } catch (\Exception $e) {
-                    throw $e;
+                } catch (\throwable $e) {
+
+                    if ($this->config->logs->exceptions) {
+                        $this->logger->logExceptions->debug($e);
+                    }
+                    continue;
                 }
             }
         }
@@ -69,8 +73,12 @@ class Tasks extends BasePackage
             return false;
         }
 
+        if (!isset($data['priority']) || (isset($data['priority']) && $data['priority'] == '0')) {
+            $data['priority'] = '1';
+        }
+
         $data['status'] = 0;
-        $data['type'] = 1;
+        $data['type'] = 1;//1 for user and 0 for system
         $data['previous_run'] = 0;
         $data['next_run'] = 0;
 
@@ -83,15 +91,19 @@ class Tasks extends BasePackage
 
     public function updateTask(array $data)
     {
+        $task = $this->getById($data['id']);
+
         if (!isset($data['via_job']) &&
-            (isset($data['type']) && $data['type'] == 0)
+            (isset($task['type']) && $task['type'] == 0)
         ) {
             $this->addResponse('Cannot update system task.', 1);
 
             return false;
         }
 
-        $task = $this->getById($data['id']);
+        if (!isset($data['priority']) || (isset($data['priority']) && $data['priority'] == '0')) {
+            $data['priority'] = '1';
+        }
 
         $task = array_merge($task, $data);
 
@@ -123,14 +135,26 @@ class Tasks extends BasePackage
     {
         $task = $this->getById($data['id']);
 
+        $task = array_merge($task, $data);
+
         $time = Carbon::now();
 
-        $task['force_next_run'] = '1';
-        $task['status'] = '1';
-        $task['next_run'] = $time->addMinute()->startOfMinute()->format('Y-m-d H:i:s');
+        if (isset($data['cancel']) && $data['cancel'] == 'true') {
+            $task['force_next_run'] = '0';
+            $task['status'] = '1';
+            $task['next_run'] = '-';
+        } else {
+            $task['force_next_run'] = '1';
+            $task['status'] = '1';
+            $task['next_run'] = $time->addMinute()->startOfMinute()->format('Y-m-d H:i:s');
+        }
 
         if ($this->update($task)) {
-            $this->addResponse($task['name'] . ' scheduled with worker for next run.');
+            if (isset($data['cancel']) && $data['cancel'] == 'true') {
+                $this->addResponse($task['name'] . ' cancelled with worker for next run.');
+            } else {
+                $this->addResponse($task['name'] . ' scheduled with worker for next run.');
+            }
         } else {
             $this->addResponse('Error scheduling task with worker.', 1);
         }
@@ -138,16 +162,22 @@ class Tasks extends BasePackage
 
     public function getEnabledTasks()
     {
+        $sorted = null;
+
         $filter =
             $this->model->filter(
                 function($function) {
                     $function = $function->toArray();
 
+                    if (!$function['priority'] || $function['priority'] == '0') {
+                        $function['priority'] = 1;//Set default priority as we need to sort it later
+                    }
+
                     if ($function['force_next_run'] == 1) {
                         $function['org_schedule_id'] = $function['schedule_id'];
                         $function['schedule_id'] = 1;//Make it minute so it can be picked by the scheduler for next run
                         return $function;
-                    } else if ($function['enabled'] == 1 && $function['status'] != 2) {
+                    } else if ($function['enabled'] == 1 && $function['status'] != 2) {//Enabled and not running
                         return $function;
                     }
                 }
@@ -156,5 +186,33 @@ class Tasks extends BasePackage
         $sorted = msort($filter, 'priority', SORT_REGULAR, SORT_DESC);
 
         return $sorted;
+    }
+
+    public function findByParametersMethod($method)
+    {
+        if (!$this->tasks) {
+            $this->init();
+        }
+
+        $filter =
+            $this->model->filter(
+                function($task) use ($method) {
+                    $task = $task->toArray();
+
+                    if ($task['parameters'] && $task['parameters'] !== '') {
+                        $task['parameters'] = Json::decode($task['parameters'], true);
+
+                        if (isset($task['parameters']['method']) && $task['parameters']['method'] === $method) {
+                            return $task;
+                        }
+                    }
+                }
+            );
+
+        if ($filter) {
+            return $filter[0];
+        }
+
+        return false;
     }
 }

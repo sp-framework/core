@@ -42,7 +42,7 @@
         'dtStateSave'           : false,
         'dtBordered'            : false,
         'dtHideIdColumn'        : true,
-        'dtNoOfColumnsToShow'   : 8,
+        'dtNoOfColumnsToShow'   : 10,
         'dtTableCompact'        : true,
         'dtZeroRecords'         : 'No task available. Add by clicking the Add new task button.'
     ]
@@ -60,6 +60,14 @@ window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFu
 
 function initFuncs() {
     $('.rowForceNextRun').each(function(index,row) {
+        if ($(row).parents('td').siblings('.data-force_next_run').text() === 'Yes') {
+            $(row).children().first().remove();
+            $(row).prepend(
+                '<span class="fa-stack"><i class="fas fa-fw fa-xs fa-forward fa-stack-1x"></i><i class="fas fa-fw fa-sm fa-ban fa-stack-2x text-danger"></i></span>'
+            );
+            $(row).children().last().html('CANCEL FORCE NEXT RUN');
+        }
+
         $(row).off();
         $(row).click(function(e) {
             e.preventDefault();
@@ -70,6 +78,10 @@ function initFuncs() {
             var dataToSend = { };
             dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
             dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
+
+            if ($(this).parents('td').siblings('.data-force_next_run').text() === 'Yes') {
+                dataToSend.cancel = true;
+            }
 
             $.ajax({
                 url         : url,
