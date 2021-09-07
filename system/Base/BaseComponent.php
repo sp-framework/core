@@ -59,11 +59,11 @@ abstract class BaseComponent extends Controller
 			if ($this->views) {
 				$this->viewSettings = json_decode($this->views['settings'], true);
 
+				$this->checkLayout();
+
 				if (!$this->isJson() && $this->request->isGet()) {
 					$this->setDefaultViewData();
 				}
-
-				$this->checkLayout();
 
 				$this->view->setViewsDir($this->view->getViewsDir() . $this->getURI());
 			}
@@ -127,9 +127,54 @@ abstract class BaseComponent extends Controller
 					'namespace'  => $namespace
 				]
 			);
-
-			return;
 		}
+
+		if (!$this->isJson()) {
+			$this->view->canView = false;
+			$this->view->canAdd = false;
+			$this->view->canUpdate = false;
+			$this->view->canRemove = false;
+
+			$permissions = $this->checkPermissions();
+
+			if ($permissions) {
+				if (isset($permissions['view']) && $permissions['view'] == 1) {
+					$this->view->canView = true;
+				}
+				if (isset($permissions['add']) && $permissions['add'] == 1) {
+					$this->view->canAdd = true;
+				}
+				if (isset($permissions['update']) && $permissions['update'] == 1) {
+					$this->view->canUpdate = true;
+				}
+				if (isset($permissions['remove']) && $permissions['remove'] == 1) {
+					$this->view->canRemove = true;
+				}
+			}
+		}
+	}
+
+	protected function checkPermissions()
+	{
+		if ($this->auth->account()) {
+			if ($this->auth->account()['permissions'] !== '') {
+				$permissions = Json::decode($this->auth->account()['permissions'], true);
+			}
+
+			if (is_array($permissions) && count($permissions) === 0) {
+				if ($this->auth->account()['role']['permissions'] !== '') {
+					$permissions = Json::decode($this->auth->account()['role']['permissions'], true);
+				}
+			}
+
+			if (is_array($permissions) && count($permissions) > 0) {
+				if (isset($permissions[$this->app['id']][$this->component['id']])) {
+					return $permissions[$this->app['id']][$this->component['id']];
+				}
+			}
+		}
+
+		return false;
 	}
 
 	protected function checkCSRF()

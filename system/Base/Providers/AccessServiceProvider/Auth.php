@@ -48,6 +48,8 @@ class Auth
 
     protected $profile;
 
+    protected $roles;
+
     protected $email;
 
     protected $emailQueue;
@@ -69,6 +71,7 @@ class Auth
         $links,
         $accounts,
         $profile,
+        $roles,
         $email,
         $emailQueue,
         $domains
@@ -96,6 +99,8 @@ class Auth
         $this->accounts = $accounts;
 
         $this->profile = $profile;
+
+        $this->roles = $roles;
 
         $this->email = $email;
 
@@ -418,6 +423,8 @@ class Auth
 
             $this->setAccountProfile();
 
+            $this->setAccountRole();
+
             return true;
         }
 
@@ -549,6 +556,8 @@ class Auth
             }
 
             $this->setAccountProfile();
+
+            $this->setAccountRole();
         } else {
             return false;
         }
@@ -557,6 +566,11 @@ class Auth
     protected function setAccountProfile()
     {
         $this->account['profile'] = $this->profile->profile($this->account['id']);
+    }
+
+    protected function setAccountRole()
+    {
+        $this->account['role'] = $this->roles->getById($this->account['role_id']);
     }
 
     protected function setUserSession()
