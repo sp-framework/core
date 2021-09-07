@@ -96,6 +96,9 @@ class NotificationsComponent extends BaseComponent
         }
     }
 
+    /**
+     * @acl(name=view)
+     */
     public function viewAction()
     {
         if (isset($this->getData()['id'])) {
@@ -156,6 +159,9 @@ class NotificationsComponent extends BaseComponent
         $this->view->pick('notifications/list');
     }
 
+    /**
+     * @acl(name=remove)
+     */
     public function removeAction()
     {
         if ($this->request->isPost()) {
