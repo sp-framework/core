@@ -35,6 +35,13 @@ class SystemApiXeroContactGroups
                     ]
                 ),
                 new Column(
+                    'baz_customer_group_id',
+                    [
+                        'type'          => Column::TYPE_SMALLINTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'ContactGroupID',
                     [
                         'type'          => Column::TYPE_VARCHAR,

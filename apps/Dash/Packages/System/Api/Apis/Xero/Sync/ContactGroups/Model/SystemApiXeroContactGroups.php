@@ -12,6 +12,8 @@ class SystemApiXeroContactGroups extends BaseModel
 
     public $baz_vendor_group_id;
 
+    public $baz_customer_group_id;
+
     public $ContactGroupID;
 
     public $Name;
