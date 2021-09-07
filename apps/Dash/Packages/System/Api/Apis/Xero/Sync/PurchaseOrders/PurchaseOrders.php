@@ -165,6 +165,7 @@ class PurchaseOrders extends BasePackage
         $contacts = new Contacts;
 
         $contacts->sync($apiId, $parameters);
+        die();
 
         $this->responseData = array_merge($this->responseData, ['contacts' => $contacts->packagesData->responseData]);
 

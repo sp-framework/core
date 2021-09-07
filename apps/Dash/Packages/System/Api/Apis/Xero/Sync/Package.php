@@ -27,7 +27,7 @@ class Package extends BasePackage
     {
         $this->init();
 
-        $this->installSyncTasks();return;
+        // $this->installSyncTasks();return;
 
         try {
             if ($dropTables) {
