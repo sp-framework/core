@@ -28,6 +28,13 @@ class SystemApiXeroContacts
                     ]
                 ),
                 new Column(
+                    'baz_customer_id',
+                    [
+                        'type'          => Column::TYPE_INTEGER,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
                     'api_id',
                     [
                         'type'          => Column::TYPE_TINYINTEGER,

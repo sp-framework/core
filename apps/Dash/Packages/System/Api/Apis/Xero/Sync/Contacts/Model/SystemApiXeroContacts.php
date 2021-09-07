@@ -10,6 +10,8 @@ class SystemApiXeroContacts extends BaseModel
 
     public $baz_vendor_id;
 
+    public $baz_customer_id;
+
     public $api_id;
 
     public $ContactID;
