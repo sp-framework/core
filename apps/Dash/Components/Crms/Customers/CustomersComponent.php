@@ -47,21 +47,6 @@ class CustomersComponent extends BaseComponent
 
                 $customer['notes'] = $this->notes->getNotes('customers', $this->getData()['id']);
 
-                if ($customer['address_ids'] && $customer['address_ids'] !== '') {
-                    $customer['address_ids'] = Json::decode($customer['address_ids'], true);
-
-                    foreach ($customer['address_ids'] as $addressTypeKey => $addressType) {
-                        if (is_array($addressType) && count($addressType) > 0) {
-                            foreach ($addressType as $addressKey => $address) {
-                                $customer['address_ids'][$addressTypeKey][$addressKey] =
-                                    $this->basepackages->addressbook->getById($address);
-                            }
-                        }
-                        $customer['address_ids'][$addressTypeKey] =
-                            msort($customer['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
-                    }
-                }
-
                 $storages = $this->basepackages->storages;
 
                 if ($customer['portrait'] && $customer['portrait'] !== '') {
@@ -113,6 +98,15 @@ class CustomersComponent extends BaseComponent
         }
 
         if ($this->request->isPost()) {
+            $replaceColumns =
+                function ($dataArr) {
+                    if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                        return $this->replaceColumns($dataArr);
+                    }
+
+                    return $dataArr;
+                };
+        } else {
             $replaceColumns = null;
         }
 
@@ -129,16 +123,39 @@ class CustomersComponent extends BaseComponent
             $this->customers,
             'crms/customers/view',
             null,
-            ['first_name', 'last_name', 'contact_mobile', 'account_email'],
+            ['account_id', 'first_name', 'last_name', 'contact_mobile', 'account_email'],
             true,
-            ['first_name', 'last_name', 'contact_mobile', 'account_email'],
+            ['account_id', 'first_name', 'last_name', 'contact_mobile', 'account_email'],
             $controlActions,
-            ['account_email'=>'email', 'contact_mobile'=>'mobile'],
-            null,
+            ['account_id'=>'account', 'account_email'=>'email', 'contact_mobile'=>'mobile'],
+            $replaceColumns,
             'first_name'
         );
 
         $this->view->pick('customers/list');
+    }
+
+    protected function replaceColumns($dataArr)
+    {
+        foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->generateAccountLink($dataKey, $data);
+        }
+
+        return $dataArr;
+    }
+
+    protected function generateAccountLink($rowId, $data)
+    {
+        if ($data['account_id'] && $data['account_id'] != '0') {
+            $data['account_id'] =
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('system/users/accounts/q/id/' . $data['account_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
+                    <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                </a>';
+        } else {
+            $data['account_id'] = '-';
+        }
+
+        return $data;
     }
 
     /**

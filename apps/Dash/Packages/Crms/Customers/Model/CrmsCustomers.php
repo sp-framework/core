@@ -41,8 +41,6 @@ class CrmsCustomers extends BaseModel
 
     public $contact_other;
 
-    public $contact_notes;
-
     public $address_ids;
 
     public function initialize()

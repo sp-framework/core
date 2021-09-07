@@ -10,7 +10,7 @@ class CrmsCustomersFinancialDetails extends BaseModel
 
     public $customer_id;
 
-    public $acn;
+    public $abn;
 
     public $currency;
 

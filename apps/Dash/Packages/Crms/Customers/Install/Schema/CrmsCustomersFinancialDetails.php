@@ -28,10 +28,10 @@ class CrmsCustomersFinancialDetails
                     ]
                 ),
                 new Column(
-                    'acn',
+                    'abn',
                     [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 9,
+                        'type'          => Column::TYPE_BIGINTEGER,
+                        'size'          => 11,
                         'notNull'       => false,
                     ]
                 ),

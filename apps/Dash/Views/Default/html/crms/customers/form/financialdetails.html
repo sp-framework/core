@@ -1,5 +1,5 @@
 {% if customer['id'] is defined %}
-    {% set customerAcn = customer['acn'] %}
+    {% set customerAbn = customer['abn'] %}
     {% set customerCurrency = customer['currency'] %}
     {% set customerBsb = customer['bsb'] %}
     {% set customerAccountNumber = customer['account_number'] %}
@@ -12,7 +12,7 @@
     {% set customerCreditLimitBlock = customer['credit_limit_block'] %}
     {% set customerInvoiceDiscount = customer['invoice_discount'] %}
 {% else %}
-    {% set customerAcn = '' %}
+    {% set customerAbn = '' %}
     {% set customerCurrency = '' %}
     {% set customerBsb = '' %}
     {% set customerAccountNumber = '' %}
@@ -33,20 +33,20 @@
                 'componentName'                         : componentName,
                 'componentId'                           : componentId,
                 'sectionId'                             : sectionId,
-                'fieldId'                               : 'acn',
-                'fieldLabel'                            : 'ACN',
+                'fieldId'                               : 'abn',
+                'fieldLabel'                            : 'ABN',
                 'fieldType'                             : 'input',
                 'fieldHelp'                             : true,
-                'fieldHelpTooltipContent'               : 'ACN of the customer',
+                'fieldHelpTooltipContent'               : 'ABN of the customer',
                 'fieldInputTypeTextFilter'              : 'positiveInt',
                 'fieldRequired'                         : false,
                 'fieldBazScan'                          : true,
                 'fieldBazJstreeSearch'                  : true,
                 'fieldBazPostOnCreate'                  : true,
                 'fieldBazPostOnUpdate'                  : true,
-                'fieldDataInputMinLength'               : 9,
-                'fieldDataInputMaxLength'               : 9,
-                'fieldValue'                            : customerAcn
+                'fieldDataInputMinLength'               : 11,
+                'fieldDataInputMaxLength'               : 11,
+                'fieldValue'                            : customerAbn
             ]
         )}}
     </div>

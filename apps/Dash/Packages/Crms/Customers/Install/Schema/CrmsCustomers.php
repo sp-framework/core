@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Crms\Customers\Install\Schema;
 
 use Phalcon\Db\Column;
+use Phalcon\Db\Index;
 
 class CrmsCustomers
 {
@@ -140,15 +141,7 @@ class CrmsCustomers
                     'contact_other',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 15,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
-                    'contact_notes',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 2048,
+                        'size'          => 100,
                         'notNull'       => false,
                     ]
                 ),
@@ -163,6 +156,15 @@ class CrmsCustomers
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
+            ],
+            'indexes' => [
+                new Index(
+                    'column_UNIQUE',
+                    [
+                        'account_email'
+                    ],
+                    'UNIQUE'
+                )
             ]
         ];
     }

@@ -22,22 +22,41 @@ class Customers extends BasePackage
 
         $customerObj = $customerModel::findFirstById($id);
 
-        $customer = $customerObj->toArray();
+        if ($customerObj) {
+            $customer = $customerObj->toArray();
 
-        $financialDetailsObj = $customerObj->getFinancial_details();
+            if ($customer['address_ids'] && $customer['address_ids'] !== '') {
+                $customer['address_ids'] = Json::decode($customer['address_ids'], true);
 
-        if ($financialDetailsObj) {
-            $financialDetails = $financialDetailsObj->toArray();
+                foreach ($customer['address_ids'] as $addressTypeKey => $addressType) {
+                    if (is_array($addressType) && count($addressType) > 0) {
+                        foreach ($addressType as $addressKey => $address) {
+                            $customer['address_ids'][$addressTypeKey][$addressKey] =
+                                $this->basepackages->addressbook->getById($address);
+                        }
+                    }
+                    $customer['address_ids'][$addressTypeKey] =
+                        msort($customer['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
+                }
+            }
 
-            unset($financialDetails['id']);
-            unset($financialDetails['cc_details']);
+            $financialDetailsObj = $customerObj->getFinancial_details();
 
-            $customer = array_merge($customer, $financialDetails);
+            if ($financialDetailsObj) {
+                $financialDetails = $financialDetailsObj->toArray();
+
+                unset($financialDetails['id']);
+                unset($financialDetails['cc_details']);
+
+                $customer = array_merge($customer, $financialDetails);
+            }
+
+            $this->packagesData->customer = $customer;
+
+            return $customer;
         }
 
-        $this->packagesData->customer = $customer;
-
-        return $customer;
+        return false;
     }
 
     /**
@@ -45,6 +64,12 @@ class Customers extends BasePackage
      */
     public function addCustomer(array $data)
     {
+        if ($this->checkCustomerDuplicate($data['account_email'])) {
+            $this->addResponse('Customer ' . $data['account_email'] . ' already exists.', 1);
+
+            return;
+        }
+
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
         if (isset($data['address_ids'])) {
@@ -56,11 +81,15 @@ class Customers extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['portrait']);
             }
 
-            $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
+            if (isset($data['create_account']) && $data['create_account'] == '1') {
+                $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
+            }
 
             $data['id'] = $this->packagesData->last['id'];
 
             $this->update($data);
+
+            $data['customer_id'] = $data['id'];
 
             $this->addFinancialDetails($data);
 
@@ -80,6 +109,14 @@ class Customers extends BasePackage
     public function updateCustomer(array $data)
     {
         $customer = $this->getById($data['id']);
+
+        if ($data['account_email'] !== $contact['account_email']) {
+            if ($this->checkCustomerDuplicate($data['account_email'])) {
+                $this->addResponse('Customer ' . $data['account_email'] . ' already exists.', 1);
+
+                return;
+            }
+        }
 
         $data['account_id'] = $customer['account_id'];
 
@@ -103,7 +140,9 @@ class Customers extends BasePackage
 
             $this->updateFinancialDetails($data);
 
-            $data['account_id'] = $this->addUpdateAccount($data);
+            if (isset($data['create_account']) && $data['create_account'] == '1') {
+                $data['account_id'] = $this->addUpdateAccount($data);
+            }
 
             $this->update($data);
 
@@ -137,6 +176,18 @@ class Customers extends BasePackage
         } else {
             $this->addResponse('Error removing customer.', 1);
         }
+    }
+
+    /**
+     * @notification(name=error)
+     */
+    public function errorCustomer($messageTitle = null, $messageDetails = null, $id = null)
+    {
+        if (!$messageTitle) {
+            $messageTitle = 'Contact has errors, contact administrator!';
+        }
+
+        $this->addToNotification('error', $messageTitle, $messageDetails, null, $id);
     }
 
     protected function addUpdateAccount($data)
@@ -177,11 +228,9 @@ class Customers extends BasePackage
         }
     }
 
-    protected function addFinancialDetails(array $data)
+    public function addFinancialDetails(array $data)
     {
         $this->modelToUse = CrmsCustomersFinancialDetails::class;
-
-        $data['customer_id'] = $data['id'];
 
         unset($data['id']);
 
@@ -190,15 +239,15 @@ class Customers extends BasePackage
         $this->modelToUse = CrmsCustomers::class;
     }
 
-    protected function updateFinancialDetails(array $data)
+    public function updateFinancialDetails(array $data)
     {
         $this->modelToUse = CrmsCustomersFinancialDetails::class;
 
         $financialDetailsModel = $this->modelToUse::findFirst(
             [
-                'conditions'    => 'customer_id = :vid:',
+                'conditions'    => 'customer_id = :cid:',
                 'bind'          => [
-                    'vid'       => $data['id']
+                    'cid'       => $data['customer_id']
                 ]
             ]
         );
@@ -216,20 +265,20 @@ class Customers extends BasePackage
         $this->modelToUse = CrmsCustomers::class;
     }
 
-    protected function checkCustomerDuplicate($name)
+    public function checkCustomerDuplicate($email)
     {
         return $this->modelToUse::findFirst(
             [
-                'conditions'    => 'business_name = :name:',
+                'conditions'    => 'account_email = :email:',
                 'bind'          =>
                 [
-                    'name'      => $name
+                    'email'      => $email
                 ]
             ]
         );
     }
 
-    protected function updateAddresses($data)
+    public function updateAddresses($data)
     {
         if ($data['address_ids'] !== '') {
             $data['address_ids'] = Json::decode($data['address_ids'], true);
