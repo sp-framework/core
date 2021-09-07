@@ -62,17 +62,15 @@ class Logger
                 $this->request->getClientAddress()
             );
 
-        if ($this->logsConfig->exceptions) {
-            $streamAdapter = new Stream($savePath . 'exceptions.log');
-            $streamAdapter->setFormatter($this->customFormatter);
+        $streamAdapter = new Stream($savePath . 'exceptions.log');
+        $streamAdapter->setFormatter($this->customFormatter);
 
-            $this->logExceptions = new PhalconLogger(
-                'messages',
-                ['stream'        => $streamAdapter]
-            );
+        $this->logExceptions = new PhalconLogger(
+            'messages',
+            ['stream'        => $streamAdapter]
+        );
 
-            $this->logExceptions->getAdapter('stream')->begin();
-        }
+        $this->logExceptions->getAdapter('stream')->begin();
 
         if ($this->logsConfig->enabled) {
             if ($this->logsConfig->service === 'streamLogs') {
