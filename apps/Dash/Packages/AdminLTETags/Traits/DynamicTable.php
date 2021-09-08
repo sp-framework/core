@@ -80,6 +80,13 @@ trait DynamicTable {
 
                     if (isset($postUrlParams) && is_array($postUrlParams)) {
                         $table['postUrlParams'] = $postUrlParams;
+
+                        if ($account &&
+                            $account['id'] === $filter['account_id'] &&
+                            $filter['is_default'] === '1'
+                        ) {
+                            $table['postUrlParams'] = array_merge($table['postUrlParams'], ['conditions' => $filter['conditions']]);
+                        }
                     } else if (isset($this->getData()['filter'])) {
                         if ($this->getData()['filter'] === $filter['id']) {
                             $table['filters'][$filter['id']]['data']['queryFilterId'] = $filter['id'];
@@ -88,8 +95,9 @@ trait DynamicTable {
                             $table['filters'][$filter['id']]['data']['queryFilterId'] = $this->getData()['filter'];
                             $table['postUrlParams'] = ['conditions' => '-:id:equals:0&'];
                         }
-                    } else if (($account && ($account['id'] === $filter['account_id'])) &&
-                                $filter['is_default'] === '1'
+                    } else if ($account &&
+                               $account['id'] === $filter['account_id'] &&
+                               $filter['is_default'] === '1'
                     ) {
                         $table['postUrlParams'] = ['conditions' => $filter['conditions']];
                     } else {
