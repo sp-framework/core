@@ -23,24 +23,28 @@ class Employees extends BasePackage
 
         $employeeObj = $employeeModel::findFirstById($id);
 
-        $employee = $employeeObj->toArray();
+        if ($employeeObj) {
+            $employee = $employeeObj->toArray();
 
-        $financeObj = $employeeObj->getFinance();
-        $finance = $financeObj->toArray();
-        unset($finance['id']);
-        $employee = array_merge($employee, $finance);
+            $financeObj = $employeeObj->getFinance();
+            $finance = $financeObj->toArray();
+            unset($finance['id']);
+            $employee = array_merge($employee, $finance);
 
-        $contactObj = $employeeObj->getContact();
-        $contact = $contactObj->toArray();
-        unset($contact['id']);
-        $employee = array_merge($employee, $contact);
+            $contactObj = $employeeObj->getContact();
+            $contact = $contactObj->toArray();
+            unset($contact['id']);
+            $employee = array_merge($employee, $contact);
 
-        $employmentObj = $employeeObj->getEmployment();
-        $employment = $employmentObj->toArray();
-        unset($employment['id']);
-        $employee = array_merge($employee, $employment);
+            $employmentObj = $employeeObj->getEmployment();
+            $employment = $employmentObj->toArray();
+            unset($employment['id']);
+            $employee = array_merge($employee, $employment);
 
-        return $employee;
+            return $employee;
+        }
+
+        return false;
     }
 
     public function addEmployee(array $data)
@@ -88,7 +92,6 @@ class Employees extends BasePackage
             $this->addEmployeeFinance($data);
             $this->addEmployeeContact($data);
             $this->addEmployeeEmployment($data);
-
 
             $this->basepackages->notes->addNote($this->packageName, $data);
 

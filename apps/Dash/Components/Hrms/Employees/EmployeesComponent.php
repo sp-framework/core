@@ -141,33 +141,14 @@ class EmployeesComponent extends BaseComponent
         }
 
         if ($this->request->isPost()) {
-            $statusesToName = [];
-            $designationToName = [];
-
-            foreach ($statuses as $statusesKey => $statusesValue) {
-                $statusesToName[$statusesValue['id']] = $statusesValue['name'];
-            }
-            foreach ($designations as $designationKey => $designationValue) {
-                $designationToName[$designationValue['id']] = $designationValue['name'];
-            }
-
             $replaceColumns =
-                [
-                    'status' => ['html'  => $statusesToName],
-                    'designation' => ['html'  => $designationToName],
-                    'type_id'   => ['html'  =>
-                        [
-                            '1' => 'Employee',
-                            '2' => 'Contractor'
-                        ]
-                    ],
-                    'work_type_id'   => ['html'  =>
-                        [
-                            '1' => 'Traditional',
-                            '2' => 'Remote'
-                        ]
-                    ]
-                ];
+                function ($dataArr) {
+                    if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                        return $this->replaceColumns($dataArr);
+                    }
+
+                    return $dataArr;
+                };
         } else {
             $replaceColumns = null;
         }
@@ -185,16 +166,58 @@ class EmployeesComponent extends BaseComponent
             $this->employees,
             'hrms/employees/view',
             null,
-            ['ref_id', 'account_email', 'first_name', 'last_name', 'designation', 'status'],
+            ['account_id', 'ref_id', 'account_email', 'first_name', 'last_name', 'designation', 'status'],
             true,
-            ['ref_id', 'account_email', 'first_name', 'last_name', 'designation', 'status'],
+            ['account_id', 'ref_id', 'account_email', 'first_name', 'last_name', 'designation', 'status'],
             $controlActions,
-            ['ref_id' => 'Employee Id', 'account_email'=>'email'],
+            ['account_id'=>'account', 'ref_id' => 'Employee Id', 'account_email'=>'email'],
             $replaceColumns,
             'first_name'
         );
 
         $this->view->pick('employees/list');
+    }
+
+    protected function replaceColumns($dataArr)
+    {
+        $statusesArr = $this->statuses->getAll()->hrmsStatuses;
+        $designationsArr = $this->designations->getAll()->hrmsDesignations;
+
+        $statuses = [];
+        $designations = [];
+
+        foreach ($statusesArr as $statusesKey => $statusesValue) {
+            $statuses[$statusesValue['id']] = $statusesValue['name'];
+        }
+        foreach ($designationsArr as $designationKey => $designationValue) {
+            $designations[$designationValue['id']] = $designationValue['name'];
+        }
+
+        foreach ($dataArr as $dataKey => &$data) {
+            if ($data['status'] != '0') {
+                $data['status'] = $statuses[$data['status']];
+            }
+            if ($data['designation'] != '0') {
+                $data['designation'] = $designations[$data['designation']];
+            }
+            $data = $this->generateAccountLink($dataKey, $data);
+        }
+
+        return $dataArr;
+    }
+
+    protected function generateAccountLink($rowId, $data)
+    {
+        if ($data['account_id'] && $data['account_id'] != '0') {
+            $data['account_id'] =
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('system/users/accounts/q/id/' . $data['account_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
+                    <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                </a>';
+        } else {
+            $data['account_id'] = '-';
+        }
+
+        return $data;
     }
 
     /**
