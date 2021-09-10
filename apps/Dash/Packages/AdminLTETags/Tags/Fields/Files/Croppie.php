@@ -189,22 +189,24 @@ class Croppie
                 );
         }
 
-        $croppieButtons =
-            array_merge(
-                $croppieButtons,
-                [
-                    'croppie-remove' =>
+        if (isset($this->params['remove']) && $this->params['remove'] === true) {
+            $croppieButtons =
+                array_merge(
+                    $croppieButtons,
                     [
-                        'title'                     => false,
-                        'type'                      => 'danger',
-                        'position'                  => 'left',
-                        'icon'                      => 'trash',
-                        'hidden'                    => true,
-                        'size'                      => 'xs',
-                        'buttonAdditionalClass'     => 'mr-1 ml-1'
+                        'croppie-remove' =>
+                        [
+                            'title'                     => false,
+                            'type'                      => 'danger',
+                            'position'                  => 'left',
+                            'icon'                      => 'trash',
+                            'hidden'                    => true,
+                            'size'                      => 'xs',
+                            'buttonAdditionalClass'     => 'mr-1 ml-1'
+                        ]
                     ]
-                ]
-            );
+                );
+        }
 
         $this->content .=
             '<div class="row">
