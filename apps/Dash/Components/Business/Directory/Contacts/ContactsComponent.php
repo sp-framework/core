@@ -105,6 +105,19 @@ class ContactsComponent extends BaseComponent
             return;
         }
 
+        if ($this->request->isPost()) {
+            $replaceColumns =
+                function ($dataArr) {
+                    if ($dataArr && is_array($dataArr) && count($dataArr) > 0) {
+                        return $this->replaceColumns($dataArr);
+                    }
+
+                    return $dataArr;
+                };
+        } else {
+            $replaceColumns = null;
+        }
+
         $controlActions =
             [
                 'actionsToEnable'       =>
@@ -118,16 +131,39 @@ class ContactsComponent extends BaseComponent
             $this->contacts,
             'business/directory/contacts/view',
             null,
-            ['first_name', 'last_name', 'contact_phone', 'contact_mobile', 'account_email'],
+            ['account_id', 'first_name', 'last_name', 'contact_phone', 'contact_mobile', 'account_email'],
             true,
-            ['first_name', 'last_name', 'contact_phone', 'contact_mobile', 'account_email'],
+            ['account_id', 'first_name', 'last_name', 'contact_phone', 'contact_mobile', 'account_email'],
             $controlActions,
-            ['account_email'=>'email','contact_phone'=>'phone', 'contact_mobile'=>'mobile'],
-            null,
+            ['account_id'=>'account', 'account_email'=>'email', 'contact_mobile'=>'mobile'],
+            $replaceColumns,
             'first_name'
         );
 
         $this->view->pick('contacts/list');
+    }
+
+    protected function replaceColumns($dataArr)
+    {
+        foreach ($dataArr as $dataKey => &$data) {
+            $data = $this->generateAccountLink($dataKey, $data);
+        }
+
+        return $dataArr;
+    }
+
+    protected function generateAccountLink($rowId, $data)
+    {
+        if ($data['account_id'] && $data['account_id'] != '0') {
+            $data['account_id'] =
+                '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('system/users/accounts/q/id/' . $data['account_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
+                    <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                </a>';
+        } else {
+            $data['account_id'] = '-';
+        }
+
+        return $data;
     }
 
     /**

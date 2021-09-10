@@ -96,6 +96,8 @@ dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-id'                              : { },
         '{{componentId}}-{{sectionId}}-account_id'                      : { },
+        '{{componentId}}-{{sectionId}}-create_account'                  : { },
+        '{{componentId}}-{{sectionId}}-account_link'                    : { },
         '{{componentId}}-{{sectionId}}-account_email'                   : {
             afterInit   : function() {
                 dataCollectionSection['{{componentId}}-{{sectionId}}-form']['autoCompleteAccounts'] =

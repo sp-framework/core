@@ -51,7 +51,9 @@ class Contacts extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['portrait']);
             }
 
-            $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
+            if (isset($data['create_account']) && $data['create_account'] == '1') {
+                $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
+            }
 
             $data['id'] = $this->packagesData->last['id'];
 
@@ -104,7 +106,9 @@ class Contacts extends BasePackage
                 $this->basepackages->storages->changeOrphanStatus($data['portrait'], $contact['portrait']);
             }
 
-            $data['account_id'] = $this->addUpdateAccount($data);
+            if (isset($data['create_account']) && $data['create_account'] == '1') {
+                $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
+            }
 
             $this->update($data);
 
@@ -228,40 +232,38 @@ class Contacts extends BasePackage
 
         $vendorArr = $vendors->getById($data['vendor_id']);
 
-        if ($vendorArr['is_b2b_customer'] == '1') {
-            $data['package_name'] = 'contacts';
-            $data['package_row_id'] = $data['id'];
+        $data['package_name'] = 'contacts';
+        $data['package_row_id'] = $data['id'];
 
-            unset($data['id']);
+        unset($data['id']);
 
-            $data['email'] = $data['account_email'];
+        $data['email'] = $data['account_email'];
 
-            if (isset($data['account_id']) &&
-                $data['account_id'] != '' &&
-                $data['account_id'] != '0'
-            ) {
-                $data['id'] = $data['account_id'];
+        if (isset($data['account_id']) &&
+            $data['account_id'] != '' &&
+            $data['account_id'] != '0'
+        ) {
+            $data['id'] = $data['account_id'];
 
-                try {
-                    $this->basepackages->accounts->updateAccount($data);
+            try {
+                $this->basepackages->accounts->updateAccount($data);
 
-                    return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
-                } catch (\Exception $e) {
-                    $this->addResponse('Error adding/updating contact account. Please contact administrator', 1);
-                }
-            } else {
-                $data['role_id'] = '0';
-                $data['override_role'] = '0';
-                $data['permissions'] = '[]';
-                $data['can_login'] = '';
+                return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
+            } catch (\Exception $e) {
+                $this->addResponse('Error adding/updating contact account. Please contact administrator', 1);
+            }
+        } else {
+            $data['role_id'] = '0';
+            $data['override_role'] = '0';
+            $data['permissions'] = '[]';
+            $data['can_login'] = '';
 
-                try {
-                    $this->basepackages->accounts->addAccount($data);
+            try {
+                $this->basepackages->accounts->addAccount($data);
 
-                    return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
-                } catch (\Exception $e) {
-                    $this->addResponse('Error adding/updating contact account. Please contact administrator', 1);
-                }
+                return $this->basepackages->accounts->packagesData->packagesData['last']['id'];
+            } catch (\Exception $e) {
+                $this->addResponse('Error adding/updating contact account. Please contact administrator', 1);
             }
         }
     }
