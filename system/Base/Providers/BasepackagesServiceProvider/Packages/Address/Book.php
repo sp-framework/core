@@ -15,6 +15,23 @@ class Book extends BasePackage
 
     public $addressbook;
 
+    public function getAddressById($id)
+    {
+        $address = $this->getById($id);
+
+        if ($address) {
+            unset($address['id']);
+            unset($address['name']);
+            unset($address['address_type']);
+            unset($address['is_primary']);
+            unset($address['package_name']);
+
+            return $address;
+        }
+
+        return false;
+    }
+
     public function addAddress(array $data)
     {
         if ($data['city_id'] == 0 ||
