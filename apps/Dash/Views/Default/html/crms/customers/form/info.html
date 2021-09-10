@@ -118,7 +118,7 @@
                 )}}
             </div>
             <div class="col">
-                {% if customerAccountId !== '' and customerAccountId != '0' %}
+                {% if customerAccountId is defined and customerAccountId !== '' and customerAccountId != '0' %}
                     {% set linkHidden = false %}
                     {% set createLink =
                         '<a href="' ~ links.url('system/users/accounts/q/id/' ~ customerAccountId) ~ '" type="button" data-id="' ~ customerAccountId ~ '" class="text-white btn btn-primary btn-xs text-uppercase contentAjaxLink">
