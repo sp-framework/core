@@ -4,7 +4,9 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Fun
 
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\ContactGroups\ContactGroups;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Contacts\Contacts;
+use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Organisations;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\PurchaseOrders;
+use GuzzleHttp\Exception\ConnectException;
 use Phalcon\Helper\Json;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Functions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Tasks;
@@ -68,6 +70,8 @@ class SyncXero extends Functions
                 $sync = new PurchaseOrders;
             } else if ($parameters['process'] === 'contactGroups') {
                 $sync = new ContactGroups;
+            } else if ($parameters['process'] === 'organisations') {
+                $sync = new Organisations;
             }
 
             if (!isset($parameters['timeout'])) {
@@ -88,42 +92,86 @@ class SyncXero extends Functions
                 } else {
                     throw new \Exception('Parameters method not set.');
                 }
-            } catch (\Exception $e) {
+            } catch (ConnectException | \Exception $e) {
                 if ($this->config->logs->exceptions) {
                     $this->logger->logExceptions->debug($e);
                 }
 
-                $thisFunction->packagesData->responseCode = 1;
+                if (get_class($e) === 'GuzzleHttp\Exception\ConnectException') {
+                    $message = $e->getMessage();
+
+                    if ($parameters && $parameters['method'] === 'syncFromData') {
+                        $this->scheduleChildProcesses($parameters);
+
+                        $message = $message . '. Rescheduling Task.';
+                    }
+
+                    $thisFunction->packagesData->responseMessage = $message;
+                }
 
                 $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
 
+                $thisFunction->packagesData->responseCode = 1;
+
+                if (isset($sync->packagesData->responseData)) {
+                    $thisFunction->packagesData->responseData = $sync->packagesData->responseData;
+                } else if (isset($sync->processing)) {
+                    $thisFunction->packagesData->responseData = ['lastProcessingID' => $sync->processing];
+                }
+
                 $this->addJobResult($thisFunction->packagesData, $args);
 
-                $thisFunction->updateJobTask(4, $args);
+                $thisFunction->updateJobTask(3, $args);
 
                 return;
             }
 
             if ($scheduleChildProcesses) {
-                $taskPackage = new Tasks;
-
-                $task = $taskPackage->findByParametersMethod('syncFromData');
-
-                if ($task) {
-                    $taskPackage->forceNextRun(
-                        [
-                            'id'            => $task['id'],
-                            'parameters'    =>
-                            [
-                                'process'   => $parameters['process'],
-                                'method'    => 'syncFromData',
-                            ]
-                        ]
-                    );
-                }
+                $this->scheduleChildProcesses($parameters);
             }
 
             $thisFunction->updateJobTask(3, $args);
         };
     }
+
+    protected function scheduleChildProcesses($parameters)
+    {
+        $taskPackage = new Tasks;
+
+        $task = $taskPackage->findByParametersMethod('syncFromData');
+
+        if ($task) {
+            $taskPackage->forceNextRun(
+                [
+                    'id'            => $task['id'],
+                    'parameters'    =>
+                    [
+                        'process'   => $parameters['process'],
+                        'method'    => 'syncFromData',
+                    ]
+                ]
+            );
+        }
+    }
 }
+// Contacts Parameters -
+// {
+//     "process": "contacts",
+//     "method": "sync",
+//     "1":
+//     {
+//         "Contacts":
+//         {
+//             "modifiedSince": "2021-09-08 9:00:00"
+//         }
+//     }
+// }
+// Contacts SyncData -
+// {
+//     "method": "syncFromData"
+// }
+// Contact Groups -
+// {
+//     "process": "contactGroups",
+//     "method": "sync"
+// }
