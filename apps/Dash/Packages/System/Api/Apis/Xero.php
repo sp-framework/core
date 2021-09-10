@@ -36,6 +36,8 @@ class Xero
     {
         $this->packagesData = new PackagesData;
 
+        $this->apiConfig['debug'] = self::$debug;
+
         if ($this->apiConfig['setup'] == '4') {
             $this->checkUserToken();
         }
@@ -50,8 +52,6 @@ class Xero
 
     protected function mergeXeroConfigs()
     {
-        $this->apiConfig['debug'] = self::$debug;
-
         if ($this->apiConfig['use_systems_credentials'] == 1) {
             try {
                 $config = include(base_path('apps/Dash/Packages/System/Api/Configs/Xero/Config.php'));
