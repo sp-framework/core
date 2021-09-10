@@ -139,7 +139,7 @@ class Entities extends BasePackage
             ) {
                 $apiPackage = $this->usePackage(Api::class);
 
-                if ($entity['api_id'] != '0' &&
+                if ($entity['api_id'] && $entity['api_id'] != '0' &&
                     $data['api_id'] !== $entity['api_id']
                 ) {
                     $api = $apiPackage->getById($entity['api_id']);
@@ -158,6 +158,17 @@ class Entities extends BasePackage
                 $api['used_by'] = 'Entity (' . $data['business_name'] . ')';
 
                 $apiPackage->update($api);
+            } else if (isset($data['api_id']) &&
+                       ($data['api_id'] === '' || $data['api_id'] == 0) &&
+                       $entity['api_id'] != '0'
+            ) {
+                    $api = $apiPackage->getById($entity['api_id']);
+
+                    $api['in_use'] = 0;
+
+                    $api['used_by'] = '';
+
+                    $apiPackage->update($api);
             }
 
             $this->packagesData->responseCode = 0;
