@@ -1,3 +1,15 @@
+{% set firstNameDisabled = false %}
+{% set lastNameDisabled = false %}
+{% set canUpload = true %}
+{% set canAvatar = true %}
+{% set canRemove = true %}
+{% if account['package_name'] === 'employees' %}
+    {% set firstNameDisabled = true %}
+    {% set lastNameDisabled = true %}
+    {% set canUpload = false %}
+    {% set canAvatar = false %}
+    {% set canRemove = false %}
+{% endif %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
         {% if profile['portrait'] is defined and profile['portrait'] !== '' %}
@@ -17,8 +29,9 @@
                 'fieldValue'                     : profile['portrait'],
                 'imageType'                      : 'portrait',
                 'storageType'                    : 'private',
-                'upload'                         : true,
-                'avatar'                         : true,
+                'upload'                         : canUpload,
+                'avatar'                         : canAvatar,
+                'remove'                         : canRemove,
                 'portraitLink'                   : portraitLink
             ]
         )}}
@@ -106,6 +119,7 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'First Name',
                         'fieldRequired'                  : true,
+                        'fieldDisabled'                  : firstNameDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,
@@ -129,6 +143,7 @@
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'Last Name',
                         'fieldRequired'                  : true,
+                        'fieldDisabled'                  : lastNameDisabled,
                         'fieldBazScan'                   : true,
                         'fieldBazJstreeSearch'           : true,
                         'fieldBazPostOnCreate'           : true,

@@ -92,7 +92,7 @@
     </div>
 </div>
 <script>
-/* globals BazContentFieldsValidator PNotify autoComplete fixGrid */
+/* globals BazContentFieldsValidator PNotify autoComplete fixGrid Inputmask */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
 if (!window['dataCollection']['{{componentId}}']) {
@@ -178,10 +178,25 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-account_role'                    : { },
         '{{componentId}}-{{sectionId}}-first_name'                      : { },
         '{{componentId}}-{{sectionId}}-last_name'                       : { },
-        '{{componentId}}-{{sectionId}}-contact_phone'                   : { },
+        '{{componentId}}-{{sectionId}}-contact_phone'                   : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_phone'));
+            }
+        },
         '{{componentId}}-{{sectionId}}-contact_phone_ext'               : { },
-        '{{componentId}}-{{sectionId}}-contact_mobile'                  : { },
-        '{{componentId}}-{{sectionId}}-contact_fax'                     : { },
+        '{{componentId}}-{{sectionId}}-contact_fax'                     : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_fax'));
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_mobile'                  : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_mobile'));
+            }
+        },
         '{{componentId}}-{{sectionId}}-contact_other'                   : { },
         '{{componentId}}-{{sectionId}}-secondary_email'                 : { },
         '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
@@ -192,58 +207,6 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-strength-meter'                  : { },
         '{{componentId}}-{{sectionId}}-generated_password'              : { },
         '{{componentId}}-{{sectionId}}-confirm_password'                : { },
-        // '{{componentId}}-{{sectionId}}-skills'                          : {
-        //     'placeholder'   : "SELECT SKILLS",
-        //     'tags'          : true,
-        //     'ajax'          : {
-        //         url         : "{{links.url('hrms/skills/searchSkill')}}",
-        //         dataType    : 'json',
-        //         method      : 'post',
-        //         data: function(params) {
-        //             return {
-        //                 search: params.term
-        //             }
-        //         },
-        //         processResults: function(data) {
-        //             if (data.tokenKey && data.token) {
-        //                 $('#security-token').attr('name', data.tokenKey);
-        //                 $('#security-token').val(data.token);
-        //             }
-        //             if (data.skills) {
-        //                 var skillsData = [];
-        //                 for (var item of data.skills) {
-        //                     skillsData.push({
-        //                         'id'    : item['id'],
-        //                         'text'  : item['name']
-        //                     });
-        //                 }
-
-        //                 return {
-        //                     results: skillsData
-        //                 }
-        //             } else {
-        //                 return {
-        //                     results : []
-        //                 }
-        //             }
-        //         },
-        //         cache: true
-        //     },
-        //     minimumInputLength : 2,
-        //     createTag     : function(params) {
-        //         var term = $.trim(params.term);
-
-        //         if (term === '') {
-        //             return null;
-        //         }
-
-        //         return {
-        //             id: term,
-        //             text: term,
-        //             newTag: true
-        //         }
-        //     }
-        // },
         '{{componentId}}-{{sectionId}}-subscriptions'                 :
         $.extend(dataCollectionSection['{{componentId}}-{{sectionId}}-subscriptions'], {
             plugins: [
