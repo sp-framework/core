@@ -1,6 +1,6 @@
 {
     "name"          : "PurchaseOrders",
-    "display_name"   : "Purchase Orders",
+    "display_name"  : "Purchase Orders",
     "description"   : "Package for Stock Purchase Orders component",
     "app_type"      : "dash",
     "category"      : "business",

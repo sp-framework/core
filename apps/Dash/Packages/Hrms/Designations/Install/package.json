@@ -1,6 +1,6 @@
 {
     "name"          : "HrmsDesignations",
-    "display_name"   : "Hrms Designations Package",
+    "display_name"  : "Designations",
     "description"   : "Package for Hrms Designations component",
     "app_type"      : "dash",
     "category"      : "business",

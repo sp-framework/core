@@ -1,6 +1,6 @@
 {
     "name"          : "Products",
-    "display_name"   : "Admin Products Package",
+    "display_name"  : "Products",
     "description"   : "Package for Products component",
     "app_type"      : "dash",
     "category"      : "business",

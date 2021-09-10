@@ -1,6 +1,6 @@
 {
     "name"          : "Brands",
-    "display_name"   : "Admin Brands Package",
+    "display_name"  : "Brands",
     "description"   : "Package for Brands component",
     "app_type"      : "dash",
     "category"      : "business",

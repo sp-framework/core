@@ -1,6 +1,6 @@
 {
     "name"          : "Specifications",
-    "display_name"   : "Admin Specifications Package",
+    "display_name"  : "Specifications",
     "description"   : "Package for Specifications component",
     "app_type"      : "dash",
     "category"      : "business",
