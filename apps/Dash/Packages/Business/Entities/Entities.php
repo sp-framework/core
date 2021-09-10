@@ -42,6 +42,31 @@ class Entities extends BasePackage
         return $this;
     }
 
+    public function getEntityById($id)
+    {
+        $entity = $this->getById($id);
+
+        if ($entity) {
+            if ($entity['settings'] !== '') {
+                $entity['settings'] = Json::decode($entity['settings'], true);
+            }
+
+            if ($entity['address_id'] !== '' || $entity['address_id'] != '0') {
+                $address = $this->basepackages->addressbook->getAddressById($entity['address_id']);
+
+                if ($address) {
+                    $entity = array_merge($entity, $address);
+                }
+
+                return $entity;
+            }
+
+            return $entity;
+        }
+
+        return false;
+    }
+
     public function addEntity(array $data)
     {
         $data = $this->addAccountant($data);
@@ -113,6 +138,16 @@ class Entities extends BasePackage
                 ($data['api_id'] !== '' && $data['api_id'] != 0)
             ) {
                 $apiPackage = $this->usePackage(Api::class);
+
+                if ($data['api_id'] !== $entity['api_id']) {
+                    $api = $apiPackage->getById($entity['api_id']);
+
+                    $api['in_use'] = 0;
+
+                    $api['used_by'] = '';
+
+                    $apiPackage->update($api);
+                }
 
                 $api = $apiPackage->getById($data['api_id']);
 
@@ -208,7 +243,7 @@ class Entities extends BasePackage
 
     public function searchByEntityId($id)
     {
-        $entity = $this->getById($id);
+        $entity = $this->getEntityById($id);
 
         if ($entity) {
             $this->packagesData->responseCode = 0;
