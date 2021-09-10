@@ -11,6 +11,7 @@ class Account
         $insertAdmin = $db->insertAsDict(
             'basepackages_users_accounts',
             [
+                'status'                => '1',
                 'email'                 => $email,
                 'domain'                => explode('@', $email)[1],
                 'package_name'          => 'profiles',

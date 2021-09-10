@@ -290,6 +290,16 @@ class Auth
         $this->account = $this->accounts->checkAccountByEmail($data['user'], true);
 
         if ($this->account) {
+            if ($this->account['status'] != '1') {
+                $this->packagesData->responseCode = 1;
+
+                $this->packagesData->responseMessage = 'Error: Username/Password incorrect!';
+
+                $this->logger->log->debug($data['user'] . ' is disabled!');
+
+                return false;
+            }
+
             //New App OR New account via rego
             if (!$this->accounts->canLogin($this->account['id'], $this->app['route'])) {
 

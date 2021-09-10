@@ -15,6 +15,8 @@ class BasepackagesUsersAccounts extends BaseModel
 {
     public $id;
 
+    public $status;
+
     public $email;
 
     public $domain;

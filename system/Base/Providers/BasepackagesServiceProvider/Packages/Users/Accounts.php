@@ -118,6 +118,10 @@ class Accounts extends BasePackage
      */
     public function addAccount(array $data)
     {
+        if (!isset($data['status'])) {
+            $data['status'] = '0';
+        }
+
         $data['email'] = strtolower($data['email']);
 
         $data['domain'] = explode('@', $data['email'])[1];
@@ -200,6 +204,10 @@ class Accounts extends BasePackage
      */
     public function updateAccount(array $data)
     {
+        if (!isset($data['status'])) {
+            $data['status'] = '0';
+        }
+
         $accountObj = $this->modelToUse::findFirstById($data['id']);
 
         $account = $this->getAccountById($data['id'], true);
@@ -253,7 +261,9 @@ class Accounts extends BasePackage
 
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
-            if (isset($data['force_logout']) && $data['force_logout'] === '1') {
+            if ((isset($data['force_logout']) && $data['force_logout'] === '1') ||
+                 (isset($data['status']) && $data['status'] === '0')
+            ) {
                 $this->removeRelatedData($accountObj, false, false);
             }
         } else {

@@ -1,13 +1,26 @@
 {% if account['id'] is defined %}
     {% set accountId = account['id'] %}
+    {% set accountStatus = account['status'] %}
     {% set accountEmail = account['email'] %}
     {% set accountFirstName = account['profile']['first_name'] %}
     {% set accountLastName = account['profile']['last_name'] %}
 {% else %}
     {% set accountId = '' %}
+    {% set accountStatus = '' %}
     {% set accountEmail = '' %}
     {% set accountFirstName = '' %}
     {% set accountLastName = '' %}
+{% endif %}
+{% if accountStatus == '1' %}
+    {% set accountStatusChecked = true %}
+{% else %}
+    {% set accountStatusChecked = false %}
+{% endif %}
+{% if accountId == '1' %}
+    {% set accountStatusChecked = true %}
+    {% set accountStatusDisabled = true %}
+{% else %}
+    {% set accountStatusDisabled = false %}
 {% endif %}
 <div class="row">
     <div class="col">
@@ -34,6 +47,29 @@
     </div>
 </div>
 <div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'status',
+                'fieldLabel'                     : 'Enabled?',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Check to enable account.',
+                'fieldType'                      : 'checkbox',
+                'fieldCheckboxType'              : 'success',
+                'fieldCheckboxChecked'           : accountStatusChecked,
+                'fieldCheckboxAdditionClass'     : 'text-sm text-uppercase',
+                'fieldBazScan'                   : true,
+                'fieldDisabled'                  : accountStatusDisabled,
+                'fieldBazJstreeSearch'           : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true
+            ]
+        )}}
+    </div>
     <div class="col">
         {{adminltetags.useTag('fields',
             [

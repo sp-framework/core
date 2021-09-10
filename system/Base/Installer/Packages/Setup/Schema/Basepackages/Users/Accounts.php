@@ -22,6 +22,13 @@ class Accounts
                         ]
                     ),
                     new Column(
+                        'status',
+                        [
+                            'type'          => Column::TYPE_BOOLEAN,
+                            'notNull'       => true,
+                        ]
+                    ),
+                    new Column(
                         'email',
                         [
                             'type'          => Column::TYPE_VARCHAR,
