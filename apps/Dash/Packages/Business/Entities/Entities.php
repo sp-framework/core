@@ -139,7 +139,9 @@ class Entities extends BasePackage
             ) {
                 $apiPackage = $this->usePackage(Api::class);
 
-                if ($data['api_id'] !== $entity['api_id']) {
+                if ($entity['api_id'] != '0' &&
+                    $data['api_id'] !== $entity['api_id']
+                ) {
                     $api = $apiPackage->getById($entity['api_id']);
 
                     $api['in_use'] = 0;
