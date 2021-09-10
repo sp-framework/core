@@ -133,6 +133,8 @@ class Accounts extends BasePackage
 
                 $account = array_merge($account, $data);
 
+                $account['account_id'] = $account['id'];
+
                 $this->updateAccount($account);
 
                 $this->packagesData->last = $account;
@@ -166,9 +168,9 @@ class Accounts extends BasePackage
 
                 $this->addUpdateSecurity($id, $data);
 
-                if ($data['package_name'] === 'profiles') {
-                    $this->basepackages->profile->addProfile($data);
+                $this->basepackages->profile->addProfile($data);
 
+                if ($data['package_name'] === 'profiles') {
                     $data['package_row_id'] = $this->basepackages->profile->packagesData->responseData['id'];
 
                     $this->update($data);
@@ -243,9 +245,9 @@ class Accounts extends BasePackage
                 $this->emailNewPassword($data['email'], $password);
             }
 
-            if (isset($account['package_name']) && $account['package_name'] === 'profiles') {
-                $this->basepackages->profile->updateProfileViaAccount($data);
-            }
+            // if (isset($account['package_name']) && $account['package_name'] === 'profiles') {
+            $this->basepackages->profile->updateProfileViaAccount($data);
+            // }
 
             if (isset($data['role_id']) &&
                 $data['role_id'] != '0'
@@ -337,12 +339,6 @@ class Accounts extends BasePackage
             }
         }
 
-        if ($sessions) {
-            if ($accountObj->getsessions()) {
-                $accountObj->getsessions()->delete();
-            }
-        }
-
         if ($identifiers) {
             if ($accountObj->getidentifiers()) {
                 $accountObj->getidentifiers()->delete();
@@ -352,6 +348,12 @@ class Accounts extends BasePackage
         if ($agents) {
             if ($accountObj->getagents()) {
                 $accountObj->getagents()->delete();
+            }
+        }
+
+        if ($sessions) {
+            if ($accountObj->getsessions()) {
+                $accountObj->getsessions()->delete();
             }
         }
 
@@ -760,45 +762,7 @@ class Accounts extends BasePackage
                 $this->packagesData->acls = Json::encode($acls);
 
                 $account['permissions'] = Json::encode($permissions);
-                if ($account['package_name'] === 'profiles') {
-                    $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
-                } else if ($account['package_name'] === 'contacts') {
-                    $contactsPackage = $this->init()->checkPackage('Apps\Dash\Packages\Business\Directory\Contacts\Contacts');
-
-                    if ($contactsPackage) {
-                        $contactsPackage = $this->usePackage(\Apps\Dash\Packages\Business\Directory\Contacts\Contacts::class);
-                    }
-
-                    $contact = $contactsPackage->getById($account['package_row_id']);
-
-                    if ($contact) {
-                        $account['profile'] = $contact;
-                    }
-                } else if ($account['package_name'] === 'customers') {
-                    $customersPackage = $this->init()->checkPackage('Apps\Dash\Packages\Crms\Customers\Customers');
-
-                    if ($customersPackage) {
-                        $customersPackage = $this->usePackage(\Apps\Dash\Packages\Crms\Customers\Customers::class);
-                    }
-
-                    $customer = $customersPackage->getById($account['package_row_id']);
-
-                    if ($customer) {
-                        $account['profile'] = $customer;
-                    }
-                } else if ($account['package_name'] === 'employees') {
-                    $employeesPackage = $this->init()->checkPackage('Apps\Dash\Packages\Hrms\Employees\Employees');
-
-                    if ($employeesPackage) {
-                        $employeesPackage = $this->usePackage(\Apps\Dash\Packages\Hrms\Employees\Employees::class);
-                    }
-
-                    $employee = $employeesPackage->getById($account['package_row_id']);
-
-                    if ($employee) {
-                        $account['profile'] = $employee;
-                    }
-                }
+                $account['profile'] = $this->basepackages->profile->getProfile($account['id']);
 
                 $this->packagesData->account = $account;
 

@@ -89,9 +89,9 @@ class AccountsComponent extends BaseComponent
             $this->accounts,
             'system/users/accounts/view',
             null,
-            ['package_row_id', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
+            ['package_row_id', 'status', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
             true,
-            ['package_row_id', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
+            ['package_row_id', 'status', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
             $controlActions,
             ['role_id' => 'role (ID)', 'package_name' => 'Used By', 'package_row_id' => 'link'],
             $replaceColumns,
@@ -124,6 +124,12 @@ class AccountsComponent extends BaseComponent
             }
 
             $data['package_name'] = ucfirst($data['package_name']);
+
+            if ($data['status'] != '1') {
+                $data['status'] = '<span class="badge badge-secondary text-uppercase">DISABLED</span>';
+            } else {
+                $data['status'] = '<span class="badge badge-success text-uppercase">ENABLED</span>';
+            }
         }
 
         return $dataArr;
@@ -154,6 +160,9 @@ class AccountsComponent extends BaseComponent
                         <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
                     </a>';
             }
+        } else {
+            $data['package_row_id'] = '-';
+            $data['package_name'] = '-';
         }
 
         return $data;
@@ -173,6 +182,9 @@ class AccountsComponent extends BaseComponent
                         <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
                     </a>';
             }
+        } else {
+            $data['package_row_id'] = '-';
+            $data['package_name'] = '-';
         }
 
         return $data;
@@ -192,6 +204,9 @@ class AccountsComponent extends BaseComponent
                         <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
                     </a>';
             }
+        } else {
+            $data['package_row_id'] = '-';
+            $data['package_name'] = '-';
         }
 
         return $data;
