@@ -329,6 +329,8 @@ class Contacts extends BasePackage
         //@todo - This can be done on demand from the customer/accounting app.
         if ($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '0') {
             return true;
+        } else if ($contact['IsCustomer'] == '1' && $contact['EmailAddress'] === '') {
+            return true;
         }
 
         if (isset($contact['HasAttachments']) && $contact['HasAttachments'] == true) {
