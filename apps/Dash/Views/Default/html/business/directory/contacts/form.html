@@ -1,3 +1,53 @@
+{% set vendorAddresses = [] %}
+{% if vendor[0] is defined and vendor[0]['address_ids'] is defined %}
+    {% for addressType in vendor[0]['address_ids'] %}
+        {% if addressType|length > 0 %}
+            {% for address in addressType %}
+                {% set vendorAddresses[address['id']] = address %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% set selectVendorAddresses = [] %}
+{% if vendorAddresses|length > 0 %}
+    {% for vendorAddress in vendorAddresses %}
+        {% set select = '' %}
+        {% if vendorAddress['address_type'] == '1' %}
+            {% set select = select ~ 'Mailing/Shipping - ' %}
+        {% elseif vendorAddress['address_type'] == '2' %}
+            {% set select = select ~ 'Billing - ' %}
+        {% endif %}
+        {% if vendorAddress['name'] != '' %}
+            {% set select = select ~ vendorAddress['name'] ~ ', ' %}
+        {% endif %}
+        {% if vendorAddress['street_address'] != '' %}
+            {% set select = select ~ vendorAddress['street_address'] ~ ', ' %}
+        {% endif %}
+        {% if vendorAddress['street_address_2'] != '' %}
+            {% set select = select ~ vendorAddress['street_address_2'] ~ ', ' %}
+        {% endif %}
+        {% if vendorAddress['city_name'] != '' %}
+            {% set select = select ~ vendorAddress['city_name'] ~ ', ' %}
+        {% endif %}
+        {% if vendorAddress['post_code'] != '' %}
+            {% set select = select ~ vendorAddress['post_code'] ~ ', ' %}
+        {% endif %}
+        {% if vendorAddress['state_name'] != '' %}
+            {% set select = select ~ vendorAddress['state_name'] ~ ', ' %}
+        {% endif %}
+        {% if vendorAddress['country_name'] != '' %}
+            {% set select = select ~ vendorAddress['country_name'] %}
+        {% endif %}
+        {% set selectVendorAddresses = array_merge(selectVendorAddresses, [['id' : vendorAddress['id'], 'name' : select]]) %}
+    {% endfor %}
+{% endif %}
+{% set vendorAddresses = json_encode(vendorAddresses, 16) %}
+{% if selectVendorAddresses|length > 0 %}
+    {% set copyAddressFromVendorHidden = false %}
+{% else %}
+    {% set copyAddressFromVendorHidden = true %}
+{% endif %}
+
 {% if contact['id'] is defined %}
     {% set contactNotes = contact['notes'] %}
 {% else %}
@@ -70,7 +120,12 @@
                                 [
                                     'tabTitle'          : 'Addresses',
                                     'tabInclude'        : 'contacts/form/addresses',
-                                    'tabIncludeParams'  : ['contact': contact]
+                                    'tabIncludeParams'  :
+                                        [
+                                            'contact'                       : contact,
+                                            'copyAddressFromVendorHidden'   : copyAddressFromVendorHidden,
+                                            'selectVendorAddresses'         : selectVendorAddresses
+                                        ]
                                 ],
                                 'notes'   :
                                 [
@@ -91,6 +146,7 @@
 </div>
 <script>
 /* globals BazContentFieldsValidator PNotify autoComplete dataCollectionSection Inputmask */
+var addresses = JSON.parse('{{vendorAddresses}}');
 
 dataCollectionSection =
     $.extend(dataCollectionSection, {
@@ -215,7 +271,7 @@ dataCollectionSection =
                 },
                 cache: true
             },
-            minimumInputLength : 2,
+            minimumInputLength : 2
         },
         '{{componentId}}-{{sectionId}}-last_name'                       : { },
         '{{componentId}}-{{sectionId}}-contact_manager_id'              : { },
@@ -430,28 +486,141 @@ dataCollectionSection =
                 });
             }
         },
-        '{{componentId}}-{{sectionId}}-contact_phone'           : {
+        '{{componentId}}-{{sectionId}}-contact_phone'                   : {
             afterInit: function() {
                 Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
                     .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_phone'));
             }
         },
-        '{{componentId}}-{{sectionId}}-contact_phone_ext'       : { },
-        '{{componentId}}-{{sectionId}}-contact_fax'             : {
-            afterInit: function() {
-                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
-                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_fax'));
-            }
-        },
+        '{{componentId}}-{{sectionId}}-contact_phone_ext'               : { },
         '{{componentId}}-{{sectionId}}-contact_mobile'                  : {
             afterInit: function() {
                 Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
                     .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_mobile'));
             }
         },
+        '{{componentId}}-{{sectionId}}-contact_fax'                     : {
+            afterInit: function() {
+                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                    .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_fax'));
+            }
+        },
+        '{{componentId}}-{{sectionId}}-contact_other'                   : { },
         '{{componentId}}-{{sectionId}}-contact_secondary_email'         : { },
         '{{componentId}}-{{sectionId}}-cc_emails_to_secondary_email'    : { },
-        '{{componentId}}-{{sectionId}}-contact_other'                   : { },
+        '{{componentId}}-{{sectionId}}-copy_address_from_vendor'        : {
+            placeholder: 'COPY ADDRESS FROM VENDOR',
+            allowClear: true,
+            afterInit: function() {
+                //Will only work when you select a vendor
+                $('#{{componentId}}-{{sectionId}}-vendor_id').on('select2:select', function(e) {
+                    $('#{{componentId}}-{{sectionId}}-copy_address_from_vendor').parents('.form-group').removeClass('d-none');
+                    $('#{{componentId}}-{{sectionId}}-address_types').val(0).trigger('change');
+                    $('#{{componentId}}-{{sectionId}}-copy_address_from_vendor option').each(function(index, option) {
+                        if ($(option).val() !== '') {
+                            $(option).remove();
+                        }
+                    });
+                    $('#{{componentId}}-{{sectionId}}-copy_address_from_vendor').trigger('change');
+
+                    addresses = { };
+                    var vendorId = e.params.data.id;
+
+                    var postData = { };
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+                    postData['vendorId'] = vendorId;
+
+                    $.post('{{links.url("business/directory/vendors/searchvendorid")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        //eslint-disable-next-line
+                        console.log(response);
+
+                        if (response.vendor['address_ids'] && typeof response.vendor['address_ids'] === 'object') {
+                            for (var addressType in response.vendor['address_ids']) {
+                                if (response.vendor['address_ids'][addressType].length > 0) {
+                                    $(response.vendor['address_ids'][addressType]).each(function(index, address) {
+
+                                        addresses[address.id] = address;
+                                        var select = '';
+
+                                        if (address.address_type == '1') {
+                                            select += 'Mailing/Shipping - ';
+                                        } else if (address.address_type == '2') {
+                                            select += 'Billing - ';
+                                        }
+
+                                        if (address.name) {
+                                            select += address.name + ', ';
+                                        }
+                                        if (address.street_address) {
+                                            select += address.street_address + ', ';
+                                        }
+                                        if (address.city_name) {
+                                            select += address.city_name + ', ';
+                                        }
+                                        if (address.post_code) {
+                                            select += address.post_code + ', ';
+                                        }
+                                        if (address.state_name) {
+                                            select += address.state_name + ', ';
+                                        }
+                                        if (address.country_name) {
+                                            select += address.country_name;
+                                        }
+
+                                        var newOption = new Option(select, address.id, false, false);
+                                        $('#{{componentId}}-{{sectionId}}-copy_address_from_vendor').append(newOption).trigger('change');
+                                    });
+                                }
+                            }
+                        }
+                    }, 'json');
+                });
+
+                $('#{{componentId}}-{{sectionId}}-copy_address_from_vendor').on('select2:select', function(e) {
+                    if (addresses[e.params.data.id]) {
+                        $('#{{componentId}}-{{sectionId}}-address_types').val(addresses[e.params.data.id]['address_type']).trigger('change');
+
+                        var attentionTo = $('#{{componentId}}-{{sectionId}}-first_name').val() + ' ' + $('#{{componentId}}-{{sectionId}}-last_name').val();
+
+                        if (attentionTo === ' ') {
+                            attentionTo = addresses[e.params.data.id]['attention_to'];
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-attention_to').val(attentionTo);
+                        $('#{{componentId}}-{{sectionId}}-attention_to').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-street_address').val(addresses[e.params.data.id]['street_address']);
+                        $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-street_address_2').val(addresses[e.params.data.id]['street_address_2']);
+                        $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-city_id').val(addresses[e.params.data.id]['city_id']);
+                        $('#{{componentId}}-{{sectionId}}-city_id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-city_name').val(addresses[e.params.data.id]['city_name']);
+                        $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-post_code').val(addresses[e.params.data.id]['post_code']);
+                        $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-state_id').val(addresses[e.params.data.id]['state_id']);
+                        $('#{{componentId}}-{{sectionId}}-state_id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-state_name').val(addresses[e.params.data.id]['state_name']);
+                        $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-country_id').val(addresses[e.params.data.id]['country_id']);
+                        $('#{{componentId}}-{{sectionId}}-country_id').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-country_name').val(addresses[e.params.data.id]['country_name']);
+                        $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', false);
+                        $('#{{componentId}}-{{sectionId}}-add-address').attr('hidden', false);
+                        $('#{{componentId}}-{{sectionId}}-cancel-address').attr('hidden', false);
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-addresses').on('addressAdd addressUpdate addressCancel', function() {
+                    $('#{{componentId}}-{{sectionId}}-copy_address_from_vendor').val(0).trigger('change');
+                });
+            }
+        },
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             rules       : {

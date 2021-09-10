@@ -140,6 +140,7 @@ class Locations extends BasePackage
                 }
             }
         }
+
         unset($location['employee_ids']);
 
         $location['address'] =

@@ -40,7 +40,7 @@ class ContactsComponent extends BaseComponent
 
                 $vendors = $this->usePackage(Vendors::class);
 
-                $vendorArr[] = $vendors->getById($contact['vendor_id']);
+                $vendorArr[] = $vendors->getVendorById($contact['vendor_id']);
 
                 $this->view->vendor = $vendorArr;
 

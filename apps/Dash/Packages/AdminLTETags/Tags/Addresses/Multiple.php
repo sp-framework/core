@@ -54,7 +54,7 @@ class Multiple
     protected function buildMultipleAddressesLayout()
     {
         $this->content .=
-            '<div class="row vdivide">
+            '<div class="row vdivide" id="' . $this->compSecId . '-addresses">
                 <div class="col">
                     <div class="row">
                         <div class="col">' .
@@ -211,7 +211,7 @@ class Multiple
                                         [
                                             'add-address'       => [
                                                 'title'                   => 'Add',
-                                                'hidden'                  => true,
+                                                'disabled'                => true,
                                                 'size'                    => 'xs',
                                                 'type'                    => 'primary',
                                                 'icon'                    => 'plus',
@@ -220,6 +220,7 @@ class Multiple
                                             'update-address'    => [
                                                 'title'                   => 'Update',
                                                 'hidden'                  => true,
+                                                'disabled'                => true,
                                                 'size'                    => 'xs',
                                                 'type'                    => 'primary',
                                                 'icon'                    => 'plus',
@@ -227,7 +228,6 @@ class Multiple
                                             ],
                                             'cancel-address'    => [
                                                 'title'                   => 'Cancel',
-                                                'hidden'                  => true,
                                                 'size'                    => 'xs',
                                                 'type'                    => 'secondary',
                                                 'icon'                    => 'times',
@@ -274,6 +274,15 @@ class Multiple
                                                 count($this->params['address_ids']) > 0 &&
                                                 count($this->params['address_ids'][$type['id']]) > 0
                                             ) {
+                                                $this->content .=
+                                                    '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-addresses-' . $type['id'] . '-nodata" hidden>
+                                                        <div class="row">
+                                                            <div class="col text-uppercase">
+                                                                <i class="fa fa-fw fa-exclamation"></i> Add ' . $type['name'] . '
+                                                            </div>
+                                                        </div>
+                                                    </div>';
+
                                                 foreach ($this->params['address_ids'][$type['id']] as $key => $address) {
                                                     if ($key === 0) {
                                                         $listType = 'success';
@@ -293,6 +302,9 @@ class Multiple
                                                                     </button>
                                                                     <button data-sort-id="" type="button" class="btn btn-xs btn-primary float-right ml-1 addressEditButton">
                                                                         <i class="fa fas fa-fw text-xs fa-edit"></i>
+                                                                    </button>
+                                                                    <button data-sort-id="" type="button" class="btn btn-xs btn-info float-right ml-1 addressCopyButton">
+                                                                        <i class="fa fas fa-fw text-xs fa-copy"></i>
                                                                     </button>
                                                                 </div>
                                                             </div>
@@ -318,6 +330,15 @@ class Multiple
                                                             </div>
                                                         </li>';
                                                 }
+                                            } else {
+                                                $this->content .=
+                                                    '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-addresses-' . $type['id'] . '-nodata">
+                                                        <div class="row">
+                                                            <div class="col text-uppercase">
+                                                                <i class="fa fa-fw fa-exclamation"></i> Add ' . $type['name'] . '
+                                                            </div>
+                                                        </div>
+                                                    </div>';
                                             }
 
                                         $this->content .=
@@ -371,10 +392,21 @@ class Multiple
                             dataCollectionSection["data"]["address_ids"] = { }
                             dataCollectionSection["data"]["delete_address_ids"] = [];
 
-                            $("#' . $this->compSecId . '-address_types").on("select2:select", function(e) {
-                                var id = e.params.data.id;
+                            $("#' . $this->compSecId . '-address_types").on("change.select2", function(e) {
+                                var id;
 
-                                toggleAddressFields(false);
+                                if (e.params) {
+                                    id = e.params.data.id;
+                               } else {
+                                    id = $("#' . $this->compSecId . '-address_types").val();
+                                }
+
+                                if (!id || id == "0") {
+                                    toggleAddressFields(true);
+                                    $(".addressEditButton, .addressDeleteButton").attr("disabled", false);
+                                } else {
+                                    toggleAddressFields(false);
+                                }
 
                                 initMainButtons(id);
                             });
@@ -387,12 +419,22 @@ class Multiple
                                     $(".addressEditButton, .addressDeleteButton").attr("disabled", false);
                                     e.preventDefault();
                                     toggleAddressFields(true);
+                                    $("#' . $this->compSecId . '-addresses").trigger("addressCancel");
                                 });
                                 $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").off();
+                                $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").attr("disabled", false);
                                 $("#' . $this->compSecId . '-add-address, #' . $this->compSecId . '-update-address").click(function(e) {
-                                    $(".addressEditButton, .addressDeleteButton").attr("disabled", false);
                                     e.preventDefault();
-                                    extractData(id);
+                                    $(".addressEditButton, .addressDeleteButton").attr("disabled", false);
+
+                                    if ($(this)[0].id === "' . $this->compSecId . '-update-address") {
+                                        extractData(id, true);
+                                        $("#' . $this->compSecId . '-addresses").trigger("addressUpdate");
+                                    } else {
+                                        extractData(id);
+                                        $("#' . $this->compSecId . '-addresses").trigger("addressAdd");
+                                    }
+
                                 });
                             }
 
@@ -408,9 +450,7 @@ class Multiple
                                 $("#' . $this->compSecId . '-state_name").attr("disabled", status);
                                 $("#' . $this->compSecId . '-country_id").attr("disabled", status);
                                 $("#' . $this->compSecId . '-country_name").attr("disabled", status);
-                                $("#' . $this->compSecId . '-cancel-address").attr("hidden", status);
-                                $("#' . $this->compSecId . '-add-address").attr("hidden", status);
-                                $("#' . $this->compSecId . '-update-address").attr("hidden", status);
+
                                 if (status === true) {
                                     $("#' . $this->compSecId . '-address_types").attr("disabled", false);
                                     $("#' . $this->compSecId . '-address_id").val("");
@@ -429,12 +469,15 @@ class Multiple
                                 if (update === true) {
                                     $("#' . $this->compSecId . '-add-address").attr("hidden", true);
                                     $("#' . $this->compSecId . '-update-address").attr("hidden", false);
+                                    $("#' . $this->compSecId . '-update-address").attr("disabled", true);
                                 } else {
+                                    $("#' . $this->compSecId . '-add-address").attr("hidden", false);
+                                    $("#' . $this->compSecId . '-add-address").attr("disabled", true);
                                     $("#' . $this->compSecId . '-update-address").attr("hidden", true);
                                 }
                             }
 
-                            function extractData(id) {
+                            function extractData(id, update = false) {
                                 if ($("#' . $this->compSecId . '-street_address").val() === "") {
                                     $("#' . $this->compSecId . '-street_address").addClass("is-invalid");
                                     $("#' . $this->compSecId . '-street_address").focus(function() {
@@ -461,22 +504,22 @@ class Multiple
                                         $(this).removeClass("is-invalid");
                                     });
                                 } else {
-                                    $("#' . $this->compSecId . '-address_types").val(0);
-                                    $("#' . $this->compSecId . '-address_types").trigger("change");
                                     var data = { };
                                     var addressId, addressNew;
 
+                                    //eslint-disable-next-line
+                                    console.log($("#' . $this->compSecId . '-attention_to").val());
                                     data["address_id"] = $("#' . $this->compSecId . '-address_id").val();
-                                    data["attention_to"] = $("#' . $this->compSecId . '-attention_to").val();
-                                    data["street_address"] = $("#' . $this->compSecId . '-street_address").val();
-                                    data["street_address_2"] = $("#' . $this->compSecId . '-street_address_2").val();
+                                    data["attention_to"] = $("#' . $this->compSecId . '-attention_to").val().trim();
+                                    data["street_address"] = $("#' . $this->compSecId . '-street_address").val().trim();
+                                    data["street_address_2"] = $("#' . $this->compSecId . '-street_address_2").val().trim();
                                     data["city_id"] = $("#' . $this->compSecId . '-city_id").val();
-                                    data["city_name"] = $("#' . $this->compSecId . '-city_name").val();
-                                    data["post_code"] = $("#' . $this->compSecId . '-post_code").val();
+                                    data["city_name"] = $("#' . $this->compSecId . '-city_name").val().trim();
+                                    data["post_code"] = $("#' . $this->compSecId . '-post_code").val().trim();
                                     data["state_id"] = $("#' . $this->compSecId . '-state_id").val();
-                                    data["state_name"] = $("#' . $this->compSecId . '-state_name").val();
+                                    data["state_name"] = $("#' . $this->compSecId . '-state_name").val().trim();
                                     data["country_id"] = $("#' . $this->compSecId . '-country_id").val();
-                                    data["country_name"] = $("#' . $this->compSecId . '-country_name").val();
+                                    data["country_name"] = $("#' . $this->compSecId . '-country_name").val().trim();
 
                                     var html =
                                         \'<dl class="row mb-0">\' +
@@ -496,14 +539,18 @@ class Multiple
                                             \'<dd class="mb-0 col-sm-8 cla-country" data-id="\' + data["country_id"] + \'">\' + data["country_name"] + \'</dd>\' +
                                         \'</dl>\';
 
+
                                     if ($("#' . $this->compSecId . '-sortable-addresses-" + id).length > 0) {
                                         var listType;
-                                        if ($("#' . $this->compSecId . '-sortable-addresses-" + id + " li").length > 0) {
+
+                                        var addressesLi = $("#' . $this->compSecId . '-sortable-addresses-" + id + " li");
+
+                                        if (addressesLi.length > 0) {
                                             listType = "secondary";
                                         } else {
                                             listType = "success";
                                         }
-
+                                        console.log(data);
                                         if (data["address_id"] === "") {
                                             addressId = Date.now();
                                             addressNew = "1";
@@ -527,6 +574,9 @@ class Multiple
                                                         \'<button data-sort-id="" type="button" class="btn btn-xs btn-primary float-right ml-1 addressEditButton">\' +
                                                             \'<i class="fa fas fa-fw text-xs fa-edit"></i>\' +
                                                         \'</button>\' +
+                                                        \'<button data-sort-id="" type="button" class="btn btn-xs btn-info float-right ml-1 addressCopyButton">\' +
+                                                            \'<i class="fa fas fa-fw text-xs fa-edit"></i>\' +
+                                                        \'</button>\' +
                                                     \'</div>\' +
                                                 \'</div>\' +
                                                 \'<div class="row">\' +
@@ -535,16 +585,38 @@ class Multiple
                                                     \'</div>\' +
                                                 \'</div>\' +
                                             \'</li>\';
-                                        //Check this again for multiple addresses in the list. This might be a bug.
-                                        //Also add No-data div like we did in dropzone.
-                                        if (addressNew === "1") {
-                                            $("#' . $this->compSecId . '-sortable-addresses-" + id).append(list);
-                                        } else {
-                                            $("#' . $this->compSecId . '-sortable-addresses-" + id + " .list-group-item-data").empty().append(html);
-                                        }
-                                    }
 
-                                    toggleAddressFields(true);
+                                        if (update === false && addressesLi.length > 0) {
+                                            var exists = false;
+
+                                            $(addressesLi).each(function(index, li) {
+                                                //eslint-disable-next-line
+                                                console.log($(li).find(".cla-postcode").text());
+
+                                                if ($(li).find(".cla-attentionTo").text() === data["attention_to"] &&
+                                                    $(li).find(".cla-street").text() === data["street_address"] &&
+                                                    $(li).find(".cla-postcode").text() === data["post_code"]
+                                                ) {
+                                                    PNotify.error({"title" : "Address with same name, street & post code already added!"});
+                                                    exists = true;
+                                                    return;
+                                                }
+                                            });
+
+                                            if (exists === false) {
+                                                $("#' . $this->compSecId . '-sortable-addresses-" + id).append(list);
+                                            }
+                                        } else if (update === true) {
+                                            $("#' . $this->compSecId . '-sortable-addresses-" + id + " [data-address-id=" + addressId + "]")
+                                                .find(".list-group-item-data").empty().append(html);
+                                        } else {
+                                            $("#' . $this->compSecId . '-sortable-addresses-" + id).append(list);
+                                            $("#' . $this->compSecId . '-addresses-" + id + "-nodata").attr("hidden", true);
+                                        }
+
+                                    }
+                                    $("#' . $this->compSecId . '-address_types").val(0).trigger("change");
+                                    // toggleAddressFields(true);
                                     initSortable("' . $this->compSecId . '-sortable-addresses-" + id, id);
                                     collectData();
                                     registerAddressButtons();
@@ -654,11 +726,40 @@ class Multiple
                                     });
                                 });
 
+                                $(".addressCopyButton").each(function(index, button) {
+                                    $(button).off();
+                                    $(button).click(function() {
+                                        $("#' . $this->compSecId . '-address_types").val(0).trigger("change");
+                                        $($(this).parents("li").children(".row")[1]).find("dd").each(function(index,dd) {
+                                            if ($(dd).is(".cla-attentionTo")) {
+                                                $("#' . $this->compSecId . '-attention_to").val($(dd).html());
+                                            } else if ($(dd).is(".cla-street")) {
+                                                $("#' . $this->compSecId . '-street_address").val($(dd).html());
+                                            } else if ($(dd).is(".cla-street2")) {
+                                                $("#' . $this->compSecId . '-street_address_2").val($(dd).html());
+                                            } else if ($(dd).is(".cla-city")) {
+                                                $("#' . $this->compSecId . '-city_id").val($(dd).data("id"));
+                                                $("#' . $this->compSecId . '-city_name").val($(dd).html());
+                                            } else if ($(dd).is(".cla-postcode")) {
+                                                $("#' . $this->compSecId . '-post_code").val($(dd).html());
+                                            } else if ($(dd).is(".cla-state")) {
+                                                $("#' . $this->compSecId . '-state_id").val($(dd).data("id"));
+                                                $("#' . $this->compSecId . '-state_name").val($(dd).html());
+                                            } else if ($(dd).is(".cla-country")) {
+                                                $("#' . $this->compSecId . '-country_id").val($(dd).data("id"));
+                                                $("#' . $this->compSecId . '-country_name").val($(dd).html());
+                                            }
+                                        });
+                                        toggleAddressFields(false, false);
+                                    });
+                                });
+
                                 $(".addressDeleteButton").each(function(index, button) {
                                     $(button).off();
                                     $(button).click(function() {
 
                                         var addressesCount = $(this).parents("ul").children("li").length;
+                                        var typeId = $(this).parents("ul").data("sortlisttypeid");
 
                                         if (addressesCount > 1) {
                                             if ($(this).parents("li").is(".list-group-item-success")) {
@@ -667,10 +768,16 @@ class Multiple
                                                 $($(this).parents("li").siblings("li")[0]).addClass("list-group-item-success");
                                             }
                                         }
+
                                         dataCollectionSection["data"]["delete_address_ids"].push($(this).parents("li").data("address-id"));
 
                                         $(this).parents("li").remove();
 
+                                        addressesCount = addressesCount - 1;
+
+                                        if (addressesCount === 0) {
+                                            $("#' . $this->compSecId . '-addresses-" + typeId + "-nodata").attr("hidden", false);
+                                        }
                                         collectData();
                                     });
                                 });

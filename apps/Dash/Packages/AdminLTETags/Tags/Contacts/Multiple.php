@@ -198,6 +198,15 @@ class Multiple
                                     if (isset($this->params['contact_ids']) &&
                                         count($this->params['contact_ids']) > 0
                                     ) {
+                                        $this->content .=
+                                            '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-contacts-nodata" hidden>
+                                                <div class="row">
+                                                    <div class="col text-uppercase">
+                                                        <i class="fa fa-fw fa-exclamation"></i> Add Contacts
+                                                    </div>
+                                                </div>
+                                            </div>';
+
                                         foreach ($this->params['contact_ids'] as $key => $contact) {
                                             if ($key === 0) {
                                                 $listType = 'success';
@@ -237,6 +246,15 @@ class Multiple
                                                     </div>
                                                 </li>';
                                         }
+                                    } else {
+                                        $this->content .=
+                                            '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-contacts-nodata">
+                                                <div class="row">
+                                                    <div class="col text-uppercase">
+                                                        <i class="fa fa-fw fa-exclamation"></i> Add Contacts
+                                                    </div>
+                                                </div>
+                                            </div>';
                                     }
 
                             $this->content .=
@@ -479,7 +497,9 @@ class Multiple
                                             \'<dd class="mb-0 col-sm-8 cla-extension">\' + data["contact_phone_ext"] + \'</dd>\' +
                                         \'</dl>\';
 
-                                    if ($("#' . $this->compSecId . '-sortable-contacts li").length > 0) {
+                                    var contactsLi = $("#' . $this->compSecId . '-sortable-contacts li");
+
+                                    if (contactsLi.length > 0) {
                                         listType = "secondary";
                                     } else {
                                         listType = "success";
@@ -513,8 +533,6 @@ class Multiple
                                                 \'</div>\' +
                                             \'</div>\' +
                                         \'</li>\';
-
-                                    var contactsLi = $("#' . $this->compSecId . '-sortable-contacts li");
 
                                     if (contactsLi.length > 0) {
                                         var exists = false;

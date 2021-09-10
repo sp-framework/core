@@ -198,6 +198,15 @@ class Multiple
                                     if (isset($this->params['employee_ids']) &&
                                         count($this->params['employee_ids']) > 0
                                     ) {
+                                        $this->content .=
+                                            '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-employees-nodata" hidden>
+                                                <div class="row">
+                                                    <div class="col text-uppercase">
+                                                        <i class="fa fa-fw fa-exclamation"></i> Add Contacts
+                                                    </div>
+                                                </div>
+                                            </div>';
+
                                         foreach ($this->params['employee_ids'] as $key => $employee) {
                                             if ($key === 0) {
                                                 $listType = 'success';
@@ -237,6 +246,15 @@ class Multiple
                                                     </div>
                                                 </li>';
                                         }
+                                    } else {
+                                        $this->content .=
+                                            '<div class="list-group-item list-group-item-secondary no-data rounded-0" id="' . $this->compSecId . '-employees-nodata">
+                                                <div class="row">
+                                                    <div class="col text-uppercase">
+                                                        <i class="fa fa-fw fa-exclamation"></i> Add Employees
+                                                    </div>
+                                                </div>
+                                            </div>';
                                     }
 
                             $this->content .=
@@ -535,6 +553,8 @@ class Multiple
                                         }
                                     } else {
                                         $("#' . $this->compSecId . '-sortable-employees").append(list);
+
+                                        $("#' . $this->compSecId . '-employees-nodata").attr("hidden", true);
                                     }
 
                                     toggleEmployeeFields(false);
@@ -612,6 +632,12 @@ class Multiple
                                         }
 
                                         $(this).parents("li").remove();
+
+                                        employeesCount = employeesCount - 1;
+
+                                        if (employeesCount === 0) {
+                                            $("#' . $this->compSecId . '-employees-nodata").attr("hidden", false);
+                                        }
 
                                         collectData();
                                     });

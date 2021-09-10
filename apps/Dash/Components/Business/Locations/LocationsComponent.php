@@ -48,9 +48,11 @@ class LocationsComponent extends BaseComponent
                     foreach ($location['employee_ids'] as $employeeKey => $employee) {
                         if ($this->employees->searchById($employee)) {
                             $employeeArr = $this->employees->packagesData->employee;
-                        }
 
-                        $location['employee_ids'][$employeeKey] = $employeeArr;
+                            $location['employee_ids'][$employeeKey] = $employeeArr;
+                        } else {
+                            unset($location['employee_ids'][$employeeKey]);
+                        }
                     }
                 }
 

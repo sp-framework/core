@@ -1,3 +1,31 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                            : component,
+                'componentName'                        : componentName,
+                'componentId'                          : componentId,
+                'sectionId'                            : sectionId,
+                'fieldId'                              : 'copy_address_from_vendor',
+                'fieldLabel'                           : 'Copy Address From Vendor',
+                'fieldType'                            : 'select2',
+                'fieldHelp'                            : true,
+                'fieldHelpTooltipContent'              : 'Copy address from vendor, if available.',
+                'fieldRequired'                        : false,
+                'fieldHidden'                          : copyAddressFromVendorHidden,
+                'fieldBazScan'                         : true,
+                'fieldBazJstreeSearch'                 : false,
+                'fieldBazPostOnCreate'                 : false,
+                'fieldBazPostOnUpdate'                 : false,
+                'fieldDataSelect2Options'              : selectVendorAddresses,
+                'fieldDataSelect2OptionsKey'           : 'id',
+                'fieldDataSelect2OptionsValue'         : 'name',
+                'fieldDataSelect2OptionsArray'         : true,
+                'fieldDataSelect2OptionsSelected'      : ''
+            ]
+        )}}
+    </div>
+</div>
 {{adminltetags.useTag('addresses',
     [
         'component'                                   : component,
