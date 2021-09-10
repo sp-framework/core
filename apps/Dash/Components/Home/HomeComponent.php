@@ -12,7 +12,6 @@ use Apps\Dash\Components\Ims\Categories\Install\Component as CategoriesComponent
 use Apps\Dash\Components\Ims\Products\Install\Component as ProductsComponent;
 use Apps\Dash\Components\Ims\Specifications\Install\Component as SpecificationsComponent;
 use Apps\Dash\Components\Ims\Stock\Purchaseorders\Install\Component as PurchaseOrdersComponent;
-use Apps\Dash\Components\Ims\Suppliers\Install\Component as SuppliersComponent;
 use Apps\Dash\Components\System\Api\Ebay\Taxonomy\Install\Component as TaxonomyComponent;
 use Apps\Dash\Components\System\Api\Install\Component as ApiComponent;
 use Apps\Dash\Components\System\Messenger\MessengerComponent;
@@ -40,7 +39,6 @@ use Apps\Dash\Packages\Ims\Categories\Install\Package as CategoriesPackage;
 use Apps\Dash\Packages\Ims\Products\Install\Package as ProductsPackage;
 use Apps\Dash\Packages\Ims\Specifications\Install\Package as SpecificationsPackage;
 use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Install\Package as PurchaseOrdersPackage;
-use Apps\Dash\Packages\Ims\Suppliers\Install\Package as SuppliersPackage;
 use Apps\Dash\Packages\System\Api\Api;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Package as XeroSyncPackage;
 use Apps\Dash\Packages\System\Api\Ebay\Taxonomy\Install\Package as TaxonomyPackage;
@@ -56,6 +54,7 @@ class HomeComponent extends BaseComponent
      */
     public function viewAction()
     {
+        // var_dump($this->auth->account());die();
         // $this->resetTemp();return;
 
         // $this->reset();return;
@@ -101,8 +100,8 @@ class HomeComponent extends BaseComponent
         //
         // $apiPackage = new ApiPackage();
         // $apiPackage->installPackage(true);
-        // $xeroSyncPackage = new XeroSyncPackage();
-        // $xeroSyncPackage->installPackage(true);
+        $xeroSyncPackage = new XeroSyncPackage();
+        $xeroSyncPackage->installPackage(true);
 
         // $vendorgroupsComponent = new VendorGroupsComponent();
         // $vendorgroupsComponent->installComponent();
@@ -136,13 +135,6 @@ class HomeComponent extends BaseComponent
         // For Installing Specifications Package
         $specificationPackage = new SpecificationsPackage();
         $specificationPackage->installPackage(true);
-
-        // For Installing Suppliers
-        // $suppliersComponent = new SuppliersComponent();
-        // $suppliersComponent->installComponent();
-        // For Installing Suppliers Package
-        $suppliersPackage = new SuppliersPackage();
-        $suppliersPackage->installPackage(true);
 
         // For Installing Products
         // $productsComponent = new ProductsComponent();
