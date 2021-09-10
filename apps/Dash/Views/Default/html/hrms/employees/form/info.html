@@ -75,22 +75,6 @@
                         'componentName'                         : componentName,
                         'componentId'                           : componentId,
                         'sectionId'                             : sectionId,
-                        'fieldId'                               : 'account_id',
-                        'fieldLabel'                            : 'Account ID',
-                        'fieldHidden'                           : true,
-                        'fieldType'                             : 'input',
-                        'fieldBazScan'                          : true,
-                        'fieldBazPostOnCreate'                  : true,
-                        'fieldBazPostOnUpdate'                  : true,
-                        'fieldValue'                            : employeeAccountId
-                    ]
-                )}}
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                             : component,
-                        'componentName'                         : componentName,
-                        'componentId'                           : componentId,
-                        'sectionId'                             : sectionId,
                         'fieldId'                               : 'account_email',
                         'fieldLabel'                            : 'Email',
                         'fieldType'                             : 'input',
@@ -155,6 +139,77 @@
                         'fieldDataSelect2OptionsValue'         : 'name',
                         'fieldDataSelect2OptionsArray'         : true,
                         'fieldDataSelect2OptionsSelected'      : employeeStatus
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {% if employeeAccountId is defined and employeeAccountId !== '' and employeeAccountId != '0' %}
+                    {% set linkHidden = false %}
+                    {% set createLink =
+                        '<a href="' ~ links.url('system/users/accounts/q/id/' ~ employeeAccountId) ~ '" type="button" data-id="' ~ employeeAccountId ~ '" class="text-white btn btn-primary btn-xs text-uppercase contentAjaxLink">
+                            <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
+                        </a>'
+                    %}
+                    {% set createHidden = true %}
+                {% else %}
+                    {% set createLink = '' %}
+                    {% set linkHidden = true %}
+                    {% set createHidden = false %}
+                {% endif %}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_id',
+                        'fieldLabel'                            : 'Account ID',
+                        'fieldHidden'                           : true,
+                        'fieldType'                             : 'input',
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldValue'                            : employeeAccountId
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'create_account',
+                        'fieldLabel'                            : 'Create User Account?',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'Create user account for this customer?',
+                        'fieldRequired'                         : false,
+                        'fieldHidden'                           : createHidden,
+                        'fieldType'                             : 'checkbox',
+                        'fieldCheckboxType'                     : 'info',
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldBazScan'                          : true
+                    ]
+                )}}
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'account_link',
+                        'fieldLabel'                            : 'User Account',
+                        'fieldType'                             : 'html',
+                        'fieldHelp'                             : true,
+                        'fieldHidden'                           : linkHidden,
+                        'fieldHelpTooltipContent'               : 'User account link',
+                        'fieldAdditionalClass'                  : 'mb-0',
+                        'fieldHtmlContent'                      : createLink,
+                        'fieldBazScan'                          : true,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazPostOnCreate'                  : false,
+                        'fieldBazPostOnUpdate'                  : false
                     ]
                 )}}
             </div>
