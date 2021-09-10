@@ -271,6 +271,14 @@ class Local extends BasePackage
 
     protected function addFileInfoToDb()
     {
+        $createdBy = 0;
+        $updatedBy = 0;
+
+        if (isset($this->auth)) {
+            $createdBy = $this->auth->account()['id'];
+            $updatedBy = $this->auth->account()['id'];
+        }
+
         $data =
             [
                 'storages_id'           => $this->storage['id'],
@@ -280,8 +288,8 @@ class Local extends BasePackage
                 'size'                  => $this->fileSize,
                 'type'                  => $this->mimeType,
                 'orphan'                => 1,
-                'created_by'            => $this->auth->account()['id'] ?? 0,
-                'updated_by'            => $this->auth->account()['id'] ?? 0
+                'created_by'            => $createdBy,
+                'updated_by'            => $updatedBy
             ];
 
         $this->add($data);

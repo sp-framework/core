@@ -42,7 +42,7 @@ class Domains extends BasePackage
 		$this->domain = $this->getNamedDomain($this->request->getHttpHost());
 
 		if ($this->domain) {
-			if ($this->domain['apps']) {
+			if ($this->domain['apps'] !== '') {
 				$this->domain['apps'] = Json::decode($this->domain['apps'], true);
 			}
 		}

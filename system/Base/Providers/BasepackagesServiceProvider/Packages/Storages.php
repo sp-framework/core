@@ -236,6 +236,14 @@ class Storages extends BasePackage
             $app = $this->apps->getAppInfo();
         }
 
+        if (!$domain) {
+            $domain = $this->domains->getById(1);
+
+            if (!is_array($domain['apps']) && $domain['apps'] !== '') {
+                $domain['apps'] = Json::decode($domain['apps'], true);
+            }
+        }
+
         if ((isset($domain['apps'][$app['id']]['publicStorage']) &&
             $domain['apps'][$app['id']]['publicStorage'] !== '') &&
             (isset($domain['apps'][$app['id']]['privateStorage']) &&
