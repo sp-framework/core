@@ -740,7 +740,7 @@ class Contacts extends BasePackage
                             if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
                                 $this->addedIds[$vendor['vendor']['ContactID']] = 'Created vendor with ID: ' . $vendor['vendor']['id'];
                             } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
-                                $this->updatedIds[$vendor['vendor']['ContactID']] = 'Updated Customer with ID: ' . $vendor['vendor']['id'];
+                                $this->updatedIds[$vendor['vendor']['ContactID']] = 'Updated vendor with ID: ' . $vendor['vendor']['id'];
                             }
 
                             if ($vendor['errors']['vendors'] && count($vendor['errors']['vendors']) > 0) {
