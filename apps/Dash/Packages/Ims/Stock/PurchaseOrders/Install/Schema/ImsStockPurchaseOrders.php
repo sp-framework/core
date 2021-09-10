@@ -168,7 +168,7 @@ class ImsStockPurchaseOrders
                     'contact_phone',
                     [
                         'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 15,
+                        'size'    => 100,
                         'notNull' => true,
                     ]
                 ),
