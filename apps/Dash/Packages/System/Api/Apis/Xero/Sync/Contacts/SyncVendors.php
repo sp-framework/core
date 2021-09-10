@@ -53,7 +53,7 @@ class SyncVendors extends BasePackage
         }
 
         if ($contact['finance']['TaxNumber']) {
-            $vendor['abn'] = str_replace(' ', '', $contact['finance']['TaxNumber']);
+            $vendor['abn'] = preg_replace('/[^0-9]/', '', $contact['finance']['TaxNumber']);
         } else {
             $vendor['abn'] = '00000000000';
         }
