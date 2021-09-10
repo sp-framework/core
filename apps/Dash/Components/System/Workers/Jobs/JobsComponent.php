@@ -24,7 +24,7 @@ class JobsComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $job = $this->jobs->getById($this->getData()['id']);
+                $job = $this->jobs->getJobById($this->getData()['id']);
 
                 $this->view->job = $job;
             }

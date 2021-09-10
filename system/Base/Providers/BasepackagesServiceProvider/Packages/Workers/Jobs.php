@@ -2,6 +2,8 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Workers;
 
+use Apps\Dash\Packages\System\Api\Model\SystemApiCalls;
+use Carbon\Carbon;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Workers\BasepackagesWorkersJobs;
@@ -17,6 +19,47 @@ class Jobs extends BasePackage
     public function init(bool $resetCache = false)
     {
         return $this;
+    }
+
+    public function getJobById($id)
+    {
+        $job = $this->getById($id);
+
+        $apiModel = SystemApiCalls::class;
+
+        if ($job['run_on'] && $job['run_on'] !== '' && $job['run_on'] != '0' && $job['run_on'] !== '-') {
+            $start = $job['run_on'];
+            $timeRan = Carbon::createFromFormat('Y-m-d H:i:s', $start);
+            $timeRan->addSeconds((float) round($job['execution_time']));
+            $end = $timeRan->format('Y-m-d H:i:s');
+
+            $callsObj = $apiModel::find(
+                [
+                    'conditions'        => 'called_at BETWEEN :start: AND :end:',
+                    'bind'              =>
+                        [
+                            'start'     => $start,
+                            'end'       => $end
+                        ]
+                ]
+            );
+
+            if ($callsObj) {
+                $callsArr = $callsObj->toArray();
+
+                $calls = [];
+
+                if (count($callsArr) > 0) {
+                    foreach ($callsArr as $key => $call) {
+                        $calls[$call['id']] = $call;
+                    }
+                }
+
+                $job['calls'] = $calls;
+            }
+        }
+
+        return $job;
     }
 
     public function addJob(array $data)

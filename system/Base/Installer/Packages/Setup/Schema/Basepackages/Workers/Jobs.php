@@ -73,15 +73,14 @@ class Jobs
                     new Column(
                         'response_message',
                         [
-                            'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 4096,
+                            'type'          => Column::TYPE_TEXT,
                             'notNull'       => false,
                         ]
                     ),
                     new Column(
                         'response_data',
                         [
-                            'type'          => Column::TYPE_TEXT,
+                            'type'          => Column::TYPE_MEDIUMTEXT,
                             'notNull'       => false,
                         ]
                     )
