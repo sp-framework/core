@@ -140,14 +140,21 @@ class SyncXero extends Functions
 
         $task = $taskPackage->findByParametersMethod('syncFromData');
 
+        if (isset($parameters['processCount'])) {
+            $count = $parameters['processCount'];
+        } else {
+            $count = 50;
+        }
+
         if ($task) {
             $taskPackage->forceNextRun(
                 [
-                    'id'            => $task['id'],
-                    'parameters'    =>
+                    'id'                => $task['id'],
+                    'parameters'        =>
                     [
-                        'process'   => $parameters['process'],
-                        'method'    => 'syncFromData',
+                        'process'       => $parameters['process'],
+                        'method'        => 'syncFromData',
+                        'processCount'  => $count
                     ]
                 ]
             );
