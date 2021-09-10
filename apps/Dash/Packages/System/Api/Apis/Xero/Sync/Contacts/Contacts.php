@@ -22,6 +22,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\History\Model\SystemApiXeroHist
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentByIdRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactAttachmentsRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactHistoryRestRequest;
+use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactRestRequest;
 use Apps\Dash\Packages\System\Api\Apis\Xero\XeroAccountingApi\Operations\GetContactsRestRequest;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\StorageAttributes;
@@ -113,6 +114,32 @@ class Contacts extends BasePackage
         $this->api = $this->apiPackage->useApi(['api_id' => $apiId]);
 
         $this->xeroApi = $this->api->useService('XeroAccountingApi');
+
+        if ($parameters && isset($parameters[$apiId]['Contacts']['ContactID'])) {
+            $request = new GetContactRestRequest;
+
+            $request->ContactID = $parameters[$apiId]['Contacts']['ContactID'];
+
+            $response = $this->xeroApi->getContact($request);
+
+            $this->api->refreshXeroCallStats($response->getHeaders());
+
+            $responseArr = $response->toArray();
+
+            if ((isset($responseArr['Status']) && $responseArr['Status'] === 'OK') &&
+                isset($responseArr['Contacts'])
+            ) {
+                if (count($responseArr['Contacts']) > 0) {
+                    $this->scheduleChildrenTasks = true;
+
+                    $this->syncData($apiId, $responseArr['Contacts']);
+
+                    $this->downloadCounter = $this->downloadCounter + count($responseArr['Contacts']);
+                }
+            }
+
+            return;
+        }
 
         if ($parameters && isset($parameters[$apiId]['Contacts']['modifiedSince'])) {
             $modifiedSince = $parameters[$apiId]['Contacts']['modifiedSince'];//Should be set to UTC
@@ -329,8 +356,12 @@ class Contacts extends BasePackage
         //@todo - This can be done on demand from the customer/accounting app.
         if ($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '0') {
             return true;
-        } else if ($contact['IsCustomer'] == '1' && $contact['EmailAddress'] === '') {
-            return true;
+        } else if ($contact['IsCustomer'] == '1') {
+            if (!isset($contact['EmailAddress']) ||
+                (isset($contact['EmailAddress']) && $contact['EmailAddress'] === '')
+            ) {
+                return true;
+            }
         }
 
         if (isset($contact['HasAttachments']) && $contact['HasAttachments'] == true) {
