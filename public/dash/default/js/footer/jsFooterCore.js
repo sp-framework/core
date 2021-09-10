@@ -5806,9 +5806,11 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 //Add Name
                 $('#' + sectionId + '-name').keyup(function() {
                     if ($(this).val() !== '') {
-                        $('#' + sectionId + '-filter-save').attr('disabled', false);
+                        $('#' + sectionId + '-filter-save-add').removeClass('disabled');
+                        $('#' + sectionId + '-filter-save-update').removeClass('disabled');
                     } else {
-                        $('#' + sectionId + '-filter-save').attr('disabled', true);
+                        $('#' + sectionId + '-filter-save-add').addClass('disabled');
+                        $('#' + sectionId + '-filter-save-update').addClass('disabled');
                     }
                 });
 
@@ -5870,7 +5872,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         }
                     }, 'json');
 
-                    $('#' + sectionId + '-filter-save').attr('disabled', false);
+                    $('#' + sectionId + '-filter-save-add').removeClass('disabled');
+                    $('#' + sectionId + '-filter-save-update').removeClass('disabled');
                 });
 
                 //If Only 1 row - Remove And/Or
@@ -6054,7 +6057,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     dataCollection[componentId][sectionId + '-filter'][sectionId + '-filter-table']['data'] = [];
                     $('#' + sectionId + '-filter-name').attr('disabled', true);
                     $('#' + sectionId + '-filter-name').val('New Filter');
-                    $('#' + sectionId + '-filter-save').attr('disabled', true);
+                    $('#' + sectionId + '-filter-save-add').addClass('disabled');
+                    $('#' + sectionId + '-filter-save-update').addClass('disabled');
                     $('#' + sectionId + '-filter-cancel-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-update-button').attr('hidden', true);
                     $('#' + sectionId + '-filter-assign-button').attr('hidden', false);
