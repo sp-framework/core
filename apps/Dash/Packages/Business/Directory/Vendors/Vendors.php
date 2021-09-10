@@ -224,14 +224,7 @@ class Vendors extends BasePackage
         if ($contacts && count($contacts) > 0) {
             foreach ($contacts as $contactKey => $contact) {
                 if ($contact['account_id'] !== '0') {
-
-                    $accountObj = new \System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
-
-                    $account = $accountObj::findFirstById($contact['account_id']);
-
-                    if ($account) {
-                        $this->basepackages->accounts->removeRelatedData($account, false);
-                    }
+                    $this->basepackages->accounts->removeAccount(['id' => $contact['account_id']]);
                 }
             }
         }
