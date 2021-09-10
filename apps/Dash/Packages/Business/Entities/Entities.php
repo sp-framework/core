@@ -162,13 +162,15 @@ class Entities extends BasePackage
                        ($data['api_id'] === '' || $data['api_id'] == 0) &&
                        $entity['api_id'] != '0'
             ) {
-                    $api = $apiPackage->getById($entity['api_id']);
+                $apiPackage = $this->usePackage(Api::class);
 
-                    $api['in_use'] = 0;
+                $api = $apiPackage->getById($entity['api_id']);
 
-                    $api['used_by'] = '';
+                $api['in_use'] = 0;
 
-                    $apiPackage->update($api);
+                $api['used_by'] = '';
+
+                $apiPackage->update($api);
             }
 
             $this->packagesData->responseCode = 0;
