@@ -51,17 +51,19 @@ class Contacts extends BasePackage
 
     protected $request;
 
+    protected $downloadCounter = 0;
+
+    protected $downloadIds = [];
+
     protected $addCounter = 0;
 
     protected $addedIds = [];
 
     protected $updateCounter = 0;
 
-    protected $downloadCounter = 0;
-
-    protected $downloadIds = [];
-
     protected $updatedIds = [];
+
+    protected $skippedCounter = 0;
 
     protected $skippedIds = [];
 
@@ -281,7 +283,10 @@ class Contacts extends BasePackage
         );
 
         $this->responseMessage =
-            $this->responseMessage . ' ' . 'Contacts Sync Ok. Added: ' . $this->addCounter . '. Updated: ' . $this->updateCounter . '.';
+            $this->responseMessage . ' ' .
+            'Contacts Sync Ok. Added: ' . $this->addCounter .
+            '. Updated: ' . $this->updateCounter .
+            '. Skipped: ' . $this->skippedCounter . '.';
 
         $this->addResponse(
             $this->responseMessage,
@@ -601,10 +606,15 @@ class Contacts extends BasePackage
                     if ($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '0') {
                         if (isset($this->addedIds[$contact['ContactID']])) {
                             unset($this->addedIds[$contact['ContactID']]);
+                            $this->addCounter = $this->addCounter - 1;
                         } else if (isset($this->updatedIds[$contact['ContactID']])) {
                             unset($this->updatedIds[$contact['ContactID']]);
+                            $this->updateCounter = $this->updateCounter - 1;
                         }
+
                         $this->skippedIds[$contact['ContactID']] = 'Skipped - Contact is not customer or supplier as per xero.';
+
+                        $this->skippedCounter = $this->skippedCounter + 1;
 
                         $markContactObj = $model::findById($contact['id']);
 
@@ -700,11 +710,15 @@ class Contacts extends BasePackage
                         } else {
                             if (isset($this->addedIds[$customer['customer']['ContactID']])) {
                                 unset($this->addedIds[$customer['customer']['ContactID']]);
+                                $this->addCounter = $this->addCounter - 1;
                             } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
                                 unset($this->updatedIds[$customer['customer']['ContactID']]);
+                                $this->updateCounter = $this->updateCounter - 1;
                             }
 
                             $this->skippedIds[$customer['customer']['ContactID']] = 'Skipped - Contact email is not set.';
+
+                            $this->skippedCounter = $this->skippedCounter + 1;
 
                             $markContactObj = $model::findByContactID($customer['customer']['ContactID']);
 
@@ -740,10 +754,15 @@ class Contacts extends BasePackage
                         } else {
                             if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
                                 unset($this->addedIds[$vendor['vendor']['ContactID']]);
+                                $this->addCounter = $this->addCounter - 1;
                             } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
                                 unset($this->updatedIds[$vendor['vendor']['ContactID']]);
+                                $this->updateCounter = $this->updateCounter - 1;
                             }
+
                             $this->skippedIds[$vendor['vendor']['ContactID']] = 'Skipped - Contact email not set.';
+
+                            $this->skippedCounter = $this->skippedCounter + 1;
 
                             $markContactObj = $model::findByContactID($vendor['vendor']['ContactID']);
 
