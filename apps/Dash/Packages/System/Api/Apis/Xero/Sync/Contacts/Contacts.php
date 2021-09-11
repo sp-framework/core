@@ -244,8 +244,6 @@ class Contacts extends BasePackage
 
     public function syncFromData($apiId = null, $parameters = null, $count = 50)
     {
-        sleep(10);
-        return true;
         if (isset($parameters['processCount'])) {
             $count = $parameters['processCount'];
         }
