@@ -1071,7 +1071,7 @@ class Auth
                 );
             $agent = $agentObj->toArray();
 
-            if (!$this->secTools->checkPassword($data['code'], $agent['verification_code'])) {
+            if ($this->secTools->checkPassword($data['code'], $agent['verification_code'])) {
                 if ($agent['client_address'] === $clientAddress &&
                     $agent['user_agent'] === $userAgent &&
                     $agent['session_id'] === $sessionId &&
