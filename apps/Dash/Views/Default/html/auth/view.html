@@ -196,7 +196,10 @@ $(document).ready(function(){
             beforeSend      : function() {
                                     $("#{{componentId}}-form :input").prop("disabled", true);
                                 },
-            error           : function() {
+            error           : function(response) {
+                                    if (response.getResponseHeader('redirect_url')) {
+                                        window.location = response.getResponseHeader('redirect_url');
+                                    }
                                     $('.login-box-msg').text('Error! Please contact administrator.');
                                     failed();
                                 },
@@ -210,7 +213,11 @@ $(document).ready(function(){
                                     }
                                 } else if (response.responseCode == '1') {
                                     $('.login-box-msg').text(response.responseMessage);
-                                    failed();
+                                    if (response.redirectUrl) {
+                                        failed(response.redirectUrl);
+                                    } else {
+                                        failed();
+                                    }
                                 } else if (response.responseCode == '2') {
                                     $('.login-box-msg').text(response.responseMessage);
                                     failed();
@@ -227,7 +234,10 @@ $(document).ready(function(){
         });
     }
 
-    function failed() {
+    function failed(redirectUrl = null) {
+        if (redirectUrl) {
+            window.location = redirectUrl;
+        }
         $('.login-spinner').attr('hidden', true);
         $('.login-box-msg').removeClass('fadeIn').addClass('text-danger animated fadeIn');
         $('#{{componentId}}-form :input').prop('disabled', false);

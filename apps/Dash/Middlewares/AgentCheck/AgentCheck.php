@@ -32,6 +32,10 @@ class AgentCheck extends BaseMiddleware
             $appRoute . '/auth/verify'
         ];
 
+        if (in_array($givenRoute, $guestAccess) && $this->request->isGet()) {
+            return $this->response->redirect($appRoute . '/auth');
+        }
+
         if (!in_array($givenRoute, $guestAccess)) {
             //Browser Auth
             if (!$this->auth->checkAgent()) {

@@ -870,6 +870,34 @@ class Auth
                     $agent['verified'] == '1'
                 ) {
                     return true;
+                } else if ($agent['client_address'] === $clientAddress &&
+                    $agent['user_agent'] === $userAgent &&
+                    $agent['session_id'] === $sessionId &&
+                    $agent['account_id'] === $this->account()['id'] &&
+                    $agent['verified'] == '0'
+                ) {
+                    if (!$this->email->setup()) {
+                        return true;
+                    }
+
+                    return false;
+                } else if ($agent['client_address'] === $clientAddress &&
+                    $agent['user_agent'] !== $userAgent &&
+                    $agent['session_id'] === $sessionId &&
+                    $agent['account_id'] === $this->account()['id'] &&
+                    $agent['verified'] == '1'
+                ) {
+                    // Browser could have updated causing causing agent information change
+                    // We will remove the agent entry and ask for reauth, just in case.
+                    $agentObj->delete();
+
+                    $this->account['force_logout'] = '1';
+
+                    $this->accounts->update($this->account);
+
+                    $this->logout();
+
+                    return false;
                 } else if ($agent['session_id'] === $sessionId &&
                            $agent['verified'] == '1'
                 ) {
@@ -880,17 +908,6 @@ class Auth
                     $this->accounts->update($this->account);
 
                     $this->logout();
-
-                    return false;
-                } else if ($agent['client_address'] === $clientAddress &&
-                    $agent['user_agent'] === $userAgent &&
-                    $agent['session_id'] === $sessionId &&
-                    $agent['account_id'] === $this->account()['id'] &&
-                    $agent['verified'] == '0'
-                ) {
-                    if (!$this->email->setup()) {
-                        return true;
-                    }
 
                     return false;
                 }
@@ -1003,6 +1020,8 @@ class Auth
 
             return;
         }
+
+        $this->packagesData->redirectUrl = $this->links->url('auth');
 
         $this->packagesData->responseMessage = 'Please contact administrator.';
 
