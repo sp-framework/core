@@ -138,6 +138,12 @@ class TasksComponent extends BaseComponent
 
     protected function formatStatus($rowId, $data)
     {
+        if ($data['enabled'] == '0' && $data['status'] != '2') {
+            $data['status'] = '-';
+
+            return $data;
+        }
+
         if ($data['status'] == '0') {
             $data['status'] = '-';
         } else if ($data['status'] == '1') {
@@ -150,10 +156,6 @@ class TasksComponent extends BaseComponent
 
         if ($data['force_next_run'] == '1') {
             return $data;
-        }
-
-        if ($data['enabled'] == '0') {
-            $data['status'] = '-';
         }
 
         return $data;
@@ -183,7 +185,11 @@ class TasksComponent extends BaseComponent
 
     protected function formatEnabled($rowId, $data)
     {
-        if ($data['force_next_run']) {
+        if ($data['force_next_run'] ||
+            (($data['status'] == '1' ||
+              $data['status'] == '<span class="badge badge-info text-uppercase">Running...</span>') &&
+             $data['enabled'] == '0')
+        ) {
             $data['enabled'] = '<span class="badge badge-warning text-uppercase">Yes</span>';
 
             return $data;

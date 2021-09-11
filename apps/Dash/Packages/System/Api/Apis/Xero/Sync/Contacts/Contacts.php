@@ -33,7 +33,7 @@ use System\Base\BasePackage;
 
 class Contacts extends BasePackage
 {
-    protected $syncDataDirectory = 'var/api/sync/customers/';
+    protected $syncDataDirectory = 'var/api/sync/contacts/';
 
     protected $scheduleChildrenTasks = false;
 
@@ -173,9 +173,13 @@ class Contacts extends BasePackage
         }
 
         $page = 1;
+        $continue = true;
 
-        if ($parameters && isset($parameters[$apiId]['Contacts']['page'])) {
+        if ($parameters && isset($parameters[$apiId]['Contacts']['startPage'])) {
+            $page = (int) $parameters[$apiId]['Contacts']['startPage'];
+        } else if ($parameters && isset($parameters[$apiId]['Contacts']['page'])) {
             $page = (int) $parameters[$apiId]['Contacts']['page'];
+            $continue = false;
         }
 
         do {
@@ -204,8 +208,17 @@ class Contacts extends BasePackage
                 }
             }
 
-            $page++;
-        } while (isset($responseArr['Contacts']) && count($responseArr['Contacts']) > 0);
+            if ($parameters && isset($parameters[$apiId]['Contacts']['endPage'])) {
+                if ($page !== $parameters[$apiId]['Contacts']['endPage'])  {
+                    $page++;
+                } else {
+                    $continue = false;
+                }
+            } else {
+                $page++;
+            }
+
+        } while ($continue && isset($responseArr['Contacts']) && count($responseArr['Contacts']) > 0);
     }
 
     protected function syncData($apiId, array $contacts)
@@ -231,6 +244,8 @@ class Contacts extends BasePackage
 
     public function syncFromData($apiId = null, $parameters = null, $count = 50)
     {
+        sleep(10);
+        return true;
         if (isset($parameters['processCount'])) {
             $count = $parameters['processCount'];
         }
