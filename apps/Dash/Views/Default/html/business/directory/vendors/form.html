@@ -269,9 +269,15 @@ dataCollectionSection =
                                         newOption = new Option(response.businessDetails.businessEntity202001.mainName.organisationName, 0, false, false);
                                         $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
                                     }
+                                    var count = 0;
                                     $.each(response.businessDetails.businessEntity202001.businessName, function(index, businessName) {
-                                        newOption = new Option(businessName.organisationName, index + 1, false, false);
-                                        $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
+                                        if (index === 'organisationName') {
+                                            newOption = new Option(businessName, count + 1, false, false);
+                                            $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
+                                        } else {
+                                            newOption = new Option(businessName.organisationName, index + 1, false, false);
+                                            $('#{{componentId}}-{{sectionId}}-business_name_list').append(newOption).trigger('change');
+                                        }
                                     });
                                     $('#{{componentId}}-{{sectionId}}-business_name').val($('#{{componentId}}-{{sectionId}}-business_name_list option:first').text());
                                     $('#{{componentId}}-{{sectionId}}-business_name_list').on('select2:select', function(e) {
@@ -290,7 +296,11 @@ dataCollectionSection =
                                     if (response.businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
                                         $('#{{componentId}}-{{sectionId}}-business_name').val(response.businessDetails.businessEntity202001.mainName.organisationName);
                                     } else {
-                                        $('#{{componentId}}-{{sectionId}}-business_name').val(response.businessDetails.businessEntity202001.mainTradingName.organisationName);
+                                        if (response.businessDetails.businessEntity202001.mainTradingName) {
+                                            $('#{{componentId}}-{{sectionId}}-business_name').val(response.businessDetails.businessEntity202001.mainTradingName.organisationName);
+                                        } else if (response.businessDetails.businessEntity202001.legalName) {
+                                            $('#{{componentId}}-{{sectionId}}-business_name').val(response.businessDetails.businessEntity202001.legalName.familyName);
+                                        }
                                     }
                                 }
 
@@ -316,7 +326,11 @@ dataCollectionSection =
                         if (businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
                             $('#company-name').html(businessDetails.businessEntity202001.mainName.organisationName);
                         } else {
-                            $('#company-name').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
+                            if (businessDetails.businessEntity202001.mainTradingName) {
+                                $('#company-name').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
+                            } else if (businessDetails.businessEntity202001.legalName) {
+                                $('#company-name').html(businessDetails.businessEntity202001.legalName.familyName);
+                            }
                         }
                         $('#company-status').html(businessDetails.businessEntity202001.entityStatus.entityStatusCode);
                         if (businessDetails.businessEntity202001.businessName) {
@@ -330,7 +344,11 @@ dataCollectionSection =
                             if (businessDetails.businessEntity202001.entityType.entityTypeCode === 'PRV') {
                                 $('#company-business-names').html(businessDetails.businessEntity202001.mainName.organisationName);
                             } else {
-                                $('#company-business-names').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
+                                if (businessDetails.businessEntity202001.mainTradingName) {
+                                    $('#company-business-names').html(businessDetails.businessEntity202001.mainTradingName.organisationName);
+                                } else if (businessDetails.businessEntity202001.legalName) {
+                                    $('#company-business-names').html(businessDetails.businessEntity202001.legalName.familyName);
+                                }
                             }
                         }
                         $('#company-abn').html(businessDetails.businessEntity202001.ABN.identifierValue);
