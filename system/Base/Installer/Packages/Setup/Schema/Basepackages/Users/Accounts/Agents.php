@@ -47,7 +47,7 @@ class Agents
                         'user_agent',
                         [
                             'type'          => Column::TYPE_VARCHAR,
-                            'size'          => 1024,
+                            'size'          => 2048,
                             'notNull'       => true,
                         ]
                     ),
@@ -61,9 +61,9 @@ class Agents
                     new Column(
                         'verification_code',
                         [
-                            'type'              => Column::TYPE_VARCHAR,
-                            'size'              => 50,
-                            'notNull'           => false,
+                            'type'         => Column::TYPE_VARCHAR,
+                            'size'         => 2048,
+                            'notNull'      => false,
                         ]
                     ),
                 ],

@@ -998,7 +998,11 @@ class Auth
 
             $code = $this->secTools->random->base62(12);
 
-            $agentObj->assign(['verification_code' => $code])->update();
+            $agentObj->assign(
+                [
+                    'verification_code' => $this->secTools->hashPassword($code, $this->config->security->passwordWorkFactor)
+                ]
+            )->update();
 
             if ($this->emailVerificationCode($code)) {
                 $this->logger->log
@@ -1067,7 +1071,7 @@ class Auth
                 );
             $agent = $agentObj->toArray();
 
-            if ($agent['verification_code'] === $data['code']) {
+            if (!$this->secTools->checkPassword($data['code'], $agent['verification_code'])) {
                 if ($agent['client_address'] === $clientAddress &&
                     $agent['user_agent'] === $userAgent &&
                     $agent['session_id'] === $sessionId &&
