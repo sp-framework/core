@@ -92,12 +92,13 @@ class Contacts extends BasePackage
 
             $this->responseData = array_merge($this->responseData,
                 [
-                    'downloadIds' => $this->downloadIds
+                    'downloadIds'   => $this->downloadIds,
+                    'skippedIds'    => $this->skippedIds
                 ]
             );
 
             $this->responseMessage =
-                $this->responseMessage . ' ' . 'Contacts Sync Ok. Downloaded: ' . $this->downloadCounter . '.';
+                $this->responseMessage . ' ' . 'Contacts Sync Ok. Downloaded: ' . $this->downloadCounter . '. Skipped: ' . $this->skippedCounter . '.';
 
             $this->addResponse(
                 $this->responseMessage,
@@ -134,6 +135,14 @@ class Contacts extends BasePackage
                 $response = $this->xeroApi->getContact($request);
 
                 $this->api->refreshXeroCallStats($response->getHeaders());
+
+                if ($response->getStatusCode() === 404) {
+                    $this->skippedIds[$contact] = 'Skipped - Error: Not Found!';
+
+                    $this->skippedCounter = $this->skippedCounter + 1;
+
+                    continue;
+                }
 
                 $responseArr = $response->toArray();
 
