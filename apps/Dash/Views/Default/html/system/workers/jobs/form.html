@@ -21,12 +21,13 @@
         {% set rows = '' %}
         {% for jobCall in job['calls'] %}
             {% set rows = rows ~ '<tr>' %}
-                {% set columns =
-                    '<td>' ~ jobCall['called_at'] ~ '</td>' ~
-                    '<td>' ~ jobCall['call_method'] ~ '</td>' ~
-                    '<td>' ~ jobCall['call_response_code'] ~ '</td>' ~
-                    '<td>' ~ jobCall['call_exec_time'] ~ '</td>'
-                %}
+                {% set columns = '<td>' ~ jobCall['called_at'] ~ '</td><td>' ~ jobCall['call_method'] ~ '</td>' %}
+                {% if jobCall['call_response_code'] != '200' %}
+                    {% set columns = columns ~ '<td><span class="badge badge-danger text-uppercase">' ~ jobCall['call_response_code'] ~ '</span></td>' %}
+                {% else %}
+                    {% set columns = columns ~ '<td><span class="badge badge-success text-uppercase">' ~ jobCall['call_response_code'] ~ '</span></td>' %}
+                {% endif %}
+                {% set columns = columns ~ '<td>' ~ jobCall['call_exec_time'] ~ '</td>' %}
                 {% set rows = rows ~ columns %}
             {% set rows = rows ~ '</tr>' %}
             {% if jobCall['call_stats'] is defined and jobCall['call_stats'] !== '' %}
