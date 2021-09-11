@@ -28,8 +28,7 @@ class SyncXero extends Functions
                 try {
                     $parameters = Json::decode($args['task']['parameters'], true);
                 } catch (\Exception $e) {
-
-                    if ($e->getMessage() === "json_decode error: Syntax error") {
+                    if (str_contains($e->getMessage(), "json_decode")) {
                         $thisFunction->packagesData->responseMessage = 'Task parameters format is incorrect. Make sure the format is json.';
                     } else {
                         $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
@@ -92,7 +91,7 @@ class SyncXero extends Functions
                 } else {
                     throw new \Exception('Parameters method not set.');
                 }
-            } catch (ConnectException | \Exception $e) {
+            } catch (\PDOException | ConnectException | \Exception $e) {
                 if ($this->config->logs->exceptions) {
                     $this->logger->logExceptions->debug($e);
                 }

@@ -120,23 +120,33 @@ class Contacts extends BasePackage
         if ($parameters && isset($parameters[$apiId]['Contacts']['ContactID'])) {
             $request = new GetContactRestRequest;
 
-            $request->ContactID = $parameters[$apiId]['Contacts']['ContactID'];
+            $contacts = [];
 
-            $response = $this->xeroApi->getContact($request);
+            if (is_string($parameters[$apiId]['Contacts']['ContactID'])) {
+                array_push($contacts, $parameters[$apiId]['Contacts']['ContactID']);
+            } else {
+                $contacts = $parameters[$apiId]['Contacts']['ContactID'];
+            }
 
-            $this->api->refreshXeroCallStats($response->getHeaders());
+            foreach ($contacts as $contact) {
+                $request->ContactID = $contact;
 
-            $responseArr = $response->toArray();
+                $response = $this->xeroApi->getContact($request);
 
-            if ((isset($responseArr['Status']) && $responseArr['Status'] === 'OK') &&
-                isset($responseArr['Contacts'])
-            ) {
-                if (count($responseArr['Contacts']) > 0) {
-                    $this->scheduleChildrenTasks = true;
+                $this->api->refreshXeroCallStats($response->getHeaders());
 
-                    $this->syncData($apiId, $responseArr['Contacts']);
+                $responseArr = $response->toArray();
 
-                    $this->downloadCounter = $this->downloadCounter + count($responseArr['Contacts']);
+                if ((isset($responseArr['Status']) && $responseArr['Status'] === 'OK') &&
+                    isset($responseArr['Contacts'])
+                ) {
+                    if (count($responseArr['Contacts']) > 0) {
+                        $this->scheduleChildrenTasks = true;
+
+                        $this->syncData($apiId, $responseArr['Contacts']);
+
+                        $this->downloadCounter = $this->downloadCounter + count($responseArr['Contacts']);
+                    }
                 }
             }
 
@@ -259,12 +269,20 @@ class Contacts extends BasePackage
                         $this->xeroApi = $this->api->useService('XeroAccountingApi');
                     }
 
-                    if ($this->addUpdateXeroContacts($contact['api_id'], $contact)) {
-                        try {
-                            $this->localContent->delete($files[$fileCount]);
-                        } catch (FilesystemException | UnableToDeleteFile $exception) {
-                            throw $exception;
+                    try {
+                        if ($this->addUpdateXeroContacts($contact['api_id'], $contact)) {
+                            try {
+                                $this->localContent->delete($files[$fileCount]);
+                            } catch (FilesystemException | UnableToDeleteFile $exception) {
+                                throw $exception;
+                            }
                         }
+                    } catch (\PDOException | \Exception $e) {
+                        if (get_class($e) !== 'PDOException') {
+                            throw $e;
+                        }
+
+                        $this->skippedIds[$contact['ContactID']] = 'Skipped - Error: ' . $this->escaper->escapeHtml($e->getMessage());
                     }
                 } catch (FilesystemException | UnableToReadFile $exception) {
                     throw $exception;
@@ -272,7 +290,15 @@ class Contacts extends BasePackage
             }
         }
 
-        $this->syncWithLocal();
+        try {
+            $this->syncWithLocal();
+        } catch (\PDOException | \Exception $e) {
+            if (get_class($e) !== 'PDOException') {
+                throw $e;
+            }
+
+            $this->skippedIds[$contact['ContactID']] = 'Skipped - Error: ' . $this->escaper->escapeHtml($e->getMessage());
+        }
 
         $this->responseData = array_merge($this->responseData,
             [
