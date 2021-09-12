@@ -951,7 +951,7 @@ class Auth
                 $verified = 0;
             }
 
-            if ($this->account()) {
+            if ($this->check()) {
                 //User has remember Identifier set and sessionID has changed.
                 $verified = 1;
             }
@@ -980,7 +980,7 @@ class Auth
 
         //If Email is not configured, we cannot send new passcodes.
         //User has remember Identifier set and sessionID has changed.
-        if (!$this->email->setup() || $this->account()) {
+        if (!$this->email->setup() || $this->check()) {
             return true;
         }
 
