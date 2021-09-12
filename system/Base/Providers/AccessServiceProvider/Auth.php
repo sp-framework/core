@@ -912,6 +912,7 @@ class Auth
                     return false;
                 }
             } else {
+
                 if (!$this->email->setup()) {
                     $verified = 1;
                 } else {
@@ -944,6 +945,11 @@ class Auth
                 $verified = 1;
             } else {
                 $verified = 0;
+            }
+
+            if ($this->auth->account()) {
+                //User has remember Identifier set and is just that the sessionID has changed.
+                $verified = 1;
             }
 
             $newAgent =
