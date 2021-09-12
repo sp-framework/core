@@ -520,6 +520,10 @@ class Auth
 
     public function check()
     {
+        if ($this->hasUserInSession() || $this->hasRecaller()) {
+            return true;
+        }
+
         if ($this->account) {
             return true;
         }
