@@ -26,6 +26,8 @@ class Auth
 
     protected $session;
 
+    protected $oldSessionId;
+
     protected $sessionTools;
 
     protected $cookies;
@@ -444,7 +446,7 @@ class Auth
     //Old session expired in browser, update session ids in db, else we will get stale entry in db during logout.
     protected function updateSessionIdForSessionAndIdentifier($identifier)
     {
-        $oldSessionId = $identifier['session_id'];
+        $this->oldSessionId = $identifier['session_id'];
 
         $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
@@ -457,7 +459,7 @@ class Auth
         $session = $sessionModel::findFirst(
             [
             'session_id = :sessionId:',
-            'bind'      => ['sessionId' => $oldSessionId]
+            'bind'      => ['sessionId' => $this->oldSessionId]
             ]
         );
 
@@ -520,11 +522,11 @@ class Auth
 
     public function check()
     {
-        if ($this->hasUserInSession() || $this->hasRecaller()) {
+        if ($this->account) {
             return true;
         }
 
-        if ($this->account) {
+        if ($this->hasUserInSession() || $this->hasRecaller()) {
             return true;
         }
 
@@ -916,50 +918,59 @@ class Auth
                     return false;
                 }
             } else {
-                if (!$this->email->setup()) {
-                    $verified = 1;
-                } else {
-                    $verified = 0;
-                }
+                $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+            }
+        } else {
+            $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+        }
 
-                if ($this->check()) {
-                    //User has remember Identifier set and sessionID has changed.
-                    $verified = 1;
-                }
+        //If Email is not configured, we cannot send new passcodes.
+        //User has remember Identifier set and sessionID has changed.
+        if (!$this->email->setup() || $this->check()) {
+            return true;
+        }
 
-                $newAgent =
-                    [
-                        'account_id'        => $this->account['id'],
-                        'session_id'        => $sessionId,
-                        'client_address'    => $clientAddress,
-                        'user_agent'        => $userAgent,
-                        'verified'          => $verified
-                    ];
+        return false;
+    }
 
-                $agentsObj = new BasepackagesUsersAccountsAgents;
+    protected function addUpdateAgent($sessionId, $clientAddress, $userAgent)
+    {
+        if (!$this->email->setup()) {
+            $verified = 1;
+        } else {
+            $verified = 0;
+        }
 
-                $agentsObj->assign($newAgent);
+        if ($this->check()) {
+            //User has remember Identifier set and sessionID has changed.
+            $verified = 1;
+        }
+
+        $agentsObj = new BasepackagesUsersAccountsAgents;
+
+        if ($this->oldSessionId) {
+            $oldAgentObj = $agentsObj->findFirstBysession_id($this->oldSessionId);
+
+            if ($oldAgentObj) {
+                $oldAgent = $oldAgentObj->toArray();
+
+                $oldAgent['session_id'] = $sessionId;
+
+                $oldAgentObj->assign($oldAgent);
 
                 try {
-                    $agentsObj->create();
+                    $oldAgentObj->update();
                 } catch (\Exception $e) {
                     $this->logout();
 
                     throw $e;
                 }
+            } else {
+                $this->oldSessionId = null;
+
+                $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
             }
         } else {
-            if (!$this->email->setup()) {
-                $verified = 1;
-            } else {
-                $verified = 0;
-            }
-
-            if ($this->check()) {
-                //User has remember Identifier set and sessionID has changed.
-                $verified = 1;
-            }
-
             $newAgent =
                 [
                     'account_id'        => $this->account['id'],
@@ -969,7 +980,6 @@ class Auth
                     'verified'          => $verified
                 ];
 
-            $agentsObj = new BasepackagesUsersAccountsAgents;
 
             $agentsObj->assign($newAgent);
 
@@ -981,15 +991,8 @@ class Auth
                 throw $e;
             }
         }
-
-        //If Email is not configured, we cannot send new passcodes.
-        //User has remember Identifier set and sessionID has changed.
-        if (!$this->email->setup() || $this->check()) {
-            return true;
-        }
-
-        return false;
     }
+
 
     public function sendVerificationEmail()
     {
