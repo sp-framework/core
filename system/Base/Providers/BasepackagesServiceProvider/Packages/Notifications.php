@@ -137,10 +137,10 @@ class Notifications extends BasePackage
 
         $body = 'Notification Title: ' . $notificationTitle . '<br>Notification Details: ' . $notificationDetails . '<br>';
 
+        $now = date("F j, Y, g:i a");
+
         if ($createdBy != 0) {
             $profile = $this->basepackages->profile->getProfile($createdBy);
-
-            $now = date("F j, Y, g:i a");
 
             if ($profile) {
                 $body .= 'Notification By: ' . $profile['full_name'] . ' (' . $now . ')<br>';
