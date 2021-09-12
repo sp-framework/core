@@ -370,7 +370,7 @@ class Xero
 
             if ($api) {
                 $this->apiConfig['in_use'] = 0;
-                $this->apiConfig['used_by'] = 'ERROR: Disabled due to Error limit reach. To Re-enable assign to Entity again.';
+                $this->apiConfig['used_by'] = 'ERROR: Disabled due to day limit reach. To re-enable api, please re-assign to entity again.';
 
                 $api->assign($this->apiConfig);
 

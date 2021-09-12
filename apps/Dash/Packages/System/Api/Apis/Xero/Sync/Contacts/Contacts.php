@@ -73,15 +73,30 @@ class Contacts extends BasePackage
 
     public $processing = null;
 
-    public function sync($apiId = null, $parameters = null)
+    protected function getEnabledApis()
     {
-        $this->apiPackage = new Api;
-
-        $this->request = new GetContactsRestRequest;
+        if (!$this->apiPackage) {
+            $this->apiPackage = new Api;
+        }
 
         $xeroApis = $this->apiPackage->getApiByType('xero', true);
 
-        if ($xeroApis && count($xeroApis) > 0) {
+        if ($xeroApis) {
+            if ($xeroApis && count($xeroApis) > 0) {
+                return $xeroApis;
+            }
+        }
+
+        return false;
+    }
+
+    public function sync($apiId = null, $parameters = null)
+    {
+        $this->request = new GetContactsRestRequest;
+
+        $xeroApis = $this->getEnabledApis();
+
+        if ($xeroApis) {
             if (!$apiId) {
                 foreach ($xeroApis as $key => $xeroApi) {
                     $this->syncWithXero($xeroApi['api_id'], $parameters);
@@ -244,6 +259,12 @@ class Contacts extends BasePackage
 
     public function syncFromData($apiId = null, $parameters = null, $count = 50)
     {
+        if (!$this->getEnabledApis()) {
+            $this->addResponse('Sync Error. No API Configuration Found', 1);
+
+            return false;
+        }
+
         if (isset($parameters['processCount'])) {
             $count = $parameters['processCount'];
         }
@@ -278,10 +299,6 @@ class Contacts extends BasePackage
                     $contact['lock'] = true;
 
                     $this->writeJsonFile($contact);
-
-                    if (!$this->apiPackage) {
-                        $this->apiPackage = new Api;
-                    }
 
                     if (!$this->api) {
                         $this->api = $this->apiPackage->useApi(['api_id' => $contact['api_id']]);

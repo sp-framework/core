@@ -145,7 +145,7 @@ class SyncXero extends Functions
             $count = 50;
         }
 
-        if ($task) {
+        if ($task && $task['force_next_run'] === null) {
             $taskPackage->forceNextRun(
                 [
                     'id'                => $task['id'],

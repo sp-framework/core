@@ -60,7 +60,10 @@ window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFu
 
 function initFuncs() {
     $('.rowForceNextRun').each(function(index,row) {
-        if ($(row).parents('td').siblings('.data-force_next_run').text() === 'Yes') {
+        if ($(row).parents('td').siblings('.data-force_next_run').text() === 'Yes' ||
+            ($(row).parents('td').siblings('.data-force_next_run').text() === 'No' &&
+             $(row).parents('td').siblings('.data-enabled').text() === 'Yes')
+        ) {
             $(row).children().first().remove();
             $(row).prepend(
                 '<span class="fa-stack"><i class="fas fa-fw fa-xs fa-forward fa-stack-1x"></i><i class="fas fa-fw fa-sm fa-ban fa-stack-2x text-danger"></i></span>'
@@ -79,7 +82,10 @@ function initFuncs() {
             dataToSend[$('#security-token').attr('name')] = $('#security-token').val();
             dataToSend.id = window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]['datatable'].row($(thisButton).parents('tr')).id();
 
-            if ($(this).parents('td').siblings('.data-force_next_run').text() === 'Yes') {
+            if ($(row).parents('td').siblings('.data-force_next_run').text() === 'Yes' ||
+                ($(row).parents('td').siblings('.data-force_next_run').text() === 'No' &&
+                 $(row).parents('td').siblings('.data-enabled').text() === 'Yes')
+            ) {
                 dataToSend.cancel = true;
             }
 
