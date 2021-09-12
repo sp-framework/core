@@ -916,11 +916,15 @@ class Auth
                     return false;
                 }
             } else {
-
                 if (!$this->email->setup()) {
                     $verified = 1;
                 } else {
                     $verified = 0;
+                }
+
+                if ($this->check()) {
+                    //User has remember Identifier set and sessionID has changed.
+                    $verified = 1;
                 }
 
                 $newAgent =
