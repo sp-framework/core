@@ -140,7 +140,7 @@ class Tasks extends BasePackage
         $time = Carbon::now();
 
         if (isset($data['cancel']) && $data['cancel'] == 'true') {
-            $task['force_next_run'] = '0';
+            $task['force_next_run'] = null;
             $task['status'] = '1';
             $task['next_run'] = '-';
         } else {
