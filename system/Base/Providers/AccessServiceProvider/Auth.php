@@ -239,9 +239,9 @@ class Auth
             return false;
         }
 
-        if ($this->account['two_fa_status'] == '1' &&
-            !isset($data['code'])
-        ) {
+        $security = $this->getAccountSecurityObject();
+
+        if ($security->two_fa_status == '1' && !isset($data['code'])) {
             $this->packagesData->responseCode = 3;
 
             $this->packagesData->responseMessage = '2FA Code Required';
@@ -249,8 +249,8 @@ class Auth
             return false;
         }
 
-        if (($this->account['two_fa_status'] == '1' && isset($data['code'])) &&
-            !$this->verifyTwoFa($data['code'])
+        if (($security->two_fa_status == '1' && isset($data['code'])) &&
+            (isset($security->two_fa_secret) && !$this->verifyTwoFa($data['code'], $security->two_fa_secret))
         ) {
             $this->packagesData->responseCode = 1;
 
@@ -776,9 +776,9 @@ class Auth
 
     public function enableVerifyTwoFa(int $code)
     {
-        if ($this->account['two_fa_status'] &&
-            $this->account['two_fa_status'] == '1'
-        ) {
+        $security = $this->getAccountSecurityObject();
+
+        if ($security->two_fa_status && $security->two_fa_status == '1') {
             $this->packagesData->responseCode = 1;
 
             $this->packagesData->responseMessage = "2FA already enabled! Contact Administrator.";
@@ -786,25 +786,25 @@ class Auth
             return false;
         }
 
-        if ($this->verifyTwoFa($code)) {
-            unset($this->account['profile']);
+        if ($this->verifyTwoFa($code, $security->two_fa_secret)) {
+            $security->two_fa_status = '1';
 
-            $this->account['two_fa_status'] = '1';
-
-            $this->accounts->update($this->account);
+            $security->update();
         }
     }
 
     public function disableTwoFa(int $code)
     {
-        $totp = TOTP::create($this->account['two_fa_secret']);
+        $security = $this->getAccountSecurityObject();
+
+        $totp = TOTP::create($security->two_fa_secret);
 
         if ($totp->verify($code)) {
-            $this->account['two_fa_status'] = null;
+            $security->two_fa_status = null;
 
-            $this->account['two_fa_secret'] = null;
+            $security->two_fa_secret = null;
 
-            $this->accounts->update($this->account);
+            $security->update();
 
             $this->packagesData->responseCode = 0;
 
@@ -816,9 +816,9 @@ class Auth
         }
     }
 
-    public function verifyTwoFa(int $code)
+    public function verifyTwoFa(int $code, $secret)
     {
-        $totp = TOTP::create($this->account['two_fa_secret']);
+        $totp = TOTP::create($secret);
 
         if ($totp->verify($code)) {
             $this->packagesData->responseCode = 0;
@@ -837,13 +837,22 @@ class Auth
 
     protected function updateTwoFaSecret()
     {
-        unset($this->account['profile']);
+        $twoFaSecret = trim(Base32::encodeUpper(random_bytes(16)), '=');
 
-        $this->account['two_fa_secret'] = trim(Base32::encodeUpper(random_bytes(16)), '=');
+        $security = $this->getAccountSecurityObject();
 
-        $this->accounts->update($this->account);
+        $security->two_fa_secret = $twoFaSecret;
 
-        return $this->account['two_fa_secret'];
+        $security->update();
+
+        return $twoFaSecret;
+    }
+
+    protected function getAccountSecurityObject()
+    {
+        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+
+        return $accountsObj->getSecurity();
     }
 
     public function checkAgent()
