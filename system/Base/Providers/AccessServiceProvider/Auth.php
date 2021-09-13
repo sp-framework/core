@@ -848,6 +848,7 @@ class Auth
 
     public function checkAgent()
     {
+        $update = false;
         $clientAddress = $this->request->getClientAddress();
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
@@ -918,15 +919,15 @@ class Auth
                     return false;
                 }
             } else {
-                $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+                $update = $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
             }
         } else {
-            $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+            $update = $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
         }
 
         //If Email is not configured, we cannot send new passcodes.
         //User has remember Identifier set and sessionID has changed.
-        if (!$this->email->setup() || $this->check()) {
+        if (!$this->email->setup() || $update === true) {
             return true;
         }
 
@@ -935,15 +936,10 @@ class Auth
 
     protected function addUpdateAgent($sessionId, $clientAddress, $userAgent)
     {
-        if (!$this->email->setup()) {
+        if (!$this->email->setup() || $this->oldSessionId) {
             $verified = 1;
         } else {
             $verified = 0;
-        }
-
-        if ($this->check()) {
-            //User has remember Identifier set and sessionID has changed.
-            $verified = 1;
         }
 
         $agentsObj = new BasepackagesUsersAccountsAgents;
@@ -955,11 +951,17 @@ class Auth
                 $oldAgent = $oldAgentObj->toArray();
 
                 $oldAgent['session_id'] = $sessionId;
+                $oldAgent['account_id'] = $this->account()['id'];
+                $oldAgent['verified'] = $verified;
 
                 $oldAgentObj->assign($oldAgent);
 
                 try {
                     $oldAgentObj->update();
+
+                    $this->oldSessionId = null;
+
+                    return true;
                 } catch (\Exception $e) {
                     $this->logout();
 
@@ -968,7 +970,7 @@ class Auth
             } else {
                 $this->oldSessionId = null;
 
-                $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
+                return $this->addUpdateAgent($sessionId, $clientAddress, $userAgent);
             }
         } else {
             $newAgent =
@@ -985,6 +987,8 @@ class Auth
 
             try {
                 $agentsObj->create();
+
+                return false;
             } catch (\Exception $e) {
                 $this->logout();
 
@@ -992,7 +996,6 @@ class Auth
             }
         }
     }
-
 
     public function sendVerificationEmail()
     {

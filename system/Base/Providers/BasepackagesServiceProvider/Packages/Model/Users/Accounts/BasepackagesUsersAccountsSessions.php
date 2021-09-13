@@ -28,7 +28,10 @@ class BasepackagesUsersAccountsSessions extends BaseModel
         $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsIdentifiers::class,
-            'session_id'
+            'session_id',
+            [
+                'alias'         => 'identifiers'
+            ]
         );
 
         $this->hasOne(

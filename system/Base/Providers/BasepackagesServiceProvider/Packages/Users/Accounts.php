@@ -6,9 +6,11 @@ use Phalcon\Helper\Json;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsCanlogin;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSecurity;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsSessions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsTunnels;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
@@ -671,6 +673,114 @@ class Accounts extends BasePackage
         $role['accounts'] = Json::encode($role['accounts']);
 
         $this->basepackages->roles->update($role);
+    }
+
+    public function removeAccountAgents(array $data)
+    {
+        $agentModel = new BasepackagesUsersAccountsAgents;
+        $sessionModel = new BasepackagesUsersAccountsSessions;
+
+        if (isset($data['id'])) {
+            $agentObj = $agentModel::findFirstById($data['id']);
+
+            if ($agentObj) {
+                if ($agentObj->session_id === $this->session->getId()) {
+                    $this->addResponse('Cannot remove this session.', 1);
+
+                    return;
+                }
+
+                $sessionObj = $sessionModel::findFirstBysession_id($agentObj->session_id);
+
+                if ($sessionObj) {
+                    if ($sessionObj->identifiers) {
+                        $sessionObj->identifiers->delete();
+                    }
+
+                    $sessionObj->delete();
+                }
+
+                if ($agentObj->delete()) {
+                    $this->addResponse('Removed!');
+                } else {
+                    $this->addResponse('Error removing', 1);
+                }
+
+                return;
+            }
+        } else if (isset($data['verified'])) {
+            if (!$this->auth->account()) {
+                $this->addResponse('Account Not Found!');
+
+                return;
+            }
+
+            $agentObj = $agentModel::find(
+                [
+                    'conditions'    => 'account_id = :aid: AND verified = :v:',
+                    'bind'          => [
+                        'aid'       => $this->auth->account()['id'],
+                        'v'         => $data['verified']
+                    ]
+                ]
+            );
+
+            if ($agentObj) {
+                $removed = true;
+                foreach ($agentObj as $agent) {
+                    if ($agent->session_id !== $this->session->getId()) {
+                        $sessionObj = $sessionModel::findFirstBysession_id($agent->session_id);
+
+                        if ($sessionObj) {
+
+                            if ($sessionObj->identifiers) {
+                                $sessionObj->identifiers->delete();
+                            }
+
+                            $sessionObj->delete();
+                        }
+
+                        if (!$agent->delete()) {
+                            $removed = false;
+                        }
+                    }
+                }
+
+                if ($data['verified'] == '1') {
+                    $sessionObj = $sessionModel::find(
+                        [
+                            'conditions'    => 'account_id = :aid:',
+                            'bind'          => [
+                                'aid'       => $this->auth->account()['id'],
+                            ]
+                        ]
+                    );
+
+                    if ($sessionObj) {
+                        foreach ($sessionObj as $session) {
+                            if ($session->session_id !== $this->session->getId()) {
+                                if ($session->identifiers) {
+                                    $session->identifiers->delete();
+                                }
+                                if (!$session->delete()) {
+                                    $removed = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if ($removed) {
+                    $this->addResponse('Removed!');
+                } else {
+                    $this->addResponse('Error removing session', 1);
+                }
+
+                return;
+            }
+        }
+
+        $this->addResponse('Id/all & verified not set.', 1);
     }
 
     public function generateViewData(int $uid = null)
