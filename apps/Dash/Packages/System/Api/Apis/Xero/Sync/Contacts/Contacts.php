@@ -756,89 +756,93 @@ class Contacts extends BasePackage
 
                     if ($contact['IsCustomer'] == '1' && $contact['IsSupplier'] == '0') {
                         $customer = $syncCustomers->generateCustomerData($contact);
-
-                        if ($customer['customer']['id'] != '0') {
-                            if (isset($this->addedIds[$customer['customer']['ContactID']])) {
-                                $this->addedIds[$customer['customer']['ContactID']] = 'Created customer with ID: ' . $customer['customer']['id'];
-                            } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
-                                $this->updatedIds[$customer['customer']['ContactID']] = 'Updated Customer with ID: ' . $customer['customer']['id'];
-                            }
-
-                            if ($customer['errors']['customers'] && count($customer['errors']['customers']) > 0) {
-                                if ($customer['errors']['address'] && count($customer['errors']['address']) > 0) {
-                                    $errors = array_merge($customer['errors']['customers'], $customer['errors']['address']);
-                                } else {
-                                    $errors = $customer['errors']['customers'];
-                                }
-                                $this->customersPackage->errorCustomer('Errors in customers. Please check details for more information.', Json::encode($errors));
-                            }
-                        } else {
-                            if (isset($this->addedIds[$customer['customer']['ContactID']])) {
-                                unset($this->addedIds[$customer['customer']['ContactID']]);
-                                $this->addCounter = $this->addCounter - 1;
-                            } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
-                                unset($this->updatedIds[$customer['customer']['ContactID']]);
-                                $this->updateCounter = $this->updateCounter - 1;
-                            }
-
-                            $this->skippedIds[$customer['customer']['ContactID']] = 'Skipped - Contact email is not set.';
-
-                            $this->skippedCounter = $this->skippedCounter + 1;
-
-                            $markContactObj = $model::findByContactID($customer['customer']['ContactID']);
-
-                            if ($markContactObj) {
-                                $markContact = $markContactObj->toArray();
-
-                                $markContact['baz_vendor_id'] = 0;
-                                $markContact['baz_customer_id'] = 0;
-
-                                $markContactObj->update($markContact);
-                            }
-                        }
                     } else if (($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '1') ||
                                ($contact['IsCustomer'] == '1' && $contact['IsSupplier'] == '1')
                     ) {
                         $vendor = $syncVendors->generateVendorData($contact);
+                    }
+                }
 
-                        if ($vendor['vendor']['id'] != '0') {
-                            if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
-                                $this->addedIds[$vendor['vendor']['ContactID']] = 'Created vendor with ID: ' . $vendor['vendor']['id'];
-                            } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
-                                $this->updatedIds[$vendor['vendor']['ContactID']] = 'Updated vendor with ID: ' . $vendor['vendor']['id'];
+                if (isset($customer)) {
+                    if ($customer['customer']['id'] != '0') {
+                        if (isset($this->addedIds[$customer['customer']['ContactID']])) {
+                            $this->addedIds[$customer['customer']['ContactID']] = 'Created customer with ID: ' . $customer['customer']['id'];
+                        } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
+                            $this->updatedIds[$customer['customer']['ContactID']] = 'Updated Customer with ID: ' . $customer['customer']['id'];
+                        }
+
+                        if ($customer['errors']['customers'] && count($customer['errors']['customers']) > 0) {
+                            if ($customer['errors']['address'] && count($customer['errors']['address']) > 0) {
+                                $errors = array_merge($customer['errors']['customers'], $customer['errors']['address']);
+                            } else {
+                                $errors = $customer['errors']['customers'];
                             }
+                            $this->customersPackage->errorCustomer('Errors in customers. Please check details for more information.', Json::encode($errors));
+                        }
+                    } else {
+                        if (isset($this->addedIds[$customer['customer']['ContactID']])) {
+                            unset($this->addedIds[$customer['customer']['ContactID']]);
+                            $this->addCounter = $this->addCounter - 1;
+                        } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
+                            unset($this->updatedIds[$customer['customer']['ContactID']]);
+                            $this->updateCounter = $this->updateCounter - 1;
+                        }
 
-                            if ($vendor['errors']['vendors'] && count($vendor['errors']['vendors']) > 0) {
-                                if ($vendor['errors']['address'] && count($vendor['errors']['address']) > 0) {
-                                    $errors = array_merge($vendor['errors']['vendors'], $vendor['errors']['address']);
-                                } else {
-                                    $errors = $vendor['errors']['vendors'];
-                                }
-                                $this->vendorsPackage->errorVendor('Errors in vendors. Please check details for more information.', Json::encode($errors));
+                        $this->skippedIds[$customer['customer']['ContactID']] = 'Skipped - Contact email is not set.';
+
+                        $this->skippedCounter = $this->skippedCounter + 1;
+
+                        $markContactObj = $model::findByContactID($customer['customer']['ContactID']);
+
+                        if ($markContactObj) {
+                            $markContact = $markContactObj->toArray();
+
+                            $markContact['baz_vendor_id'] = 0;
+                            $markContact['baz_customer_id'] = 0;
+
+                            $markContactObj->update($markContact);
+                        }
+                    }
+                }
+
+                if (isset($vendor)) {
+                    if ($vendor['vendor']['id'] != '0') {
+                        if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
+                            $this->addedIds[$vendor['vendor']['ContactID']] = 'Created vendor with ID: ' . $vendor['vendor']['id'];
+                        } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
+                            $this->updatedIds[$vendor['vendor']['ContactID']] = 'Updated vendor with ID: ' . $vendor['vendor']['id'];
+                        }
+
+                        if ($vendor['errors']['vendors'] && count($vendor['errors']['vendors']) > 0) {
+                            if ($vendor['errors']['address'] && count($vendor['errors']['address']) > 0) {
+                                $errors = array_merge($vendor['errors']['vendors'], $vendor['errors']['address']);
+                            } else {
+                                $errors = $vendor['errors']['vendors'];
                             }
-                        } else {
-                            if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
-                                unset($this->addedIds[$vendor['vendor']['ContactID']]);
-                                $this->addCounter = $this->addCounter - 1;
-                            } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
-                                unset($this->updatedIds[$vendor['vendor']['ContactID']]);
-                                $this->updateCounter = $this->updateCounter - 1;
-                            }
+                            $this->vendorsPackage->errorVendor('Errors in vendors. Please check details for more information.', Json::encode($errors));
+                        }
+                    } else {
+                        if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
+                            unset($this->addedIds[$vendor['vendor']['ContactID']]);
+                            $this->addCounter = $this->addCounter - 1;
+                        } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
+                            unset($this->updatedIds[$vendor['vendor']['ContactID']]);
+                            $this->updateCounter = $this->updateCounter - 1;
+                        }
 
-                            $this->skippedIds[$vendor['vendor']['ContactID']] = 'Skipped - Contact email not set.';
+                        $this->skippedIds[$vendor['vendor']['ContactID']] = 'Skipped - Contact email not set.';
 
-                            $this->skippedCounter = $this->skippedCounter + 1;
+                        $this->skippedCounter = $this->skippedCounter + 1;
 
-                            $markContactObj = $model::findByContactID($vendor['vendor']['ContactID']);
+                        $markContactObj = $model::findByContactID($vendor['vendor']['ContactID']);
 
-                            if ($markContactObj) {
-                                $markContact = $markContactObj->toArray();
+                        if ($markContactObj) {
+                            $markContact = $markContactObj->toArray();
 
-                                $markContact['baz_vendor_id'] = 0;
-                                $markContact['baz_customer_id'] = 0;
+                            $markContact['baz_vendor_id'] = 0;
+                            $markContact['baz_customer_id'] = 0;
 
-                                $markContactObj->update($markContact);
-                            }
+                            $markContactObj->update($markContact);
                         }
                     }
                 }
