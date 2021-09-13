@@ -256,6 +256,10 @@ abstract class BasePackage extends Controller
 			foreach ($postConditions as $conditionKey => $condition) {
 				$conditionArr = explode(':', $condition);
 
+				if (str_starts_with(strtolower($conditionArr[1]), 'not')) {
+					$conditionArr[1] = '[' . $conditionArr[1] . ']';
+				}
+
 				if (Arr::firstKey($postConditions) !== $conditionKey) {
 					if ($conditionArr[0] === '') {
 						$conditions .= ' AND ';//Default for AND/OR
