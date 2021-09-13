@@ -4,6 +4,8 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Users;
 
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsAgents;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accounts\BasepackagesUsersAccountsIdentifiers;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersProfiles;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
 
@@ -455,6 +457,29 @@ class Profile extends BasePackage
         $this->packagesData->subscriptions = Json::encode($subscriptions);
 
         $this->packagesData->notifications = Json::encode($notifications);
+
+        //We grab agents instead of sessions so we can clear stale agents as well as sessions. Number of agents can be more then sessions and each agent will have its session ID.
+        $this->packagesData->sessions = [];
+
+        $agentsModel = new BasepackagesUsersAccountsAgents;
+
+        $agentsObj = $agentsModel->findByaccount_id($this->auth->account()['id']);
+
+        if ($agentsObj) {
+            $agents = $agentsObj->toArray();
+
+            if (count($agents) > 0) {
+                $identifiersModel = new BasepackagesUsersAccountsIdentifiers;
+
+                foreach ($agents as &$agent) {
+                    if ($identifiersModel::findBysession_id($agent['session_id'])) {
+                        $agent['remember'] = true;
+                    }
+                }
+            }
+
+            $this->packagesData->sessions = $agents;
+        }
 
         return true;
     }

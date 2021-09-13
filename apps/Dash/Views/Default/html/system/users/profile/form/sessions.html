@@ -1,0 +1,228 @@
+{% set verified = 0 %}
+{% set stale = 0 %}
+{% set rows = '' %}
+{% if sessions is defined and sessions|length > 0 %}
+    {% for session in sessions %}
+        {% set rows = rows ~ '<tr data-id="' ~ session['id'] ~'">' %}
+        {% set rows = rows ~ '<td>' ~ session['client_address'] ~ '</td>' %}
+        {% set rows = rows ~ '<td>' ~ session['user_agent'] ~ '</td>' %}
+        {% if session['verified'] == '1' %}
+            {% set verified = verified + 1 %}
+            {% set rows = rows ~ '<td><span class="badge badge-success text-uppercase">Verfied</span></td>' %}
+        {% elseif session['verified'] != '1' %}
+            {% set stale = stale + 1 %}
+            {% set rows = rows ~ '<td><span class="badge badge-warning text-uppercase">Stale</span></td>' %}
+        {% endif %}
+        {% if session['remember'] is defined and session['remember'] === true %}
+            {% set rows = rows ~ '<td><span class="badge badge-info text-uppercase">Yes</span></td>' %}
+        {% else %}
+            {% set rows = rows ~ '<td><span class="badge badge-secondary text-uppercase">No</span></td>' %}
+        {% endif %}
+        {% if session['session_id'] !== session.getId() %}
+            {% if session['verified'] == '1' %}
+                {% set button = 'danger' %}
+                {% set class = 'rowVerified' %}
+            {% else %}
+                {% set button = 'warning' %}
+                {% set class = 'rowStale' %}
+            {% endif %}
+            {% set rows = rows ~ '<td><button class="btn btn-xs btn-' ~ button ~ ' ' ~ class ~ ' mr-1 clearRow" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button"><i class="fas fa-fw fa-trash"></i></button></td>' %}
+        {% else %}
+            {% set rows = rows ~ '<td><span class="badge badge-info text-uppercase">This session</span></td>' %}
+        {% endif %}
+        {% set rows = rows ~ '</tr>' %}
+    {% endfor %}
+{% endif %}
+<div id="{{componentId}}-{{sectionId}}-sessions" class="row mb-1">
+    <div class="col">
+        <strong>VERIFIED :
+            <span id="{{componentId}}-{{sectionId}}-verified-count" class="badge badge-success text-uppercase" style="top: -2px;position: relative;">{{verified}}</span>
+        </strong>
+        {% if verified > 1 %}
+            {% set verifiedButtonHidden = '' %}
+        {% else %}
+            {% set verifiedButtonHidden = 'hidden=""' %}
+        {% endif %}
+        {% if stale > 0 %}
+            {% set staleColor = 'warning' %}
+            {% set staleHidden = '' %}
+            {% set staleButtonHidden = '' %}
+        {% elseif stale === 0 %}
+            {% set staleColor = 'success' %}
+            {% set staleHidden = 'hidden=""' %}
+            {% set staleButtonHidden = 'hidden=""' %}
+        {% endif %}
+        <strong {{staleHidden}}>Stale :
+            <span id="{{componentId}}-{{sectionId}}-stale-count" class="badge badge-{{staleColor}} text-uppercase" style="top: -2px;position: relative;">{{stale}}</span>
+        </strong>
+    </div>
+    <div class="col">
+        <button class="btn btn-xs btn-danger float-right verified" id="{{componentId}}-{{sectionId}}-clear-all-verified" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" {{verifiedButtonHidden}}><i class="fas fa-fw fa-trash"></i> CLEAR ALL VERIFIED</button>
+        <button class="btn btn-xs btn-warning mr-2 float-right stale" id="{{componentId}}-{{sectionId}}-clear-all-stale" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" {{staleButtonHidden}}><i class="fas fa-fw fa-trash"></i> CLEAR ALL STALE</button>
+    </div>
+</div>
+<div class="table-responsive p-0" style="height:600px">
+    <table id="{{componentId}}-{{sectionId}}-sessions-details-table" class="table table-head-fixed table-hover table-striped table-sm text-nowrap">
+        <thead>
+            <tr>
+                <th>CLIENT IP ADDRESS</th>
+                <th>USER AGENT</th>
+                <th>STATUS</th>
+                <th>REMEMBER SET</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>{{rows}}</tbody>
+    </table>
+</div>
+<script>
+/* global PNotify Swal */
+var staleCount = parseInt('{{stale}}');
+var verifiedCount = parseInt('{{verified}}');
+var url = '{{links.url("system/users/profile/removeAccountAgents")}}';
+
+$('.clearRow').click(function(e) {
+    e.preventDefault();
+
+    var verified;
+    var thisRow = $(this).parents('tr');
+
+    if ($(this).is('.rowVerified')) {
+        verified = true;
+    } else if ($(this).is('.rowStale')) {
+        verified = false;
+    }
+
+    var removeAccountAgentsData = { };
+    removeAccountAgentsData['id'] = $(this).parents('tr').data('id');
+    removeAccountAgentsData[$('#security-token').attr('name')] = $('#security-token').val();
+
+    $.post(url, removeAccountAgentsData, function(response) {
+        if (response.responseCode == 0) {
+            PNotify.success(response.responseMessage);
+            $(thisRow).remove();
+            if (verified === false) {
+                if (staleCount > 0) {
+                    staleCount = staleCount - 1;
+                }
+                $('#{{componentId}}-{{sectionId}}-stale-count').html(staleCount);
+                if (staleCount == 0) {
+                    $('#{{componentId}}-{{sectionId}}-clear-all-stale').attr('hidden', true);
+                    $('#{{componentId}}-{{sectionId}}-stale-count').parents('strong').remove();
+                }
+            } else if (verified === true) {
+                if (verifiedCount > 0) {
+                    verifiedCount = verifiedCount - 1;
+                }
+                $('#{{componentId}}-{{sectionId}}-verified-count').html(verifiedCount);
+                if (verifiedCount == 1) {
+                    $('#{{componentId}}-{{sectionId}}-clear-all-verified').attr('hidden', true);
+                }
+            }
+        } else {
+            PNotify.error(response.responseMessage);
+        }
+
+        if (response.tokenKey && response.token) {
+            $("#security-token").attr("name", response.tokenKey);
+            $("#security-token").val(response.token);
+        }
+    }, 'json');
+});
+
+$('#{{componentId}}-{{sectionId}}-clear-all-verified, #{{componentId}}-{{sectionId}}-clear-all-stale').click(function(e) {
+    e.preventDefault();
+
+    if ($(this).is('.verified')) {
+        Swal.fire({
+            title                       : '<span class="text-danger">Remove all verified sessions?</span>',
+            icon                        : 'question',
+            width                       : '100%',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Remove',
+            customClass                 : {
+                'confirmButton'         : 'btn btn-danger text-uppercase',
+                'cancelButton'          : 'ml-2 btn btn-secondary text-uppercase'
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : false,
+            allowEscapeKey              : false,
+            didOpen                     : function() {
+                window.dataCollection.env.sounds.swalSound.play();
+            }
+        }).then((result) => {
+            if (result.isConfirmed === true) {
+                var removeAccountAgentsData = { };
+                removeAccountAgentsData[$('#security-token').attr('name')] = $('#security-token').val();
+                removeAccountAgentsData['verified'] = '1';
+
+                var url = '{{links.url("system/users/profile/removeAccountAgents")}}';
+
+                $.post(url, removeAccountAgentsData, function(response) {
+                    if (response.responseCode === 0) {
+                        PNotify.success(response.responseMessage);
+                        $('#{{componentId}}-{{sectionId}}-verified-count').html(1);
+                        $('.rowVerified').parents('tr').remove();
+                        $('#{{componentId}}-{{sectionId}}-clear-all-verified').attr('hidden', true);
+                    } else {
+                        PNotify.error(response.responseMessage);
+                    }
+
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }, 'json');
+            }
+        });
+    } else if ($(this).is('.stale')) {
+        Swal.fire({
+            title                       : '<span class="text-warning">Remove all stale sessions?</span>',
+            icon                        : 'question',
+            width                       : '100%',
+            background                  : 'rgba(0,0,0,.8)',
+            backdrop                    : 'rgba(0,0,0,.6)',
+            buttonsStyling              : false,
+            confirmButtonText           : 'Remove',
+            customClass                 : {
+                'confirmButton'         : 'btn btn-warning text-uppercase',
+                'cancelButton'          : 'ml-2 btn btn-secondary text-uppercase'
+            },
+            showCancelButton            : true,
+            keydownListenerCapture      : true,
+            allowOutsideClick           : false,
+            allowEscapeKey              : false,
+            didOpen                     : function() {
+                window.dataCollection.env.sounds.swalSound.play();
+            }
+        }).then((result) => {
+            if (result.isConfirmed === true) {
+                var removeAccountAgentsData = { };
+                removeAccountAgentsData[$('#security-token').attr('name')] = $('#security-token').val();
+                removeAccountAgentsData['verified'] = '0';
+
+                var url = '{{links.url("system/users/profile/removeAccountAgents")}}';
+
+                $.post(url, removeAccountAgentsData, function(response) {
+                    if (response.responseCode === 0) {
+                        PNotify.success(response.responseMessage);
+                        $('#{{componentId}}-{{sectionId}}-stale-count').parents('strong').remove();
+                        $('.rowStale').parents('tr').remove();
+                        $('#{{componentId}}-{{sectionId}}-clear-all-stale').attr('hidden', true);
+                    } else {
+                        PNotify.error(response.responseMessage);
+                    }
+
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                }, 'json');
+            }
+        });
+    }
+});
+</script>

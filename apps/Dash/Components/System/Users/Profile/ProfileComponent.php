@@ -22,6 +22,10 @@ class ProfileComponent extends BaseComponent
             return;
         }
 
+        $this->getNewToken();
+
+        $this->useStorage('private');
+
         $profile = $this->profile->generateViewData();
 
         if ($profile) {
@@ -32,11 +36,11 @@ class ProfileComponent extends BaseComponent
             $this->view->notifications = $this->profile->packagesData->notifications;
 
             $this->view->canEmail = $this->profile->packagesData->canEmail;
+
+            $this->view->sessions = $this->profile->packagesData->sessions;
+        } else {
+            return;
         }
-
-        $this->getNewToken();
-
-        $this->useStorage('private');
     }
 
     /**
@@ -52,14 +56,12 @@ class ProfileComponent extends BaseComponent
 
             $this->profile->updateProfile($this->postData());
 
-            $this->view->responseCode = $this->profile->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->profile->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->profile->packagesData->responseMessage,
+                $this->profile->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -74,14 +76,12 @@ class ProfileComponent extends BaseComponent
                 $this->view->responseData = $this->auth->packagesData->responseData;
             }
 
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->auth->packagesData->responseMessage,
+                $this->auth->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -101,9 +101,7 @@ class ProfileComponent extends BaseComponent
             $this->view->responseMessage = $this->auth->packagesData->responseMessage;
 
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -136,9 +134,7 @@ class ProfileComponent extends BaseComponent
 
             $this->view->responseCode = $this->auth->packagesData->responseCode;
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -161,9 +157,7 @@ class ProfileComponent extends BaseComponent
 
             $this->view->responseCode = $this->auth->packagesData->responseCode;
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -176,13 +170,12 @@ class ProfileComponent extends BaseComponent
 
             $this->auth->enableVerifyTwoFa($this->postData()['code']);
 
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
+            $this->addResponse(
+                $this->auth->packagesData->responseMessage,
+                $this->auth->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -195,13 +188,12 @@ class ProfileComponent extends BaseComponent
 
             $this->auth->disableTwoFa($this->postData()['code']);
 
-            $this->view->responseMessage = $this->auth->packagesData->responseMessage;
-
-            $this->view->responseCode = $this->auth->packagesData->responseCode;
+            $this->addResponse(
+                $this->auth->packagesData->responseMessage,
+                $this->auth->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -230,14 +222,26 @@ class ProfileComponent extends BaseComponent
                 return;
             }
 
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Error Generating Avatar';
-
+            $this->addResponse('Error Generating Avatar', 1);
         } else {
-            $this->view->responseCode = 1;
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
 
-            $this->view->responseMessage = 'Method Not Allowed';
+    public function removeAccountAgentsAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->accounts->removeAccountAgents($this->postData());
+
+            $this->view->responseMessage = $this->basepackages->accounts->packagesData->responseMessage;
+
+            $this->view->responseCode = $this->basepackages->accounts->packagesData->responseCode;
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }
