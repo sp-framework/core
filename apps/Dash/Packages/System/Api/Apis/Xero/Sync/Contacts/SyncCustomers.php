@@ -534,11 +534,24 @@ class SyncCustomers extends BasePackage
         $newNote['note_type'] = '1';
         $newNote['note_app_visibility']['data'] = [];
         $newNote['is_private'] = '0';
+        if (isset($history['User']) && $history['User'] !== '') {
+            $historyUser = '<br>Created By: ' . $history['User'];
+        } else {
+            $historyUser = '';
+        }
+
+        if (isset($history['Details']) && $history['Details'] !== '') {
+            $historyDetails = '<br>Details: ' . $history['Details'];
+        } else {
+            $historyDetails = '<br>Details: -';
+        }
+
         $newNote['note'] =
             'Added via Xero API.' .
             '<br>Change Type: ' . $history['Changes'] .
             '<br>Created At: ' . \DateTime::createFromFormat('Y-m-d\TH:i:s', $history['DateUTCString'])->format('Y-m-d H:i:s') .
-            '<br>Details: ' . $history['Details'];
+            $historyUser .
+            $historyDetails;
 
         $this->basepackages->notes->addNote('customers', $newNote);
 
