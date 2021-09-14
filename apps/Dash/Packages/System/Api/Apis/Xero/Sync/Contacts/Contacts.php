@@ -265,6 +265,15 @@ class Contacts extends BasePackage
             $count = $parameters['processCount'];
         }
 
+        if (isset($parameters['processLocked']) &&
+            is_bool($parameters['processLocked']) &&
+            $parameters['processLocked'] === true
+        ) {
+            $lock = false;
+        } else {
+            $lock = true;
+        }
+
         $contact = null;
 
         $files =
@@ -292,7 +301,7 @@ class Contacts extends BasePackage
 
                     $contact = Json::decode($contact, true);
 
-                    if ($contact['lock'] === true) {//Lock in case multiple process access the same file.
+                    if ($contact['lock'] === $lock) {//Lock in case multiple process access the same file.
                         continue;
                     }
 
