@@ -161,6 +161,8 @@ class SyncVendors extends BasePackage
 
                 $vendorFinancials = $this->generateVendorFinancialsData($contact, $vendor);
 
+                $vendorFinancials['id'] = $vendor['id'];
+
                 $this->vendorsPackage->updateFinancialDetails($vendorFinancials);
             } else {
 

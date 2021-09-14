@@ -368,6 +368,8 @@ class SyncCustomers extends BasePackage
 
     protected function generateCustomerFinancialsData($contact, $customer)
     {
+        $customerFinancials['id'] = $customer['id'];
+
         $customerFinancials['customer_id'] = $customer['id'];
 
         if ($contact['finance']['TaxNumber']) {

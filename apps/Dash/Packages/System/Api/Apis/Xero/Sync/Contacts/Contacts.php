@@ -55,10 +55,6 @@ class Contacts extends BasePackage
 
     protected $downloadIds = [];
 
-    protected $addCounter = 0;
-
-    protected $addedIds = [];
-
     protected $updateCounter = 0;
 
     protected $updatedIds = [];
@@ -345,17 +341,13 @@ class Contacts extends BasePackage
 
         $this->responseData = array_merge($this->responseData,
             [
-                'addedIds'      => $this->addedIds,
                 'updatedIds'    => $this->updatedIds,
                 'skippedIds'    => $this->skippedIds
             ]
         );
 
         $this->responseMessage =
-            $this->responseMessage . ' ' .
-            'Contacts Sync Ok. Added: ' . $this->addCounter .
-            '. Updated: ' . $this->updateCounter .
-            '. Skipped: ' . $this->skippedCounter . '.';
+            $this->responseMessage . ' ' . 'Contacts Sync Ok. Updated: ' . $this->updateCounter . '. Skipped: ' . $this->skippedCounter . '.';
 
         $this->addResponse(
             $this->responseMessage,
@@ -391,10 +383,6 @@ class Contacts extends BasePackage
 
             $modelToUse->create();
 
-            // $this->addCounter = $this->addCounter + 1;
-
-            // $this->addedIds[$contact['ContactID']] = 0;
-
             $thisContact = $modelToUse->toArray();
         } else {
             if ($xeroContact->baz_vendor_id) {
@@ -404,10 +392,6 @@ class Contacts extends BasePackage
             $xeroContact->assign($this->jsonData($contact));
 
             $xeroContact->update();
-
-            // $this->updateCounter = $this->updateCounter + 1;
-
-            // $this->updatedIds[$contact['ContactID']] = 0;
 
             $thisContact = $xeroContact->toArray();
         }
@@ -704,7 +688,6 @@ class Contacts extends BasePackage
                 }
 
                 $this->processing = $contact['ContactID'];
-                $this->addedIds[$contact['ContactID']] = 0;
                 $this->updatedIds[$contact['ContactID']] = 0;
 
                 $addressesModel = SystemApiXeroContactsAddresses::class;
@@ -770,15 +753,9 @@ class Contacts extends BasePackage
                     $customer = $syncCustomers->generateCustomerData($contact);
 
                     if ($customer['customer']['id'] != '0') {
-                        if (isset($this->addedIds[$customer['customer']['ContactID']])) {
-                            $this->addedIds[$customer['customer']['ContactID']] = 'Created customer with ID: ' . $customer['customer']['id'];
-                            $this->addCounter = $this->addCounter + 1;
-                            unset($this->updatedIds[$customer['customer']['ContactID']]);
-                        }
                         if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
                             $this->updatedIds[$customer['customer']['ContactID']] = 'Updated Customer with ID: ' . $customer['customer']['id'];
                             $this->updateCounter = $this->updateCounter + 1;
-                            unset($this->addedIds[$customer['customer']['ContactID']]);
                         }
 
                         if ($customer['errors']['customers'] && count($customer['errors']['customers']) > 0) {
@@ -791,9 +768,6 @@ class Contacts extends BasePackage
                             $customerErrors = array_merge($customerErrors, $errors);
                         }
                     } else {
-                        if (isset($this->addedIds[$customer['customer']['ContactID']])) {
-                            unset($this->addedIds[$customer['customer']['ContactID']]);
-                        }
                         if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
                             unset($this->updatedIds[$customer['customer']['ContactID']]);
                         }
@@ -819,15 +793,9 @@ class Contacts extends BasePackage
                     $vendor = $syncVendors->generateVendorData($contact);
 
                     if ($vendor['vendor']['id'] != '0') {
-                        if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
-                            $this->addedIds[$vendor['vendor']['ContactID']] = 'Created vendor with ID: ' . $vendor['vendor']['id'];
-                            $this->addCounter = $this->addCounter + 1;
-                            unset($this->updatedIds[$vendor['vendor']['ContactID']]);
-                        }
                         if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
                             $this->updatedIds[$vendor['vendor']['ContactID']] = 'Updated vendor with ID: ' . $vendor['vendor']['id'];
                             $this->updateCounter = $this->updateCounter + 1;
-                            unset($this->addedIds[$vendor['vendor']['ContactID']]);
                         }
 
                         if ($vendor['errors']['vendors'] && count($vendor['errors']['vendors']) > 0) {
@@ -840,9 +808,6 @@ class Contacts extends BasePackage
                             $vendorErrors = array_merge($vendorErrors, $errors);
                         }
                     } else {
-                        if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
-                            unset($this->addedIds[$vendor['vendor']['ContactID']]);
-                        }
                         if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
                             unset($this->updatedIds[$vendor['vendor']['ContactID']]);
                         }
