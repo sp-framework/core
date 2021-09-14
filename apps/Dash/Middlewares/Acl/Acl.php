@@ -46,7 +46,12 @@ class Acl extends BaseMiddleware
         }
 
         $this->accountPermissions = Json::decode($this->account['permissions'], true);
-        if ($this->account['role_id'] === '1' && count($this->accountPermissions) === 0) {//Systems Administrators
+
+        //System Admin bypasses the ACL if they don't have any permissions defined.
+        if ($this->account['id'] === '1' &&
+            $this->account['role_id'] === '1' &&
+            count($this->accountPermissions) === 0
+        ) {
             return;
         }
 
@@ -59,6 +64,7 @@ class Acl extends BaseMiddleware
         if (!$this->setControllerAndAction()) {
             return true;
         }
+
         if ($this->account && $this->account['override_role'] === '1') {
             $this->accountEmail = str_replace('.', '', str_replace('@', '', $this->account['email']));
 
@@ -98,10 +104,16 @@ class Acl extends BaseMiddleware
 
             $this->roleName = strtolower(str_replace(' ', '', $this->role['name']));
 
-            if ($this->localContent->fileExists($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action)) {
-
-                $this->acl = unserialize($this->localContent->read($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action));
-
+            if ($this->localContent->fileExists(
+                        $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action
+                    )
+            ) {
+                $this->acl =
+                    unserialize(
+                        $this->localContent->read(
+                            $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action
+                        )
+                    );
             } else {
                 $this->generateComponentsArr();
 
@@ -126,10 +138,12 @@ class Acl extends BaseMiddleware
                 }
 
                 if ($this->config->cache->enabled) {
-                    $this->localContent->write($aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->acl));
+                    $this->localContent->write(
+                        $aclFileDir . $this->roleName . $this->role['id'] . $this->controllerRoute . $this->action, serialize($this->acl)
+                    );
                 }
             }
-            // var_dump($this->roleName, $this->controllerRoute, $this->action);
+
             if ($this->found &&
                 !$this->acl->isAllowed($this->roleName, $this->controllerRoute, $this->action)
             ) {
@@ -155,13 +169,6 @@ class Acl extends BaseMiddleware
                 unset($url[Arr::lastKey($url)]);
             }
 
-            // if (isset($this->domain['exclusive_to_default_app']) &&
-            //     $this->domain['exclusive_to_default_app'] == 1
-            // ) {
-            //     if ($url[0] === $this->app['route']) {
-            //         unset($url[0]);
-            //     }
-            // }
             unset($url[0]);
 
             $componentRoute = implode('/', $url);
@@ -190,12 +197,11 @@ class Acl extends BaseMiddleware
         $componentRoute = $this->components[$componentKey]['route'];
         $componentDescription = $this->components[$componentKey]['description'];
         $componentAcls = $this->components[$componentKey]['acls'];
-        // var_dump($this->components[$componentKey]);
+
         $this->acl->addComponent(
             new Component($componentRoute, $componentDescription), $componentAcls
         );
 
-        // var_dump($permission[$this->action]);
         if ($permission[$this->action] === 1) {
             $this->acl->allow($roleName, $componentRoute, $this->action);
             $this->logger->log->debug(
