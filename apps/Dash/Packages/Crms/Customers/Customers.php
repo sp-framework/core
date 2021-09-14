@@ -110,7 +110,7 @@ class Customers extends BasePackage
     {
         $customer = $this->getById($data['id']);
 
-        if ($data['account_email'] !== $contact['account_email']) {
+        if ($data['account_email'] !== $customer['account_email']) {
             if ($this->checkCustomerDuplicate($data['account_email'])) {
                 $this->addResponse('Customer ' . $data['account_email'] . ' already exists.', 1);
 
@@ -247,7 +247,7 @@ class Customers extends BasePackage
             [
                 'conditions'    => 'customer_id = :cid:',
                 'bind'          => [
-                    'cid'       => $data['customer_id']
+                    'cid'       => $data['id']
                 ]
             ]
         );
