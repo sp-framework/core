@@ -301,7 +301,7 @@ class Contacts extends BasePackage
 
                     $contact = Json::decode($contact, true);
 
-                    if ($contact['lock'] === $lock) {//Lock in case multiple process access the same file.
+                    if ($lock === true && $contact['lock'] === $lock) {//Lock in case multiple process access the same file.
                         continue;
                     }
 
