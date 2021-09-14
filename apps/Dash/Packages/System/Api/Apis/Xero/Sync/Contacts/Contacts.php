@@ -277,6 +277,8 @@ class Contacts extends BasePackage
             ->map(fn (StorageAttributes $attributes) => $attributes->path())
             ->toArray();
 
+        $processFiles = false;
+
         if ($files && is_array($files) && count($files) > 0) {
             if (count($files) < $count) {
                 $count = count($files);
@@ -284,6 +286,8 @@ class Contacts extends BasePackage
                 $this->scheduleChildrenTasks = false;
             } else {
                 $this->scheduleChildrenTasks = true;
+
+                $processFiles = true;
             }
 
             for ($fileCount = 0; $fileCount < $count; $fileCount++) {
@@ -330,7 +334,7 @@ class Contacts extends BasePackage
         }
 
         try {
-            $this->syncWithLocal();
+            $this->syncWithLocal($count, $processFiles);
         } catch (\PDOException | \Exception $e) {
             if (get_class($e) !== 'PDOException') {
                 throw $e;
@@ -387,9 +391,9 @@ class Contacts extends BasePackage
 
             $modelToUse->create();
 
-            $this->addCounter = $this->addCounter + 1;
+            // $this->addCounter = $this->addCounter + 1;
 
-            $this->addedIds[$contact['ContactID']] = 0;
+            // $this->addedIds[$contact['ContactID']] = 0;
 
             $thisContact = $modelToUse->toArray();
         } else {
@@ -401,9 +405,9 @@ class Contacts extends BasePackage
 
             $xeroContact->update();
 
-            $this->updateCounter = $this->updateCounter + 1;
+            // $this->updateCounter = $this->updateCounter + 1;
 
-            $this->updatedIds[$contact['ContactID']] = 0;
+            // $this->updatedIds[$contact['ContactID']] = 0;
 
             $thisContact = $xeroContact->toArray();
         }
@@ -637,7 +641,7 @@ class Contacts extends BasePackage
         }
     }
 
-    public function syncWithLocal()
+    public function syncWithLocal($count = 50, $processFiles = false)
     {
         $this->processing = null;
 
@@ -654,6 +658,14 @@ class Contacts extends BasePackage
         );
 
         if ($xeroContact) {
+            if ($xeroContact->count() < $count) {
+                $count = $xeroContact->count();
+
+                $this->scheduleChildrenTasks = false;
+            } else {
+                $this->scheduleChildrenTasks = true;
+            }
+
             $this->vendorsPackage = $this->usePackage(Vendors::class);
 
             $this->contactsPackage = $this->usePackage(BusinessDirectoryContacts::class);
@@ -666,109 +678,106 @@ class Contacts extends BasePackage
 
             $syncVendors = (new SyncVendors)->setup($this->api, $this->xeroApi);
 
-            if ($contacts && count($contacts) > 0) {
-                foreach ($contacts as $contactKey => $contact) {
-                    if ($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '0') {
-                        if (isset($this->addedIds[$contact['ContactID']])) {
-                            unset($this->addedIds[$contact['ContactID']]);
-                            $this->addCounter = $this->addCounter - 1;
-                        } else if (isset($this->updatedIds[$contact['ContactID']])) {
-                            unset($this->updatedIds[$contact['ContactID']]);
-                            $this->updateCounter = $this->updateCounter - 1;
-                        }
+            $customerErrors = [];
+            $vendorErrors = [];
 
-                        $this->skippedIds[$contact['ContactID']] = 'Skipped - Contact is not customer or supplier as per xero.';
+            for ($fileCount = 0; $fileCount < $count; $fileCount++) {
+                $contact = $contacts[$fileCount];
 
-                        $this->skippedCounter = $this->skippedCounter + 1;
+                if ($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '0') {
+                    $this->skippedIds[$contact['ContactID']] = 'Skipped - Contact is not customer or supplier as per xero.';
 
-                        $markContactObj = $model::findById($contact['id']);
+                    $this->skippedCounter = $this->skippedCounter + 1;
 
-                        if ($markContactObj) {
-                            $markContact = $markContactObj->toArray();
+                    $markContactObj = $model::findById($contact['id']);
 
-                            $markContact['baz_vendor_id'] = 0;
-                            $markContact['baz_customer_id'] = 0;
+                    if ($markContactObj) {
+                        $markContact = $markContactObj->toArray();
 
-                            $markContactObj->update($markContact);
-                        }
+                        $markContact['baz_vendor_id'] = 0;
+                        $markContact['baz_customer_id'] = 0;
 
-                        continue;//We dont want to add just placeholder accounts.
+                        $markContactObj->update($markContact);
                     }
 
-                    $this->processing = $contact['ContactID'];
-
-                    $addressesModel = SystemApiXeroContactsAddresses::class;
-
-                    $contactAddresses = $addressesModel::find(
-                        [
-                            'conditions'    => 'ContactID = :cid:',
-                            'bind'          =>
-                                [
-                                    'cid'   => $contact['ContactID']
-                                ]
-                        ]
-                    );
-                    if ($contactAddresses) {
-                        $contact['addresses'] = $contactAddresses->toArray();
-                    }
-
-                    $contactPersonsModel = SystemApiXeroContactsContactPersons::class;
-                    $contactPersons = $contactPersonsModel::find(
-                        [
-                            'conditions'    => 'ContactID = :cid:',
-                            'bind'          =>
-                                [
-                                    'cid'   => $contact['ContactID']
-                                ]
-                        ]
-                    );
-                    if ($contactPersons) {
-                        $contact['persons'] = $contactPersons->toArray();
-                    }
-
-                    $contactFinanceModel = SystemApiXeroContactsFinance::class;
-                    $contactFinance = $contactFinanceModel::findFirst(
-                        [
-                            'conditions'    => 'ContactID = :cid:',
-                            'bind'          =>
-                                [
-                                    'cid'   => $contact['ContactID']
-                                ]
-                        ]
-                    );
-                    if ($contactFinance) {
-                        $contact['finance'] = $contactFinance->toArray();
-                    }
-
-                    $contactPhonesModel = SystemApiXeroContactsPhones::class;
-                    $contactPhones = $contactPhonesModel::find(
-                        [
-                            'conditions'    => 'ContactID = :cid:',
-                            'bind'          =>
-                                [
-                                    'cid'   => $contact['ContactID']
-                                ]
-                        ]
-                    );
-                    if ($contactPhones) {
-                        $contact['phones'] = $contactPhones->toArray();
-                    }
-
-                    if ($contact['IsCustomer'] == '1' && $contact['IsSupplier'] == '0') {
-                        $customer = $syncCustomers->generateCustomerData($contact);
-                    } else if (($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '1') ||
-                               ($contact['IsCustomer'] == '1' && $contact['IsSupplier'] == '1')
-                    ) {
-                        $vendor = $syncVendors->generateVendorData($contact);
-                    }
+                    continue;//We dont want to add just placeholder accounts.
                 }
 
-                if (isset($customer)) {
+                $this->processing = $contact['ContactID'];
+                $this->addedIds[$contact['ContactID']] = 0;
+                $this->updatedIds[$contact['ContactID']] = 0;
+
+                $addressesModel = SystemApiXeroContactsAddresses::class;
+
+                $contactAddresses = $addressesModel::find(
+                    [
+                        'conditions'    => 'ContactID = :cid:',
+                        'bind'          =>
+                            [
+                                'cid'   => $contact['ContactID']
+                            ]
+                    ]
+                );
+                if ($contactAddresses) {
+                    $contact['addresses'] = $contactAddresses->toArray();
+                }
+
+                $contactPersonsModel = SystemApiXeroContactsContactPersons::class;
+                $contactPersons = $contactPersonsModel::find(
+                    [
+                        'conditions'    => 'ContactID = :cid:',
+                        'bind'          =>
+                            [
+                                'cid'   => $contact['ContactID']
+                            ]
+                    ]
+                );
+                if ($contactPersons) {
+                    $contact['persons'] = $contactPersons->toArray();
+                }
+
+                $contactFinanceModel = SystemApiXeroContactsFinance::class;
+                $contactFinance = $contactFinanceModel::findFirst(
+                    [
+                        'conditions'    => 'ContactID = :cid:',
+                        'bind'          =>
+                            [
+                                'cid'   => $contact['ContactID']
+                            ]
+                    ]
+                );
+                if ($contactFinance) {
+                    $contact['finance'] = $contactFinance->toArray();
+                }
+
+                $contactPhonesModel = SystemApiXeroContactsPhones::class;
+                $contactPhones = $contactPhonesModel::find(
+                    [
+                        'conditions'    => 'ContactID = :cid:',
+                        'bind'          =>
+                            [
+                                'cid'   => $contact['ContactID']
+                            ]
+                    ]
+                );
+                if ($contactPhones) {
+                    $contact['phones'] = $contactPhones->toArray();
+                }
+
+                $errors = [];
+
+                if ($contact['IsCustomer'] == '1' && $contact['IsSupplier'] == '0') {
+                    $customer = $syncCustomers->generateCustomerData($contact);
+
                     if ($customer['customer']['id'] != '0') {
                         if (isset($this->addedIds[$customer['customer']['ContactID']])) {
                             $this->addedIds[$customer['customer']['ContactID']] = 'Created customer with ID: ' . $customer['customer']['id'];
+                            $this->addCounter = $this->addCounter + 1;
+                            unset($this->updatedIds[$customer['customer']['ContactID']]);
                         } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
                             $this->updatedIds[$customer['customer']['ContactID']] = 'Updated Customer with ID: ' . $customer['customer']['id'];
+                            $this->updateCounter = $this->updateCounter + 1;
+                            unset($this->addedIds[$customer['customer']['ContactID']]);
                         }
 
                         if ($customer['errors']['customers'] && count($customer['errors']['customers']) > 0) {
@@ -777,15 +786,14 @@ class Contacts extends BasePackage
                             } else {
                                 $errors = $customer['errors']['customers'];
                             }
-                            $this->customersPackage->errorCustomer('Errors in customers. Please check details for more information.', Json::encode($errors));
+
+                            $customerErrors = array_merge($customerErrors, $errors);
                         }
                     } else {
                         if (isset($this->addedIds[$customer['customer']['ContactID']])) {
                             unset($this->addedIds[$customer['customer']['ContactID']]);
-                            $this->addCounter = $this->addCounter - 1;
                         } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
                             unset($this->updatedIds[$customer['customer']['ContactID']]);
-                            $this->updateCounter = $this->updateCounter - 1;
                         }
 
                         $this->skippedIds[$customer['customer']['ContactID']] = 'Skipped - Contact email is not set.';
@@ -803,14 +811,20 @@ class Contacts extends BasePackage
                             $markContactObj->update($markContact);
                         }
                     }
-                }
+                } else if (($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '1') ||
+                           ($contact['IsCustomer'] == '1' && $contact['IsSupplier'] == '1')
+                ) {
+                    $vendor = $syncVendors->generateVendorData($contact);
 
-                if (isset($vendor)) {
                     if ($vendor['vendor']['id'] != '0') {
                         if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
                             $this->addedIds[$vendor['vendor']['ContactID']] = 'Created vendor with ID: ' . $vendor['vendor']['id'];
+                            $this->addCounter = $this->addCounter + 1;
+                            unset($this->updatedIds[$vendor['vendor']['ContactID']]);
                         } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
                             $this->updatedIds[$vendor['vendor']['ContactID']] = 'Updated vendor with ID: ' . $vendor['vendor']['id'];
+                            $this->updateCounter = $this->updateCounter + 1;
+                            unset($this->addedIds[$vendor['vendor']['ContactID']]);
                         }
 
                         if ($vendor['errors']['vendors'] && count($vendor['errors']['vendors']) > 0) {
@@ -819,15 +833,14 @@ class Contacts extends BasePackage
                             } else {
                                 $errors = $vendor['errors']['vendors'];
                             }
-                            $this->vendorsPackage->errorVendor('Errors in vendors. Please check details for more information.', Json::encode($errors));
+
+                            $vendorErrors = array_merge($vendorErrors, $errors);
                         }
                     } else {
                         if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
                             unset($this->addedIds[$vendor['vendor']['ContactID']]);
-                            $this->addCounter = $this->addCounter - 1;
                         } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
                             unset($this->updatedIds[$vendor['vendor']['ContactID']]);
-                            $this->updateCounter = $this->updateCounter - 1;
                         }
 
                         $this->skippedIds[$vendor['vendor']['ContactID']] = 'Skipped - Contact email not set.';
@@ -847,6 +860,18 @@ class Contacts extends BasePackage
                     }
                 }
             }
+
+            if (count($customerErrors) > 0) {
+                $this->customersPackage->errorCustomer('Errors in customers. Please check details for more information.', Json::encode($customerErrors));
+            }
+
+            if (count($vendorErrors) > 0) {
+                $this->vendorsPackage->errorVendor('Errors in vendors. Please check details for more information.', Json::encode($vendorErrors));
+            }
+        }
+
+        if ($processFiles) {
+            $this->scheduleChildrenTasks = true;
         }
     }
 }

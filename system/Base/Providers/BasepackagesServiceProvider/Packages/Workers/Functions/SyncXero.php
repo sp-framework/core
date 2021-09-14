@@ -96,6 +96,8 @@ class SyncXero extends Functions
                     $this->logger->logExceptions->debug($e);
                 }
 
+                $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
+
                 if (get_class($e) === 'GuzzleHttp\Exception\ConnectException') {
                     $message = $e->getMessage();
 
@@ -107,8 +109,6 @@ class SyncXero extends Functions
 
                     $thisFunction->packagesData->responseMessage = $message;
                 }
-
-                $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
 
                 $thisFunction->packagesData->responseCode = 1;
 
@@ -145,6 +145,7 @@ class SyncXero extends Functions
             $count = 50;
         }
 
+        //This will run regardless you manually cancel the force next run. To cancel you have to cancel this before it executes a new cycle.
         if ($task && $task['force_next_run'] === null) {
             $taskPackage->forceNextRun(
                 [
