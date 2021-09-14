@@ -8,5 +8,5 @@
     "version": "0.0.1",
     "repo": "https://.../dash-package-system-admin-apiS",
     "class": "Apps\\Dash\\Packages\\System\\Api\\Api",
-    "settings": "[]"
+    "settings": {"componentRoute":"system/api"}
 }

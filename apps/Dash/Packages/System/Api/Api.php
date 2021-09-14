@@ -263,6 +263,7 @@ class Api extends BasePackage
 
     /**
      * @notification(name=warning)
+     * @notification_allowed_methods(email, sms)
      */
     public function warningApi($messageTitle = null, $messageDetails = null, $id = null)
     {
@@ -275,6 +276,7 @@ class Api extends BasePackage
 
     /**
      * @notification(name=error)
+     * @notification_allowed_methods(email, sms)
      */
     public function errorApi($messageTitle = null, $messageDetails = null, $id = null)
     {
