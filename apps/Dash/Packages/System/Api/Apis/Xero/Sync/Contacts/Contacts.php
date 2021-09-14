@@ -326,6 +326,12 @@ class Contacts extends BasePackage
                             }
                         }
                     } catch (\PDOException | \Exception $e) {
+                        $contact['hasError'] = true;
+
+                        $contact['error'] = $e->getMessage();
+
+                        $this->writeJsonFile($contact);
+
                         if (get_class($e) !== 'PDOException') {
                             throw $e;
                         }

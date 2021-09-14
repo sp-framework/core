@@ -62,7 +62,7 @@ class SystemApiXeroAttachments
                     'FileName',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 100,
+                        'size'          => 200,
                         'notNull'       => true
                     ]
                 ),
@@ -78,7 +78,7 @@ class SystemApiXeroAttachments
                     'MimeType',
                     [
                         'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 50,
+                        'size'          => 200,
                         'notNull'       => true,
                     ]
                 ),
