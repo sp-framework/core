@@ -774,7 +774,8 @@ class Contacts extends BasePackage
                             $this->addedIds[$customer['customer']['ContactID']] = 'Created customer with ID: ' . $customer['customer']['id'];
                             $this->addCounter = $this->addCounter + 1;
                             unset($this->updatedIds[$customer['customer']['ContactID']]);
-                        } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
+                        }
+                        if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
                             $this->updatedIds[$customer['customer']['ContactID']] = 'Updated Customer with ID: ' . $customer['customer']['id'];
                             $this->updateCounter = $this->updateCounter + 1;
                             unset($this->addedIds[$customer['customer']['ContactID']]);
@@ -792,7 +793,8 @@ class Contacts extends BasePackage
                     } else {
                         if (isset($this->addedIds[$customer['customer']['ContactID']])) {
                             unset($this->addedIds[$customer['customer']['ContactID']]);
-                        } else if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
+                        }
+                        if (isset($this->updatedIds[$customer['customer']['ContactID']])) {
                             unset($this->updatedIds[$customer['customer']['ContactID']]);
                         }
 
@@ -821,7 +823,8 @@ class Contacts extends BasePackage
                             $this->addedIds[$vendor['vendor']['ContactID']] = 'Created vendor with ID: ' . $vendor['vendor']['id'];
                             $this->addCounter = $this->addCounter + 1;
                             unset($this->updatedIds[$vendor['vendor']['ContactID']]);
-                        } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
+                        }
+                        if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
                             $this->updatedIds[$vendor['vendor']['ContactID']] = 'Updated vendor with ID: ' . $vendor['vendor']['id'];
                             $this->updateCounter = $this->updateCounter + 1;
                             unset($this->addedIds[$vendor['vendor']['ContactID']]);
@@ -839,7 +842,8 @@ class Contacts extends BasePackage
                     } else {
                         if (isset($this->addedIds[$vendor['vendor']['ContactID']])) {
                             unset($this->addedIds[$vendor['vendor']['ContactID']]);
-                        } else if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
+                        }
+                        if (isset($this->updatedIds[$vendor['vendor']['ContactID']])) {
                             unset($this->updatedIds[$vendor['vendor']['ContactID']]);
                         }
 
