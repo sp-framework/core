@@ -24,6 +24,10 @@ class RolesComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $role = $this->roles->generateViewData($this->getData()['id']);
+
+                if (!$role) {
+                    return $this->throwIdNotFound();
+                }
             } else {
                 $role = $this->roles->generateViewData();
             }

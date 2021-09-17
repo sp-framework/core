@@ -35,6 +35,10 @@ class FiltersComponent extends BaseComponent
                 if ($this->getData()['id'] != 0) {
                     $filter = $this->filters->getById($this->getData()['id']);
 
+                    if (!$filter) {
+                        return $this->throwIdNotFound();
+                    }
+
                     $this->view->filter = $filter;
                 }
 

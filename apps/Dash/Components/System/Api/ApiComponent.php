@@ -49,8 +49,11 @@ class ApiComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-
                 $api = $this->apiPackage->getApiById($this->getData()['id']);
+
+                if (!$api) {
+                    return $this->throwIdNotFound();
+                }
 
                 if ($api['api_type'] === 'ebay') {
                     $this->includeEbayIds();

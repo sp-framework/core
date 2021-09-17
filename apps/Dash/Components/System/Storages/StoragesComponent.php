@@ -31,6 +31,10 @@ class StoragesComponent extends BaseComponent
                 if ($this->getData()['id'] != 0) {
                     $storage = $this->storages->getById($this->getData()['id']);
 
+                    if (!$storage) {
+                        return $this->throwIdNotFound();
+                    }
+
                     $storage['allowed_image_mime_types'] = Json::decode($storage['allowed_image_mime_types']);
                     $storage['allowed_image_sizes'] = Json::decode($storage['allowed_image_sizes']);
                     $storage['allowed_file_mime_types'] = Json::decode($storage['allowed_file_mime_types']);

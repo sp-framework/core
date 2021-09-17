@@ -27,6 +27,10 @@ class TaxgroupsComponent extends BaseComponent
 
                 $taxGroup = $this->taxgroupsPackage->getById($this->getData()['id']);
 
+                if (!$taxGroup) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->taxGroup = $taxGroup;
             }
 

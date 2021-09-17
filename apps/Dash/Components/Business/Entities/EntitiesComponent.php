@@ -70,6 +70,10 @@ class EntitiesComponent extends BaseComponent
             }
 
             if ($this->getData()['id'] != 0) {
+                if (!isset($entities[$this->getData()['id']])) {
+                    return $this->throwIdNotFound();
+                }
+
                 $entity = $entities[$this->getData()['id']];
 
                 $address = $this->basepackages->addressbook->getById($entity['address_id']);

@@ -166,6 +166,10 @@ class Domains extends BasePackage
 		if ($did) {
 			$domain = $this->getById($did);
 
+			if (!$domain) {
+				return false;
+			}
+
 			$domain['apps'] = Json::decode($domain['apps'], true);
 			if ($domain['settings']) {
 				$domain['settings'] = Json::decode($domain['settings'], true);

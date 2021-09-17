@@ -30,6 +30,10 @@ class SchedulesComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $schedule = $this->schedules->getById($this->getData()['id']);
 
+                if (!$schedule) {
+                    return $this->throwIdNotFound();
+                }
+
                 $schedule['schedule'] = Json::decode($schedule['schedule'], true);
 
                 $this->view->schedule = $schedule;

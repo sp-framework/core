@@ -26,8 +26,11 @@ class CitiesComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $city =
-                    $this->basepackages->geoCities->getById($this->getData()['id']);
+                $city = $this->basepackages->geoCities->getById($this->getData()['id']);
+
+                if (!$city) {
+                    return $this->throwIdNotFound();
+                }
 
                 $this->view->city = $city;
             } else {

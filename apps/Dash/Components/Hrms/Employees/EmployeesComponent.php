@@ -56,6 +56,10 @@ class EmployeesComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $employee = $this->employees->getEmployeeById($this->getData()['id']);
 
+                if (!$employee) {
+                    return $this->throwIdNotFound();
+                }
+
                 if ($employee['portrait'] && $employee['portrait'] !== '') {
                     $this->view->portraitLink = $this->links->url('system/storages/q/uuid/' . $employee['portrait'] . '/w/200');
                 }

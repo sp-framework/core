@@ -22,12 +22,18 @@ class DomainsComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $domain = $this->domains->generateViewData($this->getData()['id']);
+
+                if (!$domain) {
+                    return $this->throwIdNotFound();
+                }
             } else {
                 $domain = $this->domains->generateViewData();
             }
+
             if ($domain) {
                 $this->view->domain = $this->domains->packagesData->domain;
             }
+
             $this->view->emailservices = $this->domains->packagesData->emailservices;
 
             $storages = $this->domains->packagesData->storages;

@@ -40,8 +40,11 @@ class CustomersComponent extends BaseComponent
             $this->view->taxes = $this->usePackage(Taxes::class)->getAll()->taxes;
 
             if ($this->getData()['id'] != 0) {
-
                 $customer = $this->customers->getCustomerById($this->getData()['id']);
+
+                if (!$customer) {
+                    return $this->throwIdNotFound();
+                }
 
                 $customer['activityLogs'] = $this->customers->getActivityLogs($this->getData()['id']);
 

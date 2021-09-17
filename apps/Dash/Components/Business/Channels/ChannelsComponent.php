@@ -39,6 +39,10 @@ class ChannelsComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $channel = $this->channels->getChannelById($this->getData()['id']);
 
+                if (!$channel) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->channel = $channel;
 
                 $this->view->channelType = $channel['channel_type'];

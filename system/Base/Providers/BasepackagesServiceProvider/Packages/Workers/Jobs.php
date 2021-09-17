@@ -25,6 +25,10 @@ class Jobs extends BasePackage
     {
         $job = $this->getById($id);
 
+        if (!$job) {
+            return false;
+        }
+
         $apiModel = SystemApiCalls::class;
 
         if ($job['run_on'] && $job['run_on'] !== '' && $job['run_on'] != '0' && $job['run_on'] !== '-') {

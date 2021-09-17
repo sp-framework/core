@@ -26,8 +26,13 @@ class BrandsComponent extends BaseComponent
             $this->view->logoLink = '';
 
             if ($this->getData()['id'] != 0) {
+                $brand = $this->brands->getById($this->getData()['id']);
 
-                $this->view->brand = $this->brands->getById($this->getData()['id']);
+                if (!$brand) {
+                    return $this->throwIdNotFound();
+                }
+
+                $this->view->brand = $brand;
 
                 $storages = $this->basepackages->storages;
 

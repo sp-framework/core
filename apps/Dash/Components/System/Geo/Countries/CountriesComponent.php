@@ -36,8 +36,11 @@ class CountriesComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $country =
-                    $this->basepackages->geoCountries->getById($this->getData()['id']);
+                $country = $this->basepackages->geoCountries->getById($this->getData()['id']);
+
+                if (!$country) {
+                    return $this->throwIdNotFound();
+                }
 
                 $this->view->country = $country;
             } else {

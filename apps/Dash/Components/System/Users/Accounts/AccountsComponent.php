@@ -37,6 +37,10 @@ class AccountsComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $account = $this->accounts->generateViewData($this->getData()['id']);
+
+                if (!$account) {
+                    return $this->throwIdNotFound();
+                }
             } else {
                 $account = $this->accounts->generateViewData();
             }

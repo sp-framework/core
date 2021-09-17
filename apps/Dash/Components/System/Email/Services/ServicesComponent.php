@@ -25,6 +25,10 @@ class ServicesComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $emailservice = $this->emailservices->getById($this->getData()['id']);
 
+                if (!$emailservice) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->emailservice = $emailservice;
             }
             $this->view->pick('services/view');

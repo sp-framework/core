@@ -39,17 +39,7 @@ class Error
 
 	public function init()
 	{
-		// if ($this->appInfo) {
-		// 	if ($this->appInfo['mode'] === 0) {
-		// 		$this->appDebug = false;
-		// 	} else if ($this->appInfo['mode'] === 1) {
-		// 		$this->appDebug = true;
-		// 	} else {
-		// 		$this->appDebug = (bool) $this->config->debug;
-		// 	}
-		// } else {
-			$this->appDebug = (bool) $this->config->debug;
-		// }
+		$this->appDebug = (bool) $this->config->debug;
 
 		if ($this->appDebug) {
 			error_reporting(-1);

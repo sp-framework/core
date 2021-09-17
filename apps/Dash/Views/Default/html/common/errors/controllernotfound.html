@@ -1,12 +1,12 @@
 {% set sectionId = '404' %}
-<div id="{{componentId}}-{{sectionId}}">
+<div class="card p-3 rounded-0" id="{{componentId}}-{{sectionId}}">
     <div class="row">
         <div class="col">
             <div class="jumbotron text-center bg-danger">
                 <h1>
                     <span class="text-white"><i class="fas fa-fw fa-search-minus"></i> Not Found! (Error:404)</span>
                 </h1>
-                <p class="lead text-white">Controller Not Found</p>
+                <p class="lead text-white">Component Not Found</p>
                 <p>
                     <a href="{{links.url('home')}}" class="contentAjaxLink btn btn-primary btn-lg">
                         <span class="text-uppercase">Goto Home</span>

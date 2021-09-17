@@ -27,6 +27,10 @@ class CustomergroupsComponent extends BaseComponent
 
                 $customerGroup = $this->customergroups->getById($this->getData()['id']);
 
+                if (!$customerGroup) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->customerGroup = $customerGroup;
             }
 

@@ -29,6 +29,10 @@ class TaxesComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $tax = $this->taxesPackage->getById($this->getData()['id']);
 
+                if (!$tax) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->tax = $tax;
             }
 

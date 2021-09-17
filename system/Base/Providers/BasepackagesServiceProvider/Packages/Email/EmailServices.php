@@ -170,7 +170,11 @@ class EmailServices extends BasePackage
     {
         $emailService = parent::getById($id, $resetCache, $enableCache);
 
-        return $this->decryptPass($emailService);
+        if ($emailService) {
+            return $this->decryptPass($emailService);
+        }
+
+        return false;
     }
 
     protected function decryptPass(array $data)

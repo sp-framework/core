@@ -79,6 +79,10 @@ class VendorsComponent extends BaseComponent
 
                 $vendor = $this->vendors->getVendorById($this->getData()['id']);
 
+                if (!$vendor) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->b2bAccountManagers = $vendor['b2bAccountManagers'];
 
                 $vendor['activityLogs'] = $this->vendors->getActivityLogs($this->getData()['id']);

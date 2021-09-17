@@ -35,6 +35,10 @@ class TasksComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $task = $this->tasks->getById($this->getData()['id']);
 
+                if (!$task) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->task = $task;
             }
             $this->view->pick('tasks/view');

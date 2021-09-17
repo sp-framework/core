@@ -139,7 +139,7 @@ class EmailQueue extends BasePackage
             return;
         }
 
-        $this->addResponse('Queue processes successfully.');
+        $this->addResponse('Queue processed successfully.');
     }
 
     public function requeue(array $data)

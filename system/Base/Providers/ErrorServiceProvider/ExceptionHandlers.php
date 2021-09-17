@@ -6,14 +6,7 @@ use System\Base\BaseComponent;
 
 class ExceptionHandlers extends BaseComponent
 {
-	// public function handleEmailException($exception)
-	// {
-	// 	$this->view->responseCode = 1;
-
-	// 	$this->view->responseMessage = $exception->getMessage();
-
-	// 	return $this->sendJson();
-	// }
+	protected $baseErrorDir = 'system/Base/Providers/ErrorServiceProvider/View/errors/';
 
 	public function handlePermissionDeniedException($exception)
 	{
@@ -24,9 +17,7 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/View/errors/'));
-
-		return $this->view->partial('permissionDenied');
+		return $this->setViewsDir('permissionDenied');
 	}
 
 	public function handleAppNotAllowedException($exception)
@@ -38,9 +29,19 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/View/errors/'));
+		return $this->setViewsDir('notFound');
+	}
 
-		return $this->view->partial('notFound');
+	public function handleControllerNotFoundException($exception)
+	{
+		if ($this->request->getBestAccept() === 'application/json') {
+
+			$this->addResponse($exception->getMessage(), 1);
+
+			return $this->sendJson();
+		}
+
+		return $this->setViewsDir('notFound');
 	}
 
 	public function handleIdNotFoundException($exception)
@@ -52,9 +53,7 @@ class ExceptionHandlers extends BaseComponent
 			return $this->sendJson();
 		}
 
-		$this->view->setViewsDir(base_path('system/Base/Providers/ErrorServiceProvider/View/errors/'));
-
-		return $this->view->partial('notFound');
+		return $this->setViewsDir('notFound');
 	}
 
 	public function handleValidationException($exception)
@@ -72,5 +71,12 @@ class ExceptionHandlers extends BaseComponent
 		$this->flash->now('warning', 'Session expired, please login again.');
 
 		return redirect('/auth/login');
+	}
+
+	private function setViewsDir($partial)
+	{
+		$this->view->setViewsDir(base_path($this->baseErrorDir));
+
+		return $this->view->partial($partial);
 	}
 }

@@ -26,6 +26,10 @@ class QueueComponent extends BaseComponent
             if ($this->getData()['id'] != 0) {
                 $email = $this->emailqueue->getById($this->getData()['id']);
 
+                if (!$email) {
+                    return $this->throwIdNotFound();
+                }
+
                 $email = $this->formatStatus(0, $email);
                 $email = $this->formatPriority(0, $email);
                 $email = $this->formatSentOn(0, $email);

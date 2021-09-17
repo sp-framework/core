@@ -25,7 +25,13 @@ class DesignationsComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $this->view->status = $this->designations->getById($this->getData()['id']);
+                $designation = $this->designations->getById($this->getData()['id']);
+
+                if (!$designation) {
+                    return $this->throwIdNotFound();
+                }
+
+                $this->view->designation = $designation;
             }
 
             $this->view->pick('designations/view');

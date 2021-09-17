@@ -25,8 +25,11 @@ class TimezonesComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $timezone =
-                    $this->basepackages->geoTimezones->getById($this->getData()['id']);
+                $timezone = $this->basepackages->geoTimezones->getById($this->getData()['id']);
+
+                if (!$timezone) {
+                    return $this->throwIdNotFound();
+                }
 
                 $this->view->timezone = $timezone;
             } else {

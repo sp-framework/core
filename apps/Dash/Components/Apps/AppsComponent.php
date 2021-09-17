@@ -22,6 +22,11 @@ class AppsComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $app = $this->apps->getById($this->getData()['id']);
+
+                if (!$app) {
+                    return $this->throwIdNotFound();
+                }
+
                 $app['can_login_role_ids'] = Json::decode($app['can_login_role_ids'], true);
 
                 $components = [];

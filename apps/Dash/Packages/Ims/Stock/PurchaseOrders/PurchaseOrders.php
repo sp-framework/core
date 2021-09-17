@@ -19,9 +19,11 @@ class PurchaseOrders extends BasePackage
 
     public function getPurchaseOrderById(int $id)
     {
-        $purchaseOrderModel = new $this->modelToUse;
+        $purchaseOrderObj = $this->getFirst('id', $id);
 
-        $purchaseOrderObj = $purchaseOrderModel::findFirstById($id);
+        if (!$purchaseOrderObj) {
+            return false;
+        }
 
         $purchaseOrder = $purchaseOrderObj->toArray();
 

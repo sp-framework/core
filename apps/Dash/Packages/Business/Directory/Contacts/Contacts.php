@@ -22,11 +22,15 @@ class Contacts extends BasePackage
 
         $contactObj = $contactModel::findFirstById($id);
 
-        $contact = $contactObj->toArray();
+        if ($contactObj) {
+            $contact = $contactObj->toArray();
 
-        unset($contact['cc_details']);
+            unset($contact['cc_details']);
 
-        return $contact;
+            return $contact;
+        }
+
+        return false;
     }
 
     /**

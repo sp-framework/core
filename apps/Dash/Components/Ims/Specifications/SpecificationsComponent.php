@@ -35,8 +35,13 @@ class SpecificationsComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
+                $specification = $this->specifications->getById($this->getData()['id']);
 
-                $this->view->specification = $this->specifications->getById($this->getData()['id']);
+                if (!$specification) {
+                    return $this->throwIdNotFound();
+                }
+
+                $this->view->specification = $specification;
             }
 
             if ($specifications) {

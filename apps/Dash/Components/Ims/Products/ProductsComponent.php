@@ -70,8 +70,11 @@ class ProductsComponent extends BaseComponent
             $this->view->categorySources = $categorySources;
 
             if ($this->getData()['id'] != 0) {
-
                 $product = $this->products->getById($this->getData()['id']);
+
+                if (!$product) {
+                    return $this->throwIdNotFound();
+                }
 
                 $storages = $this->basepackages->storages;
 

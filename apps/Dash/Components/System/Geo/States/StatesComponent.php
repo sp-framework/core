@@ -25,8 +25,11 @@ class StatesComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $state =
-                    $this->basepackages->geoStates->getById($this->getData()['id']);
+                $state = $this->basepackages->geoStates->getById($this->getData()['id']);
+
+                if (!$state) {
+                    return $this->throwIdNotFound();
+                }
 
                 $this->view->state = $state;
             } else {

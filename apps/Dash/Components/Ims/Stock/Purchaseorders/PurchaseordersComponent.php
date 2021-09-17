@@ -55,6 +55,10 @@ class PurchaseordersComponent extends BaseComponent
 			if ($this->getData()['id'] != 0) {
 				$purchaseOrder = $this->purchaseOrdersPackage->getPurchaseOrderById($this->getData()['id']);
 
+				if (!$purchaseOrder) {
+					return $this->throwIdNotFound();
+				}
+
 				$purchaseOrder = $this->getAddress($purchaseOrder);
 
 				$purchaseOrder['activityLogs'] = $this->purchaseOrdersPackage->getActivityLogs($this->getData()['id']);

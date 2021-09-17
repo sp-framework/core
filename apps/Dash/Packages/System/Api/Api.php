@@ -27,25 +27,19 @@ class Api extends BasePackage
         if ($id) {
             $this->init();
 
-            if ($enableCache) {
-                $parameters = $this->paramsWithCache($this->getIdParams($id));
-            } else {
-                $parameters = $this->getIdParams($id);
+            $api = $this->getById($id, false, false);
+
+            if (!$api) {
+                return false;
             }
-
-            if (!$this->config->cache->enabled) {
-                $parameters = $this->getIdParams($id);
-            }
-
-            $this->model = $this->modelToUse::find($parameters);
-
-            $api = $this->getDbData($parameters, $enableCache);
 
             $api = $this->initAPIType($api);
 
-            $this->model = $this->modelToUse::find($api['api_id']);
+            $apiData = $this->getById($api['api_id'], false, false);
 
-            $apiData = $this->getDbData($parameters, $enableCache);
+            if (!$apiData) {
+                return false;
+            }
 
             unset($apiData['id']);
 
@@ -53,20 +47,6 @@ class Api extends BasePackage
                 $api = array_merge($api, $apiData);
             }
 
-            // if ($api['api_type'] === 'ebay' &&
-            //     isset($api['setup']) && (int) $api['setup'] < 4
-            // ) {
-            //     //Check ebay app token time. usually its 7200 seconds (2 hrs) if > 2hrs then reset setup to step 2.
-            //     if (isset($api['app_access_token_valid_until'])) {
-            //         $timeDiff = (int) $api['app_access_token_valid_until'] - time();
-
-            //         if ($timeDiff <= 0) {
-            //             $api['setup'] = 2;
-
-            //             $this->init()->updateApi($api);
-            //         }
-            //     }
-            // }
             return $api;
         }
 
@@ -171,7 +151,7 @@ class Api extends BasePackage
     {
         $data['api_type'] = strtolower($data['api_type']);
 
-        $api = $this->getById($data['id']);
+        $api = $this->getById($data['id'], false, false);
 
         $api = array_merge($api, $data);
 
@@ -227,7 +207,7 @@ class Api extends BasePackage
      */
     public function removeApi(array $data)
     {
-        $api = $this->getById($data['id']);
+        $api = $this->getById($data['id'], false, false);
 
         if ($api['in_use'] == '1') {
             $this->packagesData->responseCode = 1;
@@ -305,7 +285,7 @@ class Api extends BasePackage
                         [
                             'identifier'    => $data['state']
                         ]
-                ]
+                ], false, false
             );
 
             if ($api && count($api) === 1) {
@@ -320,7 +300,7 @@ class Api extends BasePackage
                             [
                                 'id'    => $apiId
                             ]
-                    ]
+                    ], false, false
                 );
 
                 if (count($apiApi) === 1) {

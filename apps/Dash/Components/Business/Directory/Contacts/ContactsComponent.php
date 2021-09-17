@@ -35,6 +35,9 @@ class ContactsComponent extends BaseComponent
 
                 $contact = $this->contacts->getContactById($this->getData()['id']);
 
+                if (!$contact) {
+                    return $this->throwIdNotFound();
+                }
 
                 $contact['notes'] = $this->notes->getNotes('contacts', $this->getData()['id']);
 

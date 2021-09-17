@@ -27,6 +27,10 @@ class VendorgroupsComponent extends BaseComponent
 
                 $vendorGroup = $this->vendorgroups->getById($this->getData()['id']);
 
+                if (!$vendorGroup) {
+                    return $this->throwIdNotFound();
+                }
+
                 $this->view->vendorGroup = $vendorGroup;
             }
 

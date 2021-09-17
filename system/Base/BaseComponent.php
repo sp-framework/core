@@ -9,9 +9,10 @@ use Phalcon\Di\DiInterface;
 use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
 use Phalcon\Mvc\Controller;
-use Phalcon\Mvc\Dispatcher;
 use Phalcon\Mvc\View;
 use Phalcon\Tag;
+use System\Base\Exceptions\IdNotFoundException;
+use System\Base\Exceptions\controllerNotFoundException;
 
 abstract class BaseComponent extends Controller
 {
@@ -102,31 +103,14 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	public function beforeExecuteRoute(Dispatcher $dispatcher)
+	public function beforeExecuteRoute()
 	{
 		if (!$this->component && $this->app) {
-			$component = $this->modules->components->getComponentById($this->app['errors_component']);
+			$this->setErrorDispatcher('controllerNotFound');
 
-			if (isset($this->app['errors_component']) &&
-				$this->app['errors_component'] != 0
-			) {
-				$errorClassArr = explode('\\', $component['class']);
-				unset($errorClassArr[Arr::lastKey($errorClassArr)]);
-				$errorComponent = ucfirst($component['route']);
-				$namespace = implode('\\', $errorClassArr);
-				$this->view->setViewsDir($this->modules->views->getPhalconViewPath());
-			} else {
-				$errorComponent = 'Errors';
-				$namespace = 'System\Base\Providers\ErrorServiceProvider';
-			}
-
-			$dispatcher->forward(
-				[
-					'controller' => $errorComponent,
-					'action'     => 'controllerNotFound',
-					'namespace'  => $namespace
-				]
-			);
+			return false;
+		} else if (!$this->component) {
+			throw new controllerNotFoundException('Component Not Found!');
 		}
 
 		if (!$this->isJson()) {
@@ -283,6 +267,10 @@ abstract class BaseComponent extends Controller
 
 	protected function buildHeaderBreadcrumb()
 	{
+		if ($this->component['route'] === 'errors') {
+			$this->componentRoute = 'Errors';
+		}
+
 		if ($this->app && isset($this->componentRoute)) {
 			if ($this->componentRoute === '') {
 				$this->componentRoute = 'home';
@@ -701,6 +689,45 @@ abstract class BaseComponent extends Controller
 
 		if ($responseData !== null) {
 			$this->view->responseData = $responseData;
+		}
+	}
+
+	protected function throwIdNotFound()
+	{
+		if ($this->app) {
+			$this->setErrorDispatcher('idNotFound');
+
+			return false;
+		}
+
+		throw new IdNotFoundException('ID Not Found!');
+	}
+
+	protected function setErrorDispatcher($action)
+	{
+		if ($this->app) {
+			$component = $this->modules->components->getComponentById($this->app['errors_component']);
+
+			if (isset($this->app['errors_component']) &&
+				$this->app['errors_component'] != 0
+			) {
+				$errorClassArr = explode('\\', $component['class']);
+				unset($errorClassArr[Arr::lastKey($errorClassArr)]);
+				$errorComponent = ucfirst($component['route']);
+				$namespace = implode('\\', $errorClassArr);
+				$this->view->setViewsDir($this->modules->views->getPhalconViewPath());
+			} else {
+				$errorComponent = 'Errors';
+				$namespace = 'System\Base\Providers\ErrorServiceProvider';
+			}
+
+			$this->dispatcher->forward(
+				[
+					'controller' => $errorComponent,
+					'action'     => $action,
+					'namespace'  => $namespace
+				]
+			);
 		}
 	}
 }
