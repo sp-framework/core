@@ -140,7 +140,7 @@ class Notes extends BasePackage
                     $note['note_attachments'] = Json::encode($data['note_attachments']);
                 }
 
-                if ($this->add($note)) {
+                if ($this->add($note, false)) {
                     $this->packagesData->responseCode = 0;
 
                     $this->packagesData->responseMessage = 'Note Added';

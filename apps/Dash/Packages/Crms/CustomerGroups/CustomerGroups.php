@@ -61,8 +61,8 @@ class CustomerGroups extends BasePackage
 
         $modelToUse = CrmsCustomers::class;
 
-        $searchVendors =
-            $modelToUse::findFirst(
+        $searchCustomers =
+            $modelToUse::count(
                 [
                     'conditions'    => 'customer_group_id = :gid:',
                     'bind'          => [
@@ -71,8 +71,8 @@ class CustomerGroups extends BasePackage
                 ]
             );
 
-        if ($searchVendors) {
-            $this->addResponse('Vendors assigned to the group, cannot remove group.', 1);
+        if ($searchCustomers) {
+            $this->addResponse($searchCustomers . ' customers assigned to the group, cannot remove group.', 1);
 
             return;
         }

@@ -12,7 +12,7 @@ class Domains extends BasePackage
 
 	public $domains;
 
-	public $domain = null;
+	public $domain;
 
 	protected $appDefaults;
 
@@ -128,22 +128,13 @@ class Domains extends BasePackage
 
 	public function getNamedDomain($name)
 	{
-		$filter =
-			$this->model->filter(
-				function($domain) use ($name) {
-					if ($domain->name === $name) {
-						return $domain;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate domain name found for domain ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
-		} else {
-			return false;
+		foreach($this->domains as $domain) {
+			if ($domain['name'] === $name) {
+				return $domain;
+			}
 		}
+
+		return false;
 	}
 
 	public function generateViewData(int $did = null)
@@ -200,27 +191,4 @@ class Domains extends BasePackage
 			$this->update($domain);
 		}
 	}
-
-	// public function getDefaultAppIdDomain($id)
-	// {
-	// 	$filter =
-	// 		$this->model->filter(
-	// 			function($domain) use ($id) {
-	// 				if ($domain->default_app_id == $id) {
-	// 					if (!is_array($domain->apps)) {
-	// 						$domain->apps = Json::decode($domain->apps, true);
-	// 					}
-	// 					return $domain;
-	// 				}
-	// 			}
-	// 		);
-
-	// 	if (count($filter) > 1) {
-	// 		throw new \Exception('Duplicate domain name found for appId ' . $id);
-	// 	} else if (count($filter) === 1) {
-	// 		return $filter[0]->toArray();
-	// 	} else {
-	// 		return false;
-	// 	}
-	// }
 }

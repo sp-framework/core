@@ -9,7 +9,17 @@ abstract class BaseModel extends Model
 {
 	protected $app;
 
-	protected static $modelRelations;
+	protected static $modelRelations = [];
+
+	public function onConstruct()
+	{
+		$this->useDynamicUpdate(true);
+	}
+
+	public function initialize()
+	{
+		//
+	}
 
 	public function init()
 	{
@@ -20,16 +30,6 @@ abstract class BaseModel extends Model
 		$this->modules = $this->getDi()->getShared('modules');
 
 		return $this;
-	}
-
-	public function onConstruct()
-	{
-
-	}
-
-	public function initialize()
-	{
-		$this->useDynamicUpdate(true);
 	}
 
 	public function getModelRelations()

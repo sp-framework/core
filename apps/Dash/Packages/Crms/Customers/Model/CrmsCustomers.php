@@ -45,7 +45,7 @@ class CrmsCustomers extends BaseModel
 
     public function initialize()
     {
-        $this->hasOne(
+        self::$modelRelations['financial_details']['relationObj'] = $this->hasOne(
             'id',
             CrmsCustomersFinancialDetails::class,
             'customer_id',
@@ -53,5 +53,7 @@ class CrmsCustomers extends BaseModel
                 'alias' => 'financial_details'
             ]
         );
+
+        parent::initialize();
     }
 }

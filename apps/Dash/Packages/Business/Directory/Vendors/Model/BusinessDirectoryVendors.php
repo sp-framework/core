@@ -51,7 +51,7 @@ class BusinessDirectoryVendors extends BaseModel
 
     public function initialize()
     {
-        $this->hasOne(
+        self::$modelRelations['financial_details']['relationObj'] = $this->hasOne(
             'id',
             BusinessDirectoryVendorsFinancialDetails::class,
             'vendor_id',
@@ -59,5 +59,7 @@ class BusinessDirectoryVendors extends BaseModel
                 'alias' => 'financial_details'
             ]
         );
+
+        parent::initialize();
     }
 }

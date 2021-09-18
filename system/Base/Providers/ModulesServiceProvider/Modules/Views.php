@@ -213,105 +213,67 @@ class Views extends BasePackage
 
     public function getAppView($appId, $name)
     {
-        $filter =
-            $this->model->filter(
-                function($view) use ($appId, $name) {
-                    $view = $view->toArray();
-                    $view['apps'] = Json::decode($view['apps'], true);
-                    if ((isset($view['apps'][$appId]['enabled']) &&
-                        $view['apps'][$appId]['enabled'] === true) &&
-                        $view['name'] === ucfirst($name)
-                    ) {
-                        return $view;
-                    }
-                }
-            );
+        foreach($this->views as $view) {
+            $view['apps'] = Json::decode($view['apps'], true);
 
-        if (count($filter) > 1) {
-            throw new \Exception('Duplicate default view for app ' . $name);
-        } else if (count($filter) === 1) {
-            return $filter[0];
-        } else {
-            return false;
+            if ((isset($view['apps'][$appId]['enabled']) &&
+                $view['apps'][$appId]['enabled'] == true) &&
+                strtolower($view['name']) == strtolower($name)
+            ) {
+                return $view;
+            }
         }
+
+        return false;
     }
 
     public function getViewsForApp($appId)
     {
-        $filter =
-            $this->model->filter(
-                function($view) use ($appId) {
-                    $view = $view->toArray();
-                    $view['apps'] = Json::decode($view['apps'], true);
-                    if (isset($view['apps'][$appId]['enabled']) &&
-                        $view['apps'][$appId]['enabled'] === true
-                    ) {
-                        return $view;
-                    }
-                }
-            );
+        foreach($this->views as $view) {
+            $view['apps'] = Json::decode($view['apps'], true);
 
-        return $filter;
+            if (isset($view['apps'][$appId]['enabled']) &&
+                $view['apps'][$appId]['enabled'] == 'true'
+            ) {
+                return $view;
+            }
+        }
+
+        return false;
     }
 
     public function getIdViews($id)
     {
-        $filter =
-            $this->model->filter(
-                function($view) use ($id) {
-                    if ($view->id == $id) {
-                        return $view;
-                    }
-                }
-            );
-
-        if (count($filter) > 1) {
-            throw new \Exception('Duplicate view Id found for id ' . $id);
-        } else if (count($filter) === 1) {
-            return $filter[0]->toArray();
-        } else {
-            return false;
+        foreach($this->views as $view) {
+            if ($view['id'] == $id) {
+                return $view;
+            }
         }
+
+        return false;
     }
 
     public function getNameViews($name)
     {
-        $filter =
-            $this->model->filter(
-                function($view) use ($name) {
-                    if ($view->name == $name) {
-                        return $view;
-                    }
-                }
-            );
-
-        if (count($filter) > 1) {
-            throw new \Exception('Duplicate view Id found for name ' . $name);
-        } else if (count($filter) === 1) {
-            return $filter[0]->toArray();
-        } else {
-            return false;
+        foreach($this->views as $view) {
+            if ($view['name'] == $name) {
+                return $view;
+            }
         }
+
+        return false;
     }
 
     public function getViewsForCategoryAndSubcategory($category, $subCategory)
     {
         $views = [];
 
-        $filter =
-            $this->model->filter(
-                function($view) use ($category, $subCategory) {
-                    $view = $view->toArray();
-                    if ($view['category'] === $category &&
-                        $view['sub_category'] === $subCategory
-                    ) {
-                        return $view;
-                    }
-                }
-            );
-
-        foreach ($filter as $key => $value) {
-            $views[$key] = $value;
+        foreach($this->views as $view) {
+            if ($view['category'] === $category &&
+                $view['sub_category'] === $subCategory
+            ) {
+                $views[$view['id']] = $view;
+            }
         }
 
         return $views;
@@ -321,18 +283,10 @@ class Views extends BasePackage
     {
         $views = [];
 
-        $filter =
-            $this->model->filter(
-                function($view) use ($type) {
-                    $view = $view->toArray();
-                    if ($view['app_type'] === $type) {
-                        return $view;
-                    }
-                }
-            );
-
-        foreach ($filter as $key => $value) {
-            $views[$key] = $value;
+        foreach($this->views as $view) {
+            if ($view['app_type'] === $type) {
+                $views[$view['id']] = $view;
+            }
         }
 
         return $views;
@@ -340,19 +294,15 @@ class Views extends BasePackage
 
     public function getDefaultViewForAppType(string $type)
     {
-        $filter =
-            $this->model->filter(
-                function($view) use ($type) {
-                    $view = $view->toArray();
-                    if ($view['app_type'] === $type &&
-                        $view['name'] === 'Default'
-                    ) {
-                        return $view;
-                    }
-                }
-            );
+        foreach($this->views as $view) {
+            if ($view['app_type'] === $type &&
+                $view['name'] === 'Default'
+            ) {
+                return $view;
+            }
+        }
 
-        return $filter[0];
+        return false;
     }
 
     public function updateViews(array $data)

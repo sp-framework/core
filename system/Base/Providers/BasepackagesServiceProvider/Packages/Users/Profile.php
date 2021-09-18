@@ -42,19 +42,10 @@ class Profile extends BasePackage
 
     public function getProfile(int $accountId)
     {
-        $profile =
-            $this->getByParams(
-            [
-                'conditions'    => 'account_id = :aid:',
-                'bind'          =>
-                    [
-                        'aid'   => $accountId
-                    ]
-            ]
-        );
+        $profile = $this->getFirst('account_id', $accountId);
 
-        if ($profile && count($profile) === 1) {
-            $profile = $profile[0];
+        if ($profile) {
+            $profile = $profile->toArray();
 
             if ($profile['settings'] &&
                 !is_array($profile['settings']) &&
@@ -323,7 +314,7 @@ class Profile extends BasePackage
 
     public function generateViewData()
     {
-        $accountObj = $this->basepackages->accounts->getModelToUse()::findFirstById($this->auth->account()['id']);
+        $accountObj = $this->basepackages->accounts->getFirst('id', $this->auth->account()['id']);
 
         $canLoginArr = $accountObj->canlogin->toArray();
 

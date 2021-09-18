@@ -62,7 +62,7 @@ class VendorGroups extends BasePackage
         $modelToUse = BusinessDirectoryVendors::class;
 
         $searchVendors =
-            $modelToUse::findFirst(
+            $modelToUse::count(
                 [
                     'conditions'    => 'vendor_group_id = :gid:',
                     'bind'          => [
@@ -72,7 +72,7 @@ class VendorGroups extends BasePackage
             );
 
         if ($searchVendors) {
-            $this->addResponse('Vendors assigned to the group, cannot remove group.', 1);
+            $this->addResponse($searchVendors . ' vendors assigned to the group, cannot remove group.', 1);
 
             return;
         }

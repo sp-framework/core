@@ -19,7 +19,7 @@ class Entities extends BasePackage
     public function getAll(bool $resetCache = false, bool $enableCache = true)
     {
         if ($enableCache && $this->config->cache->enabled) {
-            $parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+            $parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheName());
         } else {
             $parameters = [];
         }

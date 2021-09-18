@@ -35,7 +35,7 @@ class HrmsEmployees extends BaseModel
 
     public function initialize()
     {
-        $this->hasOne(
+        self::$modelRelations['employment']['relationObj'] = $this->hasOne(
             'id',
             HrmsEmployeesEmployment::class,
             'employee_id',
@@ -44,7 +44,7 @@ class HrmsEmployees extends BaseModel
             ]
         );
 
-        $this->hasOne(
+        self::$modelRelations['contact']['relationObj'] = $this->hasOne(
             'id',
             HrmsEmployeesContact::class,
             'employee_id',
@@ -53,7 +53,7 @@ class HrmsEmployees extends BaseModel
             ]
         );
 
-        $this->hasOne(
+        self::$modelRelations['finance']['relationObj'] = $this->hasOne(
             'id',
             HrmsEmployeesFinance::class,
             'employee_id',
@@ -61,5 +61,7 @@ class HrmsEmployees extends BaseModel
                 'alias' => 'finance'
             ]
         );
+
+        parent::initialize();
     }
 }

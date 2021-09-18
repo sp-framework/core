@@ -14,8 +14,8 @@ return
 		],
 		"cache"			=>
 		[
-			"enabled"			=> false, //Global Cache value //true - Production false - Development
-			"timeout"			=> 60, //Global Cache timeout in seconds
+			"enabled"			=> true, //Global Cache value //true - Production false - Development
+			"timeout"			=> 3600, //Global Cache timeout in seconds
 			"service"			=> "streamCache"
 		],
 		"security"		=>

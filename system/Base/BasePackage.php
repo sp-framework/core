@@ -28,9 +28,7 @@ abstract class BasePackage extends Controller
 
 	protected $model;
 
-	protected $cacheKey;
-
-	protected $cacheKeys = [];
+	protected $cacheName;
 
 	protected $manager = null;
 
@@ -42,8 +40,8 @@ abstract class BasePackage extends Controller
 
 		$this->setDefaultPackageResponse();
 
-		if (!$this->cacheKey) {
-			$this->resetCacheKey();
+		if (!$this->cacheName || $this->config->cache->enabled) {
+			$this->getCacheName();
 		}
 
 		$this->setNames();
@@ -85,43 +83,63 @@ abstract class BasePackage extends Controller
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
 		if ($id) {
-			if ($enableCache) {
-				$parameters = $this->paramsWithCache($this->getIdParams($id));
+			if ($enableCache && $this->cacheName) {
+				$parameters = $this->paramsWithCache($this->getIdParams($id), $this->cacheName);
 			} else {
 				$parameters = $this->getIdParams($id);
 			}
 
-			if (!$this->config->cache->enabled) {
-				$parameters = $this->getIdParams($id);
+			$this->getFirst(null, null, $resetCache, $enableCache, null, $parameters);
+
+			if ($this->model) {
+				return $this->getDbData($parameters, $enableCache);
 			}
 
-			$this->model = $this->modelToUse::find($parameters);
-
-			$data = $this->getDbData($parameters, $enableCache);
-
-			if ($data) {
-				return $data;
-			} else {
-				return false;
-			}
+			return false;
 		}
 
 		throw new \Exception('getById needs id parameter to be set.');
 	}
 
-	public function getAll(bool $resetCache = false, bool $enableCache = true)
+	public function getFirst($by = null, $value = null, bool $resetCache = false, bool $enableCache = true, $model = null, $params = [])
 	{
-		if ($enableCache && $this->config->cache->enabled) {
-			$parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheKey());
+		if (!$model) {
+			$modelToUse = new $this->modelToUse;
 		} else {
-			$parameters = [];
+			$modelToUse = new $model;
 		}
 
+		if ($by && $value && !$params) {
+			$params = $this->getParams($by, $value);
+		}
+
+		if ($enableCache && $this->cacheName) {
+			$parameters = $this->paramsWithCache($params);
+		} else {
+			$parameters = $params;
+		}
+
+		try {
+			$this->model = $modelToUse::findFirst($parameters);
+
+			$this->cacheTools->updateIndex(
+				$this->cacheName,
+				$parameters,
+				null,
+				true,
+				$this->model
+			);
+
+			return $this->model;
+		} catch (\Exception $e) {
+			throw $e;
+		}
+	}
+
+	public function getAll(bool $resetCache = false, bool $enableCache = true)
+	{
 		if (!$this->{$this->packageName} || $resetCache) {
-
-			$this->model = $this->modelToUse::find($parameters);
-
-			$this->{$this->packageName} = $this->model->toArray();
+			$this->{$this->packageName} = $this->getByParams(['conditions'=>''], $resetCache, $enableCache);
 		}
 
 		return $this;
@@ -130,8 +148,8 @@ abstract class BasePackage extends Controller
 	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
 	{
 		if (isset($params['conditions'])) {
-			if ($enableCache && $this->config->cache->enabled) {
-				$parameters = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
+			if ($enableCache && $this->cacheName) {
+				$parameters = $this->paramsWithCache($params);
 			} else {
 				$parameters = $params;
 			}
@@ -160,7 +178,17 @@ abstract class BasePackage extends Controller
 				}
 			}
 
-			$this->model = $this->modelToUse::find($parameters);
+			// if (isset($parameters['cache']['key'])) {
+				// $cachedModel = $this->cacheTools->getCache($parameters['cache']['key']);
+
+				// if ($cachedModel) {
+				// 	$this->model = $cachedModel;
+				// } else {
+					$this->model = $this->modelToUse::find($parameters);
+				// }
+			// } else {
+			// 	$this->model = $this->modelToUse::find($parameters);
+			// }
 
 			$data = $this->getDbData($parameters, $enableCache, 'params');
 
@@ -180,16 +208,20 @@ abstract class BasePackage extends Controller
 
 	protected function getRelationColumnsData($relationColumns, $data)
 	{
+		if (count($relationColumns) === 0) {
+			return $data;
+		}
+
 		foreach ($data as $dataKey => $row) {
-			$this->model = $this->modelToUse::findFirstById($row['id']);
+			$model = $this->getFirst('id', $row['id']);
 
 			foreach ($relationColumns as $relationColumnKey => $relationColumn) {
 				$alias = $relationColumn['relationObj']->getOption('alias');
 
-				if ($this->model->{$alias}) {
-					$relationRowData = $this->model->{$alias}->toArray();
-					foreach ($relationRowData as $relationRowKey => $relationRow) {
+				if ($model->{$alias}) {
+					$relationRowData = $model->{$alias}->toArray();
 
+					foreach ($relationRowData as $relationRowKey => $relationRow) {
 						if (in_array($relationRowKey, $relationColumn['requestedColumns'])) {
 							$data[$dataKey][$relationRowKey] = $relationRow;
 						}
@@ -380,8 +412,8 @@ abstract class BasePackage extends Controller
 				);
 		}
 
-		$data = $this->getByParams($params);
-
+		$data = $this->getByParams($params, $resetCache, $enableCache);
+		// die();
 		if ($data) {
 			$pageParams['data'] = $data;
 		} else {
@@ -421,34 +453,32 @@ abstract class BasePackage extends Controller
 
 	protected function getDbData($parameters, bool $enableCache = true, string $type = 'id', bool $returnArray = true)
 	{
-		if ($this->model->count() === 0) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'No Record Found!';
-
-			return;
-		}
-
 		if ($type === 'id') {
-			if ($this->model->count() === 1) {
-				$this->packagesData->responseCode = 0;
-				$this->packagesData->responseMessage = 'Found';
+			$this->packagesData->responseCode = 0;
 
-				if ($enableCache && $this->config->cache->enabled) {
-					array_push($this->cacheKeys, $parameters['cache']['key']);
-				}
+			$this->packagesData->responseMessage = 'Found';
 
-				return $this->model->toArray()[0];
-
-			} else if ($this->model->count() > 1) {
-				$this->packagesData->responseCode = 1;
-				$this->packagesData->responseMessage =
-					'Duplicate Id found! Database Corrupt'; //Run package to fix database
-
-				return;
+			if ($enableCache && $this->cacheName) {
+				$this->cacheTools->updateIndex(
+					$this->cacheName,
+					$parameters,
+					null,
+					true,
+					$this->model
+				);
 			}
+
+			return $this->model->toArray();
+
 		} else if ($type === 'params') {
-			if ($enableCache && $this->config->cache->enabled) {
-				array_push($this->cacheKeys, $parameters['cache']['key']);
+			if ($enableCache && $this->cacheName) {
+				$this->cacheTools->updateIndex(
+					$this->cacheName,
+					$parameters,
+					true,
+					null,
+					$this->model
+				);
 			}
 
 			if (!$returnArray) {
@@ -463,7 +493,7 @@ abstract class BasePackage extends Controller
 		return false;
 	}
 
-	public function add(array $data)
+	public function add(array $data, $resetCache = true)
 	{
 		if ($data) {
 			$data = $this->jsonData($data);
@@ -475,13 +505,15 @@ abstract class BasePackage extends Controller
 			$create = ${$this->packageName}->create();
 
 			if ($create) {
-				$this->resetCache();
-
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = "Added {$this->packageNameS}!";
 
 				$this->packagesData->last = ${$this->packageName}->toArray();
+
+				if ($resetCache) {
+					$this->resetCache();
+				}
 
 				return true;
 			} else {
@@ -501,13 +533,12 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	public function update(array $data)
+	public function update(array $data, $resetCache = true)
 	{
 		if ($data) {
-
 			$data = $this->jsonData($data);
 
-			${$this->packageName} = $this->modelToUse::findFirstById($data['id']);
+			${$this->packageName} = $this->getFirst('id', $data['id'], false, false);
 
 			if (!${$this->packageName}) {
 				$this->packagesData->responseCode = 1;
@@ -533,14 +564,15 @@ abstract class BasePackage extends Controller
 					join(',', $errMessages)
 				);
 			} else {
-				//Delete Old cache if exists and generate new cache
-				$this->updateCache($data['id']);
-
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
 
 				$this->packagesData->last = ${$this->packageName}->toArray();
+
+				if ($resetCache) {
+					$this->resetCache($this->packagesData->last['id']);
+				}
 
 				return true;
 			}
@@ -560,39 +592,25 @@ abstract class BasePackage extends Controller
 		return $data;
 	}
 
-	public function remove(int $id)
+	public function remove(int $id, $resetCache = true)
 	{
-		//Move this to Modules Package
-		// if ($this->packageName === 'core') {
-		// 	$this->packagesData->responseCode = 1;
-		// 	$this->packagesData->responseMessage = "Could not delete {$this->packageNameS}.";
-		// 	return;
-		// }
-		//Need to solve dependencies for removal
-
 		$this->getById($id);
 
-		if ($this->model->count() === 1) {
+		if ($this->model->toArray()['id'] == $id) {
 			if ($this->model->delete()) {
 
-				$this->resetCache($id);
+				if ($resetCache) {
+					$this->resetCache($id, true);
+				}
 
-				$this->packagesData->responseCode = 0;
-
-				$this->packagesData->responseMessage = "{$this->packageNameS} Deleted!";
+				$this->addResponse("{$this->packageNameS} Deleted!");
 
 				return true;
 			} else {
-				$this->packagesData->responseCode = 1;
-
-				$this->packagesData->responseMessage = "Could not delete {$this->packageNameS}.";
+				$this->addResponse("Could not delete {$this->packageNameS}.", 1);
 			}
-		} else if ($this->model->count() > 1) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'Duplicate Id found! Database Corrupt';
-		} else if ($this->model->count() === 0) {
-			$this->packagesData->responseCode = 1;
-			$this->packagesData->responseMessage = 'No Record Found with that ID!';
+		} else {
+			$this->addResponse("No Record Found with that ID!", 1);
 		}
 	}
 
@@ -660,6 +678,18 @@ abstract class BasePackage extends Controller
 			];
 	}
 
+	protected function getParams($by, $value)
+	{
+		return
+			[
+				'conditions'	=> $by . ' = :' . $by . ':',
+				'bind'			=>
+					[
+						$by		=> $value
+					]
+			];
+	}
+
 	protected function getClassName()
 	{
 		$reflection = new \ReflectionClass($this);
@@ -667,37 +697,27 @@ abstract class BasePackage extends Controller
 		return explode('\\', $reflection->getName());
 	}
 
-	protected function extractCacheKey()
+	protected function extractCacheName()
 	{
 		$class = $this->getClassName();
 
-		$key = [];
+		return strtolower(join($class));
+	}
 
-		foreach ($class as $value) {
-			// array_push($key, substr($value, 0, 4));
-			array_push($key, $value);
+	public function setCacheName($key)
+	{
+		$this->cacheName = $key;
+
+		return $this->cacheName;
+	}
+
+	public function getCacheName()
+	{
+		if (!$this->cacheName) {
+			return $this->setCacheName($this->extractCacheName());
 		}
 
-		return strtolower(join($key));
-	}
-
-	public function resetCacheKey()
-	{
-		$this->cacheKeys = [];
-
-		$this->setCacheKey($this->extractCacheKey());
-	}
-
-	public function setCacheKey($key)
-	{
-		$this->cacheKey = $key;
-
-		$this->cacheKeys[0] = $this->cacheKey;
-	}
-
-	public function getCacheKey()
-	{
-		return $this->cacheKey;
+		return $this->cacheName;
 	}
 
 	protected function usePackage($packageClass)
@@ -730,64 +750,12 @@ abstract class BasePackage extends Controller
 
 	protected function paramsWithCache(array $params)
 	{
-		if ($this->cacheKey) {
-			$params = $this->cacheTools->addModelCacheParameters($params, $this->getCacheKey());
-		}
-
-		$this->cacheKey = $params['cache']['key'];
-
-		return $params;
+		return $this->cacheTools->addModelCacheParameters($params, $this->cacheName);
 	}
 
-	//Very broad at the moment, we need to narrow down search and delete caching
-	protected function resetCaches(int $id = null)
+	protected function resetCache(int $id = null, $removeId = false)
 	{
-		foreach ($this->cacheKeys as $key => $cacheKey) {
-			$cache = $this->cacheTools->getCache($cacheKey);
-			if ($cache) {
-				if ($id) {
-					$cache->filter(
-						function ($search) use ($id, $cacheKey) {
-							if ($search->id == $id) {
-								$this->cacheTools->deleteCache($cacheKey);
-							}
-						}
-					);
-				} else {
-					$this->cacheTools->deleteCache($cacheKey);
-				}
-			}
-		}
-	}
-
-	protected function resetCache(int $id = null)
-	{
-		if (!$this->config->cache->enabled) {
-			return;
-		}
-
-		$this->resetCacheKey();
-
-		if ($id) {
-			array_push(
-				$this->cacheKeys,
-				$this->paramsWithCache(
-					$this->getIdParams($id)
-				)['cache']['key']
-			);
-		}
-
-		$this->resetCaches($id);
-	}
-
-	protected function updateCache(int $id)
-	{
-		if (!$this->config->cache->enabled) {
-			return;
-		}
-		$this->resetCache($id);
-
-		$this->resetCacheKey();
+		$this->cacheTools->resetCache($this->cacheName, $id, $removeId);
 	}
 
 	public function getModel()
@@ -912,8 +880,6 @@ abstract class BasePackage extends Controller
 
 		if (count($md) > 0) {
 			$filteredColumns = [];
-			$dataTypes = [];
-			$number = [];
 
 			$rmdArr = $this->getModelsRelations();
 
@@ -925,24 +891,24 @@ abstract class BasePackage extends Controller
 				foreach ($rmdArr as $rmdKey => $rmd) {
 					if ($rmdKey === 'dataTypes') {
 						if (count($rmd) > 0) {
-							$dataTypes = array_merge($md['dataTypes'], $rmd);
+							$md['dataTypes'] = array_merge($md['dataTypes'], $rmd);
 						}
 					}
 					if ($rmdKey === 'number') {
 						if (count($rmd) > 0) {
-							$number = array_merge($md['number'], $rmd);
+							$md['number'] = array_merge($md['number'], $rmd);
 						}
 					}
 					if ($rmdKey === 'columns') {
 						if (count($rmd) > 0) {
-							$columns = array_merge($md['columns'], $rmd);
+							$md['columns'] = array_merge($md['columns'], $rmd);
 						}
 					}
 				}
 			}
 
 			if (count($filter) > 0) {
-				foreach ($columns as $column) {
+				foreach ($md['columns'] as $column) {
 					if (in_array($column, $filter)) {
 						array_push($filteredColumns, $column);
 					}
@@ -960,7 +926,7 @@ abstract class BasePackage extends Controller
 						$metadata[$filteredColumn]['data']['number'] = 'false';
 					}
 
-					$metadata[$filteredColumn]['data']['dataType'] = $dataTypes[$filteredColumn];
+					$metadata[$filteredColumn]['data']['dataType'] = $md['dataTypes'][$filteredColumn];
 				}
 
 				return $metadata;

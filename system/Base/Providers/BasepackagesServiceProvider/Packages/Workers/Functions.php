@@ -21,7 +21,7 @@ class Functions extends BasePackage
     protected function updateJob($status, $args)
     {
         if (isset($args['job'])) {
-            $job = $this->basepackages->workers->jobs->getById($args['job']['id']);
+            $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
             if ($job['status'] != 4) {
                 $job['status'] = $status;
@@ -43,13 +43,13 @@ class Functions extends BasePackage
     protected function updateTask($status, $args)
     {
         if (isset($args['task'])) {
-            $task = $this->basepackages->workers->tasks->getById($args['task']['id']);
+            $task = $this->basepackages->workers->tasks->getById($args['task']['id'], false, false);
 
             if ($status == 2) {
                 $task['status'] = 2;
             } else if ($status == 3) {
                 $task['status'] = 1;
-                $job = $this->basepackages->workers->jobs->getById($args['job']['id']);
+                $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
                 $task['previous_run'] = $job['run_on'];
             }
@@ -63,7 +63,7 @@ class Functions extends BasePackage
     protected function addJobResult($packagesData, $args)
     {
         if (isset($args['job'])) {
-            $job = $this->basepackages->workers->jobs->getById($args['job']['id']);
+            $job = $this->basepackages->workers->jobs->getById($args['job']['id'], false, false);
 
             if (isset($packagesData->responseCode)) {
                 $job['response_code'] = $packagesData->responseCode;

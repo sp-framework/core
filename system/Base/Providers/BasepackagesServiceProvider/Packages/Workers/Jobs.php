@@ -81,7 +81,7 @@ class Jobs extends BasePackage
 
     public function updateJob(array $data)
     {
-        $job = $this->getById($data['id']);
+        $job = $this->getById($data['id'], false, false);
 
         $job = array_merge($job, $data);
 

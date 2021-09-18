@@ -19,7 +19,9 @@ trait DynamicTable {
         string $dtNotificationTextFromColumn = null,
         $dtAdditionControlButtons = null,
         bool $dtAdditionControlButtonsBeforeControlButtons = false,
-        int $componentId = null
+        int $componentId = null,
+        $resetCache = false,
+        $enableCache = true
     ) {
         if (gettype($package) === 'string') {
             $package = $this->usePackage($package);
@@ -122,7 +124,9 @@ trait DynamicTable {
                     $package->getPaged(
                         [
                             'columns' => $columnsForTable
-                        ]
+                        ],
+                        $resetCache,
+                        $enableCache
                     );
 
                 $rows = $pagedData->getItems();
@@ -135,7 +139,9 @@ trait DynamicTable {
                     $package->getPaged(
                         [
                             'columns' => $columnsForTable
-                        ]
+                        ],
+                        $resetCache,
+                        $enableCache
                     );
 
                 $rows = $pagedData->getItems();

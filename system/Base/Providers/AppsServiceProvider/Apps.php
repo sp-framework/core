@@ -88,85 +88,46 @@ class Apps extends BasePackage
 
 	public function getIdApp($id)
 	{
-		$filter =
-			$this->model->filter(
-				function($app) use ($id) {
-					$app = $app->toArray();
-					if ($app['id'] == $id) {
-						return $app;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate app Id found for id ' . $id);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+		foreach($this->apps as $app) {
+			if ($app['id'] == $id) {
+				return $app;
+			}
 		}
+
+		return false;
 	}
 
 	public function getNamedApp($name)
 	{
-		$filter =
-			$this->model->filter(
-				function($app) use ($name) {
-					$app = $app->toArray();
-					if ($app['name'] === ucfirst($name)) {
-						return $app;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate app name found for app ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+		foreach($this->apps as $app) {
+			if (strtolower($app['name']) === strtolower($name)) {
+				return $app;
+			}
 		}
+
+		return false;
 	}
 
 	public function getRouteApp($route)
 	{
-		$filter =
-			$this->model->filter(
-				function($app) use ($route) {
-					$app = $app->toArray();
-					if ($app['route'] === ($route)) {
-						return $app;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate app route found for route ' . $route);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+		foreach($this->apps as $app) {
+			if (strtolower($app['route']) == strtolower($route)) {
+				return $app;
+			}
 		}
+
+		return false;
 	}
 
 	public function getDefaultApp()
 	{
-		$filter =
-			$this->model->filter(
-				function($app) {
-					if ($app->is_default === '1') {
-						return $app;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate default app for app. DB Corrupt');
-		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
-		} else {
-			return false;
+		foreach($this->apps as $app) {
+			if ($app['is_default'] == '1') {
+				return $app;
+			}
 		}
+
+		return false;
 	}
 
 	/**

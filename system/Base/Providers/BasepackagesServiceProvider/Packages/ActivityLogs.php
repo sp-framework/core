@@ -29,7 +29,6 @@ class ActivityLogs extends BasePackage
         unset($data['id']);
 
         $data = $this->removeSessionToken($data);
-
         if (isset($data['package_name'])) {
             unset($data['package_name']);
         }
@@ -66,7 +65,7 @@ class ActivityLogs extends BasePackage
 
         $log['log'] = Json::encode($data);
 
-        if ($this->add($log)) {
+        if ($this->add($log, false)) {
             $this->packagesData->responseCode = 0;
 
             $this->packagesData->responseMessage = 'Activity Log Added';

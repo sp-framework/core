@@ -21,114 +21,78 @@ class Components extends BasePackage
 
 	public function getComponentByName($name)
 	{
-		$filter =
-			$this->model->filter(
-				function($component) use ($name) {
-					$component = $component->toArray();
-
-					if ($component['name'] === $name) {
-						return $component;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate component route found for component ' . $route);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+		foreach($this->components as $component) {
+			if (strtolower($component['name']) === strtolower($name)) {
+				return $component;
+			}
 		}
+
+		return false;
 	}
 
 	public function getRouteComponentForApp($route, $appId)
 	{
-		$filter =
-			$this->model->filter(
-				function($component) use ($route, $appId) {
-					$component = $component->toArray();
+		foreach($this->components as $component) {
+			$component['apps'] = Json::decode($component['apps'], true);
 
-					$component['apps'] = Json::decode($component['apps'], true);
-
-					if (isset($component['apps'][$appId])) {
-						if ($component['apps'][$appId]['enabled'] === true &&
-							$component['route'] === $route
-						) {
-							return $component;
-						}
-					}
+			if (isset($component['apps'][$appId])) {
+				if (isset($component['apps'][$appId]['enabled']) &&
+					$component['apps'][$appId]['enabled'] === true &&
+					$component['route'] === $route
+				) {
+					return $component;
 				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate component route found for component ' . $route);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+			}
 		}
+
+		return false;
 	}
 
 	public function getNamedComponentForApp($name, $appId)
 	{
-		$filter =
-			$this->model->filter(
-				function($component) use ($name, $appId) {
-					$component = $component->toArray();
-					$component['apps'] = Json::decode($component['apps'], true);
+		foreach($this->components as $component) {
+			$component['apps'] = Json::decode($component['apps'], true);
 
-					if (isset($component['apps'][$appId])) {
-						if ($component['apps'][$appId]['enabled'] === true &&
-							strtolower($component['name']) === strtolower($name)
-						) {
-							return $component;
-						}
-					}
+			if (isset($component['apps'][$appId])) {
+				if (isset($component['apps'][$appId]['enabled']) &&
+					$component['apps'][$appId]['enabled'] === true &&
+					strtolower($component['name']) === strtolower($name)
+				) {
+					return $component;
 				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate component name found for component ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+			}
 		}
+
+		return false;
 	}
 
 	public function getComponentsForApp($appId)
 	{
-		$filter =
-			$this->model->filter(
-				function($component) use ($appId) {
-					$component = $component->toArray();
-					$component['apps'] = Json::decode($component['apps'], true);
-					if (isset($component['apps'][$appId]['enabled']) &&
-						$component['apps'][$appId]['enabled'] === true
-					) {
-						return $component;
-					}
-				}
-			);
+		$components = [];
 
-		return $filter;
+		foreach($this->components as $component) {
+			$component['apps'] = Json::decode($component['apps'], true);
+
+			if (isset($component['apps'][$appId]['enabled']) &&
+				$component['apps'][$appId]['enabled'] === true
+			) {
+				$components[$component['id']] = $component;
+			}
+		}
+
+		return $components;
 	}
 
 	public function getComponentsForAppAndType($appId, $type)
 	{
 		$components = [];
 
-		$filter =
-			$this->model->filter(
-				function($component) use ($appId, $type) {
-					if ($component->app_id === $appId && $component->type === $type) {
-						return $component;
-					}
-				}
-			);
-
-		foreach ($filter as $key => $value) {
-			$components[$key] = $value->toArray();
+		foreach($this->components as $component) {
+			if ($component['app_id'] == $appId &&
+				$component['type'] == $type
+			) {
+				$components[$component['id']] = $component;
+			}
 		}
 
 		return $components;
@@ -136,49 +100,23 @@ class Components extends BasePackage
 
 	public function getComponentById($id)
 	{
-		$filter =
-			$this->model->filter(
-				function($component) use ($id) {
-					if ($component->id == $id) {
-						return $component;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate component Id found for id ' . $id);
-		} else if (count($filter) === 1) {
-			return $filter[0]->toArray();
-		} else {
-			return false;
+		foreach($this->components as $component) {
+			if ($component['id'] == $id) {
+				return $component;
+			}
 		}
 	}
 
-	public function getComponentsForCategoryAndSubcategory($category, $subCategory, $inclCommon = true)
+	public function getComponentsForCategoryAndSubcategory($category, $subCategory)
 	{
 		$components = [];
 
-		$filter =
-			$this->model->filter(
-				function($component) use ($category, $subCategory, $inclCommon) {
-					$component = $component->toArray();
-					if ($inclCommon) {
-						if (($component['category'] === $category && $component['sub_category'] === $subCategory) ||
-							($component['category'] === $category && $component['sub_category'] === 'common')
-						) {
-							return $component;
-						}
-					} else {
-						if ($component['category'] === $category && $component['sub_category'] === $subCategory) {
-							return $component;
-						}
-					}
-				}
-			);
-
-		foreach ($filter as $key => $value) {
-			$components[$key] = $value;
+		foreach($this->components as $component) {
+			if ($component['category'] === $category && $component['sub_category'] === $subCategory) {
+				$components[$component['id']] = $component;
+			}
 		}
+
 		return $components;
 	}
 
@@ -186,19 +124,12 @@ class Components extends BasePackage
 	{
 		$components = [];
 
-		$filter =
-			$this->model->filter(
-				function($component) use ($type) {
-					$component = $component->toArray();
-					if ($component['app_type'] === $type) {
-						return $component;
-					}
-				}
-			);
-
-		foreach ($filter as $key => $value) {
-			$components[$key] = $value;
+		foreach($this->components as $component) {
+			if ($component['app_type'] === $type) {
+				$components[$component['id']] = $component;
+			}
 		}
+
 		return $components;
 	}
 
@@ -240,10 +171,6 @@ class Components extends BasePackage
 				$component['apps'][$data['id']]['enabled'] = false;
 			}
 
-			// if ($component['menu_id']) {
-			// 	$this->updateMenu($data, $component, $status);
-			// }
-
 			$component['apps'] = Json::encode($component['apps']);
 
 			$this->update($component);
@@ -251,23 +178,4 @@ class Components extends BasePackage
 
 		return true;
 	}
-
-	// protected function updateMenu($data, $component, $status)
-	// {
-	// 	$menu = $this->basepackages->menus->getById($component['menu_id']);
-
-	// 	$menu['apps'] = Json::decode($menu['apps'], true);
-
-	// 	if ($status === true) {
-	// 		$menu['apps'][$data['id']]['enabled'] = true;
-	// 	} else if ($status === false) {
-	// 		$menu['apps'][$data['id']]['enabled'] = false;
-	// 	}
-
-	// 	$menu['apps'] = Json::encode($menu['apps']);
-
-	// 	$this->basepackages->menus->update($menu);
-
-	// 	$this->basepackages->menus->init(true);
-	// }
 }

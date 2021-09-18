@@ -19,124 +19,68 @@ class Packages extends BasePackage
 		return $this;
 	}
 
-
 	public function getNamedPackageForApp($name, $appId)
 	{
-		$filter =
-			$this->model->filter(
-				function($package) use ($name, $appId) {
-					$package = $package->toArray();
-					$package['apps'] = Json::decode($package['apps'], true);
-					if (isset($package['apps'][$appId])) {
-						if (strtolower($package['name']) === strtolower($name) &&
-							$package['apps'][$appId]['enabled'] === true
-						) {
-							return $package;
-						}
-					}
-				}
-			);
+		foreach($this->packages as $package) {
+			$package['apps'] = Json::decode($package['apps'], true);
 
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate package name found for package ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+			if (isset($package['apps'][$appId])) {
+				if (strtolower($package['name']) === strtolower($name) &&
+					$package['apps'][$appId]['enabled'] === true
+				) {
+					return $package;
+				}
+			}
 		}
+
+		return false;
 	}
 
 	public function getNamedPackageForRepo($name, $repo)
 	{
-		$filter =
-			$this->model->filter(
-				function($package) use ($name, $repo) {
-					$package = $package->toArray();
-
-					if ($package['name'] === ucfirst($name) &&
-						$package['repo'] === $repo
-					) {
-						return $package;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate package name found for package ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+		foreach($this->packages as $package) {
+			if (strtolower($package['name']) === strtolower($name) &&
+				strtolower($package['repo']) === strtolower($repo)
+			) {
+				return $package;
+			}
 		}
+
+		return false;
 	}
 
 	public function getIdPackage($id)
 	{
-		$filter =
-			$this->model->filter(
-				function($package) use ($id) {
-					$package = $package->toArray();
-					if ($package['id'] == $id) {
-						return $package;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate package Id found for id ' . $id);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+		foreach($this->packages as $package) {
+			if ($package['id'] == $id) {
+				return $package;
+			}
 		}
+
+		return false;
 	}
 
 	public function getNamePackage($name)
 	{
-		$filter =
-			$this->model->filter(
-				function($package) use ($name) {
-					$package = $package->toArray();
-					if ($package['name'] === ucfirst($name)) {
-						return $package;
-					}
-				}
-			);
-
-		if (count($filter) > 1) {
-			throw new \Exception('Duplicate package found for name ' . $name);
-		} else if (count($filter) === 1) {
-			return $filter[0];
-		} else {
-			return false;
+		foreach($this->packages as $package) {
+			if (strtolower($package['name']) === strtolower($name)) {
+				return $package;
+			}
 		}
+
+		return false;
 	}
 
-	public function getPackagesForCategoryAndSubcategory($category, $subCategory, $inclCommon = true)
+	public function getPackagesForCategoryAndSubcategory($category, $subCategory)
 	{
 		$packages = [];
 
-		$filter =
-			$this->model->filter(
-				function($package) use ($category, $subCategory, $inclCommon) {
-					$package = $package->toArray();
-					if ($inclCommon) {
-						if (($package['category'] === $category && $package['sub_category'] === $subCategory) ||
-							($package['category'] === $category && $package['sub_category'] === 'common')
-						) {
-							return $package;
-						}
-					} else {
-						if ($package['category'] === $category && $package['sub_category'] === $subCategory) {
-							return $package;
-						}
-					}
-				}
-			);
-
-		foreach ($filter as $key => $value) {
-			$packages[$key] = $value;
+		foreach($this->packages as $package) {
+			if ($package['category'] === $category && $package['sub_category'] === $subCategory) {
+				$packages[$package['id']] = $package;
+			}
 		}
+
 		return $packages;
 	}
 
@@ -144,38 +88,30 @@ class Packages extends BasePackage
 	{
 		$packages = [];
 
-		$filter =
-			$this->model->filter(
-				function($package) use ($type) {
-					$package = $package->toArray();
-					if ($package['app_type'] === $type) {
-						return $package;
-					}
-				}
-			);
-
-		foreach ($filter as $key => $value) {
-			$packages[$key] = $value;
+		foreach($this->packages as $package) {
+			if ($package['app_type'] === $type) {
+				$packages[$package['id']] = $package;
+			}
 		}
+
 		return $packages;
 	}
 
 	public function getPackagesForApp($appId)
 	{
-		$filter =
-			$this->model->filter(
-				function($package) use ($appId) {
-					$package = $package->toArray();
-					$package['apps'] = Json::decode($package['apps'], true);
-					if (isset($package['apps'][$appId]['enabled']) &&
-						$package['apps'][$appId]['enabled'] === true
-					) {
-						return $package;
-					}
-				}
-			);
+		$packages = [];
 
-		return $filter;
+		foreach($this->packages as $package) {
+			$package['apps'] = Json::decode($package['apps'], true);
+
+			if (isset($package['apps'][$appId]['enabled']) &&
+				$package['apps'][$appId]['enabled'] == 'true'
+			) {
+				$packages[$package['id']] = $package;
+			}
+		}
+
+		return $packages;
 	}
 
 	public function addPackage(array $data)
@@ -237,19 +173,13 @@ class Packages extends BasePackage
 			return;
 		}
 
-		// var_dump($subscriptions);
-		$packages = $this->modules->packages->packages;
-
-		foreach ($packages as $packageKey => $package) {
+		foreach ($this->packages as $packageKey => $package) {
 			if ($package['class'] && $package['class'] !== '') {
-				// var_dump($package['notification_subscriptions']);
 				if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
 					$package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
 
 					foreach ($appsArr as $appKey => $app) {
 						if (isset($subscriptions[$app['id']][$package['id']])) {
-							// var_dump($package['name']);
-							// var_dump($package['notification_subscriptions']);
 							if (isset($package['notification_subscriptions'][$app['id']])) {
 								foreach ($subscriptions[$app['id']][$package['id']] as $subscriptionKey => $subscriptionValue) {
 									if (isset($package['notification_subscriptions'][$app['id']][$subscriptionKey])) {
@@ -279,7 +209,6 @@ class Packages extends BasePackage
 											}
 										}
 									} else {//If new notificationkey
-										// var_dump('new Notification ' . $subscriptionKey);
 										$reflector = $this->annotations->get($package['class']);
 										$methods = $reflector->getMethodsAnnotations();
 
@@ -316,10 +245,9 @@ class Packages extends BasePackage
 									}
 								}
 							} else {
-								// var_dump('new App');
 								if (is_array($subscriptions[$app['id']][$package['id']]) && count($subscriptions[$app['id']][$package['id']]) > 0) {
 									$package['notification_subscriptions'][$app['id']] = [];
-									// var_dump($subscriptions[$app['id']][$package['id']]);
+
 									foreach ($subscriptions[$app['id']][$package['id']] as $notificationKey => $notification) {
 										if ($notification == 1) {
 											if ($notificationKey == 'email') {
@@ -330,7 +258,6 @@ class Packages extends BasePackage
 												$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id']];
 											}
 										} else {
-											// var_dump($notificationKey);
 											$package['notification_subscriptions'][$app['id']][$notificationKey] = [];
 										}
 									}
@@ -339,7 +266,6 @@ class Packages extends BasePackage
 						}
 					}
 				} else {
-					// var_dump('new Everything');
 					foreach ($appsArr as $appKey => $app) {
 						if (isset($subscriptions[$app['id']][$package['id']])) {
 							$package['notification_subscriptions'][$app['id']] = [];
@@ -354,120 +280,16 @@ class Packages extends BasePackage
 										$package['notification_subscriptions'][$app['id']][$notificationKey] = [$account['id']];
 									}
 								} else {
-									// var_dump($notificationKey);
 									$package['notification_subscriptions'][$app['id']][$notificationKey] = [];
 								}
 							}
 						}
 					}
 				}
-				// var_dump($package['notification_subscriptions']);
 				$package['notification_subscriptions'] = Json::encode($package['notification_subscriptions']);
+
 				$this->update($package);
 			}
 		}
-
-		// if (count($subscriptions) > 0) {
-		// 	foreach ($subscriptions as $appKey => $appNotifications) {
-		// 		if (in_array($appKey, $appsIdArr)) {
-		// 			if (count($appNotifications) > 0) {
-		// 				foreach ($appNotifications as $packageId => $notifications) {
-
-		// 					$package = $this->getIdPackage($packageId);
-		// 					$notificationSubscriptions = [];
-
-		// 					if ($package['notification_subscriptions'] && $package['notification_subscriptions'] !== '') {
-
-		// 						$package['notification_subscriptions'] = Json::decode($package['notification_subscriptions'], true);
-
-		// 						//unset if there is an leftover app from before.
-		// 						foreach($package['notification_subscriptions'] as $appIdKey => $appIdNotifications) {
-		// 							if (!in_array($appIdKey, $appsIdArr)) {
-		// 								unset($package['notification_subscriptions'][$appIdKey]);
-		// 							}
-		// 						}
-
-		// 						if (isset($package['notification_subscriptions'][$appKey])) {//Modify Notifications
-		// 							foreach ($notifications as $notificationKey => $notification) {
-		// 								if (isset($package['notification_subscriptions'][$appKey][$notificationKey])) {
-		// 									if (in_array($account['id'], $package['notification_subscriptions'][$appKey][$notificationKey])) {
-		// 										if ($notification == 0) {
-		// 											unset($package['notification_subscriptions'][$appKey][$notificationKey][array_keys($package['notification_subscriptions'][$appKey][$notificationKey], $account['id'])[0]]);
-		// 										}
-		// 									} else {
-		// 										if ($notification == 1) {
-		// 											array_push($package['notification_subscriptions'][$appKey][$notificationKey], $account['id']);
-		// 										}
-		// 									}
-		// 								} else {//If new notificationkey
-
-		// 									$reflector = $this->annotations->get($package['class']);
-		// 									$methods = $reflector->getMethodsAnnotations();
-
-		// 									if ($methods) {
-		// 										$notification_actions = [];
-		// 										foreach ($methods as $annotation) {
-		// 											array_push($notification_actions, $annotation->getAll('notification')[0]->getArguments()['name']);
-		// 											$notification_allowed_methods = $annotation->getAll('notification_allowed_methods');
-		// 											if (count($notification_allowed_methods) > 0) {
-		// 												$notification_allowed_methods = $annotation->getAll('notification_allowed_methods')[0]->getArguments();
-		// 											}
-		// 										}
-
-		// 										if (in_array($notificationKey, $notification_actions) || in_array($notificationKey, $notification_allowed_methods)) {
-		// 											if ($notification == 1) {
-		// 												$package['notification_subscriptions'][$appKey][$notificationKey] = [$account['id']];
-		// 											} else {
-		// 												$package['notification_subscriptions'][$appKey][$notificationKey] = [];
-		// 											}
-		// 										}
-		// 									}
-		// 								}
-		// 							}
-
-		// 							$package['notification_subscriptions'] = Json::encode($package['notification_subscriptions']);
-
-		// 							$this->update($package);
-		// 						} else {//New App Notifications
-		// 							if (is_array($notifications) && count($notifications) > 0) {
-		// 								$package['notification_subscriptions'][$appKey] = [];
-		// 								foreach ($notifications as $notificationKey => $notification) {
-		// 									if ($notification == 1) {
-		// 										$package['notification_subscriptions'][$appKey][$notificationKey] = [$account['id']];
-		// 									} else {
-		// 										$package['notification_subscriptions'][$appKey][$notificationKey] = [];
-		// 									}
-		// 								}
-
-		// 								$package['notification_subscriptions'] = Json::encode($package['notification_subscriptions']);
-
-		// 								$this->update($package);
-		// 							}
-		// 						}
-		// 					} else {//New All Notifications
-		// 						if (is_array($notifications) && count($notifications) > 0) {
-		// 							$notificationSubscriptions[$appKey] = [];
-
-		// 							foreach ($notifications as $notificationKey => $notification) {
-		// 								if ($notification == 1) {
-		// 									$notificationSubscriptions[$appKey][$notificationKey] = [$account['id']];
-		// 								} else {
-		// 									$notificationSubscriptions[$appKey][$notificationKey] = [];
-		// 								}
-		// 							}
-		// 						}
-		// 						$packageSubscriptions['id'] = $packageId;
-		// 						$packageSubscriptions['notification_subscriptions'] = Json::encode($notificationSubscriptions);
-
-		// 						$this->update($packageSubscriptions);
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
-
-		// die();
-
 	}
 }

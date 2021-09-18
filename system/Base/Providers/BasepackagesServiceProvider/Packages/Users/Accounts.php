@@ -32,14 +32,14 @@ class Accounts extends BasePackage
         $gettunnels = false,
         $getprofiles = false
     ) {
-        $accountObj = $this->modelToUse::findFirstById($id);
+        $this->getFirst('id', $id);
 
-        if ($accountObj) {
-            $account = $accountObj->toArray();
+        if ($this->model) {
+            $account = $this->model->toArray();
 
             if ($getsecurity) {
-                if ($accountObj->getsecurity()) {
-                    $relationData = $accountObj->getsecurity()->toArray();
+                if ($this->model->getsecurity()) {
+                    $relationData = $this->model->getsecurity()->toArray();
 
                     unset($relationData['id']);
 
@@ -48,8 +48,8 @@ class Accounts extends BasePackage
             }
 
             if ($getcanlogin) {
-                if ($accountObj->getcanlogin()) {
-                    $relationData = $accountObj->getcanlogin()->toArray();
+                if ($this->model->getcanlogin()) {
+                    $relationData = $this->model->getcanlogin()->toArray();
 
                     unset($relationData['id']);
 
@@ -58,8 +58,8 @@ class Accounts extends BasePackage
             }
 
             if ($getsessions) {
-                if ($accountObj->getsessions()) {
-                    $relationData = $accountObj->getsessions()->toArray();
+                if ($this->model->getsessions()) {
+                    $relationData = $this->model->getsessions()->toArray();
 
                     unset($relationData['id']);
 
@@ -68,8 +68,8 @@ class Accounts extends BasePackage
             }
 
             if ($getidentifiers) {
-                if ($accountObj->getidentifiers()) {
-                    $relationData = $accountObj->getidentifiers()->toArray();
+                if ($this->model->getidentifiers()) {
+                    $relationData = $this->model->getidentifiers()->toArray();
 
                     unset($relationData['id']);
 
@@ -78,8 +78,8 @@ class Accounts extends BasePackage
             }
 
             if ($getagents) {
-                if ($accountObj->getagents()) {
-                    $relationData = $accountObj->getagents()->toArray();
+                if ($this->model->getagents()) {
+                    $relationData = $this->model->getagents()->toArray();
 
                     unset($relationData['id']);
 
@@ -88,8 +88,8 @@ class Accounts extends BasePackage
             }
 
             if ($gettunnels) {
-                if ($accountObj->gettunnels()) {
-                    $relationData = $accountObj->gettunnels()->toArray();
+                if ($this->model->gettunnels()) {
+                    $relationData = $this->model->gettunnels()->toArray();
 
                     unset($relationData['id']);
 
@@ -98,7 +98,7 @@ class Accounts extends BasePackage
             }
 
             if ($getprofiles) {
-                if ($accountObj->getprofiles()) {
+                if ($this->model->getprofiles()) {
                     $relationData = $accountObj->getprofiles()->toArray();
 
                     unset($relationData['id']);
@@ -212,7 +212,7 @@ class Accounts extends BasePackage
             $data['status'] = '0';
         }
 
-        $accountObj = $this->modelToUse::findFirstById($data['id']);
+        $accountObj = $this->getFirst('id', $data['id']);
 
         $account = $this->getAccountById($data['id'], true);
 
@@ -282,7 +282,7 @@ class Accounts extends BasePackage
      */
     public function removeAccount(array $data)
     {
-        $accountObj = $this->modelToUse::findFirstById($data['id']);
+        $accountObj = $this->getFirst('id', $id);
 
         if ($accountObj) {
             $account = $accountObj->toArray();
@@ -467,22 +467,13 @@ class Accounts extends BasePackage
 
     public function checkAccountByEmail(string $email, $getSecurity = false)
     {
-        $accountObj =
-            $this->modelToUse::findFirst(
-                [
-                    'conditions'    => 'email = :email:',
-                    'bind'          =>
-                        [
-                            'email'  => $email
-                        ]
-                ],
-            );
+        $this->getFirst('email', $email);
 
-        if ($accountObj) {
-            $account = $accountObj->toArray();
+        if ($this->model) {
+            $account = $this->model->toArray();
 
-            if ($accountObj->getsecurity()) {
-                $security = $accountObj->getsecurity()->toArray();
+            if ($this->model->getsecurity()) {
+                $security = $this->model->getsecurity()->toArray();
 
                 unset($security['id']);
                 unset($security['account_id']);
@@ -500,7 +491,7 @@ class Accounts extends BasePackage
 
     public function canLogin($id, $app)
     {
-        $this->model = $this->modelToUse::findFirst($id);
+        $this->getById($id);
 
         $canLogin =
             $this->model->canlogin->filter(
@@ -525,7 +516,7 @@ class Accounts extends BasePackage
 
     public function hasSession($id, $session)
     {
-        $this->model = $this->modelToUse::findFirst($id);
+        $this->getById($id);
 
         $hasSession =
             $this->model->sessions->filter(
@@ -657,7 +648,6 @@ class Accounts extends BasePackage
 
     protected function removeRoleAccount(int $rid, int $id)
     {
-        var_dump($rid, $id);
         $role = $this->basepackages->roles->getById($rid);
 
         $role['accounts'] = Json::decode($role['accounts'], true);
@@ -798,9 +788,7 @@ class Accounts extends BasePackage
                         'title' => strtoupper($app['name']),
                         'id' => strtoupper($app['id'])
                     ];
-                // foreach ($componentsArr as $key => $component) {
-                //     $components[strtolower($app['name'])]['childs'] = ['title' => strtoupper($component['type'])];
-                // }
+
                 foreach ($componentsArr as $key => $component) {
                     $reflector = $this->annotations->get($component['class']);
                     $methods = $reflector->getMethodsAnnotations();
@@ -812,6 +800,7 @@ class Accounts extends BasePackage
                 }
             }
         }
+
 
         $this->packagesData->components = $components;
 

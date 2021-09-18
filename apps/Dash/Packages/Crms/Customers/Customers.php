@@ -18,12 +18,10 @@ class Customers extends BasePackage
 
     public function getCustomerById(int $id)
     {
-        $customerModel = new $this->modelToUse;
+        $this->getFirst(null, null, false, true, null, $this->getIdParams($id));
 
-        $customerObj = $customerModel::findFirstById($id);
-
-        if ($customerObj) {
-            $customer = $customerObj->toArray();
+        if ($this->model) {
+            $customer = $this->model->toArray();
 
             if ($customer['address_ids'] && $customer['address_ids'] !== '') {
                 $customer['address_ids'] = Json::decode($customer['address_ids'], true);
@@ -40,7 +38,7 @@ class Customers extends BasePackage
                 }
             }
 
-            $financialDetailsObj = $customerObj->getFinancial_details();
+            $financialDetailsObj = $this->model->getFinancial_details();
 
             if ($financialDetailsObj) {
                 $financialDetails = $financialDetailsObj->toArray();

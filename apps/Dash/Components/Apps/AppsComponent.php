@@ -21,7 +21,7 @@ class AppsComponent extends BaseComponent
 
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $app = $this->apps->getById($this->getData()['id']);
+                $app = $this->apps->getIdApp($this->getData()['id']);
 
                 if (!$app) {
                     return $this->throwIdNotFound();
@@ -36,8 +36,7 @@ class AppsComponent extends BaseComponent
 
                 $this->view->modulesMenus = $this->basepackages->menus->getMenusForApp($app['id']);
 
-                $componentsArr =
-                    $this->modules->components->getComponentsForAppType($app['app_type']);
+                $componentsArr = $this->modules->components->getComponentsForAppType($app['app_type']);
 
                 foreach ($componentsArr as $key => &$componentValue) {
                     if ($componentValue['apps']) {
@@ -60,8 +59,7 @@ class AppsComponent extends BaseComponent
                     $components[$key] = $componentValue;
                 }
 
-                $viewsArr =
-                    $this->modules->views->getViewsForAppType($app['app_type']);
+                $viewsArr = $this->modules->views->getViewsForAppType($app['app_type']);
 
                 foreach ($viewsArr as $key => &$viewValue) {
                     if ($viewValue['apps']) {

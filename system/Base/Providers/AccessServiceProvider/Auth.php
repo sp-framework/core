@@ -448,26 +448,28 @@ class Auth
     {
         $this->oldSessionId = $identifier['session_id'];
 
-        $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+        if ($this->oldSessionId !== $this->session->getId()) {
+            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
 
-        $identifier['session_id'] = $this->session->getId();
-        $identifierModel->assign($identifier);
-        $identifierModel->update();
+            $identifier['session_id'] = $this->session->getId();
+            $identifierModel->assign($identifier);
+            $identifierModel->update();
 
-        $sessionModel = new BasepackagesUsersAccountsSessions;
+            $sessionModel = new BasepackagesUsersAccountsSessions;
 
-        $session = $sessionModel::findFirst(
-            [
-            'session_id = :sessionId:',
-            'bind'      => ['sessionId' => $this->oldSessionId]
-            ]
-        );
+            $session = $sessionModel::findFirst(
+                [
+                'session_id = :sessionId:',
+                'bind'      => ['sessionId' => $this->oldSessionId]
+                ]
+            );
 
-        if ($session) {
-            $session = $session->toArray();
-            $session['session_id'] = $this->session->getId();
-            $sessionModel->assign($session);
-            $sessionModel->update();
+            if ($session) {
+                $session = $session->toArray();
+                $session['session_id'] = $this->session->getId();
+                $sessionModel->assign($session);
+                $sessionModel->update();
+            }
         }
 
         $this->setUserSession();
@@ -852,7 +854,7 @@ class Auth
 
     protected function getAccountSecurityObject()
     {
-        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
 
         return $accountsObj->getSecurity();
     }
@@ -864,7 +866,7 @@ class Auth
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
 
-        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
 
         if ($accountsObj->agents) {
             $agentObj =
@@ -1014,7 +1016,7 @@ class Auth
             $this->setUserFromSession();
         }
 
-        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
 
         if ($accountsObj->agents) {
             $agentObj =
@@ -1088,7 +1090,7 @@ class Auth
         $userAgent = $this->request->getUserAgent();
         $sessionId = $this->session->getId();
 
-        $accountsObj = $this->accounts->getModelToUse()::findFirstById($this->account()['id']);
+        $accountsObj = $this->accounts->getFirst('id', $this->account()['id']);
 
         if ($accountsObj->agents) {
             $agentObj =

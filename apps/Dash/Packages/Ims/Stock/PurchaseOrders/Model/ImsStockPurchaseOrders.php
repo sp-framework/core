@@ -68,7 +68,7 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public function initialize()
     {
-        $this->hasMany(
+        self::$modelRelations['products']['relationObj'] = $this->hasMany(
             'id',
             ImsStockPurchaseOrdersProducts::class,
             'purchase_order_id',
@@ -80,7 +80,7 @@ class ImsStockPurchaseOrders extends BaseModel
         $apiPackage = $this->init()->checkPackage('\Apps\Dash\Packages\System\Api\Api');
 
         if ($apiPackage) {
-            $this->hasOne(
+            self::$modelRelations['xero']['relationObj'] = $this->hasOne(
                 'id',
                 SystemApiXeroPurchaseOrders::class,
                 'baz_po_id',
@@ -89,5 +89,7 @@ class ImsStockPurchaseOrders extends BaseModel
                 ]
             );
         }
+
+        parent::initialize();
     }
 }

@@ -64,7 +64,7 @@ class Notifications extends BasePackage
         $newNotification['notification_title'] = $notificationTitle;
         $newNotification['notification_details'] = $notificationDetails;
 
-        if ($this->add($newNotification)) {
+        if ($this->add($newNotification, false)) {
             $this->pushNotification($newNotification);
 
             $this->addResponse('Added new notification');
@@ -75,13 +75,14 @@ class Notifications extends BasePackage
 
     protected function pushNotification($notification)
     {
-        $account = $this->basepackages->accounts->getModelToUse()::findFirst(['id = ' . $notification['account_id']]);
+        $account = $this->basepackages->accounts->getFirst('id', $notification['account_id']);
 
         if (!$account->tunnels) {
             return;
         } else {
             $tunnels = $account->tunnels->toArray();
         }
+
         if ($tunnels['notifications_tunnel']) {
             $count =
                 $this->modelToUse::count(
@@ -228,7 +229,7 @@ class Notifications extends BasePackage
                             'read'          => 0,
                             'archive'       => 0
                         ]
-                ]
+                ], false, false
             );
     }
 
@@ -270,7 +271,7 @@ class Notifications extends BasePackage
                         'aId'           => $this->auth->account()['id'],
                         'read'          => 0,
                         'archive'       => 0
-                    ]
+                    ], true, false
             ]
         );
 

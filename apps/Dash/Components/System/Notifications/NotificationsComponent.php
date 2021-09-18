@@ -153,7 +153,9 @@ class NotificationsComponent extends BaseComponent
             'notification_title',
             null,
             false,
-            null
+            null,
+            false,
+            false
         );
 
         $this->view->pick('notifications/list');

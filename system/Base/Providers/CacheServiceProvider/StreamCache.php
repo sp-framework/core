@@ -55,8 +55,8 @@ class StreamCache
 
     protected function checkCachePath()
     {
-        if (!is_dir(base_path('var/storage/cache/'))) {
-            if (!mkdir(base_path('var/storage/cache/'), 0777, true)) {
+        if (!is_dir(base_path('var/storage/cache/stream/'))) {
+            if (!mkdir(base_path('var/storage/cache/stream/'), 0777, true)) {
                 return false;
             }
         }

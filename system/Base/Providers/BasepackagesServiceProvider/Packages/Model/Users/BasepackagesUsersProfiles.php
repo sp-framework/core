@@ -57,5 +57,7 @@ class BasepackagesUsersProfiles extends BaseModel
                 'alias' => 'addressbook'
             ]
         );
+
+        parent::initialize();
     }
 }

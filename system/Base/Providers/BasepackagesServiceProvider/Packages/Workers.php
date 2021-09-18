@@ -548,7 +548,7 @@ class Workers extends BasePackage
         if ($addJob) {
             $this->scheduledJobs[$task['id'] . '-' . $schedule['type']] = $this->jobs->packagesData->responseData;
 
-            $task = $this->basepackages->workers->tasks->getById($task['id']);
+            $task = $this->basepackages->workers->tasks->getById($task['id'], false, false);
 
             $task['via_job'] = 1;
             $task['status'] = 1;//Scheduled
@@ -600,7 +600,7 @@ class Workers extends BasePackage
                     $scheduledJob['worker_id'] != '' &&
                     $scheduledJob['worker_id'] != '0'
                 ) {
-                    $worker = $this->workers->getById($scheduledJob['worker_id']);
+                    $worker = $this->workers->getById($scheduledJob['worker_id'], false, false);
 
                     if ($worker) {
                         $worker['status'] = 0;

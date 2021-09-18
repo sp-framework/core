@@ -52,25 +52,17 @@ class Menus extends BasePackage
     {
         $menus = [];
 
-        $filter =
-            $this->model->filter(
-                function($menu) use ($appId) {
-                    $menu = $menu->toArray();
+        foreach($this->menus as $menu) {
+            $menu['apps'] = Json::decode($menu['apps'], true);
 
-                    $menu['apps'] = Json::decode($menu['apps'], true);
-                    if (count($menu['apps']) > 0) {
-                        if (isset($menu['apps'][$appId]) &&
-                            $menu['apps'][$appId]['enabled'] === true
-                        ) {
-
-                            return $menu;
-                        }
-                    }
+            if (count($menu['apps']) > 0) {
+                if (isset($menu['apps'][$appId]) &&
+                    $menu['apps'][$appId]['enabled'] === true
+                ) {
+                    $menus[$menu['id']] = $menu;
                 }
-            );
+            }
 
-        foreach ($filter as $key => $value) {
-            $menus[$value['id']] = $value;
         }
 
         return $menus;
