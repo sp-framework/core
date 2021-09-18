@@ -199,7 +199,10 @@ class Filters extends AdminLTETags
                 '</form>
             </div>';
 
-        if (isset($this->params['dtFilterShowQuickFilter']) && $this->params['dtFilterShowQuickFilter'] === true) {
+        if (isset($this->params['dtFilterColumns']) &&
+            isset($this->params['dtFilterShowQuickFilter']) &&
+            $this->params['dtFilterShowQuickFilter'] === true
+        ) {
             $fieldGroupPreAddonDropdownButtonListTitle = [];
 
             foreach ($this->params['dtFilterColumns'] as $column) {
