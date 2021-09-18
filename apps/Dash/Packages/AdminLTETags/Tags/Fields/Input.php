@@ -183,23 +183,21 @@ class Input
                     <button type="button" ' . $this->fieldParams['fieldId'] . '-prepend-dropdown-button" class="btn btn-' . $this->fieldParams['fieldGroupPreAddonDropdownButtonClass'] . ' dropdown-toggle rounded-0" data-toggle="dropdown" aria-expanded="false" '. $this->fieldParams['fieldGroupPreAddonDropdownButtonDisabled'] . '>
                         <span>' . $this->fieldParams['fieldGroupPreAddonDropdownButtonTitle'] . '</span>
                     </button>
-                    <ul class="dropdown-menu">';
+                    <div class="dropdown-menu">';
 
             if ($this->fieldParams['fieldGroupPreAddonDropdownButtonListTitle']) {
-                foreach ($this->fieldParams['fieldGroupPreAddonDropdownButtonListTitle'] as $title) {
+                foreach ($this->fieldParams['fieldGroupPreAddonDropdownButtonListTitle'] as $key => $title) {
                     if ($title === 'divider') {
                         $this->content .=
-                            '<li class="dropdown-divider"></li>';
+                            '<div class="dropdown-divider"></div>';
                     } else {
                         $this->content .=
-                            '<li class="dropdown-item">
-                                <a ' . $this->fieldParams['fieldId'] . '-' . strtolower($title) . '" href="#">' . $title . '</a>
-                            </li>';
+                            '<a class="dropdown-item text-uppercase" data-id="' . $key . '" ' . $this->fieldParams['fieldId'] . '-' . $key . '" href="#">' . $title . '</a>';
                     }
                 }
             }
 
-            $this->content .= '<ul></div>';
+            $this->content .= '</div></div>';
 
         }
 
@@ -368,23 +366,22 @@ class Input
                     <button type="button" id="' . $this->fieldParams['fieldId'] . '-append-dropdown-button" class="btn btn-' . $this->fieldParams['fieldGroupPostAddonDropdownButtonClass'] . ' dropdown-toggle rounded-0" data-toggle="dropdown" aria-expanded="false" ' . $this->fieldParams['fieldGroupPostAddonDropdownButtonDisabled'] . '>
                         <span>' . $this->fieldParams['fieldGroupPostAddonDropdownButtonTitle'] . '</span>
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-right">';
+                    <div class="dropdown-menu dropdown-menu-right">';
 
             if ($this->fieldParams['fieldGroupPostAddonDropdownButtonListTitle']) {
-                foreach ($this->fieldParams['fieldGroupPostAddonDropdownButtonListTitle'] as $title) {
+                foreach ($this->fieldParams['fieldGroupPostAddonDropdownButtonListTitle'] as $key => $title) {
                     if ($title === 'divider') {
                         $this->content .=
-                            '<li class="dropdown-divider"></li>';
+                            '<div class="dropdown-divider"></div>';
                     } else {
                         $this->content .=
-                            '<li class="dropdown-item">
-                                <a ' . $this->fieldParams['fieldId'] . '-' . strtolower($title) . '" href="#">' . $title . '</a>
-                            </li>';
+                            '<a class="dropdown-item text-uppercase" data-id="' . $key . '" ' . $this->fieldParams['fieldId'] . '-' . $key . '" href="#">' . $title . '</a>
+                            </div>';
                     }
                 }
             }
 
-            $this->content .= '<ul></div>';
+            $this->content .= '</div></div>';
 
         }
 

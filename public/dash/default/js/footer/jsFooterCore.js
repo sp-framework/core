@@ -5891,8 +5891,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     });
                     $('#' + sectionId + '-filter-andor').val('and').trigger('change');
                     $('#' + sectionId + '-filter-andor').attr('disabled', false);
-                    //eslint-disable-next-line
-                    // console.log(e.rowsCount);
+
                     if (e.rowsCount === 1) {
                         $($('#' + sectionId + '-filter-table-data tbody tr')[0]).find('td')[0].innerHTML = '-';
                     }
@@ -6071,6 +6070,40 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                     clearStoredData();
                 });
+
+                if ($('#listing-filters-quick').length === 1) {
+                    var dataType, selectedId;
+
+                    $('#listing-filters-quick a').click(function(e) {
+                        e.preventDefault();
+
+                        $('#' + sectionId + '-filter-quick').attr('disabled', false);
+                        $('#' + sectionId + '-filter-quick').val('');
+                        $('#' + sectionId + '-filter-search').attr('disabled', false);
+
+                        $('#' + sectionId + '-filter-quick-prepend-dropdown-button span').text($(this).text().toUpperCase());
+
+                        selectedId = $(this).data('id');
+
+                        dataType = $('#' + sectionId + '-filter-field').find('[data-value="' + $(this).data('id') + '"]').data('datatype');
+                    });
+
+                    $('#' + sectionId + '-search').click(function(e) {
+                        e.preventDefault();
+
+                        if (dataType == 0) {
+                            query = '-:' + selectedId + ':equals:' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
+                        } else if (dataType == 2) {
+                            query = '-:' + selectedId + ':like:%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
+                        }
+
+                        that._filterRunAjax(
+                            1,
+                            datatableOptions.paginationCounters.limit,
+                            query
+                        );
+                    });
+                }
             }
 
             //Build listing datatable

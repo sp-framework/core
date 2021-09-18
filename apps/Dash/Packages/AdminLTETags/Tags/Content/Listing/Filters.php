@@ -89,10 +89,12 @@ class Filters extends AdminLTETags
 
         if ($defaultFilter === 0) {
             $this->content .=
-                '</div><div id="' . $this->compSecId . '-filter-alert" class="alert alert-danger alert-dismissible animated fadeIn rounded-0 mb-3">
-                    <button id="admin-filters-main-alert-dismiss" type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                    <i class="icon fa fa-ban"></i>Filter with id ' . $queryFilterId . ' not found. Please select filter from list below.
-                </div><div class="row mb-2">';
+                '</div>
+                    <div id="' . $this->compSecId . '-filter-alert" class="alert alert-danger alert-dismissible animated fadeIn rounded-0 mb-3">
+                        <button id="admin-filters-main-alert-dismiss" type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <i class="icon fa fa-ban"></i>Filter with id ' . $queryFilterId . ' not found. Please select filter from list below.
+                    </div>
+                <div class="row mb-2">';
         }
 
         if (!isset($this->params['dtFilterButtons']) ||
@@ -197,11 +199,55 @@ class Filters extends AdminLTETags
                 '</form>
             </div>';
 
-            $this->content .= $this->getFilterModalContent();
+        if (isset($this->params['dtFilterShowQuickFilter']) && $this->params['dtFilterShowQuickFilter'] === true) {
+            $fieldGroupPreAddonDropdownButtonListTitle = [];
 
-            $this->content .= $this->getShareModalContent();
+            foreach ($this->params['dtFilterColumns'] as $column) {
+                $fieldGroupPreAddonDropdownButtonListTitle[$column['id']] = $column['name'];
+            }
 
-            $this->content .= $this->inclJs();
+            $this->content .=
+                '<div class="col" id="listing-filters-quick">
+                    <form autocomplete="off">' .
+                        $this->useTag(
+                            'fields',
+                            [
+                                'componentId'                                   => $this->params['componentId'],
+                                'sectionId'                                     => $this->params['sectionId'] . '-filter',
+                                'fieldId'                                       => 'quick',
+                                'fieldLabel'                                    => false,
+                                'fieldType'                                     => 'input',
+                                'fieldInputType'                                => 'text',
+                                'fieldAdditionalClass'                          => 'mb-1',
+                                'fieldPlaceholder'                              => 'Quick Search...',
+                                'fieldDisabled'                                 => true,
+                                'fieldGroupPreAddonDropdown'                    => true,
+                                'fieldGroupPreAddonDropdownButtonTitle'         => 'SELECT FIELD',
+                                'fieldGroupPreAddonDropdownButtonListTitle'     => $fieldGroupPreAddonDropdownButtonListTitle,
+                                'fieldHelp'                                     => false,
+                                'fieldGroupPostAddonButtons'                    =>
+                                    [
+                                        'search'        => [
+                                            'title'                   => false,
+                                            'type'                    => 'primary',
+                                            'icon'                    => 'search',
+                                            'noMargin'                => true,
+                                            'disabled'                => true,
+                                            'buttonAdditionalClass'   => 'rounded-0 text-white',
+                                            'position'                => 'right'
+                                        ]
+                                    ]
+                            ]
+                        ) .
+                    '</form>
+                </div>';
+        }
+
+        $this->content .= $this->getFilterModalContent();
+
+        $this->content .= $this->getShareModalContent();
+
+        $this->content .= $this->inclJs();
 
     }
 
