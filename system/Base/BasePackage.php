@@ -570,7 +570,7 @@ abstract class BasePackage extends Controller
 
 				$this->packagesData->last = ${$this->packageName}->toArray();
 
-				if ($resetCache) {
+				if ($resetCache && count(${$this->packageName}->getUpdatedFields()) !== 0) {//Make sure we only update when we change any fields
 					$this->resetCache($this->packagesData->last['id']);
 				}
 
