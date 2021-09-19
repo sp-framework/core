@@ -5,6 +5,7 @@ namespace Apps\Dash\Packages\Crms\Customers\Install;
 use Apps\Dash\Packages\Crms\Customers\Customers;
 use Apps\Dash\Packages\Crms\Customers\Install\Schema\CrmsCustomers;
 use Apps\Dash\Packages\Crms\Customers\Install\Schema\CrmsCustomersFinancialDetails;
+use Phalcon\Db\Column;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 
@@ -30,6 +31,7 @@ class Package extends BasePackage
         try {
             if ($dropTables) {
                 $this->createTable('crms_customers', '', (new CrmsCustomers)->columns(), $dropTables);
+                $this->addIndex('crms_customers', (new CrmsCustomers)->indexes());
                 $this->createTable('crms_customers_financial_details', '', (new CrmsCustomersFinancialDetails)->columns(), $dropTables);
             } else {
                 $this->createTable('crms_customers', '', (new CrmsCustomers)->columns());
@@ -70,7 +72,68 @@ class Package extends BasePackage
 
     public function updatePackage()
     {
+        $this->init();
+
+        // $this->alterTable(
+        //     'add',
+        //     'crms_customers',
+        //     [
+        //         new Column(
+        //             'added',
+        //             [
+        //                 'type'          => Column::TYPE_VARCHAR,
+        //                 'size'          => 1024,
+        //                 'notNull'       => false,
+        //                 'comment'       => 'ADDED'
+        //             ]
+        //         ),
+        //         new Column(
+        //             'added_2',
+        //             [
+        //                 'type'          => Column::TYPE_VARCHAR,
+        //                 'size'          => 1024,
+        //                 'notNull'       => false,
+        //                 'comment'       => 'ADDED 2'
+        //             ]
+        //         )
+        //     ]
+        // );
+
+        // $this->alterTable(
+        //     'modify',
+        //     'crms_customers',
+        //     [
+        //         new Column(
+        //             'added',
+        //             [
+        //                 'type'          => Column::TYPE_VARCHAR,
+        //                 'size'          => 100,
+        //                 'notNull'       => false,
+        //                 'comment'       => 'ADDED'
+        //             ]
+        //         ),
+        //         new Column(
+        //             'added_2',
+        //             [
+        //                 'type'          => Column::TYPE_VARCHAR,
+        //                 'size'          => 100,
+        //                 'notNull'       => false,
+        //                 'comment'       => 'ADDED 2'
+        //             ]
+        //         )
+        //     ]
+        // );
         //
+        // $this->alterTable(
+        //     'drop',
+        //     'crms_customers',
+        //     [
+        //         'added',
+        //         'added_2',
+        //     ]
+        // );
+
+        // $this->dropIndex('crms_customers', 'column_contact_mobile_index');
     }
 
     public function deletePackage()

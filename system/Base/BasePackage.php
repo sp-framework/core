@@ -945,6 +945,15 @@ abstract class BasePackage extends Controller
 	// 	}
 	// }
 
+	protected function executeSQL(string $sql)
+	{
+		try {
+			return $this->db->query($sql);
+		} catch (\PDOException $e) {
+			throw new \Exception($e->getMessage());
+		}
+	}
+
 	public function describe(string $table = null, $indexes = false, $references = false)
 	{
 		if (!$table) {
@@ -975,6 +984,11 @@ abstract class BasePackage extends Controller
 		return $this->db->tableExists($table);
 	}
 
+	public function dropTable(string $table)
+	{
+		$this->db->dropTable($table);
+	}
+
 	public function createTable(string $table, string $dbName = '', array $columns, $drop = false)
 	{
 		try {
@@ -988,14 +1002,57 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	public function alterTable()
+	public function alterTable(string $method, string $table, array $columns, $schemaName = '')
 	{
-		//
+		$method = $method . 'Column';
+
+		try {
+			foreach ($columns as $column) {
+				$this->db->{$method}(
+					$table,
+					$schemaName,
+					$column
+				);
+			}
+
+			return true;
+		} catch (\PDOException $e) {
+			throw new \Exception($e->getMessage());
+		}
 	}
 
-	public function dropTable(string $table)
+	public function addIndex(string $table, array $index, $schemaName = '')
 	{
-		$this->db->dropTable($table);
+		foreach ($index as $idx) {
+			$columnsArr = $idx->getColumns();
+
+			if (count($columnsArr) > 1) {
+				$columns = '';
+
+				foreach ($columnsArr as $columnsArrKey => $column) {
+					$columns .= '`' . $column . '`';
+
+					if ($columnsArrKey != Arr::lastKey($columnsArr)) {
+						$columns .= ',';
+					}
+				}
+			} else {
+				$columns = '`' . $columnsArr[0] . '`';
+			}
+
+			$this->executeSQL(
+				'ALTER TABLE `' . $table . '` ADD ' . strtoupper($idx->getType()) . ' `' . $idx->getName() . '` (' . $columns . ')'
+			);
+		}
+	}
+
+	public function dropIndex(string $table, string $indexName, $schemaName = '')
+	{
+		try {
+			return $this->db->dropIndex($table, $schemaName, $indexName);
+		} catch (\PDOException $e) {
+			throw new \Exception($e->getMessage());
+		}
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true)

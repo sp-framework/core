@@ -24,7 +24,8 @@ class CrmsCustomersFinancialDetails
                     'customer_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => false,
+                        'notNull'       => true,
+                        'comment'       => 'Customer ID of this row'
                     ]
                 ),
                 new Column(
@@ -33,6 +34,7 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_BIGINTEGER,
                         'size'          => 11,
                         'notNull'       => false,
+                        'comment'       => 'Australia Business Number'
                     ]
                 ),
                 new Column(
@@ -40,7 +42,8 @@ class CrmsCustomersFinancialDetails
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 3,
-                        'notNull'       => true,
+                        'notNull'       => false,
+                        'comment'       => 'Currency'
                     ]
                 ),
                 new Column(
@@ -49,6 +52,7 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 8,
                         'notNull'       => false,
+                        'comment'       => 'BSB'
                     ]
                 ),
                 new Column(
@@ -57,6 +61,7 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 20,
                         'notNull'       => false,
+                        'comment'       => 'Account Number'
                     ]
                 ),
                 new Column(
@@ -65,6 +70,7 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 20,
                         'notNull'       => false,
+                        'comment'       => 'Bank Swift code'
                     ]
                 ),
                 new Column(
@@ -73,6 +79,7 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 4,
                         'notNull'       => false,
+                        'comment'       => 'Invoice Due Day of the month from start of month'
                     ]
                 ),
                 new Column(
@@ -81,6 +88,7 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 20,
                         'notNull'       => false,
+                        'comment'       => 'Invoice Due Day term'
                     ]
                 ),
                 new Column(
@@ -88,6 +96,7 @@ class CrmsCustomersFinancialDetails
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => false,
+                        'comment'       => 'Invoice tax enabled'
                     ]
                 ),
                 new Column(
@@ -95,6 +104,7 @@ class CrmsCustomersFinancialDetails
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => false,
+                        'comment'       => 'Invoice tax ID from package Taxes'
                     ]
                 ),
                 new Column(
@@ -103,6 +113,7 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 20,
                         'notNull'       => false,
+                        'comment'       => 'Credit limit'
                     ]
                 ),
                 new Column(
@@ -110,6 +121,7 @@ class CrmsCustomersFinancialDetails
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => false,
+                        'comment'       => 'Block generating invoices for customer after credit limit reached'
                     ]
                 ),
                 new Column(
@@ -118,13 +130,15 @@ class CrmsCustomersFinancialDetails
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 3,
                         'notNull'       => false,
+                        'comment'       => 'Discount provided'
                     ]
                 ),
-                new Column(//Encrypted text field with CC information of the customer. The key is with customer and cannot be viewed even if the data is stolen.
+                new Column(
                     'cc_details',
                     [
                         'type'          => Column::TYPE_TEXT,
                         'notNull'       => false,
+                        'comment'       => 'Encrypted CC Details'
                     ]
                 ),
             ],

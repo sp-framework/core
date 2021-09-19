@@ -27,6 +27,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 1024,
                         'notNull'       => false,
+                        'comment'       => 'Portrait (UUID)'
                     ]
                 ),
                 new Column(
@@ -34,6 +35,7 @@ class CrmsCustomers
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false,
+                        'comment'       => 'Account ID'
                     ]
                 ),
                 new Column(
@@ -41,7 +43,8 @@ class CrmsCustomers
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 50,
-                        'notNull'       => true,
+                        'notNull'       => false,
+                        'comment'       => 'Email'
                     ]
                 ),
                 new Column(
@@ -49,6 +52,7 @@ class CrmsCustomers
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false,
+                        'comment'       => 'Group ID'
                     ]
                 ),
                 new Column(
@@ -57,6 +61,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 100,
                         'notNull'       => true,
+                        'comment'       => 'First Name'
                     ]
                 ),
                 new Column(
@@ -65,6 +70,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 100,
                         'notNull'       => true,
+                        'comment'       => 'Last Name'
                     ]
                 ),
                 new Column(
@@ -73,6 +79,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 200,
                         'notNull'       => true,
+                        'comment'       => 'Full Name. Concat of First & Last Name'
                     ]
                 ),
                 new Column(
@@ -81,6 +88,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 50,
                         'notNull'       => false,
+                        'comment'       => 'Contact Source'
                     ]
                 ),
                 new Column(
@@ -89,6 +97,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 100,
                         'notNull'       => false,
+                        'comment'       => 'Contact Source details'
                     ]
                 ),
                 new Column(
@@ -96,6 +105,7 @@ class CrmsCustomers
                     [
                         'type'          => Column::TYPE_INTEGER,
                         'notNull'       => false,
+                        'comment'       => 'Referrer customer ID'
                     ]
                 ),
                 new Column(
@@ -104,6 +114,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 100,
                         'notNull'       => false,
+                        'comment'       => 'Phone'
                     ]
                 ),
                 new Column(
@@ -112,6 +123,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 20,
                         'notNull'       => false,
+                        'comment'       => 'Phone Ext'
                     ]
                 ),
                 new Column(
@@ -119,7 +131,8 @@ class CrmsCustomers
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 100,
-                        'notNull'       => true,
+                        'notNull'       => false,
+                        'comment'       => 'Mobile'
                     ]
                 ),
                 new Column(
@@ -128,6 +141,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 100,
                         'notNull'       => false,
+                        'comment'       => 'Secondary email'
                     ]
                 ),
                 new Column(
@@ -135,6 +149,7 @@ class CrmsCustomers
                     [
                         'type'          => Column::TYPE_TINYINTEGER,
                         'notNull'       => false,
+                        'comment'       => 'CC to secondary email'
                     ]
                 ),
                 new Column(
@@ -143,6 +158,7 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 200,
                         'notNull'       => false,
+                        'comment'       => 'Other contact'
                     ]
                 ),
                 new Column(
@@ -151,21 +167,48 @@ class CrmsCustomers
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 100,
                         'notNull'       => false,
+                        'comment'       => 'Addresses IDs'
                     ]
                 ),
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
-            ],
-            'indexes' => [
-                new Index(
-                    'column_UNIQUE',
-                    [
-                        'account_email'
-                    ],
-                    'UNIQUE'
-                )
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_first_name_index',
+                [
+                    'first_name'
+                ],
+                'INDEX'
+            ),
+            new Index(
+                'column_last_name_index',
+                [
+                    'last_name'
+                ],
+                'INDEX'
+            ),
+            new Index(
+                'column_email_index',
+                [
+                    'account_email'
+                ],
+                'INDEX'
+            ),
+            new Index(
+                'column_contact_mobile_index',
+                [
+                    'contact_mobile'
+                ],
+                'INDEX'
+            )
         ];
     }
 }
