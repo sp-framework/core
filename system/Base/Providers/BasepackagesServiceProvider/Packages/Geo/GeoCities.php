@@ -24,26 +24,18 @@ class GeoCities extends BasePackage
 
             $this->updateSeq();
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' city';
+            $this->addResponse('Added ' . $data['name'] . ' city');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new city.';
+            $this->addResponse('Error adding new city.', 1);
         }
     }
 
     protected function updateSeq()
     {
-        $totalCities = $this->modelToUse::find();
+        $lastCityId = $this->modelToUse::maximum(['column' => 'id']);
 
-        if ($totalCities) {
-            $lastCityId = (int) $totalCities->getLast()->id;
-
-            if ($lastCityId > 100000) {
-                return;
-            }
+        if ($lastCityId && (int) $lastCityId > 100000) {
+            return;
         }
 
         $model = new $this->modelToUse;
@@ -63,13 +55,9 @@ class GeoCities extends BasePackage
     public function updateCity(array $data)
     {
         if ($this->update($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' city';
+            $this->addResponse('Updated ' . $data['name'] . ' city');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating city.';
+            $this->addResponse('Error updating city.', 1);
         }
     }
 

@@ -24,26 +24,18 @@ class GeoStates extends BasePackage
 
             $this->updateSeq();
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' state';
+            $this->addResponse('Added ' . $data['name'] . ' state');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new state.';
+            $this->addResponse('Error adding new state.', 1);
         }
     }
 
     protected function updateSeq()
     {
-        $totalStates = $this->modelToUse::find();
+        $lastStateId = $this->modelToUse::maximum(['column' => 'id']);
 
-        if ($totalStates) {
-            $lastStateId = (int) $totalStates->getLast()->id;
-
-            if ($lastStateId > 100000) {
-                return;
-            }
+        if ($lastStateId && (int) $lastStateId > 100000) {
+            return;
         }
 
         $model = new $this->modelToUse;
@@ -63,13 +55,9 @@ class GeoStates extends BasePackage
     public function updateState(array $data)
     {
         if ($this->update($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' state';
+            $this->addResponse('Updated ' . $data['name'] . ' state');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating state.';
+            $this->addResponse('Error updating state.', 1);
         }
     }
 

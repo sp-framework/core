@@ -92,7 +92,20 @@ class StatesComponent extends BaseComponent
      */
     public function addAction()
     {
-        //
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->geoStates->addState($this->postData());
+
+            $this->addResponse(
+                $this->geoStates->packagesData->responseMessage,
+                $this->geoStates->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
     }
 
     /**
@@ -107,14 +120,12 @@ class StatesComponent extends BaseComponent
 
             $this->geoStates->updateState($this->postData());
 
-            $this->view->responseCode = $this->geoStates->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->geoStates->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->geoStates->packagesData->responseMessage,
+                $this->geoStates->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -136,9 +147,7 @@ class StatesComponent extends BaseComponent
                     $this->view->states = $this->basepackages->geoStates->packagesData->states;
                 }
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
+                $this->addResponse('Search Query Missing', 1);
             }
         }
     }

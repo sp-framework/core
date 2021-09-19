@@ -92,7 +92,20 @@ class TimezonesComponent extends BaseComponent
      */
     public function addAction()
     {
-        //
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->geoTimezones->addTimezone($this->postData());
+
+            $this->addResponse(
+                $this->geoTimezones->packagesData->responseMessage,
+                $this->geoTimezones->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
     }
 
     /**
@@ -107,14 +120,12 @@ class TimezonesComponent extends BaseComponent
 
             $this->geoTimezones->updateTimezone($this->postData());
 
-            $this->view->responseCode = $this->geoTimezones->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->geoTimezones->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->geoStates->packagesData->responseMessage,
+                $this->geoStates->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -136,9 +147,7 @@ class TimezonesComponent extends BaseComponent
                     $this->view->timezones = $this->basepackages->geoTimezones->packagesData->timezones;
                 }
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
+                $this->addResponse('Search Query Missing', 1);
             }
         }
     }

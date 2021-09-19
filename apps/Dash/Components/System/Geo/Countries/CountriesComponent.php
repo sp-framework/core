@@ -120,7 +120,20 @@ class CountriesComponent extends BaseComponent
      */
     public function addAction()
     {
-        //
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->geoCountries->addCountry($this->postData());
+
+            $this->addResponse(
+                $this->geoCountries->packagesData->responseMessage,
+                $this->geoCountries->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
     }
 
     /**
@@ -135,14 +148,12 @@ class CountriesComponent extends BaseComponent
 
             $this->geoCountries->updateCountry($this->postData());
 
-            $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->geoCountries->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->geoCountries->packagesData->responseMessage,
+                $this->geoCountries->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -155,14 +166,12 @@ class CountriesComponent extends BaseComponent
 
             $this->geoCountries->installCountry($this->postData());
 
-            $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->geoCountries->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->geoCountries->packagesData->responseMessage,
+                $this->geoCountries->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -181,17 +190,15 @@ class CountriesComponent extends BaseComponent
                     return;
                 }
 
-                $searchCountries = $this->basepackages->geoCountries->searchCountries($searchQuery);
+                $searchCountries = $this->geoCountries->searchCountries($searchQuery);
 
                 if ($searchCountries) {
-                    $this->view->responseCode = $this->basepackages->geoCountries->packagesData->responseCode;
+                    $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
 
-                    $this->view->countries = $this->basepackages->geoCountries->packagesData->countries;
+                    $this->view->countries = $this->geoCountries->packagesData->countries;
                 }
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
+                $this->addResponse('Search Query Missing', 1);
             }
         }
     }
@@ -208,13 +215,12 @@ class CountriesComponent extends BaseComponent
                     '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/' . $this->getData()['srcFile'] . '.json'
                 );
 
-                $this->view->responseCode = $geoExtractDataPackage->packagesData->responseCode;
-
-                $this->view->responseMessage = $geoExtractDataPackage->packagesData->responseMessage;
+                $this->addResponse(
+                    $geoExtractDataPackage->packagesData->responseMessage,
+                    $geoExtractDataPackage->packagesData->responseCode
+                );
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'Only super admin allowed to extract geo data';
+                $this->addResponse('Only super admin allowed to extract geo data', 1);
             }
         } else {
             throw new \Exception('Source file missing in url. Example URL: admin/settings/geo/q/extractdata/true/srcFile/src');

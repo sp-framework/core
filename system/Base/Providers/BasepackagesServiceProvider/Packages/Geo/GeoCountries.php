@@ -57,30 +57,26 @@ class GeoCountries extends BasePackage
      */
     public function addCountry(array $data)
     {
+        if (!isset($data['installed'])) {
+            $data['installed'] = '1';
+        }
+
         if ($this->add($data)) {
 
             $this->updateSeq();
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' country';
+            $this->addResponse('Added country ' . $data['name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new country.';
+            $this->addResponse('Error adding country ' . $country['name'], 1);
         }
     }
 
     protected function updateSeq()
     {
-        $totalCountries = $this->modelToUse::find();
+        $lastCountryId = $this->modelToUse::maximum(['column' => 'id']);
 
-        if ($totalCountries) {
-            $lastCountryId = (int) $totalCountries->getLast()->id;
-
-            if ($lastCountryId > 1000) {
-                return;
-            }
+        if ($lastCountryId && (int) $lastCountryId > 1000) {
+            return;
         }
 
         $model = new $this->modelToUse;
@@ -104,13 +100,9 @@ class GeoCountries extends BasePackage
         $country = array_merge($country, $data);
 
         if ($this->update($country)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' country';
+            $this->addResponse('Updated country ' . $data['name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating country.';
+            $this->addResponse('Error updating country ' . $country['name'], 1);
         }
     }
 
@@ -126,43 +118,39 @@ class GeoCountries extends BasePackage
 
         $this->registerStates($countryData['states'], $countryData['id']);
             // dump($countryData);
-        $this->registerTimezones($countryData['timezones'], $countryData['id']);
+        // $this->registerTimezones($countryData['timezones'], $countryData['id']);
 
         $country = $this->getById($data['country_id']);
 
         $country['installed'] = 1;
 
         if ($this->update($country)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Installed ' . $country['name'] . ' country';
+            $this->addResponse('Installed country ' . $country['name']);
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error installing ' . $country['name'] . ' country.';
+            $this->addResponse('Error installing country ' . $country['name'], 1);
         }
     }
 
-    protected function registerTimezones($timezonesData, $country_id)
-    {
-        foreach ($timezonesData as $key => $timezone) {
-            $geoTimezone = [];
-            $geoTimezone['country_id'] = $country_id;
-            $geoTimezone['zone_name'] = $timezone['zoneName'];
-            $geoTimezone['gmt_offset'] = $timezone['gmtOffset'];
-            $geoTimezone['gmt_offset_name'] = $timezone['gmtOffsetName'];
-            $geoTimezone['abbreviation'] = $timezone['abbreviation'];
-            $geoTimezone['tz_name'] = $timezone['tzName'];
+    // protected function registerTimezones($timezonesData, $country_id)
+    // {
+    //     foreach ($timezonesData as $key => $timezone) {
+    //         $geoTimezone = [];
+    //         $geoTimezone['country_id'] = $country_id;
+    //         $geoTimezone['zone_name'] = $timezone['zoneName'];
+    //         $geoTimezone['gmt_offset'] = $timezone['gmtOffset'];
+    //         $geoTimezone['gmt_offset_name'] = $timezone['gmtOffsetName'];
+    //         $geoTimezone['abbreviation'] = $timezone['abbreviation'];
+    //         $geoTimezone['tz_name'] = $timezone['tzName'];
 
-            $this->basepackages->geoTimezones->add($geoTimezone);
-        }
-    }
+    //         $this->basepackages->geoTimezones->add($geoTimezone, false);
+    //     }
+    // }
 
     protected function registerStates($statesData, $country_id)
     {
         foreach ($statesData as $key => $state) {
             $state['country_id'] = $country_id;
-            $this->basepackages->geoStates->add($state);
+            $this->basepackages->geoStates->add($state, false);
             // dump($state);
             // $this->db->insertAsDict(
             //     'geo_states',
@@ -183,7 +171,7 @@ class GeoCountries extends BasePackage
         foreach ($citiesData as $key => $city) {
             $city['state_id'] = $state_id;
             $city['country_id'] = $country_id;
-            $this->basepackages->geoCities->add($city);
+            $this->basepackages->geoCities->add($city, false);
             // var_dump($city);
             // die();
             // $this->db->insertAsDict(
