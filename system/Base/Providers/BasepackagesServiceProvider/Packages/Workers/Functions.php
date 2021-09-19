@@ -36,7 +36,7 @@ class Functions extends BasePackage
                 $job['execution_time'] = round($this->stopTime - $this->startTime, 3);
             }
 
-            $this->basepackages->workers->jobs->update($job);
+            $this->basepackages->workers->jobs->update($job, false);
         }
     }
 
@@ -56,7 +56,7 @@ class Functions extends BasePackage
 
             $task['via_job'] = 1;
 
-            $this->basepackages->workers->tasks->updateTask($task);
+            $this->basepackages->workers->tasks->updateTask($task, false);
         }
     }
 
@@ -80,7 +80,7 @@ class Functions extends BasePackage
                 $job['response_data'] = Json::encode($packagesData->responseData);
             }
 
-            $this->basepackages->workers->jobs->update($job);
+            $this->basepackages->workers->jobs->update($job, false);
         }
     }
 }

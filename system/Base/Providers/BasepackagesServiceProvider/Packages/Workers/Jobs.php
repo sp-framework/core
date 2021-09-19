@@ -68,7 +68,7 @@ class Jobs extends BasePackage
 
     public function addJob(array $data)
     {
-        if ($this->add($data)) {
+        if ($this->add($data, false)) {
             $this->addResponse('Added job', 0, null, true);
 
             return true;
