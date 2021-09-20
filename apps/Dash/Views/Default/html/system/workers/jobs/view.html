@@ -5,6 +5,8 @@
         {% set cardType = 'danger' %}
     {% elseif job['status'] == 3 %}
         {% set cardType = 'success' %}
+    {% elseif job['status'] == 5 %}
+        {% set cardType = 'warning' %}
     {% else %}
         {% set cardType = 'secondary' %}
     {% endif %}

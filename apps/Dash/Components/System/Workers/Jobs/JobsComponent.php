@@ -70,7 +70,11 @@ class JobsComponent extends BaseComponent
             $controlActions,
             ['task_id'=>'task', 'worker_id'=>'worker'],
             $replaceColumns,
-            'id'
+            'id',
+            null,
+            false,
+            null,
+            true
         );
 
         $this->view->pick('jobs/list');
@@ -99,6 +103,8 @@ class JobsComponent extends BaseComponent
             $data['status'] = '<span class="badge badge-success text-uppercase">Success</span>';
         } else if ($data['status'] == '4') {
             $data['status'] = '<span class="badge badge-danger text-uppercase">Error!</span>';
+        } else if ($data['status'] == '5') {
+            $data['status'] = '<span class="badge badge-warning text-uppercase">Rescheduled!</span>';
         }
 
         return $data;

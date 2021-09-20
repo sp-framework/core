@@ -97,7 +97,10 @@ class TasksComponent extends BaseComponent
             ['schedule_id' => 'schedule', 'is_on_demand' => 'Runs On Demand'],
             $replaceColumns,
             'name',
-            $dtAdditionControlButtons
+            $dtAdditionControlButtons,
+            false,
+            null,
+            true
         );
 
         $this->view->pick('tasks/list');

@@ -45,11 +45,11 @@ class Workers extends BasePackage
 
     public function init(bool $resetCache = false)
     {
-        $this->workers = (new WorkersWorkers())->init();
+        $this->workers = (new WorkersWorkers())->init(true);
 
-        $this->schedules = (new Schedules())->init();
+        $this->schedules = (new Schedules())->init(true);
 
-        $this->tasks = (new Tasks())->init();
+        $this->tasks = (new Tasks())->init(true);
 
         $this->jobs = (new Jobs())->init();
 
@@ -80,6 +80,7 @@ class Workers extends BasePackage
         // 2 - Running
         // 3 - Success
         // 4 - Error
+        // 5 - Warning
 
 
         // if (!$this->checkIdleWorkers()) {
@@ -130,7 +131,7 @@ class Workers extends BasePackage
         $this->scheduler->run();
         // var_dump('done');
         $failedJobs = $this->scheduler->getFailedJobs();
-        // var_dump($failedJobs);
+        // var_dump($failedJobs);die();
         if (count($failedJobs) > 0) {
             foreach ($failedJobs as $failedJobKey => $failedJob) {
                 $id = $failedJob->getJob()->getId();
@@ -448,11 +449,13 @@ class Workers extends BasePackage
         if ($newJob['worker_id'] == '0') {
             $newJob['run_on']               =  '-';
             $newJob['type']                 =  0;
-            $newJob['status']               =  4;//Error
+            $newJob['status']               =  5;//Warning
             $newJob['execution_time']       =  '0.000';
             $newJob['response_code']        =  '1';
-            $newJob['response_message']     =  'No Worker Available. Reschedule task to run on different time or add more workers.';
+            $newJob['response_message']     =  'Task rescheduled for next run as no worker was available. Add more workers to avoid this situation.';
             $newJob['response_data']        =  '';
+
+            $this->tasks->forceNextRun($task);
 
             $this->jobs->updateJob($newJob);
 
@@ -573,7 +576,7 @@ class Workers extends BasePackage
 
     protected function checkIdleWorkers()
     {
-        $this->workers = (new WorkersWorkers())->init();
+        $this->workers = (new WorkersWorkers())->init(true);
 
         $idleWorkers = $this->workers->init()->getIdleWorkers();
 
