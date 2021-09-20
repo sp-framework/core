@@ -337,14 +337,14 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-contact_phone'           : {
             afterInit: function() {
-                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                Inputmask({mask:"9{1,4}-9{1,4}-9{1,10}", greedy: false})
                     .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_phone'));
             }
         },
         '{{componentId}}-{{sectionId}}-contact_phone_ext'       : { },
         '{{componentId}}-{{sectionId}}-contact_fax'             : {
             afterInit: function() {
-                Inputmask({mask:"9{1,3}-9{1,3}-9{1,10}", greedy: false})
+                Inputmask({mask:"9{1,4}-9{1,4}-9{1,10}", greedy: false})
                     .mask(document.getElementById('{{componentId}}-{{sectionId}}-contact_fax'));
             }
         },
