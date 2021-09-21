@@ -286,16 +286,18 @@ class Contacts extends BasePackage
 
         if ($files && is_array($files) && count($files) > 0) {
             if (count($files) < $count) {
-                $count = count($files);
+                $filesCount = count($files);
 
                 $this->scheduleChildrenTasks = false;
             } else {
+                $filesCount = $count;
+
                 $this->scheduleChildrenTasks = true;
 
                 $processFiles = true;
             }
 
-            for ($fileCount = 0; $fileCount < $count; $fileCount++) {
+            for ($fileCount = 0; $fileCount < $filesCount; $fileCount++) {
                 try {
                     $contact = $this->localContent->read($files[$fileCount]);
 
@@ -337,6 +339,10 @@ class Contacts extends BasePackage
                         }
 
                         $this->skippedIds[$contact['ContactID']] = 'Skipped - Error: ' . $this->escaper->escapeHtml($e->getMessage());
+
+                        $contact['lock'] = false;
+
+                        $this->writeJsonFile($contact);
                     }
                 } catch (FilesystemException | UnableToReadFile $exception) {
                     throw $exception;
@@ -400,8 +406,12 @@ class Contacts extends BasePackage
 
             $thisContact = $modelToUse->toArray();
         } else {
-            if ($xeroContact->baz_vendor_id) {
+            if (($xeroContact->baz_vendor_id !== null || $xeroContact->baz_customer_id !== null) &&
+                ($xeroContact->baz_vendor_id != '0' || $xeroContact->baz_customer_id != '0')
+            ) {
                 $contact['resync_local'] = '1';
+            } else {
+                $contact['resync_local'] = null;
             }
 
             $xeroContact->assign($this->jsonData($contact));
@@ -429,12 +439,6 @@ class Contacts extends BasePackage
         //@todo - This can be done on demand from the customer/accounting app.
         if ($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '0') {
             return true;
-        } else if ($contact['IsCustomer'] == '1') {
-            if (!isset($contact['EmailAddress']) ||
-                (isset($contact['EmailAddress']) && $contact['EmailAddress'] === '')
-            ) {
-                return true;
-            }
         }
 
         if (isset($contact['HasAttachments']) && $contact['HasAttachments'] == true) {
@@ -648,20 +652,37 @@ class Contacts extends BasePackage
 
         $xeroContact = $model::find(
             [
-                'conditions'    => 'baz_vendor_id IS NULL AND baz_customer_id IS NULL OR resync_local = :rl:',
+                'conditions'    => 'resync_local = :rl:',
                 'bind'          =>
                     [
                         'rl'    => '1',
-                    ]
+                    ],
+                'limit'         => $count
             ]
         );
 
-        if ($xeroContact) {
+        if ($xeroContact->count() < $count) {
+            $xeroContact = $model::find(
+                [
+                    'conditions'    => 'baz_vendor_id IS NULL AND baz_customer_id IS NULL OR resync_local = :rl:',
+                    'bind'          =>
+                        [
+                            'rl'    => '1',
+                        ],
+                    'limit'         => $count,
+                    'order'         => 'resync_local desc, id'
+                ]
+            );
+        }
+
+        if ($xeroContact && $xeroContact->count() > 0) {
             if ($xeroContact->count() < $count) {
-                $count = $xeroContact->count();
+                $contactsCount = $xeroContact->count();
 
                 $this->scheduleChildrenTasks = false;
             } else {
+                $contactsCount = $count;
+
                 $this->scheduleChildrenTasks = true;
             }
 
@@ -680,8 +701,8 @@ class Contacts extends BasePackage
             $customerErrors = [];
             $vendorErrors = [];
 
-            for ($fileCount = 0; $fileCount < $count; $fileCount++) {
-                $contact = $contacts[$fileCount];
+            for ($contactCount = 0; $contactCount < $contactsCount; $contactCount++) {
+                $contact = $contacts[$contactCount];
 
                 if ($contact['IsCustomer'] == '0' && $contact['IsSupplier'] == '0') {
                     $this->skippedIds[$contact['ContactID']] = 'Skipped - Contact is not customer or supplier as per xero.';
@@ -852,6 +873,8 @@ class Contacts extends BasePackage
             if (count($vendorErrors) > 0) {
                 $this->vendorsPackage->errorVendor('Errors in vendors. Please check details for more information.', Json::encode($vendorErrors));
             }
+        } else {
+            $this->scheduleChildrenTasks = false;
         }
 
         if ($processFiles) {

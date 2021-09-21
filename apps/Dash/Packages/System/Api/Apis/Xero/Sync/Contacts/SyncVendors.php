@@ -58,7 +58,29 @@ class SyncVendors extends BasePackage
             $vendor['abn'] = '00000000000';
         }
 
-        $vendor['business_name'] = $contact['Name'];
+        $contactName = explode(' ', trim($contact['Name']));
+
+        preg_match_all('/[0].*/', $contact['Name'], $phoneInName);
+
+        if (isset($phoneInName[0]) && count($phoneInName[0]) > 0) {
+            if (isset($phoneInName[0][0])) {
+                $phoneInName = $phoneInName[0][0];
+
+                $vendor['business_name'] = trim(str_replace($phoneInName, '', $contact['Name']));
+
+                $phoneInName = str_replace(' ', '', $phoneInName);
+
+                $vendor['contact_phone'] = $phoneInName;
+            } else {
+                $vendor['contact_phone'] = '0';
+
+                $vendor['business_name'] = $contact['Name'];
+            }
+        } else {
+            $vendor['contact_phone'] = '0';
+
+            $vendor['business_name'] = $contact['Name'];
+        }
 
         $vendor['vendor_group_id'] = '0';
 
@@ -104,7 +126,7 @@ class SyncVendors extends BasePackage
         if ($contact['EmailAddress']) {
             $vendor['email'] = $contact['EmailAddress'];
         } else {
-            $vendor['email'] = 'missing';
+            $vendor['email'] = 'no-reply@' . $this->domains->domains[0]['name'];
         }
 
         $vendor['website'] = $contact['Website'];
@@ -116,23 +138,29 @@ class SyncVendors extends BasePackage
                 $phoneStr = '';
 
                 if ($phone['PhoneCountryCode']) {
-                    $phoneStr .= $phone['PhoneCountryCode'] . '-';
+                    $phoneStr .= $phone['PhoneCountryCode'];
                 }
                 if ($phone['PhoneAreaCode']) {
-                    $phoneStr .= $phone['PhoneAreaCode'] . '-';
+                    $phoneStr .= $phone['PhoneAreaCode'];
                 }
                 if ($phone['PhoneNumber']) {
                     $phoneStr .= $phone['PhoneNumber'];
                 }
 
                 if ($phone['PhoneType'] === 'DEFAULT') {
-                    $vendor['contact_phone'] = $phoneStr;
+                    if (!isset($vendor['contact_phone'])) {//If we grabbed the contact from the Name we dont set his.
+                        $vendor['contact_phone'] = $phoneStr;
+                    } else if ($phoneStr !== '') {
+                        $vendor['contact_other'] .= 'Phone: ' . $phoneStr . ' ';
+                    }
                 } else if ($phone['PhoneType'] === 'DDI') {
                     if ($phoneStr !== '') {
                         $vendor['contact_other'] .= 'Direct: ' . $phoneStr . ' ';
                     }
                 } else if ($phone['PhoneType'] === 'FAX') {
-                    $vendor['contact_fax'] = $phoneStr;
+                    if ($phoneStr !== '') {
+                        $vendor['contact_fax'] = $phoneStr;
+                    }
                 } else if ($phone['PhoneType'] === 'MOBILE') {
                     if ($phoneStr !== '') {
                         $vendor['contact_other'] .= 'Mobile: ' . $phoneStr . ' ';
@@ -143,7 +171,7 @@ class SyncVendors extends BasePackage
             $vendor['contact_other'] = trim($vendor['contact_other']);
         }
 
-        if (!isset($vendor['contact_phone']) ||$vendor['contact_phone'] === '') {
+        if (!isset($vendor['contact_phone']) || $vendor['contact_phone'] === '') {
             $vendor['contact_phone'] = '0';
         }
 
@@ -181,7 +209,7 @@ class SyncVendors extends BasePackage
             }
         }
 
-        if ($vendor['email'] === 'missing') {
+        if ($vendor['email'] === 'no-reply@' . $this->domains->domains[0]['name']) {
             $this->vendor['errors']['vendors'] = array_merge($this->vendor['errors']['vendors'], ['Email missing for vendor - ' . $vendor['business_name']]);
         }
         if ($vendor['abn'] === '00000000000') {

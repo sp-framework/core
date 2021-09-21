@@ -45,18 +45,44 @@ class SyncCustomers extends BasePackage
         if (isset($contact['EmailAddress']) && $contact['EmailAddress'] !== '') {
             $customer['account_email'] = $contact['EmailAddress'];
         } else {
-            $customer['ContactID'] = $contact['ContactID'];
-
-            $this->customer['customer'] = $customer;
-
-            return $this->customer;
+            $customer['account_email'] = 'no-reply@' . $this->domains->domains[0]['name'];
         }
 
-        $customer['first_name'] = $contact['Name'];
-        $customer['last_name'] = $contact['Name'];
-        $customer['full_name'] = $contact['Name'];
-        $customer['contact_mobile'] = '0';
+        $contactName = explode(' ', trim($contact['Name']));
 
+        $customer['first_name'] = $contactName[0];
+        if (count($contactName) !== 1) {
+            unset($contactName[0]);
+        }
+
+        preg_match_all('/[0].*/', $contact['Name'], $phoneInName);
+
+        if (isset($phoneInName[0]) && count($phoneInName[0]) > 0) {
+            if (isset($phoneInName[0][0])) {
+                $phoneInName = $phoneInName[0][0];
+
+                $customer['last_name'] =
+                    trim(str_replace($customer['first_name'], '', str_replace($phoneInName, '', $contact['Name'])));
+
+                $phoneInName = str_replace(' ', '', $phoneInName);
+
+                $customer['contact_mobile'] = $phoneInName;
+            } else {
+                $customer['contact_mobile'] = '0';
+
+                $customer['last_name'] = implode(' ', $contactName);
+            }
+        } else {
+            $customer['contact_mobile'] = '0';
+
+            $customer['last_name'] = implode(' ', $contactName);
+        }
+
+        if ($customer['last_name'] === '') {
+            $customer['last_name'] = $customer['first_name'];
+        }
+
+        $customer['full_name'] = trim($customer['first_name'] . ' ' . $customer['last_name']);
         $customer['customer_group_id'] = '0';
 
         if ($contact['ContactGroups'] && $contact['ContactGroups'] !== '') {
@@ -103,10 +129,10 @@ class SyncCustomers extends BasePackage
                 $phoneStr = '';
 
                 if ($phone['PhoneCountryCode']) {
-                    $phoneStr .= $phone['PhoneCountryCode'] . '-';
+                    $phoneStr .= $phone['PhoneCountryCode'];
                 }
                 if ($phone['PhoneAreaCode']) {
-                    $phoneStr .= $phone['PhoneAreaCode'] . '-';
+                    $phoneStr .= $phone['PhoneAreaCode'];
                 }
                 if ($phone['PhoneNumber']) {
                     $phoneStr .= $phone['PhoneNumber'];
@@ -119,7 +145,9 @@ class SyncCustomers extends BasePackage
                         $customer['contact_other'] .= 'Direct: ' . $phoneStr . ' ';
                     }
                 } else if ($phone['PhoneType'] === 'FAX') {
-                    $customer['contact_fax'] = $phoneStr;
+                    if ($phoneStr !== '') {
+                        $customer['contact_fax'] = $phoneStr;
+                    }
                 } else if ($phone['PhoneType'] === 'MOBILE') {
                     if ($phoneStr !== '') {
                         $customer['contact_other'] .= 'Mobile: ' . $phoneStr . ' ';
@@ -130,11 +158,11 @@ class SyncCustomers extends BasePackage
             $customer['contact_other'] = trim($customer['contact_other']);
         }
 
-        if (!isset($customer['contact_phone']) ||$customer['contact_phone'] === '') {
+        if (!isset($customer['contact_phone']) || $customer['contact_phone'] === '') {
             $customer['contact_phone'] = '0';
         }
 
-        $checkCustomer = $this->customersPackage->checkCustomerDuplicate($customer['account_email']);
+        $checkCustomer = $this->customersPackage->checkCustomerDuplicate(null, $customer['contact_mobile']);
 
         if ($contact['baz_customer_id'] && $contact['baz_customer_id'] != '0' || $checkCustomer) {
             if ($checkCustomer) {
@@ -166,8 +194,11 @@ class SyncCustomers extends BasePackage
             }
         }
 
-        if ($customer['contact_phone'] === '0') {
-            $this->customer['errors']['customers'] = array_merge($this->customer['errors']['customers'], ['Phone missing for customer - ' . $contact['Name']]);
+        if ($customer['account_email'] === 'no-reply@' . $this->domains->domains[0]['name']) {
+            $this->customer['errors']['customers'] = array_merge($this->customer['errors']['customers'], ['Email missing for customer - ' . $contact['Name']]);
+        }
+        if ($customer['contact_mobile'] === '0') {
+            $this->customer['errors']['customers'] = array_merge($this->customer['errors']['customers'], ['Mobile missing for customer - ' . $contact['Name']]);
         }
 
         if ($contact['HasAttachments'] == '1') {
@@ -302,7 +333,9 @@ class SyncCustomers extends BasePackage
 
                         if (count($stateData) > 0) {
                             foreach ($stateData as $stateKey => $state) {
-                                if (strtolower($state['state_code']) === strtolower($address['Region'])) {
+                                if (strtolower($state['state_code']) === strtolower($address['Region']) ||
+                                    strtolower($state['name']) === strtolower($address['Region'])
+                                ) {
                                     $foundState = $state;
                                     break;
                                 }
@@ -312,7 +345,7 @@ class SyncCustomers extends BasePackage
 
                     if (!$foundState) {
                         $newState['name'] = $address['Region'];
-                        $newState['state_code'] = substr($address['Region'], 0, 3);
+                        $newState['state_code'] = strtoupper(substr($address['Region'], 0, 3));
                         $newState['user_added'] = '1';
                         $newState['country_id'] = $newAddress['country_id'];
 
