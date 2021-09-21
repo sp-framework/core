@@ -263,15 +263,43 @@ class Customers extends BasePackage
         $this->modelToUse = CrmsCustomers::class;
     }
 
-    public function checkCustomerDuplicate($email)
+    public function checkCustomerDuplicate(string $email = null, string $mobile = null)
     {
+        if ($email && $mobile === null) {
+            $email = explode('@', $email)[0];
+
+            if (strtolower($email) === 'no-reply') {
+                return false;
+            }
+
+            $condition = 'contact_mobile = :email:';
+
+            $bind = ['email' => $email];
+        } else if (!$email && $mobile !== null) {
+            if ($mobile == '0') {
+                return false;
+            }
+
+            $condition = 'contact_mobile = :mobile:';
+
+            $bind = ['mobile' => $mobile];
+        } else if ($email && $mobile !== null) {
+            if (strtolower($email) === 'no-reply') {
+                return false;
+            }
+            if ($mobile == '0') {
+                return false;
+            }
+
+            $condition = 'contact_mobile = :email: AND contact_mobile = :mobile:';
+
+            $bind = ['email' => $email, 'mobile' => $mobile];
+        }
+
         return $this->modelToUse::findFirst(
             [
-                'conditions'    => 'account_email = :email:',
-                'bind'          =>
-                [
-                    'email'      => $email
-                ]
+                'conditions'    => $condition,
+                'bind'          => $bind
             ]
         );
     }
