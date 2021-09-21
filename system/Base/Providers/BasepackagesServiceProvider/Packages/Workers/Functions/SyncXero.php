@@ -173,6 +173,17 @@ class SyncXero extends Functions
 //         }
 //     }
 // }
+// {
+//     "process": "contacts",
+//     "method": "sync",
+//     "1":
+//     {
+//         "Contacts":
+//         {
+//             "ContactID": ["40aa7206-dbd0-446c-b7a6-c05496ba5862"]
+//         }
+//     }
+// }
 // Contacts SyncData -
 // {
 //     "method": "syncFromData"
@@ -182,3 +193,6 @@ class SyncXero extends Functions
 //     "process": "contactGroups",
 //     "method": "sync"
 // }
+
+// {"process":"contacts","method":"sync","1":{"Contacts":{"modifiedSince":"2021-09-19 00:00:00"}}}
+// {"process":"contacts","method":"sync","1":{"Contacts":{"ContactID":["3c3e4b8f-6fff-4d05-b4eb-aac8d2ec6671"]}}}
