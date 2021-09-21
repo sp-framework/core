@@ -99,7 +99,20 @@ class CitiesComponent extends BaseComponent
      */
     public function addAction()
     {
-        //
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->geoCities->addCity($this->postData());
+
+            $this->addResponse(
+                $this->geoCities->packagesData->responseMessage,
+                $this->geoCities->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
     }
 
     /**
@@ -114,14 +127,12 @@ class CitiesComponent extends BaseComponent
 
             $this->geoCities->updateCity($this->postData());
 
-            $this->view->responseCode = $this->geoCities->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->geoCities->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->geoCities->packagesData->responseMessage,
+                $this->geoCities->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -143,9 +154,7 @@ class CitiesComponent extends BaseComponent
                     $this->view->cities = $this->basepackages->geoCities->packagesData->cities;
                 }
             } else {
-                $this->view->responseCode = 1;
-
-                $this->view->responseMessage = 'search query missing';
+                $this->addResponse('Search Query Missing', 1);
             }
         }
     }
