@@ -32,5 +32,7 @@ class BasepackagesUsersAccountsSecurity extends BaseModel
             BasepackagesUsersAccounts::class,
             'id'
         );
+
+        parent::initialize();
     }
 }

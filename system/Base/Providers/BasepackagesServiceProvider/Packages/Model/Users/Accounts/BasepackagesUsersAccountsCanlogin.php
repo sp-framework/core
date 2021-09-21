@@ -22,5 +22,7 @@ class BasepackagesUsersAccountsCanlogin extends BaseModel
             BasepackagesUsersAccounts::class,
             'id'
         );
+
+        parent::initialize();
     }
 }

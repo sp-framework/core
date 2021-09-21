@@ -22,5 +22,7 @@ class BasepackagesUsersAccountsTunnels extends BaseModel
             BasepackagesUsersAccounts::class,
             'id'
         );
+
+        parent::initialize();
     }
 }

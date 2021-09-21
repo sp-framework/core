@@ -467,7 +467,7 @@ class Accounts extends BasePackage
 
     public function checkAccountByEmail(string $email, $getSecurity = false)
     {
-        $this->getFirst('email', $email);
+        $this->getFirst('email', $email, true);
 
         if ($this->model) {
             $account = $this->model->toArray();
@@ -718,7 +718,10 @@ class Accounts extends BasePackage
             if ($agentObj) {
                 $removed = true;
                 foreach ($agentObj as $agent) {
-                    if ($agent->session_id !== $this->session->getId()) {
+                    if ($agent->session_id !== $this->session->getId() ||
+                        ($agent->session_id === $this->session->getId() &&
+                         $agent->verified == '0')
+                    ) {
                         $sessionObj = $sessionModel::findFirstBysession_id($agent->session_id);
 
                         if ($sessionObj) {

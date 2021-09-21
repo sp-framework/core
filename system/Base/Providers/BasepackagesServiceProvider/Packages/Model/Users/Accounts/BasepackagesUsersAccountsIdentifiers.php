@@ -21,10 +21,12 @@ class BasepackagesUsersAccountsIdentifiers extends BaseModel
 
     public function initialize()
     {
-        $this->belongsTo(
+        self::$modelRelations['security']['relationObj'] = $this->belongsTo(
             'session_id',
             BasepackagesUsersAccountsSessions::class,
             'session_id'
         );
+
+        parent::initialize();
     }
 }

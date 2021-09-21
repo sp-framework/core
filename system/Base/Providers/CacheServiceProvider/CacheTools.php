@@ -2,6 +2,8 @@
 
 namespace System\Base\Providers\CacheServiceProvider;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\UnableToReadFile;
 use Phalcon\Helper\Json;
 
 class CacheTools
@@ -255,8 +257,11 @@ class CacheTools
 			$this->index = $index;
 
 			return $index;
-		} catch (\Exception $e) {
-			if (str_contains($e->getMessage(), "json_decode")) {
+		} catch (FilesystemException | UnableToReadFile | \Exception $e) {
+			if (str_contains($e->getMessage(), "json_decode") ||
+				get_class($e) !== 'FilesystemException' ||
+				get_class($e) !== 'UnableToReadFile'
+			) {
 				$this->createIndexFile($cacheName, true);
 
 				return $this->getIndex($cacheName);

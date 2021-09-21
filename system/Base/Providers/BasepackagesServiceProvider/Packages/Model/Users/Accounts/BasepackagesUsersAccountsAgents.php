@@ -28,5 +28,7 @@ class BasepackagesUsersAccountsAgents extends BaseModel
             BasepackagesUsersAccountsSessions::class,
             'session_id'
         );
+
+        parent::initialize();
     }
 }
