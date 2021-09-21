@@ -83,7 +83,7 @@ abstract class BasePackage extends Controller
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
 		if ($id) {
-			if ($enableCache && $this->cacheName) {
+			if (!$resetCache && $enableCache && $this->cacheName) {
 				$parameters = $this->paramsWithCache($this->getIdParams($id), $this->cacheName);
 			} else {
 				$parameters = $this->getIdParams($id);
@@ -113,7 +113,7 @@ abstract class BasePackage extends Controller
 			$params = $this->getParams($by, $value);
 		}
 
-		if ($enableCache && $this->cacheName) {
+		if (!$resetCache && $enableCache && $this->cacheName) {
 			$parameters = $this->paramsWithCache($params);
 		} else {
 			$parameters = $params;
@@ -148,7 +148,7 @@ abstract class BasePackage extends Controller
 	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
 	{
 		if (isset($params['conditions'])) {
-			if ($enableCache && $this->cacheName) {
+			if (!$resetCache && $enableCache && $this->cacheName) {
 				$parameters = $this->paramsWithCache($params);
 			} else {
 				$parameters = $params;
@@ -413,7 +413,7 @@ abstract class BasePackage extends Controller
 		}
 
 		$data = $this->getByParams($params, $resetCache, $enableCache);
-		// die();
+
 		if ($data) {
 			$pageParams['data'] = $data;
 		} else {
