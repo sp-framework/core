@@ -6093,7 +6093,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
                         if (dataType == 0) {
                             query = '-:' + selectedId + ':equals:' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
-                        } else if (dataType == 2) {
+                        } else {
                             query = '-:' + selectedId + ':like:%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
                         }
 
