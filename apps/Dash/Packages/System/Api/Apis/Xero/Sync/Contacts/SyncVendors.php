@@ -289,9 +289,7 @@ class SyncVendors extends BasePackage
                                 $newAddress['state_name'] = $city['state_name'];
                                 $newAddress['country_id'] = $city['country_id'];
                                 $newAddress['country_name'] = $city['country_name'];
-                            }
 
-                            if ($found) {
                                 break;
                             }
                         }
@@ -350,15 +348,22 @@ class SyncVendors extends BasePackage
                     //State (Region in Xero Address)
                     $foundState = null;
 
-                    if ($this->basepackages->geoStates->searchStatesByCode($address['Region'], true)) {
-                        $stateData = $this->basepackages->geoStates->packagesData->states;
+                    $stateData = null;
 
-                        if (count($stateData) > 0) {
-                            foreach ($stateData as $stateKey => $state) {
-                                if (strtolower($state['state_code']) === strtolower($address['Region'])) {
-                                    $foundState = $state;
-                                    break;
-                                }
+                    if ($this->basepackages->geoStates->searchStates($address['Region'], true)) {
+                        $stateData = $this->basepackages->geoStates->packagesData->states;
+                    }
+                    if (!$stateData && $this->basepackages->geoStates->searchStatesByCode($address['Region'], true)) {
+                        $stateData = $this->basepackages->geoStates->packagesData->states;
+                    }
+
+                    if ($stateData && is_array($stateData) && count($stateData) > 0) {
+                        foreach ($stateData as $stateKey => $state) {
+                            if (strtolower($state['state_code']) === strtolower($address['Region']) ||
+                                strtolower($state['name']) === strtolower($address['Region'])
+                            ) {
+                                $foundState = $state;
+                                break;
                             }
                         }
                     }
