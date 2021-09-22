@@ -300,7 +300,7 @@ class SyncCustomers extends BasePackage
                         $newCountry['enabled'] = '1';
                         $newCountry['user_added'] = '1';
 
-                        if ($this->basepackages->geoCountries->add($newCountry)) {
+                        if ($this->basepackages->geoCountries->addCountry($newCountry)) {
                             $newAddress['country_id'] = $this->basepackages->geoCountries->packagesData->last['id'];
                             $newAddress['country_name'] = $newCountry['name'];
                         } else {
@@ -349,7 +349,7 @@ class SyncCustomers extends BasePackage
                         $newState['user_added'] = '1';
                         $newState['country_id'] = $newAddress['country_id'];
 
-                        if ($this->basepackages->geoStates->add($newState)) {
+                        if ($this->basepackages->geoStates->addState($newState)) {
                             $newAddress['state_id'] = $this->basepackages->geoStates->packagesData->last['id'];
                             $newAddress['state_name'] = $newState['name'];
                         } else {
@@ -369,7 +369,7 @@ class SyncCustomers extends BasePackage
                     $newCity['country_id'] = $newAddress['country_id'];
                     $newCity['user_added'] = '1';
 
-                    if ($this->basepackages->geoCities->add($newCity)) {
+                    if ($this->basepackages->geoCities->addCity($newCity)) {
                         $newAddress['city_id'] = $this->basepackages->geoCities->packagesData->last['id'];
                         $newAddress['city_name'] = $newCity['name'];
                     } else {
