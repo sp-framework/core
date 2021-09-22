@@ -125,7 +125,9 @@ class Pusher extends BasePackage implements WampServerInterface
 
         $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
 
-        $this->account = $this->accountsObj->toArray();
+        if ($this->accountsObj) {
+            $this->account = $this->accountsObj->toArray();
+        }
 
         if (!$this->account) {
             return false;
