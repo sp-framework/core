@@ -119,6 +119,10 @@ abstract class BasePackage extends Controller
 			$parameters = $params;
 		}
 
+		if ($resetCache) {
+			$this->resetCache();
+		}
+
 		try {
 			$this->model = $modelToUse::findFirst($parameters);
 
@@ -178,6 +182,9 @@ abstract class BasePackage extends Controller
 				}
 			}
 
+			if ($resetCache) {
+				$this->resetCache();
+			}
 			// if (isset($parameters['cache']['key'])) {
 				// $cachedModel = $this->cacheTools->getCache($parameters['cache']['key']);
 
@@ -410,6 +417,10 @@ abstract class BasePackage extends Controller
 						'order'	=> $this->request->getPost()['order']
 					]
 				);
+		}
+
+		if (isset($this->request->getPost()['resetCache']) && $this->request->getPost()['resetCache'] == 'true') {
+			$resetCache = true;
 		}
 
 		$data = $this->getByParams($params, $resetCache, $enableCache);

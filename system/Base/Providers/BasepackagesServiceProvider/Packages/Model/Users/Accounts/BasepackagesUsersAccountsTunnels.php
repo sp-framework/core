@@ -17,7 +17,7 @@ class BasepackagesUsersAccountsTunnels extends BaseModel
 
     public function initialize()
     {
-        $this->belongsTo(
+        self::$modelRelations['account']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id'

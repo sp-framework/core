@@ -1645,6 +1645,20 @@
                         });
                     });
                 });
+
+                if ($('.reset-cache').length === 1) {
+                    $('.reset-cache').off();
+                    $('.reset-cache').click(function(e) {
+                        e.preventDefault();
+
+                        that._filterRunAjax(
+                            1,
+                            datatableOptions.paginationCounters.limit,
+                            query,
+                            true
+                        );
+                    });
+                }
                 $('body').trigger('sectionWithListingEventsRegistered');
             }
 
@@ -1671,7 +1685,7 @@
                 }
             }
 
-            _proto._filterRunAjax = function(page = null, limit = null, filterQuery = null) {
+            _proto._filterRunAjax = function(page = null, limit = null, filterQuery = null, resetCache = false) {
                 if (!page) {
                     page = datatableOptions.paginationCounters.current;
                 }
@@ -1694,6 +1708,10 @@
                     postData['order'] = filterQuery.order;
                 } else {
                     postData['conditions'] = filterQuery;
+                }
+
+                if (resetCache) {
+                    postData['resetCache'] = 'true';
                 }
 
                 that._runDatatableAjax(postData, true);

@@ -27,7 +27,7 @@ class BasepackagesUsersAccountsSecurity extends BaseModel
 
     public function initialize()
     {
-        $this->belongsTo(
+        self::$modelRelations['accounts']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id'

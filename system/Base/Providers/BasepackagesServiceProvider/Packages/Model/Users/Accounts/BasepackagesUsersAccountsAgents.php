@@ -23,7 +23,7 @@ class BasepackagesUsersAccountsAgents extends BaseModel
 
     public function initialize()
     {
-        $this->belongsTo(
+        self::$modelRelations['sessions']['relationObj'] = $this->belongsTo(
             'session_id',
             BasepackagesUsersAccountsSessions::class,
             'session_id'

@@ -111,32 +111,37 @@ class Card extends AdminLTETags
                     $tools .= '<div class="section-navigators"></div>';
                 } else if ($tool === "jstreeTools") {
                     $tools .=
-                        '<button type="button" id="collapseTreeCards" class="btn btn-tool">
+                        '<button type="button" id="collapseTreeCards" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Close All">
                             <i class="fas fa-fw fa-compress-arrows-alt"></i>
                         </button>
-                        <button type="button" id="expandTreeCards" class="btn btn-tool">
+                        <button type="button" id="expandTreeCards" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Open All">
                             <i class="fas fa-fw fa-expand-arrows-alt"></i>
                         </button>';
                 } else if ($tool === "refresh") {
                     $tools .=
-                        '<button type="button" class="btn btn-tool" data-card-widget="refresh"' . $cardRefreshSource . ' ' . $cardRefreshParams . ' ' . $cardRefreshDataType . ' ' . $cardRefreshMethod . ' ' . $cardRefreshSourceSelector . '>
+                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Refresh" data-card-widget="refresh"' . $cardRefreshSource . ' ' . $cardRefreshParams . ' ' . $cardRefreshDataType . ' ' . $cardRefreshMethod . ' ' . $cardRefreshSourceSelector . '>
                             <i class="fas fa-fw fa-sync-alt"></i>
                         </button>';
                 } else if ($tool === "maximize") {
                     $tools .=
-                        '<button type="button" class="btn btn-tool" data-card-widget="maximize">
+                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Maximize" data-card-widget="maximize">
                             <i class="fas fa-fw fa-expand"></i>
+                        </button>';
+                } else if ($tool === "reset") {
+                    $tools .=
+                        '<button type="button" class="btn btn-tool reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
+                            <i class="fas fa-fw fa-database"></i>
                         </button>';
                 } else if (!isset($this->params['cardCollapsed']) ||
                            ($this->params['cardCollapsed'] === false && $tool === "collapse")
                 ) {
                     $tools .=
-                        '<button type="button" class="btn btn-tool" data-card-widget="collapse">
+                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Collapse" data-card-widget="collapse">
                             <i class="fas fa-fw fa-minus"></i>
                         </button>';
                 } else if ($tool === "remove") {
                     $tools .=
-                        '<button type="button" class="btn btn-tool" data-card-widget="remove">
+                        '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Remove" data-card-widget="remove">
                             <i class="fas fa-fw fa-times"></i>
                         </button>';
                 }

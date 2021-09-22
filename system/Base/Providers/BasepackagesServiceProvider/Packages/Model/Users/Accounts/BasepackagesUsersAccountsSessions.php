@@ -19,13 +19,13 @@ class BasepackagesUsersAccountsSessions extends BaseModel
 
     public function initialize()
     {
-        $this->belongsTo(
+        self::$modelRelations['accounts']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id'
         );
 
-        $this->hasOne(
+        self::$modelRelations['identifiers']['relationObj'] = $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsIdentifiers::class,
             'session_id',
@@ -34,7 +34,7 @@ class BasepackagesUsersAccountsSessions extends BaseModel
             ]
         );
 
-        $this->hasOne(
+        self::$modelRelations['sessions']['relationObj'] = $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsAgents::class,
             'session_id'
