@@ -184,6 +184,7 @@ var BazContentLoader = function() {
                     response = null;
                     window.location = xhr.getResponseHeader('REDIRECT_URL');
                 } else {
+                    dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
                     // console.log(xhr.getAllResponseHeaders()); //trying to get page last edit for storing data locally
                     if (options.ajaxSetTitle) {
                         var titlePart = response.split("title>"); //dirty little trick to get an html element
@@ -216,7 +217,6 @@ var BazContentLoader = function() {
                     }
                     // Reset counter after page load complete to accommodate new links (if any)
                     init(options);
-                    dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
 
                     $('body').trigger('bazContentLoaderAjaxComplete');
 
@@ -265,6 +265,8 @@ var BazContentLoader = function() {
                 if (xhr.getResponseHeader('NEED_AUTH') === '1') {
                     window.location = xhr.getResponseHeader('REDIRECT_URL');
                 } else {
+                    dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
+
                     if (status == "success") {
                         // BAZ Template Not Found
                         var template = /^Error: can't load template.*$/;
@@ -287,7 +289,6 @@ var BazContentLoader = function() {
                     }
                     // Reset counter after page load complete to accommodate new links (if any)
                     init(options);
-                    dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
                     // Trigger Modal Complete
                     $('body').trigger('bazContentLoaderModalComplete');
 
@@ -568,6 +569,7 @@ var BazCore = function() {
                                                 bazUpdateBreadcrumb();
                                                 toolTipsAndPopovers();
                                                 $("#loader").attr('hidden', true);
+                                                openMenu();
                                             },
             'ajaxError'                     : function () {
                                                 bazUpdateBreadcrumb();

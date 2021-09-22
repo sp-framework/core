@@ -90,7 +90,6 @@
                             'title'                   : 'Subscriptions',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
-                            'icon'                    : 'cog',
                             'buttonAdditionalClass'   : 'contentAjaxLink',
                             'position'                : 'right',
                             'url'                     : links.url('system/users/profile')
@@ -119,16 +118,16 @@
     ]
 )}}
 <script>
-/* globals Swal PNotify BazContentLoader BazNotifications */
+/* globals Swal PNotify BazCore BazNotifications */
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterTableInit"] = function() {
     initFuncs();
     mark();
-    BazContentLoader.init();
+    BazCore.bazContent();
 }
 window["dataCollection"]["{{componentId}}"]["{{componentId}}-listing"]["customFunctions"]["afterRedraw"] = function() {
     initFuncs();
     mark();
-    BazContentLoader.init();
+    BazCore.bazContent();
 }
 
 function mark() {

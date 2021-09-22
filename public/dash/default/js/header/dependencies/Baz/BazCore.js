@@ -200,6 +200,7 @@ var BazCore = function() {
                                                 bazUpdateBreadcrumb();
                                                 toolTipsAndPopovers();
                                                 $("#loader").attr('hidden', true);
+                                                openMenu();
                                             },
             'ajaxError'                     : function () {
                                                 bazUpdateBreadcrumb();
