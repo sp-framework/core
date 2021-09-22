@@ -19,6 +19,7 @@ var BazNotifications = function() {
     var initialized = false;
     var pullNotifications = false;
     var appRoute;
+    var promiseInit = false;
     // Error
     // function error(errorMsg) {
     //     throw new Error(errorMsg);
@@ -51,6 +52,7 @@ var BazNotifications = function() {
 
         //eslint-disable-next-line
         console.log('Notification service online');
+
         initPullNotifications(false);
     }
 
@@ -61,6 +63,7 @@ var BazNotifications = function() {
 
         //eslint-disable-next-line
         console.log('Notification service offline');
+
         initPullNotifications(true);
     }
 
@@ -78,22 +81,27 @@ var BazNotifications = function() {
             }
 
             if (response.responseCode == 0 && response.responseData) {
-                if (!Number.isInteger(response.responseData.count)) {
-                    parseInt(response.responseData.count);
+                if (!Number.isInteger(response.responseData.count.total)) {
+                    parseInt(response.responseData.count.total);
                 }
 
-                if (response.responseData.count === window.dataCollection.env.notifications.count) {
-                    return;
-                } else if (response.responseData.count < window.dataCollection.env.notifications.count) {
+                if (window.dataCollection.env.notifications.count) {
+                    if (response.responseData.count.total === window.dataCollection.env.notifications.count.total) {
+                        return;
+                    } else if (response.responseData.count.total < window.dataCollection.env.notifications.count.total) {
+                        window.dataCollection.env.notifications.count.total = response.responseData.count.total;
+                        updateCounter(response);
+                        return;
+                    }
+
+                    window.dataCollection.env.notifications.count.total = response.responseData.count.total;
+                    updateCounter(response);
+                } else {
                     window.dataCollection.env.notifications.count = response.responseData.count;
                     updateCounter(response);
-                    return;
                 }
 
-                window.dataCollection.env.notifications.count = response.responseData.count;
-                updateCounter(response);
-
-                if (response.responseData.count > 0 && !response.responseData.mute) {
+                if (response.responseData.count.total > 0 && !response.responseData.mute) {
                     window.dataCollection.env.sounds.notificationSound.play();
                 }
             }
@@ -133,23 +141,26 @@ var BazNotifications = function() {
     }
 
     function initPullNotifications(offline) {
-        // $(document).ready(function() {
-            // getNotificationsCount();
-        // });
-        if (offline) {
+        //eslint-disable-next-line
+        console.log(promiseInit);
+        if (offline && !promiseInit) {
+            //eslint-disable-next-line
+            console.log('promiseInit');
             BazHelpers.interval(
                 async(iteration, stop) => {
                     //eslint-disable-next-line
                     console.log(BazNotifications.getPullNotifications());
                     if (!BazNotifications.getPullNotifications()) {
+                        BazNotifications.setPromiseInit(false);
                         stop();
                     } else {
                         BazNotifications.getNotificationsCount();
                     }
                 },
-                100000
+                10000
             );
 
+            promiseInit = true;
         }
 
         pullNotifications = offline;
@@ -157,6 +168,10 @@ var BazNotifications = function() {
 
     function getPullNotifications() {
         return pullNotifications;
+    }
+
+    function setPromiseInit(state) {
+        promiseInit = state;
     }
 
     function shakeNotificationsButton() {
@@ -207,6 +222,9 @@ var BazNotifications = function() {
         }
         BazNotifications.getPullNotifications = function(options) {
             return getPullNotifications(_extends(BazNotifications.defaults, options));
+        }
+        BazNotifications.setPromiseInit = function(options) {
+            return setPromiseInit(options);
         }
     }
 

@@ -54,7 +54,8 @@
                 'buttonType'                        : 'DropdownSplitButtons',
                 'dropdownButtonId'                  : 'mark',
                 'dropdownButtonTitle'               : 'Mark selected',
-                'dropdownButtonIcon'                : 'check',
+                'dropdownButtonIcon'                : 'cog fa-spin',
+                'dropdownButtonIconHidden'          : true,
                 'dropdownButtonAdditionalClass'     : 'text-uppercase',
                 'dropdownButtonDisabled'            : true,
                 'buttonPosition'                    : 'right',
@@ -86,7 +87,7 @@
                 'buttons'               :
                     {
                         'subscriptions' : {
-                            'title'                   : 'Manage Subscriptions',
+                            'title'                   : 'Subscriptions',
                             'size'                    : 'sm',
                             'type'                    : 'primary',
                             'icon'                    : 'cog',
@@ -138,6 +139,9 @@ function mark() {
     $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').off();
     $('#{{componentId}}-listing-mark-read, #{{componentId}}-listing-mark-archive, #{{componentId}}-listing-mark-remove').click(function(e) {
         e.preventDefault();
+
+        $('#{{componentId}}-listing-mark').attr('disabled', true);
+        $('#{{componentId}}-listing-mark').children('i').attr('hidden', false);
 
         if ($(this)[0].id === '{{componentId}}-listing-mark-read') {
             url = '{{links.url("system/notifications/markRead")}}'
@@ -199,11 +203,13 @@ function mark() {
                     PNotify.error({
                         title           : response.responseMessage,
                     });
+                    $('#{{componentId}}-listing-mark').attr('disabled', false);
                 }
                 if (response.tokenKey && response.token) {
                     $('#security-token').attr('name', response.tokenKey);
                     $('#security-token').val(response.token);
                 }
+                $('#{{componentId}}-listing-mark').children('i').attr('hidden', true);
             }
         });
     }

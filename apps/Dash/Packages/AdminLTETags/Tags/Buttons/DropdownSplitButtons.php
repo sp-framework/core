@@ -134,13 +134,18 @@ class DropdownSplitButtons
             '';
 
         if (isset($this->params['dropdownButtonIcon']) && isset($this->params['dropdownButtonTitle'])) {
+            if (isset($this->params['dropdownButtonIconHidden']) && $this->params['dropdownButtonIconHidden'] === true) {
+                $dropdownButtonIconHidden = 'hidden';
+            } else {
+                $dropdownButtonIconHidden = '';
+            }
             if (isset($this->params['dropdownButtonIconPosition']) && $this->params['dropdownButtonIconPosition'] === 'after') {
                 $this->buttonParams['dropdownButtonIcon'] =
-                    '<i class="fas fa-fw fa-' . $this->params['dropdownButtonIcon'] . '"></i>';
+                    '<i class="fas fa-fw fa-' . $this->params['dropdownButtonIcon'] . '" ' . $dropdownButtonIconHidden . '></i>';
                 $this->buttonParams['dropdownButtonIconPosition'] = 'after';
             } else {
                 $this->buttonParams['dropdownButtonIcon'] =
-                    '<i class="fas fa-fw fa-' . $this->params['dropdownButtonIcon'] . '"></i>';
+                    '<i class="fas fa-fw fa-' . $this->params['dropdownButtonIcon'] . '" ' . $dropdownButtonIconHidden . '></i>';
                 $this->buttonParams['dropdownButtonIconPosition'] = '';
             }
         } else {
@@ -201,13 +206,18 @@ class DropdownSplitButtons
             '';
 
         if (isset($this->params['splitMainButtonIcon']) && isset($this->params['splitMainButtonTitle'])) {
+            if (isset($this->params['splitMainButtonIconHidden']) && $this->params['splitMainButtonIconHidden'] === true) {
+                $splitMainButtonIconHidden = 'hidden';
+            } else {
+                $splitMainButtonIconHidden = '';
+            }
             if (isset($this->params['splitMainButtonIconPosition']) && $this->params['splitMainButtonIconPosition'] === 'after') {
                 $this->buttonParams['splitMainButtonIcon'] =
-                    '<i class="fas fa-fw fa-' . $this->params['splitMainButtonIcon'] . '"></i>';
+                    '<i class="fas fa-fw fa-' . $this->params['splitMainButtonIcon'] . '" ' . $splitMainButtonIconHidden . '></i>';
                 $this->buttonParams['splitMainButtonIconPosition'] = 'after';
             } else {
                 $this->buttonParams['splitMainButtonIcon'] =
-                    '<i class="fas fa-fw fa-' . $this->params['splitMainButtonIcon'] . '"></i>';
+                    '<i class="fas fa-fw fa-' . $this->params['splitMainButtonIcon'] . '" ' . $splitMainButtonIconHidden . '></i>';
                 $this->buttonParams['splitMainButtonIconPosition'] = '';
             }
         } else {

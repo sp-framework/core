@@ -108,7 +108,9 @@ var BazTunnels = function() {
                     }
                 },
                 function() {
-                    if (!reconnectPusherTunnel) {
+                    //eslint-disable-next-line
+                    console.log(reconnectPusherTunnel);
+                    if (!reconnectPusherTunnel || reconnectPusherTunnel == null) {
                         BazMessenger.serviceOffline();
                         BazNotifications.serviceOffline();
                         BazAnnouncements.serviceOffline();
