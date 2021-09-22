@@ -60,6 +60,8 @@ class Auth
 
     public $packagesData;
 
+    protected $cookieTimeout = 0;
+
     public function __construct(
         $request,
         $config,
@@ -116,6 +118,8 @@ class Auth
     public function init()
     {
         $this->cookieKey = 'remember_' . $this->getKey();
+
+        $this->cookieTimeout = time() + 86400;//Get this time from configuration
 
         return $this;
     }
@@ -184,6 +188,7 @@ class Auth
             null,
             true
         );
+
         $this->cookies->get($this->cookieKey)->setOptions(['samesite'=>'strict']);
 
         $this->cookies->set(
@@ -397,7 +402,7 @@ class Auth
         $this->cookies->set(
             'id',
             $this->account['id'],
-            time() + 86400,
+            $this->cookieTimeout,
             '/',
             null,
             null,
@@ -477,6 +482,36 @@ class Auth
 
     public function hasRecaller()
     {
+        if (!$this->cookies->has($this->cookieKey) && $this->hasUserInSession()) {
+            if (!$this->cookies->has('id')) {
+                $this->setUserIdCooikie();
+            }
+
+            $identifierModel = new BasepackagesUsersAccountsIdentifiers;
+
+            $identifier = $identifierModel::findFirst(
+                [
+                'session_id = :sessionId:',
+                'bind'      => ['sessionId' => $this->session->getId()]
+                ]
+            );
+
+            if ($identifier) {
+                if (!$identifier->delete()) {
+                    $this->logger->log->debug($identifier->getMessages());
+
+                    return false;
+                }
+
+                $this->setRecaller();
+
+                return true;
+            }
+
+
+            return false;
+        }
+
         return $this->cookies->has($this->cookieKey);
     }
 
@@ -487,7 +522,7 @@ class Auth
         $this->cookies->set(
             $this->cookieKey,
             $identifier . $this->separator . $token,
-            time() + 86400,
+            $this->cookieTimeout,
             '/',
             null,
             null,
