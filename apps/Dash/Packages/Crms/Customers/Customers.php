@@ -74,6 +74,9 @@ class Customers extends BasePackage
             $data = $this->updateAddresses($data);
         }
 
+        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        $data['contact_mobile'] = $this->extractNumbers($data['contact_mobile']);
+
         if ($this->add($data)) {
             if (isset($data['portrait'])) {
                 $this->basepackages->storages->changeOrphanStatus($data['portrait']);
@@ -130,6 +133,9 @@ class Customers extends BasePackage
                 $this->deleteAddresses($data['delete_address_ids']);
             }
         }
+
+        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        $data['contact_mobile'] = $this->extractNumbers($data['contact_mobile']);
 
         if ($this->update($data)) {
             if (isset($data['portrait'])) {

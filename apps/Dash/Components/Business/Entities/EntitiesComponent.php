@@ -83,6 +83,9 @@ class EntitiesComponent extends BaseComponent
 
                 $entity = array_merge($entity, $address);
 
+                $entity['contact_phone'] = $this->formatNumbers($entity['contact_phone']);
+                $entity['contact_fax'] = $this->formatNumbers($entity['contact_fax']);
+
                 $this->view->entity = $entity;
 
                 unset($entities[$this->getData()['id']]);

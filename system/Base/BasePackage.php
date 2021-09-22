@@ -1317,4 +1317,9 @@ abstract class BasePackage extends Controller
 
 		return $data;
 	}
+
+	protected function extractNumbers($string)
+	{
+		return preg_replace('/[^0-9]/', '', $string);
+	}
 }

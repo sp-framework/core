@@ -62,6 +62,9 @@ class CustomersComponent extends BaseComponent
                     $customer['contact_referrer_full_name'] = '';
                 }
 
+                $customer['contact_phone'] = $this->formatNumbers($customer['contact_phone']);
+                $customer['contact_mobile'] = $this->formatNumbers($customer['contact_mobile']);
+
                 $this->view->customer = $customer;
             } else {
                 $customer = [];
@@ -142,6 +145,7 @@ class CustomersComponent extends BaseComponent
     {
         foreach ($dataArr as $dataKey => &$data) {
             $data = $this->generateAccountLink($dataKey, $data);
+            $data = $this->formatContactNumbers($dataKey, $data);
         }
 
         return $dataArr;
@@ -156,6 +160,15 @@ class CustomersComponent extends BaseComponent
                 </a>';
         } else {
             $data['account_id'] = '-';
+        }
+
+        return $data;
+    }
+
+    protected function formatContactNumbers($rowId, $data)
+    {
+        if ($data['contact_mobile'] && strlen($data['contact_mobile']) > 1) {
+            $data['contact_mobile'] = $this->formatNumbers($data['contact_mobile']);
         }
 
         return $data;

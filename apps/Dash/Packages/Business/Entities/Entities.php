@@ -85,6 +85,9 @@ class Entities extends BasePackage
 
         $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
 
+        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
+
         if ($this->add($data)) {
 
             if (isset($data['api_id']) &&
@@ -131,6 +134,9 @@ class Entities extends BasePackage
         $data['name'] = $data['business_name'];
 
         $this->basepackages->addressbook->mergeAndUpdate($data);
+
+        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
 
         if ($this->update($data)) {
 

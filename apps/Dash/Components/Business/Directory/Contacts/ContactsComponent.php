@@ -80,6 +80,10 @@ class ContactsComponent extends BaseComponent
                     $contact['contact_referrer_full_name'] = '';
                 }
 
+                $contact['contact_phone'] = $this->formatNumbers($contact['contact_phone']);
+                $contact['contact_mobile'] = $this->formatNumbers($contact['contact_mobile']);
+                $contact['contact_fax'] = $this->formatNumbers($contact['contact_fax']);
+
                 $this->view->contact = $contact;
             } else {
                 $contact = [];
@@ -150,6 +154,7 @@ class ContactsComponent extends BaseComponent
     {
         foreach ($dataArr as $dataKey => &$data) {
             $data = $this->generateAccountLink($dataKey, $data);
+            $data = $this->formatContactNumbers($dataKey, $data);
         }
 
         return $dataArr;
@@ -164,6 +169,15 @@ class ContactsComponent extends BaseComponent
                 </a>';
         } else {
             $data['account_id'] = '-';
+        }
+
+        return $data;
+    }
+
+    protected function formatContactNumbers($rowId, $data)
+    {
+        if ($data['contact_mobile'] && strlen($data['contact_mobile']) > 1) {
+            $data['contact_mobile'] = $this->formatNumbers($data['contact_mobile']);
         }
 
         return $data;

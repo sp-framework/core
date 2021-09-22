@@ -99,6 +99,9 @@ class VendorsComponent extends BaseComponent
                     $vendor['brands'] = Json::decode($vendor['brands'], true);
                 }
 
+                $vendor['contact_phone'] = $this->formatNumbers($vendor['contact_phone']);
+                $vendor['contact_fax'] = $this->formatNumbers($vendor['contact_fax']);
+
                 $this->view->vendor = $vendor;
             } else {
                 $vendor = [];

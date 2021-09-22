@@ -70,6 +70,7 @@ class Employees extends BasePackage
 
             $data['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
         }
+
         if ($this->add($data)) {
             $data['id'] = $this->packagesData->last['id'];
 
@@ -213,6 +214,10 @@ class Employees extends BasePackage
 
         unset($data['id']);
 
+        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        $data['contact_mobile'] = $this->extractNumbers($data['contact_mobile']);
+        $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
+
         $this->add($data);
 
         $this->modelToUse = HrmsEmployees::class;
@@ -233,6 +238,10 @@ class Employees extends BasePackage
 
         if ($contactModel) {
             unset($data['id']);
+
+            $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+            $data['contact_mobile'] = $this->extractNumbers($data['contact_mobile']);
+            $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
 
             $contact = $contactModel->toArray();
 

@@ -92,6 +92,9 @@ class Vendors extends BasePackage
 
         $data = $this->updateAddresses($data);
 
+        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
+
         if ($this->add($data)) {
             $this->basepackages->storages->changeOrphanStatus($data['logo']);
 
@@ -140,6 +143,9 @@ class Vendors extends BasePackage
                 $this->deleteAddresses($data['delete_address_ids']);
             }
         }
+
+        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
 
         if ($this->update($data)) {
             if ($data['is_b2b_customer'] == '0') {

@@ -730,4 +730,42 @@ abstract class BaseComponent extends Controller
 			);
 		}
 	}
+
+	protected function formatNumbers($number, $saperator = '-')
+	{
+		$number = $this->extractNumbers($number);
+
+		if (strlen($number) === 10) {
+			$split = str_split($number, 4);
+			$digits = $split[0];
+			unset($split[0]);
+			$split = implode('', $split);
+			$split = str_split($split, 3);
+			$split = implode($saperator, $split);
+			$digits .= $saperator . $split;
+
+			$number = $digits;
+		} else if (strlen($number) === 11) {//Incl Country Code (AU)
+			$split = str_split($number, 2);
+			$digits = $split[0];
+			unset($split[0]);
+			$split = implode('', $split);
+			$split = str_split($split, 1);
+			$digits .= $saperator . $split[0];
+			unset($split[0]);
+			$split = implode('', $split);
+			$split = str_split($split, 3);
+			$split = implode($saperator, $split);
+			$digits .= $saperator . $split;
+
+			$number = $digits;
+		}
+
+		return $number;
+	}
+
+	protected function extractNumbers($string)
+	{
+		return preg_replace('/[^0-9]/', '', $string);
+	}
 }
