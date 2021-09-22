@@ -754,8 +754,8 @@ abstract class BaseComponent extends Controller
 			$digits .= $saperator . $split[0];
 			unset($split[0]);
 			$split = implode('', $split);
-			$split = str_split($split, 3);
-			$split = implode($saperator, $split);
+			// $split = str_split($split, 4);
+			// $split = implode($saperator, $split);
 			$digits .= $saperator . $split;
 
 			$number = $digits;
