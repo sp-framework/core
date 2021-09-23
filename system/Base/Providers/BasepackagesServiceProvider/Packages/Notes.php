@@ -248,7 +248,7 @@ class Notes extends BasePackage
 
     protected function extractData(array $data)
     {
-        $columns = array_keys($this->getModelsColumnMap());
+        $columns = array_keys($this->getModelsColumnMap()['columns']);
 
         foreach ($data as $key => $value) {
             if (!in_array($key, $columns)) {

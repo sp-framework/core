@@ -158,11 +158,13 @@ abstract class BasePackage extends Controller
 				$parameters = $params;
 			}
 
+			// var_dump($this->getModelsColumnMap());
+
+			$relationColumns = [];
+
 			if (isset($parameters['columns']) && count($parameters['columns']) > 0) {
 				$modelMetaData = $this->getModelsMetaData();
 				$modelRelations = $this->getModelsRelations()['modelRelations'];
-
-				$relationColumns = [];
 
 				foreach ($parameters['columns'] as $columnKey => $column) {
 					if (!in_array($column, $modelMetaData['columns'])) {
@@ -185,24 +187,86 @@ abstract class BasePackage extends Controller
 			if ($resetCache) {
 				$this->resetCache();
 			}
-			// if (isset($parameters['cache']['key'])) {
-				// $cachedModel = $this->cacheTools->getCache($parameters['cache']['key']);
+			// var_dump($relationColumns);
+			// if (count($relationColumns) > 0) {
+			// 	if (isset($parameters['bind']) && count($parameters['bind']) > 0) {
+			// 		$index = 0;
+			// 		$searchRelatedColumns = [];
 
-				// if ($cachedModel) {
-				// 	$this->model = $cachedModel;
-				// } else {
-					$this->model = $this->modelToUse::find($parameters);
-				// }
+			// 		foreach ($parameters['bind'] as $bindKey => $bindValue) {
+			// 			$bindKey = str_replace('baz_' . $index . '_', '', $bindKey);
+
+			// 			if (!in_array($bindKey, $parameters['columns'])) {
+			// 				array_push($searchRelatedColumns, $bindKey);
+			// 			}
+
+			// 			$index++;
+			// 		}
+
+			// 		if (count($searchRelatedColumns) > 0 && count($relationColumns) > 0) {//change model and search the other way around
+			// 			$index = 0;
+
+			// 			$data = [];
+
+			// 			$rootModel = $this->getModelToUse();
+			// 			$rootParameters = $parameters;
+
+			// 			foreach ($searchRelatedColumns as $searchRelatedColumn) {
+			// 				foreach ($relationColumns as $relationColumn) {
+			// 					if (in_array($searchRelatedColumn, $relationColumn['columns'])) {
+			// 						// $parameters['columns'] = $relationColumn['columns'];
+			// 						var_dump($relationColumn['relationObj']->getReferencedModel());
+			// 						// var_dump($parameters);
+			// 						var_dump($parameters);
+			// 						$this->model = $this->modelToUse::find($parameters);
+
+			// 						// if ($this->getDbData($parameters, false, 'params')) {
+			// 						// 	$data = $this->getRelationColumnsData($relationColumns, $this->getDbData($parameters, false, 'params'));
+			// 						// }
+			// 						// var_dump($this->getModelsRelations());
+			// 						// var_dump($this->model->toArray());die();
+			// 						// array_push($data, $this->getDbData($parameters, false, 'params'));
+			// 					}
+			// 				}
+			// 				// var_dump($this->modelToUse);
+
+			// 				var_dump($rootModel);
+			// 				$model = $rootModel::find($rootParameters);
+			// 				var_dump($rootParameters);
+			// 				var_dump($model->toArray());
+			// 				// array_push($data[$index], $this->getDbData($rootParameters, false, 'params'));
+
+			// 				$index++;
+			// 			}
+			// 			var_dump($data);
+			// 		} else {
+			// 			$this->model = $this->modelToUse::find($parameters);
+
+			// 			$data = $this->getDbData($parameters, $enableCache, 'params');
+
+			// 			if ($data && count($relationColumns) > 0) {
+			// 				$data = $this->getRelationColumnsData($relationColumns, $data);
+			// 			}
+			// 		}
+			// 	} else {
+			// 		$this->model = $this->modelToUse::find($parameters);
+
+			// 		$data = $this->getDbData($parameters, $enableCache, 'params');
+
+			// 		if ($data && count($relationColumns) > 0) {
+			// 			$data = $this->getRelationColumnsData($relationColumns, $data);
+			// 		}
+			// 	}
 			// } else {
-			// 	$this->model = $this->modelToUse::find($parameters);
+				$this->model = $this->modelToUse::find($parameters);
+
+				$data = $this->getDbData($parameters, $enableCache, 'params');
+
+				if ($data && count($relationColumns) > 0) {
+					$data = $this->getRelationColumnsData($relationColumns, $data);
+				}
 			// }
-
-			$data = $this->getDbData($parameters, $enableCache, 'params');
-
-			if ($data && isset($relationColumns)) {
-				$data = $this->getRelationColumnsData($relationColumns, $data);
-			}
-
+			// var_dump($parameters, $relationColumns);
 			if ($data) {
 				return $data;
 			} else {
@@ -271,6 +335,22 @@ abstract class BasePackage extends Controller
 			$pageParams['limit'] = 20;
 		}
 
+		if (isset($this->request->getPost()['resetCache']) && $this->request->getPost()['resetCache'] == 'true') {
+			$resetCache = true;
+		}
+
+		if (isset($this->request->getPost()['order']) &&
+			$this->request->getPost()['order'] !== ''
+		) {
+			$params =
+				array_merge(
+					$params,
+					[
+						'order'	=> $this->request->getPost()['order']
+					]
+				);
+		}
+
 		if ($pageParams['currentPage'] > 1) {
 			$offset = ['offset' => $pageParams['currentPage'] * $pageParams['limit']];
 		}
@@ -289,11 +369,23 @@ abstract class BasePackage extends Controller
 
 		if (isset($pageParams['conditions']) && $pageParams['conditions'] !== '') {
 			$postConditions = explode('&', rtrim($pageParams['conditions'], '&'));
-			$conditions = '';
-			$bind = [];
+
+			$queries = [];
+			$multiModel = false;
+			$modelColumnMap = $this->getModelsColumnMap();
 
 			foreach ($postConditions as $conditionKey => $condition) {
-				$conditionArr = explode(':', $condition);
+				$conditionArr = explode('|', $condition);
+				$model = Arr::last(explode('\\', $modelColumnMap['model'][$conditionArr[1]]));
+
+				$condition = '';
+				$bind = [];
+
+				$queries[$model]['model'] = $modelColumnMap['model'][$conditionArr[1]];
+
+				if ($modelColumnMap['model'][$conditionArr[1]] !== $this->modelToUse) {
+					$multiModel = true;
+				}
 
 				if (str_starts_with(strtolower($conditionArr[1]), 'not')) {
 					$conditionArr[1] = '[' . $conditionArr[1] . ']';
@@ -301,9 +393,9 @@ abstract class BasePackage extends Controller
 
 				if (Arr::firstKey($postConditions) !== $conditionKey) {
 					if ($conditionArr[0] === '') {
-						$conditions .= ' AND ';//Default for AND/OR
+						$queries[$model]['andor'] = 'AND';//Default for AND/OR
 					} else {
-						$conditions .= ' ' . strtoupper($conditionArr[0]) . ' ';
+						$queries[$model]['andor'] = strtoupper($conditionArr[0]);
 					}
 				}
 
@@ -339,15 +431,15 @@ abstract class BasePackage extends Controller
 					$valueArr = explode(',', $conditionArr[3]);
 
 					if ($conditionArr[2] === 'between') {
-						$conditions .=
+						$condition .=
 							$conditionArr[1] . ' ' . $sign;
 					} else if ($conditionArr[2] === 'notbetween') {
-						$conditions .=
+						$condition .=
 						'NOT ' . $conditionArr[1] . ' BETWEEN';
 					}
 
 					foreach ($valueArr as $valueKey => $valueValue) {
-						$conditions .=
+						$condition .=
 							' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
 
 						$bind[
@@ -355,17 +447,17 @@ abstract class BasePackage extends Controller
 						] = $valueValue;
 
 						if (Arr::lastKey($valueArr) !== $valueKey) {
-							$conditions .= ' AND';
+							$condition .= ' AND';
 						}
 					}
 				} else if ($conditionArr[2] === 'empty' || $conditionArr[2] === 'notempty') {
-					$conditions .= $conditionArr[1] . ' ' . $sign;
+					$condition .= $conditionArr[1] . ' ' . $sign;
 				} else {
 					$valueArr = explode(',', $conditionArr[3]);
 
 					if (count($valueArr) > 1) {
 						foreach ($valueArr as $valueKey => $valueValue) {
-							$conditions .=
+							$condition .=
 								$conditionArr[1] . ' ' . $sign .
 								' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
 
@@ -374,12 +466,11 @@ abstract class BasePackage extends Controller
 							] = $valueValue;
 
 							if (Arr::lastKey($valueArr) !== $valueKey) {
-								$conditions .= ' OR ';
+								$condition .= ' OR ';
 							}
 						}
 					} else {
-
-						$conditions .=
+						$condition .=
 							$conditionArr[1] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
 
 						$bind[
@@ -387,16 +478,99 @@ abstract class BasePackage extends Controller
 						] = $valueArr[0];
 					}
 				}
+
+				if (isset($queries[$model]['condition'])) {
+					$queries[$model]['condition'] .= ' ' . $queries[$model]['andor'] . ' ' . $condition;
+				} else {
+					$queries[$model]['condition'] = $condition;
+				}
+
+				if (isset($queries[$model]['bind'])) {
+					$queries[$model]['bind'] = array_merge($queries[$model]['bind'], $bind);
+				} else {
+					$queries[$model]['bind'] = $bind;
+				}
 			}
 
-			$filterConditions =
-				[
-					'conditions'	=> $conditions,
-					'bind'			=> $bind
-				];
+			$data = [];
 
-			$params = array_merge($params, $filterConditions);
+			if (count($queries) > 0) {
+				$relationColumns = [];
 
+				if (isset($params['columns']) && count($params['columns']) > 0) {
+					$modelMetaData = $this->getModelsMetaData();
+					$modelRelations = $this->getModelsRelations()['modelRelations'];
+
+					foreach ($params['columns'] as $columnKey => $column) {
+						if (!in_array($column, $modelMetaData['columns'])) {
+							if ($modelRelations) {
+								foreach ($modelRelations as $modelRelationKey => $modelRelation) {
+									if (in_array($column, $modelRelation['columns'])) {
+										if (!isset($relationColumns[$modelRelationKey])) {
+											$relationColumns[$modelRelationKey] = $modelRelation;
+											$relationColumns[$modelRelationKey]['requestedColumns'] = [];
+										}
+										array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
+										unset($params['columns'][$columnKey]);
+									}
+								}
+							}
+						}
+					}
+				}
+
+				foreach ($queries as $query) {
+					if ($query['model'] !== $this->modelToUse) {
+						$this->modelToUse = $query['model'];
+					}
+
+					$md = $this->getModelsMetaData();
+
+					$filterConditions =
+						[
+							'conditions'	=> $query['condition'],
+							'bind'			=> $query['bind']
+						];
+
+					$params = array_merge($params, $filterConditions);
+
+					$params['columns'] = $md['columns'];
+
+					$rows = $this->getByParams($params, true, false);
+
+					if ($rows && count($rows) > 0) {
+						foreach ($rows as $row) {
+							$rootModel = $this->getFirst('id', $row['id']);
+
+							if ($rootModel) {
+								$rowData = $rootModel->toArray();
+							}
+
+							$model = $this->getFirst('id', $row['id'], true, false, $query['model']);
+
+							$modelRelations = $model->getModelRelations();
+
+							if ($modelRelations && count($modelRelations) > 0) {
+								foreach ($modelRelations as $relationColumnKey => $relationColumn) {
+									if (isset($relationColumns[$relationColumnKey])) {
+										$alias = $relationColumn['relationObj']->getOption('alias');
+
+										if (isset($rootModel->{$alias}) && $rootModel->{$alias}) {
+											$relationRowData = $rootModel->{$alias}->toArray();
+
+											$rowData = array_merge($rowData, $relationRowData);
+										}
+									}
+								}
+								array_push($data, $rowData);
+							} else {
+								$rowData = array_merge($rowData, $model->toArray());
+								array_push($data, $rowData);
+							}
+						}
+					}
+				}
+			}
 		} else {
 			$params =
 				array_merge(
@@ -405,25 +579,9 @@ abstract class BasePackage extends Controller
 						'conditions'	=> '',
 					]
 				);
-		}
 
-		if (isset($this->request->getPost()['order']) &&
-			$this->request->getPost()['order'] !== ''
-		) {
-			$params =
-				array_merge(
-					$params,
-					[
-						'order'	=> $this->request->getPost()['order']
-					]
-				);
+			$data = $this->getByParams($params, $resetCache, $enableCache);
 		}
-
-		if (isset($this->request->getPost()['resetCache']) && $this->request->getPost()['resetCache'] == 'true') {
-			$resetCache = true;
-		}
-
-		$data = $this->getByParams($params, $resetCache, $enableCache);
 
 		if ($data) {
 			$pageParams['data'] = $data;
@@ -457,7 +615,7 @@ abstract class BasePackage extends Controller
 			$this->packagesData->paginationCounters = $paginationCounters;
 
 			return $paged;
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			throw $e;
 		}
 	}
@@ -801,6 +959,7 @@ abstract class BasePackage extends Controller
 	protected function getModelsRelations()
 	{
 		if ($this->modelToUse) {
+
 			$model = new $this->modelToUse;
 
 			$relations = [];
@@ -888,6 +1047,7 @@ abstract class BasePackage extends Controller
 		$metadata = [];
 
 		$md = $this->getModelsMetaData();
+		$md['model'] = [];
 
 		if (count($md) > 0) {
 			$filteredColumns = [];
@@ -897,7 +1057,8 @@ abstract class BasePackage extends Controller
 			if ($rmdArr &&
 				count($rmdArr['dataTypes']) > 0 &&
 				count($rmdArr['number']) > 0 &&
-				count($rmdArr['columns']) > 0
+				count($rmdArr['columns']) > 0 &&
+				count($rmdArr['modelRelations']) > 0
 			) {
 				foreach ($rmdArr as $rmdKey => $rmd) {
 					if ($rmdKey === 'dataTypes') {
@@ -913,6 +1074,17 @@ abstract class BasePackage extends Controller
 					if ($rmdKey === 'columns') {
 						if (count($rmd) > 0) {
 							$md['columns'] = array_merge($md['columns'], $rmd);
+						}
+					}
+					if ($rmdKey === 'modelRelations') {
+						if (count($rmd) > 0) {
+							foreach ($rmd as $rmdModel) {
+								$model = $rmdModel['relationObj']->getReferencedModel();
+
+								foreach ($rmdModel['columns'] as $rmdModelColumn) {
+									$md['model'][$rmdModelColumn] = $model;
+								}
+							}
 						}
 					}
 				}
@@ -931,19 +1103,23 @@ abstract class BasePackage extends Controller
 					$metadata[$filteredColumn]['id'] = $filteredColumn;
 					$metadata[$filteredColumn]['name'] = str_replace('_', ' ', $filteredColumn);
 
-					if (isset($number[$filteredColumn]) && $number[$filteredColumn] === true) {
+					if (isset($md['number'][$filteredColumn]) && $md['number'][$filteredColumn] === true) {
 						$metadata[$filteredColumn]['data']['number'] = 'true';
 					} else {
 						$metadata[$filteredColumn]['data']['number'] = 'false';
 					}
 
 					$metadata[$filteredColumn]['data']['dataType'] = $md['dataTypes'][$filteredColumn];
+
+					// if (isset($md['model'][$filteredColumn])) {
+					// 	$metadata[$filteredColumn]['data']['model'] = $md['model'][$filteredColumn];
+					// }
 				}
 
 				return $metadata;
 			}
 
-			return $md['columns'];
+			return $md;
 		}
 
 		return false;

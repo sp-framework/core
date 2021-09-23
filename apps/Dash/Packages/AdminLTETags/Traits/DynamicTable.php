@@ -39,7 +39,11 @@ trait DynamicTable {
         if ($this->request->isGet()) {
 
             $table = [];
-            $table['columns'] = $this->sortColumns($columnsForTable, $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable)));
+            if (isset($package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable))['columns'])) {
+                $table['columns'] = $this->sortColumns($columnsForTable, $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable))['columns']);
+            } else {
+                $table['columns'] = $this->sortColumns($columnsForTable, $package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable)));
+            }
 
             if ($dtReplaceColumnsTitle && count($dtReplaceColumnsTitle) > 0) {
                 foreach ($dtReplaceColumnsTitle as $dtReplaceColumnsTitleKey => $dtReplaceColumnsTitleValue) {
@@ -65,7 +69,11 @@ trait DynamicTable {
                     $filtersArr = $this->basepackages->filters->getFiltersForComponent($componentId);
                 }
 
-                $table['filterColumns'] = $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter));
+                if (isset($package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter))['columns'])) {
+                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter))['columns']);
+                } else {
+                    $table['filterColumns'] = $this->sortColumns($columnsForFilter, $package->getModelsColumnMap($this->removeEscapeFromName($columnsForFilter)));
+                }
                 foreach ($filtersArr as $key => $filter) {
                     $table['filters'][$filter['id']] = $filter;
                     $table['filters'][$filter['id']]['data']['name'] = $filter['name'];

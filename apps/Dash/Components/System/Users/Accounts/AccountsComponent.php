@@ -95,7 +95,7 @@ class AccountsComponent extends BaseComponent
             null,
             ['package_row_id', 'status', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
             true,
-            ['package_row_id', 'status', 'email', 'role_id', 'first_name', 'last_name', 'package_name'],
+            ['status', 'email', 'role_id', 'first_name', 'last_name'],
             $controlActions,
             ['role_id' => 'role (ID)', 'package_name' => 'Used By', 'package_row_id' => 'link'],
             $replaceColumns,
