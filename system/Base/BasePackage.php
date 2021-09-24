@@ -303,14 +303,19 @@ abstract class BasePackage extends Controller
 
 			foreach ($postConditions as $conditionKey => $condition) {
 				$conditionArr = explode('|', $condition);
-				$model = Arr::last(explode('\\', $modelColumnMap['model'][$conditionArr[1]]));
+
+				if (isset($modelColumnMap['model'][$conditionArr[1]])) {
+					$model = Arr::last(explode('\\', $modelColumnMap['model'][$conditionArr[1]]));
+					$queries[$model]['model'] = $modelColumnMap['model'][$conditionArr[1]];
+				} else {
+					$model = Arr::last(explode('\\', $this->modelToUse));
+					$queries[$model]['model'] = $this->modelToUse;
+				}
 
 				$condition = '';
 				$bind = [];
 
-				$queries[$model]['model'] = $modelColumnMap['model'][$conditionArr[1]];
-
-				if ($modelColumnMap['model'][$conditionArr[1]] !== $this->modelToUse) {
+				if ($queries[$model]['model'] !== $this->modelToUse) {
 					$multiModel = true;
 				}
 
@@ -454,6 +459,12 @@ abstract class BasePackage extends Controller
 
 						$md = $this->getModelsMetaData();
 
+						foreach ($md['columns'] as &$column) {
+							if (str_starts_with(strtolower($column), 'not')) {
+								$column = '[' . $column . ']';
+							}
+						}
+
 						$filterConditions =
 							[
 								'conditions'	=> $query['condition'],
@@ -494,6 +505,8 @@ abstract class BasePackage extends Controller
 										}
 									}
 
+									$rowData = [];
+
 									if (count($rootFieldsToQuery) > 0 && count($rootFieldsToQuery) === 1) {
 										$rootModelToUse = $this->getFirst($rootFieldsToQuery[0]['rootField'], $rootFieldsToQuery[0]['rootReferencedField']);
 
@@ -512,20 +525,29 @@ abstract class BasePackage extends Controller
 												}
 											}
 										}
-
 									} else if (count($rootFieldsToQuery) > 0) {
 										//Search By Params
 									}
 
-									array_push($data, $rowData);
+									if (count($rowData) > 0) {
+										array_push($data, $rowData);
+									}
 								} else {
 									$rowData = array_merge($rowData, $model->toArray());
-									array_push($data, $rowData);
+									if (count($rowData) > 0) {
+										array_push($data, $rowData);
+									}
 								}
 							}
 						}
 					} else {
 						$md = $this->getModelsMetaData();
+
+						foreach ($md['columns'] as &$column) {
+							if (str_starts_with(strtolower($column), 'not')) {
+								$column = '[' . $column . ']';
+							}
+						}
 
 						$filterConditions =
 							[
@@ -563,10 +585,14 @@ abstract class BasePackage extends Controller
 											}
 										}
 									}
-									array_push($data, $rowData);
+									if (count($rowData) > 0) {
+										array_push($data, $rowData);
+									}
 								} else {
 									$rowData = array_merge($rowData, $model->toArray());
-									array_push($data, $rowData);
+									if (count($rowData) > 0) {
+										array_push($data, $rowData);
+									}
 								}
 							}
 						}
