@@ -112,6 +112,8 @@ class Pusher extends BasePackage implements WampServerInterface
 
     protected function checkAccount($conn)
     {
+        $this->db->connect();
+
         $cookiesArr = $conn->httpRequest->getHeaders()['Cookie'][0];
 
         $cookiesArr = explode(';', $cookiesArr);
@@ -125,7 +127,7 @@ class Pusher extends BasePackage implements WampServerInterface
 
         $this->accountsObj = $this->basepackages->accounts->getModelToUse()::findFirstById($cookies['id']);
 
-        if ($this->accountsObj) {
+        if ($this->accountsObj && $this->accountsObj->count() > 0) {
             $this->account = $this->accountsObj->toArray();
         }
 
