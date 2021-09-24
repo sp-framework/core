@@ -54,7 +54,7 @@ class Filters extends BasePackage
                         'cid'       => $componentId,
                         'ag'        => 1
                     ]
-                ]
+                ], true
             );
     }
 
@@ -78,7 +78,7 @@ class Filters extends BasePackage
                             'aid'       => $account['id'],
                             'aid0'      => 0
                         ]
-                    ]
+                    ], true
                 );
 
             $myFilters = [];
@@ -311,9 +311,9 @@ class Filters extends BasePackage
     {
         $conditions =
             [
-                'all_unread'=> '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:0&and:archive:equals:0&',
-                'read'      => '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:1&and:archive:equals:0&',
-                'archive'   => '-:app_id:equals:' . $this->app['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:archive:equals:1&'
+                'all_unread'=> '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|read|equals|0&and|archive|equals|0&',
+                'read'      => '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|read|equals|1&and|archive|equals|0&',
+                'archive'   => '-|app_id|equals|' . $this->app['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|archive|equals|1&'
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
@@ -357,10 +357,10 @@ class Filters extends BasePackage
     {
         $conditions =
             [
-                'all_in_queue'      => '-:status:equals:1&',
-                'all_sent'          => '-:status:equals:2&',
-                'all_errors'        => '-:status:equals:3&',
-                'high_prioriry'     => '-:priority:equals:1&'
+                'all_in_queue'      => '-|status|equals|1&',
+                'all_sent'          => '-|status|equals|2&',
+                'all_errors'        => '-|status|equals|3&',
+                'high_prioriry'     => '-|priority|equals|1&'
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
@@ -410,10 +410,10 @@ class Filters extends BasePackage
     {
         $conditions =
             [
-                'all_scheduled_and_running'      => '-:status:equals:1&OR:status:equals:2&',
-                'all_success'                    => '-:status:equals:3&',
-                'all_errors'                     => '-:status:equals:4&',
-                'all_user_jobs'                  => '-:type:equals:1&'
+                'all_scheduled_and_running'      => '-|status|equals|1&OR|status|equals|2&',
+                'all_success'                    => '-|status|equals|3&',
+                'all_errors'                     => '-|status|equals|4&',
+                'all_user_jobs'                  => '-|type|equals|1&'
             ];
 
         foreach ($conditions as $conditionKey => $condition) {
@@ -678,7 +678,7 @@ class Filters extends BasePackage
                 ];
         }
 
-        $this->defaultFilter = $this->getByParams($params);
+        $this->defaultFilter = $this->getByParams($params, true);
 
         if ($this->defaultFilter) {
             $this->packagesData->responseCode = 0;

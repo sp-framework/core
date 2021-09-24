@@ -228,7 +228,7 @@ class EbayTaxonomyExtractData extends BasePackage
                 [
                     'name'              =>  'Show All Root',
                     'component_id'      =>  $componentId,
-                    'conditions'        =>  '-:root_id:equals:0&'
+                    'conditions'        =>  '-|root_id|equals|0&'
                 ]
             );
 
@@ -236,7 +236,7 @@ class EbayTaxonomyExtractData extends BasePackage
                 [
                     'name'              =>  'Show All Installed',
                     'component_id'      =>  $componentId,
-                    'conditions'        =>  '-:installed:equals:1&'
+                    'conditions'        =>  '-|installed|equals|1&'
                 ]
             );
 
@@ -244,7 +244,7 @@ class EbayTaxonomyExtractData extends BasePackage
                 [
                     'name'              =>  'Show All Enabled',
                     'component_id'      =>  $componentId,
-                    'conditions'        =>  '-:enabled:equals:1&'
+                    'conditions'        =>  '-|enabled|equals|1&'
                 ]
             );
 
@@ -253,9 +253,9 @@ class EbayTaxonomyExtractData extends BasePackage
                 [
                     'name'              =>  'Show All ' . $rootCategory['category']['categoryName'],
                     'component_id'      =>  $componentId,
-                    'conditions'        =>  '-:id:equals:' .
+                    'conditions'        =>  '-|id|equals|' .
                                             $rootCategory['category']['categoryId'] .
-                                            '&or:root_id:equals:' .
+                                            '&or|root_id|equals|' .
                                             $rootCategory['category']['categoryId'] .
                                             '&'
                 ];

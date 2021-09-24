@@ -119,7 +119,7 @@ class NotificationsComponent extends BaseComponent
         $conditions =
             [
                 'conditions'    =>
-                    '-:app_id:equals:' . $this->apps->getAppInfo()['id'] . '&and:account_id:equals:' . $this->auth->account()['id'] . '&and:read:equals:0&and:archive:equals:0&',
+                    '-|app_id|equals|' . $this->apps->getAppInfo()['id'] . '&and|account_id|equals|' . $this->auth->account()['id'] . '&and|read|equals|0&and|archive|equals|0&',
                 'order'         => 'id desc'
             ];
 
@@ -232,7 +232,7 @@ class NotificationsComponent extends BaseComponent
 
     protected function generateUserInfo($rowId, $data)
     {
-        if ($data['created_by']) {
+        if ($data['created_by'] && $data['created_by'] != '0') {
             $profile = $this->basepackages->profile->getProfile($data['created_by']);
 
             if ($profile) {
@@ -240,6 +240,8 @@ class NotificationsComponent extends BaseComponent
             } else {
                 $data['created_by'] = 'System';
             }
+        } else {
+            $data['created_by'] = 'System';
         }
 
         return $data;

@@ -134,7 +134,7 @@ class TaxonomyComponent extends BaseComponent
             // if ($this->request->isGet()) {
             //     $postUrlParams =
             //         [
-            //             'conditions'    => '-:root_id:equals:0&',
+            //             'conditions'    => '-|root_id|equals|0&',
             //             'limit'         => 100
             //         ];
             // } else {

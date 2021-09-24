@@ -53,7 +53,7 @@ class QueueComponent extends BaseComponent
         $conditions =
             [
                 'conditions'    =>
-                    '-:status:equals:1&',
+                    '-|status|equals|1&',
                 'order'         => 'id desc'
             ];
 

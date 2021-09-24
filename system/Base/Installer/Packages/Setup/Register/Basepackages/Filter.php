@@ -22,7 +22,7 @@ class Filter
             [
                 'name'              => 'Exclude Auto Generated Filters',
                 'component_id'      => $filterComponent[0]['id'],
-                'conditions'        => '-:auto_generated:equals:0&',
+                'conditions'        => '-|auto_generated|equals|0&',
                 'filter_type'       => 0,
                 'auto_generated'    => 0,
                 'is_default'        => 1,

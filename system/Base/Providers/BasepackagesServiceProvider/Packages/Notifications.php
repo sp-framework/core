@@ -57,7 +57,11 @@ class Notifications extends BasePackage
         if ($createdBy) {
             $newNotification['created_by'] = $createdBy;
         } else {
-            $newNotification['created_by'] = '0';
+            if ($this->auth->account()) {
+                $newNotification['created_by'] = $this->auth->account()['id'];
+            } else {
+                $newNotification['created_by'] = '0';
+            }
         }
         $newNotification['package_name'] = $packageName;
         $newNotification['package_row_id'] = $packageRowId;
@@ -75,9 +79,9 @@ class Notifications extends BasePackage
 
     protected function pushNotification($notification)
     {
-        $account = $this->basepackages->accounts->getFirst('id', $notification['account_id']);
+        $account = $this->basepackages->accounts->getFirst('id', $notification['account_id'], true);
 
-        if (!$account->tunnels) {
+        if (!$account || ($account && !$account->tunnels)) {
             return;
         } else {
             $tunnels = $account->tunnels->toArray();

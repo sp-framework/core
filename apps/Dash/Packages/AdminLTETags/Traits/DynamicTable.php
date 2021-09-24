@@ -119,7 +119,7 @@ trait DynamicTable {
                             $table['postUrlParams'] = ['conditions' => $filter['conditions']];
                         } else {
                             $table['filters'][$filter['id']]['data']['queryFilterId'] = $this->getData()['filter'];
-                            $table['postUrlParams'] = ['conditions' => '-:id:equals:0&'];
+                            $table['postUrlParams'] = ['conditions' => '-|id|equals|0&'];
                         }
                     } else if ($account &&
                                $account['id'] === $filter['account_id'] &&

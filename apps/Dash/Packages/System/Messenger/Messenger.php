@@ -230,8 +230,8 @@ class Messenger extends BasePackage implements MessageComponentInterface
         $conditions =
             [
                 'conditions'    =>
-                    '-:from_account_id:equals:' . $data['user'] . '&and:to_account_id:equals:' . $this->auth->account()['id'] . '&' .
-                    'or:from_account_id:equals:' . $this->auth->account()['id'] . '&and:to_account_id:equals:' . $data['user'] . '&',
+                    '-|from_account_id|equals|' . $data['user'] . '&and|to_account_id|equals|' . $this->auth->account()['id'] . '&' .
+                    'or|from_account_id|equals|' . $this->auth->account()['id'] . '&and|to_account_id|equals|' . $data['user'] . '&',
                 'order'         => 'id desc'
             ];
 
