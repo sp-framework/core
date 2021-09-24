@@ -5573,7 +5573,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     var conditionsColumns = [];
 
                     $.each(conditionsRows, function(index, row) {
-                        conditionsColumns[index] = row.split(':');
+                        conditionsColumns[index] = row.split('|');
                     });
 
                     var select2FieldData;
@@ -5920,15 +5920,15 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     $.each(tableData, function(index, data) {
                         if (index === 0) {
                             query +=
-                                '-:' +
-                                data[sectionId + '-filter-field'] + ':' +
-                                data[sectionId + '-filter-operator'] + ':' +
+                                '-|' +
+                                data[sectionId + '-filter-field'] + '|' +
+                                data[sectionId + '-filter-operator'] + '|' +
                                 data[sectionId + '-filter-value'] + '&';
                         } else {
                             query +=
-                                data[sectionId + '-filter-andor'] + ':' +
-                                data[sectionId + '-filter-field'] + ':' +
-                                data[sectionId + '-filter-operator'] + ':' +
+                                data[sectionId + '-filter-andor'] + '|' +
+                                data[sectionId + '-filter-field'] + '|' +
+                                data[sectionId + '-filter-operator'] + '|' +
                                 data[sectionId + '-filter-value']
                                 + '&';
                         }
@@ -6092,9 +6092,9 @@ Object.defineProperty(exports, '__esModule', { value: true });
                         e.preventDefault();
 
                         if (dataType == 0) {
-                            query = '-:' + selectedId + ':equals:' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
+                            query = '-|' + selectedId + '|equals|' + $('#' + sectionId + '-filter-quick').val().trim() + '&';
                         } else {
-                            query = '-:' + selectedId + ':like:%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
+                            query = '-|' + selectedId + '|like|%' + $('#' + sectionId + '-filter-quick').val().trim() + '%&';
                         }
 
                         that._filterRunAjax(
