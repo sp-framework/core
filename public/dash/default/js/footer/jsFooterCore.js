@@ -3483,6 +3483,24 @@ $(document).on('libsLoadComplete bazContentLoaderAjaxComplete bazContentLoaderMo
                     });
                     this._initSectionButtonsAndActions();
                 }
+
+                if ($('.reset-cache').length === 1) {
+                    if (dataCollection.env.currentId == '0') {
+                        $('.reset-cache').hide();
+                    } else {
+                        $('.reset-cache').addClass('contentAjaxLink');
+
+                        var url = window.location.href;
+
+                        if (!url.includes('resetcache')) {
+                            $('.reset-cache').attr('href', url + '/resetcache/true');
+                        } else {
+                            $('.reset-cache').attr('href', url);
+                        }
+
+                        BazCore.bazContent();
+                    }
+                }
             };
 
             _proto._validateForm = function _validateForm() {

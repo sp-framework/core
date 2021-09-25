@@ -13,7 +13,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 // eslint-disable-next-line no-unused-vars
 var BazContentLoader = function() {
     var BazContentLoader = void 0;
-    var copyDataCollection, params;
+    var copyDataCollection;
 
     function init(options) {
         var ajaxElements, loadCount, shouldCheckCount, modalElements;
@@ -142,14 +142,14 @@ var BazContentLoader = function() {
             }
 
             // Adding id="?" to dataCollection
-            if (element[0].tagName === 'A') {
-                params = new URLSearchParams(element[0].search.substring(1));
-                if (params.get("id")) {
-                    dataCollection.env.currentId = params.get("id");
-                } else {
-                    dataCollection.env.currentId = null;
-                }
-            }
+            // if (element[0].tagName === 'A') {
+            //     params = new URLSearchParams(element[0].search.substring(1));
+            //     if (params.get("id")) {
+            //         dataCollection.env.currentId = params.get("id");
+            //     } else {
+            //         dataCollection.env.currentId = null;
+            //     }
+            // }
             options.ajaxBefore.call(element); //call the 'ajaxBefore' callback
             urlToLoad = element.attr(options.ajaxUrlAttribute);
             elementId = element.attr('data-bclaid');
@@ -170,6 +170,12 @@ var BazContentLoader = function() {
                     window.location = xhr.getResponseHeader('REDIRECT_URL');
                 } else {
                     dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
+
+                    if (xhr.getResponseHeader('currentid')) {
+                        dataCollection.env.currentId  = xhr.getResponseHeader('currentid');
+                    } else {
+                        dataCollection.env.currentId  = null;
+                    }
                     // console.log(xhr.getAllResponseHeaders()); //trying to get page last edit for storing data locally
                     if (options.ajaxSetTitle) {
                         var titlePart = response.split("title>"); //dirty little trick to get an html element
@@ -226,14 +232,14 @@ var BazContentLoader = function() {
         }
         if (element) {
             // Adding id="?" to dataCollection
-            if (element[0].tagName === 'A') {
-                params = new URLSearchParams(element[0].search.substring(1));
-                if (params.get("id")) {
-                    dataCollection.env.currentId = params.get("id");
-                } else {
-                    dataCollection.env.currentId = null;
-                }
-            }
+            // if (element[0].tagName === 'A') {
+            //     params = new URLSearchParams(element[0].search.substring(1));
+            //     if (params.get("id")) {
+            //         dataCollection.env.currentId = params.get("id");
+            //     } else {
+            //         dataCollection.env.currentId = null;
+            //     }
+            // }
             options.modalBefore.call(element); //call the 'ajaxBefore' callback
             urlToLoad = element.attr(options.modalUrlAttribute);
 
@@ -251,6 +257,12 @@ var BazContentLoader = function() {
                     window.location = xhr.getResponseHeader('REDIRECT_URL');
                 } else {
                     dataCollection.env.currentRoute = getCurrentRoute(urlToLoad);
+
+                    if (xhr.getResponseHeader('currentid')) {
+                        dataCollection.env.currentId  = xhr.getResponseHeader('currentid');
+                    } else {
+                        dataCollection.env.currentId  = null;
+                    }
 
                     if (status == "success") {
                         // BAZ Template Not Found

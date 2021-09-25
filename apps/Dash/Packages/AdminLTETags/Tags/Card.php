@@ -127,11 +127,6 @@ class Card extends AdminLTETags
                         '<button type="button" class="btn btn-tool" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Maximize" data-card-widget="maximize">
                             <i class="fas fa-fw fa-expand"></i>
                         </button>';
-                } else if ($tool === "reset") {
-                    $tools .=
-                        '<button type="button" class="btn btn-tool reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
-                            <i class="fas fa-fw fa-database"></i>
-                        </button>';
                 } else if (!isset($this->params['cardCollapsed']) ||
                            ($this->params['cardCollapsed'] === false && $tool === "collapse")
                 ) {
@@ -148,6 +143,13 @@ class Card extends AdminLTETags
             }
         } else {
             $tools = '';
+        }
+
+        if ($this->config->cache->enabled) {
+            $tools .=
+                '<button type="button" class="btn btn-tool reset-cache" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title="Reset Cache">
+                    <i class="fas fa-fw fa-database"></i>
+                </button>';
         }
 
         $cardBodyAdditionalClass =

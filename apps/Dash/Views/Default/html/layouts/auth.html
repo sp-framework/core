@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false -->
+<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -69,6 +69,7 @@ if (!window.dataCollection) {
     var uri = window.location.href.replace(dataCollection.env.rootPath, '');
     var splitUri = uri.split('/q/');
     dataCollection.env.currentRoute = splitUri[0];
+    dataCollection.env.currentId = "{{currentId}}";
 }
 </script>
         <script type="text/javascript" charset="utf-8">
@@ -78,3 +79,4 @@ if (!window.dataCollection) {
         {{content()}}
     </body>
 </html>
+<!-- htmlmin:ignore -->

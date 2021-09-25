@@ -16,6 +16,8 @@ use System\Base\Providers\ModulesServiceProvider\Modules\Packages\PackagesData;
 
 abstract class BasePackage extends Controller
 {
+	protected $getQueryArr = [];
+
 	public $packagesData;
 
 	protected $app;
@@ -80,13 +82,50 @@ abstract class BasePackage extends Controller
 		}
 	}
 
+	protected function buildGetQueryParamsArr()
+	{
+		if ($this->request->isGet()) {
+			$arr = Arr::chunk($this->dispatcher->getParams(), 2);
+
+			foreach ($arr as $value) {
+				if (isset($value[1])) {
+					$this->getQueryArr[$value[0]] = $value[1];
+				} else {
+					$this->getQueryArr[$value[0]] = 0; //Value not set, so default to 0
+				}
+			}
+		}
+	}
+
+	protected function getData()
+	{
+		return $this->getQueryArr;
+	}
+
+	protected function postData()
+	{
+		return $this->request->getPost();
+	}
+
+	protected function putData()
+	{
+		return $this->request->getPut();
+	}
+
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
+		$this->buildGetQueryParamsArr();
+
+
 		if ($id) {
 			if (!$resetCache && $enableCache && $this->cacheName) {
 				$parameters = $this->paramsWithCache($this->getIdParams($id), $this->cacheName);
 			} else {
 				$parameters = $this->getIdParams($id);
+			}
+
+			if (isset($this->getData()['resetcache']) && $this->getData()['resetcache'] == 'true') {
+				$this->resetCache($id);
 			}
 
 			$this->getFirst(null, null, $resetCache, $enableCache, null, $parameters);
@@ -238,42 +277,42 @@ abstract class BasePackage extends Controller
 			unset($params['columns']);
 		}
 
-		if (isset($this->request->getPost()['page'])) {
-			$pageParams['currentPage'] = $this->request->getPost()['page'];
+		if (isset($this->postData()['page'])) {
+			$pageParams['currentPage'] = $this->postData()['page'];
 		} else if (isset($params['page'])) {
 			$pageParams['currentPage'] = $params['page'];
 		} else {
 			$pageParams['currentPage'] = 1;
 		}
 
-		if (isset($this->request->getPost()['conditions'])) {
-			$pageParams['conditions'] = $this->request->getPost()['conditions'];
+		if (isset($this->postData()['conditions'])) {
+			$pageParams['conditions'] = $this->postData()['conditions'];
 		} else if (isset($params['conditions'])) {
 			$pageParams['conditions'] = $params['conditions'];
 		} else {
 			$pageParams['conditions'] = '';
 		}
 
-		if (isset($this->request->getPost()['limit'])) {
-			$pageParams['limit'] = $this->request->getPost()['limit'];
+		if (isset($this->postData()['limit'])) {
+			$pageParams['limit'] = $this->postData()['limit'];
 		} else if (isset($params['limit'])) {
 			$pageParams['limit'] = $params['limit'];
 		} else {
 			$pageParams['limit'] = 20;
 		}
 
-		if (isset($this->request->getPost()['resetCache']) && $this->request->getPost()['resetCache'] == 'true') {
+		if (isset($this->postData()['resetCache']) && $this->postData()['resetCache'] == 'true') {
 			$resetCache = true;
 		}
 
-		if (isset($this->request->getPost()['order']) &&
-			$this->request->getPost()['order'] !== ''
+		if (isset($this->postData()['order']) &&
+			$this->postData()['order'] !== ''
 		) {
 			$params =
 				array_merge(
 					$params,
 					[
-						'order'	=> $this->request->getPost()['order']
+						'order'	=> $this->postData()['order']
 					]
 				);
 		}

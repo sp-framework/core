@@ -280,6 +280,13 @@ abstract class BaseComponent extends Controller
 				'breadcrumb',
 				$this->componentRoute
 			);
+
+			if (isset($this->getData()['id'])) {
+				$this->response->setHeader(
+					'currentId',
+					$this->getData()['id']
+				);
+			}
 		}
 	}
 
