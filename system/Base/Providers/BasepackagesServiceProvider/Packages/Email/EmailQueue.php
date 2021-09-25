@@ -84,7 +84,7 @@ class EmailQueue extends BasePackage
                     ]
             ];
 
-        $queue = $this->getByParams($conditions);
+        $queue = $this->getByParams($conditions, true, false);
 
         if ($queue && is_array($queue) && count($queue) > 0) {
             foreach ($queue as $key => $queueEmail) {
@@ -150,12 +150,12 @@ class EmailQueue extends BasePackage
         $email['logs'] = '';
 
         if ($this->update($email)) {
-            $this->addResponse('Requeued');
+            $this->addResponse('Re-queued');
 
             return;
         }
 
-        $this->addResponse('Error requeuing message');
+        $this->addResponse('Error re-queuing message');
     }
 
     public function removeFromQueue(array $data)
