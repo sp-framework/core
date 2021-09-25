@@ -8,12 +8,15 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Organisations\Organisations;
 use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\PurchaseOrders\PurchaseOrders;
 use GuzzleHttp\Exception\ConnectException;
 use Phalcon\Helper\Json;
+use System\Base\Exceptions\FunctionParametersIncorrect;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Functions;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Workers\Tasks;
 
 class SyncXero extends Functions
 {
     public $funcName = "Sync Xero";
+
+    protected $parameters = null;
 
     public function run(array $args = [])
     {
@@ -22,36 +25,24 @@ class SyncXero extends Functions
         return function() use ($thisFunction, $args) {
             $thisFunction->updateJobTask(2, $args);
 
-            $parameters = null;
+            $this->parameters = $this->extractParameters($thisFunction, $args);
 
-            if (isset($args['task']['parameters']) && $args['task']['parameters'] !== '') {
-                try {
-                    $parameters = Json::decode($args['task']['parameters'], true);
-                } catch (\Exception $e) {
-                    if (str_contains($e->getMessage(), "json_decode")) {
-                        $thisFunction->packagesData->responseMessage = 'Task parameters format is incorrect. Make sure the format is json.';
-                    } else {
-                        $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
-                    }
-
-                    if ($this->config->logs->exceptions) {
-                        $this->logger->logExceptions->debug($e);
-                    }
-
-                    $thisFunction->packagesData->responseCode = 1;
-
-                    $this->addJobResult($thisFunction->packagesData, $args);
-
-                    $thisFunction->updateJobTask(3, $args);
-
-                    return;
-                }
+            if (!$this->parameters) {
+                return;
             }
 
-            if (!$parameters['process'] && !$parameters['method']) {
+            if (!isset($this->parameters['process']) ||
+                !isset($this->parameters['method'])
+            ) {
                 $thisFunction->packagesData->responseCode = 1;
 
-                $thisFunction->packagesData->responseMessage = 'Parameters process/method missing';
+                if (!isset($this->parameters['process'])) {
+                    $thisFunction->packagesData->responseMessage = 'Parameters process missing';
+                } else if (!isset($this->parameters['method'])) {
+                    $thisFunction->packagesData->responseMessage = 'Parameters method missing';
+                } else {
+                    $thisFunction->packagesData->responseMessage = 'Parameters process/method missing';
+                }
 
                 $this->addJobResult($thisFunction->packagesData, $args);
 
@@ -60,36 +51,36 @@ class SyncXero extends Functions
                 return;
             }
 
-            $sync = null;
-            $scheduleChildProcesses = false;
-
-            if ($parameters['process'] === 'contacts') {
-                $sync = new Contacts;
-            } else if ($parameters['process'] === 'purchaseOrders') {
-                $sync = new PurchaseOrders;
-            } else if ($parameters['process'] === 'contactGroups') {
-                $sync = new ContactGroups;
-            } else if ($parameters['process'] === 'organisations') {
-                $sync = new Organisations;
-            }
-
-            if (!isset($parameters['timeout'])) {
+            if (!isset($this->parameters['timeout'])) {
                 set_time_limit(300);
             } else {
-                set_time_limit($parameters['timeout']);
+                set_time_limit($this->parameters['timeout']);
             }
 
             try {
-                if (isset($parameters['method'])) {
-                    if (method_exists($sync, $parameters['method'])) {
-                        $scheduleChildProcesses = $sync->{$parameters['method']}(null, $parameters);
+                $sync = null;
+                $scheduleChildProcesses = false;
 
-                        $this->addJobResult($sync->packagesData, $args);
-                    } else {
-                        throw new \Exception('Parameters method not correct.');
-                    }
+                if ($this->parameters['process'] === 'contacts') {
+                    $sync = new Contacts;
+                } else if ($this->parameters['process'] === 'purchaseOrders') {
+                    $sync = new PurchaseOrders;
+                } else if ($this->parameters['process'] === 'contactGroups') {
+                    $sync = new ContactGroups;
+                } else if ($this->parameters['process'] === 'organisations') {
+                    $sync = new Organisations;
+                }
+
+                if (!$sync) {
+                    throw new FunctionParametersIncorrect('Task parameters "process" is not correct.');
+                }
+
+                if (method_exists($sync, $this->parameters['method'])) {
+                    $scheduleChildProcesses = $sync->{$this->parameters['method']}(null, $this->parameters);
+
+                    $this->addJobResult($sync->packagesData, $args);
                 } else {
-                    throw new \Exception('Parameters method not set.');
+                    throw new FunctionParametersIncorrect('Task parameters "method" is not correct.');
                 }
             } catch (\PDOException | ConnectException | \Exception $e) {
                 if ($this->config->logs->exceptions) {
@@ -101,13 +92,15 @@ class SyncXero extends Functions
                 if (get_class($e) === 'GuzzleHttp\Exception\ConnectException') {
                     $message = $e->getMessage();
 
-                    if ($parameters && $parameters['method'] === 'syncFromData') {
-                        $this->scheduleChildProcesses($parameters);
+                    if ($this->parameters && $this->parameters['method'] === 'syncFromData') {
+                        $this->scheduleChildProcesses();
 
                         $message = $message . '. Rescheduling Task.';
                     }
 
                     $thisFunction->packagesData->responseMessage = $message;
+                } else if (get_class($e) === 'System\Base\Exceptions\FunctionParametersIncorrect') {
+                    $thisFunction->packagesData->responseMessage = $e->getMessage();
                 }
 
                 $thisFunction->packagesData->responseCode = 1;
@@ -126,21 +119,21 @@ class SyncXero extends Functions
             }
 
             if ($scheduleChildProcesses) {
-                $this->scheduleChildProcesses($parameters);
+                $this->scheduleChildProcesses();
             }
 
             $thisFunction->updateJobTask(3, $args);
         };
     }
 
-    protected function scheduleChildProcesses($parameters)
+    protected function scheduleChildProcesses()
     {
         $taskPackage = new Tasks;
 
         $task = $taskPackage->findByParametersMethod('syncFromData');
 
-        if (isset($parameters['processCount'])) {
-            $count = $parameters['processCount'];
+        if (isset($this->parameters['processCount'])) {
+            $count = $this->parameters['processCount'];
         } else {
             $count = 50;
         }
@@ -152,7 +145,7 @@ class SyncXero extends Functions
                     'id'                => $task['id'],
                     'parameters'        =>
                     [
-                        'process'       => $parameters['process'],
+                        'process'       => $this->parameters['process'],
                         'method'        => 'syncFromData',
                         'processCount'  => $count
                     ]
