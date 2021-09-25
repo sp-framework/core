@@ -205,8 +205,15 @@ class Filters extends AdminLTETags
         ) {
             $fieldGroupPreAddonDropdownButtonListTitle = [];
 
-            foreach ($this->params['dtFilterColumns'] as $column) {
-                $fieldGroupPreAddonDropdownButtonListTitle[$column['id']] = $column['name'];
+            foreach ($this->params['dtFilterColumns'] as $columnKey => $column) {
+                if (isset($this->params['dtTable']['columns'][$column['id']]) &&
+                    $this->params['dtTable']['columns'][$column['id']]['name'] !== $column['name']
+                ) {
+                    $fieldGroupPreAddonDropdownButtonListTitle[$column['id']] = $this->params['dtTable']['columns'][$column['id']]['name'];
+                    $this->params['dtFilterColumns'][$columnKey]['name'] = $this->params['dtTable']['columns'][$column['id']]['name'];
+                } else {
+                    $fieldGroupPreAddonDropdownButtonListTitle[$column['id']] = $column['name'];
+                }
             }
 
             $this->content .=
