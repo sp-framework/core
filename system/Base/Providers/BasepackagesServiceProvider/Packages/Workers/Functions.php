@@ -83,4 +83,31 @@ class Functions extends BasePackage
             $this->basepackages->workers->jobs->update($job, false);
         }
     }
+
+    protected function extractParameters($thisFunction, $args)
+    {
+        if (isset($args['task']['parameters']) && $args['task']['parameters'] !== '') {
+            try {
+                return Json::decode($args['task']['parameters'], true);
+            } catch (\Exception $e) {
+                if (str_contains($e->getMessage(), "json_decode")) {
+                    $thisFunction->packagesData->responseMessage = 'Task parameters format is incorrect. Make sure the format is json.';
+                } else {
+                    $thisFunction->packagesData->responseMessage = 'Exception: Please check exceptions log for more details.';
+                }
+
+                if ($this->config->logs->exceptions) {
+                    $this->logger->logExceptions->debug($e);
+                }
+
+                $thisFunction->packagesData->responseCode = 1;
+
+                $this->addJobResult($thisFunction->packagesData, $args);
+
+                $thisFunction->updateJobTask(3, $args);
+
+                return false;
+            }
+        }
+    }
 }
