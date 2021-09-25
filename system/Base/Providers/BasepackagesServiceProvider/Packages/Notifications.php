@@ -57,7 +57,7 @@ class Notifications extends BasePackage
         if ($createdBy) {
             $newNotification['created_by'] = $createdBy;
         } else {
-            if ($this->auth->account()) {
+            if (isset($this->auth) && $this->auth->account()) {
                 $newNotification['created_by'] = $this->auth->account()['id'];
             } else {
                 $newNotification['created_by'] = '0';
