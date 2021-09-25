@@ -9,6 +9,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersAccountsSessions extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $account_id;
@@ -41,5 +43,10 @@ class BasepackagesUsersAccountsSessions extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

@@ -7,6 +7,8 @@ use System\Base\BaseModel;
 
 class CrmsCustomers extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $portrait;
@@ -55,5 +57,10 @@ class CrmsCustomers extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

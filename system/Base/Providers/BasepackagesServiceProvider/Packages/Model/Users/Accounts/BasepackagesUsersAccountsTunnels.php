@@ -7,6 +7,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersAccountsTunnels extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $account_id;
@@ -24,5 +26,10 @@ class BasepackagesUsersAccountsTunnels extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

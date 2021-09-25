@@ -2,10 +2,13 @@
 
 namespace Apps\Dash\Packages\Crms\Customers\Model;
 
+use Apps\Dash\Packages\Crms\Customers\Model\CrmsCustomers;
 use System\Base\BaseModel;
 
 class CrmsCustomersFinancialDetails extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $customer_id;
@@ -35,4 +38,23 @@ class CrmsCustomersFinancialDetails extends BaseModel
     public $invoice_discount;
 
     public $cc_details;
+
+    public function initialize()
+    {
+        self::$modelRelations['customers']['relationObj'] = $this->belongsTo(
+            'customer_id',
+            CrmsCustomers::class,
+            'id',
+            [
+                'alias' => 'customers'
+            ]
+        );
+
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
+    }
 }

@@ -2,10 +2,13 @@
 
 namespace Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model;
 
+use Apps\Dash\Packages\Ims\Stock\PurchaseOrders\Model\ImsStockPurchaseOrders;
 use System\Base\BaseModel;
 
 class ImsStockPurchaseOrdersProducts extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $purchase_order_id;
@@ -35,4 +38,23 @@ class ImsStockPurchaseOrdersProducts extends BaseModel
     public $product_unit_price_incl_tax;
 
     public $product_amount;
+
+    public function initialize()
+    {
+        self::$modelRelations['purchase_orders']['relationObj'] = $this->hasMany(
+            'purchase_order_id',
+            ImsStockPurchaseOrders::class,
+            'id',
+            [
+                'alias' => 'purchase_orders'
+            ]
+        );
+
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
+    }
 }

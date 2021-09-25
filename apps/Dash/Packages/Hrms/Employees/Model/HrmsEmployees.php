@@ -9,6 +9,8 @@ use System\Base\BaseModel;
 
 class HrmsEmployees extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $ref_id;
@@ -63,5 +65,10 @@ class HrmsEmployees extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

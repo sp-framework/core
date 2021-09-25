@@ -8,6 +8,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersProfiles extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $portrait;
@@ -40,7 +42,7 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['account']['relationObj'] = $this->hasOne(
+        self::$modelRelations['account']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id',
@@ -59,5 +61,10 @@ class BasepackagesUsersProfiles extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

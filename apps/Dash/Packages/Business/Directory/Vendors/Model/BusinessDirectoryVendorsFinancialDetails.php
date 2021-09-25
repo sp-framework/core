@@ -2,10 +2,13 @@
 
 namespace Apps\Dash\Packages\Business\Directory\Vendors\Model;
 
+use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendors;
 use System\Base\BaseModel;
 
 class BusinessDirectoryVendorsFinancialDetails extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $vendor_id;
@@ -47,4 +50,23 @@ class BusinessDirectoryVendorsFinancialDetails extends BaseModel
     public $credit_limit_block;
 
     public $invoice_discount;
+
+    public function initialize()
+    {
+        self::$modelRelations['vendors']['relationObj'] = $this->belongsTo(
+            'vendor_id',
+            BusinessDirectoryVendors::class,
+            'id',
+            [
+                'alias' => 'vendors'
+            ]
+        );
+
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
+    }
 }

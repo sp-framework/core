@@ -7,6 +7,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 
 class BasepackagesUsersAccountsIdentifiers extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $account_id;
@@ -28,5 +30,10 @@ class BasepackagesUsersAccountsIdentifiers extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

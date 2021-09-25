@@ -8,6 +8,8 @@ use System\Base\BaseModel;
 
 class ImsStockPurchaseOrders extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $ref_id;
@@ -91,5 +93,10 @@ class ImsStockPurchaseOrders extends BaseModel
         }
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

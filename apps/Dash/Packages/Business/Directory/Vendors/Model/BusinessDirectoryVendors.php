@@ -7,6 +7,8 @@ use System\Base\BaseModel;
 
 class BusinessDirectoryVendors extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $logo;
@@ -61,5 +63,10 @@ class BusinessDirectoryVendors extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

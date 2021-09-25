@@ -13,6 +13,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersAccounts extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $status;
@@ -97,5 +99,10 @@ class BasepackagesUsersAccounts extends BaseModel
         );
 
         parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
     }
 }

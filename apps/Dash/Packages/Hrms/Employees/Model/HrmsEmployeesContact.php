@@ -2,10 +2,13 @@
 
 namespace Apps\Dash\Packages\Hrms\Employees\Model;
 
+use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployees;
 use System\Base\BaseModel;
 
 class HrmsEmployeesContact extends BaseModel
 {
+    protected static $modelRelations = [];
+
     public $id;
 
     public $employee_id;
@@ -25,4 +28,23 @@ class HrmsEmployeesContact extends BaseModel
     public $contact_fax;
 
     public $contact_other;
+
+    public function initialize()
+    {
+        self::$modelRelations['employee']['relationObj'] = $this->belongsTo(
+            'employee_id',
+            HrmsEmployees::class,
+            'id',
+            [
+                'alias' => 'employee'
+            ]
+        );
+
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
+    }
 }

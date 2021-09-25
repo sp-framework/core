@@ -476,57 +476,55 @@ abstract class BasePackage extends Controller
 						$params['columns'] = $md['columns'];
 
 						$rows = $this->getByParams($params, true, false);
-						// var_dump($query, $rows, $relationColumns);
+
 						if ($rows && count($rows) > 0) {
 							foreach ($rows as $row) {
 								$model = $this->getFirst('id', $row['id'], true, false);
 
+								$rowData = $model->toArray();
+
 								$modelRelations = $model->getModelRelations();
 
 								if ($modelRelations && count($modelRelations) > 0) {
-									$rootFieldsToQuery = [];
-
 									foreach ($modelRelations as $relationColumnKey => $relationColumn) {
-										if (isset($relationColumns[$relationColumnKey])) {
-											$refModel = $relationColumn['relationObj']->getReferencedModel();
+										if ($relationColumn['relationObj']->getType() === 0) {
+											$parentFields = $relationColumn['relationObj']->getFields();
+											$parentReferencedFields = $relationColumn['relationObj']->getReferencedFields();
+											$parentModelClass = $relationColumn['relationObj']->getReferencedModel();
 
-											if ($refModel === $query['model']) {
-												$rootFields = $relationColumn['relationObj']->getFields();
-												$rootReferencedFields = $relationColumn['relationObj']->getReferencedFields();
-
-												if (is_array($rootFields) && is_array($rootReferencedFields)) {
-													// multiple fields
-												} else {
-													$rootFieldsToQuery[0]['rootField'] = $rootFields;
-													$rootFieldsToQuery[0]['rootReferencedField'] = $model->{$rootReferencedFields};
-												}
-												break;
-											}
+											break;
 										}
 									}
+								}
 
-									$rowData = [];
+								if (isset($parentModelClass) && is_string($parentFields) && is_string($parentReferencedFields)) {
+									$parentModel = $this->getFirst($parentReferencedFields, $rowData[$parentFields], true, false, $parentModelClass);
+								} else if (isset($parentModelClass) && is_array($parentFields) && is_array($parentReferencedFields)) {
+									// Params
+									// $parentModel = $this->getFirst($parentReferencedFields, $rowData[$parentFields], true, false, $parentModelClass);
+								}
 
-									if (count($rootFieldsToQuery) > 0 && count($rootFieldsToQuery) === 1) {
-										$rootModelToUse = $this->getFirst($rootFieldsToQuery[0]['rootField'], $rootFieldsToQuery[0]['rootReferencedField']);
+								if (isset($parentModel)) {
+									$rowData = array_merge($rowData, $parentModel->toArray());
 
-										if ($rootModelToUse) {
-											$rowData = $rootModelToUse->toArray();
-										}
+									if (method_exists($parentModel, 'getModelRelations')) {
+										$parentModelRelations = $parentModel->getModelRelations();
+									}
 
-										foreach ($modelRelations as $relationColumnKey => $relationColumn) {
-											if (isset($relationColumns[$relationColumnKey])) {
-												$alias = $relationColumn['relationObj']->getOption('alias');
+									if (isset($parentModelRelations) && is_array($parentModelRelations) && count($parentModelRelations) > 0) {
+										foreach ($parentModelRelations as $parentModelRelationKey => $parentModelRelation) {
+											if ($parentModelRelation['relationObj']->getReferencedModel() !== $this->modelToUse) {
+												$childrenAlias = $parentModelRelation['relationObj']->getOption('alias');
 
-												if (isset($rootModelToUse->{$alias}) && $rootModelToUse->{$alias}) {
-													$relationRowData = $rootModelToUse->{$alias}->toArray();
-													unset($relationRowData['id']);
-													$rowData = array_merge($rowData, $relationRowData);
+												if (isset($parentModel->{$childrenAlias}) && $parentModel->{$childrenAlias}) {
+													$childrenRowData = $parentModel->{$childrenAlias}->toArray();
+
+													unset($childrenRowData['id']);
+
+													$rowData = array_merge($rowData, $childrenRowData);
 												}
 											}
 										}
-									} else if (count($rootFieldsToQuery) > 0) {
-										//Search By Params
 									}
 
 									if (count($rowData) > 0) {
@@ -534,6 +532,7 @@ abstract class BasePackage extends Controller
 									}
 								} else {
 									$rowData = array_merge($rowData, $model->toArray());
+
 									if (count($rowData) > 0) {
 										array_push($data, $rowData);
 									}
@@ -610,7 +609,7 @@ abstract class BasePackage extends Controller
 
 			$data = $this->getByParams($params, $resetCache, $enableCache);
 		}
-
+		// var_dump($data);die();
 		if ($data) {
 			$pageParams['data'] = $data;
 		} else {
@@ -987,7 +986,6 @@ abstract class BasePackage extends Controller
 	protected function getModelsRelations()
 	{
 		if ($this->modelToUse) {
-
 			$model = new $this->modelToUse;
 
 			$relations = [];
@@ -1075,6 +1073,7 @@ abstract class BasePackage extends Controller
 		$metadata = [];
 
 		$md = $this->getModelsMetaData();
+
 		$md['model'] = [];
 		$md['model']['id'] = $this->modelToUse;
 
