@@ -317,13 +317,19 @@ dataCollectionSection =
                     new autoComplete({
                         data: {
                             src: async() => {
+                                var value = document.querySelector("#{{componentId}}-{{sectionId}}-manager_full_name").value;
+
+                                if (value.toLowerCase() === 'self') {
+                                    return;
+                                }
+
                                 const url = '{{links.url("hrms/employees/searchEmployee")}}';
 
                                 var myHeaders = new Headers();
                                 myHeaders.append("accept", "application/json");
 
                                 var formdata = new FormData();
-                                formdata.append("search", document.querySelector("#{{componentId}}-{{sectionId}}-manager_full_name").value);
+                                formdata.append("search", value);
                                 formdata.append($('#security-token').attr('name'), $('#security-token').val());
 
                                 var requestOptions = {
@@ -391,12 +397,14 @@ dataCollectionSection =
                             $('#{{componentId}}-{{sectionId}}-manager_full_name').blur();
                             $('#{{componentId}}-{{sectionId}}-manager_full_name').val(feedback.selection.value.full_name);
                             $('#{{componentId}}-{{sectionId}}-manager_full_name').attr('value', feedback.selection.value.full_name);
+                            $('#{{componentId}}-{{sectionId}}-manager_full_name_list').children('li').remove();
                         }
                 });
                 // On delete
                 $('#{{componentId}}-{{sectionId}}-manager_full_name').on('input propertychange', function() {
                     $('#{{componentId}}-{{sectionId}}-manager_id').val(0);
                     $('#{{componentId}}-{{sectionId}}-manager_id').attr('value', 0);
+                    $('#{{componentId}}-{{sectionId}}-manager_full_name_list').children('li').remove();
                 });
 
                 $('#{{componentId}}-{{sectionId}}-manager_full_name').focusout(function() {

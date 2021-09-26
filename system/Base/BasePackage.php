@@ -32,6 +32,8 @@ abstract class BasePackage extends Controller
 
 	protected $cacheName;
 
+	protected $cacheClass;
+
 	protected $manager = null;
 
 	protected $transaction = null;
@@ -41,6 +43,12 @@ abstract class BasePackage extends Controller
 		$this->packagesData = new PackagesData;
 
 		$this->setDefaultPackageResponse();
+
+		if (isset($this->modelToUse)) {
+			$this->cacheClass = $this->modelToUse;
+		} else {
+			$this->cacheClass = $this;
+		}
 
 		if (!$this->cacheName || $this->config->cache->enabled) {
 			$this->getCacheName();
@@ -115,7 +123,6 @@ abstract class BasePackage extends Controller
 	public function getById(int $id, bool $resetCache = false, bool $enableCache = true)
 	{
 		$this->buildGetQueryParamsArr();
-
 
 		if ($id) {
 			if (!$resetCache && $enableCache && $this->cacheName) {
@@ -829,10 +836,46 @@ abstract class BasePackage extends Controller
 
 	public function remove(int $id, $resetCache = true)
 	{
-		$this->getById($id);
+		$this->getFirst('id', $id);
 
-		if ($this->model->toArray()['id'] == $id) {
-			if ($this->model->delete()) {
+		if ($this->model && $this->model->id == $id) {
+
+			$relationsDeleted = true;
+
+			$modelRelations = $this->getModelsRelations();
+
+			if (isset($modelRelations['modelRelations']) &&
+				is_array($modelRelations['modelRelations']) &&
+				count($modelRelations['modelRelations']) > 0
+			) {
+				$relationsDeleted = true;
+
+				foreach ($modelRelations['modelRelations'] as $modelRelationKey => $modelRelation) {
+					$type = $modelRelation['relationObj']->getType();
+
+					if ($type !== 0) {//Other than belongsTo
+						$alias = $modelRelation['relationObj']->getOption('alias');
+
+						if ($this->model->{$alias}) {
+							$relationRowsData = $this->model->{$alias}->toArray();
+
+							if (!$this->model->{$alias}->delete()) {
+								$relationsDeleted = false;
+							} else {
+								if ($resetCache &&
+									count($relationRowsData) > 0 &&
+									isset($relationRowsData['id'])
+								) {
+									$cacheName = $this->extractCacheName($modelRelation['relationObj']->getReferencedModel());
+									$this->resetCache($relationRowsData['id'], true, $cacheName);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			if ($relationsDeleted && $this->model->delete()) {
 
 				if ($resetCache) {
 					$this->resetCache($id, true);
@@ -932,9 +975,20 @@ abstract class BasePackage extends Controller
 		return explode('\\', $reflection->getName());
 	}
 
-	protected function extractCacheName()
+	protected function getCacheClassName($cacheClass = null)
 	{
-		$class = $this->getClassName();
+		if (!$cacheClass) {
+			$cacheClass = $this->cacheClass;
+		}
+
+		$reflection = new \ReflectionClass($cacheClass);
+
+		return explode('\\', $reflection->getName());
+	}
+
+	protected function extractCacheName($cacheClass = null)
+	{
+		$class = $this->getCacheClassName($cacheClass);
 
 		return strtolower(join($class));
 	}
@@ -988,9 +1042,13 @@ abstract class BasePackage extends Controller
 		return $this->cacheTools->addModelCacheParameters($params, $this->cacheName);
 	}
 
-	protected function resetCache(int $id = null, $removeId = false)
+	protected function resetCache(int $id = null, $removeId = false, $cacheName = null)
 	{
-		$this->cacheTools->resetCache($this->cacheName, $id, $removeId);
+		if (!$cacheName) {
+			$cacheName = $this->cacheName;
+		}
+
+		$this->cacheTools->resetCache($cacheName, $id, $removeId);
 	}
 
 	public function getModel()
@@ -1191,13 +1249,6 @@ abstract class BasePackage extends Controller
 
 		return false;
 	}
-
-	// protected function regenerateCaches(int $id = null)
-	// {
-	// 	if ($id) {
-	// 		$this->get($id);
-	// 	}
-	// }
 
 	protected function executeSQL(string $sql)
 	{

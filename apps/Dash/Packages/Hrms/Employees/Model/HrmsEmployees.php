@@ -6,6 +6,7 @@ use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesContact;
 use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesEmployment;
 use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesFinance;
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class HrmsEmployees extends BaseModel
 {
@@ -61,6 +62,15 @@ class HrmsEmployees extends BaseModel
             'employee_id',
             [
                 'alias' => 'finance'
+            ]
+        );
+
+        self::$modelRelations['accounts']['relationObj'] = $this->hasOne(
+            'account_id',
+            BasepackagesUsersAccounts::class,
+            'id',
+            [
+                'alias' => 'accounts'
             ]
         );
 

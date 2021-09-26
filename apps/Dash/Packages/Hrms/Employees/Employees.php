@@ -19,9 +19,7 @@ class Employees extends BasePackage
 
     public function getEmployeeById(int $id)
     {
-        $employeeModel = new $this->modelToUse;
-
-        $employeeObj = $employeeModel::findFirstById($id);
+        $employeeObj = $this->getFirst('id', $id);
 
         if ($employeeObj) {
             $employee = $employeeObj->toArray();

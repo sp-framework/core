@@ -116,6 +116,10 @@ class EmployeesComponent extends BaseComponent
                 }
 
                 $employee['notes'] = $this->basepackages->notes->getNotes('employees', $this->getData()['id']);
+
+                $employee['contact_phone'] = $this->formatNumbers($employee['contact_phone']);
+                $employee['contact_mobile'] = $this->formatNumbers($employee['contact_mobile']);
+                $employee['contact_fax'] = $this->formatNumbers($employee['contact_fax']);
             } else {
                 $employee = [];
             }
@@ -128,10 +132,6 @@ class EmployeesComponent extends BaseComponent
             }
 
             $this->view->currencies = $this->basepackages->geoCountries->currencyEnabled(true);
-
-            $employee['contact_phone'] = $this->formatNumbers($employee['contact_phone']);
-            $employee['contact_mobile'] = $this->formatNumbers($employee['contact_mobile']);
-            $employee['contact_fax'] = $this->formatNumbers($employee['contact_fax']);
 
             $this->view->employee = $employee;
 
