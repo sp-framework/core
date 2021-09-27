@@ -834,7 +834,7 @@ abstract class BasePackage extends Controller
 		return $data;
 	}
 
-	public function remove(int $id, $resetCache = true)
+	public function remove(int $id, $resetCache = true, $removeRelated = true, $removeRelatedAliases = [])
 	{
 		$this->getFirst('id', $id);
 
@@ -842,32 +842,42 @@ abstract class BasePackage extends Controller
 
 			$relationsDeleted = true;
 
-			$modelRelations = $this->getModelsRelations();
+			if ($removeRelated) {
+				$modelRelations = $this->getModelsRelations();
 
-			if (isset($modelRelations['modelRelations']) &&
-				is_array($modelRelations['modelRelations']) &&
-				count($modelRelations['modelRelations']) > 0
-			) {
-				$relationsDeleted = true;
+				if (isset($modelRelations['modelRelations']) &&
+					is_array($modelRelations['modelRelations']) &&
+					count($modelRelations['modelRelations']) > 0
+				) {
+					$relationsDeleted = true;
 
-				foreach ($modelRelations['modelRelations'] as $modelRelationKey => $modelRelation) {
-					$type = $modelRelation['relationObj']->getType();
+					foreach ($modelRelations['modelRelations'] as $modelRelationKey => $modelRelation) {
+						$type = $modelRelation['relationObj']->getType();
 
-					if ($type !== 0) {//Other than belongsTo
-						$alias = $modelRelation['relationObj']->getOption('alias');
+						if ($type !== 0) {//Other than belongsTo
+							$removeAlias = false;
 
-						if ($this->model->{$alias}) {
-							$relationRowsData = $this->model->{$alias}->toArray();
+							$alias = $modelRelation['relationObj']->getOption('alias');
 
-							if (!$this->model->{$alias}->delete()) {
-								$relationsDeleted = false;
-							} else {
-								if ($resetCache &&
-									count($relationRowsData) > 0 &&
-									isset($relationRowsData['id'])
-								) {
-									$cacheName = $this->extractCacheName($modelRelation['relationObj']->getReferencedModel());
-									$this->resetCache($relationRowsData['id'], true, $cacheName);
+							if (count($removeRelatedAliases) > 0 && in_array($alias, $removeRelatedAliases)) {
+								$removeAlias = true;
+							} else if (count($removeRelatedAliases) === 0) {
+								$removeAlias = true;
+							}
+
+							if ($removeAlias && $this->model->{$alias}) {
+								$relationRowsData = $this->model->{$alias}->toArray();
+
+								if (!$this->model->{$alias}->delete()) {
+									$relationsDeleted = false;
+								} else {
+									if ($resetCache &&
+										count($relationRowsData) > 0 &&
+										isset($relationRowsData['id'])
+									) {
+										$cacheName = $this->extractCacheName($modelRelation['relationObj']->getReferencedModel());
+										$this->resetCache($relationRowsData['id'], true, $cacheName);
+									}
 								}
 							}
 						}
@@ -876,7 +886,6 @@ abstract class BasePackage extends Controller
 			}
 
 			if ($relationsDeleted && $this->model->delete()) {
-
 				if ($resetCache) {
 					$this->resetCache($id, true);
 				}
@@ -890,6 +899,8 @@ abstract class BasePackage extends Controller
 		} else {
 			$this->addResponse("No Record Found with that ID!", 1);
 		}
+
+		return false;
 	}
 
 	public function clone(int $id, string $addCloneTxtToColumn = 'name', array $data = null)
