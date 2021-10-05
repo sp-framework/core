@@ -487,7 +487,7 @@ dataCollectionSection =
                     var postData = { };
 
                     postData['country_id'] = $('#{{componentId}}-{{sectionId}}-id').val();
-                    postData['country_iso3'] = $('#{{componentId}}-{{sectionId}}-iso3').val();
+                    postData['country_iso2'] = $('#{{componentId}}-{{sectionId}}-iso2').val();
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
                     $.post(url, postData, function(response) {
                         if (response.responseCode == 0) {

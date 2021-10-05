@@ -28,6 +28,7 @@
         "cboden/ratchet": "^0.4.3",
         "react/zmq": "^0.4.0",
         "peppeocchi/php-cron-scheduler": "^4.0",
-        "php-imap/php-imap": "^4.1"
+        "php-imap/php-imap": "^4.1",
+        "league/csv": "^9.0"
     }
 }

@@ -4,6 +4,7 @@ namespace Apps\Dash\Components\System\Geo\Timezones;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use System\Base\BaseComponent;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoExtractData;
 
 class TimezonesComponent extends BaseComponent
 {
@@ -21,6 +22,18 @@ class TimezonesComponent extends BaseComponent
      */
     public function viewAction()
     {
+        if (isset($this->getData()['extractdata']) &&
+            $this->getData()['extractdata'] == true
+        ) {
+            $this->extractData();
+
+            echo 'Code: ' . $this->view->responseCode . '<br>';
+
+            echo 'Message: ' . $this->view->responseMessage;
+
+            return false;
+        }
+
         $countriesArr = $this->basepackages->geoCountries->getAll()->geoCountries;
 
         if (isset($this->getData()['id'])) {
@@ -74,11 +87,11 @@ class TimezonesComponent extends BaseComponent
             $this->geoTimezones,
             'system/geo/timezones/view',
             null,
-            ['zone_name', 'tz_name', 'gmt_offset', 'gmt_offset_name', 'abbreviation', 'country_id'],
+            ['zone_name', 'tz_name', 'gmt_offset', 'gmt_offset_name', 'gmt_offset_dst', 'gmt_offset_name_dst', 'abbreviation'],
             true,
-            ['zone_name', 'tz_name', 'gmt_offset', 'gmt_offset_name', 'abbreviation', 'country_id'],
+            ['zone_name', 'tz_name', 'gmt_offset', 'gmt_offset_name', 'gmt_offset_dst', 'gmt_offset_name_dst', 'abbreviation'],
             $controlActions,
-            ['gmt_offset'=>'gmt offset (secs)', 'country_id'=>'country','tz_name'=>'time zone name'],
+            ['gmt_offset'=>'gmt offset (secs)','gmt_offset_dst'=>'gmt offset DST (secs)','tz_name'=>'time zone name'],
             $replaceColumns,
             'zone_name',
             // $dtAdditionControlButtons
@@ -149,6 +162,26 @@ class TimezonesComponent extends BaseComponent
             } else {
                 $this->addResponse('Search Query Missing', 1);
             }
+        }
+    }
+
+    //To update get table from wikipedia link - https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+    //Timezone data is placed in /system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/ folder.
+    protected function extractData()
+    {
+        $account = $this->auth->account();
+        $account['id'] = 1;
+        if ($account && $account['id'] == 1) {
+            $geoExtractDataPackage = new GeoExtractData;
+
+            $geoExtractDataPackage->extractTZData();
+
+            $this->addResponse(
+                $geoExtractDataPackage->packagesData->responseMessage,
+                $geoExtractDataPackage->packagesData->responseCode
+            );
+        } else {
+            $this->addResponse('Only super admin allowed to extract geo data', 1);
         }
     }
 }

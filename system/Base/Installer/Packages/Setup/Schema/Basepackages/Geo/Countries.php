@@ -24,148 +24,171 @@ class Countries
                 new Column(
                     'name',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => true
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => true
                     ]
                 ),
                 new Column(
                     'iso3',
                     [
-                        'type'      => Column::TYPE_CHAR,
-                        'size'      => 3,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_CHAR,
+                        'size'          => 3,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'iso2',
                     [
-                        'type'      => Column::TYPE_CHAR,
-                        'size'      => 2,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_CHAR,
+                        'size'          => 2,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'phone_code',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'capital',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'currency',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'currency_symbol',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 10,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'currency_enabled',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'native',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'region',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'subregion',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'emoji',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'emojiU',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'longitude',
+                    [
+                        'type'          => Column::TYPE_DECIMAL,
+                        'size'          => 11,
+                        'scale'         => 8,
+                        'notNull'       => false,
+                    ]
+                ),
+                new Column(
+                    'latitude',
+                    [
+                        'type'          => Column::TYPE_DECIMAL,
+                        'size'          => 10,
+                        'scale'         => 8,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
                     'translations',
                     [
-                        'type'      => Column::TYPE_JSON,
-                        'size'      => 2048,
-                        'notNull'   => false
+                        'type'          => Column::TYPE_JSON,
+                        'size'          => 2048,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'installed',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'enabled',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => true,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => true,
                     ]
                 ),
                 new Column(
                     'user_added',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
                     ]
                 )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_unicode_ci'
-            ],
-            'indexes' => [
-                new Index(
-                    'column_UNIQUE',
-                    [
-                        'name'
-                    ],
-                    'UNIQUE'
-                )
             ]
+        ];
+    }
+
+    public function indexes()
+    {
+        return
+        [
+            new Index(
+                'column_UNIQUE',
+                [
+                    'name'
+                ],
+                'UNIQUE'
+            )
         ];
     }
 }

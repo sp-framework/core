@@ -42,5 +42,6 @@ return
         'Symfony\\Polyfill\\Ctype'                      => __DIR__ . '/../../../ThirdParty/vendor/symfony/polyfill-ctype',
         'GO'                                            => __DIR__ . '/../../../ThirdParty/vendor/peppeocchi/php-cron-scheduler/src/GO',
         'Cron'                                          => __DIR__ . '/../../../ThirdParty/vendor/dragonmantank/cron-expression/src/Cron',
-        'PhpImap'                                       => __DIR__ . '/../../../ThirdParty/vendor/php-imap/php-imap/src/PhpImap'
+        'PhpImap'                                       => __DIR__ . '/../../../ThirdParty/vendor/php-imap/php-imap/src/PhpImap',
+        'League\\Csv'                                   => __DIR__ . '/../../../ThirdParty/vendor/league/csv/src'
     ];

@@ -3,6 +3,7 @@
     {% set cityName = city['name'] %}
     {% set cityLongitude = city['longitude'] %}
     {% set cityLatitude = city['latitude'] %}
+    {% set cityPostcode = city['postcode'] %}
     {% set cityState = city['state_id'] %}
     {% set cityCountry = city['country_id'] %}
 {% else %}
@@ -10,6 +11,7 @@
     {% set cityName = '' %}
     {% set cityLongitude = '' %}
     {% set cityLatitude = '' %}
+    {% set cityPostcode = '' %}
     {% set cityState = '' %}
     {% set cityCountry = '' %}
 {% endif %}
@@ -76,7 +78,7 @@
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'City Longitude',
-                        'fieldRequired'                  : true,
+                        'fieldRequired'                  : false,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
@@ -98,13 +100,35 @@
                         'fieldType'                      : 'input',
                         'fieldHelp'                      : true,
                         'fieldHelpTooltipContent'        : 'City Latitude',
-                        'fieldRequired'                  : true,
+                        'fieldRequired'                  : false,
                         'fieldBazScan'                   : true,
                         'fieldBazPostOnCreate'           : true,
                         'fieldBazPostOnUpdate'           : true,
                         'fieldDataInputMinLength'        : 1,
                         'fieldDataInputMaxLength'        : 100,
                         'fieldValue'                     : cityLatitude
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'postcode',
+                        'fieldLabel'                     : 'Post Code',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'City Post Code',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 50,
+                        'fieldValue'                     : cityPostcode
                     ]
                 )}}
             </div>
@@ -193,6 +217,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-name'                    : { },
         '{{componentId}}-{{sectionId}}-longitude'               : { },
         '{{componentId}}-{{sectionId}}-latitude'                : { },
+        '{{componentId}}-{{sectionId}}-postcode'                : { },
         '{{componentId}}-{{sectionId}}-state_id'                : {
             placeholder : 'SELECT STATE'
         },
@@ -202,15 +227,13 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form'                    : {
             rules: {
                 '{{componentId}}-{{sectionId}}-name'            : 'required',
-                '{{componentId}}-{{sectionId}}-longitude'       : 'required',
-                '{{componentId}}-{{sectionId}}-latitude'        : 'required',
+                '{{componentId}}-{{sectionId}}-postcode'        : 'required',
                 '{{componentId}}-{{sectionId}}-state_id'        : 'required',
                 '{{componentId}}-{{sectionId}}-country_id'      : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-name'            : 'Please enter city name',
-                '{{componentId}}-{{sectionId}}-longitude'       : 'Please enter city longitude',
-                '{{componentId}}-{{sectionId}}-latitude'        : 'Please enter city latitude',
+                '{{componentId}}-{{sectionId}}-postcode'        : 'Please enter city post code',
                 '{{componentId}}-{{sectionId}}-state_id'        : 'Please select state',
                 '{{componentId}}-{{sectionId}}-country_id'      : 'Please select country',
             }

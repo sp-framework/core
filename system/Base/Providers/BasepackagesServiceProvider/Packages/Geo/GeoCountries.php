@@ -14,6 +14,8 @@ class GeoCountries extends BasePackage
 
     public $geoCountries;
 
+    protected $sourceDir = 'system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/';
+
     public function searchCountries(string $countryQueryString, $all = false)
     {
         $searchCountries =
@@ -30,14 +32,14 @@ class GeoCountries extends BasePackage
             $countries = [];
 
             foreach ($searchCountries as $countryKey => $countryValue) {
-                $country = $this->getById($countryValue['id']);
+                // $country = $this->getById($countryValue['id']);
 
                 if ($all) {
                     $countries[$countryKey] = $countryValue;
                     continue;
                 }
 
-                if ($country['enabled'] == 1 && $country['installed'] == 1) {
+                if ($countryValue['enabled'] == 1 && $countryValue['installed'] == 1) {
                     $countries[$countryKey] = $countryValue;
                 }
             }
@@ -63,7 +65,9 @@ class GeoCountries extends BasePackage
 
         if ($this->add($data)) {
 
-            $this->updateSeq();
+            if (!isset($data['id'])) {
+                $this->updateSeq();
+            }
 
             $this->addResponse('Added country ' . $data['name']);
         } else {
@@ -108,13 +112,15 @@ class GeoCountries extends BasePackage
 
     public function installCountry(array $data)
     {
-        $countryData =
-            Json::decode(
-                $this->localContent->read(
-                    '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/' . $data['country_iso3'] . '.json'
-                ),
-                true
-            );
+        if (!$this->downloadCountryData($data['country_iso2'])) {
+            return false;
+        }
+
+        if (!$this->extractCountryData($data['country_iso2'])) {
+            return false;
+        }
+
+        $countryData = Json::decode($this->localContent->read($this->sourceDir . $data['country_iso2'] . '.json'), true);
 
         $this->registerStates($countryData['states'], $countryData['id']);
             // dump($countryData);
@@ -131,6 +137,55 @@ class GeoCountries extends BasePackage
         }
     }
 
+    protected function downloadCountryData($country)
+    {
+        try {
+            $this->localContent->write(
+                $this->sourceDir . $country . '.zip',
+                $this->remoteContent
+                    ->request(
+                        'GET',
+                        'https://dev.bazaari.com.au/sp-public/geodata/raw/branch/master/' . $country . '.zip',
+                        ['verify' => false]
+                    )->getBody()->getContents()
+                );
+            return true;
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+
+        return false;
+    }
+
+    protected function extractCountryData($country)
+    {
+        $zip = new \ZipArchive;
+
+        try {
+            if ($zip->open(base_path($this->sourceDir . $country . '.zip'))) {
+                if (!$zip->extractTo('/')) {
+                    $this->addResponse('Country zip file corrupt.', 1);
+
+                    return false;
+                }
+            } else {
+                $this->addResponse('Country zip file corrupt.', 1);
+
+                return false;
+            }
+
+            $zip->close(base_path($this->sourceDir . $country . '.zip'));
+
+            return true;
+        } catch (\Exception $e) {
+            $this->addResponse($e->getMessage(), 1);
+
+            return false;
+        }
+    }
+
     // protected function registerTimezones($timezonesData, $country_id)
     // {
     //     foreach ($timezonesData as $key => $timezone) {
@@ -142,27 +197,43 @@ class GeoCountries extends BasePackage
     //         $geoTimezone['abbreviation'] = $timezone['abbreviation'];
     //         $geoTimezone['tz_name'] = $timezone['tzName'];
 
-    //         $this->basepackages->geoTimezones->add($geoTimezone, false);
+    //         $this->basepackages->geoTimezones->add($geoTimezone);
     //     }
     // }
 
     protected function registerStates($statesData, $country_id)
     {
+        $searchByCities = [];
+
         foreach ($statesData as $key => $state) {
             $state['country_id'] = $country_id;
-            $this->basepackages->geoStates->add($state, false);
-            // dump($state);
-            // $this->db->insertAsDict(
-            //     'geo_states',
-            //     [
-            //         'id'            => $statesData[$key]['id'],
-            //         'name'          => $statesData[$key]['name'],
-            //         'state_code'    => $statesData[$key]['state_code'],
-            //         'country_id'    => $country_id
-            //     ]
-            // );
 
-            $this->registerCities($statesData[$key]['cities'], $country_id, $statesData[$key]['id']);
+            if (isset($state['cities'])) {
+                $cities = $state['cities'];
+                unset($state['cities']);
+            }
+
+            if (isset($state['id']) && $this->basepackages->geoStates->getById($state['id'])) {
+                $this->basepackages->geoStates->updateState($state);
+            } else if (count($state) === 2 && isset($state['name'])) {//We make sure we have only state['name'] && state['cities'] set
+                $searchByCities[$key] = $state;
+
+                if (isset($cities)) {
+                    $searchByCities[$key]['cities'] = $cities;
+                }
+
+                continue;
+            } else {
+                $this->basepackages->geoStates->addState($state);
+            }
+
+            if (isset($cities)) {
+                $this->registerCities($cities, $country_id, $state['id']);
+            }
+        }
+
+        if (count($searchByCities) > 0) {
+            $this->searchByCities($searchByCities, $country_id);
         }
     }
 
@@ -171,20 +242,36 @@ class GeoCountries extends BasePackage
         foreach ($citiesData as $key => $city) {
             $city['state_id'] = $state_id;
             $city['country_id'] = $country_id;
-            $this->basepackages->geoCities->add($city, false);
-            // var_dump($city);
-            // die();
-            // $this->db->insertAsDict(
-            //     'geo_cities',
-            //     [
-            //         'id'            => $citiesData[$key]['id'],
-            //         'name'          => $citiesData[$key]['name'],
-            //         'latitude'      => $citiesData[$key]['latitude'],
-            //         'longitude'     => $citiesData[$key]['longitude'],
-            //         'state_id'      => $state_id,
-            //         'country_id'    => $country_id
-            //     ]
-            // );
+
+            if (isset($city['id']) && $this->basepackages->geoCities->getById($city['id'])) {
+                $this->basepackages->geoCities->updateCity($city);
+            } else {
+                $this->basepackages->geoCities->addCity($city);
+            }
+        }
+    }
+
+    protected function searchByCities($searchByCities, $country_id)
+    {
+        foreach ($searchByCities as $stateKey => $state) {
+            if (count($state['cities']) > 0) {
+                foreach ($state['cities'] as $cityKey => $city) {
+                    $dbCityObj = $this->basepackages->geoCities->getFirst('name', $city['name']);
+
+                    if ($dbCityObj) {
+                        $dbCity = $dbCityObj->toArray();
+
+                        $dbCity = array_merge($dbCity, $city);
+
+                        $this->basepackages->geoCities->updateCity($dbCity);
+                    } else {
+                        $city['state_id'] = 0;
+                        $city['country_id'] = $country_id;
+
+                        $this->basepackages->geoCities->addCity($city);
+                    }
+                }
+            }
         }
     }
 

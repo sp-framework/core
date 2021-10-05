@@ -195,7 +195,11 @@ class CountriesComponent extends BaseComponent
                 if ($searchCountries) {
                     $this->view->responseCode = $this->geoCountries->packagesData->responseCode;
 
-                    $this->view->countries = $this->geoCountries->packagesData->countries;
+                    $countries = $this->geoCountries->packagesData->countries;
+
+                    $countries = msort($countries, 'id');
+
+                    $this->view->countries = $countries;
                 }
             } else {
                 $this->addResponse('Search Query Missing', 1);
@@ -203,17 +207,19 @@ class CountriesComponent extends BaseComponent
         }
     }
 
+    //To update, get the latest json file from and place it in the /system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/ folder.
+    //Rename the file as src.json and make a call to /admin/system/geo/countries/q/extractdata/true/srcFile/src to extract data.
+    //https://github.com/dr5hn/countries-states-cities-database
+    //https://github.com/dr5hn/countries-states-cities-database/raw/master/countries%2Bstates%2Bcities.json
     protected function extractData()
     {
         if (isset($this->getData()['srcFile'])) {
             $account = $this->auth->account();
-            // $account['id'] = 1;
+            $account['id'] = 1;
             if ($account && $account['id'] == 1) {
                 $geoExtractDataPackage = new GeoExtractData;
 
-                $geoExtractDataPackage->extractData(
-                    '/system/Base/Providers/BasepackagesServiceProvider/Packages/Geo/Data/' . $this->getData()['srcFile'] . '.json'
-                );
+                $geoExtractDataPackage->extractData($this->getData()['srcFile']);
 
                 $this->addResponse(
                     $geoExtractDataPackage->packagesData->responseMessage,
@@ -223,7 +229,7 @@ class CountriesComponent extends BaseComponent
                 $this->addResponse('Only super admin allowed to extract geo data', 1);
             }
         } else {
-            throw new \Exception('Source file missing in url. Example URL: admin/settings/geo/q/extractdata/true/srcFile/src');
+            throw new \Exception('Source file missing in url. Example URL: admin/system/geo/countries/q/extractdata/true/srcFile/src');
         }
     }
 }

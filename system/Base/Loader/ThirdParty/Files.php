@@ -17,5 +17,6 @@ return
         __DIR__ . '/../../../ThirdParty/vendor/symfony/deprecation-contracts/function.php',
         __DIR__ . '/../../../ThirdParty/vendor/symfony/translation/Resources/functions.php',
         __DIR__ . '/../../../ThirdParty/vendor/react/promise/src/functions_include.php',
-        __DIR__ . '/../../../ThirdParty/vendor/react/promise-timer/src/functions_include.php'
+        __DIR__ . '/../../../ThirdParty/vendor/react/promise-timer/src/functions_include.php',
+        __DIR__ . '/../../../ThirdParty/vendor/league/csv/src/functions_include.php'
     ];

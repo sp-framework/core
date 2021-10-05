@@ -22,7 +22,9 @@ class GeoCities extends BasePackage
     {
         if ($this->add($data)) {
 
-            $this->updateSeq();
+            if (!isset($data['id'])) {
+                $this->updateSeq();
+            }
 
             $this->addResponse('Added ' . $data['name'] . ' city');
         } else {
@@ -95,5 +97,7 @@ class GeoCities extends BasePackage
 
             return true;
         }
+
+        return false;
     }
 }

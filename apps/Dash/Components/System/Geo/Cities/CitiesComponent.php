@@ -44,14 +44,20 @@ class CitiesComponent extends BaseComponent
         }
 
         $countries = [];
-        foreach ($countriesArr as $countriesKey => $country) {
-            $countries[$country['id']] = $country['name'] . ' (' . $country['id'] . ')';
+        $states = [];
+
+        if ($countriesArr) {
+            foreach ($countriesArr as $countriesKey => $country) {
+                $countries[$country['id']] = $country['name'] . ' (' . $country['id'] . ')';
+            }
         }
 
-        $states = [];
-        foreach ($statesArr as $statesKey => $state) {
-            $states[$state['id']] = $state['name'] . ' (' . $state['id'] . ')';
+        if ($statesArr) {
+            foreach ($statesArr as $statesKey => $state) {
+                $states[$state['id']] = $state['name'] . ' (' . $state['id'] . ')';
+            }
         }
+
         $controlActions =
             [
                 // 'includeQ'              => true,
@@ -81,11 +87,11 @@ class CitiesComponent extends BaseComponent
             $this->geoCities,
             'system/geo/cities/view',
             null,
-            ['name', 'longitude', 'latitude', 'state_id', 'country_id'],
+            ['name', 'longitude', 'latitude', 'postcode', 'state_id', 'country_id'],
             true,
-            ['name', 'longitude', 'latitude', 'state_id', 'country_id'],
+            ['name', 'longitude', 'latitude', 'postcode', 'state_id', 'country_id'],
             $controlActions,
-            null,
+            ['state_id'=>'State','postcode'=>'post code', 'country_id'=>'country'],
             $replaceColumns,
             'name',
             // $dtAdditionControlButtons

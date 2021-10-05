@@ -8,17 +8,19 @@ class BasepackagesGeoTimezones extends BaseModel
 {
     public $id;
 
-    public $country_id;
-
     public $zone_name;
+
+    public $tz_name;
 
     public $gmt_offset;
 
     public $gmt_offset_name;
 
-    public $abbreviation;
+    public $gmt_offset_dst;
 
-    public $tz_name;
+    public $gmt_offset_name_dst;
+
+    public $abbreviation;
 
     public $user_added;
 }

@@ -5,7 +5,6 @@
     {% set timezoneGmtOffset = timezone['gmt_offset'] %}
     {% set timezoneGmtOffsetName = timezone['gmt_offset_name'] %}
     {% set timezoneAbbreviation = timezone['abbreviation'] %}
-    {% set timezoneCountry = timezone['country_id'] %}
 {% else %}
     {% set timezoneId = '' %}
     {% set timezoneZoneName = '' %}
@@ -13,7 +12,6 @@
     {% set timezoneGmtOffset = '' %}
     {% set timezoneGmtOffsetName = '' %}
     {% set timezoneAbbreviation = '' %}
-    {% set timezoneCountry = '' %}
 {% endif %}
 <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
     <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
@@ -154,29 +152,47 @@
                     ]
                 )}}
             </div>
-        </div>
-        <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
-                        'component'                            : component,
-                        'componentName'                        : componentName,
-                        'componentId'                          : componentId,
-                        'sectionId'                            : sectionId,
-                        'fieldId'                              : 'country_id',
-                        'fieldLabel'                           : 'Country',
-                        'fieldType'                            : 'select2',
-                        'fieldHelp'                            : true,
-                        'fieldHelpTooltipContent'              : 'State Country Example: Australia.',
-                        'fieldRequired'                        : true,
-                        'fieldBazScan'                         : true,
-                        'fieldBazPostOnCreate'                 : true,
-                        'fieldBazPostOnUpdate'                 : true,
-                        'fieldDataSelect2Options'              : countries,
-                        'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'name',
-                        'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : timezoneCountry
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'gmt_offset_dst',
+                        'fieldLabel'                     : 'GMT Offset DST (secs)',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'GMT offset in seconds. Example: 36000 for +10:00',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : timezoneGmtOffset
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'gmt_offset_name_dst',
+                        'fieldLabel'                     : 'GMT Offset Name DST',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'GMT offset name. Example: UTC+10:00',
+                        'fieldRequired'                  : false,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataInputMinLength'        : 1,
+                        'fieldDataInputMaxLength'        : 15,
+                        'fieldValue'                     : timezoneGmtOffsetName
                     ]
                 )}}
             </div>
@@ -216,26 +232,23 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-tz_name'                     : { },
         '{{componentId}}-{{sectionId}}-gmt_offset'                  : { },
         '{{componentId}}-{{sectionId}}-gmt_offset_name'             : { },
+        '{{componentId}}-{{sectionId}}-gmt_offset_dst'              : { },
+        '{{componentId}}-{{sectionId}}-gmt_offset_name_dst'         : { },
         '{{componentId}}-{{sectionId}}-abbreviation'                : { },
-        '{{componentId}}-{{sectionId}}-country_id'                  : {
-            placeholder : 'SELECT COUNTRY'
-        },
         '{{componentId}}-{{sectionId}}-form'                        : {
             rules: {
                 '{{componentId}}-{{sectionId}}-zone_name'           : 'required',
                 '{{componentId}}-{{sectionId}}-tz_name'             : 'required',
                 '{{componentId}}-{{sectionId}}-gmt_offset'          : 'required',
                 '{{componentId}}-{{sectionId}}-gmt_offset_name'     : 'required',
-                '{{componentId}}-{{sectionId}}-abbreviation'        : 'required',
-                '{{componentId}}-{{sectionId}}-country_id'          : 'required'
+                '{{componentId}}-{{sectionId}}-abbreviation'        : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-zone_name'           : 'Please enter zone name',
                 '{{componentId}}-{{sectionId}}-tz_name'             : 'Please enter time zone name',
                 '{{componentId}}-{{sectionId}}-gmt_offset'          : 'Please enter gmt offset',
                 '{{componentId}}-{{sectionId}}-gmt_offset_name'     : 'Please enter gmt offset name',
-                '{{componentId}}-{{sectionId}}-abbreviation'        : 'Please enter abbreviation',
-                '{{componentId}}-{{sectionId}}-country_id'          : 'Please select country',
+                '{{componentId}}-{{sectionId}}-abbreviation'        : 'Please enter abbreviation'
             }
         }
     });

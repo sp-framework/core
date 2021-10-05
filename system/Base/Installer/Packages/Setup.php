@@ -11,10 +11,9 @@ use Phalcon\Db\Index;
 use Phalcon\Validation\Validator\Email;
 use Phalcon\Validation\Validator\PresenceOf;
 use System\Base\Installer\Packages\Setup\Register\App as RegisterApp;
-use System\Base\Installer\Packages\Setup\Register\App\Type as RegisterAppType;
-use System\Base\Installer\Packages\Setup\Register\Basepackages\Address\Type as RegisterAddressType;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Filter as RegisterFilter;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Countries as RegisterCountries;
+use System\Base\Installer\Packages\Setup\Register\Basepackages\Geo\Timezones as RegisterTimezones;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Menu as RegisterMenu;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\Storages\Storages as RegisterStorages;
 use System\Base\Installer\Packages\Setup\Register\Basepackages\User\Account as RegisterRootAdminAccount;
@@ -31,10 +30,8 @@ use System\Base\Installer\Packages\Setup\Register\Modules\Package as RegisterPac
 use System\Base\Installer\Packages\Setup\Register\Modules\Repository as RegisterRepository;
 use System\Base\Installer\Packages\Setup\Register\Modules\View as RegisterView;
 use System\Base\Installer\Packages\Setup\Schema\Apps;
-use System\Base\Installer\Packages\Setup\Schema\Apps\Types as AppsTypes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\ActivityLogs;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Book as AddressBook;
-use System\Base\Installer\Packages\Setup\Schema\Basepackages\Address\Types as AddressTypes;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\AddressBook;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailQueue;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\EmailServices;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Filters;
@@ -177,7 +174,6 @@ class Setup
 		$dbName = $this->dbConfig['db']['dbname'];
 
 		$this->db->createTable('core', $dbName, (new Core)->columns());
-		$this->db->createTable('apps_types', $dbName, (new AppsTypes)->columns());
 		$this->db->createTable('apps', $dbName, (new Apps)->columns());
 		$this->db->createTable('domains', $dbName, (new Domains)->columns());
 		$this->db->createTable('modules_components', $dbName, (new Components)->columns());
@@ -201,12 +197,14 @@ class Setup
 		$this->db->createTable('basepackages_menus', $dbName, (new Menus)->columns());
 		$this->db->createTable('basepackages_filters', $dbName, (new Filters)->columns());
 		$this->db->createTable('basepackages_geo_countries', $dbName, (new Countries)->columns());
-		$this->db->createTable('basepackages_geo_timezones', $dbName, (new Timezones)->columns());
+		$this->addIndex('basepackages_geo_countries', (new Countries)->indexes());
 		$this->db->createTable('basepackages_geo_states', $dbName, (new States)->columns());
+		$this->addIndex('basepackages_geo_states', (new States)->indexes());
 		$this->db->createTable('basepackages_geo_cities', $dbName, (new Cities)->columns());
+		$this->addIndex('basepackages_geo_cities', (new Cities)->indexes());
+		$this->db->createTable('basepackages_geo_timezones', $dbName, (new Timezones)->columns());
+		// $this->db->createTable('basepackages_geo_ipaddresses', $dbName, (new IpAddresses)->columns());
 		$this->db->createTable('basepackages_address_book', $dbName, (new AddressBook)->columns());
-		$this->db->createTable('basepackages_address_types', $dbName, (new AddressTypes)->columns());
-		$this->registerAddressTypes();
 		$this->db->createTable('basepackages_storages', $dbName, (new Storages)->columns());
 		$this->db->createTable('basepackages_storages_local', $dbName, (new StoragesLocal)->columns());
 		$this->db->createTable('basepackages_activity_logs', $dbName, (new ActivityLogs)->columns());
@@ -242,14 +240,7 @@ class Setup
 
 	public function registerApp()
 	{
-		$this->registerAppTypes();
-
 		return $this->registerAdminApp();
-	}
-
-	protected function registerAppTypes()
-	{
-		return (new RegisterAppType())->register($this->db);
 	}
 
 	protected function registerAdminApp()
@@ -446,14 +437,14 @@ class Setup
 		return (new RegisterCountries())->register($this->db, $this->localContent);
 	}
 
+	public function registerTimezones()
+	{
+		return (new RegisterTimezones())->register($this->db, $this->localContent);
+	}
+
 	public function registerStorages()
 	{
 		return (new RegisterStorages())->register($this->db);
-	}
-
-	protected function registerAddressTypes()
-	{
-		return (new RegisterAddressType())->register($this->db);
 	}
 
 	protected function getInstalledFiles($directory = null, $sub = true)
@@ -519,5 +510,39 @@ class Setup
 		// }
 
 		// (new Pdo())->write($this->localContent);
+	}
+
+	protected function addIndex(string $table, array $index, $schemaName = '')
+	{
+		foreach ($index as $idx) {
+			$columnsArr = $idx->getColumns();
+
+			if (count($columnsArr) > 1) {
+				$columns = '';
+
+				foreach ($columnsArr as $columnsArrKey => $column) {
+					$columns .= '`' . $column . '`';
+
+					if ($columnsArrKey != Arr::lastKey($columnsArr)) {
+						$columns .= ',';
+					}
+				}
+			} else {
+				$columns = '`' . $columnsArr[0] . '`';
+			}
+
+			$this->executeSQL(
+				'ALTER TABLE `' . $table . '` ADD ' . strtoupper($idx->getType()) . ' `' . $idx->getName() . '` (' . $columns . ')'
+			);
+		}
+	}
+
+	protected function executeSQL(string $sql)
+	{
+		try {
+			return $this->db->query($sql);
+		} catch (\PDOException $e) {
+			throw new \Exception($e->getMessage());
+		}
 	}
 }

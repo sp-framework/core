@@ -34,6 +34,10 @@ class BasepackagesGeoCountries extends BaseModel
 
     public $emojiU;
 
+    public $latitude;
+
+    public $longitude;
+
     public $translations;
 
     public $user_added;

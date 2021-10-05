@@ -23,55 +23,64 @@ class Timezones
                 new Column(
                     'zone_name',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 512,
-                        'notNull'   => true
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 512,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'tz_name',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => true
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'gmt_offset',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 50,
-                        'notNull'   => true
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'gmt_offset_name',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 255,
-                        'notNull'   => true
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'gmt_offset_dst',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 50,
+                        'notNull'       => false
+                    ]
+                ),
+                new Column(
+                    'gmt_offset_name_dst',
+                    [
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 255,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'abbreviation',
                     [
-                        'type'      => Column::TYPE_VARCHAR,
-                        'size'      => 10,
-                        'notNull'   => true
-                    ]
-                ),
-                new Column(
-                    'country_id',
-                    [
-                        'type'      => Column::TYPE_INTEGER,
-                        'notNull'   => true
+                        'type'          => Column::TYPE_VARCHAR,
+                        'size'          => 10,
+                        'notNull'       => false
                     ]
                 ),
                 new Column(
                     'user_added',
                     [
-                        'type'    => Column::TYPE_TINYINTEGER,
-                        'notNull' => false,
+                        'type'          => Column::TYPE_TINYINTEGER,
+                        'notNull'       => false,
                     ]
                 )
             ],

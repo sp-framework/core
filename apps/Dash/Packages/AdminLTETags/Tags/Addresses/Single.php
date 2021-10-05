@@ -730,7 +730,13 @@ class Single
                             highlight: true,
                             resultItem: {
                                 content: (data, source) => {
-                                    source.innerHTML = data.match + " <span>(State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
+                                    var postCode = "0";
+
+                                    if (data.value.postcode) {
+                                        postCode = data.value.postcode;
+                                    }
+
+                                    source.innerHTML = data.match + " <span>(Post Code: " + postCode + ", State: " + data.value.state_name + ", Country: " + data.value.country_name + ")</span>";
                                 },
                                 element: "div"
                             },
@@ -754,7 +760,8 @@ class Single
                                 $("#' . $this->compSecId . '-city_id").attr("value", feedback.selection.value.id);
                                 $("#' . $this->compSecId . '-city_name").blur();
                                 $("#' . $this->compSecId . '-city_name").val(feedback.selection.value.name);
-                                $("#' . $this->compSecId . '-city_name").attr("value", feedback.selection.value.name);
+                                $("#' . $this->compSecId . '-post_code").val(feedback.selection.value.postcode);
+                                $("#' . $this->compSecId . '-post_code").attr("value", feedback.selection.value.postcode);
                                 $("#' . $this->compSecId . '-state_id").val(feedback.selection.value.state_id);
                                 $("#' . $this->compSecId . '-state_id").attr("value", feedback.selection.value.state_id);
                                 $("#' . $this->compSecId . '-state_name").val(feedback.selection.value.state_name);
@@ -769,6 +776,7 @@ class Single
                     $("#' . $this->compSecId . '-city_name").on("input propertychange", function() {
                         $("#' . $this->compSecId . '-city_id").val(0);
                         $("#' . $this->compSecId . '-city_id").attr("value", 0);
+                        $("#' . $this->compSecId . '-post_code").val("");
                         $("#' . $this->compSecId . '-state_id").val(0);
                         $("#' . $this->compSecId . '-state_id").attr("value", 0);
                         $("#' . $this->compSecId . '-state_name").val("");

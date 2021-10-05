@@ -151,6 +151,8 @@ Class Setup
 
 					$this->setupPackage->registerCountries();
 
+					$this->setupPackage->registerTimezones();
+
 					$this->setupPackage->registerStorages();
 
 					$this->setupPackage->registerWorkers();

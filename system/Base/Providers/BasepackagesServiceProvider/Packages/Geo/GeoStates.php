@@ -22,7 +22,9 @@ class GeoStates extends BasePackage
     {
         if ($this->add($data)) {
 
-            $this->updateSeq();
+            if (!isset($data['id'])) {
+                $this->updateSeq();
+            }
 
             $this->addResponse('Added ' . $data['name'] . ' state');
         } else {
