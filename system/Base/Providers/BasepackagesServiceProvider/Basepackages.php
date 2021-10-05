@@ -3,8 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider;
 
 use System\Base\Providers\BasepackagesServiceProvider\Packages\ActivityLogs;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Book as Addressbook;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Address\Types as Addresstypes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\AddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\Email;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailQueue;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Email\EmailServices;
@@ -54,8 +53,6 @@ class Basepackages
 	protected $storages;
 
 	protected $addressbook;
-
-	protected $addresstypes;
 
 	protected $activityLogs;
 
@@ -175,16 +172,9 @@ class Basepackages
 
 	protected function initAddressbook()
 	{
-		$this->addressbook = (new Addressbook())->init();
+		$this->addressbook = (new AddressBook())->init();
 
 		return $this->addressbook;
-	}
-
-	protected function initAddresstypes()
-	{
-		$this->addresstypes = (new Addresstypes())->init();
-
-		return $this->addresstypes;
 	}
 
 	protected function initActivityLogs()
