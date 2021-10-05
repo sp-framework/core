@@ -320,7 +320,7 @@ dataCollectionSection =
                                 var value = document.querySelector("#{{componentId}}-{{sectionId}}-manager_full_name").value;
 
                                 if (value.toLowerCase() === 'self') {
-                                    return;
+                                    return [];
                                 }
 
                                 const url = '{{links.url("hrms/employees/searchEmployee")}}';
@@ -378,6 +378,12 @@ dataCollectionSection =
                             element: "div"
                         },
                         noResults: () => {
+                            var value = document.querySelector("#{{componentId}}-{{sectionId}}-manager_full_name").value;
+
+                            if (value.toLowerCase() === 'self') {
+                                return;
+                            }
+
                             const result = document.createElement("li");
                             result.setAttribute("class", "autoComplete_result text-danger");
                             result.setAttribute("tabindex", "1");
@@ -415,7 +421,9 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-employment_type_id'              : {
             'placeholder'   : "SELECT EMPLOYMENT TYPE",
             afterInit       : function () {
-                $('#{{componentId}}-{{sectionId}}-type_id').on('select2:select', function(e) {
+                $('#{{componentId}}-{{sectionId}}-employment_type_id').on('select2:select', function(e) {
+                    //eslint-disable-next-line
+                    console.log(e.params.data.id);
                     if (e.params.data.id === '2') {
                         $('#{{componentId}}-{{sectionId}}-contractors').attr('hidden', false);
                         $('#{{componentId}}-{{sectionId}}-contractor_vendor_id').attr('disabled', false);
@@ -868,8 +876,8 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-form'                            : {
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {
-                // //eslint-disable-next-line
-                // console.log(validator.errorList);
+                //eslint-disable-next-line
+                console.log(validator.errorList);
             },
             rules: {
                 '{{componentId}}-{{sectionId}}-account_id'                  : 'required',

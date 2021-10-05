@@ -14,14 +14,14 @@
     {% set employeeId = '' %}
     {% set employeePortrait = '' %}
     {% set employeeEntityId = '' %}
-    {% set employeeAccountId = '' %}
+    {% set employeeAccountId = '0' %}
     {% set employeeAccountEmail = '' %}
     {% set employeeStatus = '' %}
     {% set employeeFirstName = '' %}
     {% set employeeLastName = '' %}
     {% set employeeDesignation = '' %}
-    {% set employeeManagerId = '' %}
-    {% set employeeManager = '' %}
+    {% set employeeManagerId = '0' %}
+    {% set employeeManager = 'SELF' %}
 {% endif %}
 <div class="row vdivide">
     <div class="col-md-3 col-sm-12">
@@ -99,31 +99,6 @@
                         'componentName'                        : componentName,
                         'componentId'                          : componentId,
                         'sectionId'                            : sectionId,
-                        'fieldId'                              : 'entity_id',
-                        'fieldLabel'                           : 'Business Entity',
-                        'fieldType'                            : 'select2',
-                        'fieldHelp'                            : true,
-                        'fieldHelpTooltipContent'              : 'Select a business entity that is placing the purchase order.',
-                        'fieldRequired'                        : true,
-                        'fieldBazScan'                         : true,
-                        'fieldBazPostOnCreate'                 : true,
-                        'fieldBazPostOnUpdate'                 : true,
-                        'fieldBazJstreeSearch'                 : true,
-                        'fieldDataSelect2Options'              : entities,
-                        'fieldDataSelect2OptionsKey'           : 'id',
-                        'fieldDataSelect2OptionsValue'         : 'business_name',
-                        'fieldDataSelect2OptionsArray'         : true,
-                        'fieldDataSelect2OptionsSelected'      : employeeEntityId
-                    ]
-                )}}
-            </div>
-            <div class="col">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                            : component,
-                        'componentName'                        : componentName,
-                        'componentId'                          : componentId,
-                        'sectionId'                            : sectionId,
                         'fieldId'                              : 'status',
                         'fieldLabel'                           : 'Status',
                         'fieldType'                            : 'select2',
@@ -155,6 +130,7 @@
                     {% set createLink = '' %}
                     {% set linkHidden = true %}
                     {% set createHidden = false %}
+                    {% set employeeAccountId = '0' %}
                 {% endif %}
                 {{adminltetags.useTag('fields',
                     [
@@ -210,6 +186,33 @@
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : false,
                         'fieldBazPostOnUpdate'                  : false
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'entity_id',
+                        'fieldLabel'                           : 'Business Entity',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : 'Select a business entity that is placing the purchase order.',
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldDataSelect2Options'              : entities,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'business_name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeEntityId
                     ]
                 )}}
             </div>
@@ -316,7 +319,7 @@
                         'fieldType'                             : 'input',
                         'fieldPlaceholder'                      : 'Search Manager',
                         'fieldHelp'                             : true,
-                        'fieldHelpTooltipContent'               : 'Search Manager. If Employee is top level manager who doesnt report to anyone, enter field value - <strong>self</strong>',
+                        'fieldHelpTooltipContent'               : 'Search Manager. If Employee does not report to anyone, enter field value - <strong>SELF</strong>',
                         'fieldBazScan'                          : true,
                         'fieldBazJstreeSearch'                  : true,
                         'fieldBazPostOnCreate'                  : false,
