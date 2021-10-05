@@ -2,14 +2,11 @@
 
 namespace Apps\Dash\Components\System\Tools\Barcodes;
 
-use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\System\Tools\Barcodes\Barcodes;
 use System\Base\BaseComponent;
 
 class BarcodesComponent extends BaseComponent
 {
-    use DynamicTable;
-
     protected $barcodes;
 
     protected $barcodesSettings;
@@ -43,14 +40,12 @@ class BarcodesComponent extends BaseComponent
 
             $this->barcodes->updateBarcodesSettings($this->postData());
 
-            $this->view->responseCode = $this->barcodes->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->barcodes->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->barcodes->packagesData->responseMessage,
+                $this->barcodes->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -68,9 +63,7 @@ class BarcodesComponent extends BaseComponent
             }
 
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -83,8 +76,9 @@ class BarcodesComponent extends BaseComponent
             $test
         );
 
-        $this->view->responseCode = $this->barcodes->packagesData->responseCode;
-
-        $this->view->responseMessage = $this->barcodes->packagesData->responseMessage;
+        $this->addResponse(
+            $this->barcodes->packagesData->responseMessage,
+            $this->barcodes->packagesData->responseCode
+        );
     }
 }

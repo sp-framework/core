@@ -2,14 +2,11 @@
 
 namespace Apps\Dash\Components\System\Tools\Qrcodes;
 
-use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\System\Tools\Qrcodes\Qrcodes;
 use System\Base\BaseComponent;
 
 class QrcodesComponent extends BaseComponent
 {
-    use DynamicTable;
-
     protected $qrcodes;
 
     protected $qrcodesSettings;
@@ -63,14 +60,12 @@ class QrcodesComponent extends BaseComponent
 
             $this->qrcodes->updateQrcodesSettings($this->postData());
 
-            $this->view->responseCode = $this->qrcodes->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->qrcodes->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->qrcodes->packagesData->responseMessage,
+                $this->qrcodes->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -86,11 +81,8 @@ class QrcodesComponent extends BaseComponent
             if ($this->qrcodes->packagesData->responseCode === 0) {
                 $this->view->qrcode = $this->qrcodes->packagesData->qrcode;
             }
-
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -98,8 +90,9 @@ class QrcodesComponent extends BaseComponent
     {
         $this->qrcodes->generateQrcode($this->postData()['qrcode'], $this->postData());
 
-        $this->view->responseCode = $this->qrcodes->packagesData->responseCode;
-
-        $this->view->responseMessage = $this->qrcodes->packagesData->responseMessage;
+        $this->addResponse(
+            $this->qrcodes->packagesData->responseMessage,
+            $this->qrcodes->packagesData->responseCode
+        );
     }
 }

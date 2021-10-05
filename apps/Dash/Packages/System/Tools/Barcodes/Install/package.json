@@ -1,6 +1,6 @@
 {
     "name"          : "Barcodes",
-    "display_name"   : "Barcodes Package",
+    "display_name"  : "Barcodes Package",
     "description"   : "Package for generating and validating Barcodes",
     "app_type"      : "dash",
     "category"      : "system",
