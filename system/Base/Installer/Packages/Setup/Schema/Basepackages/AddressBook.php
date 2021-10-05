@@ -1,10 +1,10 @@
 <?php
 
-namespace System\Base\Installer\Packages\Setup\Schema\Basepackages\Address;
+namespace System\Base\Installer\Packages\Setup\Schema\Basepackages;
 
 use Phalcon\Db\Column;
 
-class Book
+class AddressBook
 {
     public function columns()
     {
@@ -21,11 +21,18 @@ class Book
                     ]
                 ),
                 new Column(
-                    'name',
+                    'package_name',
                     [
                         'type'    => Column::TYPE_VARCHAR,
                         'size'    => 100,
-                        'notNull' => true,
+                        'notNull' => true
+                    ]
+                ),
+                new Column(//Source Row Id
+                    'package_row_id',
+                    [
+                        'type'    => Column::TYPE_INTEGER,
+                        'notNull' => true
                     ]
                 ),
                 new Column(
@@ -40,14 +47,6 @@ class Book
                     [
                         'type'    => Column::TYPE_TINYINTEGER,
                         'notNull' => true
-                    ]
-                ),
-                new Column(
-                    'package_name',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
-                        'notNull' => true,
                     ]
                 ),
                 new Column(

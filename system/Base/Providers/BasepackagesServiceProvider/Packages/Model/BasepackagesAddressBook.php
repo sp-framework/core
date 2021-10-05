@@ -1,6 +1,6 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Address;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model;
 
 use System\Base\BaseModel;
 
@@ -8,13 +8,13 @@ class BasepackagesAddressBook extends BaseModel
 {
     public $id;
 
-    public $name;
+    public $package_name;
+
+    public $package_row_id;
 
     public $address_type;
 
     public $is_primary;
-
-    public $package_name;
 
     public $attention_to;
 

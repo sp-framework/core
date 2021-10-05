@@ -23,7 +23,7 @@ class Apps extends BasePackage
 
 	public function init(bool $resetCache = false)
 	{
-		$this->types = (new Types)->init($resetCache)->types;
+		$this->types = $this->getAppTypes();
 
 		$this->reservedRoutes = $this->getReservedRoutes();
 
@@ -263,55 +263,38 @@ class Apps extends BasePackage
 	{
 		return
 			[
-				'admin', 'dash', 'ecom', 'pos', 'cms', 'api', 'pusher'
+				'admin', 'dash', 'ecom', 'pos', 'cms', 'api', 'pusher', 'messenger'
 			];
 	}
 
-	// public function getAppCategories()
-	// {
-	// 	return
-	// 		[
-	// 			'1'   =>
-	// 				[
-	// 					'id'   => 'ecom',
-	// 					'name' => 'E-Commerce Management System'
-	// 				],
-	// 			'2'    =>
-	// 				[
-	// 					'id'   => 'tms',
-	// 					'name' => 'Transport Management System'
-	// 				]
-	// 		];
-	// }
-
-	// public function getAppSubCategories()
-	// {
-	// 	return
-	// 		[
-	// 			'1'	  =>
-	// 				[
-	// 					'id'  		=> 'admin',
-	// 					'parent'	=> 'ecom',
-	// 					'name' 		=> 'Admin'
-	// 				],
-	// 			'2'   =>
-	// 				[
-	// 					'id'  		=> 'dashboard',
-	// 					'parent'	=> 'ecom',
-	// 					'name' 		=> 'Dashboard'
-	// 				],
-	// 			'3'   =>
-	// 				[
-	// 					'id'  		=> 'eshop',
-	// 					'parent'	=> 'ecom',
-	// 					'name' 		=> 'EShop'
-	// 				],
-	// 			'4'   =>
-	// 				[
-	// 					'id'  		=> 'pos',
-	// 					'parent'	=> 'ecom',
-	// 					'name' 		=> 'PoS'
-	// 				]
-	// 		];
-	// }
+	public function getAppTypes()
+	{
+		return
+			[
+				'1'   =>
+					[
+						'app_type'      => 'dash',
+						'name'          => 'Dashboard',
+						'description'   => 'Dashboard. Can run modules that require a dashboard, like Admin, Cpanel or Dashboard.',
+					],
+				'2'    =>
+					[
+						'app_type'      => 'ecom',
+						'name'          => 'E-Commerce E-Shop',
+						'description'   => 'Online product catalogue and checkout system.',
+					],
+				'3'    =>
+					[
+						'app_type'      => 'pos',
+						'name'          => 'Point of Sales System',
+						'description'   => 'In-store checkout system.',
+					],
+				'4'    =>
+					[
+						'app_type'      => 'cms',
+						'name'          => 'Content Management System',
+						'description'   => 'App to display any web content. Like a blog.',
+					]
+			];
+	}
 }

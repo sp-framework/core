@@ -30,7 +30,7 @@ class Addresses extends AdminLTETags
             return;
         }
 
-        $this->addressesParams['addressTypes'] = $this->basepackages->addresstypes->addresstypes;
+        $this->addressesParams['addressTypes'] = $this->basepackages->addressbook->getAddressesTypes();
 
         try {
             $address = 'Apps\\Dash\\Packages\\AdminLTETags\\Tags\\Addresses\\' . ucfirst($this->params['addressFieldType']);
