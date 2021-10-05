@@ -2,6 +2,7 @@
 
 namespace Apps\Dash\Packages\Hrms\Employees;
 
+use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployees;
 use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesContact;
 use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesEmployment;
@@ -154,7 +155,6 @@ class Employees extends BasePackage
             $this->updateEmployeeContact($data);
             $this->updateEmployeeEmployment($data);
 
-
             $this->basepackages->storages->changeOrphanStatus($data['portrait'], $employee['portrait']);
 
             if (isset($data['employment_attachments']) && $data['employment_attachments'] !== '') {
@@ -253,6 +253,16 @@ class Employees extends BasePackage
 
     protected function addEmployeeEmployment(array $data)
     {
+        if ($data['employment_type_id'] == '2') {
+            $data['contractor_vendor_id'] = Json::decode($data['contractor_vendor_id'], true);
+
+            if ($data['contractor_vendor_id']['data'][0]) {
+                $data['contractor_vendor_id'] = $data['contractor_vendor_id']['data'][0];
+            } else if (isset($data['contractor_vendor_id']['newTags'][0])) {
+                $data['contractor_vendor_id'] = $this->addContractorVendor($data['account_email'], $data['contractor_vendor_id']['newTags'][0]);
+            }
+        }
+
         $this->modelToUse = HrmsEmployeesEmployment::class;
 
         unset($data['id']);
@@ -264,6 +274,16 @@ class Employees extends BasePackage
 
     protected function updateEmployeeEmployment(array $data)
     {
+        if ($data['employment_type_id'] == '2') {
+            $data['contractor_vendor_id'] = Json::decode($data['contractor_vendor_id'], true);
+
+            if (isset($data['contractor_vendor_id']['data'][0])) {
+                $data['contractor_vendor_id'] = $data['contractor_vendor_id']['data'][0];
+            } else if (isset($data['contractor_vendor_id']['newTags'][0])) {
+                $data['contractor_vendor_id'] = $this->addContractorVendor($data['account_email'], $data['contractor_vendor_id']['newTags'][0]);
+            }
+        }
+
         $this->modelToUse = HrmsEmployeesEmployment::class;
 
         $employmentModel = $this->modelToUse::findFirst(
@@ -286,6 +306,31 @@ class Employees extends BasePackage
         }
 
         $this->modelToUse = HrmsEmployees::class;
+    }
+
+    protected function addContractorVendor($email, $vendorName)
+    {
+        $newVendor['abn'] = '0';
+        $newVendor['business_name'] = $vendorName;
+        $newVendor['contact_phone'] = '0';
+        $newVendor['is_service_provider'] = '1';
+        $newVendor['email'] = 'no-reply@' . $this->domains->domains[0]['name'];
+
+        $vendorPackage = $this->usePackage(Vendors::class);
+
+        $vendorPackage->addVendor($newVendor);
+
+        $vendor = $vendorPackage->packagesData->last;
+
+        $newNote['package_row_id'] = $vendor['vendor_id'];
+        $newNote['note_type'] = '1';
+        $newNote['note_app_visibility']['data'] = [];
+        $newNote['is_private'] = '0';
+        $newNote['note'] = 'Added via employee package : ' . $email;
+
+        $this->basepackages->notes->addNote('vendors', $newNote);
+
+        return $vendor['vendor_id'];
     }
 
     public function checkAccount($id)

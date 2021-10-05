@@ -62,7 +62,14 @@
                 )}}
             </div>
         </div>
-        <div class="row" id="{{componentId}}-{{sectionId}}-contractors" hidden>
+        {% if employeeEmploymentType == 2 %}
+            {% set contractorsHidden = '' %}
+            {% set contractorsDisabled = false %}
+        {% else %}
+            {% set contractorsHidden = 'hidden' %}
+            {% set contractorsDisabled = true %}
+        {% endif %}
+        <div class="row" id="{{componentId}}-{{sectionId}}-contractors" {{contractorsHidden}}>
             <div class="col">
                 {{adminltetags.useTag('fields',
                     [
@@ -76,7 +83,7 @@
                         'fieldHelp'                            : true,
                         'fieldHelpTooltipContent'              : 'Select or add new contractor',
                         'fieldRequired'                        : true,
-                        'fieldDisabled'                        : true,
+                        'fieldDisabled'                        : contractorsDisabled,
                         'fieldBazScan'                         : true,
                         'fieldBazPostOnCreate'                 : true,
                         'fieldBazPostOnUpdate'                 : true,
