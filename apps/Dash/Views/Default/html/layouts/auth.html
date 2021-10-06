@@ -1,4 +1,4 @@
-<!-- htmlhint tag-pair:false --><!-- htmlmin:ignore -->
+<!-- htmlhint tag-pair:false -->
 {{get_doctype()}}
 <html lang="en">
     <head>
@@ -16,6 +16,7 @@
         {{assets.outputInlineCss()}}
     </head>
     <body id="body" class="login-page">
+        {% set currentId = null %}
         <script>
 /* globals dataCollection */
 if (!window.dataCollection) {
@@ -79,4 +80,3 @@ if (!window.dataCollection) {
         {{content()}}
     </body>
 </html>
-<!-- htmlmin:ignore -->
