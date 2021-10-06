@@ -125,7 +125,7 @@ abstract class BasePackage extends Controller
 		$this->buildGetQueryParamsArr();
 
 		if ($id) {
-			if (!$resetCache && $enableCache && $this->cacheName) {
+			if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
 				$parameters = $this->paramsWithCache($this->getIdParams($id), $this->cacheName);
 			} else {
 				$parameters = $this->getIdParams($id);
@@ -159,7 +159,7 @@ abstract class BasePackage extends Controller
 			$params = $this->getParams($by, $value);
 		}
 
-		if (!$resetCache && $enableCache && $this->cacheName) {
+		if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
 			$parameters = $this->paramsWithCache($params);
 		} else {
 			$parameters = $params;
@@ -198,7 +198,7 @@ abstract class BasePackage extends Controller
 	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
 	{
 		if (isset($params['conditions'])) {
-			if (!$resetCache && $enableCache && $this->cacheName) {
+			if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
 				$parameters = $this->paramsWithCache($params);
 			} else {
 				$parameters = $params;
@@ -765,9 +765,11 @@ abstract class BasePackage extends Controller
 					array_push($errMessages, $value->getMessage());
 				}
 
+				array_push($errMessages, $data);
+
 				throw new \Exception(
 					"Could not add {$this->packageNameS}. Reasons: <br>" .
-					join(',', $errMessages)
+					join(',', $this->jsonData($errMessages))
 				);
 			}
 		} else {

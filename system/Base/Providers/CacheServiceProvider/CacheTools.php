@@ -80,7 +80,7 @@ class CacheTools
 
 	public function deleteCache($cacheKey)
 	{
-		if ($this->cache->has($cacheKey)) {
+		if ($this->cache && $this->cache->has($cacheKey)) {
 			$this->cache->delete($cacheKey);
 
 			return true;
