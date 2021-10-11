@@ -1,0 +1,150 @@
+{% if importexport['id'] is defined %}
+    {% set importexportId = importexport['id'] %}
+    {% set title = importexport['type'] ~ ' Request (' ~ importexport['id'] ~ ')' %}
+{% else %}
+    {% set importexportId = '' %}
+    {% set title = 'New ' ~ importexport['type'] ~ ' Request' %}
+{% endif %}
+
+{% if importexport['type'] === 'import' %}
+    {% if importexport['id'] is not defined or importexport['setup'] != 4 %}
+        {% if importexport['id'] is defined %}
+            {% set importexportStep = 2 %}
+        {% else %}
+            {% set importexportStep = importexport['setup'] %}
+        {% endif %}
+        {{adminltetags.useTag('content',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : 'main',
+                'contentType'                   : 'sectionWithWizard',
+                'cardHeader'                    : true,
+                'cardFooter'                    : true,
+                'cardType'                      : 'primary',
+                'cardIcon'                      : 'magic',
+                'cardTitle'                     : title,
+                'cardAdditionalClass'           : 'rounded-0',
+                'wizardType'                    : 'triangle',
+                'wizardCanCancel'               : true,
+                'wizardCancelUrl'               : 'system/tools/importexport',
+                'wizardDoneUrl'                 : 'system/tools/importexport',
+                'wizardStartAtStep'             : importexportStep,
+                'wizardSteps'                   :
+                    [
+                        '0' :
+                            [
+                                'title'             : 'Information',
+                                'content'           : view.getPartial('importexport/types/ebay/wizard/info')
+                            ],
+                        '1' :
+                            [
+                                'title'             : 'Register Request',
+                                'content'           : view.getPartial('importexport/types/ebay/wizard/register',
+                                                        [
+                                                            'wizard'    : true,
+                                                            'title'     : title
+                                                        ]
+                                                    ),
+                                'description'       : 'Step 1: Register Request information with this system.',
+                                'submitOnNext'      : true
+                            ],
+                        '2' :
+                            [
+                                'title'             : 'Authorize App',
+                                'content'           : view.getPartial('importexport/types/ebay/wizard/authorizeapp',
+                                                        [
+                                                            'componentId'       : componentId,
+                                                            'sectionId'         : 'main',
+                                                            'parentComponentId' : parent
+                                                        ]
+                                                    ),
+                                'description'       : 'Step 2: Authorize this system using systems/your eBay dev account credentials.',
+                                'nextDisabled'      : true
+                            ],
+                        '3' :
+                            [
+                                'title'             : 'Authorize User',
+                                'content'           : view.getPartial('importexport/types/ebay/wizard/authorizeuser',
+                                                        [
+                                                            'componentId'       : componentId,
+                                                            'sectionId'         : 'main',
+                                                            'parentComponentId' : parent
+                                                        ]
+                                                    ),
+                                'description'       : 'Step 3: Get an authorization key for your eBay user account',
+                                'nextDisabled'      : true
+                            ],
+                        '4' :
+                            [
+                                'title'             : 'Assign',
+                                'content'           : view.getPartial('importexport/types/ebay/wizard/assign',
+                                                        [
+                                                            'componentId'       : componentId,
+                                                            'sectionId'         : 'main',
+                                                            'parentComponentId' : parent
+                                                        ]
+                                                    ),
+                                'description'       : 'Step 4: Assign eBay Request to channel.',
+                                'goBack'            : false
+                            ]
+                    ]
+            ]
+        )}}
+    {% else %}
+        {{adminltetags.useTag('content',
+            [
+                'component'                     : component,
+                'componentName'                 : componentName,
+                'componentId'                   : componentId,
+                'parentComponentId'             : parent,
+                'sectionId'                     : 'main',
+                'contentType'                   : 'sectionWithForm',
+                'cardHeader'                    : true,
+                'cardFooter'                    : true,
+                'cardType'                      : 'primary',
+                'cardIcon'                      : 'exchange-alt fa-flip-horizontal',
+                'cardTitle'                     : title,
+                'cardAdditionalClass'           : 'rounded-0',
+                'cardBodyInclude'               : 'importexport/types/ebay/wizard/register/form',
+                'formButtons'                   :
+                [
+                    'updateButtonId'                : importexportId,
+                    'addActionUrl'                  : 'system/tools/importexport/add',
+                    'addSuccessRedirectUrl'         : 'system/tools/importexport',
+                    'updateActionUrl'               : 'system/tools/importexport/update',
+                    'updateSuccessRedirectUrl'      : 'system/tools/importexport',
+                    'cancelActionUrl'               : 'system/tools/importexport',
+                    'closeActionUrl'                : 'system/tools/importexport'
+                ]
+            ]
+        )}}
+    {% endif %}
+{% elseif importexport['type'] === 'export' %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'exchange-alt fa-flip-horizontal',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'importexport/types/export/form',
+            'formButtons'                   :
+            [
+                'addActionUrl'                  : 'system/tools/importexport/add',
+                'addSuccessRedirectUrl'         : 'system/tools/importexport',
+                'cancelActionUrl'               : 'system/tools/importexport',
+                'closeActionUrl'                : 'system/tools/importexport'
+            ]
+        ]
+    )}}
+{% endif %}

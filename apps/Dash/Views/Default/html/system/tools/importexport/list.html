@@ -1,0 +1,60 @@
+{{adminltetags.useTag('content',
+    [
+        'component'                 : table['component'],
+        'componentName'             : componentName,
+        'componentId'               : componentId,
+        'parentComponentId'         : parent,
+        'sectionId'                 : 'listing',
+        'contentType'               : 'sectionWithListing',
+        'cardHeader'                : true,
+        'cardType'                  : 'primary',
+        'cardIcon'                  : 'exchange-alt fa-flip-horizontal',
+        'cardTitle'                 : 'Import/Export',
+        'cardAdditionalClass'       : 'rounded-0',
+        'cardShowTools'             : ['maximize'],
+        'dtFixedHeader'             : true,
+        'dtFilter'                  : true,
+        'dtFilterShowQuickFilter'   : true,
+        'dtFilterButtons'           : ['edit', 'delete', 'add', 'clone', 'reset'],
+        'dtFilters'                 : table['filters'],
+        'dtFilterColumns'           : table['filterColumns'],
+        'dtPrimaryButtons'      :
+            {
+                'componentId'                       : componentId,
+                'sectionId'                         : 'listing',
+                'buttonType'                        : 'DropdownSplitButtons',
+                'dropdownButtonId'                  : 'main',
+                'dropdownButtonTitle'               : 'New Request',
+                'dropdownButtonIcon'                : 'plus',
+                'dropdownButtonAdditionalClass'     : 'text-uppercase',
+                'buttonPosition'                    : 'right',
+                'dropdownAlign'                     : 'right',
+                'buttons'                           :
+                    {
+                        'import' : {
+                            'title'                   : 'Import',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('system/tools/importexport/q/type/import/id/0')
+                        },
+                        'export' : {
+                            'title'                   : 'Export',
+                            'type'                    : 'primary',
+                            'additionalClass'         : 'contentAjaxLink',
+                            'url'                     : links.url('system/tools/importexport/q/type/export/id/0')
+                        }
+                    }
+            },
+        'dtTable'                   : table,
+        'dtColumns'                 : table['columns'],
+        'dtPostUrl'                 : table['postUrl'],
+        'dtPostUrlParams'           : table['postUrlParams'],
+        'dtStriped'                 : true,
+        'dtStateSave'               : false,
+        'dtBordered'                : false,
+        'dtHideIdColumn'            : true,
+        'dtNoOfColumnsToShow'       : 8,
+        'dtTableCompact'            : true,
+        'dtZeroRecords'             : 'No import/export requests.'
+    ]
+)}}

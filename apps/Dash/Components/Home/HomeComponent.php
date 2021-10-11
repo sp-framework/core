@@ -44,6 +44,7 @@ use Apps\Dash\Packages\System\Api\Apis\Xero\Sync\Package as XeroSyncPackage;
 use Apps\Dash\Packages\System\Api\Ebay\Taxonomy\Install\Package as TaxonomyPackage;
 use Apps\Dash\Packages\System\Api\Install\Package as ApiPackage;
 use Apps\Dash\Packages\System\Messenger\Install\Package as MessengerPackage;
+use Apps\Dash\Packages\System\Tools\ImportExport\Install\Package as ImportExportPackage;
 use Phalcon\Helper\Json;
 use System\Base\BaseComponent;
 
@@ -100,8 +101,8 @@ class HomeComponent extends BaseComponent
         //
         // $apiPackage = new ApiPackage();
         // $apiPackage->installPackage(true);
-        $xeroSyncPackage = new XeroSyncPackage();
-        $xeroSyncPackage->installPackage(true);
+        // $xeroSyncPackage = new XeroSyncPackage();
+        // $xeroSyncPackage->installPackage(true);
 
         // $vendorgroupsComponent = new VendorGroupsComponent();
         // $vendorgroupsComponent->installComponent();

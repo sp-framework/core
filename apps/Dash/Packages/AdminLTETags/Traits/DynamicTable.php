@@ -37,8 +37,8 @@ trait DynamicTable {
         }
 
         if ($this->request->isGet()) {
-
             $table = [];
+
             if (isset($package->getModelsColumnMap($this->removeEscapeFromName($columnsForTable))['columns'])) {
                 $table['columns'] =
                     $this->sortColumns(
@@ -58,6 +58,7 @@ trait DynamicTable {
                     $table['columns'][$dtReplaceColumnsTitleKey]['name'] = $dtReplaceColumnsTitleValue;
                 }
             }
+
             $table['postUrl'] = $this->links->url($postUrl);
 
             $table['component'] = $this->component;
@@ -143,32 +144,42 @@ trait DynamicTable {
             $this->view->table = $table;
 
         } else if ($this->request->isPost()) {
-            if (is_callable($dtReplaceColumns)) {
-                $pagedData =
-                    $package->getPaged(
-                        [
-                            'columns' => $columnsForTable
-                        ],
-                        $resetCache,
-                        $enableCache
-                    );
+            try {
+                if (is_callable($dtReplaceColumns)) {
+                        $pagedData =
+                            $package->getPaged(
+                                [
+                                    'columns' => $columnsForTable
+                                ],
+                                $resetCache,
+                                $enableCache
+                            );
 
-                $rows = $pagedData->getItems();
+                        $rows = $pagedData->getItems();
 
-                $rows = $this->extractColumnsForTable($columnsForTable, $dtReplaceColumns($rows));//Call & extract columnsTable
+                        $rows = $this->extractColumnsForTable($columnsForTable, $dtReplaceColumns($rows));//Call & extract columnsTable
 
-                $dtReplaceColumns = null;//Remove function before its passed to Table
-            } else {
-                $pagedData =
-                    $package->getPaged(
-                        [
-                            'columns' => $columnsForTable
-                        ],
-                        $resetCache,
-                        $enableCache
-                    );
+                        $dtReplaceColumns = null;//Remove function before its passed to Table
+                } else {
+                    $pagedData =
+                        $package->getPaged(
+                            [
+                                'columns' => $columnsForTable
+                            ],
+                            $resetCache,
+                            $enableCache
+                        );
 
-                $rows = $pagedData->getItems();
+                    $rows = $pagedData->getItems();
+                }
+            } catch (\Exception $e) {
+                $rows = [];
+
+                if ($this->config->logs->exceptions) {
+                    $this->logger->logExceptions->debug($e);
+                }
+
+                $this->addResponse('Exception: Please check exceptions log for more details.', 1);
             }
 
             if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {
