@@ -1,5 +1,8 @@
 {% if entity['id'] is defined %}
     {% set entityAcn = entity['acn'] %}
+    {% if entityAcn == '0' %}
+        {% set entityAcn = '' %}
+    {% endif %}
     {% set entityTfn = entity['tfn'] %}
     {% set entityCurrency = entity['currency'] %}
     {% set entityBsb = entity['bsb'] %}
@@ -29,7 +32,7 @@
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'ACN of the entity',
                 'fieldInputTypeTextFilter'       : 'positiveInt',
-                'fieldRequired'                  : true,
+                'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
@@ -52,7 +55,7 @@
                 'fieldType'                             : 'select2',
                 'fieldHelp'                             : true,
                 'fieldHelpTooltipContent'               : 'Currency',
-                'fieldRequired'                         : true,
+                'fieldRequired'                         : false,
                 'fieldBazScan'                          : true,
                 'fieldBazPostOnCreate'                  : true,
                 'fieldBazPostOnUpdate'                  : true,
@@ -103,7 +106,7 @@
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'BSB of the entity',
-                'fieldRequired'                  : true,
+                'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
@@ -127,7 +130,7 @@
                 'fieldInputTypeTextFilter'       : 'positiveInt',
                 'fieldHelp'                      : true,
                 'fieldHelpTooltipContent'        : 'Account Number of the entity',
-                'fieldRequired'                  : true,
+                'fieldRequired'                  : false,
                 'fieldBazScan'                   : true,
                 'fieldBazJstreeSearch'           : true,
                 'fieldBazPostOnCreate'           : true,
@@ -181,7 +184,7 @@
                 'fieldBazPostOnUpdate'                 : true,
                 'fieldBazJstreeSearch'                 : true,
                 'fieldDataSelect2Create'               : true,
-                'fieldDataSelect2Options'              : accountants,
+                'fieldDataSelect2Options'              : [],
                 'fieldDataSelect2OptionsKey'           : 'id',
                 'fieldDataSelect2OptionsValue'         : 'business_name',
                 'fieldDataSelect2OptionsArray'         : true,

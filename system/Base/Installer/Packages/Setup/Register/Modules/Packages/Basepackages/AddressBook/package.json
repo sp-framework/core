@@ -7,6 +7,6 @@
     "sub_category"  : "tools",
     "version"       : "0.0.1",
     "repo"          : "https://.../",
-    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\Address\\Book",
+    "class"         : "System\\Base\\Providers\\BasepackagesServiceProvider\\Packages\\AddressBook",
     "settings"      : { }
 }

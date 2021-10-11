@@ -381,7 +381,7 @@ dataCollectionSection =
                         for (var item of response.vendors) {
                             vendorsData.push({
                                 'id' : item['id'],
-                                'text' : item['name']
+                                'text' : item['business_name']
                             });
                         }
 
@@ -500,11 +500,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-city_name'               : 'required',
                 '{{componentId}}-{{sectionId}}-post_code'               : 'required',
                 '{{componentId}}-{{sectionId}}-state_name'              : 'required',
-                '{{componentId}}-{{sectionId}}-country_name'            : 'required',
-                '{{componentId}}-{{sectionId}}-acn'                     : 'required',
-                '{{componentId}}-{{sectionId}}-currency'                : 'required',
-                '{{componentId}}-{{sectionId}}-bsb'                     : 'required',
-                '{{componentId}}-{{sectionId}}-account_number'          : 'required'
+                '{{componentId}}-{{sectionId}}-country_name'            : 'required'
             },
             messages: {
                 '{{componentId}}-{{sectionId}}-abn'                     : 'Please enter abn',
@@ -518,11 +514,7 @@ dataCollectionSection =
                 '{{componentId}}-{{sectionId}}-city_name'               : 'Please enter city',
                 '{{componentId}}-{{sectionId}}-post_code'               : 'Please enter post code',
                 '{{componentId}}-{{sectionId}}-state_name'              : 'Please enter state',
-                '{{componentId}}-{{sectionId}}-country_name'            : 'Please enter country',
-                '{{componentId}}-{{sectionId}}-acn'                     : 'Please enter acn',
-                '{{componentId}}-{{sectionId}}-currency'                : 'Please select currency',
-                '{{componentId}}-{{sectionId}}-bsb'                     : 'Please enter bsb',
-                '{{componentId}}-{{sectionId}}-account_number'          : 'Please enter account number',
+                '{{componentId}}-{{sectionId}}-country_name'            : 'Please enter country'
             }
         }
     });

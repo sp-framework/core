@@ -3,6 +3,7 @@
 namespace Apps\Dash\Packages\Business\Entities\Model;
 
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
 
 class BusinessEntities extends BaseModel
 {
@@ -15,8 +16,6 @@ class BusinessEntities extends BaseModel
     public $business_name;
 
     public $entity_type;
-
-    public $address_id;
 
     public $api_id;
 
@@ -47,4 +46,29 @@ class BusinessEntities extends BaseModel
     public $accountant_vendor_id;
 
     public $settings;
+
+    public function initialize()
+    {
+        self::$modelRelations['address']['relationObj'] = $this->hasOne(
+            'id',
+            BasepackagesAddressBook::class,
+            'package_row_id',
+            [
+                'alias'                 => 'address',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'entities'
+                    ]
+                ]
+            ]
+        );
+
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return self::$modelRelations;
+    }
 }

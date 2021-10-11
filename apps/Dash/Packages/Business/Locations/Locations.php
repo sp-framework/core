@@ -17,15 +17,13 @@ class Locations extends BasePackage
 
     public function addLocation(array $data)
     {
-        $data['package_name'] = $this->packageName;
-
         $data = $this->updateEmployees($data);
 
-        $this->basepackages->addressbook->addAddress($data);
-
-        $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
-
         if ($this->add($data)) {
+            $data['package_name'] = $this->packageName;
+            $data['package_row_id'] = $this->packagesData->last['id'];
+            $this->basepackages->addressbook->addAddress($data);
+
             $this->addActivityLog($data);
 
             $this->addResponse('Added ' . $data['name'] . ' location.');
@@ -38,15 +36,14 @@ class Locations extends BasePackage
     {
         $location = $this->getById($data['id']);
 
-        $data['package_name'] = $this->packageName;
-
         $data = $this->updateEmployees($data);
 
         $oldAddress = $this->basepackages->addressbook->getById($data['address_id']);
 
-        $this->basepackages->addressbook->mergeAndUpdate($data);
-
         if ($this->update($data)) {
+            $data['package_name'] = $this->packageName;
+            $this->basepackages->addressbook->mergeAndUpdate($data);
+
             $this->addActivityLog($data, $location, $oldAddress);
 
             $this->addResponse('Updated ' . $data['name'] . ' location.');
@@ -62,7 +59,10 @@ class Locations extends BasePackage
         if ($location['total_stock_qty'] && (int) $location['total_stock_qty'] > 0) {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Location carries stock of ' . $location['total_stock_qty'] . ' products. Move stock to different location before removing location. Error removing location.';
+            $this->packagesData->responseMessage =
+                'Location carries stock of ' .
+                $location['total_stock_qty'] .
+                ' products. Move stock to different location before removing location. Error removing location.';
 
             return false;
         }
@@ -70,12 +70,21 @@ class Locations extends BasePackage
         if ($location['total_employees'] && (int) $location['total_employees'] > 0) {
             $this->packagesData->responseCode = 1;
 
-            $this->packagesData->responseMessage = 'Location has ' . $location['total_employees'] . ' employees. Move employees to different location before removing location. Error removing location.';
+            $this->packagesData->responseMessage =
+                'Location has ' .
+                $location['total_employees'] .
+                ' employees. Move employees to different location before removing location. Error removing location.';
 
             return false;
         }
 
+        $addressObj = $this->getLocationAddress($data['id'], true);
+
         if ($this->remove($data['id'])) {
+            if ($addressObj) {
+                $addressObj->delete();
+            }
+
             $this->addResponse('Removed location.');
         } else {
             $this->addResponse('Error removing location.', 1);
@@ -114,43 +123,34 @@ class Locations extends BasePackage
         //
     }
 
-    public function getLocationById($data)
+    public function getLocationById($id)
     {
-        $location = $this->getById($data['id']);
+        $location = $this->getById($id);
 
-        if (isset($location['employee_ids']) && $location['employee_ids'] !== '') {
-            $location['employees'] = [];
-
+        if ($location['employee_ids'] && $location['employee_ids'] !== '') {
             $location['employee_ids'] = Json::decode($location['employee_ids'], true);
 
-            if (count($location['employee_ids']) > 0) {
-                foreach ($location['employee_ids'] as $employeeKey => $employee) {
-                    $employees = $this->usePackage(Employees::class);
+            foreach ($location['employee_ids'] as $employeeKey => $employee) {
+                if ($this->employees->searchById($employee)) {
+                    $employeeArr = $this->employees->packagesData->employee;
 
-                    $employeeArr = $employees->getEmployeeById($employee);
-
-                    if ($employeeArr) {
-                        $location['employees'][$employeeArr['id']] =
-                            [
-                                'contact_name'      => $employeeArr['full_name'],
-                                'contact_phone'     => $employeeArr['contact_phone'],
-                                'contact_phone_ext' => $employeeArr['contact_phone_ext'],
-                            ];
-                    }
+                    $location['employee_ids'][$employeeKey] = $employeeArr;
+                } else {
+                    unset($location['employee_ids'][$employeeKey]);
                 }
             }
         }
 
-        unset($location['employee_ids']);
+        // unset($location['employee_ids']);
 
-        $location['address'] =
-            $this->basepackages->addressbook->getById($location['address_id']);
+        $location['address'] = $this->getLocationAddress($id);
+            // $this->basepackages->addressbook->getById($location['address_id']);
 
-        unset($location['address_id']);
+        // unset($location['address_id']);
 
         $this->addResponse('Ok', 0, $location);
 
-        return true;
+        return $location;
     }
 
     public function getLocationsByEntityId($data)
@@ -197,5 +197,24 @@ class Locations extends BasePackage
         }
 
         parent::addActivityLog($data, $oldData);
+    }
+
+    protected function getLocationAddress($id, $obj = false)
+    {
+        $locationObj = $this->getFirst('id', $id);
+
+        if ($locationObj) {
+            $addressObj = $locationObj->getAddress();
+
+            if ($addressObj) {
+                if ($obj) {
+                    return $addressObj;
+                }
+
+                return $addressObj->toArray();
+            }
+        }
+
+        return [];
     }
 }

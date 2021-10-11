@@ -1,14 +1,14 @@
-{% if entity['id'] is defined %}
-    {% set entityAddressId = entity['address_id'] %}
-    {% set entityStreetAddress = entity['street_address'] %}
-    {% set entityStreetAddress2 = entity['street_address_2'] %}
-    {% set entityCityId = entity['city_id'] %}
-    {% set entityCity = entity['city_name'] %}
-    {% set entityPostCode = entity['post_code'] %}
-    {% set entityStateId = entity['state_id'] %}
-    {% set entityState = entity['state_name'] %}
-    {% set entityCountryId = entity['country_id'] %}
-    {% set entityCountry = entity['country_name'] %}
+{% if entity['id'] is defined and entity['address']|length > 0 %}
+    {% set entityAddressId = entity['address']['id'] %}
+    {% set entityStreetAddress = entity['address']['street_address'] %}
+    {% set entityStreetAddress2 = entity['address']['street_address_2'] %}
+    {% set entityCityId = entity['address']['city_id'] %}
+    {% set entityCity = entity['address']['city_name'] %}
+    {% set entityPostCode = entity['address']['post_code'] %}
+    {% set entityStateId = entity['address']['state_id'] %}
+    {% set entityState = entity['address']['state_name'] %}
+    {% set entityCountryId = entity['address']['country_id'] %}
+    {% set entityCountry = entity['address']['country_name'] %}
 {% else %}
     {% set entityAddressId = '' %}
     {% set entityStreetAddress = '' %}

@@ -54,13 +54,6 @@ class Entities
                     ]
                 ),
                 new Column(
-                    'address_id',
-                    [
-                        'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => true,
-                    ]
-                ),
-                new Column(
                     'api_id',
                     [
                         'type'          => Column::TYPE_INTEGER,
@@ -119,7 +112,7 @@ class Entities
                     'acn',
                     [
                         'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => true,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
@@ -135,7 +128,7 @@ class Entities
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 3,
-                        'notNull'       => true,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(
@@ -173,7 +166,7 @@ class Entities
                     'settings',
                     [
                         'type'          => Column::TYPE_TEXT,
-                        'notNull'       => true,
+                        'notNull'       => false,
                     ]
                 ),
             ],

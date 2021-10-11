@@ -98,8 +98,8 @@ class Accounts extends BasePackage
             }
 
             if ($getprofiles) {
-                if ($this->model->getprofiles()) {
-                    $relationData = $accountObj->getprofiles()->toArray();
+                if ($this->model->getProfiles()) {
+                    $relationData = $this->model->getProfiles()->toArray();
 
                     unset($relationData['id']);
 
@@ -282,7 +282,7 @@ class Accounts extends BasePackage
      */
     public function removeAccount(array $data)
     {
-        $accountObj = $this->getFirst('id', $id);
+        $accountObj = $this->getFirst('id', $data['id']);
 
         if ($accountObj) {
             $account = $accountObj->toArray();
@@ -300,8 +300,12 @@ class Accounts extends BasePackage
             if (isset($data['id']) && $data['id'] != 1) {
                 if ($this->remove($data['id'])) {
 
-                    if ($accountObj->getprofiles()) {
-                        $accountObj->getprofiles()->delete();
+                    if ($accountObj->getProfiles()) {
+                        if ($accountObj->getProfiles()->getAddress()) {
+                            $accountObj->getProfiles()->getAddress()->delete();
+                        }
+
+                        $accountObj->getProfiles()->delete();
                     }
 
                     $this->removeRelatedData($accountObj);

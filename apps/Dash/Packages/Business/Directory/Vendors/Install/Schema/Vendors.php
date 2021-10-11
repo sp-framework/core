@@ -118,14 +118,6 @@ class Vendors
                     ]
                 ),
                 new Column(
-                    'address_ids',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 100,
-                        'notNull'       => false,
-                    ]
-                ),
-                new Column(
                     'contact_phone',
                     [
                         'type'          => Column::TYPE_VARCHAR,

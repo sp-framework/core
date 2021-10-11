@@ -31,7 +31,7 @@ class LocationsComponent extends BaseComponent
     {
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
-                $location = $this->locations->getById($this->getData()['id']);
+                $location = $this->locations->getLocationById($this->getData()['id']);
 
                 if (!$location) {
                     return $this->throwIdNotFound();
@@ -39,30 +39,10 @@ class LocationsComponent extends BaseComponent
 
                 $location['activityLogs'] = $this->locations->getActivityLogs($this->getData()['id']);
 
-                $address = $this->basepackages->addressbook->getById($location['address_id']);
-
-                unset($address['id']);
-                unset($address['name']);
-
-                $location = array_merge($location, $address);
-
-                if ($location['employee_ids'] && $location['employee_ids'] !== '') {
-                    $location['employee_ids'] = Json::decode($location['employee_ids'], true);
-
-                    foreach ($location['employee_ids'] as $employeeKey => $employee) {
-                        if ($this->employees->searchById($employee)) {
-                            $employeeArr = $this->employees->packagesData->employee;
-
-                            $location['employee_ids'][$employeeKey] = $employeeArr;
-                        } else {
-                            unset($location['employee_ids'][$employeeKey]);
-                        }
-                    }
-                }
-
                 $this->view->location = $location;
             } else {
                 $location = [];
+                $location['address'] = [];
                 $location['employee_ids'] = [];
                 $this->view->location = $location;
             }
@@ -216,7 +196,7 @@ class LocationsComponent extends BaseComponent
     {
         if ($this->request->isPost()) {
 
-            $this->locations->getLocationById($this->postData());
+            $this->locations->getLocationById($this->postData()['id']);
 
             $this->addResponse(
                 $this->locations->packagesData->responseMessage,

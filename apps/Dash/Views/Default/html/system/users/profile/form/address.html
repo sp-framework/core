@@ -1,3 +1,26 @@
+{% if profile['address']|length > 0  %}
+    {% set profileAddressId = profile['address']['id'] %}
+    {% set profileStreetAddress = profile['address']['street_address'] %}
+    {% set profileStreetAddress2 = profile['address']['street_address_2'] %}
+    {% set profileCityId = profile['address']['city_id'] %}
+    {% set profileCity = profile['address']['city_name'] %}
+    {% set profilePostCode = profile['address']['post_code'] %}
+    {% set profileStateId = profile['address']['state_id'] %}
+    {% set profileState = profile['address']['state_name'] %}
+    {% set profileCountryId = profile['address']['country_id'] %}
+    {% set profileCountry = profile['address']['country_name'] %}
+{% else %}
+    {% set profileAddressId = '' %}
+    {% set profileStreetAddress = '' %}
+    {% set profileStreetAddress2 = '' %}
+    {% set profileCityId = '' %}
+    {% set profileCity = '' %}
+    {% set profilePostCode = '' %}
+    {% set profileStateId = '' %}
+    {% set profileState = '' %}
+    {% set profileCountryId = '' %}
+    {% set profileCountry = '' %}
+{% endif %}
 <div class="row">
     <div class="col">
         {{adminltetags.useTag('fields',
@@ -6,18 +29,18 @@
                 'componentName'                  : componentName,
                 'componentId'                    : componentId,
                 'sectionId'                      : sectionId,
-                'fieldId'                        : 'contact_address_id',
-                'fieldLabel'                     : 'Profile Contact Address ID',
+                'fieldId'                        : 'address_id',
+                'fieldLabel'                     : 'Profile Address ID',
                 'fieldType'                      : 'input',
                 'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Profile Contact Address ID',
+                'fieldHelpTooltipContent'        : 'Profile Address ID',
                 'fieldRequired'                  : true,
                 'fieldBazScan'                   : true,
                 'fieldBazPostOnCreate'           : false,
                 'fieldBazPostOnUpdate'           : true,
                 'fieldHidden'                    : true,
                 'fieldDisabled'                  : true,
-                'fieldValue'                     : profile['contact_address_id']
+                'fieldValue'                     : profileAddressId
             ]
         )}}
         {{adminltetags.useTag('addresses',
@@ -29,29 +52,29 @@
                 'addressFieldType'                            : 'single',
                 'includeStreet'                               : true,
                 'searchType'                                  : 'city',
-                'streetAddress'                               : profile['street_address'],
+                'streetAddress'                               : profileStreetAddress,
                 'streetAddressFieldRequired'                  : false,
                 'streetAddressFieldBazPostOnCreate'           : true,
                 'streetAddressFieldBazPostOnUpdate'           : true,
-                'streetAddress2'                              : profile['street_address_2'],
+                'streetAddress2'                              : profileStreetAddress2,
                 'streetAddress2FieldBazPostOnCreate'          : true,
                 'streetAddress2FieldBazPostOnUpdate'          : true,
-                'cityId'                                      : profile['city_id'],
-                'cityName'                                    : profile['city_name'],
+                'cityId'                                      : profileCityId,
+                'cityName'                                    : profileCity,
                 'cityFieldRequired'                           : false,
                 'cityFieldBazPostOnCreate'                    : true,
                 'cityFieldBazPostOnUpdate'                    : true,
-                'postCode'                                    : profile['post_code'],
+                'postCode'                                    : profilePostCode,
                 'postCodeFieldRequired'                       : false,
                 'postCodeFieldBazPostOnCreate'                : true,
                 'postCodeFieldBazPostOnUpdate'                : true,
-                'stateId'                                     : profile['state_id'],
-                'stateName'                                   : profile['state_name'],
+                'stateId'                                     : profileStateId,
+                'stateName'                                   : profileState,
                 'stateFieldRequired'                          : false,
                 'stateFieldBazPostOnCreate'                   : true,
                 'stateFieldBazPostOnUpdate'                   : true,
-                'countryId'                                   : profile['country_id'],
-                'countryName'                                 : profile['country_name'],
+                'countryId'                                   : profileCountryId,
+                'countryName'                                 : profileCountry,
                 'countryFieldRequired'                        : false,
                 'countryFieldBazPostOnCreate'                 : true,
                 'countryFieldBazPostOnUpdate'                 : true

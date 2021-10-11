@@ -4,7 +4,6 @@ namespace Apps\Dash\Components\Business\Entities;
 
 use Apps\Dash\Packages\AdminLTETags\Traits\DynamicTable;
 use Apps\Dash\Packages\Business\ABNLookup\ABNLookup;
-use Apps\Dash\Packages\Business\Directory\Vendors\Vendors;
 use Apps\Dash\Packages\Business\Entities\Entities;
 use Apps\Dash\Packages\System\Api\Api;
 use System\Base\BaseComponent;
@@ -58,8 +57,6 @@ class EntitiesComponent extends BaseComponent
         if (isset($this->getData()['id'])) {
             $this->view->packages = $this->getPackages();
 
-            $this->view->accountants = $this->usePackage(Vendors::class)->getAll()->vendors;
-
             $this->view->logoLink = '';
 
             $entitiesArr = $this->entities->getAll()->entities;
@@ -76,24 +73,15 @@ class EntitiesComponent extends BaseComponent
 
                 $entity = $entities[$this->getData()['id']];
 
-                $address = $this->basepackages->addressbook->getById($entity['address_id']);
-
-                unset($address['id']);
-                unset($address['name']);
-
-                $entity = array_merge($entity, $address);
-
                 $entity['contact_phone'] = $this->formatNumbers($entity['contact_phone']);
                 $entity['contact_fax'] = $this->formatNumbers($entity['contact_fax']);
 
                 $this->view->entity = $entity;
 
-                unset($entities[$this->getData()['id']]);
-
                 $storages = $this->basepackages->storages;
 
-                if ($this->view->entity['logo']) {
-                    $this->view->logoLink = $storages->getPublicLink($this->view->entity['logo'], 200);
+                if ($entity['logo']) {
+                    $this->view->logoLink = $storages->getPublicLink($entity['logo'], 200);
                 }
 
                 $apiArr = $this->apiPackage->getApiByType('xero', false);

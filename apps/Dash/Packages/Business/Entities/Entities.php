@@ -18,26 +18,23 @@ class Entities extends BasePackage
 
     public function getAll(bool $resetCache = false, bool $enableCache = true)
     {
-        if ($enableCache && $this->config->cache->enabled) {
-            $parameters = $this->cacheTools->addModelCacheParameters([], $this->getCacheName());
-        } else {
-            $parameters = [];
-        }
+        parent::getAll();
 
-        if (!$this->{$this->packageName} || $resetCache) {
+        $entities = [];
 
-            $this->model = $this->modelToUse::find($parameters);
-
-            $entities = $this->model->toArray();
-
-            foreach ($entities as $entityKey => &$entity) {
+        if ($this->{$this->packageName} && count($this->{$this->packageName}) > 0) {
+            foreach ($this->{$this->packageName} as $entityKey => $entity) {
                 if ($entity['settings'] !== '') {
                     $entity['settings'] = Json::decode($entity['settings'], true);
                 }
-            }
 
-            $this->{$this->packageName} = $entities;
+                $entity['address'] = $this->getEntityAddress($entity['id']);
+
+                $entities[$entity['id']] = $entity;
+            }
         }
+
+        $this->{$this->packageName} = $entities;
 
         return $this;
     }
@@ -51,20 +48,31 @@ class Entities extends BasePackage
                 $entity['settings'] = Json::decode($entity['settings'], true);
             }
 
-            if ($entity['address_id'] !== '' || $entity['address_id'] != '0') {
-                $address = $this->basepackages->addressbook->getAddressById($entity['address_id']);
-
-                if ($address) {
-                    $entity = array_merge($entity, $address);
-                }
-
-                return $entity;
-            }
+            $entity['address'] = $this->getEntityAddress($entity['id']);
 
             return $entity;
         }
 
         return false;
+    }
+
+    protected function getEntityAddress($id, $obj = false)
+    {
+        $entityObj = $this->getFirst('id', $id);
+
+        if ($entityObj) {
+            $addressObj = $entityObj->getAddress();
+
+            if ($addressObj) {
+                if ($obj) {
+                    return $addressObj;
+                }
+
+                return $addressObj->toArray();
+            }
+        }
+
+        return [];
     }
 
     public function addEntity(array $data)
@@ -77,19 +85,10 @@ class Entities extends BasePackage
             return;
         }
 
-        $data['package_name'] = $this->packageName;
-
-        $data['name'] = $data['business_name'];
-
-        $this->basepackages->addressbook->addAddress($data);
-
-        $data['address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
-
         $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
         $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
 
         if ($this->add($data)) {
-
             if (isset($data['api_id']) &&
                 ($data['api_id'] !== '' && $data['api_id'] != 0)
             ) {
@@ -104,14 +103,13 @@ class Entities extends BasePackage
                 $apiPackage->update($api);
             }
 
+            $data['package_name'] = $this->packageName;
+            $data['package_row_id'] = $this->packagesData->last['id'];
+            $this->basepackages->addressbook->addAddress($data);
 
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['business_name'] . ' business entity.';
+            $this->addResponse('Added ' . $data['business_name'] . ' business entity.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new business entity.';
+            $this->addResponse('Error adding new business entity.', 1);
         }
     }
 
@@ -129,17 +127,10 @@ class Entities extends BasePackage
             }
         }
 
-        $data['package_name'] = $this->packageName;
-
-        $data['name'] = $data['business_name'];
-
-        $this->basepackages->addressbook->mergeAndUpdate($data);
-
         $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
         $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
 
         if ($this->update($data)) {
-
             if (isset($data['api_id']) &&
                 ($data['api_id'] !== '' && $data['api_id'] != 0)
             ) {
@@ -179,13 +170,13 @@ class Entities extends BasePackage
                 $apiPackage->update($api);
             }
 
-            $this->packagesData->responseCode = 0;
+            $data['package_name'] = $this->packageName;
+            $data['package_row_id'] = $data['id'];
+            $this->basepackages->addressbook->mergeAndUpdate($data);
 
-            $this->packagesData->responseMessage = 'Updated ' . $data['business_name'] . ' business entity.';
+            $this->addResponse('Updated ' . $data['business_name'] . ' business entity.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating business entity.';
+            $this->addResponse('Error updating business entity.', 1);
         }
     }
 
@@ -193,8 +184,9 @@ class Entities extends BasePackage
     {
         $entity = $this->getById($data['id']);
 
-        if ($this->remove($data['id'])) {
+        $addressObj = $this->getEntityAddress($data['id'], true);
 
+        if ($this->remove($data['id'])) {
             if (isset($entity['api_id']) &&
                 ($entity['api_id'] !== '' && $entity['api_id'] != 0)
             ) {
@@ -209,13 +201,13 @@ class Entities extends BasePackage
                 $apiPackage->update($api);
             }
 
-            $this->packagesData->responseCode = 0;
+            if ($addressObj) {
+                $addressObj->delete();
+            }
 
-            $this->packagesData->responseMessage = 'Removed business entity.';
+            $this->addResponse('Removed business entity.');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing business entity.';
+            $this->addResponse('Error removing business entity.');
         }
     }
 

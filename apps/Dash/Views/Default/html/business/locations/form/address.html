@@ -1,15 +1,16 @@
-{% if location['id'] is defined %}
-    {% set locationStreetAddress = location['street_address'] %}
-    {% set locationStreetAddress2 = location['street_address_2'] %}
-    {% set locationCityId = location['city_id'] %}
-    {% set locationCity = location['city_name'] %}
-    {% set locationPostCode = location['post_code'] %}
-    {% set locationStateId = location['state_id'] %}
-    {% set locationState = location['state_name'] %}
-    {% set locationCountryId = location['country_id'] %}
-    {% set locationCountry = location['country_name'] %}
-    {% set locationAddressId = location['address_id'] %}
+{% if location['id'] is defined and location['address']|length > 0  %}
+    {% set locationAddressId = location['address']['id'] %}
+    {% set locationStreetAddress = location['address']['street_address'] %}
+    {% set locationStreetAddress2 = location['address']['street_address_2'] %}
+    {% set locationCityId = location['address']['city_id'] %}
+    {% set locationCity = location['address']['city_name'] %}
+    {% set locationPostCode = location['address']['post_code'] %}
+    {% set locationStateId = location['address']['state_id'] %}
+    {% set locationState = location['address']['state_name'] %}
+    {% set locationCountryId = location['address']['country_id'] %}
+    {% set locationCountry = location['address']['country_name'] %}
 {% else %}
+    {% set locationAddressId = '' %}
     {% set locationStreetAddress = '' %}
     {% set locationStreetAddress2 = '' %}
     {% set locationCityId = '' %}
@@ -19,7 +20,6 @@
     {% set locationState = '' %}
     {% set locationCountryId = '' %}
     {% set locationCountry = '' %}
-    {% set locationAddressId = '' %}
 {% endif %}
 {% if locationInboundShipping == '1' %}
     {% set locationInboundShippingChecked = true %}

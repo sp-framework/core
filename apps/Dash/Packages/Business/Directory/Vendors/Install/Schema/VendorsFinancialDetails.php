@@ -40,7 +40,7 @@ class VendorsFinancialDetails
                     [
                         'type'          => Column::TYPE_VARCHAR,
                         'size'          => 3,
-                        'notNull'       => true,
+                        'notNull'       => false,
                     ]
                 ),
                 new Column(

@@ -173,27 +173,27 @@ dataCollectionSection =
                                 $('#security-token').val(response.token);
                             }
 
-                            if (response.entity) {
-                                if (response.entity.street_address) {
-                                    $('#{{componentId}}-{{sectionId}}-street_address').val(response.entity.street_address);
+                            if (response.entity && response.entity.address) {
+                                if (response.entity.address.street_address) {
+                                    $('#{{componentId}}-{{sectionId}}-street_address').val(response.entity.address.street_address);
                                 }
-                                if (response.entity.street_address_2) {
-                                    $('#{{componentId}}-{{sectionId}}-street_address_2').val(response.entity.street_address_2);
+                                if (response.entity.address.street_address_2) {
+                                    $('#{{componentId}}-{{sectionId}}-street_address_2').val(response.entity.address.street_address_2);
                                 }
-                                if (response.entity.city_id && response.entity.city_name) {
-                                    $('#{{componentId}}-{{sectionId}}-city_id').val(response.entity.city_id);
-                                    $('#{{componentId}}-{{sectionId}}-city_name').val(response.entity.city_name);
+                                if (response.entity.address.city_id && response.entity.address.city_name) {
+                                    $('#{{componentId}}-{{sectionId}}-city_id').val(response.entity.address.city_id);
+                                    $('#{{componentId}}-{{sectionId}}-city_name').val(response.entity.address.city_name);
                                 }
-                                if (response.entity.post_code) {
-                                    $('#{{componentId}}-{{sectionId}}-post_code').val(response.entity.post_code);
+                                if (response.entity.address.post_code) {
+                                    $('#{{componentId}}-{{sectionId}}-post_code').val(response.entity.address.post_code);
                                 }
-                                if (response.entity.state_id && response.entity.state_name) {
-                                    $('#{{componentId}}-{{sectionId}}-state_id').val(response.entity.state_id);
-                                    $('#{{componentId}}-{{sectionId}}-state_name').val(response.entity.state_name);
+                                if (response.entity.address.state_id && response.entity.address.state_name) {
+                                    $('#{{componentId}}-{{sectionId}}-state_id').val(response.entity.address.state_id);
+                                    $('#{{componentId}}-{{sectionId}}-state_name').val(response.entity.address.state_name);
                                 }
-                                if (response.entity.country_id && response.entity.country_name) {
-                                    $('#{{componentId}}-{{sectionId}}-country_id').val(response.entity.country_id);
-                                    $('#{{componentId}}-{{sectionId}}-country_name').val(response.entity.country_name);
+                                if (response.entity.address.country_id && response.entity.address.country_name) {
+                                    $('#{{componentId}}-{{sectionId}}-country_id').val(response.entity.address.country_id);
+                                    $('#{{componentId}}-{{sectionId}}-country_name').val(response.entity.address.country_name);
                                 }
                             }
                         }, 'json');

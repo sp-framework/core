@@ -93,14 +93,7 @@ class Locations
                         'size'          => 100,
                         'notNull'       => false,
                     ]
-                ),
-                new Column(
-                    'address_id',
-                    [
-                        'type'          => Column::TYPE_INTEGER,
-                        'notNull'       => true,
-                    ]
-                ),
+                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'

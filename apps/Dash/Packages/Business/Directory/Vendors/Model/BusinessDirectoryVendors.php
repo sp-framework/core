@@ -37,8 +37,6 @@ class BusinessDirectoryVendors extends BaseModel
 
     public $product_count;
 
-    public $address_ids;
-
     public $contact_phone;
 
     public $contact_phone_ext;
@@ -59,6 +57,21 @@ class BusinessDirectoryVendors extends BaseModel
             'vendor_id',
             [
                 'alias' => 'financial_details'
+            ]
+        );
+
+        self::$modelRelations['addresses']['relationObj'] = $this->hasOne(
+            'id',
+            BasepackagesAddressBook::class,
+            'package_row_id',
+            [
+                'alias'                 => 'addresses',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'vendors'
+                    ]
+                ]
             ]
         );
 

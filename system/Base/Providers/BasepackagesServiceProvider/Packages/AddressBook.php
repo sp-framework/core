@@ -34,9 +34,9 @@ class AddressBook extends BasePackage
 
     public function addAddress(array $data)
     {
-        if ($data['city_id'] == 0 ||
-            $data['state_id'] == 0 ||
-            $data['country_id'] == 0
+        if (($data['city_id'] == 0 && $data['city_name'] !== '' ) ||
+            ($data['state_id'] == 0 && $data['state_name'] !== '') ||
+            ($data['country_id'] == 0 && $data['country_name'] !== '')
         ) {
             $data = $this->getGeoLocation($data);
         }
@@ -50,39 +50,27 @@ class AddressBook extends BasePackage
         }
 
         if ($this->add($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Added ' . $data['name'] . ' address';
+            $this->addResponse('Added address');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error adding new address.';
+            $this->addResponse('Error adding new address.', 1);
         }
     }
 
     public function updateAddress(array $data)
     {
         if ($this->update($data)) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' address';
+            $this->addResponse('Updated address');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error updating address.';
+            $this->addResponse('Error updating address.', 1);
         }
     }
 
     public function removeAddress(array $data)
     {
         if ($this->remove($data['id'])) {
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Removed address';
+            $this->addResponse('Removed address');
         } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing address.';
+            $this->addResponse('Error removing address.', 1);
         }
     }
 

@@ -3,7 +3,7 @@
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users;
 
 use System\Base\BaseModel;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Address\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class BasepackagesUsersProfiles extends BaseModel
@@ -21,8 +21,6 @@ class BasepackagesUsersProfiles extends BaseModel
     public $last_name;
 
     public $full_name;
-
-    public $contact_address_id;
 
     public $contact_phone;
 
@@ -51,12 +49,18 @@ class BasepackagesUsersProfiles extends BaseModel
             ]
         );
 
-        self::$modelRelations['addressbook']['relationObj'] = $this->hasOne(
-            'contact_address_id',
-            BasepackagesAddressBook::class,
+        self::$modelRelations['address']['relationObj'] = $this->hasOne(
             'id',
+            BasepackagesAddressBook::class,
+            'package_row_id',
             [
-                'alias' => 'addressbook'
+                'alias'                 => 'address',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'profile'
+                    ]
+                ]
             ]
         );
 

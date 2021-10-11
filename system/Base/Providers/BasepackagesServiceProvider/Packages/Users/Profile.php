@@ -34,7 +34,7 @@ class Profile extends BasePackage
         }
 
         if (!$this->profile) {
-            $this->profile = $this->setProfile($this->getProfile($accountId));
+            $this->profile = $this->getProfile($accountId);
         }
 
         return $this->profile;
@@ -42,10 +42,10 @@ class Profile extends BasePackage
 
     public function getProfile(int $accountId)
     {
-        $profile = $this->getFirst('account_id', $accountId);
+        $profileObj = $this->getFirst('account_id', $accountId);
 
-        if ($profile) {
-            $profile = $profile->toArray();
+        if ($profileObj) {
+            $profile = $profileObj->toArray();
 
             if ($profile['settings'] &&
                 !is_array($profile['settings']) &&
@@ -56,49 +56,18 @@ class Profile extends BasePackage
                 $profile['settings'] = [];
             }
 
+            $addressObj = $profileObj->getAddress();
+
+            $profile['address'] = [];
+
+            if ($addressObj) {
+                $profile['address'] = $addressObj->toArray();
+            }
+
+            $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+
             return $profile;
         }
-    }
-
-    protected function setProfile($profile)
-    {
-        $profile['role'] =
-            $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
-
-        if ($profile['contact_address_id'] && $profile['contact_address_id'] !== '') {
-
-            $address = $this->basepackages->addressbook->getById($profile['contact_address_id']);
-
-            if ($address) {
-                unset($address['id']);
-                unset($address['name']);
-
-                $profile = array_merge($profile, $address);
-            } else {
-                $profile['contact_address_id'] = '';
-                $profile['street_address'] = '';
-                $profile['street_address_2'] = '';
-                $profile['city_id'] = '';
-                $profile['city_name'] = '';
-                $profile['post_code'] = '';
-                $profile['state_id'] = '';
-                $profile['state_name'] = '';
-                $profile['country_id'] = '';
-                $profile['country_name'] = '';
-            }
-        } else {
-            $profile['street_address'] = '';
-            $profile['street_address_2'] = '';
-            $profile['city_id'] = '';
-            $profile['city_name'] = '';
-            $profile['post_code'] = '';
-            $profile['state_id'] = '';
-            $profile['state_name'] = '';
-            $profile['country_id'] = '';
-            $profile['country_name'] = '';
-        }
-
-        return $profile;
     }
 
     /**
@@ -176,35 +145,29 @@ class Profile extends BasePackage
 
         $profile['full_name'] = $profile['first_name'] . ' ' . $profile['last_name'];
 
-        if ($profile['contact_address_id'] &&
-             $profile['contact_address_id'] != 0 &&
-             $profile['contact_address_id'] !== ''
+        if ($profile['address_id'] &&
+             $profile['address_id'] != 0 &&
+             $profile['address_id'] !== ''
         ) {
             $address = $profile;
 
             $address['package_name'] = $this->packageName;
 
-            $address['name'] = $profile['full_name'];
-
-            $address['address_id'] = $profile['contact_address_id'];
+            $address['package_row_id'] = $profile['id'];
 
             $this->basepackages->addressbook->mergeAndUpdate($address);
 
-        } else if (!$profile['contact_address_id'] ||
-                    $profile['contact_address_id'] == 0 ||
-                    $profile['contact_address_id'] === ''
+        } else if (!$profile['address_id'] ||
+                    $profile['address_id'] == 0 ||
+                    $profile['address_id'] === ''
         ) {
             $address = $profile;
 
             $address['package_name'] = $this->packageName;
 
-            $address['name'] = $profile['full_name'];
-
-            $address['id'] = '';
+            $address['package_row_id'] = $profile['id'];
 
             $this->basepackages->addressbook->addAddress($address);
-
-            $profile['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
         }
 
         $portrait = $this->getProfile($this->auth->account()['id'])['portrait'];
