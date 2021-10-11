@@ -112,7 +112,9 @@ class Components extends BasePackage
 		$components = [];
 
 		foreach($this->components as $component) {
-			if ($component['category'] === $category && $component['sub_category'] === $subCategory) {
+			if ($component['category'] === $category &&
+				$component['sub_category'] === $subCategory
+			) {
 				$components[$component['id']] = $component;
 			}
 		}
@@ -127,6 +129,56 @@ class Components extends BasePackage
 		foreach($this->components as $component) {
 			if ($component['app_type'] === $type) {
 				$components[$component['id']] = $component;
+			}
+		}
+
+		return $components;
+	}
+
+	public function getImportComponents()
+	{
+		$components = [];
+
+		foreach($this->components as $component) {
+			$component['settings'] = Json::decode($component['settings'], true);
+
+			if (isset($component['settings']['import']) &&
+				$component['settings']['import'] == 'true' &&
+				isset($component['settings']['importexportPackage'])
+			) {
+				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+
+				if ($package && $this->usePackage($package['class'])) {
+					$availableComponent['id'] = $component['id'];
+					$availableComponent['name'] = $component['name'];
+
+					array_push($components, $availableComponent);
+				}
+			}
+		}
+
+		return $components;
+	}
+
+	public function getExportComponents()
+	{
+		$components = [];
+
+		foreach($this->components as $component) {
+			$component['settings'] = Json::decode($component['settings'], true);
+
+			if (isset($component['settings']['export']) &&
+				$component['settings']['export'] == 'true' &&
+				isset($component['settings']['importexportPackage'])
+			) {
+				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+
+				if ($package && $this->usePackage($package['class'])) {
+					$availableComponent['id'] = $component['id'];
+					$availableComponent['name'] = $component['name'];
+
+					array_push($components, $availableComponent);
+				}
 			}
 		}
 

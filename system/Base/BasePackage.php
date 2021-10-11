@@ -341,310 +341,10 @@ abstract class BasePackage extends Controller
 			);
 
 		if (isset($pageParams['conditions']) && $pageParams['conditions'] !== '') {
-			$postConditions = explode('&', rtrim($pageParams['conditions'], '&'));
+			$data = $this->getDataWithConditions($params, $pageParams['conditions'], $resetCache, $enableCache);
+		}
 
-			$queries = [];
-			$multiModel = false;
-			$modelColumnMap = $this->getModelsColumnMap();
-
-			foreach ($postConditions as $conditionKey => $condition) {
-				$conditionArr = explode('|', $condition);
-
-				if (isset($modelColumnMap['model'][$conditionArr[1]])) {
-					$model = Arr::last(explode('\\', $modelColumnMap['model'][$conditionArr[1]]));
-					$queries[$model]['model'] = $modelColumnMap['model'][$conditionArr[1]];
-				} else {
-					$model = Arr::last(explode('\\', $this->modelToUse));
-					$queries[$model]['model'] = $this->modelToUse;
-				}
-
-				$condition = '';
-				$bind = [];
-
-				if ($queries[$model]['model'] !== $this->modelToUse) {
-					$multiModel = true;
-				}
-
-				if (str_starts_with(strtolower($conditionArr[1]), 'not')) {
-					$conditionArr[1] = '[' . $conditionArr[1] . ']';
-				}
-
-				if (Arr::firstKey($postConditions) !== $conditionKey) {
-					if ($conditionArr[0] === '') {
-						$queries[$model]['andor'] = 'AND';//Default for AND/OR
-					} else {
-						$queries[$model]['andor'] = strtoupper($conditionArr[0]);
-					}
-				}
-
-				$conditionArr[1] = str_replace(' ', '_', strtolower($conditionArr[1]));
-
-				if ($conditionArr[2] === 'equals') {
-					$sign = '=';
-				} else if ($conditionArr[2] === 'notequals') {
-					$sign = '<>';
-				} else if ($conditionArr[2] === 'greaterthan') {
-					$sign = '>';
-				} else if ($conditionArr[2] === 'greaterthanequals') {
-					$sign = '>=';
-				} else if ($conditionArr[2] === 'lessthan') {
-					$sign = '<';
-				} else if ($conditionArr[2] === 'lessthanequals') {
-					$sign = '<=';
-				} else if ($conditionArr[2] === 'like') {
-					$sign = 'LIKE';
-				} else if ($conditionArr[2] === 'notlike') {
-					$sign = 'NOT LIKE';
-				} else if ($conditionArr[2] === 'between') {
-					$sign = 'BETWEEN';
-				} else if ($conditionArr[2] === 'notbetween') {
-					$sign = 'NOT BETWEEN';
-				} else if ($conditionArr[2] === 'empty') {
-					$sign = 'IS NULL';
-				} else if ($conditionArr[2] === 'notempty') {
-					$sign = 'IS NOT NULL';
-				}
-
-				if ($conditionArr[2] === 'between' || $conditionArr[2] === 'notbetween') {
-					$valueArr = explode(',', $conditionArr[3]);
-
-					if ($conditionArr[2] === 'between') {
-						$condition .=
-							$conditionArr[1] . ' ' . $sign;
-					} else if ($conditionArr[2] === 'notbetween') {
-						$condition .=
-						'NOT ' . $conditionArr[1] . ' BETWEEN';
-					}
-
-					foreach ($valueArr as $valueKey => $valueValue) {
-						$condition .=
-							' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
-
-						$bind[
-							'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
-						] = $valueValue;
-
-						if (Arr::lastKey($valueArr) !== $valueKey) {
-							$condition .= ' AND';
-						}
-					}
-				} else if ($conditionArr[2] === 'empty' || $conditionArr[2] === 'notempty') {
-					$condition .= $conditionArr[1] . ' ' . $sign;
-				} else {
-					$valueArr = explode(',', $conditionArr[3]);
-
-					if (count($valueArr) > 1) {
-						foreach ($valueArr as $valueKey => $valueValue) {
-							$condition .=
-								$conditionArr[1] . ' ' . $sign .
-								' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
-
-							$bind[
-								'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
-							] = $valueValue;
-
-							if (Arr::lastKey($valueArr) !== $valueKey) {
-								$condition .= ' OR ';
-							}
-						}
-					} else {
-						$condition .=
-							$conditionArr[1] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
-
-						$bind[
-							'baz_' . $conditionKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
-						] = $valueArr[0];
-					}
-				}
-
-				if (isset($queries[$model]['condition'])) {
-					$queries[$model]['condition'] .= ' ' . $queries[$model]['andor'] . ' ' . $condition;
-				} else {
-					$queries[$model]['condition'] = $condition;
-				}
-
-				if (isset($queries[$model]['bind'])) {
-					$queries[$model]['bind'] = array_merge($queries[$model]['bind'], $bind);
-				} else {
-					$queries[$model]['bind'] = $bind;
-				}
-			}
-
-			$data = [];
-
-			if (count($queries) > 0) {
-				$relationColumns = [];
-
-				if (isset($params['columns']) && count($params['columns']) > 0) {
-					$modelMetaData = $this->getModelsMetaData();
-					$modelRelations = $this->getModelsRelations()['modelRelations'];
-
-					foreach ($params['columns'] as $columnKey => $column) {
-						if (!in_array($column, $modelMetaData['columns'])) {
-							if ($modelRelations) {
-								foreach ($modelRelations as $modelRelationKey => $modelRelation) {
-									if (in_array($column, $modelRelation['columns'])) {
-										if (!isset($relationColumns[$modelRelationKey])) {
-											$relationColumns[$modelRelationKey] = $modelRelation;
-											$relationColumns[$modelRelationKey]['requestedColumns'] = [];
-										}
-										array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
-										unset($params['columns'][$columnKey]);
-									}
-								}
-							}
-						}
-					}
-				}
-
-				$rootModelToUse = $this->modelToUse;
-
-				foreach ($queries as $query) {
-					if ($query['model'] !== $this->modelToUse) {
-						$this->modelToUse = $query['model'];
-
-						$md = $this->getModelsMetaData();
-
-						foreach ($md['columns'] as &$column) {
-							if (str_starts_with(strtolower($column), 'not')) {
-								$column = '[' . $column . ']';
-							}
-						}
-
-						$filterConditions =
-							[
-								'conditions'	=> $query['condition'],
-								'bind'			=> $query['bind']
-							];
-
-						$params = array_merge($params, $filterConditions);
-
-						$params['columns'] = $md['columns'];
-
-						$rows = $this->getByParams($params, true, false);
-
-						if ($rows && count($rows) > 0) {
-							foreach ($rows as $row) {
-								$model = $this->getFirst('id', $row['id'], true, false);
-
-								$rowData = $model->toArray();
-
-								$modelRelations = $model->getModelRelations();
-
-								if ($modelRelations && count($modelRelations) > 0) {
-									foreach ($modelRelations as $relationColumnKey => $relationColumn) {
-										if ($relationColumn['relationObj']->getType() === 0) {
-											$parentFields = $relationColumn['relationObj']->getFields();
-											$parentReferencedFields = $relationColumn['relationObj']->getReferencedFields();
-											$parentModelClass = $relationColumn['relationObj']->getReferencedModel();
-
-											break;
-										}
-									}
-								}
-
-								if (isset($parentModelClass) && is_string($parentFields) && is_string($parentReferencedFields)) {
-									$parentModel = $this->getFirst($parentReferencedFields, $rowData[$parentFields], true, false, $parentModelClass);
-								} else if (isset($parentModelClass) && is_array($parentFields) && is_array($parentReferencedFields)) {
-									// Params
-									// $parentModel = $this->getFirst($parentReferencedFields, $rowData[$parentFields], true, false, $parentModelClass);
-								}
-
-								if (isset($parentModel)) {
-									$rowData = array_merge($rowData, $parentModel->toArray());
-
-									if (method_exists($parentModel, 'getModelRelations')) {
-										$parentModelRelations = $parentModel->getModelRelations();
-									}
-
-									if (isset($parentModelRelations) && is_array($parentModelRelations) && count($parentModelRelations) > 0) {
-										foreach ($parentModelRelations as $parentModelRelationKey => $parentModelRelation) {
-											if ($parentModelRelation['relationObj']->getReferencedModel() !== $this->modelToUse) {
-												$childrenAlias = $parentModelRelation['relationObj']->getOption('alias');
-
-												if (isset($parentModel->{$childrenAlias}) && $parentModel->{$childrenAlias}) {
-													$childrenRowData = $parentModel->{$childrenAlias}->toArray();
-
-													unset($childrenRowData['id']);
-
-													$rowData = array_merge($rowData, $childrenRowData);
-												}
-											}
-										}
-									}
-
-									if (count($rowData) > 0) {
-										array_push($data, $rowData);
-									}
-								} else {
-									$rowData = array_merge($rowData, $model->toArray());
-
-									if (count($rowData) > 0) {
-										array_push($data, $rowData);
-									}
-								}
-							}
-						}
-					} else {
-						$md = $this->getModelsMetaData();
-
-						foreach ($md['columns'] as &$column) {
-							if (str_starts_with(strtolower($column), 'not')) {
-								$column = '[' . $column . ']';
-							}
-						}
-
-						$filterConditions =
-							[
-								'conditions'	=> $query['condition'],
-								'bind'			=> $query['bind']
-							];
-
-						$params = array_merge($params, $filterConditions);
-
-						$params['columns'] = $md['columns'];
-
-						$rows = $this->getByParams($params, true, false);
-
-						if ($rows && count($rows) > 0) {
-							foreach ($rows as $row) {
-								$rootModel = $this->getFirst('id', $row['id']);
-
-								if ($rootModel) {
-									$rowData = $rootModel->toArray();
-								}
-
-								$model = $this->getFirst('id', $row['id'], true, false, $query['model']);
-
-								$modelRelations = $model->getModelRelations();
-
-								if ($modelRelations && count($modelRelations) > 0) {
-									foreach ($modelRelations as $relationColumnKey => $relationColumn) {
-										if (isset($relationColumns[$relationColumnKey])) {
-											$alias = $relationColumn['relationObj']->getOption('alias');
-
-											if (isset($rootModel->{$alias}) && $rootModel->{$alias}) {
-												$relationRowData = $rootModel->{$alias}->toArray();
-												unset($relationRowData['id']);
-												$rowData = array_merge($rowData, $relationRowData);
-											}
-										}
-									}
-									if (count($rowData) > 0) {
-										array_push($data, $rowData);
-									}
-								} else {
-									$rowData = array_merge($rowData, $model->toArray());
-									if (count($rowData) > 0) {
-										array_push($data, $rowData);
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		} else {
+		if (!isset($data)) {
 			$params =
 				array_merge(
 					$params,
@@ -655,6 +355,7 @@ abstract class BasePackage extends Controller
 
 			$data = $this->getByParams($params, $resetCache, $enableCache);
 		}
+
 		// var_dump($data);die();
 		if ($data) {
 			$pageParams['data'] = $data;
@@ -691,6 +392,327 @@ abstract class BasePackage extends Controller
 		} catch (\Exception $e) {
 			throw $e;
 		}
+	}
+
+	protected function getDataWithConditions($params, $conditions, bool $resetCache = false, bool $enableCache = true)
+	{
+		if ($conditions === '') {
+			$params =
+				array_merge(
+					$params,
+					[
+						'conditions'	=> '',
+					]
+				);
+
+			return $this->getByParams($params, $resetCache, $enableCache);
+		}
+
+		$postConditions = explode('&', rtrim($conditions, '&'));
+
+		$queries = [];
+		$multiModel = false;
+		$modelColumnMap = $this->getModelsColumnMap();
+
+		foreach ($postConditions as $conditionKey => $condition) {
+			$conditionArr = explode('|', $condition);
+
+			if (isset($modelColumnMap['model'][$conditionArr[1]])) {
+				$model = Arr::last(explode('\\', $modelColumnMap['model'][$conditionArr[1]]));
+				$queries[$model]['model'] = $modelColumnMap['model'][$conditionArr[1]];
+			} else {
+				$model = Arr::last(explode('\\', $this->modelToUse));
+				$queries[$model]['model'] = $this->modelToUse;
+			}
+
+			$condition = '';
+			$bind = [];
+
+			if ($queries[$model]['model'] !== $this->modelToUse) {
+				$multiModel = true;
+			}
+
+			if (str_starts_with(strtolower($conditionArr[1]), 'not')) {
+				$conditionArr[1] = '[' . $conditionArr[1] . ']';
+			}
+
+			if (Arr::firstKey($postConditions) !== $conditionKey) {
+				if ($conditionArr[0] === '') {
+					$queries[$model]['andor'] = 'AND';//Default for AND/OR
+				} else {
+					$queries[$model]['andor'] = strtoupper($conditionArr[0]);
+				}
+			}
+
+			$conditionArr[1] = str_replace(' ', '_', strtolower($conditionArr[1]));
+
+			if ($conditionArr[2] === 'equals') {
+				$sign = '=';
+			} else if ($conditionArr[2] === 'notequals') {
+				$sign = '<>';
+			} else if ($conditionArr[2] === 'greaterthan') {
+				$sign = '>';
+			} else if ($conditionArr[2] === 'greaterthanequals') {
+				$sign = '>=';
+			} else if ($conditionArr[2] === 'lessthan') {
+				$sign = '<';
+			} else if ($conditionArr[2] === 'lessthanequals') {
+				$sign = '<=';
+			} else if ($conditionArr[2] === 'like') {
+				$sign = 'LIKE';
+			} else if ($conditionArr[2] === 'notlike') {
+				$sign = 'NOT LIKE';
+			} else if ($conditionArr[2] === 'between') {
+				$sign = 'BETWEEN';
+			} else if ($conditionArr[2] === 'notbetween') {
+				$sign = 'NOT BETWEEN';
+			} else if ($conditionArr[2] === 'empty') {
+				$sign = 'IS NULL';
+			} else if ($conditionArr[2] === 'notempty') {
+				$sign = 'IS NOT NULL';
+			}
+
+			if ($conditionArr[2] === 'between' || $conditionArr[2] === 'notbetween') {
+				$valueArr = explode(',', $conditionArr[3]);
+
+				if ($conditionArr[2] === 'between') {
+					$condition .=
+						$conditionArr[1] . ' ' . $sign;
+				} else if ($conditionArr[2] === 'notbetween') {
+					$condition .=
+					'NOT ' . $conditionArr[1] . ' BETWEEN';
+				}
+
+				foreach ($valueArr as $valueKey => $valueValue) {
+					$condition .=
+						' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
+
+					$bind[
+						'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
+					] = $valueValue;
+
+					if (Arr::lastKey($valueArr) !== $valueKey) {
+						$condition .= ' AND';
+					}
+				}
+			} else if ($conditionArr[2] === 'empty' || $conditionArr[2] === 'notempty') {
+				$condition .= $conditionArr[1] . ' ' . $sign;
+			} else {
+				$valueArr = explode(',', $conditionArr[3]);
+
+				if (count($valueArr) > 1) {
+					foreach ($valueArr as $valueKey => $valueValue) {
+						$condition .=
+							$conditionArr[1] . ' ' . $sign .
+							' :baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
+
+						$bind[
+							'baz_' . $conditionKey . '_' . $valueKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
+						] = $valueValue;
+
+						if (Arr::lastKey($valueArr) !== $valueKey) {
+							$condition .= ' OR ';
+						}
+					}
+				} else {
+					$condition .=
+						$conditionArr[1] . ' ' . $sign . ' :baz_' . $conditionKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1])) . ':';
+
+					$bind[
+						'baz_' . $conditionKey . '_' . str_replace('[', '', str_replace(']', '', $conditionArr[1]))
+					] = $valueArr[0];
+				}
+			}
+
+			if (isset($queries[$model]['condition'])) {
+				$queries[$model]['condition'] .= ' ' . $queries[$model]['andor'] . ' ' . $condition;
+			} else {
+				$queries[$model]['condition'] = $condition;
+			}
+
+			if (isset($queries[$model]['bind'])) {
+				$queries[$model]['bind'] = array_merge($queries[$model]['bind'], $bind);
+			} else {
+				$queries[$model]['bind'] = $bind;
+			}
+		}
+
+		$data = [];
+
+		if (count($queries) > 0) {
+			$relationColumns = [];
+
+			if (isset($params['columns']) && count($params['columns']) > 0) {
+				$modelMetaData = $this->getModelsMetaData();
+				$modelRelations = $this->getModelsRelations()['modelRelations'];
+
+				foreach ($params['columns'] as $columnKey => $column) {
+					if (!in_array($column, $modelMetaData['columns'])) {
+						if ($modelRelations) {
+							foreach ($modelRelations as $modelRelationKey => $modelRelation) {
+								if (in_array($column, $modelRelation['columns'])) {
+									if (!isset($relationColumns[$modelRelationKey])) {
+										$relationColumns[$modelRelationKey] = $modelRelation;
+										$relationColumns[$modelRelationKey]['requestedColumns'] = [];
+									}
+									array_push($relationColumns[$modelRelationKey]['requestedColumns'], $column);
+									unset($params['columns'][$columnKey]);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			$rootModelToUse = $this->modelToUse;
+
+			foreach ($queries as $query) {
+				if ($query['model'] !== $this->modelToUse) {
+					$this->modelToUse = $query['model'];
+
+					$md = $this->getModelsMetaData();
+
+					foreach ($md['columns'] as &$column) {
+						if (str_starts_with(strtolower($column), 'not')) {
+							$column = '[' . $column . ']';
+						}
+					}
+
+					$filterConditions =
+						[
+							'conditions'	=> $query['condition'],
+							'bind'			=> $query['bind']
+						];
+
+					$params = array_merge($params, $filterConditions);
+
+					$params['columns'] = $md['columns'];
+
+					$rows = $this->getByParams($params, true, false);
+
+					if ($rows && count($rows) > 0) {
+						foreach ($rows as $row) {
+							$model = $this->getFirst('id', $row['id'], true, false);
+
+							$rowData = $model->toArray();
+
+							$modelRelations = $model->getModelRelations();
+
+							if ($modelRelations && count($modelRelations) > 0) {
+								foreach ($modelRelations as $relationColumnKey => $relationColumn) {
+									if ($relationColumn['relationObj']->getType() === 0) {
+										$parentFields = $relationColumn['relationObj']->getFields();
+										$parentReferencedFields = $relationColumn['relationObj']->getReferencedFields();
+										$parentModelClass = $relationColumn['relationObj']->getReferencedModel();
+
+										break;
+									}
+								}
+							}
+
+							if (isset($parentModelClass) && is_string($parentFields) && is_string($parentReferencedFields)) {
+								$parentModel = $this->getFirst($parentReferencedFields, $rowData[$parentFields], true, false, $parentModelClass);
+							} else if (isset($parentModelClass) && is_array($parentFields) && is_array($parentReferencedFields)) {
+								// Params
+								// $parentModel = $this->getFirst($parentReferencedFields, $rowData[$parentFields], true, false, $parentModelClass);
+							}
+
+							if (isset($parentModel)) {
+								$rowData = array_merge($rowData, $parentModel->toArray());
+
+								if (method_exists($parentModel, 'getModelRelations')) {
+									$parentModelRelations = $parentModel->getModelRelations();
+								}
+
+								if (isset($parentModelRelations) && is_array($parentModelRelations) && count($parentModelRelations) > 0) {
+									foreach ($parentModelRelations as $parentModelRelationKey => $parentModelRelation) {
+										if ($parentModelRelation['relationObj']->getReferencedModel() !== $this->modelToUse) {
+											$childrenAlias = $parentModelRelation['relationObj']->getOption('alias');
+
+											if (isset($parentModel->{$childrenAlias}) && $parentModel->{$childrenAlias}) {
+												$childrenRowData = $parentModel->{$childrenAlias}->toArray();
+
+												unset($childrenRowData['id']);
+
+												$rowData = array_merge($rowData, $childrenRowData);
+											}
+										}
+									}
+								}
+
+								if (count($rowData) > 0) {
+									array_push($data, $rowData);
+								}
+							} else {
+								$rowData = array_merge($rowData, $model->toArray());
+
+								if (count($rowData) > 0) {
+									array_push($data, $rowData);
+								}
+							}
+						}
+					}
+				} else {
+					$md = $this->getModelsMetaData();
+
+					foreach ($md['columns'] as &$column) {
+						if (str_starts_with(strtolower($column), 'not')) {
+							$column = '[' . $column . ']';
+						}
+					}
+
+					$filterConditions =
+						[
+							'conditions'	=> $query['condition'],
+							'bind'			=> $query['bind']
+						];
+
+					$params = array_merge($params, $filterConditions);
+
+					$params['columns'] = $md['columns'];
+
+					$rows = $this->getByParams($params, true, false);
+
+					if ($rows && count($rows) > 0) {
+						foreach ($rows as $row) {
+							$rootModel = $this->getFirst('id', $row['id']);
+
+							if ($rootModel) {
+								$rowData = $rootModel->toArray();
+							}
+
+							$model = $this->getFirst('id', $row['id'], true, false, $query['model']);
+
+							$modelRelations = $model->getModelRelations();
+
+							if ($modelRelations && count($modelRelations) > 0) {
+								foreach ($modelRelations as $relationColumnKey => $relationColumn) {
+									if (isset($relationColumns[$relationColumnKey])) {
+										$alias = $relationColumn['relationObj']->getOption('alias');
+
+										if (isset($rootModel->{$alias}) && $rootModel->{$alias}) {
+											$relationRowData = $rootModel->{$alias}->toArray();
+											unset($relationRowData['id']);
+											$rowData = array_merge($rowData, $relationRowData);
+										}
+									}
+								}
+								if (count($rowData) > 0) {
+									array_push($data, $rowData);
+								}
+							} else {
+								$rowData = array_merge($rowData, $model->toArray());
+								if (count($rowData) > 0) {
+									array_push($data, $rowData);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return $data;
 	}
 
 	protected function getDbData($parameters, bool $enableCache = true, string $type = 'id', bool $returnArray = true)

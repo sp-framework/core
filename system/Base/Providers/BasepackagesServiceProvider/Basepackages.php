@@ -12,6 +12,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCities;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoCountries;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoStates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Geo\GeoTimezones;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\ImportExport;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Menus;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
@@ -63,6 +64,8 @@ class Basepackages
 	protected $notifications;
 
 	protected $pusher;
+
+	protected $importexport;
 
 	public function __construct()
 	{
@@ -210,5 +213,12 @@ class Basepackages
 		$this->workers = (new Workers())->init();
 
 		return $this->workers;
+	}
+
+	protected function initImportExport()
+	{
+		$this->importexport = (new ImportExport())->init();
+
+		return $this->importexport;
 	}
 }

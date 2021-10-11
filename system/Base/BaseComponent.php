@@ -89,7 +89,7 @@ abstract class BaseComponent extends Controller
 			unset($url[Arr::lastKey($url)]);
 		}
 
-		if ($url[0] === $this->app['route']) {
+		if (isset($url[0]) && $url[0] === $this->app['route']) {
 			unset($url[0]);
 		}
 

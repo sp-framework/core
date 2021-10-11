@@ -162,55 +162,47 @@ class Tasks extends BasePackage
 
     public function getEnabledTasks()
     {
+        if (!$this->tasks) {
+            $this->init();
+        }
+
         $sorted = null;
 
-        $filter =
-            $this->model->filter(
-                function($function) {
-                    $function = $function->toArray();
+        $taskArr = [];
 
-                    if (!$function['priority'] || $function['priority'] == '0') {
-                        $function['priority'] = 1;//Set default priority as we need to sort it later
-                    }
+        foreach ($this->tasks as $taskKey => $task) {
+            if (!$task['priority'] || $task['priority'] == '0') {
+                $task['priority'] = 1;//Set default priority as we need to sort it later
+            }
 
-                    if ($function['force_next_run'] == 1) {
-                        $function['org_schedule_id'] = $function['schedule_id'];
-                        $function['schedule_id'] = 1;//Make it minute so it can be picked by the scheduler for next run
-                        return $function;
-                    } else if ($function['enabled'] == 1 && $function['status'] != 2) {//Enabled and not running
-                        return $function;
-                    }
-                }
-            );
+            if ($task['force_next_run'] == 1) {
+                $task['org_schedule_id'] = $task['schedule_id'];
+                $task['schedule_id'] = 1;//Make it minute so it can be picked by the scheduler for next run
+                array_push($taskArr, $task);
+            } else if ($task['enabled'] == 1 && $task['status'] != 2) {//Enabled and not running
+                array_push($taskArr, $task);
+            }
+        }
 
-        $sorted = msort($filter, 'priority', SORT_REGULAR, SORT_DESC);
+        $sorted = msort($taskArr, 'priority', SORT_REGULAR, SORT_DESC);
 
         return $sorted;
     }
 
-    public function findByParametersMethod($method)
+    public function findByParameter($parameterValue, $parameterKey = null)
     {
         if (!$this->tasks) {
             $this->init();
         }
 
-        $filter =
-            $this->model->filter(
-                function($task) use ($method) {
-                    $task = $task->toArray();
+        foreach ($this->tasks as $taskKey => $task) {
+            if (is_string($task['parameters']) && $task['parameters'] !== '') {
+                $task['parameters'] = Json::decode($task['parameters'], true);
 
-                    if ($task['parameters'] && $task['parameters'] !== '') {
-                        $task['parameters'] = Json::decode($task['parameters'], true);
-
-                        if (isset($task['parameters']['method']) && $task['parameters']['method'] === $method) {
-                            return $task;
-                        }
-                    }
+                if (recursive_array_search($parameterValue, $task['parameters'], $parameterKey)) {
+                    return $task;
                 }
-            );
-
-        if ($filter) {
-            return $filter[0];
+            }
         }
 
         return false;

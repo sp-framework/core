@@ -39,6 +39,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Cities;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Countries;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\States;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Geo\Timezones;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\ImportExport;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Menus;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notes;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
@@ -214,6 +215,7 @@ class Setup
 		$this->db->createTable('basepackages_workers_schedules', $dbName, (new Schedules)->columns());
 		$this->db->createTable('basepackages_workers_tasks', $dbName, (new Tasks)->columns());
 		$this->db->createTable('basepackages_workers_jobs', $dbName, (new Jobs)->columns());
+		$this->db->createTable('basepackages_import_export', $dbName, (new ImportExport)->columns());
 	}
 
 	public function registerRepository()

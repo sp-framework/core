@@ -117,39 +117,27 @@ class Packages extends BasePackage
 	public function addPackage(array $data)
 	{
 		if ($this->add($data)) {
-			$this->packagesData->responseCode = 0;
-
-			$this->packagesData->responseMessage = 'Added ' . $data['name'] . ' package';
+			$this->addResponse('Added ' . $data['name'] . ' package');
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error adding new package.';
+			$this->addResponse('Error adding new package.', 1);
 		}
 	}
 
 	public function updatePackage(array $data)
 	{
 		if ($this->update($data)) {
-			$this->packagesData->responseCode = 0;
-
-			$this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' package';
+			$this->addResponse('Updated ' . $data['name'] . ' package');
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error updating package.';
+			$this->addResponse('Error updating package.', 1);
 		}
 	}
 
 	public function removePackage(array $data)
 	{
 		if ($this->remove($data['id'])) {
-			$this->packagesData->responseCode = 0;
-
-			$this->packagesData->responseMessage = 'Removed package';
+			$this->addResponse('Removed package');
 		} else {
-			$this->packagesData->responseCode = 1;
-
-			$this->packagesData->responseMessage = 'Error removing package.';
+			$this->addResponse('Error removing package.',1);
 		}
 	}
 
