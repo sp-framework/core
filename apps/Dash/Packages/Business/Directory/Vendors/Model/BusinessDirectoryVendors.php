@@ -4,6 +4,9 @@ namespace Apps\Dash\Packages\Business\Directory\Vendors\Model;
 
 use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendorsFinancialDetails;
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 
 class BusinessDirectoryVendors extends BaseModel
 {
@@ -60,12 +63,42 @@ class BusinessDirectoryVendors extends BaseModel
             ]
         );
 
-        self::$modelRelations['addresses']['relationObj'] = $this->hasOne(
+        self::$modelRelations['addresses']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesAddressBook::class,
             'package_row_id',
             [
                 'alias'                 => 'addresses',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'vendors'
+                    ]
+                ]
+            ]
+        );
+
+        self::$modelRelations['notes']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesNotes::class,
+            'package_row_id',
+            [
+                'alias'                 => 'notes',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'vendors'
+                    ]
+                ]
+            ]
+        );
+
+        self::$modelRelations['activityLogs']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesActivityLogs::class,
+            'package_row_id',
+            [
+                'alias'                 => 'activityLogs',
                 'params'                => [
                     'conditions'        => 'package_name = :package_name:',
                     'bind'              => [

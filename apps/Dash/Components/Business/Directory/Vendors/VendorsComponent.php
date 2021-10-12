@@ -76,7 +76,6 @@ class VendorsComponent extends BaseComponent
             $this->view->b2bAccountManagers = [];
 
             if ($this->getData()['id'] != 0) {
-
                 $vendor = $this->vendors->getVendorById($this->getData()['id']);
 
                 if (!$vendor) {
@@ -84,10 +83,6 @@ class VendorsComponent extends BaseComponent
                 }
 
                 $this->view->b2bAccountManagers = $vendor['b2bAccountManagers'];
-
-                $vendor['activityLogs'] = $this->vendors->getActivityLogs($this->getData()['id']);
-
-                $vendor['notes'] = $this->notes->getNotes('vendors', $this->getData()['id']);
 
                 $storages = $this->basepackages->storages;
 

@@ -20,35 +20,39 @@ class Vendors extends BasePackage
 
     public function getVendorById(int $id)
     {
-        $vendorModel = new $this->modelToUse;
-
-        $vendorObj = $vendorModel::findFirstById($id);
+        $vendorObj = $this->getFirst('id', $id);
 
         if ($vendorObj) {
             $vendor = $vendorObj->toArray();
 
-            if ($vendor['address_ids'] && $vendor['address_ids'] !== '') {
-                $vendor['address_ids'] = Json::decode($vendor['address_ids'], true);
+            $vendor['address_ids'] = [];
+            $vendor['b2bAccountManagers'] = [];
+            $vendor['notes'] = [];
+            $vendor['activityLogs'] = [];
 
-                foreach ($vendor['address_ids'] as $addressTypeKey => $addressType) {
-                    if (is_array($addressType) && count($addressType) > 0) {
-                        foreach ($addressType as $addressKey => $address) {
-                            $vendor['address_ids'][$addressTypeKey][$addressKey] =
-                                $this->basepackages->addressbook->getById($address);
+            if ($vendorObj->getAddresses()) {
+                $vendorAddresses = $vendorObj->getAddresses()->toArray();
+
+                if (count($vendorAddresses) > 0) {
+                    foreach ($vendorAddresses as $vendorAddress) {
+                        if (!isset($vendor['address_ids'][$vendorAddress['address_type']])) {
+                            $vendor['address_ids'][$vendorAddress['address_type']] = [];
                         }
+
+                        array_push($vendor['address_ids'][$vendorAddress['address_type']], $vendorAddress);
                     }
-                    $vendor['address_ids'][$addressTypeKey] =
-                        msort($vendor['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
+
+                    foreach ($vendor['address_ids'] as $addressTypeKey => $addressTypeAddresses) {
+                        $vendor['address_ids'][$addressTypeKey] =
+                            msort($vendor['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
+                    }
                 }
             }
-
-            $vendor['b2bAccountManagers'] = [];
 
             if ($vendor['b2b_account_managers'] && $vendor['b2b_account_managers'] !== '') {
                 $vendor['b2b_account_managers'] = Json::decode($vendor['b2b_account_managers'], true);
 
                 if (count($vendor['b2b_account_managers']) > 0) {
-
                     $employees = $this->usePackage(Employees::class);
 
                     foreach ($vendor['b2b_account_managers'] as $employeeKey => $employee) {
@@ -60,9 +64,9 @@ class Vendors extends BasePackage
                 }
             }
 
-            $contacts = $this->usePackage(Contacts::class);
+            $vendor['activityLogs'] = $this->getActivityLogs($vendor['id']);
 
-            $vendor['contact_ids'] = $contacts->searchByVendorId($vendor['id']);
+            $vendor['notes'] = $this->basepackages->notes->getNotes('vendors', $vendor['id']);
 
             $financialDetailsObj = $vendorObj->getFinancial_details();
 
@@ -90,15 +94,21 @@ class Vendors extends BasePackage
 
         $data = $this->addB2bAccountManagers($data);
 
-        $data = $this->updateAddresses($data);
-
-        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
-        $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
+        if (isset($data['contact_phone'])) {
+            $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
+        }
+        if (isset($data['contact_fax'])) {
+            $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
+        }
 
         if ($this->add($data)) {
-            $this->basepackages->storages->changeOrphanStatus($data['logo']);
+            if (isset($data['logo'])) {
+                $this->basepackages->storages->changeOrphanStatus($data['logo']);
+            }
 
             $data['vendor_id'] = $this->packagesData->last['id'];
+
+            $this->updateAddresses($data);
 
             $this->addFinancialDetails($data);
 
@@ -135,17 +145,12 @@ class Vendors extends BasePackage
 
         $data = $this->addB2bAccountManagers($data);
 
-        $data = $this->updateAddresses($data);
-
-        if (isset($data['delete_address_ids']) && $data['delete_address_ids'] !== '') {
-            $data['delete_address_ids'] = Json::decode($data['delete_address_ids'], true);
-            if (count($data['delete_address_ids']) > 0) {
-                $this->deleteAddresses($data['delete_address_ids']);
-            }
+        if (isset($data['contact_phone'])) {
+            $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
         }
-
-        $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
-        $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
+        if (isset($data['contact_fax'])) {
+            $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
+        }
 
         if ($this->update($data)) {
             if ($data['is_b2b_customer'] == '0') {
@@ -154,9 +159,20 @@ class Vendors extends BasePackage
 
             $data['vendor_id'] = $data['id'];
 
+            $this->updateAddresses($data);
+
+            if (isset($data['delete_address_ids']) && $data['delete_address_ids'] !== '') {
+                $data['delete_address_ids'] = Json::decode($data['delete_address_ids'], true);
+                if (count($data['delete_address_ids']) > 0) {
+                    $this->deleteAddresses($data['delete_address_ids']);
+                }
+            }
+
             $this->updateFinancialDetails($data);
 
-            $this->basepackages->storages->changeOrphanStatus($data['logo'], $vendor['logo']);
+            if (isset($data['logo'])) {
+                $this->basepackages->storages->changeOrphanStatus($data['logo'], $vendor['logo']);
+            }
 
             $this->basepackages->notes->addNote($this->packageName, $data);
 
@@ -177,20 +193,27 @@ class Vendors extends BasePackage
      */
     public function removeVendor(array $data)
     {
-        //Check relations before removing.
-        //Remove Address
-        //Notes
-        $vendorObj = $this->modelToUse::findFirstById($data['id']);
+        $vendorObj = $this->getFirst('id', $data['id']);
 
         $vendor = $vendorObj->toArray();
 
-        if ($vendorObj->getFinancial_details()) {
-            $vendorObj->getFinancial_details()->delete();
-        }
-
         if ($this->remove($data['id'])) {
+            if ($vendorObj->getFinancial_details()) {
+                $vendorObj->getFinancial_details()->delete();
+            }
+            if ($vendorObj->getAddresses()) {
+                $vendorObj->getAddresses()->delete();
+            }
+            if ($vendorObj->getNotes()) {
+                $vendorObj->getNotes()->delete();
+            }
+            if ($vendorObj->getActivityLogs()) {
+                $vendorObj->getActivityLogs()->delete();
+            }
 
-            $this->basepackages->storages->changeOrphanStatus(null, $vendor['logo']);
+            if (isset($data['logo'])) {
+                $this->basepackages->storages->changeOrphanStatus(null, $vendor['logo']);
+            }
 
             $this->addResponse('Removed vendor ' . $vendor['business_name']);
 
@@ -210,6 +233,50 @@ class Vendors extends BasePackage
         }
 
         $this->addToNotification('error', $messageTitle, $messageDetails, null, $id);
+    }
+
+    public function updateAddresses($data)
+    {
+        if (isset($data['address_ids']) && $data['address_ids'] !== '') {
+            $data['address_ids'] = Json::decode($data['address_ids'], true);
+
+            if (count($data['address_ids']) > 0) {
+                foreach ($data['address_ids'] as $addressTypeKey => $addressType) {
+                    $addressesIds[$addressTypeKey] = [];
+
+                    if (is_array($addressType) && count($addressType) > 0) {
+                        foreach ($addressType as $addressKey => $address) {
+
+                            $address['address_type'] = $addressTypeKey;
+                            $address['package_name'] = $this->packageName;
+                            $address['package_row_id'] = $data['vendor_id'];
+
+                            if ($address['seq'] == 0) {
+                                $address['is_primary'] = 1;
+                            } else {
+                                $address['is_primary'] = 0;
+                            }
+
+                            if ($address['new'] == 1) {
+                                $this->basepackages->addressbook->addAddress($address);
+                            } else {
+                                $address['id'] = $addressKey;
+                                $this->basepackages->addressbook->updateAddress($address);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    protected function deleteAddresses($ids)
+    {
+        foreach ($ids as $id) {
+            $this->basepackages->addressbook->removeAddress(['id' => $id]);
+        }
     }
 
     protected function disableVendorContactAccounts($vendorId)
@@ -290,25 +357,29 @@ class Vendors extends BasePackage
 
     protected function addBrands(array $data)
     {
-        $brands = $this->usePackage(Brands::class);
+        if (isset($data['brands']) && $data['brands'] !== '') {
+            $brands = $this->usePackage(Brands::class);
 
-        $data['brands'] = Json::decode($data['brands'], true);
+            $data['brands'] = Json::decode($data['brands'], true);
 
-        if (isset($data['brands']['data'])) {
-            if (isset($data['brands']['newTags']) &&
-                count($data['brands']['newTags']) > 0
-            ) {
-                foreach ($data['brands']['newTags'] as $brand) {
-                    $newBrand = $brands->add(['name' => $brand]);
-                    if ($newBrand) {
-                        array_push($data['brands']['data'], $brands->packagesData->last['id']);
+            if (isset($data['brands']['data'])) {
+                if (isset($data['brands']['newTags']) &&
+                    count($data['brands']['newTags']) > 0
+                ) {
+                    foreach ($data['brands']['newTags'] as $brand) {
+                        $newBrand = $brands->add(['name' => $brand]);
+                        if ($newBrand) {
+                            array_push($data['brands']['data'], $brands->packagesData->last['id']);
+                        }
                     }
                 }
-            }
 
-            $data['brands'] = Json::encode($data['brands']['data']);
+                $data['brands'] = Json::encode($data['brands']['data']);
+            } else {
+                $data['brands'] = Json::encode($data['brands']);
+            }
         } else {
-            $data['brands'] = Json::encode($data['brands']);
+            $data['brands'] = Json::encode([]);
         }
 
         return $data;
@@ -316,12 +387,16 @@ class Vendors extends BasePackage
 
     protected function addB2bAccountManagers(array $data)
     {
-        $data['b2b_account_managers'] = Json::decode($data['b2b_account_managers'], true);
+        if (isset($data['b2b_account_managers']) && $data['b2b_account_managers'] !== '') {
+            $data['b2b_account_managers'] = Json::decode($data['b2b_account_managers'], true);
 
-        if (isset($data['b2b_account_managers']['data'])) {
-            $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']['data']);
+            if (isset($data['b2b_account_managers']['data'])) {
+                $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']['data']);
+            } else {
+                $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']);
+            }
         } else {
-            $data['b2b_account_managers'] = Json::encode($data['b2b_account_managers']);
+            $data['b2b_account_managers'] = Json::encode([]);
         }
 
         return $data;
@@ -329,152 +404,100 @@ class Vendors extends BasePackage
 
     public function getAllManufacturers()
     {
-        $this->getAll()->vendors;
-
-        $manufacturers = [];
-
-        $filter =
-            $this->model->filter(
-                function($vendor) {
-                    $vendor = $vendor->toArray();
-                    if ($vendor['is_manufacturer'] == 1) {
-                        return $vendor;
-                    }
-                }
+        $searchVendors =
+            $this->getByParams(
+                [
+                    'conditions'    => 'is_manufacturer = :im:',
+                    'bind'          => [
+                        'im'        => '1'
+                    ]
+                ], true
             );
 
-        foreach ($filter as $key => $value) {
-            $manufacturers[$key] = $value;
+        if ($searchVendors && count($searchVendors) > 0) {
+            return $this->setAllData($searchVendors);
         }
 
-        return $manufacturers;
+        return false;
     }
 
     public function getAllSuppliers()
     {
-        $this->getAll()->vendors;
-
-        $suppliers = [];
-
-        $filter =
-            $this->model->filter(
-                function($vendor) {
-                    $vendor = $vendor->toArray();
-                    if ($vendor['is_supplier'] == 1) {
-                        return $vendor;
-                    }
-                }
+        $searchVendors =
+            $this->getByParams(
+                [
+                    'conditions'    => 'is_supplier = :is:',
+                    'bind'          => [
+                        'is'        => '1'
+                    ]
+                ], true
             );
 
-        foreach ($filter as $key => $value) {
-            $suppliers[$key] = $value;
+        if ($searchVendors && count($searchVendors) > 0) {
+            return $this->setAllData($searchVendors);
         }
 
-        return $suppliers;
+        return false;
     }
 
     public function getAllManufacturersSuppliers()
     {
-        $this->getAll()->vendors;
-
-        $filter =
-            $this->model->filter(
-                function($vendor) {
-                    $vendor = $vendor->toArray();
-                    if ($vendor['is_manufacturer'] == 1 ||
-                        $vendor['is_supplier'] == 1 ||
-                        $vendor['does_dropship'] == 1
-                    ) {
-                        return $vendor;
-                    }
-                }
+        $searchVendors =
+            $this->getByParams(
+                [
+                    'conditions'    => 'is_manufacturer = :im: OR is_supplier = :is: OR does_dropship = :dd:',
+                    'bind'          => [
+                        'im'        => '1',
+                        'is'        => '1',
+                        'dd'        => '1'
+                    ]
+                ], true
             );
 
-        return $filter;
+        if ($searchVendors && count($searchVendors) > 0) {
+            return $this->setAllData($searchVendors);
+        }
+
+        return false;
     }
 
     public function getAllServiceProviders()
     {
-        $vendors = $this->getAll()->vendors;
-
-        $filter =
-            $this->model->filter(
-                function($vendor) {
-                    $vendor = $vendor->toArray();
-                    if ($vendor['is_service_provider'] == 1) {
-                        return $vendor;
-                    }
-                }
+        $searchVendors =
+            $this->getByParams(
+                [
+                    'conditions'    => 'is_service_provider = :isp:',
+                    'bind'          => [
+                        'isp'       => '1'
+                    ]
+                ], true
             );
 
-        return $filter;
+        if ($searchVendors && count($searchVendors) > 0) {
+            return $this->setAllData($searchVendors);
+        }
+
+        return false;
     }
 
     public function getAllJobworkProviders()
     {
-        $vendors = $this->getAll()->vendors;
-
-        $filter =
-            $this->model->filter(
-                function($vendor) {
-                    $vendor = $vendor->toArray();
-                    if ($vendor['is_service_provider'] == 1 &&
-                        $vendor['does_jobwork'] == 1
-                    ) {
-                        return $vendor;
-                    }
-                }
+        $searchVendors =
+            $this->getByParams(
+                [
+                    'conditions'    => 'is_service_provider = :isp: AND does_jobwork = :djw:',
+                    'bind'          => [
+                        'isp'       => '1',
+                        'djw'       => '1'
+                    ]
+                ], true
             );
 
-        return $filter;
-    }
-
-    public function updateAddresses($data)
-    {
-        if ($data['address_ids'] !== '') {
-            $data['address_ids'] = Json::decode($data['address_ids'], true);
-
-            $addressesIds = [];
-            if (count($data['address_ids']) > 0) {
-                foreach ($data['address_ids'] as $addressTypeKey => $addressType) {
-                    $addressesIds[$addressTypeKey] = [];
-
-                    if (is_array($addressType) && count($addressType) > 0) {
-                        foreach ($addressType as $addressKey => $address) {
-
-                            $address['name'] = $data['business_name'];
-                            $address['address_type'] = $addressTypeKey;
-                            $address['package_name'] = $this->packageName;
-
-                            if ($address['seq'] == 0) {
-                                $address['is_primary'] = 1;
-                            } else {
-                                $address['is_primary'] = 0;
-                            }
-
-                            if ($address['new'] == 1) {
-                                $this->basepackages->addressbook->addAddress($address);
-                            } else {
-                                $address['id'] = $addressKey;
-                                $this->basepackages->addressbook->updateAddress($address);
-                            }
-                            array_push($addressesIds[$addressTypeKey], $this->basepackages->addressbook->packagesData->last['id']);
-                        }
-                    }
-                }
-            }
+        if ($searchVendors && count($searchVendors) > 0) {
+            return $this->setAllData($searchVendors);
         }
 
-        $data['address_ids'] = Json::encode($addressesIds);
-
-        return $data;
-    }
-
-    protected function deleteAddresses($ids)
-    {
-        foreach ($ids as $id) {
-            $this->basepackages->addressbook->removeAddress(['id' => $id]);
-        }
+        return false;
     }
 
     public function searchByName(string $nameQueryString)
@@ -486,23 +509,14 @@ class Vendors extends BasePackage
                     'bind'                  => [
                         'aBusinessName'     => '%' . $nameQueryString . '%'
                     ]
-                ]
+                ], true
             );
 
         if ($searchVendors && count($searchVendors) > 0) {
-            $vendors = [];
-
-            foreach ($searchVendors as $vendorKey => $vendorValue) {
-                $vendors[$vendorKey]['id'] = $vendorValue['id'];
-                $vendors[$vendorKey]['name'] = $vendorValue['business_name'];
-            }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->vendors = $vendors;
-
-            return true;
+            return $this->setAllData($searchVendors);
         }
+
+        return false;
     }
 
     public function searchSuppliersManufacturersByName(string $nameQueryString)
@@ -520,19 +534,26 @@ class Vendors extends BasePackage
             );
 
         if ($searchVendors && count($searchVendors) > 0) {
-            $vendors = [];
-
-            foreach ($searchVendors as $vendorKey => $vendorValue) {
-                $vendors[$vendorKey]['id'] = $vendorValue['id'];
-                $vendors[$vendorKey]['name'] = $vendorValue['business_name'];
-            }
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->vendors = $vendors;
-
-            return true;
+            return $this->setAllData($searchVendors);
         }
+
+        return false;
+    }
+
+    protected function setAllData($searchVendors)
+    {
+        $vendors = [];
+
+        foreach ($searchVendors as $vendorKey => $vendorValue) {
+            $vendors[$vendorKey]['id'] = $vendorValue['id'];
+            $vendors[$vendorKey]['name'] = $vendorValue['business_name'];
+        }
+
+        $this->packagesData->responseCode = 0;
+
+        $this->packagesData->vendors = $vendors;
+
+        return true;
     }
 
     public function searchByVendorId($id)
