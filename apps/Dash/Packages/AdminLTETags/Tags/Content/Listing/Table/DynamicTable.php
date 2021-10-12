@@ -206,10 +206,10 @@ class DynamicTable
             $this->params["dtStateSave"] :
             false;
 
-        $this->dtParams["dtFixedHeader"] =
-            isset($this->params["dtFixedHeader"]) ?
-            $this->params["dtFixedHeader"] :
-            false;
+        $this->dtParams["dtFixedHeader"] = false;
+            // isset($this->params["dtFixedHeader"]) ?
+            // $this->params["dtFixedHeader"] :
+            // false;
 
         $this->dtParams["dtSearching"] =
             isset($this->params["dtSearching"]) ?
