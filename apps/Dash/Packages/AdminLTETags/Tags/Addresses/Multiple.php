@@ -272,6 +272,7 @@ class Multiple
 
                                             if (isset($this->params['address_ids']) &&
                                                 count($this->params['address_ids']) > 0 &&
+                                                isset($this->params['address_ids'][$type['id']]) &&
                                                 count($this->params['address_ids'][$type['id']]) > 0
                                             ) {
                                                 $this->content .=
