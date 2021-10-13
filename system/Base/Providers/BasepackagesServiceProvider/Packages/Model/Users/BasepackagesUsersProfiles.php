@@ -8,7 +8,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersProfiles extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -40,7 +40,7 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['account']['relationObj'] = $this->belongsTo(
+        $this->modelRelations['account']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id',
@@ -49,7 +49,7 @@ class BasepackagesUsersProfiles extends BaseModel
             ]
         );
 
-        self::$modelRelations['address']['relationObj'] = $this->hasOne(
+        $this->modelRelations['address']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesAddressBook::class,
             'package_row_id',
@@ -69,6 +69,6 @@ class BasepackagesUsersProfiles extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

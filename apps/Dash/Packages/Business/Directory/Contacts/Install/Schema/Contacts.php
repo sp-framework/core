@@ -168,14 +168,6 @@ class Contacts
                         'notNull' => false,
                     ]
                 ),
-                new Column(
-                    'address_ids',
-                    [
-                        'type'    => Column::TYPE_VARCHAR,
-                        'size'    => 100,
-                        'notNull' => false,
-                    ]
-                ),
                 new Column(//Encrypted text field with CC information of the customer. The key is with customer and cannot be viewed even if the data is stolen.
                     'cc_details',
                     [

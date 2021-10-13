@@ -7,7 +7,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Accou
 
 class BasepackagesUsersAccountsAgents extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -25,7 +25,7 @@ class BasepackagesUsersAccountsAgents extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['sessions']['relationObj'] = $this->belongsTo(
+        $this->modelRelations['sessions']['relationObj'] = $this->belongsTo(
             'session_id',
             BasepackagesUsersAccountsSessions::class,
             'session_id'
@@ -37,6 +37,6 @@ class BasepackagesUsersAccountsAgents extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

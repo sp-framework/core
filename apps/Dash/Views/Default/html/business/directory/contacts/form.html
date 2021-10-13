@@ -536,9 +536,6 @@ dataCollectionSection =
                             $('#security-token').val(response.token);
                         }
 
-                        //eslint-disable-next-line
-                        console.log(response);
-
                         if (response.vendor['address_ids'] && typeof response.vendor['address_ids'] === 'object') {
                             for (var addressType in response.vendor['address_ids']) {
                                 if (response.vendor['address_ids'][addressType].length > 0) {

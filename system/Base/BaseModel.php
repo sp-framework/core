@@ -9,8 +9,6 @@ abstract class BaseModel extends Model
 {
 	protected $app;
 
-	protected static $modelRelations = [];
-
 	public function onConstruct()
 	{
 		$this->useDynamicUpdate(true);
@@ -30,11 +28,6 @@ abstract class BaseModel extends Model
 		$this->modules = $this->getDi()->getShared('modules');
 
 		return $this;
-	}
-
-	public function getModelRelations()
-	{
-		return self::$modelRelations;
 	}
 
 	protected function checkPackage($packageClass)

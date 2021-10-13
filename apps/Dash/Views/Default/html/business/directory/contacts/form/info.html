@@ -124,7 +124,7 @@
                 )}}
             </div>
             <div class="col">
-                {% if contactAccountId is defined and contactAccountId !== '' and contactAccountId != '0' %}
+                {% if contactAccountId is defined and contactAccountId !== '' and contactAccountId != '0' and basepackages.accounts.getById(contactAccountId) %}
                     {% set linkHidden = false %}
                     {% set createLink =
                         '<a href="' ~ links.url('system/users/accounts/q/id/' ~ contactAccountId) ~ '" type="button" data-id="' ~ contactAccountId ~ '" class="text-white btn btn-primary btn-xs text-uppercase contentAjaxLink">

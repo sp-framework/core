@@ -10,7 +10,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class HrmsEmployees extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -38,7 +38,7 @@ class HrmsEmployees extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['employment']['relationObj'] = $this->hasOne(
+        $this->modelRelations['employment']['relationObj'] = $this->hasOne(
             'id',
             HrmsEmployeesEmployment::class,
             'employee_id',
@@ -47,7 +47,7 @@ class HrmsEmployees extends BaseModel
             ]
         );
 
-        self::$modelRelations['contact']['relationObj'] = $this->hasOne(
+        $this->modelRelations['contact']['relationObj'] = $this->hasOne(
             'id',
             HrmsEmployeesContact::class,
             'employee_id',
@@ -56,7 +56,7 @@ class HrmsEmployees extends BaseModel
             ]
         );
 
-        self::$modelRelations['finance']['relationObj'] = $this->hasOne(
+        $this->modelRelations['finance']['relationObj'] = $this->hasOne(
             'id',
             HrmsEmployeesFinance::class,
             'employee_id',
@@ -65,12 +65,12 @@ class HrmsEmployees extends BaseModel
             ]
         );
 
-        self::$modelRelations['accounts']['relationObj'] = $this->hasOne(
+        $this->modelRelations['account']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id',
             [
-                'alias' => 'accounts'
+                'alias' => 'account'
             ]
         );
 
@@ -79,6 +79,6 @@ class HrmsEmployees extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

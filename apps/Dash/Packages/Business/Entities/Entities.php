@@ -184,8 +184,6 @@ class Entities extends BasePackage
     {
         $entity = $this->getById($data['id']);
 
-        $addressObj = $this->getEntityAddress($data['id'], true);
-
         if ($this->remove($data['id'])) {
             if (isset($entity['api_id']) &&
                 ($entity['api_id'] !== '' && $entity['api_id'] != 0)
@@ -199,10 +197,6 @@ class Entities extends BasePackage
                 $api['used_by'] = '';
 
                 $apiPackage->update($api);
-            }
-
-            if ($addressObj) {
-                $addressObj->delete();
             }
 
             $this->addResponse('Removed business entity.');

@@ -9,7 +9,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersAccountsSessions extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -21,13 +21,13 @@ class BasepackagesUsersAccountsSessions extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['accounts']['relationObj'] = $this->belongsTo(
+        $this->modelRelations['accounts']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id'
         );
 
-        self::$modelRelations['identifiers']['relationObj'] = $this->hasOne(
+        $this->modelRelations['identifiers']['relationObj'] = $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsIdentifiers::class,
             'session_id',
@@ -36,7 +36,7 @@ class BasepackagesUsersAccountsSessions extends BaseModel
             ]
         );
 
-        self::$modelRelations['sessions']['relationObj'] = $this->hasOne(
+        $this->modelRelations['sessions']['relationObj'] = $this->hasOne(
             'session_id',
             BasepackagesUsersAccountsAgents::class,
             'session_id'
@@ -47,6 +47,6 @@ class BasepackagesUsersAccountsSessions extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

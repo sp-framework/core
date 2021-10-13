@@ -596,7 +596,11 @@ abstract class BasePackage extends Controller
 
 							$rowData = $model->toArray();
 
-							$modelRelations = $model->getModelRelations();
+							$modelRelations = [];
+
+							if (method_exists($model, 'getModelRelations')) {
+								$modelRelations = $model->getModelRelations();
+							}
 
 							if ($modelRelations && count($modelRelations) > 0) {
 								foreach ($modelRelations as $relationColumnKey => $relationColumn) {
@@ -683,7 +687,11 @@ abstract class BasePackage extends Controller
 
 							$model = $this->getFirst('id', $row['id'], true, false, $query['model']);
 
-							$modelRelations = $model->getModelRelations();
+							$modelRelations = [];
+
+							if (method_exists($model, 'getModelRelations')) {
+								$modelRelations = $model->getModelRelations();
+							}
 
 							if ($modelRelations && count($modelRelations) > 0) {
 								foreach ($modelRelations as $relationColumnKey => $relationColumn) {
@@ -1124,8 +1132,11 @@ abstract class BasePackage extends Controller
 			$relations['dataTypes'] = [];
 			$relations['number'] = [];
 			$relations['columns'] = [];
+			$relations['modelRelations'] = [];
 
-			$relations['modelRelations'] = $model->getModelRelations();
+			if (method_exists($model, 'getModelRelations')) {
+				$relations['modelRelations'] = $model->getModelRelations();
+			}
 
 			if ($relations['modelRelations'] && is_array($relations['modelRelations']) && count($relations['modelRelations']) > 0) {
 				foreach ($relations['modelRelations'] as $modelRelationKey => $modelRelation) {

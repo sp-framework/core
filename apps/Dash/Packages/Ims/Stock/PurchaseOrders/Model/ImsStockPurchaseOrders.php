@@ -8,7 +8,7 @@ use System\Base\BaseModel;
 
 class ImsStockPurchaseOrders extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -70,7 +70,7 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['products']['relationObj'] = $this->hasMany(
+        $this->modelRelations['products']['relationObj'] = $this->hasMany(
             'id',
             ImsStockPurchaseOrdersProducts::class,
             'purchase_order_id',
@@ -82,7 +82,7 @@ class ImsStockPurchaseOrders extends BaseModel
         $apiPackage = $this->init()->checkPackage('\Apps\Dash\Packages\System\Api\Api');
 
         if ($apiPackage) {
-            self::$modelRelations['xero']['relationObj'] = $this->hasOne(
+            $this->modelRelations['xero']['relationObj'] = $this->hasOne(
                 'id',
                 SystemApiXeroPurchaseOrders::class,
                 'baz_po_id',
@@ -97,6 +97,6 @@ class ImsStockPurchaseOrders extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

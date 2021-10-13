@@ -100,10 +100,12 @@ class VendorsComponent extends BaseComponent
                 $this->view->vendor = $vendor;
             } else {
                 $vendor = [];
-                // $vendor['contact_ids'] = [];
+
                 $vendor['address_ids'] = [];
+
                 $this->view->vendor = $vendor;
             }
+
             //Check Geo Locations Dependencies
             if ($this->basepackages->geoCountries->isEnabled()) {
                 $this->view->geo = true;

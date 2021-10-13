@@ -197,20 +197,13 @@ class Vendors extends BasePackage
 
         $vendor = $vendorObj->toArray();
 
-        if ($this->remove($data['id'])) {
-            if ($vendorObj->getFinancial_details()) {
-                $vendorObj->getFinancial_details()->delete();
-            }
-            if ($vendorObj->getAddresses()) {
-                $vendorObj->getAddresses()->delete();
-            }
-            if ($vendorObj->getNotes()) {
-                $vendorObj->getNotes()->delete();
-            }
-            if ($vendorObj->getActivityLogs()) {
-                $vendorObj->getActivityLogs()->delete();
-            }
+        if ($vendorObj->getContacts()->count() > 0) {
+            $this->addResponse('Vendor has contacts. Error removing vendor ' . $vendor['business_name'], 1);
 
+            return;
+        }
+
+        if ($this->remove($data['id'])) {
             if (isset($data['logo'])) {
                 $this->basepackages->storages->changeOrphanStatus(null, $vendor['logo']);
             }

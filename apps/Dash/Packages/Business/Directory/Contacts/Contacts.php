@@ -18,12 +18,41 @@ class Contacts extends BasePackage
 
     public function getContactById(int $id)
     {
-        $contactModel = new $this->modelToUse;
-
-        $contactObj = $contactModel::findFirstById($id);
+        $contactObj = $this->getFirst('id', $id);
 
         if ($contactObj) {
             $contact = $contactObj->toArray();
+
+            $contact['address_ids'] = [];
+            $contact['notes'] = [];
+            $contact['activityLogs'] = [];
+
+            if ($contactObj->getAddresses()) {
+                $contactAddresses = $contactObj->getAddresses()->toArray();
+
+                if (count($contactAddresses) > 0) {
+                    foreach ($contactAddresses as $contactAddress) {
+                        if (!isset($contact['address_ids'][$contactAddress['address_type']])) {
+                            $contact['address_ids'][$contactAddress['address_type']] = [];
+                        }
+
+                        array_push($contact['address_ids'][$contactAddress['address_type']], $contactAddress);
+                    }
+
+                    foreach ($contact['address_ids'] as $addressTypeKey => $addressTypeAddresses) {
+                        $contact['address_ids'][$addressTypeKey] =
+                            msort($contact['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
+                    }
+                }
+            }
+
+            if ($contactObj->getVendor()) {
+                $contact['vendor'] = $contactObj->getVendor()->toArray();
+            }
+
+            $contact['activityLogs'] = $this->getActivityLogs($contact['id']);
+
+            $contact['notes'] = $this->basepackages->notes->getNotes('contacts', $contact['id']);
 
             unset($contact['cc_details']);
 
@@ -46,10 +75,6 @@ class Contacts extends BasePackage
 
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
-        if (isset($data['address_ids'])) {
-            $data = $this->updateAddresses($data);
-        }
-
         $data['contact_phone'] = $this->extractNumbers($data['contact_phone']);
         $data['contact_mobile'] = $this->extractNumbers($data['contact_mobile']);
         $data['contact_fax'] = $this->extractNumbers($data['contact_fax']);
@@ -65,9 +90,9 @@ class Contacts extends BasePackage
 
             $data['id'] = $this->packagesData->last['id'];
 
-            $this->update($data);
+            $this->updateAddresses($data);
 
-            // $this->updateVendorContacts($data);
+            $this->update($data);
 
             $this->basepackages->notes->addNote($this->packageName, $data);
 
@@ -98,10 +123,6 @@ class Contacts extends BasePackage
 
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
-        if (isset($data['address_ids'])) {
-            $data = $this->updateAddresses($data);
-        }
-
         if (isset($data['delete_address_ids']) && $data['delete_address_ids'] !== '') {
             $data['delete_address_ids'] = Json::decode($data['delete_address_ids'], true);
             if (count($data['delete_address_ids']) > 0) {
@@ -122,9 +143,9 @@ class Contacts extends BasePackage
                 $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
             }
 
-            $this->update($data);
+            $this->updateAddresses($data);
 
-            // $this->updateVendorContacts($data, $contact);
+            $this->update($data);
 
             $this->basepackages->notes->addNote($this->packageName, $data);
 
@@ -142,15 +163,11 @@ class Contacts extends BasePackage
     public function removeContact(array $data)
     {
         $contact = $this->getById($data['id']);
-        //Check relations before removing.
-        //Remove Address
 
         if ($this->remove($data['id'])) {
             if ($contact['portrait'] !== '') {
                 $this->basepackages->storages->changeOrphanStatus(null, $contact['portrait']);
             }
-
-            $this->updateVendorContacts($data);
 
             $this->basepackages->accounts->removeAccount(['id' => $contact['account_id']]);
 
@@ -187,63 +204,8 @@ class Contacts extends BasePackage
         );
     }
 
-    protected function updateVendorContacts($data, $contact = null)
-    {
-        $vendors = $this->usePackage(Vendors::class);
-
-        if ($contact) {
-            if ($contact['vendor_id'] === $data['vendor_id']) {
-                return;
-            } else {
-                $vendorObj = $vendors->getModelToUse()::findFirstById($contact['vendor_id']);
-
-                if ($vendorObj) {
-                    $vendor = $vendorObj->toArray();
-
-                    $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
-
-                    if (in_array($contact['id'], $vendor['contact_ids'])) {
-                        $key = array_keys($vendor['contact_ids'], $contact['id']);
-
-                        if ($key) {
-                            array_splice($vendor['contact_ids'], $key[0], 1);
-                        }
-
-                        $vendor['contact_ids'] = Json::encode($vendor['contact_ids']);
-
-                        $vendorObj->assign($vendor);
-
-                        $vendorObj->update();
-                    }
-                }
-
-                $vendorObj = $vendors->getModelToUse()::findFirstById($data['vendor_id']);
-
-                if ($vendorObj) {
-                    $vendor = $vendorObj->toArray();
-
-                    $vendor['contact_ids'] = Json::decode($vendor['contact_ids'], true);
-
-                    if (!in_array($contact['id'], $vendor['contact_ids'])) {
-                        array_push($vendor['contact_ids'], $data['id']);
-
-                        $vendor['contact_ids'] = Json::encode($vendor['contact_ids']);
-
-                        $vendorObj->assign($vendor);
-
-                        $vendorObj->update();
-                    }
-                }
-            }
-        }
-    }
-
     protected function addUpdateAccount($data)
     {
-        $vendors = $this->usePackage(Vendors::class);
-
-        $vendorArr = $vendors->getById($data['vendor_id']);
-
         $data['package_name'] = 'contacts';
         $data['package_row_id'] = $data['id'];
 
@@ -253,7 +215,8 @@ class Contacts extends BasePackage
 
         if (isset($data['account_id']) &&
             $data['account_id'] != '' &&
-            $data['account_id'] != '0'
+            $data['account_id'] != '0' &&
+            $this->basepackages->accounts->getById($data['account_id'])
         ) {
             $data['id'] = $data['account_id'];
 
@@ -376,12 +339,11 @@ class Contacts extends BasePackage
         $this->packagesData->contact = 'No Contact Found!';
     }
 
-    protected function updateAddresses($data)
+    public function updateAddresses($data)
     {
-        if ($data['address_ids'] !== '') {
+        if (isset($data['address_ids']) && $data['address_ids'] !== '') {
             $data['address_ids'] = Json::decode($data['address_ids'], true);
 
-            $addressesIds = [];
             if (count($data['address_ids']) > 0) {
                 foreach ($data['address_ids'] as $addressTypeKey => $addressType) {
                     $addressesIds[$addressTypeKey] = [];
@@ -389,9 +351,9 @@ class Contacts extends BasePackage
                     if (is_array($addressType) && count($addressType) > 0) {
                         foreach ($addressType as $addressKey => $address) {
 
-                            $address['name'] = $data['full_name'];
                             $address['address_type'] = $addressTypeKey;
                             $address['package_name'] = $this->packageName;
+                            $address['package_row_id'] = $data['id'];
 
                             if ($address['seq'] == 0) {
                                 $address['is_primary'] = 1;
@@ -405,16 +367,13 @@ class Contacts extends BasePackage
                                 $address['id'] = $addressKey;
                                 $this->basepackages->addressbook->updateAddress($address);
                             }
-                            array_push($addressesIds[$addressTypeKey], $this->basepackages->addressbook->packagesData->last['id']);
                         }
                     }
                 }
             }
         }
 
-        $data['address_ids'] = Json::encode($addressesIds);
-
-        return $data;
+        return true;
     }
 
     protected function deleteAddresses($ids)

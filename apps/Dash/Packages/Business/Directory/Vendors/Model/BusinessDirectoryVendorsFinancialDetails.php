@@ -7,7 +7,7 @@ use System\Base\BaseModel;
 
 class BusinessDirectoryVendorsFinancialDetails extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -53,7 +53,7 @@ class BusinessDirectoryVendorsFinancialDetails extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['vendors']['relationObj'] = $this->belongsTo(
+        $this->modelRelations['vendors']['relationObj'] = $this->belongsTo(
             'vendor_id',
             BusinessDirectoryVendors::class,
             'id',
@@ -67,6 +67,6 @@ class BusinessDirectoryVendorsFinancialDetails extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

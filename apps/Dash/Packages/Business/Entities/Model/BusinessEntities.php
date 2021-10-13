@@ -7,6 +7,8 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 
 class BusinessEntities extends BaseModel
 {
+    protected $modelRelations = [];
+
     public $id;
 
     public $logo;
@@ -49,7 +51,7 @@ class BusinessEntities extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['address']['relationObj'] = $this->hasOne(
+        $this->modelRelations['address']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesAddressBook::class,
             'package_row_id',
@@ -69,6 +71,6 @@ class BusinessEntities extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

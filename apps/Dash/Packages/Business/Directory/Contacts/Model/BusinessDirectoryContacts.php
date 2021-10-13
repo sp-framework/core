@@ -2,10 +2,17 @@
 
 namespace Apps\Dash\Packages\Business\Directory\Contacts\Model;
 
+use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendors;
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class BusinessDirectoryContacts extends BaseModel
 {
+    protected $modelRelations = [];
+
     public $id;
 
     public $portrait;
@@ -46,7 +53,84 @@ class BusinessDirectoryContacts extends BaseModel
 
     public $contact_other;
 
-    public $address_ids;
-
     public $cc_details;
+
+    public function initialize()
+    {
+        $this->modelRelations['account']['relationObj'] = $this->belongsTo(
+            'id',
+            BasepackagesUsersAccounts::class,
+            'package_row_id',
+            [
+                'alias'                 => 'account',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'contacts'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['addresses']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesAddressBook::class,
+            'package_row_id',
+            [
+                'alias'                 => 'addresses',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'contacts'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['notes']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesNotes::class,
+            'package_row_id',
+            [
+                'alias'                 => 'notes',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'contacts'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['activityLogs']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesActivityLogs::class,
+            'package_row_id',
+            [
+                'alias'                 => 'activityLogs',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'contacts'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['vendor']['relationObj'] = $this->belongsTo(
+            'vendor_id',
+            BusinessDirectoryVendors::class,
+            'id',
+            [
+                'alias' => 'vendor'
+            ]
+        );
+
+        parent::initialize();
+    }
+
+    public function getModelRelations()
+    {
+        return $this->modelRelations;
+    }
 }

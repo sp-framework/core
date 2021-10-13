@@ -4,10 +4,11 @@ namespace Apps\Dash\Packages\Crms\Customers\Model;
 
 use Apps\Dash\Packages\Crms\Customers\Model\CrmsCustomersFinancialDetails;
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class CrmsCustomers extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -47,7 +48,7 @@ class CrmsCustomers extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['financial_details']['relationObj'] = $this->hasOne(
+        $this->modelRelations['financial_details']['relationObj'] = $this->hasOne(
             'id',
             CrmsCustomersFinancialDetails::class,
             'customer_id',
@@ -56,11 +57,20 @@ class CrmsCustomers extends BaseModel
             ]
         );
 
+        $this->modelRelations['account']['relationObj'] = $this->belongsTo(
+            'account_id',
+            BasepackagesUsersAccounts::class,
+            'id',
+            [
+                'alias' => 'account'
+            ]
+        );
+
         parent::initialize();
     }
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

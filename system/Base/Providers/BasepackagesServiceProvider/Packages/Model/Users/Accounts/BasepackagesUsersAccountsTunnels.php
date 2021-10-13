@@ -7,7 +7,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersAccountsTunnels extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -19,7 +19,7 @@ class BasepackagesUsersAccountsTunnels extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['account']['relationObj'] = $this->belongsTo(
+        $this->modelRelations['account']['relationObj'] = $this->belongsTo(
             'account_id',
             BasepackagesUsersAccounts::class,
             'id'
@@ -30,6 +30,6 @@ class BasepackagesUsersAccountsTunnels extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

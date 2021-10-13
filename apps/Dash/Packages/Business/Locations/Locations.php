@@ -78,13 +78,7 @@ class Locations extends BasePackage
             return false;
         }
 
-        $addressObj = $this->getLocationAddress($data['id'], true);
-
         if ($this->remove($data['id'])) {
-            if ($addressObj) {
-                $addressObj->delete();
-            }
-
             $this->addResponse('Removed location.');
         } else {
             $this->addResponse('Error removing location.', 1);

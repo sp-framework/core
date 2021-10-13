@@ -142,7 +142,7 @@ class AccountsComponent extends BaseComponent
     protected function formatRoles($data, $roles)
     {
         if ($data['role_id'] == '0') {
-            $data['role_id'] = 'Not Assigned';
+            $data['role_id'] = '<span class="badge badge-danger text-uppercase">Not Assigned (0)</span>';
         } else {
             $data['role_id'] = $roles[$data['role_id']]['name'] . ' (' . $data['role_id'] . ')';
         }

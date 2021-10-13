@@ -508,8 +508,6 @@ class Multiple
                                     var data = { };
                                     var addressId, addressNew;
 
-                                    //eslint-disable-next-line
-                                    console.log($("#' . $this->compSecId . '-attention_to").val());
                                     data["address_id"] = $("#' . $this->compSecId . '-address_id").val();
                                     data["attention_to"] = $("#' . $this->compSecId . '-attention_to").val().trim();
                                     data["street_address"] = $("#' . $this->compSecId . '-street_address").val().trim();
@@ -551,7 +549,7 @@ class Multiple
                                         } else {
                                             listType = "success";
                                         }
-                                        console.log(data);
+
                                         if (data["address_id"] === "") {
                                             addressId = Date.now();
                                             addressNew = "1";
@@ -591,9 +589,6 @@ class Multiple
                                             var exists = false;
 
                                             $(addressesLi).each(function(index, li) {
-                                                //eslint-disable-next-line
-                                                console.log($(li).find(".cla-postcode").text());
-
                                                 if ($(li).find(".cla-attentionTo").text() === data["attention_to"] &&
                                                     $(li).find(".cla-street").text() === data["street_address"] &&
                                                     $(li).find(".cla-postcode").text() === data["post_code"]

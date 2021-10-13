@@ -7,7 +7,7 @@ use System\Base\BaseModel;
 
 class HrmsEmployeesEmployment extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -31,7 +31,7 @@ class HrmsEmployeesEmployment extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['employee']['relationObj'] = $this->belongsTo(
+        $this->modelRelations['employee']['relationObj'] = $this->belongsTo(
             'employee_id',
             HrmsEmployees::class,
             'id',
@@ -45,6 +45,6 @@ class HrmsEmployeesEmployment extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

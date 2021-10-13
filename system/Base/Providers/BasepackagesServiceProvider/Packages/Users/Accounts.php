@@ -282,32 +282,23 @@ class Accounts extends BasePackage
      */
     public function removeAccount(array $data)
     {
-        $accountObj = $this->getFirst('id', $data['id']);
+        if (isset($data['id']) && $data['id'] != 1) {
+            $accountObj = $this->getFirst('id', $data['id']);
 
-        if ($accountObj) {
-            $account = $accountObj->toArray();
+            if ($accountObj) {
+                $account = $accountObj->toArray();
 
-            $relationData = $accountObj->getsecurity()->toArray();
+                $relationData = $accountObj->getSecurity()->toArray();
 
-            unset($relationData['id']);
+                unset($relationData['id']);
 
-            $account = array_merge($account, $relationData);
+                $account = array_merge($account, $relationData);
 
-            if (isset($account['role_id']) && $account['role_id'] != '0') {
-                $this->removeRoleAccount($account['role_id'], $account['id']);
-            }
+                if (isset($account['role_id']) && $account['role_id'] != '0') {
+                    $this->removeRoleAccount($account['role_id'], $account['id']);
+                }
 
-            if (isset($data['id']) && $data['id'] != 1) {
                 if ($this->remove($data['id'])) {
-
-                    if ($accountObj->getProfiles()) {
-                        if ($accountObj->getProfiles()->getAddress()) {
-                            $accountObj->getProfiles()->getAddress()->delete();
-                        }
-
-                        $accountObj->getProfiles()->delete();
-                    }
-
                     $this->removeRelatedData($accountObj);
 
                     $this->addToNotification('remove', 'Removed account for ID: ' . $account['email']);
@@ -317,10 +308,10 @@ class Accounts extends BasePackage
                     $this->addResponse('Error removing account.', 1);
                 }
             } else {
-                $this->addResponse('Cannot remove default account.', 1);
+                $this->addResponse('Error removing account.', 1);
             }
         } else {
-            $this->addResponse('Error removing account.', 1);
+            $this->addResponse('Cannot remove default account.', 1);
         }
     }
 
@@ -335,6 +326,7 @@ class Accounts extends BasePackage
     ) {
         if ($security) {
             if ($accountObj->getsecurity()) {
+                var_dump($accountObj->getsecurity()->toArray());die();
                 $accountObj->getsecurity()->delete();
             }
         }

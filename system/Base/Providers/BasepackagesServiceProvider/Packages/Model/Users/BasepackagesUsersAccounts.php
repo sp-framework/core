@@ -13,7 +13,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\Basep
 
 class BasepackagesUsersAccounts extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -29,7 +29,7 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['security']['relationObj'] = $this->hasOne(
+        $this->modelRelations['security']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersAccountsSecurity::class,
             'account_id',
@@ -38,7 +38,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        self::$modelRelations['canlogin']['relationObj'] = $this->hasMany(
+        $this->modelRelations['canlogin']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesUsersAccountsCanlogin::class,
             'account_id',
@@ -47,7 +47,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        self::$modelRelations['sessions']['relationObj'] = $this->hasMany(
+        $this->modelRelations['sessions']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
@@ -56,7 +56,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        self::$modelRelations['identifiers']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['identifiers']['relationObj'] = $this->hasOneThrough(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
@@ -68,7 +68,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        self::$modelRelations['agents']['relationObj'] = $this->hasOneThrough(
+        $this->modelRelations['agents']['relationObj'] = $this->hasOneThrough(
             'id',
             BasepackagesUsersAccountsSessions::class,
             'account_id',
@@ -80,7 +80,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        self::$modelRelations['tunnels']['relationObj'] = $this->hasOne(
+        $this->modelRelations['tunnels']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersAccountsTunnels::class,
             'account_id',
@@ -89,7 +89,7 @@ class BasepackagesUsersAccounts extends BaseModel
             ]
         );
 
-        self::$modelRelations['profiles']['relationObj'] = $this->hasOne(
+        $this->modelRelations['profiles']['relationObj'] = $this->hasOne(
             'id',
             BasepackagesUsersProfiles::class,
             'account_id',
@@ -103,6 +103,6 @@ class BasepackagesUsersAccounts extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

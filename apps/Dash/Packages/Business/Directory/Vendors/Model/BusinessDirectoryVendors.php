@@ -2,6 +2,7 @@
 
 namespace Apps\Dash\Packages\Business\Directory\Vendors\Model;
 
+use Apps\Dash\Packages\Business\Directory\Contacts\Model\BusinessDirectoryContacts;
 use Apps\Dash\Packages\Business\Directory\Vendors\Model\BusinessDirectoryVendorsFinancialDetails;
 use System\Base\BaseModel;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
@@ -10,7 +11,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Basepackage
 
 class BusinessDirectoryVendors extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -54,7 +55,7 @@ class BusinessDirectoryVendors extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['financial_details']['relationObj'] = $this->hasOne(
+        $this->modelRelations['financial_details']['relationObj'] = $this->hasOne(
             'id',
             BusinessDirectoryVendorsFinancialDetails::class,
             'vendor_id',
@@ -63,7 +64,7 @@ class BusinessDirectoryVendors extends BaseModel
             ]
         );
 
-        self::$modelRelations['addresses']['relationObj'] = $this->hasMany(
+        $this->modelRelations['addresses']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesAddressBook::class,
             'package_row_id',
@@ -78,7 +79,7 @@ class BusinessDirectoryVendors extends BaseModel
             ]
         );
 
-        self::$modelRelations['notes']['relationObj'] = $this->hasMany(
+        $this->modelRelations['notes']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesNotes::class,
             'package_row_id',
@@ -93,7 +94,7 @@ class BusinessDirectoryVendors extends BaseModel
             ]
         );
 
-        self::$modelRelations['activityLogs']['relationObj'] = $this->hasMany(
+        $this->modelRelations['activityLogs']['relationObj'] = $this->hasMany(
             'id',
             BasepackagesActivityLogs::class,
             'package_row_id',
@@ -108,11 +109,20 @@ class BusinessDirectoryVendors extends BaseModel
             ]
         );
 
+        $this->modelRelations['contacts']['relationObj'] = $this->hasMany(
+            'id',
+            BusinessDirectoryContacts::class,
+            'vendor_id',
+            [
+                'alias' => 'contacts'
+            ]
+        );
+
         parent::initialize();
     }
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

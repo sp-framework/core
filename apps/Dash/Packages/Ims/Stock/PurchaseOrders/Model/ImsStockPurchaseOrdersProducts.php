@@ -7,7 +7,7 @@ use System\Base\BaseModel;
 
 class ImsStockPurchaseOrdersProducts extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -41,7 +41,7 @@ class ImsStockPurchaseOrdersProducts extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['purchase_orders']['relationObj'] = $this->hasMany(
+        $this->modelRelations['purchase_orders']['relationObj'] = $this->hasMany(
             'purchase_order_id',
             ImsStockPurchaseOrders::class,
             'id',
@@ -55,6 +55,6 @@ class ImsStockPurchaseOrdersProducts extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

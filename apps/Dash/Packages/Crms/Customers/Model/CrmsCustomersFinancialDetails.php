@@ -7,7 +7,7 @@ use System\Base\BaseModel;
 
 class CrmsCustomersFinancialDetails extends BaseModel
 {
-    protected static $modelRelations = [];
+    protected $modelRelations = [];
 
     public $id;
 
@@ -41,7 +41,7 @@ class CrmsCustomersFinancialDetails extends BaseModel
 
     public function initialize()
     {
-        self::$modelRelations['customers']['relationObj'] = $this->belongsTo(
+        $this->modelRelations['customers']['relationObj'] = $this->belongsTo(
             'customer_id',
             CrmsCustomers::class,
             'id',
@@ -55,6 +55,6 @@ class CrmsCustomersFinancialDetails extends BaseModel
 
     public function getModelRelations()
     {
-        return self::$modelRelations;
+        return $this->modelRelations;
     }
 }

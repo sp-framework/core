@@ -32,34 +32,10 @@ class ContactsComponent extends BaseComponent
             $this->view->portraitLink = '';
 
             if ($this->getData()['id'] != 0) {
-
                 $contact = $this->contacts->getContactById($this->getData()['id']);
 
                 if (!$contact) {
                     return $this->throwIdNotFound();
-                }
-
-                $contact['notes'] = $this->notes->getNotes('contacts', $this->getData()['id']);
-
-                $vendors = $this->usePackage(Vendors::class);
-
-                $vendorArr[] = $vendors->getVendorById($contact['vendor_id']);
-
-                $this->view->vendor = $vendorArr;
-
-                if ($contact['address_ids'] && $contact['address_ids'] !== '') {
-                    $contact['address_ids'] = Json::decode($contact['address_ids'], true);
-
-                    foreach ($contact['address_ids'] as $addressTypeKey => $addressType) {
-                        if (is_array($addressType) && count($addressType) > 0) {
-                            foreach ($addressType as $addressKey => $address) {
-                                $contact['address_ids'][$addressTypeKey][$addressKey] =
-                                    $this->basepackages->addressbook->getById($address);
-                            }
-                        }
-                        $contact['address_ids'][$addressTypeKey] =
-                            msort($contact['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
-                    }
                 }
 
                 $storages = $this->basepackages->storages;
@@ -83,6 +59,8 @@ class ContactsComponent extends BaseComponent
                 $contact['contact_phone'] = $this->formatNumbers($contact['contact_phone']);
                 $contact['contact_mobile'] = $this->formatNumbers($contact['contact_mobile']);
                 $contact['contact_fax'] = $this->formatNumbers($contact['contact_fax']);
+
+                $this->view->vendor = [$contact['vendor']];
 
                 $this->view->contact = $contact;
             } else {
@@ -162,7 +140,7 @@ class ContactsComponent extends BaseComponent
 
     protected function generateAccountLink($rowId, $data)
     {
-        if ($data['account_id'] && $data['account_id'] != '0') {
+        if ($data['account_id'] && $data['account_id'] != '0' && $this->basepackages->accounts->getById($data['account_id'])) {
             $data['account_id'] =
                 '<a id="' . strtolower($this->app['route']) . '-' . strtolower($this->componentName) . '-access-' . $rowId . '" href="' .  $this->links->url('system/users/accounts/q/id/' . $data['account_id']) . '" type="button" data-id="' . $data['id'] . '" data-rowid="' . $rowId . '" class="text-white btn btn-primary btn-xs rowAccess text-uppercase contentAjaxLink">
                     <i class="fas fa-fw fa-xs fa-external-link-alt"></i>
