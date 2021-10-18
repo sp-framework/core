@@ -1,16 +1,6 @@
 {% if employee['id'] is defined %}
     {% set employeeWorkType = employee['work_type_id'] %}
     {% set employeeContactLocationId = employee['contact_location_id'] %}
-    {% set employeeContactAddressId = employee['contact_address_id'] %}
-    {% set employeeContactStreetAddress = employee['street_address'] %}
-    {% set employeeContactStreetAddress2 = employee['street_address_2'] %}
-    {% set employeeContactCityId = employee['city_id'] %}
-    {% set employeeContactCity = employee['city_name'] %}
-    {% set employeeContactPostCode = employee['post_code'] %}
-    {% set employeeContactStateId = employee['state_id'] %}
-    {% set employeeContactState = employee['state_name'] %}
-    {% set employeeContactCountryId = employee['country_id'] %}
-    {% set employeeContactCountry = employee['country_name'] %}
     {% set employeeContactPhone = employee['contact_phone'] %}
     {% set employeeContactPhoneExt = employee['contact_phone_ext'] %}
     {% set employeeContactMobile = employee['contact_mobile'] %}
@@ -19,63 +9,53 @@
 {% else %}
     {% set employeeWorkType = '' %}
     {% set employeeContactLocationId = '' %}
-    {% set employeeContactAddressId = '' %}
-    {% set employeeContactStreetAddress = '' %}
-    {% set employeeContactStreetAddress2 = '' %}
-    {% set employeeContactCityId = '' %}
-    {% set employeeContactCity = '' %}
-    {% set employeeContactPostCode = '' %}
-    {% set employeeContactStateId = '' %}
-    {% set employeeContactState = '' %}
-    {% set employeeContactCountryId = '' %}
-    {% set employeeContactCountry = '' %}
     {% set employeeContactPhone = '' %}
     {% set employeeContactPhoneExt = '' %}
     {% set employeeContactMobile = '' %}
     {% set employeeContactFax = '' %}
     {% set employeeContactOther = '' %}
 {% endif %}
-<div class="row">
-    <div class="col">
-        {{adminltetags.useTag('fields',
-            [
-                'component'                      : component,
-                'componentName'                  : componentName,
-                'componentId'                    : componentId,
-                'sectionId'                      : sectionId,
-                'fieldId'                        : 'work_type_id',
-                'fieldLabel'                     : 'Work Type',
-                'fieldType'                      : 'select2',
-                'fieldHelp'                      : true,
-                'fieldHelpTooltipContent'        : 'Work Type. Traditional workers travel to office to work.',
-                'fieldRequired'                  : true,
-                'fieldBazScan'                   : true,
-                'fieldBazJstreeSearch'           : true,
-                'fieldBazPostOnCreate'           : true,
-                'fieldBazPostOnUpdate'           : true,
-                'fieldDataSelect2Options'        :
-                    [
-                        '1'            :
-                            [
-                                'id'            : '1',
-                                'name'          : 'Traditional'
-                            ],
-                        '2'            :
-                            [
-                                'id'            : '2',
-                                'name'          : 'Remote'
-                            ]
-                    ],
-                'fieldDataSelect2OptionsKey'           : 'id',
-                'fieldDataSelect2OptionsValue'         : 'name',
-                'fieldDataSelect2OptionsArray'         : true,
-                'fieldDataSelect2OptionsSelected'      : employeeWorkType
-            ]
-        )}}
-    </div>
-</div>
 <div class="row vdivide">
     <div class="col">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'work_type_id',
+                        'fieldLabel'                     : 'Work Type',
+                        'fieldType'                      : 'select2',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Work Type. Traditional workers travel to office to work.',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldDataSelect2Options'        :
+                            [
+                                '1'            :
+                                    [
+                                        'id'            : '1',
+                                        'name'          : 'Traditional'
+                                    ],
+                                '2'            :
+                                    [
+                                        'id'            : '2',
+                                        'name'          : 'Remote'
+                                    ]
+                            ],
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : employeeWorkType
+                    ]
+                )}}
+            </div>
+        </div>
         <div class="row">
             <div class="col">
                 {{adminltetags.useTag('fields',
@@ -136,73 +116,6 @@
                                 <dt class="text-uppercase col-sm-4">Country</dt>
                                 <dd class="text-uppercase col-sm-8 cla-country"></dd>
                             </dl>'
-                    ]
-                )}}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 col-sm-12">
-                {{adminltetags.useTag('fields',
-                    [
-                        'component'                      : component,
-                        'componentName'                  : componentName,
-                        'componentId'                    : componentId,
-                        'sectionId'                      : sectionId,
-                        'fieldId'                        : 'contact_address_id',
-                        'fieldLabel'                     : 'Employee Contact Address ID',
-                        'fieldType'                      : 'input',
-                        'fieldHelp'                      : true,
-                        'fieldHelpTooltipContent'        : 'Employee Contact Address ID',
-                        'fieldRequired'                  : true,
-                        'fieldBazScan'                   : true,
-                        'fieldBazPostOnCreate'           : false,
-                        'fieldBazPostOnUpdate'           : true,
-                        'fieldHidden'                    : true,
-                        'fieldDisabled'                  : true,
-                        'fieldValue'                     : employeeContactAddressId
-                    ]
-                )}}
-                {{adminltetags.useTag('addresses',
-                    [
-                        'component'                                   : component,
-                        'componentName'                               : componentName,
-                        'componentId'                                 : componentId,
-                        'sectionId'                                   : sectionId,
-                        'addressFieldType'                            : 'single',
-                        'includeStreet'                               : true,
-                        'searchType'                                  : 'city',
-                        'streetAddress'                               : employeeContactStreetAddress,
-                        'streetAddressFieldRequired'                  : false,
-                        'streetAddressFieldBazPostOnCreate'           : true,
-                        'streetAddressFieldBazPostOnUpdate'           : true,
-                        'streetAddressFieldHidden'                    : true,
-                        'streetAddress2'                              : employeeContactStreetAddress2,
-                        'streetAddress2FieldBazPostOnCreate'          : true,
-                        'streetAddress2FieldBazPostOnUpdate'          : true,
-                        'streetAddress2FieldHidden'                   : true,
-                        'cityId'                                      : employeeContactCityId,
-                        'cityName'                                    : employeeContactCity,
-                        'cityFieldRequired'                           : false,
-                        'cityFieldBazPostOnCreate'                    : true,
-                        'cityFieldBazPostOnUpdate'                    : true,
-                        'cityFieldHidden'                             : true,
-                        'postCode'                                    : employeeContactPostCode,
-                        'postCodeFieldRequired'                       : false,
-                        'postCodeFieldBazPostOnCreate'                : true,
-                        'postCodeFieldBazPostOnUpdate'                : true,
-                        'postCodeFieldHidden'                         : true,
-                        'stateId'                                     : employeeContactStateId,
-                        'stateName'                                   : employeeContactState,
-                        'stateFieldRequired'                          : false,
-                        'stateFieldBazPostOnCreate'                   : true,
-                        'stateFieldBazPostOnUpdate'                   : true,
-                        'stateFieldHidden'                            : true,
-                        'countryId'                                   : employeeContactCountryId,
-                        'countryName'                                 : employeeContactCountry,
-                        'countryFieldRequired'                        : false,
-                        'countryFieldBazPostOnCreate'                 : true,
-                        'countryFieldBazPostOnUpdate'                 : true,
-                        'countryFieldHidden'                          : true
                     ]
                 )}}
             </div>

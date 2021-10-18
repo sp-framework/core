@@ -72,6 +72,12 @@
                                     'tabInclude'        : 'employees/form/contactdetails',
                                     'tabIncludeParams'  : ['employee' : employee]
                                 ],
+                                'addresses'   :
+                                [
+                                    'tabTitle'          : 'Addresses',
+                                    'tabInclude'        : 'employees/form/addresses',
+                                    'tabIncludeParams'  : ['employee' : employee]
+                                ],
                                 'financialdetails'   :
                                 [
                                     'tabTitle'          : 'Financial Details',
@@ -422,8 +428,6 @@ dataCollectionSection =
             'placeholder'   : "SELECT EMPLOYMENT TYPE",
             afterInit       : function () {
                 $('#{{componentId}}-{{sectionId}}-employment_type_id').on('select2:select', function(e) {
-                    //eslint-disable-next-line
-                    console.log(e.params.data.id);
                     if (e.params.data.id === '2') {
                         $('#{{componentId}}-{{sectionId}}-contractors').attr('hidden', false);
                         $('#{{componentId}}-{{sectionId}}-contractor_vendor_id').attr('disabled', false);
@@ -432,6 +436,7 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-contractor_vendor_id').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-contractor_vendor_id').val('').trigger('change');
                     }
+                    dataCollectionSection['BazContentSectionWithForm']._redoFormJsTree();
                 });
             }
         },
@@ -693,12 +698,12 @@ dataCollectionSection =
                     $('.contact-location-address').attr('hidden', false);
                 } else if (selectedTypeId === '2') {
                     $('#{{componentId}}-{{sectionId}}-contact_location_id').attr('disabled', true);
-                    $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').removeClass('d-none');
-                    $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').removeClass('d-none');
+                    // $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').removeClass('d-none');
+                    // $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').removeClass('d-none');
+                    // $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').removeClass('d-none');
+                    // $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').removeClass('d-none');
+                    // $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').removeClass('d-none');
+                    // $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').removeClass('d-none');
                 }
 
                 $('#{{componentId}}-{{sectionId}}-work_type_id').on('select2:select', function(e) {
@@ -708,41 +713,41 @@ dataCollectionSection =
                         $('#{{componentId}}-{{sectionId}}-contact_location_id').parents('.form-group').removeClass('d-none');
                         $('#{{componentId}}-{{sectionId}}-contact_location_id').attr('disabled', false);
                         $('.contact-location-address').attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-street_address').val('');
-                        $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-street_address_2').val('');
-                        $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-city_name').val('');
-                        $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-post_code').val('');
-                        $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-state_name').val('');
-                        $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').addClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', true);
-                        $('#{{componentId}}-{{sectionId}}-country_name').val('');
+                        // $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').addClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', true);
+                        // $('#{{componentId}}-{{sectionId}}-street_address').val('');
+                        // $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').addClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', true);
+                        // $('#{{componentId}}-{{sectionId}}-street_address_2').val('');
+                        // $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').addClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', true);
+                        // $('#{{componentId}}-{{sectionId}}-city_name').val('');
+                        // $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').addClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', true);
+                        // $('#{{componentId}}-{{sectionId}}-post_code').val('');
+                        // $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').addClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', true);
+                        // $('#{{componentId}}-{{sectionId}}-state_name').val('');
+                        // $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').addClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', true);
+                        // $('#{{componentId}}-{{sectionId}}-country_name').val('');
                     } else if (typeId === '2') {
                         $('#{{componentId}}-{{sectionId}}-contact_location_id').parents('.form-group').addClass('d-none');
                         $('#{{componentId}}-{{sectionId}}-contact_location_id').attr('disabled', true);
                         $('#{{componentId}}-{{sectionId}}-contact_location_id').val(0).trigger('change');
                         $('.contact-location-address').attr('hidden', true);
-                        $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').removeClass('d-none');
-                        $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', false);
-                        $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', false);
+                        // $('#{{componentId}}-{{sectionId}}-street_address').parents('.form-group').removeClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-street_address_2').parents('.form-group').removeClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-city_name').parents('.form-group').removeClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-post_code').parents('.form-group').removeClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-state_name').parents('.form-group').removeClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-country_name').parents('.form-group').removeClass('d-none');
+                        // $('#{{componentId}}-{{sectionId}}-street_address').attr('disabled', false);
+                        // $('#{{componentId}}-{{sectionId}}-street_address_2').attr('disabled', false);
+                        // $('#{{componentId}}-{{sectionId}}-city_name').attr('disabled', false);
+                        // $('#{{componentId}}-{{sectionId}}-post_code').attr('disabled', false);
+                        // $('#{{componentId}}-{{sectionId}}-state_name').attr('disabled', false);
+                        // $('#{{componentId}}-{{sectionId}}-country_name').attr('disabled', false);
                     }
                     dataCollectionSection['BazContentSectionWithForm']._redoFormJsTree();
                 });
@@ -784,16 +789,16 @@ dataCollectionSection =
             }
         },
         '{{componentId}}-{{sectionId}}-contact_location_address'        : { },
-        '{{componentId}}-{{sectionId}}-contact_address_id'              : { },
-        '{{componentId}}-{{sectionId}}-contact_street_address'          : { },
-        '{{componentId}}-{{sectionId}}-contact_street_address_2'        : { },
-        '{{componentId}}-{{sectionId}}-contact_city_id'                 : { },
-        '{{componentId}}-{{sectionId}}-contact_city_name'               : { },
-        '{{componentId}}-{{sectionId}}-contact_post_code'               : { },
-        '{{componentId}}-{{sectionId}}-contact_state_id'                : { },
-        '{{componentId}}-{{sectionId}}-contact_state_name'              : { },
-        '{{componentId}}-{{sectionId}}-contact_country_id'              : { },
-        '{{componentId}}-{{sectionId}}-contact_country_name'            : { },
+        // '{{componentId}}-{{sectionId}}-contact_address_id'              : { },
+        // '{{componentId}}-{{sectionId}}-contact_street_address'          : { },
+        // '{{componentId}}-{{sectionId}}-contact_street_address_2'        : { },
+        // '{{componentId}}-{{sectionId}}-contact_city_id'                 : { },
+        // '{{componentId}}-{{sectionId}}-contact_city_name'               : { },
+        // '{{componentId}}-{{sectionId}}-contact_post_code'               : { },
+        // '{{componentId}}-{{sectionId}}-contact_state_id'                : { },
+        // '{{componentId}}-{{sectionId}}-contact_state_name'              : { },
+        // '{{componentId}}-{{sectionId}}-contact_country_id'              : { },
+        // '{{componentId}}-{{sectionId}}-contact_country_name'            : { },
         '{{componentId}}-{{sectionId}}-contact_phone'                   : {
             afterInit: function() {
                 Inputmask({mask:"9{1,4}-9{1,4}-9{1,10}", greedy: false})
@@ -877,7 +882,7 @@ dataCollectionSection =
             ignore: ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
             invalidHandler: function (form, validator) {
                 //eslint-disable-next-line
-                console.log(validator.errorList);
+                // console.log(validator.errorList);
             },
             rules: {
                 '{{componentId}}-{{sectionId}}-account_id'                  : 'required',

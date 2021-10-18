@@ -80,24 +80,6 @@ class EmployeesComponent extends BaseComponent
                     $employee['hire_referrer_full_name'] = $this->employees->getById($employee['hire_referrer_id'])['full_name'];
                 }
 
-                if ($employee['contact_address_id']) {
-                    $address = $this->basepackages->addressbook->getById($employee['contact_address_id']);
-
-                    unset($address['id']);
-
-                    $employee = array_merge($employee, $address);
-                } else {
-                    $employee['street_address'] = '';
-                    $employee['street_address_2'] = '';
-                    $employee['city_id'] = '';
-                    $employee['city_name'] = '';
-                    $employee['post_code'] = '';
-                    $employee['state_id'] = '';
-                    $employee['state_name'] = '';
-                    $employee['country_id'] = '';
-                    $employee['country_name'] = '';
-                }
-
                 if ($employee['employment_attachments']) {
                     $attachments = [];
 
@@ -122,6 +104,7 @@ class EmployeesComponent extends BaseComponent
                 $employee['contact_fax'] = $this->formatNumbers($employee['contact_fax']);
             } else {
                 $employee = [];
+                $employee['address_ids'] = [];
             }
 
             //Check Geo Locations Dependencies

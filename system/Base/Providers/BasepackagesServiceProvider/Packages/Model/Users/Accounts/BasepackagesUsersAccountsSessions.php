@@ -47,6 +47,10 @@ class BasepackagesUsersAccountsSessions extends BaseModel
 
     public function getModelRelations()
     {
+        if (count($this->modelRelations) === 0) {
+            $this->initialize();
+        }
+
         return $this->modelRelations;
     }
 }

@@ -1593,10 +1593,10 @@ abstract class BasePackage extends Controller
 
 				$entities = $entitiesPackage->getAll()->entities;
 
-				if ($entities && count($entities) > 1) {
+				if ($entities && count($entities) > 0) {
 					foreach ($entities as $entityKey => $entity) {
 						if ($entity['id'] === $data['entity_id']) {
-							$entityId = $entityKey;
+							$entityId = $entity['id'];
 							break;
 						}
 					}
@@ -1604,7 +1604,7 @@ abstract class BasePackage extends Controller
 					$entityId = 0;
 				}
 
-				if ($entities[$entityId]) {
+				if (isset($entities[$entityId])) {
 					$settings = $entities[$entityId]['settings'];
 
 					if (isset($settings['prefix-seq'][$packageName])) {

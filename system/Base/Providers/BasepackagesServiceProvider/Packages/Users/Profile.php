@@ -145,9 +145,9 @@ class Profile extends BasePackage
 
         $profile['full_name'] = $profile['first_name'] . ' ' . $profile['last_name'];
 
-        if ($profile['address_id'] &&
-             $profile['address_id'] != 0 &&
-             $profile['address_id'] !== ''
+        if (isset($profile['address']['id']) &&
+             $profile['address']['id'] != 0 &&
+             $profile['address']['id'] !== ''
         ) {
             $address = $profile;
 
@@ -155,11 +155,13 @@ class Profile extends BasePackage
 
             $address['package_row_id'] = $profile['id'];
 
+            $address['address_id'] = $profile['address']['id'];
+
             $this->basepackages->addressbook->mergeAndUpdate($address);
 
-        } else if (!$profile['address_id'] ||
-                    $profile['address_id'] == 0 ||
-                    $profile['address_id'] === ''
+        } else if (!$profile['address']['id'] ||
+                    $profile['address']['id'] == 0 ||
+                    $profile['address']['id'] === ''
         ) {
             $address = $profile;
 

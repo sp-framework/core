@@ -574,7 +574,7 @@ class Multiple
                                                             \'<i class="fa fas fa-fw text-xs fa-edit"></i>\' +
                                                         \'</button>\' +
                                                         \'<button data-sort-id="" type="button" class="btn btn-xs btn-info float-right ml-1 addressCopyButton">\' +
-                                                            \'<i class="fa fas fa-fw text-xs fa-edit"></i>\' +
+                                                            \'<i class="fa fas fa-fw text-xs fa-copy"></i>\' +
                                                         \'</button>\' +
                                                     \'</div>\' +
                                                 \'</div>\' +

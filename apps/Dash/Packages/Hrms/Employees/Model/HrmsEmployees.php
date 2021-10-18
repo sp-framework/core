@@ -6,6 +6,9 @@ use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesContact;
 use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesEmployment;
 use Apps\Dash\Packages\Hrms\Employees\Model\HrmsEmployeesFinance;
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class HrmsEmployees extends BaseModel
@@ -66,11 +69,62 @@ class HrmsEmployees extends BaseModel
         );
 
         $this->modelRelations['account']['relationObj'] = $this->belongsTo(
-            'account_id',
-            BasepackagesUsersAccounts::class,
             'id',
+            BasepackagesUsersAccounts::class,
+            'package_row_id',
             [
-                'alias' => 'account'
+                'alias'                 => 'account',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'employees'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['addresses']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesAddressBook::class,
+            'package_row_id',
+            [
+                'alias'                 => 'addresses',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'employees'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['notes']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesNotes::class,
+            'package_row_id',
+            [
+                'alias'                 => 'notes',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'employees'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['activityLogs']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesActivityLogs::class,
+            'package_row_id',
+            [
+                'alias'                 => 'activityLogs',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'employees'
+                    ]
+                ]
             ]
         );
 
@@ -79,6 +133,10 @@ class HrmsEmployees extends BaseModel
 
     public function getModelRelations()
     {
+        if (count($this->modelRelations) === 0) {
+            $this->initialize();
+        }
+
         return $this->modelRelations;
     }
 }

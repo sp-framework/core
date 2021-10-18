@@ -42,13 +42,6 @@ class HrmsEmployeesContact
                     ]
                 ),
                 new Column(
-                    'contact_address_id',
-                    [
-                        'type'              => Column::TYPE_INTEGER,
-                        'notNull'           => false,
-                    ]
-                ),
-                new Column(
                     'contact_phone',
                     [
                         'type'              => Column::TYPE_VARCHAR,
