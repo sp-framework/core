@@ -88,18 +88,6 @@ class Employees extends BasePackage
 
 
         if ($this->add($data)) {
-            // if ($data['work_type_id'] == 2) {
-                // $address = $data;
-
-                // $address['package_row_id'] = $this->packagesData->last['id'];
-
-                // $address['package_name'] = $this->packageName;
-
-                // $this->basepackages->addressbook->addAddress($address);
-
-                // $data['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
-            // }
-
             $data['id'] = $this->packagesData->last['id'];
 
             $this->updateAddresses($data);
@@ -141,48 +129,14 @@ class Employees extends BasePackage
 
         $data['full_name'] = $data['first_name'] . ' ' . $data['last_name'];
 
-        // if (isset($data['work_type_id']) && isset($data['contact_address_id'])) {
-
-        // }
+        if (isset($data['delete_address_ids']) && $data['delete_address_ids'] !== '') {
+            $data['delete_address_ids'] = Json::decode($data['delete_address_ids'], true);
+            if (count($data['delete_address_ids']) > 0) {
+                $this->deleteAddresses($data['delete_address_ids']);
+            }
+        }
 
         if ($this->update($data)) {
-        //     if ($data['work_type_id'] == 0 &&
-        //         ($data['contact_address_id'] &&
-        //          $data['contact_address_id'] != 0 &&
-        //          $data['contact_address_id'] !== '')
-        //     ) {
-        //         $address = $data;
-
-        //         $address['package_name'] = $this->packageName;
-
-        //         $address['package_row_id'] = $data['id'];
-
-                // $address['name'] = $data['full_name'];
-
-            //     $address['address_id'] = $data['contact_address_id'];
-
-            //     $this->basepackages->addressbook->mergeAndUpdate($address);
-
-            // } else if ($data['work_type_id'] == 0 &&
-            //            (!$data['contact_address_id'] ||
-            //             $data['contact_address_id'] == 0 ||
-            //             $data['contact_address_id'] === '')
-            // ) {
-            //     $address = $data;
-
-            //     $address['package_name'] = $this->packageName;
-
-            //     $address['package_row_id'] = $data['id'];
-
-                // $address['name'] = $data['full_name'];
-
-                // $address['id'] = '';
-
-                // $this->basepackages->addressbook->addAddress($address);
-
-                // $data['contact_address_id'] = $this->basepackages->addressbook->packagesData->last['id'];
-            // }
-
             $data = $this->addRefId($data);
 
             $data['account_id'] = $this->addUpdateAccount($this->packagesData->last);
@@ -493,6 +447,13 @@ class Employees extends BasePackage
         }
 
         return true;
+    }
+
+    protected function deleteAddresses($ids)
+    {
+        foreach ($ids as $id) {
+            $this->basepackages->addressbook->removeAddress(['id' => $id]);
+        }
     }
 
     public function searchByFullName(string $nameQueryString)

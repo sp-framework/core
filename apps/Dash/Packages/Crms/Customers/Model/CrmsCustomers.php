@@ -4,6 +4,9 @@ namespace Apps\Dash\Packages\Crms\Customers\Model;
 
 use Apps\Dash\Packages\Crms\Customers\Model\CrmsCustomersFinancialDetails;
 use System\Base\BaseModel;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesAddressBook;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\Users\BasepackagesUsersAccounts;
 
 class CrmsCustomers extends BaseModel
@@ -63,6 +66,51 @@ class CrmsCustomers extends BaseModel
             'id',
             [
                 'alias' => 'account'
+            ]
+        );
+
+        $this->modelRelations['addresses']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesAddressBook::class,
+            'package_row_id',
+            [
+                'alias'                 => 'addresses',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'customers'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['notes']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesNotes::class,
+            'package_row_id',
+            [
+                'alias'                 => 'notes',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'customers'
+                    ]
+                ]
+            ]
+        );
+
+        $this->modelRelations['activityLogs']['relationObj'] = $this->hasMany(
+            'id',
+            BasepackagesActivityLogs::class,
+            'package_row_id',
+            [
+                'alias'                 => 'activityLogs',
+                'params'                => [
+                    'conditions'        => 'package_name = :package_name:',
+                    'bind'              => [
+                        'package_name'  => 'customers'
+                    ]
+                ]
             ]
         );
 

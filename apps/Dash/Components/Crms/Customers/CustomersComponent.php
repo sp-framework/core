@@ -53,7 +53,7 @@ class CustomersComponent extends BaseComponent
                 $storages = $this->basepackages->storages;
 
                 if ($customer['portrait'] && $customer['portrait'] !== '') {
-                    $this->view->portraitLink = $storages->getPublicLink($customer['portrait'], 200);
+                    $this->view->portraitLink = $this->links->url('system/storages/q/uuid/' . $customer['portrait'] . '/w/200');
                 }
 
                 if ($customer['contact_referrer_id'] && $customer['contact_referrer_id'] != 0) {

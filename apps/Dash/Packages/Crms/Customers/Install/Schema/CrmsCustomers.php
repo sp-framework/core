@@ -160,16 +160,7 @@ class CrmsCustomers
                         'notNull'       => false,
                         'comment'       => 'Other contact'
                     ]
-                ),
-                new Column(
-                    'address_ids',
-                    [
-                        'type'          => Column::TYPE_VARCHAR,
-                        'size'          => 100,
-                        'notNull'       => false,
-                        'comment'       => 'Addresses IDs'
-                    ]
-                ),
+                )
             ],
             'options' => [
                 'TABLE_COLLATION' => 'utf8mb4_general_ci'
