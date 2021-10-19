@@ -42207,3 +42207,33 @@ a.disabled {
 .direct-chat-contacts {
   left: 0;
 }
+
+/* croppie images */
+/* Parent Container */
+.image-content {
+  position: relative;
+}
+
+/* Child Text Container */
+.image-content div {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background: black;
+  color: white;
+  margin-bottom: 5px;
+  font-family: sans-serif;
+  opacity: 0;
+  visibility: hidden;
+  -webkit-transition: visibility 0s, opacity 0.3s linear;
+  transition: visibility 0s, opacity 0.3s linear;
+}
+
+.image-content:hover div {
+  width: 100%;
+  padding: 8px 15px;
+  visibility: visible;
+  opacity: 0.7;
+}
+
+/* croppie images */

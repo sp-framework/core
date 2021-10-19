@@ -184,6 +184,7 @@ class Local extends BasePackage
                 }
 
                 $storageData['uuid'] = $this->uuid;
+                $storageData['name'] = $this->fileName;
                 $storageData['id'] = $this->packagesData->last['id'];
             }
         }

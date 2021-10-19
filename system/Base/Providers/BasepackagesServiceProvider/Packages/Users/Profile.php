@@ -245,12 +245,15 @@ class Profile extends BasePackage
             $counterFileNames = array_combine($this->avatarProperties, $fileArr);
 
             foreach ($counterFileNames as $type => $filename) {
-                $avatarImageArr[$type] =
-                    imagecreatefrompng(
-                        base_path($avatarDir . $type . '/' . $filename)
-                    );
+                try {
+                    $avatarImageArr[$type] =
+                        imagecreatefrompng(
+                            base_path($avatarDir . $type . '/' . $filename)
+                        );
+                } catch (\Exception $e) {
+                    return false;
+                }
             }
-
         }
 
         $this->avatar = $avatarImageArr['background'];
@@ -268,8 +271,8 @@ class Profile extends BasePackage
 
         $this->packagesData->avatar = base64_encode($avatar);
 
-        foreach ($counterFileNames as $key => &$counterFileName) {
-            $counterFileName = str_replace('.png', '', $counterFileName);
+        foreach ($counterFileNames as $type => &$counterFileName) {
+            $counterFileName = str_replace('.png', '', str_replace(base_path($avatarDir . $type . '/'), '', $counterFileName));
         }
 
         $this->packagesData->avatarName = $gender . '_' . implode('_', $counterFileNames) . '.png';

@@ -142,6 +142,7 @@ class Storages extends BasePackage
         if ($fileInfo) {
             return $fileInfo[0];
         }
+
         return false;
     }
 
