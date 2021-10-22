@@ -249,145 +249,17 @@ class SyncCustomers extends BasePackage
                     continue;
                 }
 
-                $found = false;
-
-                //Xero Uses an address API for address verification, so the address received from Xero is accurate.
-                //If we do not have matching data in our system, we create new GeoLocation data.
-                if ($this->basepackages->geoCities->searchCities($address['City'])) {
-                    $cityData = $this->basepackages->geoCities->packagesData->cities;
-
-                    if (count($cityData) > 0) {
-                        foreach ($cityData as $cityKey => $city) {
-                            if (strtolower($city['name']) === strtolower($address['City'])) {
-                                $found = true;
-
-                                $newAddress['city_id'] = $city['id'];
-                                $newAddress['city_name'] = $city['name'];
-                                $newAddress['state_id'] = $city['state_id'];
-                                $newAddress['state_name'] = $city['state_name'];
-                                $newAddress['country_id'] = $city['country_id'];
-                                $newAddress['country_name'] = $city['country_name'];
-
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                if (!$found) {
-                    //Country
-                    $foundCountry = null;
-
-                    if ($this->basepackages->geoCountries->searchCountries($address['Country'], true)) {
-                        $countryData = $this->basepackages->geoCountries->packagesData->countries;
-
-                        if (count($countryData) > 0) {
-                            foreach ($countryData as $countryKey => $country) {
-                                if (strtolower($country['name']) === strtolower($address['Country'])) {
-                                    $foundCountry = $country;
-                                    $geo['currency'] = $country['currency'];
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (!$foundCountry) {
-                        $newCountry['name'] = $address['Country'];
-                        $newCountry['installed'] = '1';
-                        $newCountry['enabled'] = '1';
-                        $newCountry['user_added'] = '1';
-
-                        if ($this->basepackages->geoCountries->addCountry($newCountry)) {
-                            $newAddress['country_id'] = $this->basepackages->geoCountries->packagesData->last['id'];
-                            $newAddress['country_name'] = $newCountry['name'];
-                        } else {
-
-                            $this->customer['errors']['address'] = array_merge($this->customer['errors']['address'], ['Could not add country data.']);
-
-                            continue;
-                        }
-                    } else {
-                        //We check if country is installed or not, if not, we install and enable it
-                        if ($foundCountry['installed'] != '1') {
-                            $foundCountry['enabled'] = '1';
-
-                            $this->basepackages->geoCountries->installCountry($foundCountry);
-                        } else if ($foundCountry['enabled'] != '1') {
-                            $foundCountry['enabled'] = '1';
-
-                            $this->basepackages->geoCountries->update($foundCountry);
-                        }
-
-                        $newAddress['country_id'] = $foundCountry['id'];
-                        $newAddress['country_name'] = $foundCountry['name'];
-                    }
-
-                    //State (Region in Xero Address)
-                    $foundState = null;
-
-                    $stateData = null;
-
-                    if ($this->basepackages->geoStates->searchStates($address['Region'], true)) {
-                        $stateData = $this->basepackages->geoStates->packagesData->states;
-                    }
-                    if (!$stateData && $this->basepackages->geoStates->searchStatesByCode($address['Region'], true)) {
-                        $stateData = $this->basepackages->geoStates->packagesData->states;
-                    }
-
-                    if ($stateData && is_array($stateData) && count($stateData) > 0) {
-                        foreach ($stateData as $stateKey => $state) {
-                            if (strtolower($state['state_code']) === strtolower($address['Region']) ||
-                                strtolower($state['name']) === strtolower($address['Region'])
-                            ) {
-                                $foundState = $state;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!$foundState) {
-                        $newState['name'] = $address['Region'];
-                        $newState['state_code'] = strtoupper(substr($address['Region'], 0, 3));
-                        $newState['user_added'] = '1';
-                        $newState['country_id'] = $newAddress['country_id'];
-
-                        if ($this->basepackages->geoStates->addState($newState)) {
-                            $newAddress['state_id'] = $this->basepackages->geoStates->packagesData->last['id'];
-                            $newAddress['state_name'] = $newState['name'];
-                        } else {
-
-                            $this->customer['errors']['address'] = array_merge($this->customer['errors']['address'], ['Could not add state data.']);
-
-                            continue;
-                        }
-                    } else {
-                        $newAddress['state_id'] = $foundState['id'];
-                        $newAddress['state_name'] = $foundState['name'];
-                    }
-
-                    //New City
-                    $newCity['name'] = $address['City'];
-                    $newCity['state_id'] = $newAddress['state_id'];
-                    $newCity['country_id'] = $newAddress['country_id'];
-                    $newCity['user_added'] = '1';
-
-                    if ($this->basepackages->geoCities->addCity($newCity)) {
-                        $newAddress['city_id'] = $this->basepackages->geoCities->packagesData->last['id'];
-                        $newAddress['city_name'] = $newCity['name'];
-                    } else {
-
-                        $this->customer['errors']['address'] = array_merge($this->customer['errors']['address'], ['Could not add city data.']);
-
-                        continue;
-                    }
-                }
-
                 $newAddress['seq'] = 0;
                 $newAddress['new'] = 1;
                 $newAddress['attention_to'] = $address['AttentionTo'];
                 $newAddress['street_address'] = $address['AddressLine1'];
                 $newAddress['street_address_2'] = $address['AddressLine2'];
+                $newAddress['city_id'] = '0';
+                $newAddress['city_name'] = $address['City'];
+                $newAddress['state_id'] = '0';
+                $newAddress['state_name'] = $address['Region'];
+                $newAddress['country_id'] = '0';
+                $newAddress['country_name'] = $address['Country'];
 
                 if ($address['AddressType'] === 'POBOX') {
                     array_push($geo['address_ids']['2'], $newAddress);
