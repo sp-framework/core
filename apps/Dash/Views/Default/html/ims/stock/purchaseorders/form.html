@@ -175,9 +175,43 @@ dataCollectionSection =
         },
         '{{componentId}}-{{sectionId}}-vendor_id'                   : {
             placeholder     : "SELECT VENDOR",
+            'ajax'          : {
+                url         : "{{links.url('business/directory/vendors/searchVendorName')}}",
+                dataType    : 'json',
+                method      : 'post',
+                data: function(params) {
+                    return {
+                        search: params.term
+                    }
+                },
+                processResults: function(response) {
+                    if (response.tokenKey && response.token) {
+                        $('#security-token').attr('name', response.tokenKey);
+                        $('#security-token').val(response.token);
+                    }
+                    if (response.vendors) {
+                        var vendorsData = [];
+                        for (var item of response.vendors) {
+                            vendorsData.push({
+                                'id' : item['id'],
+                                'text' : item['name']
+                            });
+                        }
+
+                        return {
+                            results: vendorsData
+                        }
+                    } else {
+                        return {
+                            results : []
+                        }
+                    }
+                },
+                cache: true
+            },
+            minimumInputLength : 2,
             afterInit: function() {
                 $('#{{componentId}}-{{sectionId}}-vendor_id').on('select2:select', function(e) {
-
                     $('#{{componentId}}-{{sectionId}}-vendor_details').attr('hidden', false);
                     $('#{{componentId}}-{{sectionId}}-vendor_address_id, ' +
                       '#{{componentId}}-{{sectionId}}-vendor_address_id_error, ' +
@@ -222,10 +256,14 @@ dataCollectionSection =
 
                         $('#{{componentId}}-{{sectionId}}-delivery_type').trigger('change');
 
-                        if (response.vendor['address_ids']['2'].length === 0 ||
-                            response.vendor['contact_ids'].length === 0
+                        if (!response.vendor['address_ids']['2'] ||
+                            (response.vendor['address_ids']['2'] && response.vendor['address_ids']['2'].length === 0) ||
+                            !response.vendor['contact_ids'] ||
+                            (response.vendor['contact_ids'] && response.vendor['contact_ids'].length === 0)
                         ) {
-                            if (response.vendor['address_ids']['2'].length === 0) {
+                            if (!response.vendor['address_ids']['2'] ||
+                                (response.vendor['address_ids']['2'] && response.vendor['address_ids']['2'].length === 0)
+                            ) {
                                 $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').parents('.form-group').removeClass('d-none');
                                 $('#{{componentId}}-{{sectionId}}-vendor_address_id_error').append(
                                     '<div class="callout callout-danger">' +
@@ -237,13 +275,15 @@ dataCollectionSection =
                                 );
                             }
 
-                            if (response.vendor['contact_ids'].length === 0) {
+                            if (!response.vendor['contact_ids'] ||
+                                (response.vendor['contact_ids'] && response.vendor['contact_ids'].length === 0)
+                            ) {
                                 $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').parents('.form-group').removeClass('d-none');
                                 $('#{{componentId}}-{{sectionId}}-vendor_contact_id_error').append(
                                     '<div class="callout callout-danger">' +
                                         '<h5>No contact found!</h5>' +
                                         '<p>Vendor ' + response.vendor.business_name + ' has no contact assigned. Please ' +
-                                        '<a href="{{links.url("business/directory/vendors/q/id/")}}' + vendorId + '" class="contentAjaxLink text-primary">click here</a> to add/assign contact '+
+                                        '<a href="{{links.url("business/directory/contacts")}}" class="contentAjaxLink text-primary">click here</a> to add/assign contact '+
                                         'or contact systems administrator for further instructions.</p>' +
                                     '</div>'
                                 );
