@@ -100,7 +100,6 @@ class Contracts extends BasePackage
         }
 
         if (isset($data['link']) && $data['link'] !== '') {
-
             $this->contractFilename = $this->checkLink($data['link']);
 
             if (!$this->contractFilename) {
@@ -116,19 +115,10 @@ class Contracts extends BasePackage
             try {
                 $response = $this->remoteContent->request('GET', $data['link']);
 
-            } catch (\GuzzleHttp\Exception\ConnectException $e) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = $e->getMessage();
-
-                return;
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = $e->getMessage();
-
-                return;
-            } catch (\GuzzleHttp\Exception\RequestException $e) {
+            } catch (\GuzzleHttp\Exception\ConnectException|
+                     \GuzzleHttp\Exception\ClientException|
+                     \GuzzleHttp\Exception\RequestException $e
+            ) {
                 $this->packagesData->responseCode = 1;
 
                 $this->packagesData->responseMessage = $e->getMessage();
@@ -155,9 +145,9 @@ class Contracts extends BasePackage
         } else {
             $data['link'] = 'See Content';
 
-            if ($data['content_type'] === 'json') {
+            if (strpos($data['content'], '{') !== false) {
                 $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.json');
-            } else if ($data['content_type'] === 'yaml') {
+            } else {
                 $data['filename'] = strtolower(str_replace(' ', '_', $data['name']) . '-' . Str::random(Str::RANDOM_ALNUM) . '.yaml');
             }
 
