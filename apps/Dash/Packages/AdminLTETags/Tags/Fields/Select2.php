@@ -94,13 +94,13 @@ class Select2
                 <option></option>';
 
         if ($this->fieldParams['fieldDataSelect2TreeData']) {
-
             $this->content .=
                 $this->adminLTETags->useTag(
                         'tree',
                         [
                             'treeMode'      =>  'select2',
-                            'treeData'      =>  $this->fieldParams['fieldDataSelect2TreeData'],
+                            'treeData'      =>
+                                $this->params['fieldDataSelect2OptionsArray'] === false ? [[$this->fieldParams['fieldDataSelect2TreeData']]] : $this->fieldParams['fieldDataSelect2TreeData'],
                             'fieldParams'   =>  $this->fieldParams
                         ],
                     );
