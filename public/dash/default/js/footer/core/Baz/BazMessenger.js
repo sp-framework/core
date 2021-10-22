@@ -125,6 +125,8 @@ var BazMessenger = function() {
                 onSelection: (feedback) => {
                     $('#messenger-main-search').val('');
                     $('#messenger-main-search').blur();
+                    //eslint-disable-next-line
+                    console.log(feedback.selection.value);
                     messengerWindow(feedback.selection.value);
                     addUserToMembersUsers(feedback.selection.value);
                 }
@@ -299,8 +301,7 @@ var BazMessenger = function() {
                 totalCounter = totalCounter + parseInt($(this).html());
             }
         });
-        //eslint-disable-next-line
-        console.log(totalCounter);
+
         if (totalCounter === 0) {
             $('#messenger-button-counter').html('');
         } else if (totalCounter < 10) {
@@ -394,37 +395,6 @@ var BazMessenger = function() {
 
         window.dataCollection.env.wsTunnels.messenger.emojiPicker.discover();
 
-        // $("#messenger-card-" + user.user).on('collapsed.lte.cardwidget', function(e) {
-            // expandCollapse(e, false);
-        // });
-
-       // $("#messenger-card-" + user.user).on('expanded.lte.cardwidget', function(e) {
-            // expandCollapse(e, true);
-        // });
-
-        // function expandCollapse(e, expand) {
-        //     var numberOfWindows = $('.messenger-window').length;
-
-        //     if (numberOfWindows > 1) {
-        //         var windowObj = { };
-        //         $('.messenger-window').each(function(index, windowId) {
-        //             windowObj[windowId.id] = index + 1;
-        //         });
-        //         var windowPosition = windowObj[$(e.currentTarget).parent()[0].id];
-
-        //         for (var leftWindow in windowObj) {
-        //             if (windowObj[leftWindow] > windowPosition) {
-        //                 var rightVal = parseInt($('#' + leftWindow).css('right'));
-        //                 if (expand) {
-        //                     $('#' + leftWindow).css('right', rightVal + 202);
-        //                 } else {
-        //                     $('#' + leftWindow).css('right', rightVal - 202);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
         $("#messenger-card-" + user.user).on('removed.lte.cardwidget', function(e) {
             removeCard(e);
         });
@@ -505,7 +475,6 @@ var BazMessenger = function() {
             }
             if (response.responseCode == 0) {
                 $('#messenger-loader-' + user.user).attr('hidden', true);
-
                 populateMessages(user, response.responseData.messages, response.responseData.paginationCounters);
 
                 markAllMessagesRead(user);
@@ -521,12 +490,13 @@ var BazMessenger = function() {
     }
 
     function populateMessages(toUser, messages, paginationCounters, update = false) {
+
         if (messages.length === 0) {
             $('#messenger-no-messages-' + toUser.user).attr('hidden', false);
             return;
         }
         //eslint-disable-next-line
-        // console.log(toUser, messages, paginationCounters, update);
+        console.log(toUser, messages, paginationCounters, update);
 
         var messagesHtml = '';
 
@@ -557,7 +527,7 @@ var BazMessenger = function() {
             toUser.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
         } else {
             toUser.portrait =
-                dataCollection.env.rootPath + appRoute + 'system/storages/q/uuid/' + toUser.portrait + '/w/80';
+                '/' + appRoute + 'system/storages/q/uuid/' + toUser.portrait + '/w/80';
         }
         $(messages).each(function(index, message) {
             if (message.to_account_id == toUser.user) {
@@ -659,7 +629,7 @@ var BazMessenger = function() {
             user.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
         } else {
             user.portrait =
-                dataCollection.env.rootPath + appRoute + 'system/storages/q/uuid/' + user.portrait + '/w/80';
+                '/' + appRoute + 'system/storages/q/uuid/' + user.portrait + '/w/80';
         }
 
         var newUser =
@@ -940,8 +910,9 @@ var BazMessenger = function() {
             data.user.portrait = dataCollection.env.rootPath + '/dash/default/images/general/user.png';
         } else {
             data.user.portrait =
-                dataCollection.env.rootPath + appRoute + 'system/storages/q/uuid/' + data.user.portrait + '/w/80';
+                '/' + appRoute + 'system/storages/q/uuid/' + data.user.portrait + '/w/80';
         }
+
         if ($('#direct-chat-messages-' + data.user.id).length > 0) {
             $('#messenger-loader-' + data.user.id).attr('hidden', true);
             $('#direct-chat-messages-' + data.user.id).append(
