@@ -153,6 +153,7 @@ var BazCore = function() {
 
     //Menu
     function openMenu() {
+
         var currentActiveLocation = $('a[href="/' + dataCollection.env.currentRoute + '"].nav-link');
 
         if (currentActiveLocation.length === 0) {
@@ -165,17 +166,18 @@ var BazCore = function() {
         }
 
         if ($(currentActiveLocation).parents().is('ul.nav-treeview')) {
+            $('#sidebar-menu .nav-link').removeClass('active');
             $(currentActiveLocation).addClass('active');
             $(currentActiveLocation).parents('ul.nav-treeview').show();
             $(currentActiveLocation).parents('ul.nav-treeview').siblings('a').addClass('active');
             $(currentActiveLocation).parents('li.has-treeview').addClass('menu-open');
             if ($(currentActiveLocation).parents('ul.nav-treeview').length > 1) {
                 $(document).ready(function() {
-                    $(currentActiveLocation).parents('.has-treeview').siblings('.has-treeview').children('.nav-treeview').hide();
+                    // $(currentActiveLocation).parents('.has-treeview').siblings('.has-treeview').children('.nav-treeview').hide();
                 });
             } else {
                 $(document).ready(function() {
-                    $(currentActiveLocation).parent().siblings('.has-treeview').children('.nav-treeview').hide();
+                    // $(currentActiveLocation).parent().siblings('.has-treeview').children('.nav-treeview').hide();
                 });
             }
         } else {
