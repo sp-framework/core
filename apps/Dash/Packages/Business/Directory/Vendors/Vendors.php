@@ -26,6 +26,7 @@ class Vendors extends BasePackage
             $vendor = $vendorObj->toArray();
 
             $vendor['address_ids'] = [];
+            $vendor['contact_ids'] = [];
             $vendor['b2bAccountManagers'] = [];
             $vendor['notes'] = [];
             $vendor['activityLogs'] = [];
@@ -47,6 +48,10 @@ class Vendors extends BasePackage
                             msort($vendor['address_ids'][$addressTypeKey], 'is_primary', SORT_REGULAR, SORT_DESC);
                     }
                 }
+            }
+
+            if ($vendorObj->getContacts()) {
+                $vendor['contact_ids'] = $vendorObj->getContacts()->toArray();
             }
 
             if ($vendor['b2b_account_managers'] && $vendor['b2b_account_managers'] !== '') {

@@ -64,7 +64,9 @@ class Profile extends BasePackage
                 $profile['address'] = $addressObj->toArray();
             }
 
-            $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+            if (isset($this->auth)) {
+                $profile['role'] = $this->basepackages->roles->getById($this->auth->account()['role_id'])['name'];
+            }
 
             return $profile;
         }
@@ -159,10 +161,7 @@ class Profile extends BasePackage
 
             $this->basepackages->addressbook->mergeAndUpdate($address);
 
-        } else if (!$profile['address']['id'] ||
-                    $profile['address']['id'] == 0 ||
-                    $profile['address']['id'] === ''
-        ) {
+        } else {
             $address = $profile;
 
             $address['package_name'] = $this->packageName;

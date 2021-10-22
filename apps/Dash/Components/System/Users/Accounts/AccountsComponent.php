@@ -22,11 +22,17 @@ class AccountsComponent extends BaseComponent
 
         $this->roles = $this->basepackages->roles;
 
-        $this->contacts = $this->usePackage(Contacts::class);
+        if ($this->checkPackage('Apps\Dash\Packages\Business\Directory\Contacts\Contacts')) {
+            $this->contacts = $this->usePackage(Contacts::class);
+        }
 
-        $this->employees = $this->usePackage(Employees::class);
+        if ($this->checkPackage('Apps\Dash\Packages\Hrms\Employees\Employees')) {
+            $this->employees = $this->usePackage(Employees::class);
+        }
 
-        $this->customers = $this->usePackage(Customers::class);
+        if ($this->checkPackage('Apps\Dash\Packages\Crms\Customers\Customers')) {
+            $this->customers = $this->usePackage(Customers::class);
+        }
     }
 
     /**
@@ -116,15 +122,21 @@ class AccountsComponent extends BaseComponent
         foreach ($dataArr as $dataKey => &$data) {
             $data = $this->formatRoles($data, $roles);
 
-            if ($data['package_name'] === 'profiles') {
+            if ($data['package_name'] === 'contacts' &&
+                $this->checkPackage('Apps\Dash\Packages\Business\Directory\Contacts\Contacts')
+            ) {
+                $data = $this->getContactsData($data, $dataKey);
+            } else if ($data['package_name'] === 'employees' &&
+                       $this->checkPackage('Apps\Dash\Packages\Hrms\Employees\Employees')
+            ) {
+                $data = $this->getEmployeesData($data, $dataKey);
+            } else if ($data['package_name'] === 'customers' &&
+                       $this->checkPackage('Apps\Dash\Packages\Crms\Customers\Customers')
+            ) {
+                $data = $this->getCustomersData($data, $dataKey);
+            } else {
                 $data['package_row_id'] = '-';
                 $data['package_name'] = '-';
-            } else if ($data['package_name'] === 'contacts') {
-                $data = $this->getContactsData($data, $dataKey);
-            } else if ($data['package_name'] === 'employees') {
-                $data = $this->getEmployeesData($data, $dataKey);
-            } else if ($data['package_name'] === 'customers') {
-                $data = $this->getCustomersData($data, $dataKey);
             }
 
             $data['package_name'] = ucfirst($data['package_name']);
