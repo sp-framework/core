@@ -41,8 +41,6 @@
         }
     },
     "settings"          : {
-        "mandatory"     : {
-            "admin"     : true
-        }
+        "mandatory"     : true
     }
 }

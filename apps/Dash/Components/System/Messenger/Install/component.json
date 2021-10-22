@@ -10,5 +10,5 @@
     "class": "Apps\\Dash\\Components\\System\\Messenger\\MessengerComponent",
     "dependencies": {"core":{"name":"Core","version":"0.0.1","repo":"https://.../core"},"components":[],"packages":[{"name":"Messenger","version":"0.0.1","repo":"https://.../dash-package-system-tools-messenger"}],"middlewares":[],"views":[{"name":"Default","version":"0.0.1","repo":"https://.../dash-view-default"}]},
     "menu": false,
-    "settings": {"mandatory":{"admin":true}}
+    "settings": {"mandatory":true}
 }
