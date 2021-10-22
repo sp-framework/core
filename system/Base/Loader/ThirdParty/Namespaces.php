@@ -43,5 +43,10 @@ return
         'GO'                                            => __DIR__ . '/../../../ThirdParty/vendor/peppeocchi/php-cron-scheduler/src/GO',
         'Cron'                                          => __DIR__ . '/../../../ThirdParty/vendor/dragonmantank/cron-expression/src/Cron',
         'PhpImap'                                       => __DIR__ . '/../../../ThirdParty/vendor/php-imap/php-imap/src/PhpImap',
-        'League\\Csv'                                   => __DIR__ . '/../../../ThirdParty/vendor/league/csv/src'
+        'League\\Csv'                                   => __DIR__ . '/../../../ThirdParty/vendor/league/csv/src',
+        'PHPHtmlParser'                                 => __DIR__ . '/../../../ThirdParty/vendor/paquettg/php-html-parser/src/PHPHtmlParser',
+        'stringEncode'                                  => __DIR__ . '/../../../ThirdParty/vendor/paquettg/string-encode/src/stringEncode',
+        'Http\\Promise'                                 => __DIR__ . '/../../../ThirdParty/vendor/php-http/promise/src',
+        'Http\\Client'                                  => __DIR__ . '/../../../ThirdParty/vendor/php-http/httplug/src',
+        'MyCLabs\\Enum'                                 => __DIR__ . '/../../../ThirdParty/vendor/myclabs/php-enum/src'
     ];

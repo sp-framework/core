@@ -29,6 +29,7 @@
         "react/zmq": "^0.4.0",
         "peppeocchi/php-cron-scheduler": "^4.0",
         "php-imap/php-imap": "^4.1",
-        "league/csv": "^9.0"
+        "league/csv": "^9.0",
+        "paquettg/php-html-parser": "^3.1"
     }
 }
