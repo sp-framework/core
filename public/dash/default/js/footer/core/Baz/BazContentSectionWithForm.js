@@ -487,6 +487,15 @@
                                     dataCollection[componentId][sectionId]['data'][extractComponentId][thisCounterId] = $(v).html();
                                 });
                             }
+                        } else if ($(bazScanField).data('bazscantype') === 'html') {//html
+                            thatV = bazScanField;
+                            if ($(bazScanField).data('bazpostoncreate') === true ||
+                                $(bazScanField).data('bazpostonupdate') === true ||
+                                $(bazScanField).data('bazdevpost') === true) {
+                                if (!dataCollection[componentId][sectionId]['data'][extractComponentId]) {
+                                    dataCollection[componentId][sectionId]['data'][extractComponentId] = $(bazScanField).html();
+                                }
+                            }
                         }
 
                         if (dataCollection[componentId][sectionId][$(bazScanField)[0].id] &&
