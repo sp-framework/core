@@ -130,16 +130,16 @@ class SyncXero extends Functions
     {
         $taskPackage = new Tasks;
 
-        $task = $taskPackage->findByParametersMethod('syncFromData');
-
-        if (isset($this->parameters['processCount'])) {
-            $count = $this->parameters['processCount'];
-        } else {
-            $count = 50;
-        }
+        $task = $taskPackage->findByParameter('syncFromData', 'method', 'syncxero');//(value, key, function)
 
         //This will run regardless you manually cancel the force next run. To cancel you have to cancel this before it executes a new cycle.
         if ($task && $task['force_next_run'] === null) {
+            if (isset($this->parameters['processCount'])) {
+                $count = $this->parameters['processCount'];
+            } else {
+                $count = 50;
+            }
+
             $taskPackage->forceNextRun(
                 [
                     'id'                => $task['id'],
@@ -189,3 +189,7 @@ class SyncXero extends Functions
 
 // {"process":"contacts","method":"sync","1":{"Contacts":{"modifiedSince":"2021-09-19 00:00:00"}}}
 // {"process":"contacts","method":"sync","1":{"Contacts":{"ContactID":["3c3e4b8f-6fff-4d05-b4eb-aac8d2ec6671"]}}}
+// INSERT INTO `basepackages_workers_tasks` (`id`, `name`, `description`, `function`, `schedule_id`, `is_external`, `is_raw`, `is_on_demand`, `priority`, `enabled`, `status`, `type`, `previous_run`, `next_run`, `force_next_run`, `parameters`, `email`, `result`) VALUES
+// (6, 'Xero Sync (Data)', '', 'syncxero', 0, NULL, NULL, 1, 10, 0, 1, 1, '2021-09-25 08:42:06', '-', NULL, '{\"process\":\"contacts\",\"method\":\"syncFromData\",\"processCount\":50}', NULL, NULL),
+// (7, 'Xero Sync (Contact Groups)', '', 'syncxero', 0, NULL, NULL, 1, 10, 0, 1, 1, '2021-09-10 18:38:01', '-', NULL, '{\"process\":\"contactGroups\",\"method\":\"sync\"}', NULL, NULL),
+// (8, 'Xero Sync (Organisations)', '', 'syncxero', 0, NULL, NULL, 1, 10, 0, 1, 1, '2021-09-10 18:38:02', '-', NULL, '{\"process\":\"organisations\",\"method\":\"sync\"}', NULL, NULL);
