@@ -41,7 +41,7 @@ class ImportexportComponent extends BaseComponent
                     if (isset($componentData['fields'])) {
                         foreach ($componentData['fields'] as $fieldKey => $field) {
                             $fields[$fieldKey]['id'] = $fieldKey;
-                            $fields[$fieldKey]['name'] = $field;
+                            $fields[$fieldKey]['name'] = ucfirst($field);
                         }
 
                         $this->view->fields = $fields;
@@ -52,6 +52,8 @@ class ImportexportComponent extends BaseComponent
                     }
 
                     $importexport['fields'] = Json::decode($importexport['fields'], true);
+
+                    $importexport['email_to'] = implode(',', Json::decode($importexport['email_to'], true));
 
                     if ($importexport['file'] && $importexport['file'] !== '') {
                         $importexport['file'] = $this->links->url('system/storages/q/uuid/' . $importexport['file']);
@@ -147,6 +149,12 @@ class ImportexportComponent extends BaseComponent
                 }
             } else {
                 $data['account_id'] = 'System (' . $data['account_id'] . ')';
+            }
+
+            if ($data['email_to'] && $data['email_to'] !== '') {
+                $data['email_to'] = Json::decode($data['email_to'], true);
+
+                $data['email_to'] = implode(',', $data['email_to']);
             }
 
             if ($data['file'] && $data['file'] !== '') {

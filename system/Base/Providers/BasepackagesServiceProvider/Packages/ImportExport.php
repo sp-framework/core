@@ -44,6 +44,12 @@ class ImportExport extends BasePackage
             $data['email_to'] = 'no-reply@' . $this->domains->domains[0]['name'];
         }
 
+        $data['email_to'] = explode(',', $data['email_to']);
+
+        foreach ($data['email_to'] as &$email) {
+            $email = trim($email);
+        }
+
         $data['fields'] = Json::decode($data['fields'], true);
 
         if (isset($data['fields']['data']) && is_array($data['fields']['data'])) {
@@ -178,7 +184,8 @@ class ImportExport extends BasePackage
         if ($exports && count($exports) > 0) {
             foreach ($exports as $exportKey => $export) {
                 if (!$this->processExport($export, $jobId)) {
-                    $export['status'] = 3;
+                    $export['status'] = 3;//Error
+                    $export['job_id'] = $jobId;
 
                     $this->update($export);
                 }
@@ -188,6 +195,8 @@ class ImportExport extends BasePackage
 
     protected function processExport($export, $jobId)
     {
+        $export['job_id'] = $jobId;
+
         $header = Json::decode($export['fields']);
 
         $component = $this->modules->components->getComponentById($export['component_id']);
@@ -224,7 +233,11 @@ class ImportExport extends BasePackage
                         $csv->insertAll($records);
                     }
 
-                    if ($this->writeCSVFile($export, $csv)) {
+                    $file = $this->writeCSVFile($export, $csv);
+
+                    if ($file) {
+                        $export['file'] = $file;
+
                         $this->basepackages->notifications->addNotification(
                             'Export request ID:' . $export['id'] . ' execution complete.',
                             null,
@@ -236,7 +249,7 @@ class ImportExport extends BasePackage
                             0
                         );
 
-                        $emailToAddressesArr = explode(',', $export['email_to']);
+                        $emailToAddressesArr = Json::decode($export['email_to'], true);
                         $emailToAddresses = [];
 
                         if (count($emailToAddressesArr) > 0) {
@@ -244,7 +257,7 @@ class ImportExport extends BasePackage
                                 array_push($emailToAddresses, trim($emailToAddress));
                             }
                         } else {
-                            array_push($emailToAddress, 'no-reply@' . $this->domains->domains[0]['name']);
+                            array_push($emailToAddresses, 'no-reply@' . $this->domains->domains[0]['name']);
                         }
 
                         $emailData['app_id'] = $export['app_id'];
@@ -252,7 +265,7 @@ class ImportExport extends BasePackage
                         $emailData['status'] = 1;
                         $emailData['priority'] = 1;
                         $emailData['confidential'] = 0;
-                        $emailData['to_addresses'] = Json::encode($emailToAddress);
+                        $emailData['to_addresses'] = Json::encode($emailToAddresses);
                         $emailData['subject'] = 'Export request complete.';
                         $emailData['body'] =
                             'Export request ID:' . $export['id'] . ' execution complete. To download file, click ' .
@@ -260,7 +273,7 @@ class ImportExport extends BasePackage
 
                         $this->basepackages->emailqueue->addToQueue($emailData);
 
-                        $export['status'] = 2;
+                        $export['status'] = 2;//Complete
 
                         $this->update($export);
                     }
@@ -292,13 +305,9 @@ class ImportExport extends BasePackage
                 'text/csv'
             )
         ) {
-            $export['file'] = $this->basepackages->storages->packagesData->storageData['uuid'];
-
-            if ($this->update($export)) {
-                return true;
-            }
-
-            return false;
+            return $this->basepackages->storages->packagesData->storageData['uuid'];
         }
+
+        return false;
     }
 }

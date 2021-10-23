@@ -265,7 +265,7 @@ dataCollectionSection =
         '{{componentId}}-{{sectionId}}-id'                      : { },
         '{{componentId}}-{{sectionId}}-type'                    : {
             afterInit: function() {
-                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['type'] = "{{importexportType}}";
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['type'] = "{{importexport['type']}}";
             }
         },
         '{{componentId}}-{{sectionId}}-status'                  : { },
