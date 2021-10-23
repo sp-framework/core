@@ -165,8 +165,10 @@ class Email extends BasePackage
 
             return true;
         } catch (Exception $e) {
+            $errorInfo = preg_replace('/https.*/', '', $this->email->ErrorInfo);
+            $errorInfo = preg_replace('/\/var\/www\/html.*/', '', $errorInfo);
 
-            return $this->email->ErrorInfo;
+            return $errorInfo;
         }
     }
 
@@ -265,7 +267,16 @@ class Email extends BasePackage
 
     public function getDebugOutput()
     {
-        return $this->debugOutput;
+        if ($this->debugOutput && is_array($this->debugOutput) && count($this->debugOutput) > 0) {
+            foreach ($this->debugOutput as $key => &$debug) {
+                $debug = preg_replace('/https.*/', '', $debug);
+                $debug = preg_replace('/\/var\/www\/html.*/', '', $debug);
+            }
+
+            return $this->debugOutput;
+        } else {
+            return $this->debugOutput;
+        }
     }
 
     private function reset()

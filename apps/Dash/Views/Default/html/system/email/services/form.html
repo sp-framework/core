@@ -142,6 +142,8 @@ dataCollectionSection =
                 $('#{{componentId}}-{{sectionId}}-test_email_address-test').click(function(e) {
                     e.preventDefault();
 
+                    $('#{{componentId}}-{{sectionId}}-debug').empty();
+
                     $('#{{componentId}}-{{sectionId}}').BazContentSectionWithForm({'task':'validateForm'});
 
                     if ($('#{{componentId}}-{{sectionId}}-alert').length === 0) {
@@ -162,7 +164,7 @@ dataCollectionSection =
                                 if ($.isArray(response.responseMessage)) {
                                     var message = '';
                                     $.each(response.responseMessage, function(index, msg) {
-                                        message += msg;
+                                        message += msg + '\r\n';
                                     });
                                     $('#{{componentId}}-{{sectionId}}-debug').empty().val(message);
                                 } else {
