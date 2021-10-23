@@ -189,13 +189,17 @@ class Tasks extends BasePackage
         return $sorted;
     }
 
-    public function findByParameter($parameterValue, $parameterKey = null)
+    public function findByParameter($parameterValue, $parameterKey = null, $function = null)
     {
         if (!$this->tasks) {
             $this->init();
         }
 
         foreach ($this->tasks as $taskKey => $task) {
+            if ($function && $task['function'] !== $function) {
+                continue;
+            }
+
             if (is_string($task['parameters']) && $task['parameters'] !== '') {
                 $task['parameters'] = Json::decode($task['parameters'], true);
 
