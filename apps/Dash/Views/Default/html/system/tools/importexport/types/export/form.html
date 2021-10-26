@@ -16,7 +16,9 @@
     {% if importexport['file'] is not defined or importexport['file'] === '' %}
         {% set importexportFile = '-' %}
     {% else %}
-        {% set importexportFile = '<a href="' ~ importexport['file'] ~ '" type="button" class="text-white btn btn-primary btn-xs "><i class="fas fa-fw fa-xs fa-download"></i></a>' %}
+        {% set importexportFile =
+            '<a href="' ~ importexport['file'] ~ '" type="button" class="text-white btn btn-primary btn-xs"><i class="fas fa-fw fa-xs fa-download"></i></a>'
+        %}
     {% endif %}
     {% set importexportComponentId = importexport['component_id'] %}
     {% set importexportFilterId = importexport['filter_id'] %}

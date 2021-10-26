@@ -4,6 +4,7 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
 use League\Csv\Writer;
 use Phalcon\Helper\Json;
+use Phalcon\Helper\Str;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesImportExport;
 
@@ -41,7 +42,11 @@ class ImportExport extends BasePackage
                 $data['email_to'] = $account['email'];
             }
         } else {
-            $data['email_to'] = 'no-reply@' . $this->domains->domains[0]['name'];
+            if ($data['domain_id'] != 0) {
+                $data['email_to'] = 'no-reply@' . $this->domains->getIdDomain($data['domain_id'])['name'];
+            } else {
+                $data['email_to'] = 'no-reply@' . $this->domains->domains[0]['name'];
+            }
         }
 
         $data['email_to'] = explode(',', $data['email_to']);
@@ -150,7 +155,7 @@ class ImportExport extends BasePackage
 
                     $this->packagesData->fields = $fields;
 
-                    return true;
+                    return $fields;
                 }
 
                 $this->addResponse('Component package fields not found', 1);
@@ -225,6 +230,12 @@ class ImportExport extends BasePackage
                         $conditions
                     );
 
+                    foreach ($records as &$record) {
+                        if (is_array($record)) {
+                            $record = $this->jsonData($record);
+                        }
+                    }
+
                     if ($records) {
                         $csv = Writer::createFromString();
 
@@ -267,15 +278,32 @@ class ImportExport extends BasePackage
                         $emailData['confidential'] = 0;
                         $emailData['to_addresses'] = Json::encode($emailToAddresses);
                         $emailData['subject'] = 'Export request complete.';
+
+                        if ($export['app_id'] != 0) {
+                            $route = $this->apps->getIdApp($export['app_id'])['route'];
+                        } else {
+                            $route = 'admin';
+                        }
+
+                        if ($export['domain_id'] != 0) {
+                            $domain = $this->domains->getIdDomain($export['domain_id'])['name'];
+                        } else {
+                            $domain = $this->domains->domains[0]['name'];
+                        }
+
+                        $url = Str::reduceSlashes('https://' . $domain . '/' . $route . '/' . 'system/tools/importexport/q/id/' . $export['id']);
+
                         $emailData['body'] =
                             'Export request ID:' . $export['id'] . ' execution complete. To download file, click ' .
-                            '<a href="' . $this->links->url('system/tools/importexport/q/id/' . $export['id']) . '">here</a>';
+                            '<a href="' . $url . '">here</a>';
 
                         $this->basepackages->emailqueue->addToQueue($emailData);
 
                         $export['status'] = 2;//Complete
 
                         $this->update($export);
+
+                        $this->addResponse('Export request ID:' . $export['id'] . ' execution complete.');
                     }
 
                     return true;
@@ -288,26 +316,114 @@ class ImportExport extends BasePackage
         return false;
     }
 
-    protected function writeCSVFile($export, $csv)
+    protected function writeCSVFile($data, $csv)
     {
+        $csvString = $csv->toString();
+
         if (function_exists('mb_strlen')) {
-            $size = mb_strlen($csv->toString(), '8bit');
+            $size = mb_strlen($csvString, '8bit');
         } else {
-            $size = strlen($csv->toString());
+            $size = strlen($csvString);
+        }
+
+        if (isset($data['id'])) {
+            $name = 'export_' . $data['id'] . '.csv';
+        } else if (isset($data['component_id'])) {
+            $name = 'sample_component_' . $data['component_id'] . '.csv';
+
+            $file = $this->basepackages->storages->getFileInfo(null, 'sample_component_' . $data['component_id'] . '.csv');
+
+            if ($file) {
+                return $file['uuid'];
+            }
+        } else {
+            $name = 'name_missing';
         }
 
         if ($this->basepackages->storages->storeFile(
                 'private',
                 'importexport',
-                $csv->toString(),
-                'export_' . $export['id'],
+                $csvString,
+                $name,
                 $size,
                 'text/csv'
             )
         ) {
+            $this->basepackages->storages->changeOrphanStatus($this->basepackages->storages->packagesData->storageData['uuid']);
+
             return $this->basepackages->storages->packagesData->storageData['uuid'];
         }
 
         return false;
+    }
+
+    public function getSampleFileLink($data)
+    {
+        if (!isset($data['component_id'])) {
+            $this->addResponse('Component Id missing', 1);
+
+            return;
+        }
+
+        $component = $this->modules->components->getComponentById($data['component_id']);
+
+        if ($component) {
+            $component['settings'] = Json::decode($component['settings'], true);
+
+            if (isset($component['settings']['importexportSample'])) {
+                $file = $this->writeSampleCSVFile($data, $component['settings']['importexportSample']);
+            } else {
+                $file = $this->writeSampleCSVFile($data);
+            }
+        }
+
+        if (isset($file)) {
+            $this->addResponse('sample file generated', 0, ['link' => $this->links->url('system/storages/q/uuid/' . $file)]);
+
+            return true;
+        } else {
+            $this->addResponse('error generating sample file', 1, []);
+        }
+    }
+
+    protected function writeSampleCSVFile($data, array $sample = null)
+    {
+        if ($sample) {
+            $csv = Writer::createFromString();
+
+            $csv->insertOne($sample[0]);
+
+            unset($sample[0]);
+
+            $csv->insertAll($sample);
+
+            return $this->writeCSVFile($data, $csv);
+        } else {
+            $fields = $this->getPackageFields($data['component_id']);
+
+            if ($fields) {
+                $csv = Writer::createFromString();
+
+                $csv->insertOne($fields);
+
+                return $this->writeCSVFile($data, $csv);
+            }
+
+            return false;
+        }
+    }
+
+    //Can be used after install/upgrade package
+    public function removeAllSampleFiles()
+    {
+        $files = $this->basepackages->storages->getFileInfo(null, 'sample_component', true);
+
+        if ($files && count($files) > 0) {
+            foreach ($files as $file) {
+                if (isset($file['uuid'])) {
+                    $this->basepackages->storages->removeFile($file['uuid'], 'private', true);
+                }
+            }
+        }
     }
 }
