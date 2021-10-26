@@ -399,7 +399,9 @@ class Dropzone
                             var previewNode = document.querySelector(".' . $this->compSecId . '-' . $this->params['fieldId'] . '-upload-template");
                             previewNode.id = "";
                             var previewTemplate = previewNode.parentNode.innerHTML;
-                            previewNode.parentNode.removeChild(previewNode);
+                            $(document).ready(function() {
+                                $(previewNode.parentNode).children("li").remove();
+                            });
 
                             var fieldId =
                                 window["dataCollection"]["' . $this->params['componentId'] . '"]["' . $this->compSecId . '"]["' . $this->compSecId . '-' . $this->params['fieldId'] . '"];
@@ -753,6 +755,8 @@ class Dropzone
                             }
 
                             function processDeleteUUIDs() {
+                                var deleteUUIDsLength = deleteUUIDs.length;
+
                                 if (deleteUUIDs.length > 0) {
                                     $(deleteUUIDs).each(function(index, uuid) {
                                         deleteFile(uuid);
@@ -761,6 +765,7 @@ class Dropzone
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
                                 $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
                                 deleteUUIDs = [];
+                                filesLimit = filesLimit + deleteUUIDsLength;
                                 initDropzone();
                             }
 
