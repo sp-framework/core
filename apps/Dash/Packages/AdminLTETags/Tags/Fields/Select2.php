@@ -48,11 +48,17 @@ class Select2
 
     protected function generateContent()
     {
-        //We process array for select to that is wrapped inside an array. List data received from sdk is wrapped inside array. But, if the data is received from component, it will not be wrapped. So, we need to check and re-wrap the component data into an array #}
-        $this->fieldParams['fieldDataSelect2TreeData'] =
-            isset($this->params['fieldDataSelect2OptionsArray']) && $this->params['fieldDataSelect2OptionsArray'] === true ?
-            [$this->params['fieldDataSelect2Options']] :
-            $this->params['fieldDataSelect2Options'];
+        //We process array for select to that is wrapped inside an array (double array).
+        if (isset($this->params['fieldDataSelect2OptionsArray']) && $this->params['fieldDataSelect2OptionsArray'] === true) {
+            //If data is already in an array
+            $this->fieldParams['fieldDataSelect2TreeData'] = [$this->params['fieldDataSelect2Options']];
+        } else if (isset($this->params['fieldDataSelect2OptionsArray']) && $this->params['fieldDataSelect2OptionsArray'] === false) {
+            //If data is not in an array
+            $this->fieldParams['fieldDataSelect2TreeData'] = [[$this->params['fieldDataSelect2Options']]];
+        } else {
+            //If data has childs
+            $this->fieldParams['fieldDataSelect2TreeData'] = $this->params['fieldDataSelect2Options'];
+        }
 
         $this->fieldParams['fieldSelect2Type'] =
             isset($this->params['fieldSelect2Type']) ?
@@ -98,10 +104,9 @@ class Select2
                 $this->adminLTETags->useTag(
                         'tree',
                         [
-                            'treeMode'      =>  'select2',
-                            'treeData'      =>
-                                $this->params['fieldDataSelect2OptionsArray'] === false ? [[$this->fieldParams['fieldDataSelect2TreeData']]] : $this->fieldParams['fieldDataSelect2TreeData'],
-                            'fieldParams'   =>  $this->fieldParams
+                            'treeMode'      => 'select2',
+                            'treeData'      => $this->fieldParams['fieldDataSelect2TreeData'],
+                            'fieldParams'   => $this->fieldParams
                         ],
                     );
         }
