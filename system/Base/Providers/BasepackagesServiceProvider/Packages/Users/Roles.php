@@ -65,23 +65,17 @@ class Roles extends BasePackage
     public function removeRole(array $data)
     {
         if (isset($data['id']) && $data['id'] != 1) {
+            $roleObj = $this->getFirst('id', $data['id']);
 
-            $role = $this->getById($data['id']);
+            if ($roleObj->getAccounts() && $roleObj->getAccounts()->count() > 0) {
+                $this->packagesData->responseCode = 1;
 
-            if ($role['accounts']) {
-                $accounts = Json::decode($role['accounts'], true);
+                $this->packagesData->responseMessage = 'Role has accounts assigned to it. Cannot removes role.';
 
-                if (count($accounts) > 0) {
-                    $this->packagesData->responseCode = 1;
-
-                    $this->packagesData->responseMessage = 'Role has accounts assigned to it. Cannot removes role.';
-
-                    return false;
-                }
+                return false;
             }
 
-            if ($this->remove($data['id'])) {
-                //Check accounts assigned to the role
+            if ($this->remove($data['id'], true, false)) {
                 $this->packagesData->responseCode = 0;
 
                 $this->packagesData->responseMessage = 'Removed role';
@@ -174,7 +168,6 @@ class Roles extends BasePackage
                 $role['permissions'] = Json::encode($permissions);
 
                 $this->packagesData->role = $role;
-
             } else {
 
                 $this->packagesData->responseCode = 1;
@@ -210,6 +203,7 @@ class Roles extends BasePackage
             $role['permissions'] = Json::encode($permissions);
             $this->packagesData->role = $role;
         }
+
         $this->packagesData->apps = $appsArr;
 
         $this->packagesData->roles = $roles;

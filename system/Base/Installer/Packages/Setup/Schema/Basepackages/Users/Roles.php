@@ -43,13 +43,6 @@ class Roles
                             'type'    => Column::TYPE_TEXT,
                             'notNull' => true,
                         ]
-                    ),
-                    new Column(
-                        'accounts',
-                        [
-                            'type'    => Column::TYPE_TEXT,
-                            'notNull' => false,
-                        ]
                     )
                 ],
                 'indexes' => [
