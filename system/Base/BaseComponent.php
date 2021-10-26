@@ -590,13 +590,24 @@ abstract class BaseComponent extends Controller
 		}
 	}
 
-	protected function useStorage($storageType)
+	protected function useStorage($storageType, array $overrideSettings = null)
 	{
 		$storages = $this->basepackages->storages->getAppStorages();
 
 		if ($storages && isset($storages[$storageType])) {//Assign type of storage for uploads
 			$this->view->storages = $storages;
-			$this->view->storage = $storages[$storageType];
+
+			$storage = $storages[$storageType];
+
+			if ($overrideSettings) {//add settings condition as needed
+				if (isset($storage['allowed_file_mime_types']) &&
+					isset($overrideSettings['allowed_file_mime_types'])
+				) {
+					$storage['allowed_file_mime_types'] = $overrideSettings['allowed_file_mime_types'];
+				}
+			}
+
+			$this->view->storage = $storage;
 		} else {
 			$this->view->storages = [];
 		}
