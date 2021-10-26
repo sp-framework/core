@@ -184,15 +184,9 @@ class Accounts extends BasePackage
                     $this->emailNewPassword($data['email'], $password);
                 }
 
-                if (isset($data['role_id']) &&
-                    $data['role_id'] != '0'
-                ) {
-                    $this->updateRoleAccounts($data['role_id'], $id);
+                $this->addActivityLog($data);
 
-                    $this->addActivityLog($data);
-
-                    $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
-                }
+                $this->addToNotification('add', 'Added new account for ID: ' . $data['email']);
 
                 $this->addResponse('Added new account for ID: ' . $data['email'], 0, null, true);
             }
@@ -247,21 +241,13 @@ class Accounts extends BasePackage
                 $this->emailNewPassword($data['email'], $password);
             }
 
-            // if (isset($account['package_name']) && $account['package_name'] === 'profiles') {
             $this->basepackages->profile->updateProfileViaAccount($data);
-            // }
 
-            if (isset($data['role_id']) &&
-                $data['role_id'] != '0'
-            ) {
-                $this->addUpdateSecurity($account['id'], $data);
+            $this->addUpdateSecurity($account['id'], $data);
 
-                $this->updateRoleAccounts($data['role_id'], $data['id'], $account['role_id']);
+            $this->addActivityLog($data);
 
-                $this->addActivityLog($data);
-
-                $this->addToNotification('add', 'Updated account for ID: ' . $data['email']);
-            }
+            $this->addToNotification('add', 'Updated account for ID: ' . $data['email']);
 
             $this->addResponse('Updated account for ID: ' . $data['email'], 0, null, true);
 
@@ -293,10 +279,6 @@ class Accounts extends BasePackage
                 unset($relationData['id']);
 
                 $account = array_merge($account, $relationData);
-
-                if (isset($account['role_id']) && $account['role_id'] != '0') {
-                    $this->removeRoleAccount($account['role_id'], $account['id']);
-                }
 
                 if ($this->remove($data['id'])) {
                     $this->removeRelatedData($accountObj);
@@ -606,59 +588,6 @@ class Accounts extends BasePackage
         $emailData['body'] = $password;
 
         return $this->basepackages->emailqueue->addToQueue($emailData);
-    }
-
-    protected function updateRoleAccounts(int $rid, int $id, int $oldRid = null)
-    {
-        if ($oldRid) {
-            $oldRole = $this->basepackages->roles->getById($oldRid);
-
-            if ($oldRole['accounts']) {
-                $oldRole['accounts'] = Json::decode($oldRole['accounts'], true);
-
-                $key = array_keys($oldRole['accounts'], $id);
-                if ($key) {
-                    unset($oldRole['accounts'][$key[0]]);
-                }
-
-                $oldRole['accounts'] = Json::encode($oldRole['accounts']);
-
-                $this->basepackages->roles->update($oldRole);
-            }
-        }
-
-        $role = $this->basepackages->roles->getById($rid);
-
-        if ($role['accounts']) {
-            $role['accounts'] = Json::decode($role['accounts'], true);
-        } else {
-            $role['accounts'] = [];
-        }
-
-        array_push($role['accounts'], $id);
-
-        $role['accounts'] = Json::encode($role['accounts']);
-
-        $this->basepackages->roles->update($role);
-    }
-
-    protected function removeRoleAccount(int $rid, int $id)
-    {
-        $role = $this->basepackages->roles->getById($rid);
-
-        $role['accounts'] = Json::decode($role['accounts'], true);
-
-        $accountKey = array_keys($role['accounts'], $id);
-
-        if (count($accountKey) === 0) {
-            return;
-        }
-
-        unset($role['accounts'][$accountKey[0]]);
-
-        $role['accounts'] = Json::encode($role['accounts']);
-
-        $this->basepackages->roles->update($role);
     }
 
     public function removeAccountAgents(array $data)

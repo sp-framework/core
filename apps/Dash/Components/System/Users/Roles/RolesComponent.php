@@ -42,11 +42,16 @@ class RolesComponent extends BaseComponent
                 $this->view->apps = $this->roles->packagesData->apps;
 
                 $this->view->roles = $this->roles->packagesData->roles;
+
+                if ($this->getData()['id'] == 1) {
+                    $this->view->canUpdate = false;
+                }
             }
 
-            $this->view->responseCode = $this->roles->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
+            $this->addResponse(
+                $this->roles->packagesData->responseMessage,
+                $this->roles->packagesData->responseCode
+            );
 
             $this->view->pick('roles/view');
 
@@ -91,14 +96,12 @@ class RolesComponent extends BaseComponent
 
             $this->roles->addRole($this->postData());
 
-            $this->view->responseCode = $this->roles->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->roles->packagesData->responseMessage,
+                $this->roles->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -114,14 +117,12 @@ class RolesComponent extends BaseComponent
 
             $this->roles->updateRole($this->postData());
 
-            $this->view->responseCode = $this->roles->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->roles->packagesData->responseMessage,
+                $this->roles->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 
@@ -134,14 +135,12 @@ class RolesComponent extends BaseComponent
 
             $this->roles->removeRole($this->postData());
 
-            $this->view->responseCode = $this->roles->packagesData->responseCode;
-
-            $this->view->responseMessage = $this->roles->packagesData->responseMessage;
-
+            $this->addResponse(
+                $this->roles->packagesData->responseMessage,
+                $this->roles->packagesData->responseCode
+            );
         } else {
-            $this->view->responseCode = 1;
-
-            $this->view->responseMessage = 'Method Not Allowed';
+            $this->addResponse('Method Not Allowed', 1);
         }
     }
 }
