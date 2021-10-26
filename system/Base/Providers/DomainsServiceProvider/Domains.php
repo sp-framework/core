@@ -137,6 +137,17 @@ class Domains extends BasePackage
 		return false;
 	}
 
+	public function getIdDomain($id)
+	{
+		foreach($this->domains as $domain) {
+			if ($domain['id'] === $id) {
+				return $domain;
+			}
+		}
+
+		return false;
+	}
+
 	public function generateViewData(int $did = null)
 	{
 		$appsArr = $this->apps->apps;
