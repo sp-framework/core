@@ -135,12 +135,14 @@ class Storages extends BasePackage
         return $this->initStorage($public)->getById($id);
     }
 
-    public function getFileInfo($uuid)
+    public function getFileInfo($uuid, $orgFileName = null, $like = false)
     {
-        $fileInfo = $this->initStorage(false)->getFileInfo($uuid);
+        $fileInfo = $this->initStorage(false)->getFileInfo($uuid, $orgFileName, $like);
 
-        if ($fileInfo) {
+        if ($fileInfo && !$like) {
             return $fileInfo[0];
+        } else if ($fileInfo && $like) {
+            return $fileInfo;
         }
 
         return false;

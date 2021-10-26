@@ -348,8 +348,19 @@ class Local extends BasePackage
         }
     }
 
-    public function getFileInfo($uuid)
+    public function getFileInfo($uuid, $orgFileName = null, $like = false)
     {
+        if ($orgFileName) {
+            return $this->getByParams(
+                [
+                    'conditions'    => $like === true ? 'org_file_name LIKE :org_file_name:' : 'org_file_name = :org_file_name:',
+                    'bind'          =>
+                        [
+                            'org_file_name'    => $like === true ? '%' . $orgFileName . '%' : $orgFileName
+                        ]
+                ]);
+        }
+
         return $this->getByParams(
             [
                 'conditions'    => 'uuid = :uuid:',
@@ -663,7 +674,7 @@ class Local extends BasePackage
         }
 
         for ($checkPath = count($paths) - 1; $checkPath >= 3; $checkPath--) { //>=3 to ignore images/, cache/, data/, storageID directory
-            if (count($this->localContent->listContents($paths[$checkPath], false)) === 0) {
+            if (count($this->localContent->listContents($paths[$checkPath], false)->toArray()) === 0) {
                 $this->localContent->deleteDir($paths[$checkPath]);
             }
         }
@@ -696,17 +707,17 @@ class Local extends BasePackage
             }
         } else {
             if ($oldUUID) {
-                    if (!$status) {
-                        $status = 1;
-                    }
+                if (!$status) {
+                    $status = 1;
+                }
 
                 $this->flipOrphanStatus($oldUUID, $status);
             }
 
             if ($newUUID) {
-                    if (!$status) {
-                        $status = 0;
-                    }
+                if (!$status) {
+                    $status = 0;
+                }
 
                 $this->flipOrphanStatus($newUUID, $status);
             }
@@ -720,6 +731,7 @@ class Local extends BasePackage
         } else if ($status === 1) {
             $marked = 'marked';
         }
+
         $file = $this->getFileInfo($uuid);
 
         if ($file && count($file) === 1) {
