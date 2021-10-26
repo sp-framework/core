@@ -5,21 +5,16 @@
     {% set importexportId = '' %}
     {% set title = 'New ' ~ importexport['type'] ~ ' Request' %}
 {% endif %}
-
 {% if importexport['type'] === 'import' %}
-    {% if importexport['id'] is not defined or importexport['setup'] != 4 %}
-        {% if importexport['id'] is defined %}
-            {% set importexportStep = 2 %}
-        {% else %}
-            {% set importexportStep = importexport['setup'] %}
-        {% endif %}
+    {% if importexport['id'] is not defined %}
+        {% set sectionId = 'main' %}
         {{adminltetags.useTag('content',
             [
                 'component'                     : component,
                 'componentName'                 : componentName,
                 'componentId'                   : componentId,
                 'parentComponentId'             : parent,
-                'sectionId'                     : 'main',
+                'sectionId'                     : sectionId,
                 'contentType'                   : 'sectionWithWizard',
                 'cardHeader'                    : true,
                 'cardFooter'                    : true,
@@ -31,64 +26,41 @@
                 'wizardCanCancel'               : true,
                 'wizardCancelUrl'               : 'system/tools/importexport',
                 'wizardDoneUrl'                 : 'system/tools/importexport',
-                'wizardStartAtStep'             : importexportStep,
+                'wizardStartAtStep'             : 0,
                 'wizardSteps'                   :
                     [
                         '0' :
                             [
                                 'title'             : 'Information',
-                                'content'           : view.getPartial('importexport/types/ebay/wizard/info')
+                                'content'           : view.getPartial('importexport/types/import/wizard/info')
                             ],
                         '1' :
                             [
-                                'title'             : 'Register Request',
-                                'content'           : view.getPartial('importexport/types/ebay/wizard/register',
+                                'title'             : 'Upload',
+                                'content'           : view.getPartial('importexport/types/import/wizard/request',
                                                         [
-                                                            'wizard'    : true,
-                                                            'title'     : title
+                                                            'step'          : 'upload',
+                                                            'componentId'   : componentId,
+                                                            'sectionId'     : sectionId,
+                                                            'title'         : title
                                                         ]
                                                     ),
-                                'description'       : 'Step 1: Register Request information with this system.',
-                                'submitOnNext'      : true
+                                'description'       : 'Step 1: Select component and upload file.',
+                                'nextDisabled'      : false
                             ],
                         '2' :
                             [
-                                'title'             : 'Authorize App',
-                                'content'           : view.getPartial('importexport/types/ebay/wizard/authorizeapp',
+                                'title'             : 'Process File',
+                                'content'           : view.getPartial('importexport/types/import/wizard/request',
                                                         [
-                                                            'componentId'       : componentId,
-                                                            'sectionId'         : 'main',
-                                                            'parentComponentId' : parent
+                                                            'step'          : 'pair',
+                                                            'componentId'   : componentId,
+                                                            'sectionId'     : sectionId,
+                                                            'title'         : title
                                                         ]
                                                     ),
-                                'description'       : 'Step 2: Authorize this system using systems/your eBay dev account credentials.',
-                                'nextDisabled'      : true
-                            ],
-                        '3' :
-                            [
-                                'title'             : 'Authorize User',
-                                'content'           : view.getPartial('importexport/types/ebay/wizard/authorizeuser',
-                                                        [
-                                                            'componentId'       : componentId,
-                                                            'sectionId'         : 'main',
-                                                            'parentComponentId' : parent
-                                                        ]
-                                                    ),
-                                'description'       : 'Step 3: Get an authorization key for your eBay user account',
-                                'nextDisabled'      : true
-                            ],
-                        '4' :
-                            [
-                                'title'             : 'Assign',
-                                'content'           : view.getPartial('importexport/types/ebay/wizard/assign',
-                                                        [
-                                                            'componentId'       : componentId,
-                                                            'sectionId'         : 'main',
-                                                            'parentComponentId' : parent
-                                                        ]
-                                                    ),
-                                'description'       : 'Step 4: Assign eBay Request to channel.',
-                                'goBack'            : false
+                                'description'       : 'Step 2: Process uploaded file.',
+                                'submitOnNext'      : true
                             ]
                     ]
             ]
@@ -108,7 +80,7 @@
                 'cardIcon'                      : 'exchange-alt fa-flip-horizontal',
                 'cardTitle'                     : title,
                 'cardAdditionalClass'           : 'rounded-0',
-                'cardBodyInclude'               : 'importexport/types/ebay/wizard/register/form',
+                'cardBodyInclude'               : 'importexport/types/import/wizard/register/form',
                 'formButtons'                   :
                 [
                     'updateButtonId'                : importexportId,
