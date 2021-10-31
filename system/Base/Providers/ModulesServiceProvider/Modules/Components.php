@@ -144,11 +144,15 @@ class Components extends BasePackage
 
 			if (isset($component['settings']['import']) &&
 				$component['settings']['import'] == 'true' &&
-				isset($component['settings']['importexportPackage'])
+				isset($component['settings']['importexportPackage']) &&
+				isset($component['settings']['importMethod'])
 			) {
 				$package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
 
-				if ($package && $this->usePackage($package['class'])) {
+				if ($package &&
+					$this->usePackage($package['class']) &&
+					method_exists($package['class'], $component['settings']['importMethod'])
+				) {
 					$availableComponent['id'] = $component['id'];
 					$availableComponent['name'] = $component['name'];
 

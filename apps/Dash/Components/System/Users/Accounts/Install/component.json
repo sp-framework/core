@@ -8,70 +8,7 @@
     "version": "0.0.1",
     "repo": "https://.../dash-component-system-admin-accounts",
     "class": "Apps\\Dash\\Components\\System\\Users\\Accounts\\AccountsComponent",
-    "dependencies":
-    {
-        "core":
-        {
-            "name": "Core",
-            "version": "0.0.1",
-            "repo": "https://.../core"
-        },
-        "components":
-        [],
-        "packages":
-        [],
-        "middlewares":
-        [
-            {
-                "name": "Auth",
-                "version": "0.0.1",
-                "repo": "https://.../dash-middleware-system-tools-auth"
-            },
-            {
-                "name": "Acl",
-                "version": "0.0.1",
-                "repo": "https://.../dash-middleware-system-tools-acl"
-            }
-        ],
-        "views":
-        [
-            {
-                "name": "Default",
-                "version": "0.0.1",
-                "repo": "https://.../dash-view-default"
-            }
-        ]
-    },
-    "menu":
-    {
-        "seq": 6,
-        "system":
-        {
-            "icon": "cogs",
-            "title": "system",
-            "childs":
-            {
-                "users":
-                {
-                    "title": "users",
-                    "icon": "users",
-                    "childs":
-                    {
-                        "accounts":
-                        {
-                            "title": "Accounts",
-                            "link": "system/users/accounts"
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "settings":
-    {
-        "mandatory":
-        {
-            "admin": true
-        }
-    }
+    "dependencies": {"core":{"name":"Core","version":"0.0.1","repo":"https://.../core"},"components":[],"packages":[],"middlewares":[{"name":"Auth","version":"0.0.1","repo":"https://.../dash-middleware-system-tools-auth"},{"name":"Acl","version":"0.0.1","repo":"https://.../dash-middleware-system-tools-acl"}],"views":[{"name":"Default","version":"0.0.1","repo":"https://.../dash-view-default"}]},
+    "menu": {"seq":6,"system":{"icon":"cogs","title":"system","childs":{"users":{"title":"users","icon":"users","childs":{"accounts":{"title":"Accounts","link":"system\\/users\\/accounts"}}}}}},
+    "settings": {"mandatory":{"admin":true},"export":true,"import":true,"importexportPackage":"Accounts"}
 }

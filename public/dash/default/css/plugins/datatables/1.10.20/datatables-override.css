@@ -49,3 +49,18 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role="row"] > th.dtr-control::
 .dataTables_filter > label {
     margin-bottom: 0;
 }
+td.details-control {
+    background: url('/dash/default/images/datatables/details_open.png') no-repeat center center;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('/dash/default/images/datatables/details_close.png') no-repeat center center;
+}
+/* Childs */
+ul.dtr-details {
+    width: 100%;
+}
+table.dataTable > tbody > tr.child span.dtr-title {
+    min-width: 20% !important;
+    text-transform: uppercase;
+}

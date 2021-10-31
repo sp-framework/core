@@ -253,14 +253,52 @@ class ImportexportComponent extends BaseComponent
         }
     }
 
-    public function getSampleFileLinkAction()
+    public function getStructureFileLinkAction()
     {
         if ($this->request->isPost()) {
             if (!$this->checkCSRF()) {
                 return;
             }
 
-            $this->basepackages->importexport->getSampleFileLink($this->postData());
+            $this->basepackages->importexport->getStructureFileLink($this->postData());
+
+            $this->addResponse(
+                $this->basepackages->importexport->packagesData->responseMessage,
+                $this->basepackages->importexport->packagesData->responseCode,
+                $this->basepackages->importexport->packagesData->responseData,
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function readFileAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->importexport->readFile($this->postData());
+
+            $this->addResponse(
+                $this->basepackages->importexport->packagesData->responseMessage,
+                $this->basepackages->importexport->packagesData->responseCode,
+                $this->basepackages->importexport->packagesData->responseData,
+            );
+        } else {
+            $this->addResponse('Method Not Allowed', 1);
+        }
+    }
+
+    public function processFileAction()
+    {
+        if ($this->request->isPost()) {
+            if (!$this->checkCSRF()) {
+                return;
+            }
+
+            $this->basepackages->importexport->processFile($this->postData());
 
             $this->addResponse(
                 $this->basepackages->importexport->packagesData->responseMessage,

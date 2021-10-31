@@ -8,6 +8,62 @@
 {% if importexport['type'] === 'import' %}
     {% if importexport['id'] is not defined %}
         {% set sectionId = 'main' %}
+        {% if components|length === 0 %}
+            {% set wizardSteps =
+                [
+                    '0' :
+                        [
+                            'title'             : 'Error',
+                            'content'           : view.getPartial('importexport/types/import/wizard/info',
+                                                    [
+                                                        'step'          : 'error',
+                                                        'componentId'   : componentId,
+                                                        'sectionId'     : sectionId,
+                                                        'title'         : 'ERROR'
+                                                    ]
+                                                ),
+                            'nextHidden'        : true
+                        ]
+                ]
+            %}
+        {% else %}
+            {% set wizardSteps =
+                [
+                    '0' :
+                        [
+                            'title'             : 'Information',
+                            'content'           : view.getPartial('importexport/types/import/wizard/info')
+                        ],
+                    '1' :
+                        [
+                            'title'             : 'Upload',
+                            'content'           : view.getPartial('importexport/types/import/wizard/request',
+                                                    [
+                                                        'step'          : 'upload',
+                                                        'componentId'   : componentId,
+                                                        'sectionId'     : sectionId,
+                                                        'title'         : title
+                                                    ]
+                                                ),
+                            'description'       : 'Step 1: Select component and upload file.'
+                        ],
+                    '2' :
+                        [
+                            'title'             : 'Process File',
+                            'content'           : view.getPartial('importexport/types/import/wizard/request',
+                                                    [
+                                                        'step'          : 'process',
+                                                        'componentId'   : componentId,
+                                                        'sectionId'     : sectionId,
+                                                        'title'         : title
+                                                    ]
+                                                ),
+                            'description'       : 'Step 2: Process uploaded file.',
+                            'submitOnNext'      : false
+                        ]
+                ]
+            %}
+        {% endif %}
         {{adminltetags.useTag('content',
             [
                 'component'                     : component,
@@ -27,42 +83,7 @@
                 'wizardCancelUrl'               : 'system/tools/importexport',
                 'wizardDoneUrl'                 : 'system/tools/importexport',
                 'wizardStartAtStep'             : 0,
-                'wizardSteps'                   :
-                    [
-                        '0' :
-                            [
-                                'title'             : 'Information',
-                                'content'           : view.getPartial('importexport/types/import/wizard/info')
-                            ],
-                        '1' :
-                            [
-                                'title'             : 'Upload',
-                                'content'           : view.getPartial('importexport/types/import/wizard/request',
-                                                        [
-                                                            'step'          : 'upload',
-                                                            'componentId'   : componentId,
-                                                            'sectionId'     : sectionId,
-                                                            'title'         : title
-                                                        ]
-                                                    ),
-                                'description'       : 'Step 1: Select component and upload file.',
-                                'nextDisabled'      : false
-                            ],
-                        '2' :
-                            [
-                                'title'             : 'Process File',
-                                'content'           : view.getPartial('importexport/types/import/wizard/request',
-                                                        [
-                                                            'step'          : 'pair',
-                                                            'componentId'   : componentId,
-                                                            'sectionId'     : sectionId,
-                                                            'title'         : title
-                                                        ]
-                                                    ),
-                                'description'       : 'Step 2: Process uploaded file.',
-                                'submitOnNext'      : true
-                            ]
-                    ]
+                'wizardSteps'                   : wizardSteps
             ]
         )}}
     {% else %}

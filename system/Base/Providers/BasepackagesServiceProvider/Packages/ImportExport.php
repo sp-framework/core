@@ -2,6 +2,7 @@
 
 namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
+use League\Csv\Reader;
 use League\Csv\Writer;
 use Phalcon\Helper\Json;
 use Phalcon\Helper\Str;
@@ -128,7 +129,7 @@ class ImportExport extends BasePackage
         }
     }
 
-    public function getPackageFields($id)
+    public function getPackageFields($id, $structure = false)
     {
         $component = $this->modules->components->getComponentById($id);
 
@@ -150,7 +151,11 @@ class ImportExport extends BasePackage
                     $fields = [];
 
                     foreach ($packageFields['columns'] as $column) {
-                        $fields[$column] = ucfirst(str_replace('_', ' ', $column));
+                        if ($structure) {
+                            $fields[$column] = $column;
+                        } else {
+                            $fields[$column] = ucfirst(str_replace('_', ' ', $column));
+                        }
                     }
 
                     $this->packagesData->fields = $fields;
@@ -329,9 +334,9 @@ class ImportExport extends BasePackage
         if (isset($data['id'])) {
             $name = 'export_' . $data['id'] . '.csv';
         } else if (isset($data['component_id'])) {
-            $name = 'sample_component_' . $data['component_id'] . '.csv';
+            $name = 'structure_component_' . $data['component_id'] . '.csv';
 
-            $file = $this->basepackages->storages->getFileInfo(null, 'sample_component_' . $data['component_id'] . '.csv');
+            $file = $this->basepackages->storages->getFileInfo(null, 'structure_component_' . $data['component_id'] . '.csv');
 
             if ($file) {
                 return $file['uuid'];
@@ -357,7 +362,7 @@ class ImportExport extends BasePackage
         return false;
     }
 
-    public function getSampleFileLink($data)
+    public function getStructureFileLink($data)
     {
         if (!isset($data['component_id'])) {
             $this->addResponse('Component Id missing', 1);
@@ -371,35 +376,35 @@ class ImportExport extends BasePackage
             $component['settings'] = Json::decode($component['settings'], true);
 
             if (isset($component['settings']['importexportSample'])) {
-                $file = $this->writeSampleCSVFile($data, $component['settings']['importexportSample']);
+                $file = $this->writeStructureCSVFile($data, $component['settings']['importexportSample']);
             } else {
-                $file = $this->writeSampleCSVFile($data);
+                $file = $this->writeStructureCSVFile($data);
             }
         }
 
         if (isset($file)) {
-            $this->addResponse('sample file generated', 0, ['link' => $this->links->url('system/storages/q/uuid/' . $file)]);
+            $this->addResponse('structure file generated', 0, ['link' => $this->links->url('system/storages/q/uuid/' . $file)]);
 
             return true;
         } else {
-            $this->addResponse('error generating sample file', 1, []);
+            $this->addResponse('error generating structure file', 1, []);
         }
     }
 
-    protected function writeSampleCSVFile($data, array $sample = null)
+    protected function writeStructureCSVFile($data, array $structure = null)
     {
-        if ($sample) {
+        if ($structure) {
             $csv = Writer::createFromString();
 
-            $csv->insertOne($sample[0]);
+            $csv->insertOne($structure[0]);
 
-            unset($sample[0]);
+            unset($structure[0]);
 
-            $csv->insertAll($sample);
+            $csv->insertAll($structure);
 
             return $this->writeCSVFile($data, $csv);
         } else {
-            $fields = $this->getPackageFields($data['component_id']);
+            $fields = $this->getPackageFields($data['component_id'], true);
 
             if ($fields) {
                 $csv = Writer::createFromString();
@@ -414,9 +419,9 @@ class ImportExport extends BasePackage
     }
 
     //Can be used after install/upgrade package
-    public function removeAllSampleFiles()
+    public function removeAllStructureFiles()
     {
-        $files = $this->basepackages->storages->getFileInfo(null, 'sample_component', true);
+        $files = $this->basepackages->storages->getFileInfo(null, 'structure_component', true);
 
         if ($files && count($files) > 0) {
             foreach ($files as $file) {
@@ -425,5 +430,92 @@ class ImportExport extends BasePackage
                 }
             }
         }
+    }
+
+    public function readFile(array $data)
+    {
+        if (!isset($data['uuid']) || !isset($data['component_id'])) {
+            $this->addResponse('File UUID/Component ID missing', 1, []);
+
+            return false;
+        }
+
+        $file = $this->basepackages->storages->getFileInfo($data['uuid']);
+
+        try {
+            $csv = Reader::createFromPath(base_path('private/' . $file['storages_id'] . '/data/' . $file['uuid_location'] . $file['uuid']));
+
+            $csv->setHeaderOffset(0);
+
+            $headersArr = $csv->getHeader();
+
+            $headers = [];
+
+            foreach ($headersArr as $headerValue) {
+                $headers[$headerValue] = $headerValue;
+            }
+
+            if ($headers !== $this->getPackageFields($data['component_id'], true)) {
+                $this->addResponse('File header does not match component structure, please download structure and upload file again', 1, []);
+
+                return false;
+            }
+
+            $records[0][0] = 1;
+            $records[0] = $headers;
+
+            $row = 2;
+
+            foreach ($csv as $record) {
+                $record[0] = $row;
+
+                array_push($records, $record);
+
+                $row++;
+            }
+
+            $this->addResponse('Ok', 0, ['rows' => $records]);
+
+            return $records;
+        } catch (\Exception $e) {
+            if ($e->getCode() === 2) {
+                $this->addResponse('Error loading file, please upload again', 1, []);
+
+                return false;
+            }
+        }
+    }
+
+    public function processFile($data)
+    {
+        $rows = $this->readFile($data);
+
+        if (!$rows) {
+            return false;
+        }
+
+        if (isset($data['row_index'])) {
+
+            $this->addResponse('Ok', 0, []);
+
+            $this->addResponse('Row has errors', 1, ['errors' => ['Duplicate name', 'Required permissions']]);
+
+            return;
+        }
+
+        foreach ($rows as $rowKey => $row) {
+
+        }
+        var_dump($rows);die();
+        $this->addResponse('Ok', 0, []);
+
+        $this->addResponse('Row has errors', 1, ['errors' => ['Duplicate name', 'Required permissions']]);
+        return;
+        var_dump($rows);die();
+    }
+
+    protected function processRow($data, $row)
+    {
+        //
     }
 }

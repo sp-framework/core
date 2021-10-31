@@ -1,6 +1,6 @@
-<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
-    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
-        {% if step is defined and step === 'upload' %}
+{% if step is defined and step === 'upload' %}
+    <form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+        <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
             <div class="row">
                 <div class="col">
                     {{adminltetags.useTag('fields',
@@ -76,11 +76,69 @@
                     )}}
                 </div>
             </div>
-        {% endif %}
-    </fieldset>
-</form>
-{% if step is defined and step === 'pair' %}
-    <script>
+        </fieldset>
+    </form>
+{% elseif step is defined and step === 'process' %}
+    <div class="row m-2 text-center" id="rows-loader">
+        <div class="col">
+            <div class="fa-2x">
+                <i class="fa fa-cog fa-spin"></i> Reading uploaded file...
+            </div>
+        </div>
+    </div>
+    <div class="row m-2 text-center">
+        <div class="col" id="rows-loader-error" hidden>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('buttons',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'buttonType'                     : 'button',
+                    'buttons'                        :
+                        [
+                            'process-all-rows'       : [
+                                'title'                   : 'Process All Rows',
+                                'size'                    : 'xs',
+                                'hidden'                  : true,
+                                'icon'                    : 'tasks',
+                                'position'                : 'right'
+                            ]
+                        ]
+                ]
+            )}}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{adminltetags.useTag('fields',
+                [
+                    'component'                      : component,
+                    'componentName'                  : componentName,
+                    'componentId'                    : componentId,
+                    'sectionId'                      : sectionId,
+                    'fieldId'                        : 'rows',
+                    'fieldLabel'                     : 'Rows',
+                    'fieldType'                      : 'html',
+                    'fieldHelp'                      : true,
+                    'fieldHidden'                    : true,
+                    'fieldHelpTooltipContent'        : 'CSV Rows read from the file uploaded.',
+                    'fieldAdditionalClass'           : 'mb-0',
+                    'fieldHtmlContent'               : '',
+                    'fieldBazScan'                   : true,
+                    'fieldBazJstreeSearch'           : true,
+                    'fieldBazPostOnCreate'           : false,
+                    'fieldBazPostOnUpdate'           : false
+                ]
+            )}}
+        </div>
+    </div>
+{% endif %}
+<script>
 /* globals PNotify */
 var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
 
@@ -105,10 +163,173 @@ if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
     dataCollectionSectionForm =
         dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
 }
+
 dataCollectionSection =
     $.extend(dataCollectionSection, {
         '{{componentId}}-{{sectionId}}-component_id'            : {
             "placeholder" : "SELECT COMPONENT"
+        },
+        '{{componentId}}-{{sectionId}}-rows'                    : {
+            afterInit       : function() {
+                if (dataCollectionComponent['{{componentId}}-{{sectionId}}']['initFields'] === true) {
+                    return;
+                }
+
+                $('#{{componentId}}-{{sectionId}}-rows').on('loadFile', function(e) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData['uuid'] = dataCollectionSection['{{componentId}}-{{sectionId}}-upload']['uuidData'][0];
+                    postData['component_id'] = $('#{{componentId}}-{{sectionId}}-component_id').val();
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/tools/importexport/readFile")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 1) {
+                            PNotify.error({
+                                title   : response.responseMessage
+                            });
+
+                            $('#rows-loader-error').empty().append('<span class="text-center text-danger">' + response.responseMessage + '</span>');
+                            $('#rows-loader').attr('hidden', true);
+                            $('#rows-loader-error').attr('hidden', false);
+                            return;
+                        }
+
+                        if (response.responseData.rows) {
+                            dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['rows'] = response.responseData.rows;
+
+                            var table =
+                                '<table id="{{componentId}}-{{sectionId}}-rows-table" class="table compact table-striped dt-responsive dataTable no-footer dtr-inline" style="width:100%">' +
+                                    '<thead>' +
+                                        '<tr>' +
+                                            '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Process</th>' +
+                                            '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">Process Log</th>';
+
+                            for (var th in response.responseData.rows[0]) {
+                                table +=
+                                        '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.rows[0][th] + '</th>';
+                            }
+
+                            table += '</tr><tbody>';
+
+                            $(response.responseData.rows).each(function(index, row) {
+                                if (index !== 0) {
+                                    table += '<tr data-index="' + index + '" class="process-row-' + index + '">';
+
+                                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1"><a href="#" type="button" class="process-row-button text-white btn btn-primary btn-xs">' +
+                                             '<i class="fas fa-fw fa-xs fa-check"></i> Process Row #' + row[0] + '</a>' +
+                                             '<i class="fas fa-fw fa-xs fa-check text-success process-row-success-' + index + '" hidden></i>' +
+                                             '<i class="fas fa-fw fa-xs fa-times text-danger process-row-error-' + index + '" hidden></i>' +
+                                             '</td>';
+
+                                    table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1 process-log-row-' + index + '"></td>';
+
+                                    for (var td in response.responseData.rows[index]) {
+                                        if (td != '0') {
+                                            table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.rows[index][td] + '</td>';
+                                        }
+                                    }
+
+                                    table += '</tr>';
+                                }
+                            });
+
+                            table += '</tbody></table>';
+
+                            $('#{{componentId}}-{{sectionId}}-rows').empty().append(table).ready(function() {
+                                $('#{{componentId}}-{{sectionId}}-process-all-rows').off();
+                                $('#{{componentId}}-{{sectionId}}-process-all-rows').click(function(e) {
+                                    e.preventDefault();
+
+                                    $(this).attr('disabled', true);
+                                    $(this).children('i').removeClass('fa-tasks').addClass('fa-spin fa-cog');
+
+                                    $('.process-row-button').each(function(index, button) {
+                                        $(button).addClass('disabled');
+                                        $(button).children('i').removeClass('fa-check').addClass('fa-spin fa-cog');
+                                    });
+
+                                    var postData = { };
+                                    postData['uuid'] = dataCollectionSection['{{componentId}}-{{sectionId}}-upload']['uuidData'][0];
+                                    postData['component_id'] = $('#{{componentId}}-{{sectionId}}-component_id').val();
+                                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                                    $.post('{{links.url("system/tools/importexport/processFile")}}', postData, function(response) {
+                                        if (response.tokenKey && response.token) {
+                                            $('#security-token').attr('name', response.tokenKey);
+                                            $('#security-token').val(response.token);
+                                        }
+
+                                        //
+                                    }, 'json');
+                                });
+
+                                if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-rows-table')) {
+                                    dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['table'] = $('#{{componentId}}-{{sectionId}}-rows-table').on('init.dt', function() {
+                                        $('#rows-loader').attr('hidden', true);
+                                        $('#{{componentId}}-{{sectionId}}-process-all-rows').attr('hidden', false);
+                                        $('#{{componentId}}-{{sectionId}}-rows').parents('.form-group').removeClass('d-none');
+
+                                        $('.process-row-button').off();
+                                        $('.process-row-button').click(function(e) {
+                                            e.preventDefault();
+
+                                            var thisButton = this;
+                                            var index = $(thisButton).parents('tr').data('index');
+
+                                            $(thisButton).addClass('disabled');
+                                            $(thisButton).children('i').removeClass('fa-check').addClass('fa-spin fa-cog');
+                                            $('#{{componentId}}-{{sectionId}}-process-all-rows').attr('disabled', true);
+
+                                            var postData = { };
+                                            postData['uuid'] = dataCollectionSection['{{componentId}}-{{sectionId}}-upload']['uuidData'][0];
+                                            postData['component_id'] = $('#{{componentId}}-{{sectionId}}-component_id').val();
+                                            postData['row_index'] = $(this).data('index');
+                                            postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                                            $.post('{{links.url("system/tools/importexport/processFile")}}', postData, function(response) {
+                                                if (response.tokenKey && response.token) {
+                                                    $('#security-token').attr('name', response.tokenKey);
+                                                    $('#security-token').val(response.token);
+                                                }
+
+                                                $(thisButton).attr('hidden', true);
+
+                                                if (response.responseCode == 0) {
+                                                    $('.process-row-success-' + index).attr('hidden', false);
+
+                                                    if (response.responseMessage) {
+                                                        $('.process-log-row-' + index).addClass('text-success');
+                                                        $('.process-log-row-' + index).html(response.responseMessage)
+                                                    }
+                                                } else {
+                                                    $('.process-row-error-' + index).attr('hidden', false);
+
+                                                    if (response.responseData && response.responseData.errors) {
+                                                        $('.process-log-row-' + index).addClass('text-danger');
+                                                        $('.process-log-row-' + index).html(response.responseData.errors.join())
+                                                    }
+                                                }
+
+                                                $('#{{componentId}}-{{sectionId}}-process-all-rows').attr('disabled', false);
+                                            }, 'json');
+                                        });
+                                    }).DataTable({
+                                        "columnDefs": [
+                                            { "width": "200px", "targets": 0 }
+                                        ]
+                                    });
+                                }
+                            });
+                        }
+                    }, 'json');
+                });
+            }
         },
         '{{componentId}}-{{sectionId}}-download-link'           : {
             afterInit       : function() {
@@ -121,7 +342,7 @@ dataCollectionSection =
                     postData['component_id'] = e.params.data.id;
                     postData[$('#security-token').attr('name')] = $('#security-token').val();
 
-                    $.post('{{links.url("system/tools/importexport/getSampleFileLink")}}', postData, function(response) {
+                    $.post('{{links.url("system/tools/importexport/getStructureFileLink")}}', postData, function(response) {
                         if (response.tokenKey && response.token) {
                             $('#security-token').attr('name', response.tokenKey);
                             $('#security-token').val(response.token);
@@ -148,5 +369,38 @@ dataCollectionSection =
             }
         }
     });
+
+$(document).ready(function() {
+    if (!dataCollectionSection['steps']['2']['onPrevious']) {
+        dataCollectionSection['steps']['2']['onPrevious'] =
+            function() {
+                $('#rows-loader').attr('hidden', false);
+                $('#rows-loader-error').attr('hidden', true);
+
+                if ($.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-rows-table')) {
+                    dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['table'].destroy();
+                }
+                $('#{{componentId}}-{{sectionId}}-rows').empty();
+                $('#{{componentId}}-{{sectionId}}-process-all-rows').attr('hidden', true);
+                $('#{{componentId}}-{{sectionId}}-rows').parents('.form-group').addClass('d-none');
+            }
+    }
+
+    if (!dataCollectionSection['steps']['1']['onNext']) {
+        dataCollectionSection['steps']['1']['onNext'] =
+            function(resolve, reject) {
+                if (dataCollectionSection['{{componentId}}-{{sectionId}}-upload']['uuidData'].length !== 1) {
+                    PNotify.error({
+                        title   : 'Please upload CSV file!',
+                    });
+
+                    return resolve(false);
+                }
+
+                $('#{{componentId}}-{{sectionId}}-rows').trigger('loadFile');
+
+                return resolve(true);
+            }
+    }
+});
 </script>
-{% endif %}

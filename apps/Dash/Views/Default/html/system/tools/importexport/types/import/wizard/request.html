@@ -1,27 +1,37 @@
-{{adminltetags.useTag('content',
-    [
-        'component'                     : component,
-        'componentName'                 : componentName,
-        'componentId'                   : componentId,
-        'parentComponentId'             : parent,
-        'sectionId'                     : 'main',
-        'contentType'                   : 'sectionWithForm',
-        'cardHeader'                    : false,
-        'cardFooter'                    : true,
-        'cardType'                      : 'primary',
-        'cardIcon'                      : 'exchange-alt',
-        'cardTitle'                     : title,
-        'cardAdditionalClass'           : 'rounded-0',
-        'cardBodyInclude'               : 'importexport/types/import/wizard/request/form',
-        'formButtons'                   :
+{% if step is defined and step === 'upload' %}
+    {{adminltetags.useTag('content',
         [
-            'updateButtonId'                : 0,
-            'addActionUrl'                  : 'system/tools/importexport/add',
-            'addSuccessRedirectUrl'         : 'system/tools/importexport',
-            'updateActionUrl'               : 'system/tools/importexport/update',
-            'updateSuccessRedirectUrl'      : 'system/tools/importexport',
-            'cancelActionUrl'               : 'system/tools/importexport',
-            'closeActionUrl'                : 'system/tools/importexport'
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'section',
+            'cardHeader'                    : false,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'exchange-alt',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'importexport/types/import/wizard/request/form'
         ]
-    ]
-)}}
+    )}}
+{% elseif step is defined and step === 'process' %}
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'section',
+            'cardHeader'                    : false,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'exchange-alt',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'importexport/types/import/wizard/request/form'
+        ]
+    )}}
+{% endif %}

@@ -222,6 +222,7 @@ var BazContentSectionWithWizard = function() {
         $('#' + sectionId + '-next').off();
 
         var nextDisabled = false;
+        var nextHidden = false;
 
         if (wizardOptions.canCancel) {
             $('#' + sectionId + '-cancel').attr('hidden', false);
@@ -232,10 +233,15 @@ var BazContentSectionWithWizard = function() {
         } else {
             nextDisabled = false;
         }
+        if (wizardOptions['steps'][wizardOptions['currentStep']]['nextHidden'] == true) {
+            nextHidden = true;
+        } else {
+            nextHidden = false;
+        }
 
         if (wizardOptions['currentStep'] === 0) {
             $('#' + sectionId + '-previous').attr('hidden', true);
-            $('#' + sectionId + '-next').attr('hidden', false);
+            $('#' + sectionId + '-next').attr('hidden', nextHidden);
             $('#' + sectionId + '-next').attr('disabled', nextDisabled);
             $('#' + sectionId + '-done').attr('hidden', true);
             $('#' + sectionId + '-submit').attr('hidden', true);
@@ -254,7 +260,7 @@ var BazContentSectionWithWizard = function() {
             } else {
                 $('#' + sectionId + '-previous').attr('hidden', true);
             }
-            $('#' + sectionId + '-next').attr('hidden', false);
+            $('#' + sectionId + '-next').attr('hidden', nextHidden);
             $('#' + sectionId + '-next').attr('disabled', nextDisabled);
             $('#' + sectionId + '-done').attr('hidden', true);
             $('#' + sectionId + '-submit').attr('hidden', true);
@@ -350,18 +356,26 @@ var BazContentSectionWithWizard = function() {
         if (wizardOptions['steps'][wizardOptions['currentStep']]['onNext']) {
             var onNext = new Promise(wizardOptions['steps'][wizardOptions['currentStep']]['onNext']);
 
-            onNext.then((success) => {
+            onNext.then(function(success) {
+                $('#' + sectionId + '-next').children('i').attr('hidden', true);
+                $('#' + sectionId + '-next').attr('disabled', false);
+
                 if (!success) {
                     return;
                 }
+
                 hideHeaderFooter();
-                $('#' + sectionId + '-next').children('i').attr('hidden', true);
-                $('#' + sectionId + '-next').attr('disabled', false);
+
+                processGoNext();
             });
         } else {
-            $('#' + sectionId + '-next').children('i').attr('hidden', true);
-            $('#' + sectionId + '-next').attr('disabled', false);
+            processGoNext();
         }
+    }
+
+    function processGoNext() {
+        $('#' + sectionId + '-next').children('i').attr('hidden', true);
+        $('#' + sectionId + '-next').attr('disabled', false);
 
         var nextStep = wizardOptions['currentStep'] + 1;
         $('#' + sectionId + '-' + wizardOptions['currentStep'] + '-step').addClass('visited').removeClass('current');
