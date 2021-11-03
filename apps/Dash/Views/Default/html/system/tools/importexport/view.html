@@ -6,115 +6,30 @@
     {% set title = 'New ' ~ importexport['type'] ~ ' Request' %}
 {% endif %}
 {% if importexport['type'] === 'import' %}
-    {% if importexport['id'] is not defined %}
-        {% set sectionId = 'main' %}
-        {% if components|length === 0 %}
-            {% set wizardSteps =
-                [
-                    '0' :
-                        [
-                            'title'             : 'Error',
-                            'content'           : view.getPartial('importexport/types/import/wizard/info',
-                                                    [
-                                                        'step'          : 'error',
-                                                        'componentId'   : componentId,
-                                                        'sectionId'     : sectionId,
-                                                        'title'         : 'ERROR'
-                                                    ]
-                                                ),
-                            'nextHidden'        : true
-                        ]
-                ]
-            %}
-        {% else %}
-            {% set wizardSteps =
-                [
-                    '0' :
-                        [
-                            'title'             : 'Information',
-                            'content'           : view.getPartial('importexport/types/import/wizard/info')
-                        ],
-                    '1' :
-                        [
-                            'title'             : 'Upload',
-                            'content'           : view.getPartial('importexport/types/import/wizard/request',
-                                                    [
-                                                        'step'          : 'upload',
-                                                        'componentId'   : componentId,
-                                                        'sectionId'     : sectionId,
-                                                        'title'         : title
-                                                    ]
-                                                ),
-                            'description'       : 'Step 1: Select component and upload file.'
-                        ],
-                    '2' :
-                        [
-                            'title'             : 'Process File',
-                            'content'           : view.getPartial('importexport/types/import/wizard/request',
-                                                    [
-                                                        'step'          : 'process',
-                                                        'componentId'   : componentId,
-                                                        'sectionId'     : sectionId,
-                                                        'title'         : title
-                                                    ]
-                                                ),
-                            'description'       : 'Step 2: Process uploaded file.',
-                            'submitOnNext'      : false
-                        ]
-                ]
-            %}
-        {% endif %}
-        {{adminltetags.useTag('content',
+    {{adminltetags.useTag('content',
+        [
+            'component'                     : component,
+            'componentName'                 : componentName,
+            'componentId'                   : componentId,
+            'parentComponentId'             : parent,
+            'sectionId'                     : 'main',
+            'contentType'                   : 'sectionWithForm',
+            'cardHeader'                    : true,
+            'cardFooter'                    : true,
+            'cardType'                      : 'primary',
+            'cardIcon'                      : 'exchange-alt fa-flip-horizontal',
+            'cardTitle'                     : title,
+            'cardAdditionalClass'           : 'rounded-0',
+            'cardBodyInclude'               : 'importexport/types/import/form',
+            'formButtons'                   :
             [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'parentComponentId'             : parent,
-                'sectionId'                     : sectionId,
-                'contentType'                   : 'sectionWithWizard',
-                'cardHeader'                    : true,
-                'cardFooter'                    : true,
-                'cardType'                      : 'primary',
-                'cardIcon'                      : 'magic',
-                'cardTitle'                     : title,
-                'cardAdditionalClass'           : 'rounded-0',
-                'wizardType'                    : 'triangle',
-                'wizardCanCancel'               : true,
-                'wizardCancelUrl'               : 'system/tools/importexport',
-                'wizardDoneUrl'                 : 'system/tools/importexport',
-                'wizardStartAtStep'             : 0,
-                'wizardSteps'                   : wizardSteps
+                'addActionUrl'                  : 'system/tools/importexport/add',
+                'addSuccessRedirectUrl'         : 'system/tools/importexport',
+                'cancelActionUrl'               : 'system/tools/importexport',
+                'closeActionUrl'                : 'system/tools/importexport'
             ]
-        )}}
-    {% else %}
-        {{adminltetags.useTag('content',
-            [
-                'component'                     : component,
-                'componentName'                 : componentName,
-                'componentId'                   : componentId,
-                'parentComponentId'             : parent,
-                'sectionId'                     : 'main',
-                'contentType'                   : 'sectionWithForm',
-                'cardHeader'                    : true,
-                'cardFooter'                    : true,
-                'cardType'                      : 'primary',
-                'cardIcon'                      : 'exchange-alt fa-flip-horizontal',
-                'cardTitle'                     : title,
-                'cardAdditionalClass'           : 'rounded-0',
-                'cardBodyInclude'               : 'importexport/types/import/wizard/register/form',
-                'formButtons'                   :
-                [
-                    'updateButtonId'                : importexportId,
-                    'addActionUrl'                  : 'system/tools/importexport/add',
-                    'addSuccessRedirectUrl'         : 'system/tools/importexport',
-                    'updateActionUrl'               : 'system/tools/importexport/update',
-                    'updateSuccessRedirectUrl'      : 'system/tools/importexport',
-                    'cancelActionUrl'               : 'system/tools/importexport',
-                    'closeActionUrl'                : 'system/tools/importexport'
-                ]
-            ]
-        )}}
-    {% endif %}
+        ]
+    )}}
 {% elseif importexport['type'] === 'export' %}
     {{adminltetags.useTag('content',
         [

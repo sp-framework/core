@@ -186,16 +186,16 @@ abstract class BasePackage extends Controller
 		}
 	}
 
-	public function getAll(bool $resetCache = false, bool $enableCache = true)
+	public function getAll(bool $resetCache = false, bool $enableCache = true, $model = null)
 	{
 		if (!$this->{$this->packageName} || $resetCache) {
-			$this->{$this->packageName} = $this->getByParams(['conditions'=>''], $resetCache, $enableCache);
+			$this->{$this->packageName} = $this->getByParams(['conditions'=>''], $resetCache, $enableCache, $model);
 		}
 
 		return $this;
 	}
 
-	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true)
+	public function getByParams(array $params, bool $resetCache = false, bool $enableCache = true, $model = null)
 	{
 		if (isset($params['conditions'])) {
 			if ($this->config->cache->enabled && !$resetCache && $enableCache && $this->cacheName) {
@@ -232,7 +232,13 @@ abstract class BasePackage extends Controller
 				$this->resetCache();
 			}
 
-			$this->model = $this->modelToUse::find($parameters);
+			if (!$model) {
+				$modelToUse = new $this->modelToUse;
+			} else {
+				$modelToUse = new $model;
+			}
+
+			$this->model = $modelToUse::find($parameters);
 
 			$data = $this->getDbData($parameters, $enableCache, 'params');
 
@@ -1116,6 +1122,31 @@ abstract class BasePackage extends Controller
 			$md['dataTypes'] = $metadata->getDataTypes($model);
 			$md['number'] = $metadata->getDataTypesNumeric($model);
 			$md['columns'] = $metadata->getAttributes($model);
+			$md['required'] = $metadata->getNotNullAttributes($model);
+			$md['columnSize'] = [];
+			$md['columnUnique'] = [];
+
+			$tableDescription = $this->describe($model->getSource());
+
+			if ($tableDescription && count($tableDescription) > 0) {
+				foreach ($tableDescription as $column) {
+					$md['columnSize'][$column->getName()] = $column->getSize();
+				}
+			}
+
+			$tableDescription = $this->describe($model->getSource(), true);
+
+			if ($tableDescription && count($tableDescription) > 0) {
+				foreach ($tableDescription as $index) {
+					if (strtoupper($index->getType()) === 'UNIQUE') {
+						$uniqueColumns = $index->getColumns();
+
+						foreach ($uniqueColumns as $uniqueColumn) {
+							$md['columnUnique'][$uniqueColumn] = $uniqueColumn;
+						}
+					}
+				}
+			}
 
 			return $md;
 		}
@@ -1132,6 +1163,9 @@ abstract class BasePackage extends Controller
 			$relations['dataTypes'] = [];
 			$relations['number'] = [];
 			$relations['columns'] = [];
+			$relations['required'] = [];
+			$relations['columnSize'] = [];
+			$relations['columnUnique'] = [];
 			$relations['modelRelations'] = [];
 
 			if (method_exists($model, 'getModelRelations')) {
@@ -1153,6 +1187,31 @@ abstract class BasePackage extends Controller
 					$dataTypes = $md->getDataTypes($model);
 					$number = $md->getDataTypesNumeric($model);
 					$columns = $md->getAttributes($model);
+					$required = $md->getNotNullAttributes($model);
+					$columnSize = [];
+					$columnUnique = [];
+
+					$tableDescription = $this->describe($model->getSource());
+
+					if ($tableDescription && count($tableDescription) > 0) {
+						foreach ($tableDescription as $column) {
+							$columnSize[$column->getName()] = $column->getSize();
+						}
+					}
+
+					$tableDescription = $this->describe($model->getSource(), true);
+
+					if ($tableDescription && count($tableDescription) > 0) {
+						foreach ($tableDescription as $index) {
+							if (strtoupper($index->getType()) === 'UNIQUE') {
+								$uniqueColumns = $index->getColumns();
+
+								foreach ($uniqueColumns as $uniqueColumn) {
+									$columnUnique[$uniqueColumn] = $uniqueColumn;
+								}
+							}
+						}
+					}
 
 					if (is_array($fields)) {
 						foreach ($fields as $fieldKey => $field) {
@@ -1160,12 +1219,18 @@ abstract class BasePackage extends Controller
 							unset($number[$field]);
 							$key = array_search($field, $columns);
 							unset($columns[$key]);
+							unset($required[$key]);
+							unset($columnSize[$key]);
+							unset($columnUnique[$key]);
 						}
 					} else {
 						unset($dataTypes[$fields]);
 						unset($number[$fields]);
 						$key = array_search($fields, $columns);
 						unset($columns[$key]);
+						unset($required[$key]);
+						unset($columnSize[$key]);
+						unset($columnUnique[$key]);
 					}
 
 					if (is_array($referencedFields)) {
@@ -1174,12 +1239,18 @@ abstract class BasePackage extends Controller
 							unset($number[$referencedField]);
 							$key = array_search($referencedField, $columns);
 							unset($columns[$key]);
+							unset($required[$key]);
+							unset($columnSize[$key]);
+							unset($columnUnique[$key]);
 						}
 					} else {
 						unset($dataTypes[$referencedFields]);
 						unset($number[$referencedFields]);
 						$key = array_search($referencedFields, $columns);
 						unset($columns[$key]);
+						unset($required[$key]);
+						unset($columnSize[$key]);
+						unset($columnUnique[$key]);
 					}
 
 					if (is_array($intermediateFields)) {
@@ -1188,12 +1259,18 @@ abstract class BasePackage extends Controller
 							unset($number[$intermediateField]);
 							$key = array_search($intermediateField, $columns);
 							unset($columns[$key]);
+							unset($required[$key]);
+							unset($columnSize[$key]);
+							unset($columnUnique[$key]);
 						}
 					} else {
 						unset($dataTypes[$intermediateFields]);
 						unset($number[$intermediateFields]);
 						$key = array_search($intermediateFields, $columns);
 						unset($columns[$key]);
+						unset($required[$key]);
+						unset($columnSize[$key]);
+						unset($columnUnique[$key]);
 					}
 
 					$relations['dataTypes'] = array_merge($relations['dataTypes'], $dataTypes);
@@ -1202,6 +1279,12 @@ abstract class BasePackage extends Controller
 					$relations['modelRelations'][$modelRelationKey]['number'] = $number;
 					$relations['columns'] = array_merge($relations['columns'], $columns);
 					$relations['modelRelations'][$modelRelationKey]['columns'] = $columns;
+					$relations['required'] = array_merge($relations['required'], $required);
+					$relations['modelRelations'][$modelRelationKey]['required'] = $required;
+					$relations['columnSize'] = array_merge($relations['columnSize'], $columnSize);
+					$relations['modelRelations'][$modelRelationKey]['columnSize'] = $columnSize;
+					$relations['columnUnique'] = array_merge($relations['columnUnique'], $columnUnique);
+					$relations['modelRelations'][$modelRelationKey]['columnUnique'] = $columnUnique;
 				}
 			}
 
@@ -1245,6 +1328,21 @@ abstract class BasePackage extends Controller
 					if ($rmdKey === 'columns') {
 						if (count($rmd) > 0) {
 							$md['columns'] = array_merge($md['columns'], $rmd);
+						}
+					}
+					if ($rmdKey === 'required') {
+						if (count($rmd) > 0) {
+							$md['required'] = array_merge($md['required'], $rmd);
+						}
+					}
+					if ($rmdKey === 'columnSize') {
+						if (count($rmd) > 0) {
+							$md['columnSize'] = array_merge($md['columnSize'], $rmd);
+						}
+					}
+					if ($rmdKey === 'columnUnique') {
+						if (count($rmd) > 0) {
+							$md['columnUnique'] = array_merge($md['columnUnique'], $rmd);
 						}
 					}
 					if ($rmdKey === 'modelRelations') {

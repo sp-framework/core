@@ -67,6 +67,36 @@ class Tasks
             ];
         array_push($taskArr, $taskEntry);
 
+        //Import/Export (Export)
+        $taskEntry =
+            [
+                'name'              => 'Import/Export (Export)',
+                'description'       => 'Import/Export Tools - Export',
+                'function'          => 'processimportexportqueue',
+                'parameters'        => '{"process":"export"}',
+                'schedule_id'       => 0,
+                'is_on_demand'      => 1,
+                'priority'          => 10,
+                'enabled'           => 0,
+                'type'              => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
+        //Import/Export (Import)
+        $taskEntry =
+            [
+                'name'              => 'Import/Export (Low Priority)',
+                'description'       => 'Import/Export Tools - Import',
+                'function'          => 'processimportexportqueue',
+                'parameters'        => '{"process":"import"}',
+                'schedule_id'       => 0,
+                'is_on_demand'      => 1,
+                'priority'          => 5,
+                'enabled'           => 0,
+                'type'              => 0
+            ];
+        array_push($taskArr, $taskEntry);
+
         return $taskArr;
     }
 }

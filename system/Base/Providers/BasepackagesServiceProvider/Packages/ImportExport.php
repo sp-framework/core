@@ -56,14 +56,24 @@ class ImportExport extends BasePackage
             $email = trim($email);
         }
 
-        $data['fields'] = Json::decode($data['fields'], true);
+        if (isset($data['fields'])) {
+            $data['fields'] = Json::decode($data['fields'], true);
+        }
 
         if (isset($data['fields']['data']) && is_array($data['fields']['data'])) {
             $data['fields'] = $data['fields']['data'];
         }
 
+        if (isset($data['upload']) && $data['upload'] !== '') {
+            $data['file'] = $data['upload'];
+        }
+
         if ($this->add($data)) {
-            $task = $this->basepackages->workers->tasks->findByParameter("export", 'process');
+            if (isset($data['file'])) {
+                $this->basepackages->storages->changeOrphanStatus($data['file'], null, true);
+            }
+
+            $task = $this->basepackages->workers->tasks->findByParameter($data['type'], 'process');
 
             if ($task && $task['force_next_run'] === null) {
                 $this->basepackages->workers->tasks->forceNextRun(['id' => $task['id']]);
@@ -77,59 +87,15 @@ class ImportExport extends BasePackage
 
     public function updateImportexport(array $data)
     {
-        if (!checkCtype($data['name'])) {
-
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage =
-                'Importexport name cannot have special characters';
-
-            return false;
-
-        } else {
-            $brand = $this->getById($data['id']);
-
-            if ($this->update($data)) {
-
-                $this->basepackages->storages->changeOrphanStatus($data['logo'], $brand['logo']);
-
-                $this->packagesData->responseCode = 0;
-
-                $this->packagesData->responseMessage = 'Updated ' . $data['name'] . ' brand';
-            } else {
-                $this->packagesData->responseCode = 1;
-
-                $this->packagesData->responseMessage = 'Error updating brand.';
-            }
-        }
+        //
     }
 
     public function removeImportexport(array $data)
     {
-        $brand = $this->getById($data['id']);
-
-        if ($brand['product_count'] && (int) $brand['product_count'] > 0) {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Importexport is assigned to ' . $brand['product_count'] . ' products. Error removing brand.';
-
-            return false;
-        }
-
-        if ($this->remove($data['id'])) {
-            $this->basepackages->storages->changeOrphanStatus(null, $brand['logo']);
-
-            $this->packagesData->responseCode = 0;
-
-            $this->packagesData->responseMessage = 'Removed brand';
-        } else {
-            $this->packagesData->responseCode = 1;
-
-            $this->packagesData->responseMessage = 'Error removing brand.';
-        }
+        //
     }
 
-    public function getPackageFields($id, $structure = false)
+    public function getPackageFields($id, $structure = false, $getPackageFields = false)
     {
         $component = $this->modules->components->getComponentById($id);
 
@@ -148,20 +114,37 @@ class ImportExport extends BasePackage
                 $packageFields = $packageObj->getModelsColumnMap();
 
                 if ($packageFields && isset($packageFields['columns'])) {
-                    $fields = [];
+                    $columns = [];
+                    $requiredFields = [];
 
                     foreach ($packageFields['columns'] as $column) {
                         if ($structure) {
-                            $fields[$column] = $column;
+                            $columns[$column] = $column;
                         } else {
-                            $fields[$column] = ucfirst(str_replace('_', ' ', $column));
+                            $columns[$column] = ucfirst(str_replace('_', ' ', $column));
                         }
                     }
 
-                    $this->packagesData->fields = $fields;
+                    if (isset($packageFields['required']) && is_array($packageFields['required']) && count($packageFields['required']) > 0) {
+                        foreach ($packageFields['required'] as &$required) {
+                            if ($structure) {
+                                $requiredFields[$required] = $required;
+                            }
+                        }
+                    }
 
-                    return $fields;
+                    if ($structure && $getPackageFields) {
+                        $packageFields['columns'] = $columns;
+                        $packageFields['required'] = $requiredFields;
+
+                        return $packageFields;
+                    } else {
+                        $this->packagesData->fields = $columns;
+
+                        return $columns;
+                    }
                 }
+
 
                 $this->addResponse('Component package fields not found', 1);
 
@@ -254,55 +237,7 @@ class ImportExport extends BasePackage
                     if ($file) {
                         $export['file'] = $file;
 
-                        $this->basepackages->notifications->addNotification(
-                            'Export request ID:' . $export['id'] . ' execution complete.',
-                            null,
-                            $export['app_id'],
-                            $export['account_id'],
-                            0,
-                            'ImportExport',
-                            $export['id'],
-                            0
-                        );
-
-                        $emailToAddressesArr = Json::decode($export['email_to'], true);
-                        $emailToAddresses = [];
-
-                        if (count($emailToAddressesArr) > 0) {
-                            foreach ($emailToAddressesArr as $emailToAddress) {
-                                array_push($emailToAddresses, trim($emailToAddress));
-                            }
-                        } else {
-                            array_push($emailToAddresses, 'no-reply@' . $this->domains->domains[0]['name']);
-                        }
-
-                        $emailData['app_id'] = $export['app_id'];
-                        $emailData['domain_id'] = $export['domain_id'];
-                        $emailData['status'] = 1;
-                        $emailData['priority'] = 1;
-                        $emailData['confidential'] = 0;
-                        $emailData['to_addresses'] = Json::encode($emailToAddresses);
-                        $emailData['subject'] = 'Export request complete.';
-
-                        if ($export['app_id'] != 0) {
-                            $route = $this->apps->getIdApp($export['app_id'])['route'];
-                        } else {
-                            $route = 'admin';
-                        }
-
-                        if ($export['domain_id'] != 0) {
-                            $domain = $this->domains->getIdDomain($export['domain_id'])['name'];
-                        } else {
-                            $domain = $this->domains->domains[0]['name'];
-                        }
-
-                        $url = Str::reduceSlashes('https://' . $domain . '/' . $route . '/' . 'system/tools/importexport/q/id/' . $export['id']);
-
-                        $emailData['body'] =
-                            'Export request ID:' . $export['id'] . ' execution complete. To download file, click ' .
-                            '<a href="' . $url . '">here</a>';
-
-                        $this->basepackages->emailqueue->addToQueue($emailData);
+                        $this->notifyEmail($export);
 
                         $export['status'] = 2;//Complete
 
@@ -432,12 +367,17 @@ class ImportExport extends BasePackage
         }
     }
 
-    public function readFile(array $data)
+    public function readFile(array $data, $viaImport = false)
     {
         if (!isset($data['uuid']) || !isset($data['component_id'])) {
             $this->addResponse('File UUID/Component ID missing', 1, []);
 
             return false;
+        }
+
+        if ($viaImport) {
+            $data['uuid'] = Json::decode($data['uuid']);
+            $data['uuid'] = $data['uuid'][0];
         }
 
         $file = $this->basepackages->storages->getFileInfo($data['uuid']);
@@ -455,23 +395,135 @@ class ImportExport extends BasePackage
                 $headers[$headerValue] = $headerValue;
             }
 
-            if ($headers !== $this->getPackageFields($data['component_id'], true)) {
+            $fields = $this->getPackageFields($data['component_id'], true, true);
+
+            if ($headers !== $fields['columns']) {
                 $this->addResponse('File header does not match component structure, please download structure and upload file again', 1, []);
 
                 return false;
             }
 
-            $records[0][0] = 1;
-            $records[0] = $headers;
+            if (isset($data['readonly']) && $data['readonly'] == true || $viaImport) {
+                if (!$viaImport) {
+                    $records[0] = $headers;
+
+                    $recordNo = 1;
+                } else {
+                    $recordNo = 0;
+                }
+
+                foreach ($csv as $record) {
+                    $records[$recordNo] = $record;
+
+                    $recordNo++;
+                }
+
+                $this->addResponse('Ok', 0, ['rows' => $records]);
+
+                return $records;
+            }
+
+            $uniqueColumnsData = [];
+
+            if (isset($fields['columnUnique']) && count($fields['columnUnique']) > 0) {
+                $component = $this->modules->components->getComponentById($data['component_id']);
+
+                if ($component) {
+                    $component['settings'] = Json::decode($component['settings'], true);
+
+                    $package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+
+                    $packageObj = $this->usePackage($package['class']);
+
+                    if ($packageObj) {
+                        $modelToUse = $packageObj->getModelToUse();
+
+                        $uniqueColumnsDataArr = $this->getByParams(['columns'=>$fields['columnUnique'], 'conditions'=>''], true, false, $modelToUse);
+
+                        foreach ($uniqueColumnsDataArr as $columnsData) {
+                            foreach ($columnsData as $columnKey => $columnValue) {
+                                if (!isset($uniqueColumnsData[$columnKey])) {
+                                    $uniqueColumnsData[$columnKey] = [];
+                                }
+
+                                array_push($uniqueColumnsData[$columnKey], $columnValue);
+                            }
+                        }
+                    }
+                }
+            }
+
+            $records[0]['csvrowno'] = 'CSV ROW #';
+            $records[0]['csvrowstatus'] = 'CSV ROW STATUS';
+            $records[0] = array_merge($records[0], $headers);
 
             $row = 2;
+            $recordNo = 1;
 
-            foreach ($csv as $record) {
-                $record[0] = $row;
+            foreach ($csv as $recordKey => $record) {
+                $records[$recordNo]['csvrowno'] = $row;
+                $records[$recordNo]['csvrowstatus'] = 'OK';
 
-                array_push($records, $record);
+                foreach ($record as $recKey => $rec) {
+                    $recType = isset($fields['dataTypes'][$recKey]) ? true : false;
+                    $recNumber = isset($fields['number'][$recKey]) ? true : false;
+                    $recRequired = isset($fields['required'][$recKey]) ? true : false;
+
+                    //Required
+                    if ($recRequired) {
+                        if ($rec === '') {
+                            if ($recKey === 'id' && $rec === '') {
+                                $records[$recordNo][$recKey] = $rec;
+                                continue;
+                            }
+
+                            $records[$recordNo]['csvrowstatus'] = 'ERROR';
+                            $records[$recordNo][$recKey] = 'ERROR: Field is required.';
+                            continue;
+                        }
+                    }
+
+                    //Duplicates
+                    if (isset($uniqueColumnsData[$recKey])) {
+                        if (in_array($rec, $uniqueColumnsData[$recKey])) {
+                            if (isset($record['id']) && $record['id'] === '') {
+                                $records[$recordNo]['csvrowstatus'] = 'ERROR';
+                                $records[$recordNo][$recKey] = 'ERROR: Duplicate field.';
+                                continue;
+                            }
+                        }
+                    }
+
+                    //Numberic
+                    if ($recNumber) {
+                        if (is_numeric($rec)) {
+                            $records[$recordNo][$recKey] = $rec;
+                            continue;
+                        } else {
+                            $records[$recordNo]['csvrowstatus'] = 'ERROR';
+                            $records[$recordNo][$recKey] = 'ERROR: Field should be a number.';
+                            continue;
+                        }
+                    }
+
+                    //TypeCheck - Check for JSON
+                    if ($recType) {
+                        if ($fields['dataTypes'][$recKey] === 15) {//JSON
+                            try {
+                                Json::decode($rec, true);
+                            } catch (\Exception $e) {
+                                $records[$recordNo]['csvrowstatus'] = 'ERROR';
+                                $records[$recordNo][$recKey] = 'ERROR: Field should be JSON.';
+                                continue;
+                            }
+                        }
+                    }
+
+                    $records[$recordNo][$recKey] = $rec;
+                }
 
                 $row++;
+                $recordNo++;
             }
 
             $this->addResponse('Ok', 0, ['rows' => $records]);
@@ -486,36 +538,157 @@ class ImportExport extends BasePackage
         }
     }
 
-    public function processFile($data)
+    public function processImports($jobId)
     {
-        $rows = $this->readFile($data);
+        $imports = $this->getByParams(
+            [
+                'conditions'    => 'type = :type: AND status = :status:',
+                'bind'          =>
+                    [
+                        'type'  => 'import',
+                        'status'=> '0'
+                    ]
+            ]
+        );
+
+        if ($imports && count($imports) > 0) {
+            foreach ($imports as $importKey => $import) {
+                $import['uuid'] = $import['file'];
+
+                if (!$this->processImport($import, $jobId)) {
+                    $import['status'] = 3;//Error
+                    $import['job_id'] = $jobId;
+
+                    $this->update($import);
+                }
+            }
+        }
+    }
+
+    public function processImport($import, $jobId)
+    {
+        $component = $this->modules->components->getComponentById($import['component_id']);
+
+        if (!$component) {
+            return false;
+        }
+
+        $rows = $this->readFile($import, true);
 
         if (!$rows) {
             return false;
         }
 
-        if (isset($data['row_index'])) {
+        $component['settings'] = Json::decode($component['settings'], true);
 
-            $this->addResponse('Ok', 0, []);
-
-            $this->addResponse('Row has errors', 1, ['errors' => ['Duplicate name', 'Required permissions']]);
-
-            return;
+        if (!isset($component['settings']['importexportPackage'])) {
+            throw new \Exception("Import package missing");
         }
 
-        foreach ($rows as $rowKey => $row) {
-
+        if (!isset($component['settings']['importMethod'])) {
+            throw new \Exception("Component import method missing");
         }
-        var_dump($rows);die();
-        $this->addResponse('Ok', 0, []);
 
-        $this->addResponse('Row has errors', 1, ['errors' => ['Duplicate name', 'Required permissions']]);
-        return;
-        var_dump($rows);die();
+        $package = $this->modules->packages->getNamePackage($component['settings']['importexportPackage']);
+
+        if ($package) {
+            $packageObj = $this->usePackage($package['class']);
+
+            if ($packageObj) {
+                if (method_exists($package['class'], 'add' . $component['settings']['importMethod']) &&
+                    method_exists($package['class'], 'update' . $component['settings']['importMethod'])
+                ) {
+                    foreach ($rows as $rowKey => $row) {
+                        try {
+                            if (isset($row['id']) && $row['id'] !== '' ){
+                                $importMethod = 'update' . ucfirst($component['settings']['importMethod']);
+                            } else {
+                                $importMethod = 'add' . ucfirst($component['settings']['importMethod']);
+                            }
+
+                            $packageObj->$importMethod($row);
+                        } catch (\Exception $e) {
+                            $import['status'] = 3;//Complete
+                            $import['job_id'] = $jobId;
+
+                            $this->update($import);
+
+                            throw $e;
+                        }
+                    }
+
+                    $this->notifyEmail($import);
+
+                    $import['status'] = 2;//Complete
+
+                    $this->update($import);
+
+                    $this->addResponse('Import request ID:' . $import['id'] . ' execution complete.');
+
+                    return true;
+                } else {
+                    throw new \Exception('Package import method ' . $component['settings']['importMethod'] . ' does not exists.');
+                }
+            } else {
+                throw new \Exception('Package ' . $package['class'] . ' does not exists.');
+            }
+        }
     }
 
-    protected function processRow($data, $row)
+    protected function notifyEmail($task)
     {
-        //
+        $this->basepackages->notifications->addNotification(
+            ucfirst($task['type']) . ' request ID:' . $task['id'] . ' execution complete.',
+            null,
+            $task['app_id'],
+            $task['account_id'],
+            0,
+            'ImportExport',
+            $task['id'],
+            0
+        );
+
+        $emailToAddressesArr = Json::decode($task['email_to'], true);
+        $emailToAddresses = [];
+
+        if (count($emailToAddressesArr) > 0) {
+            foreach ($emailToAddressesArr as $emailToAddress) {
+                array_push($emailToAddresses, trim($emailToAddress));
+            }
+        } else {
+            array_push($emailToAddresses, 'no-reply@' . $this->domains->domains[0]['name']);
+        }
+
+        $emailData['app_id'] = $task['app_id'];
+        $emailData['domain_id'] = $task['domain_id'];
+        $emailData['status'] = 1;
+        $emailData['priority'] = 2;
+        $emailData['confidential'] = 0;
+        $emailData['to_addresses'] = Json::encode($emailToAddresses);
+        $emailData['subject'] = ucfirst($task['type']) . ' request complete.';
+
+        if ($task['app_id'] != 0) {
+            $route = $this->apps->getIdApp($task['app_id'])['route'];
+        } else {
+            $route = 'admin';
+        }
+
+        if ($task['domain_id'] != 0) {
+            $domain = $this->domains->getIdDomain($task['domain_id'])['name'];
+        } else {
+            $domain = $this->domains->domains[0]['name'];
+        }
+
+        $url = Str::reduceSlashes('https://' . $domain . '/' . $route . '/' . 'system/tools/importexport/q/id/' . $task['id']);
+
+        if ($task['type'] === 'export') {
+            $emailData['body'] =
+                ucfirst($task['type']) . ' request ID:' . $task['id'] . ' execution complete. To download file, click ' .
+                '<a href="' . $url . '">here</a>';
+        } else if ($task['type'] === 'import') {
+            $emailData['body'] = ucfirst($task['type']) . ' request ID:' . $task['id'] . ' execution complete.';
+        }
+
+        $this->basepackages->emailqueue->addToQueue($emailData);
     }
 }

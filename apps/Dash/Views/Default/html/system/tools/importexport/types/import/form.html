@@ -1,0 +1,509 @@
+{% if importexport['id'] is defined %}
+    {% set fieldHidden = false %}
+    {% set fieldDisabled = false %}
+    {% set importexportId = importexport['id'] %}
+    {% set importexportType = '<span class="badge badge-primary text-uppercase">' ~ importexport['type'] ~ '</span>' %}
+    {% if importexport['status'] == '0' %}
+        {% set status = '<span class="badge badge-secondary text-uppercase">Scheduled</span>' %}
+    {% elseif importexport['status'] == '1' %}
+        {% set status = '<span class="badge badge-info text-uppercase">Running</span>' %}
+    {% elseif importexport['status'] == '2' %}
+        {% set status = '<span class="badge badge-success text-uppercase">Complete</span>' %}
+    {% elseif importexport['status'] == '3' %}
+        {% set status = '<span class="badge badge-danger text-uppercase">Error</span>' %}
+    {% endif %}
+    {% set importexportStatus = status %}
+    {% if importexport['file'] is not defined or importexport['file'] === '' %}
+        {% set importexportFile = '-' %}
+    {% else %}
+        {% if file is defined %}
+            {% set importexportFile =
+                '<a href="' ~ importexport['file'] ~ '" type="button" class="text-white btn btn-primary btn-xs" data-filename="' ~ file['org_file_name'] ~ '" data-uuid="' ~ file['uuid'] ~ '"><i class="fas fa-fw fa-xs fa-download"></i></a>'
+            %}
+        {% else %}
+            {% set importexportFile =
+                '<a href="' ~ importexport['file'] ~ '" type="button" class="text-white btn btn-primary btn-xs"><i class="fas fa-fw fa-xs fa-download"></i></a>'
+            %}
+        {% endif %}
+    {% endif %}
+    {% set importexportComponentId = importexport['component_id'] %}
+    {% set importexportFilterId = importexport['filter_id'] %}
+    {% set importexportFields = importexport['fields'] %}
+    {% set importexportEmailTo = importexport['email_to'] %}
+{% else %}
+    {% set fieldHidden = true %}
+    {% set fieldDisabled = true %}
+    {% set importexportId = '' %}
+    {% set importexportType = importexport['type'] %}
+    {% set importexportStatus = '' %}
+    {% set importexportFile = '-' %}
+    {% set importexportComponentId = '' %}
+    {% set importexportFilterId = '' %}
+    {% set importexportFields = '' %}
+    {% set importexportEmailTo = '' %}
+{% endif %}
+<form data-validateon="section" id="{{componentId}}-{{sectionId}}-form">
+    <fieldset id="{{componentId}}-{{sectionId}}-fieldset">
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'id',
+                        'fieldLabel'                     : 'Import/Export ID',
+                        'fieldType'                      : 'input',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Import/Export ID',
+                        'fieldRequired'                  : true,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHidden'                    : true,
+                        'fieldDisabled'                  : true,
+                        'fieldValue'                     : importexportId
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'type',
+                        'fieldLabel'                     : 'Type',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Type',
+                        'fieldRequired'                  : false,
+                        'fieldHidden'                    : fieldHidden,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : true,
+                        'fieldBazPostOnUpdate'           : true,
+                        'fieldHtmlContent'               : importexportType
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'status',
+                        'fieldLabel'                     : 'Status',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Status',
+                        'fieldRequired'                  : false,
+                        'fieldHidden'                    : fieldHidden,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldHtmlContent'               : importexportStatus
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'file',
+                        'fieldLabel'                     : 'File',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'File to download',
+                        'fieldRequired'                  : false,
+                        'fieldHidden'                    : fieldHidden,
+                        'fieldBazScan'                   : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false,
+                        'fieldHtmlContent'               : importexportFile
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                            : component,
+                        'componentName'                        : componentName,
+                        'componentId'                          : componentId,
+                        'sectionId'                            : sectionId,
+                        'fieldId'                              : 'component_id',
+                        'fieldLabel'                           : 'Component',
+                        'fieldType'                            : 'select2',
+                        'fieldHelp'                            : true,
+                        'fieldHelpTooltipContent'              : "Select component",
+                        'fieldRequired'                        : true,
+                        'fieldBazScan'                         : true,
+                        'fieldBazJstreeSearch'                 : true,
+                        'fieldBazPostOnCreate'                 : true,
+                        'fieldBazPostOnUpdate'                 : true,
+                        'fieldDataSelect2Options'              : components,
+                        'fieldDataSelect2OptionsKey'           : 'id',
+                        'fieldDataSelect2OptionsValue'         : 'name',
+                        'fieldDataSelect2OptionsArray'         : true,
+                        'fieldDataSelect2OptionsSelected'      : importexportComponentId
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                             : component,
+                        'componentName'                         : componentName,
+                        'componentId'                           : componentId,
+                        'sectionId'                             : sectionId,
+                        'fieldId'                               : 'email_to',
+                        'fieldLabel'                            : 'CC Notification Email To',
+                        'fieldType'                             : 'input',
+                        'fieldHelp'                             : true,
+                        'fieldHelpTooltipContent'               : 'CC request ready notification emails to. Email addresses separated by comma.',
+                        'fieldRequired'                         : false,
+                        'fieldBazJstreeSearch'                  : true,
+                        'fieldBazScan'                          : true,
+                        'fieldBazPostOnCreate'                  : true,
+                        'fieldBazPostOnUpdate'                  : true,
+                        'fieldDataInputMinLength'               : 1,
+                        'fieldDataInputMaxLength'               : 2048,
+                        'fieldValue'                            : importexportEmailTo
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row vdivide download-upload" hidden>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'download-link',
+                        'fieldLabel'                     : 'Download Structure File',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHelpTooltipContent'        : 'Download structure file for selected component.',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHtmlContent'               : '<div class="link text-center text-uppercase"></div>',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false
+                    ]
+                )}}
+            </div>
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                     : component,
+                        'componentName'                 : componentName,
+                        'componentId'                   : componentId,
+                        'sectionId'                     : sectionId,
+                        'fieldId'                       : 'upload',
+                        'fieldType'                     : 'files/dropzone',
+                        'fieldLabel'                    : false,
+                        'fieldDropzoneLabel'            : 'Upload File (CSV)',
+                        'fieldRequired'                 : false,
+                        'fieldHelp'                     : true,
+                        'fieldHelpTooltipContent'       : 'Max: 1. Upload a CSV file.',
+                        'fieldBazScan'                  : true,
+                        'fieldBazPostOnCreate'          : true,
+                        'fieldBazPostOnUpdate'          : true,
+                        'attachments'                   : [],
+                        'maxAttachments'                : 1,
+                        'storage'                       : storage,
+                        'upload'                        : true,
+                        'allowedUploads'                : 'files'
+                    ]
+                )}}
+            </div>
+        </div>
+        <div class="row m-2 text-center" id="rows-loader" hidden>
+            <div class="col">
+                <div class="fa-2x">
+                    <i class="fa fa-cog fa-spin"></i> <span id="rows-loader-text"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row m-2 text-center">
+            <div class="col" id="rows-loader-error" hidden>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                {{adminltetags.useTag('fields',
+                    [
+                        'component'                      : component,
+                        'componentName'                  : componentName,
+                        'componentId'                    : componentId,
+                        'sectionId'                      : sectionId,
+                        'fieldId'                        : 'rows',
+                        'fieldLabel'                     : 'Rows',
+                        'fieldType'                      : 'html',
+                        'fieldHelp'                      : true,
+                        'fieldHidden'                    : true,
+                        'fieldHelpTooltipContent'        : 'CSV Rows read from the file uploaded.',
+                        'fieldAdditionalClass'           : 'mb-0',
+                        'fieldHtmlContent'               : '',
+                        'fieldBazScan'                   : true,
+                        'fieldBazJstreeSearch'           : true,
+                        'fieldBazPostOnCreate'           : false,
+                        'fieldBazPostOnUpdate'           : false
+                    ]
+                )}}
+            </div>
+        </div>
+    </fieldset>
+</form>
+<script>
+/* globals PNotify */
+var dataCollectionComponent, dataCollectionSection, dataCollectionSectionForm;
+
+if (!window['dataCollection']['{{componentId}}']) {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'] = { };
+} else {
+    dataCollectionComponent =
+        window['dataCollection']['{{componentId}}'];
+}
+if (!dataCollectionComponent['{{componentId}}-{{sectionId}}']) {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'] = { };
+} else {
+    dataCollectionSection =
+        dataCollectionComponent['{{componentId}}-{{sectionId}}'];
+}
+if (!dataCollectionSection['{{componentId}}-{{sectionId}}-form']) {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'] = { };
+} else {
+    dataCollectionSectionForm =
+        dataCollectionSection['{{componentId}}-{{sectionId}}-form'];
+}
+
+dataCollectionSection =
+    $.extend(dataCollectionSection, {
+        '{{componentId}}-{{sectionId}}-id'                      : { },
+        '{{componentId}}-{{sectionId}}-type'                    : {
+            afterInit: function() {
+                window['dataCollection']['{{componentId}}']['{{componentId}}-{{sectionId}}']['data']['type'] = "{{importexport['type']}}";
+            }
+        },
+        '{{componentId}}-{{sectionId}}-status'                  : { },
+        '{{componentId}}-{{sectionId}}-file'                    : { },
+        '{{componentId}}-{{sectionId}}-component_id'            : {
+            "placeholder" : "SELECT COMPONENT"
+        },
+        '{{componentId}}-{{sectionId}}-download-link'           : {
+            afterInit: function() {
+                $('#{{componentId}}-{{sectionId}}-component_id').on('select2:select', function(e) {
+                    if ($('#{{componentId}}-{{sectionId}}-id').val() !== '') {
+                        return;
+                    }
+
+                    var postData = { };
+                    postData['component_id'] = e.params.data.id;
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    $.post('{{links.url("system/tools/importexport/getStructureFileLink")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseData && response.responseData.link) {
+                            $('.link').html(
+                                '<a href="' + response.responseData.link + '" class="btn btn-app bg-primary p-2"><i class="fas fa-download mb-2"></i> Structures File</a>'
+                            );
+                        }
+
+                        $('.download-upload').attr('hidden', false);
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-rows'                    : {
+            afterInit: function() {
+                $(document).ready(function() {
+                    if ($('#{{componentId}}-{{sectionId}}-id').val() !== '') {
+                        $('#rows-loader').attr('hidden', false);
+                        var filename = $('#{{componentId}}-{{sectionId}}-file a').data('filename');
+                        var uuid = $('#{{componentId}}-{{sectionId}}-file a').data('uuid');
+
+                        $('#rows-loader-text').empty().text('Reading ' + filename + '...');
+                        $('#{{componentId}}-{{sectionId}}-rows').trigger({'type' : 'loadFile', 'uuid' : uuid, 'readOnly': true});
+
+                        return;
+                    }
+
+                    window["dataCollection"]['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-upload']["onSuccess"] = function(file, response) {
+                        if (response.responseCode == 0) {
+                            $('#rows-loader').attr('hidden', false);
+                            $('#rows-loader-text').empty().text('Reading ' + response.storageData.name + '...');
+                            $('#{{componentId}}-{{sectionId}}-rows').trigger({'type' : 'loadFile', 'uuid' : response.storageData.uuid});
+                        }
+                    }
+                    window["dataCollection"]['{{componentId}}']['{{componentId}}-{{sectionId}}']['{{componentId}}-{{sectionId}}-upload']["onSave"] = function(files) {
+                        if (files.length === 0) {
+                            $('#{{componentId}}-{{sectionId}}-rows').parents('.form-group').addClass('d-none');
+
+                            if ($.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-rows-table')) {
+                                $('#{{componentId}}-{{sectionId}}-component_id').attr('disabled', false);
+                                $('#{{componentId}}-{{sectionId}}-rows').empty();
+                            }
+                        }
+                    }
+
+                    dataCollectionSection['{{componentId}}-{{sectionId}}-form']['onSubmit'] = function() {
+                        if (dataCollectionSection['{{componentId}}-{{sectionId}}-upload']['uuidData'].length !== 1) {
+                            PNotify.error({
+                                title   : 'Please upload CSV file!',
+                            });
+
+                            return false;
+                        }
+
+                        if (dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['rows'].length === 1 &&
+                            dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['rows'][0]['csvrowno'] === 'CSV ROW #'
+                        ) {
+                            PNotify.error({
+                                title   : 'CSV File uploaded has no rows!',
+                            });
+
+                            return false;
+                        }
+
+                        var errorInRow = [];
+
+                        $(dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['rows']).each(function(index, row) {
+                            if (row['csvrowstatus'] === 'ERROR') {
+                                errorInRow.push(row['csvrowno']);
+                            }
+                        });
+
+                        if (errorInRow.length > 0) {
+                            var rowText;
+
+                            if (errorInRow.length === 1) {
+                                rowText = 'row #';
+                            } else {
+                                rowText = 'rows #';
+                            }
+
+                            PNotify.error({
+                                title   : 'CSV file ' + rowText + ' ' + errorInRow.join() + ' has errors. Please fix those errors and upload file again.',
+                            });
+
+                            return false;
+                        }
+
+                        return true;
+                    }
+                });
+
+                $('#{{componentId}}-{{sectionId}}-rows').on('loadFile', function(e, data) {
+                    e.preventDefault();
+
+                    var postData = { };
+                    postData['uuid'] = e.uuid;
+                    postData['component_id'] = $('#{{componentId}}-{{sectionId}}-component_id').val();
+                    postData[$('#security-token').attr('name')] = $('#security-token').val();
+
+                    if (e.readOnly) {
+                        postData['readonly'] = true;
+                    }
+
+                    $.post('{{links.url("system/tools/importexport/readFile")}}', postData, function(response) {
+                        if (response.tokenKey && response.token) {
+                            $('#security-token').attr('name', response.tokenKey);
+                            $('#security-token').val(response.token);
+                        }
+
+                        if (response.responseCode == 1) {
+                            PNotify.error({
+                                title   : response.responseMessage
+                            });
+
+                            // $('#rows-loader-error').empty().append('<span class="text-center text-danger">' + response.responseMessage + '</span>');
+                            $('#rows-loader').attr('hidden', true);
+                            // $('#rows-loader-error').attr('hidden', false);
+                            return;
+                        }
+
+                        $('#{{componentId}}-{{sectionId}}-component_id').attr('disabled', true);
+
+                        if (response.responseData.rows) {
+                            dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['rows'] = response.responseData.rows;
+
+                            var table =
+                                '<table id="{{componentId}}-{{sectionId}}-rows-table" class="table compact table-striped dt-responsive dataTable no-footer dtr-inline" style="width:100%">' +
+                                    '<thead>' +
+                                        '<tr>';
+
+                            for (var th in response.responseData.rows[0]) {
+                                table +=
+                                        '<th class="text-uppercase text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.rows[0][th] + '</th>';
+                            }
+
+                            table += '</tr><tbody>';
+
+                            $(response.responseData.rows).each(function(index, row) {
+                                if (index !== 0) {
+                                    table += '<tr data-index="' + index + '" class="process-row-' + index + '">';
+
+                                    for (var td in response.responseData.rows[index]) {
+                                        if (td === 'csvrowstatus' && response.responseData.rows[index][td] === 'OK') {
+                                            table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1 text-success">' + response.responseData.rows[index][td] + '</td>';
+                                        } else if (td === 'csvrowstatus' && response.responseData.rows[index][td] === 'ERROR') {
+                                            table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1 text-danger">' + response.responseData.rows[index][td] + '</td>';
+                                        } else {
+                                            table += '<td class="text-truncate dt-colTextTruncate pb-1 pt-1">' + response.responseData.rows[index][td] + '</td>';
+                                        }
+                                    }
+
+                                    table += '</tr>';
+                                }
+                            });
+
+                            table += '</tbody></table>';
+
+                            $('#{{componentId}}-{{sectionId}}-rows').empty().append(table).ready(function() {
+                                if (!$.fn.DataTable.isDataTable('#{{componentId}}-{{sectionId}}-rows-table')) {
+                                    dataCollectionSection['{{componentId}}-{{sectionId}}-rows']['table'] = $('#{{componentId}}-{{sectionId}}-rows-table').on('init.dt', function() {
+                                        $('#rows-loader').attr('hidden', true);
+                                        $('#{{componentId}}-{{sectionId}}-rows').parents('.form-group').removeClass('d-none');
+                                    }).dataTable({
+                                        "order": [[ 1, "asc" ]]
+                                    });
+                                }
+                            });
+                        }
+                    }, 'json');
+                });
+            }
+        },
+        '{{componentId}}-{{sectionId}}-email_to'                : { },
+        '{{componentId}}-{{sectionId}}-form'                    : {
+            ignore      : ':submit, :reset, :image, :disabled, .ignore, .cr-slider',
+            rules: {
+                '{{componentId}}-{{sectionId}}-component_id'    : 'required'
+            },
+            messages: {
+                '{{componentId}}-{{sectionId}}-component_id'    : 'Please select component'
+            }
+        }
+    });
+</script>

@@ -58,6 +58,21 @@ class ImportexportComponent extends BaseComponent
                     if ($importexport['file'] && $importexport['file'] !== '') {
                         $importexport['file'] = $this->links->url('system/storages/q/uuid/' . $importexport['file']);
                     }
+                } else if ($importexport['type'] === 'import' && isset($importexport['component_id'])) {
+                    $importexport['email_to'] = implode(',', Json::decode($importexport['email_to'], true));
+
+                    if ($importexport['file'] && $importexport['file'] !== '') {
+                        try {
+                            $importexport['file'] = Json::decode($importexport['file'], true);
+                            $importexport['file'] = $importexport['file'][0];
+
+                            $this->view->file = $this->basepackages->storages->getFileInfo($importexport['file']);
+
+                            $importexport['file'] = $this->links->url('system/storages/q/uuid/' . $importexport['file']);
+                        } catch (\Exception $e) {
+                            throw $e;
+                        }
+                    }
                 }
 
                 if (!$importexport) {

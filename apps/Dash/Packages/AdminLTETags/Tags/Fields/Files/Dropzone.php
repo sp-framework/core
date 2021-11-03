@@ -431,7 +431,7 @@ class Dropzone
                                 registerDeleteButtons();
                                 collectData();
 
-                                $("body").trigger(
+                                $("#body").trigger(
                                     {
                                         "type"      : "dropzoneInitDone",
                                         "fieldId"   : "' . $this->params['fieldId'] . '"
@@ -491,6 +491,10 @@ class Dropzone
                                             text: "Extension not allowed! File not added."
                                         });
                                     }
+
+                                    if (fieldId["onAddedFile"]) {
+                                        fieldId["onAddedFile"]();
+                                    }
                                 });
 
                                 fieldId["dropzone"].on("removedfile", function(file) {
@@ -498,10 +502,18 @@ class Dropzone
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-save").attr("hidden", true);
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
                                     }
+
+                                    if (fieldId["onRemovedFile"]) {
+                                        fieldId["onRemovedFile"](file);
+                                    }
                                 });
 
                                 fieldId["dropzone"].on("queuecomplete", function() {
                                     initChocolat();
+
+                                    if (fieldId["onQueueComplete"]) {
+                                        fieldId["onQueueComplete"]();
+                                    }
 
                                     if (deleteUUIDs.length > 0) {
                                         processDeleteUUIDs();
@@ -644,6 +656,10 @@ class Dropzone
                                             filesLimit = filesLimit - 1
                                         }
                                     }
+
+                                    if (fieldId["onSuccess"]) {
+                                        fieldId["onSuccess"](file, response);
+                                    }
                                 });
 
                                 fieldId["dropzone"].on("error", function(file, response) {
@@ -674,6 +690,10 @@ class Dropzone
                                         $("#' . $this->compSecId . '-' . $this->params['fieldId'] . '-dropzone-cancel").attr("hidden", true);
 
                                         return;
+                                    }
+
+                                    if (fieldId["onError"]) {
+                                        fieldId["onError"]();
                                     }
                                 });
                             }
@@ -741,6 +761,10 @@ class Dropzone
                                     );
                                 } else if (deleteUUIDs.length > 0) {
                                     processDeleteUUIDs();
+                                }
+
+                                if (fieldId["onSave"]) {
+                                    fieldId["onSave"](fieldId["dropzone"].files);
                                 }
                             }
 

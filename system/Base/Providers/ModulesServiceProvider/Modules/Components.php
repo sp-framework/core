@@ -151,7 +151,8 @@ class Components extends BasePackage
 
 				if ($package &&
 					$this->usePackage($package['class']) &&
-					method_exists($package['class'], $component['settings']['importMethod'])
+					(method_exists($package['class'], 'add' . $component['settings']['importMethod']) &&
+					 method_exists($package['class'], 'update' . $component['settings']['importMethod']))
 				) {
 					$availableComponent['id'] = $component['id'];
 					$availableComponent['name'] = $component['name'];
