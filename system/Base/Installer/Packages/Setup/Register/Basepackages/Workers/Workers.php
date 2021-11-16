@@ -32,7 +32,7 @@ class Workers
             );
         }
 
-        for ($x = 3; $x <= 10; $x++) {
+        for ($x = 3; $x <= 100; $x++) {
             array_push($workersArr,
                 [
                     'name'          => 'Worker ' . $x,

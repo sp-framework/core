@@ -186,6 +186,8 @@ class Tasks extends BasePackage
 
         $sorted = msort($taskArr, 'priority', SORT_REGULAR, SORT_DESC);
 
+        $sorted = msort($sorted, 'force_next_run', SORT_REGULAR, SORT_DESC);
+
         return $sorted;
     }
 
