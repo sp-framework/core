@@ -165,7 +165,7 @@ class Workers extends BasePackage
             foreach ($this->scheduledJobs as  $scheduledJob) {
                 foreach ($stuckTasks as $stuckTaskKey => $stuckTask) {
                     if ($scheduledJob['task_id'] === $stuckTask['id']) {
-                        $stuckTask['status'] = 3;//Error
+                        $stuckTask['status'] = 1;//Reschedule
                         $stuckTask['result'] = 'Task was stuck and is free now!';
 
                         $this->tasks->update($stuckTask);
