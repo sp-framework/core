@@ -122,6 +122,7 @@ class Workers extends BasePackage
                 $this->tasks->update($task);
             }
         }
+        // var_dump($enabledTasks);
         // var_dump($this->scheduledJobs);
         // die();
         // var_dump($this->worker);
@@ -136,22 +137,50 @@ class Workers extends BasePackage
             foreach ($failedJobs as $failedJobKey => $failedJob) {
                 $id = $failedJob->getJob()->getId();
                 $this->scheduledJobs[$id]['status'] = 4;//Error
-                $this->scheduledJobs[$id]['result'] = $failedJob->getException()->getMessage();
+                $this->scheduledJobs[$id]['response_code'] = 1;
+                $this->scheduledJobs[$id]['response_message'] = $failedJob->getException()->getMessage();
+                $this->scheduledJobs[$id]['response_data'] = Json::encode([]);
 
                 $this->jobs->updateJob($this->scheduledJobs[$id]);
             }
         }
 
-        $executedJobs = $this->scheduler->getExecutedJobs();
+        // $executedJobs = $this->scheduler->getExecutedJobs();
 
-        if (count($executedJobs) > 0) {
-            foreach ($executedJobs as $executedJobKey => $executedJob) {
-                $id = $executedJob->getId();
-                // var_dump($executedJob->getOutput());
-                // $this->scheduledJobs[$id]['status'] = 4;//Error
-                // $this->scheduledJobs[$id]['result'] = $failedJob->getException()->getMessage();
+        // if (count($executedJobs) > 0) {
+        //     foreach ($executedJobs as $executedJobKey => $executedJob) {
+        //         // var_dump($executedJob);die();
+        //         // $id = $executedJob->getJob()->getId();
+        //         // var_dump($executedJob->getOutput());
+        //         // $this->scheduledJobs[$id]['status'] = 4;//Error
+        //         // $this->scheduledJobs[$id]['result'] = $failedJob->getException()->getMessage();
 
-                // $this->jobs->updateJob($this->scheduledJobs[$id]);
+        //         // $this->jobs->updateJob($this->scheduledJobs[$id]);
+        //     }
+        // }
+
+        $stuckTasks = $this->tasks->getRunningTasks();
+
+        if ($stuckTasks && count($stuckTasks) > 0) {
+            foreach ($this->scheduledJobs as  $scheduledJob) {
+                foreach ($stuckTasks as $stuckTaskKey => $stuckTask) {
+                    if ($scheduledJob['task_id'] === $stuckTask['id']) {
+                        $stuckTask['status'] = 3;//Error
+                        $stuckTask['result'] = 'Task was stuck and is free now!';
+
+                        $this->tasks->update($stuckTask);
+
+                        $stuckJob = $this->jobs->getById($scheduledJob['id']);
+
+                        if ($stuckJob && $stuckJob['status'] != 4) {
+                            $stuckJob['status'] = 4;
+                            $stuckJob['response_code'] = 1;
+                            $stuckJob['response_message'] = 'Job was stuck and is free now!';
+
+                            $this->jobs->updateJob($stuckJob);
+                        }
+                    }
+                }
             }
         }
 
