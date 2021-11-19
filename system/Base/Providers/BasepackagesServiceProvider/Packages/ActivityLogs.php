@@ -47,12 +47,14 @@ class ActivityLogs extends BasePackage
             $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
         }
 
-        $account = $this->auth->account();
+        if ($this->auth) {
+            $account = $this->auth->account();
 
-        if ($account) {
-            $log['account_id'] = $account['id'];//User
-        } else {
-            $log['account_id'] = 0;//System
+            if ($account) {
+                $log['account_id'] = $account['id'];//User
+            } else {
+                $log['account_id'] = 0;//System
+            }
         }
 
         $log['package_name'] = $packageName;

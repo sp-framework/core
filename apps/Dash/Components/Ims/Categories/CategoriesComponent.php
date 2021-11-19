@@ -29,7 +29,7 @@ class CategoriesComponent extends BaseComponent
 
         $localChannels = [];
 
-        if (count($channels) > 0) {
+        if ($channels && count($channels) > 0) {
             foreach ($channels as $channelKey => $channel) {
                 if ($channel['channel_type'] === 'eshop' ||
                     $channel['channel_type'] === 'pos'

@@ -507,5 +507,7 @@ class Api extends BasePackage
 
             return $methodEntry['called_at'];
         }
+
+        return false;
     }
 }

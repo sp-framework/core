@@ -25,6 +25,10 @@ class TaxesComponent extends BaseComponent
     {
         $taxgroupsArr = $this->usePackage(TaxGroups::class)->getAll()->taxgroups;
 
+        if (!$taxgroupsArr) {
+            $taxgroupsArr = [];
+        }
+
         if (isset($this->getData()['id'])) {
             if ($this->getData()['id'] != 0) {
                 $tax = $this->taxesPackage->getById($this->getData()['id']);

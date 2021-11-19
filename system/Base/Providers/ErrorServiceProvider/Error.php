@@ -65,6 +65,17 @@ class Error
 
 			$this->logMessage();
 		}
+
+		if ($this->config->logs->exceptions) {
+			$this->logger->logExceptions->debug($exception);
+
+			if (!$this->appDebug) {
+				echo 'Exception: Please check exceptions log for more details.';
+
+				return;
+			}
+		}
+
 		if ($this->class === 'DomainNotRegisteredException') {
 			$this->showOnScreen();
 			return;

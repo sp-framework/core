@@ -83,7 +83,7 @@ dataCollectionSection =
 
                     var label = $(e.params.data.element).parents('optgroup').attr('label');
 
-                    var url = window['dataCollection']['env']['rootPath'] + window['dataCollection']['env']['currentRoute'] + '/q/module/true/type/' + label + '/id/' + id;
+                    var url = window['dataCollection']['env']['currentRoute'] + '/q/module/true/type/' + label + '/id/' + id;
                     $('#{{componentId}}-{{sectionId}}-modules-link').attr('href', url);
 
                     BazContentLoader.loadAjax($('#{{componentId}}-{{sectionId}}-modules-link'), {

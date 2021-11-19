@@ -16,7 +16,7 @@ class Entities extends BasePackage
 
     public $entities;
 
-    public function getAll(bool $resetCache = false, bool $enableCache = true)
+    public function getAll(bool $resetCache = false, bool $enableCache = true, $model = null)
     {
         parent::getAll();
 

@@ -13,8 +13,7 @@ class Role
             [
                 'name'              => 'System Administrators',
                 'description'       => 'System Administrators Role',
-                'permissions'       => Json::encode([]),
-                'accounts'          => Json::encode([1])
+                'permissions'       => Json::encode([])
             ]
         );
 
