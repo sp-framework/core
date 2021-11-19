@@ -180,6 +180,8 @@ trait DynamicTable {
                 }
 
                 $this->addResponse('Exception: Please check exceptions log for more details.', 1);
+
+                return;
             }
 
             if ($dtAdditionControlButtons && is_callable($dtAdditionControlButtons)) {

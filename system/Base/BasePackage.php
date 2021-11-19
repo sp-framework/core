@@ -38,6 +38,8 @@ abstract class BasePackage extends Controller
 
 	protected $transaction = null;
 
+	private $filterConditions = null;
+
 	public function onConstruct()
 	{
 		$this->packagesData = new PackagesData;
@@ -283,7 +285,7 @@ abstract class BasePackage extends Controller
 		return $data;
 	}
 
-	public function getPaged(array $params = [], bool $resetCache = false, bool $enableCache = true)
+	public function getPaged(array $params = [], bool $resetCache = false, bool $enableCache = true, $arrayData = false)
 	{
 		//Empty columns causes SQL error :APL0:
 		if (isset($params['columns']) && count($params['columns']) === 0) {
@@ -346,8 +348,14 @@ abstract class BasePackage extends Controller
 				]
 			);
 
-		if (isset($pageParams['conditions']) && $pageParams['conditions'] !== '') {
+		if (!$arrayData &&
+			isset($pageParams['conditions']) && $pageParams['conditions'] !== ''
+		) {
 			$data = $this->getDataWithConditions($params, $pageParams['conditions'], $resetCache, $enableCache);
+		} else {
+			if (is_array($arrayData)) {
+				$data = $arrayData;
+			}
 		}
 
 		if (!isset($data)) {
@@ -374,10 +382,14 @@ abstract class BasePackage extends Controller
 
 			$paged = $paginator->paginate();
 
-			$paginationCounters['total_items'] = $this->modelToUse::count();
+			if (is_array($arrayData)) {
+				$paginationCounters['total_items'] = count($arrayData);
+			} else {
+				$paginationCounters['total_items'] = $this->modelToUse::count();
+			}
 
-			if (isset($filterConditions)) {
-				$paginationCounters['filtered_items'] = $this->modelToUse::count($filterConditions);
+			if ($this->filterConditions) {
+				$paginationCounters['filtered_items'] = $this->modelToUse::count($this->filterConditions);
 			} else {
 				$paginationCounters['filtered_items'] = $paginationCounters['total_items'];
 			}
@@ -584,13 +596,13 @@ abstract class BasePackage extends Controller
 						}
 					}
 
-					$filterConditions =
+					$this->filterConditions =
 						[
 							'conditions'	=> $query['condition'],
 							'bind'			=> $query['bind']
 						];
 
-					$params = array_merge($params, $filterConditions);
+					$params = array_merge($params, $this->filterConditions);
 
 					$params['columns'] = $md['columns'];
 
@@ -671,13 +683,13 @@ abstract class BasePackage extends Controller
 						}
 					}
 
-					$filterConditions =
+					$this->filterConditions =
 						[
 							'conditions'	=> $query['condition'],
 							'bind'			=> $query['bind']
 						];
 
-					$params = array_merge($params, $filterConditions);
+					$params = array_merge($params, $this->filterConditions);
 
 					$params['columns'] = $md['columns'];
 
