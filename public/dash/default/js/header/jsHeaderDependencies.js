@@ -137,11 +137,17 @@ var BazContentLoader = function() {
         // Delete old Content Objects
         for (var object in dataCollection) {
             if (object !== 'env') {
+                for (var objects in dataCollection[object]) {
+                    if (dataCollection[object][objects]['datatable']) {
+                        dataCollection[object][objects]['datatable'].destroy();
+                    }
+                }
+
                 delete dataCollection[object];
             }
         }
-        if (element) {
 
+        if (element) {
             // Check if the element is inside modal
             if (element.parents().is('.modal')) {
                 var elementModalId = element.parents('.modal')[0].id;

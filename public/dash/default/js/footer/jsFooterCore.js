@@ -5266,7 +5266,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
         var dataCollection,
             componentId,
             sectionId,
-            pnotifySound,
+            // pnotifySound,
             classes,
             that,
             thisOptions,
@@ -5294,7 +5294,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
                 query = '';
 
                 dataCollection = window['dataCollection'];
-                pnotifySound = dataCollection.env.sounds.pnotifySound
+                // pnotifySound = dataCollection.env.sounds.pnotifySound
                 swalSound = dataCollection.env.sounds.swalSound
 
                 if (!dataCollection[componentId]) {
@@ -6515,6 +6515,14 @@ Object.defineProperty(exports, '__esModule', { value: true });
                     thisOptions['datatable'] = $('#' + thisOptions.listOptions.tableName).DataTable(datatableOptions);
 
                     if (thisOptions.customFunctions.afterTableInit) {
+                        if (datatableOptions.headerClass) {
+                            var thead = $('#' + thisOptions.listOptions.tableName).children('thead').children('tr');
+
+                            if (thead) {
+                                thead.addClass(datatableOptions.headerClass).css({'position':'relative','z-index':9999});
+                            }
+                        }
+
                         thisOptions.customFunctions.afterTableInit();
                     }
 
@@ -6612,205 +6620,205 @@ Object.defineProperty(exports, '__esModule', { value: true });
             //Register __control(Action buttons)
             _proto._registerEvents = function() {
                 // customSwitch Toggle Function
-                $('#' + sectionId + '-table .custom-switch input').each(function(index,rowSwitchInput) {
-                    $(rowSwitchInput).click(function() {
-                        var rowSwitchInputId = $(rowSwitchInput)[0].id;
-                        var url = dataCollection.env.rootPath + 'index.php?route=' + $(rowSwitchInput).data('switchactionurl');
-                        var columnId = $(rowSwitchInput).data('columnid');
-                        var checked = $(rowSwitchInput).is('[checked]');
-                        var columnsDataToInclude = $(rowSwitchInput).data('switchactionincludecolumnsdata').split(',');
-                        var rowData;
-                        rowData = thisOptions['datatable'].row($(this).parents('tr')).data();
-                        if (checked) {
-                            rowData[columnId] = 0;
-                            $(rowSwitchInput).attr('checked', false);
-                            document.getElementById(rowSwitchInputId).checked = false;
-                        } else {
-                            rowData[columnId] = 1;
-                            $(rowSwitchInput).attr('checked', true);
-                            document.getElementById(rowSwitchInputId).checked = true;
-                        }
-                        var name = $(rowSwitchInput).parents('td').siblings('.data-' + $(rowSwitchInput).data('notificationtextfromcolumn')).html();
-                        var switchOnText = name + ' enabled';
-                        var switchOffText = name + ' disabled';
-                        if (checked) {
-                            Swal.fire({
-                                title                       : '<span class="text-danger"> Disable ' + name + '?</span>',
-                                icon                        : 'question',
-                                background                  : 'rgba(0,0,0,.8)',
-                                backdrop                    : 'rgba(0,0,0,.6)',
-                                customClass                 : {
-                                    'confirmButton'             : 'btn btn-danger text-uppercase',
-                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                                },
-                                buttonsStyling              : false,
-                                confirmButtonText           : 'Disable',
-                                showCancelButton            : true,
-                                keydownListenerCapture      : true,
-                                allowOutsideClick           : false,
-                                allowEscapeKey              : false,
-                                onOpen                      : function() {
-                                    swalSound.play();
-                                }
-                            }).then((result) => {
-                                if (result.value) {
-                                    runAjax(false, switchOffText);
-                                } else {
-                                    $(rowSwitchInput).attr('checked', true);
-                                    document.getElementById(rowSwitchInputId).checked = true;
-                                }
-                            });
-                        } else {
-                            runAjax(true, switchOnText);
-                        }
-                        function runAjax(status, notificationText) {
-                            var dataToSubmit = { };
-                            for (var data in rowData) {
-                                if (columnsDataToInclude.includes(data)) {
-                                    dataToSubmit[data] = rowData[data];
-                                }
-                            }
-                            $.ajax({
-                                url         : url,
-                                method      : 'post',
-                                data        : dataToSubmit,
-                                dataType    : 'json',
-                                success     : function(response) {
-                                    if (response.responseCode === 0) {
-                                        PNotify.success({
-                                            title           : notificationText,
-                                            cornerClass     : 'ui-pnotify-sharp'
-                                        });
-                                        $(rowSwitchInput).attr('checked', status);
-                                        document.getElementById(rowSwitchInputId).checked = true;
-                                    } else {
-                                        PNotify.error({
-                                            title           : 'Error!',
-                                            cornerClass     : 'ui-pnotify-sharp'
-                                        });
-                                        $(rowSwitchInput).attr('checked', false);
-                                        document.getElementById(rowSwitchInputId).checked = false;
-                                    }
-                                    pnotifySound.play();
-                                    if (response.tokenKey && response.token) {
-                                        $('#security-token').attr('name', response.tokenKey);
-                                        $('#security-token').val(response.token);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                });
+                // $('#' + sectionId + '-table .custom-switch input').each(function(index,rowSwitchInput) {
+                //     $(rowSwitchInput).click(function() {
+                //         var rowSwitchInputId = $(rowSwitchInput)[0].id;
+                //         var url = dataCollection.env.rootPath + 'index.php?route=' + $(rowSwitchInput).data('switchactionurl');
+                //         var columnId = $(rowSwitchInput).data('columnid');
+                //         var checked = $(rowSwitchInput).is('[checked]');
+                //         var columnsDataToInclude = $(rowSwitchInput).data('switchactionincludecolumnsdata').split(',');
+                //         var rowData;
+                //         rowData = thisOptions['datatable'].row($(this).parents('tr')).data();
+                //         if (checked) {
+                //             rowData[columnId] = 0;
+                //             $(rowSwitchInput).attr('checked', false);
+                //             document.getElementById(rowSwitchInputId).checked = false;
+                //         } else {
+                //             rowData[columnId] = 1;
+                //             $(rowSwitchInput).attr('checked', true);
+                //             document.getElementById(rowSwitchInputId).checked = true;
+                //         }
+                //         var name = $(rowSwitchInput).parents('td').siblings('.data-' + $(rowSwitchInput).data('notificationtextfromcolumn')).html();
+                //         var switchOnText = name + ' enabled';
+                //         var switchOffText = name + ' disabled';
+                //         if (checked) {
+                //             Swal.fire({
+                //                 title                       : '<span class="text-danger"> Disable ' + name + '?</span>',
+                //                 icon                        : 'question',
+                //                 background                  : 'rgba(0,0,0,.8)',
+                //                 backdrop                    : 'rgba(0,0,0,.6)',
+                //                 customClass                 : {
+                //                     'confirmButton'             : 'btn btn-danger text-uppercase',
+                //                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                //                 },
+                //                 buttonsStyling              : false,
+                //                 confirmButtonText           : 'Disable',
+                //                 showCancelButton            : true,
+                //                 keydownListenerCapture      : true,
+                //                 allowOutsideClick           : false,
+                //                 allowEscapeKey              : false,
+                //                 onOpen                      : function() {
+                //                     swalSound.play();
+                //                 }
+                //             }).then((result) => {
+                //                 if (result.value) {
+                //                     runAjax(false, switchOffText);
+                //                 } else {
+                //                     $(rowSwitchInput).attr('checked', true);
+                //                     document.getElementById(rowSwitchInputId).checked = true;
+                //                 }
+                //             });
+                //         } else {
+                //             runAjax(true, switchOnText);
+                //         }
+                //         function runAjax(status, notificationText) {
+                //             var dataToSubmit = { };
+                //             for (var data in rowData) {
+                //                 if (columnsDataToInclude.includes(data)) {
+                //                     dataToSubmit[data] = rowData[data];
+                //                 }
+                //             }
+                //             $.ajax({
+                //                 url         : url,
+                //                 method      : 'post',
+                //                 data        : dataToSubmit,
+                //                 dataType    : 'json',
+                //                 success     : function(response) {
+                //                     if (response.responseCode === 0) {
+                //                         PNotify.success({
+                //                             title           : notificationText,
+                //                             cornerClass     : 'ui-pnotify-sharp'
+                //                         });
+                //                         $(rowSwitchInput).attr('checked', status);
+                //                         document.getElementById(rowSwitchInputId).checked = true;
+                //                     } else {
+                //                         PNotify.error({
+                //                             title           : 'Error!',
+                //                             cornerClass     : 'ui-pnotify-sharp'
+                //                         });
+                //                         $(rowSwitchInput).attr('checked', false);
+                //                         document.getElementById(rowSwitchInputId).checked = false;
+                //                     }
+                //                     pnotifySound.play();
+                //                     if (response.tokenKey && response.token) {
+                //                         $('#security-token').attr('name', response.tokenKey);
+                //                         $('#security-token').val(response.token);
+                //                     }
+                //                 }
+                //             });
+                //         }
+                //     });
+                // });
 
                 // RadioButtons
-                $('#' + sectionId + '-table .btn-group-toggle label').each(function(index,radioButtonsLabel) {
-                    $(radioButtonsLabel).click(function() {
-                        var currentCheckedId, currentCheckedLabel;
-                        $(this).siblings('label').children('input').each(function(index,sibling) {
-                            if (sibling.checked) {
-                                currentCheckedId = sibling.id;
-                                currentCheckedLabel = sibling.parentElement;
-                            } else if (sibling.defaultChecked) {
-                                currentCheckedId = sibling.id;
-                                currentCheckedLabel = sibling.parentElement;
-                            }
-                        });
-                        var thisId = $(this).children('input')[0].id;
-                        var url = dataCollection.env.rootPath + 'index.php?route=' + $(this).children('input').data('radiobuttonsactionurl');
-                        var columnId = $(this).children('input').data('columnid');
-                        var dataValue = $(this).children('input').data('value');
-                        var checked = false;
-                        if ($(this).children('input').is('[checked]') || $(this).children('input')[0].defaultChecked) {
-                            checked = true;
-                        }
-                        var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                                                $(this).children('input').data('columnid') + ' changed';
-                        if (!checked) {
-                            Swal.fire({
-                                title                       : '<span class="text-danger"> Change ' +
-                                                                $(this).parents('td').siblings('.data-' +
-                                                                $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
-                                                                $(this).children('input').data('columnid') +
-                                                                '?</span>',
-                                icon                        : 'question',
-                                background                  : 'rgba(0,0,0,.8)',
-                                backdrop                    : 'rgba(0,0,0,.6)',
-                                buttonsStyling              : false,
-                                confirmButtonText           : 'Change',
-                                customClass                 : {
-                                    'confirmButton'             : 'btn btn-danger text-uppercase',
-                                    'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
-                                },
-                                showCancelButton            : true,
-                                keydownListenerCapture      : true,
-                                allowOutsideClick           : false,
-                                allowEscapeKey              : false,
-                                onOpen                      : function() {
-                                    swalSound.play();
-                                }
-                            }).then((result) => {
-                                if (result.value) {
-                                    runAjax(false, radioChangeText);
-                                } else {
-                                    $(this).removeClass('focus active');
-                                    $('#' + currentCheckedId).attr('checked', true);
-                                    document.getElementById(currentCheckedId).checked = true;
-                                    $(currentCheckedLabel).addClass('focus active');
-                                }
-                            });
-                        }
+                // $('#' + sectionId + '-table .btn-group-toggle label').each(function(index,radioButtonsLabel) {
+                //     $(radioButtonsLabel).click(function() {
+                //         var currentCheckedId, currentCheckedLabel;
+                //         $(this).siblings('label').children('input').each(function(index,sibling) {
+                //             if (sibling.checked) {
+                //                 currentCheckedId = sibling.id;
+                //                 currentCheckedLabel = sibling.parentElement;
+                //             } else if (sibling.defaultChecked) {
+                //                 currentCheckedId = sibling.id;
+                //                 currentCheckedLabel = sibling.parentElement;
+                //             }
+                //         });
+                //         var thisId = $(this).children('input')[0].id;
+                //         var url = dataCollection.env.rootPath + 'index.php?route=' + $(this).children('input').data('radiobuttonsactionurl');
+                //         var columnId = $(this).children('input').data('columnid');
+                //         var dataValue = $(this).children('input').data('value');
+                //         var checked = false;
+                //         if ($(this).children('input').is('[checked]') || $(this).children('input')[0].defaultChecked) {
+                //             checked = true;
+                //         }
+                //         var radioChangeText = $(this).parents('td').siblings('.data-' + $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
+                //                                 $(this).children('input').data('columnid') + ' changed';
+                //         if (!checked) {
+                //             Swal.fire({
+                //                 title                       : '<span class="text-danger"> Change ' +
+                //                                                 $(this).parents('td').siblings('.data-' +
+                //                                                 $(this).children('input').data('notificationtextfromcolumn')).html() + ' ' +
+                //                                                 $(this).children('input').data('columnid') +
+                //                                                 '?</span>',
+                //                 icon                        : 'question',
+                //                 background                  : 'rgba(0,0,0,.8)',
+                //                 backdrop                    : 'rgba(0,0,0,.6)',
+                //                 buttonsStyling              : false,
+                //                 confirmButtonText           : 'Change',
+                //                 customClass                 : {
+                //                     'confirmButton'             : 'btn btn-danger text-uppercase',
+                //                     'cancelButton'              : 'ml-2 btn btn-secondary text-uppercase',
+                //                 },
+                //                 showCancelButton            : true,
+                //                 keydownListenerCapture      : true,
+                //                 allowOutsideClick           : false,
+                //                 allowEscapeKey              : false,
+                //                 onOpen                      : function() {
+                //                     swalSound.play();
+                //                 }
+                //             }).then((result) => {
+                //                 if (result.value) {
+                //                     runAjax(false, radioChangeText);
+                //                 } else {
+                //                     $(this).removeClass('focus active');
+                //                     $('#' + currentCheckedId).attr('checked', true);
+                //                     document.getElementById(currentCheckedId).checked = true;
+                //                     $(currentCheckedLabel).addClass('focus active');
+                //                 }
+                //             });
+                //         }
 
-                        function runAjax(status, notificationText) {
-                            var columnsDataToInclude = $('#' + thisId).data('radiobuttonsactionincludecolumnsdata').split(',');
-                            var rowData = thisOptions['datatable'].row($('#' + thisId).parents('tr')).data();
-                            var dataToSubmit = { };
-                            for (var data in rowData) {
-                                if (columnsDataToInclude.includes(data)) {
-                                    if (columnId === data) {
-                                        dataToSubmit[data] = dataValue;
-                                    } else {
-                                        dataToSubmit[data] = rowData[data];
-                                    }
-                                }
-                            }
-                            $.ajax({
-                                url         : url,
-                                method      : 'post',
-                                data        : dataToSubmit,
-                                dataType    : 'json',
-                                success     : function(response) {
-                                    if (response.responseCode === 1) {
-                                        PNotify.removeAll()
-                                        PNotify.success({
-                                            title           : notificationText,
-                                            cornerClass     : 'ui-pnotify-sharp'
-                                        });
-                                        $('#' + currentCheckedId).attr('checked', false);
-                                        document.getElementById(currentCheckedId).checked = false;
-                                        $('#' + thisId).attr('checked', true);
-                                        document.getElementById(thisId).checked = true;
-                                    } else {
-                                        PNotify.error({
-                                            title           : 'Error!',
-                                            cornerClass     : 'ui-pnotify-sharp'
-                                        });
-                                        $('#' + thisId).parent('label').removeClass('focus active');
-                                        $('#' + thisId).attr('checked', false);
-                                        document.getElementById(thisId).checked = false;
-                                        $('#' + currentCheckedId).attr('checked', true);
-                                        document.getElementById(currentCheckedId).checked = true;
-                                        $(currentCheckedLabel).addClass('focus active');
-                                    }
-                                    pnotifySound.play();
-                                    if (response.tokenKey && response.token) {
-                                        $('#security-token').attr('name', response.tokenKey);
-                                        $('#security-token').val(response.token);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                });
+                //         function runAjax(status, notificationText) {
+                //             var columnsDataToInclude = $('#' + thisId).data('radiobuttonsactionincludecolumnsdata').split(',');
+                //             var rowData = thisOptions['datatable'].row($('#' + thisId).parents('tr')).data();
+                //             var dataToSubmit = { };
+                //             for (var data in rowData) {
+                //                 if (columnsDataToInclude.includes(data)) {
+                //                     if (columnId === data) {
+                //                         dataToSubmit[data] = dataValue;
+                //                     } else {
+                //                         dataToSubmit[data] = rowData[data];
+                //                     }
+                //                 }
+                //             }
+                //             $.ajax({
+                //                 url         : url,
+                //                 method      : 'post',
+                //                 data        : dataToSubmit,
+                //                 dataType    : 'json',
+                //                 success     : function(response) {
+                //                     if (response.responseCode === 1) {
+                //                         PNotify.removeAll()
+                //                         PNotify.success({
+                //                             title           : notificationText,
+                //                             cornerClass     : 'ui-pnotify-sharp'
+                //                         });
+                //                         $('#' + currentCheckedId).attr('checked', false);
+                //                         document.getElementById(currentCheckedId).checked = false;
+                //                         $('#' + thisId).attr('checked', true);
+                //                         document.getElementById(thisId).checked = true;
+                //                     } else {
+                //                         PNotify.error({
+                //                             title           : 'Error!',
+                //                             cornerClass     : 'ui-pnotify-sharp'
+                //                         });
+                //                         $('#' + thisId).parent('label').removeClass('focus active');
+                //                         $('#' + thisId).attr('checked', false);
+                //                         document.getElementById(thisId).checked = false;
+                //                         $('#' + currentCheckedId).attr('checked', true);
+                //                         document.getElementById(currentCheckedId).checked = true;
+                //                         $(currentCheckedLabel).addClass('focus active');
+                //                     }
+                //                     pnotifySound.play();
+                //                     if (response.tokenKey && response.token) {
+                //                         $('#security-token').attr('name', response.tokenKey);
+                //                         $('#security-token').val(response.token);
+                //                     }
+                //                 }
+                //             });
+                //         }
+                //     });
+                // });
 
                 // Deleting Row (element .rowRemove)
                 $('#' + sectionId + '-table .rowRemove').each(function(index,rowRemove) {

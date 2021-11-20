@@ -127,7 +127,7 @@ class DynamicTable
                             </div>
                         </div>
                     </div>
-                    <table id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-table" class="table ' . $this->dtParams['dtStriped'] . ' ' . $this->dtParams['dtBordered'] . $compact . $responsive . '" width="100%" cellspacing="0">
+                    <table id="' . $this->params['componentId'] . '-' . $this->params['sectionId'] . '-table" class="table ' . $this->dtParams['dtStriped'] . ' ' . $this->dtParams['dtBordered'] . $compact . $responsive . '" style="z-index:9999;" width="100%" cellspacing="0">
                         <tbody></tbody>
                     </table>
                 </div>
@@ -206,10 +206,15 @@ class DynamicTable
             $this->params["dtStateSave"] :
             false;
 
-        $this->dtParams["dtFixedHeader"] = false;
-            // isset($this->params["dtFixedHeader"]) ?
-            // $this->params["dtFixedHeader"] :
-            // false;
+        $this->dtParams["dtHeaderClass"] =
+            isset($this->params["dtHeaderClass"]) ?
+            $this->params["dtHeaderClass"] :
+            'bg-primary';
+
+        $this->dtParams["dtFixedHeader"] =
+            isset($this->params["dtFixedHeader"]) ?
+            $this->params["dtFixedHeader"] :
+            false;
 
         $this->dtParams["dtSearching"] =
             isset($this->params["dtSearching"]) ?
@@ -294,6 +299,7 @@ class DynamicTable
                                         "colReorder"                        : "' . $this->dtParams["dtColReorder"] . '",
                                         "order"                             : JSON.parse("' . $this->dtParams["dtOrder"] . '"),
                                         "stateSave"                         : "' . $this->dtParams["dtStateSave"] . '",
+                                        "headerClass"                       : "' . $this->dtParams["dtHeaderClass"] . '",
                                         "fixedHeader"                       : "' . $this->dtParams["dtFixedHeader"] . '",
                                         "searching"                         : "' . $this->dtParams["dtSearching"] . '",
                                         "responsive"                        : "' . $this->dtParams["dtResponsive"] . '",
