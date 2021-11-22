@@ -4,6 +4,7 @@ namespace Apps\Dash\Packages\AdminLTETags\Tags;
 
 use Apps\Dash\Packages\AdminLTETags\AdminLTETags;
 use Phalcon\Helper\Arr;
+use Phalcon\Helper\Json;
 
 class Notes extends AdminLTETags
 {
@@ -58,8 +59,9 @@ class Notes extends AdminLTETags
 
         $this->useStorage($this->notesSettings['useStorage']);
 
-        $this->content .=
-            '<div class="row vdivide">
+        if (!isset($this->params['onlyHistory'])) {
+            $this->content .=
+            '<div id="notes-form" class="row vdivide" hidden>
                 <div class="col">' .
                     '<div class="row">
                         <div class="col">' .
@@ -194,43 +196,111 @@ class Notes extends AdminLTETags
                         </div>';
                     }
 
-            if (count($this->params['notes']) > 0) {
-                $this->generateNotesContent();
-            }
+                    $this->content .=
+                        '<div class="row">
+                            <div class="col">' .
+                                $this->useTag('buttons',
+                                    [
+                                        'component'                     => $this->params['component'],
+                                        'componentName'                 => $this->params['componentName'],
+                                        'componentId'                   => $this->params['componentId'],
+                                        'sectionId'                     => $this->params['sectionId'],
+                                        'buttonType'                    => 'button',
+                                        'buttons'                       =>
+                                            [
+                                                'show-hide'             => [
+                                                    'title'             => 'Form',
+                                                    'size'              => 'xs',
+                                                    'type'              => 'info',
+                                                    'icon'              => 'eye'
+                                                ]
+                                            ]
+                                    ]
+                                ) .
+                            '</div>
+                        </div><hr>';
+        }
 
-            $this->content .= $this->inclNotesJs();
+        if (count($this->params['notes']) > 0) {
+            $this->generateNotesContent();
+        }
+
+        $this->content .= $this->inclNotesJs();
     }
 
     protected function generateNotesContent()
     {
         $this->content .=
-            '<hr>
-            <div class="row">
-                <div class="col">' .
-                    $this->useTag('fields',
-                        [
-                            'component'                             => $this->params['component'],
-                            'componentName'                         => $this->params['componentName'],
-                            'componentId'                           => $this->params['componentId'],
-                            'sectionId'                             => $this->params['sectionId'],
-                            'fieldId'                               => 'history',
-                            'fieldLabel'                            => 'History',
-                            'fieldType'                             => 'html',
-                            'fieldHelp'                             => true,
-                            'fieldHelpTooltipContent'               => 'Notes history',
-                            'fieldBazScan'                          => true,
-                            'fieldBazJstreeSearch'                  => true,
-                            'fieldBazPostOnCreate'                  => false,
-                            'fieldBazPostOnUpdate'                  => false
-                        ]
-                    ) . '
-                </div>
-            </div>
-            <div class="row">
+            '<div class="row">
+                <div id="notes-logs" class="col">';
+
+        if (isset($this->params['notes']['paginationCounters'])) {
+            if ($this->params['notes']['paginationCounters']['first'] === $this->params['notes']['paginationCounters']['current']) {
+                $start = 1;
+                $to = $this->params['notes']['paginationCounters']['limit'];
+            } else {
+                $start = (($this->params['notes']['paginationCounters']['current'] * $this->params['notes']['paginationCounters']['limit']) - $this->params['notes']['paginationCounters']['limit']) + 1;
+                $to = $this->params['notes']['paginationCounters']['current'] * $this->params['notes']['paginationCounters']['limit'];
+            }
+
+            if ($to > $this->params['notes']['paginationCounters']['filtered_items'] &&
+                $this->params['notes']['paginationCounters']['last'] === $this->params['notes']['paginationCounters']['current']
+            ) {
+                $start = (($this->params['notes']['paginationCounters']['current'] * $this->params['notes']['paginationCounters']['limit']) - $this->params['notes']['paginationCounters']['limit']) + 1;
+                $to = $this->params['notes']['paginationCounters']['filtered_items'];
+            }
+
+            $this->content .=
+                '<div class="row ml-4 mr-4">
+                    <div class="col">
+                        Showing <span class="notes-shown">' . $start . ' to ' . $to . '</span> out of <span class="active-logs-total">' . $this->params['notes']['paginationCounters']['filtered_items'] . '</span>
+                    </div>
+                    <div class="col">';
+
+            $leftDisabled = '';
+            $rightDisabled = '';
+
+            if ($this->params['notes']['paginationCounters']['first'] === 1 &&
+                $this->params['notes']['paginationCounters']['current'] === 1 &&
+                $this->params['notes']['paginationCounters']['last'] === 1
+            ) {
+                $leftDisabled = 'disabled';
+                $rightDisabled = 'disabled';
+            } else if ($this->params['notes']['paginationCounters']['first'] === 1 &&
+                       $this->params['notes']['paginationCounters']['current'] === 1 &&
+                       $this->params['notes']['paginationCounters']['last'] > 1
+            ) {
+                $leftDisabled = 'disabled';
+                $rightDisabled = '';
+            } else if ($this->params['notes']['paginationCounters']['current'] === $this->params['notes']['paginationCounters']['last']) {
+                $leftDisabled = '';
+                $rightDisabled = 'disabled';
+            }
+
+            $this->content .=
+                '<ul class="pagination pagination-sm float-right">
+                    <li class="page-item">
+                        <a class="page-link notes-previous ' . $leftDisabled . '" href="#"><i class="fas fa-chevron-left"></i></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link notes-next ' . $rightDisabled . '" href="#"><i class="fas fa-chevron-right"></i></a>
+                    </li>
+                </ul>';
+
+            $this->content .=
+                    '</div>
+                </div>';
+        }
+
+        $this->content .=
+            '<div class="row">
                 <div class="col">
                     <div id="' . $this->compSecId . '-history-timeline" class="timeline">';
 
                         foreach ($this->params['notes'] as $notesKey => $notes) {
+                            if ($notesKey === 'paginationCounters') {
+                                continue;
+                            }
                             //Private & App
                             if ($notes['note_type'] == '1') {
                                 $timelineIcon = 'file-alt';
@@ -384,7 +454,7 @@ class Notes extends AdminLTETags
             <div>
                 <i class="fas fa-fw fa-clipboard-list bg-secondary"></i>
             </div>
-            </div></div></div>';
+            </div></div></div></div></div>';
     }
 
     protected function inclNotesJs()
@@ -467,8 +537,44 @@ class Notes extends AdminLTETags
 
                             initChocolat();
                         }
-                    },
-                    "' . $this->compSecId . '-history"                      : { }
+                    }
+                });
+
+                $("#' . $this->compSecId . '-show-hide").click(function() {
+                    if ($("#notes-form").attr("hidden") === "hidden") {
+                        $(this).children("i").removeClass("fa-eye").addClass("fa-eye-slash");
+                        $("#notes-form").attr("hidden", false);
+                    } else {
+                        $(this).children("i").removeClass("fa-eye-slash").addClass("fa-eye");
+                        $("#notes-form").attr("hidden", true);
+                    }
+                });
+
+                var paginationCounters = JSON.parse(\'' . Json::encode($this->params['notes']['paginationCounters']) . '\');
+
+                $(".notes-previous, .notes-next").click(function(e) {
+                    e.preventDefault();
+
+                    var url = "' . $this->links->url('crypto/trades/getnotes') . '";
+
+                    var postData = { };
+                    postData[$("#security-token").attr("name")] = $("#security-token").val();
+                    postData["id"] = $("#' . $this->params['componentId'] . '-main-id").val();
+
+                    if ($(this).is(".notes-previous")) {
+                        postData["page"] = paginationCounters["previous"];
+                    } else if ($(this).is(".notes-next")) {
+                        postData["page"] = paginationCounters["next"];
+                    }
+
+                    $.post(url, postData, function(response) {
+                        console.log(response);
+                        if (response.responseCode == 0) {
+                            if (response.responseData) {
+                                $("#notes-logs").empty().html(response.responseData.logs);
+                            }
+                        }
+                    }, "json");
                 });
             </script>';
 

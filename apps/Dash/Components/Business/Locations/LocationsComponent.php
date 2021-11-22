@@ -37,8 +37,6 @@ class LocationsComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $location['activityLogs'] = $this->locations->getActivityLogs($this->getData()['id']);
-
                 $this->view->location = $location;
             } else {
                 $location = [];

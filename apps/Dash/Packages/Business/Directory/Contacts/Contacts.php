@@ -52,7 +52,7 @@ class Contacts extends BasePackage
 
             $contact['activityLogs'] = $this->getActivityLogs($contact['id']);
 
-            $contact['notes'] = $this->basepackages->notes->getNotes('contacts', $contact['id']);
+            $contact['notes'] = $this->getNoteLogs($contact['id']);
 
             unset($contact['cc_details']);
 

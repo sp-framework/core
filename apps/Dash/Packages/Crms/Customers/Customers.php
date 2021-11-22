@@ -57,6 +57,10 @@ class Customers extends BasePackage
                 $customer = array_merge($customer, $financialDetails);
             }
 
+            $customer['activityLogs'] = $this->getActivityLogs($customer['id']);
+
+            $customer['notes'] = $this->getNoteLogs($customer['id']);
+
             $this->packagesData->customer = $customer;
 
             return $customer;

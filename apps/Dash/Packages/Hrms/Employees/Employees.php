@@ -65,7 +65,7 @@ class Employees extends BasePackage
 
             $employee['activityLogs'] = $this->getActivityLogs($employee['id']);
 
-            $employee['notes'] = $this->basepackages->notes->getNotes('employees', $employee['id']);
+            $employee['notes'] = $this->getNoteLogs($employee['id']);
 
             return $employee;
         }

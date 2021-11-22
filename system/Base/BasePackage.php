@@ -1569,6 +1569,15 @@ abstract class BasePackage extends Controller
 		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst, $page);
 	}
 
+	public function getNoteLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
+	{
+		if ($packageName) {
+			return $this->basepackages->notes->getNotes($packageName, $id, $newFirst, $page);
+		}
+
+		return $this->basepackages->notes->getNotes($this->packageName, $id, $newFirst, $page);
+	}
+
 	protected function useStorage($storageType)
 	{
 		$storages = $this->basepackages->storages->getAppStorages();

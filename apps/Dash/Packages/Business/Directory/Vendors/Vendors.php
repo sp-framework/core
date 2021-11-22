@@ -71,7 +71,7 @@ class Vendors extends BasePackage
 
             $vendor['activityLogs'] = $this->getActivityLogs($vendor['id']);
 
-            $vendor['notes'] = $this->basepackages->notes->getNotes('vendors', $vendor['id']);
+            $vendor['notes'] = $this->getNoteLogs($vendor['id']);
 
             $financialDetailsObj = $vendorObj->getFinancial_details();
 

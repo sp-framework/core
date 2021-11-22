@@ -66,6 +66,10 @@ class PurchaseOrders extends BasePackage
             $purchaseOrder['xero'] = [];
         }
 
+        $purchaseOrder['activityLogs'] = $this->getActivityLogs($purchaseOrder['id']);
+
+        $purchaseOrder['notes'] = $this->getNoteLogs($purchaseOrder['id']);
+
         $this->packagesData->purchaseOrder = $purchaseOrder;
 
         return $purchaseOrder;

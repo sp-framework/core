@@ -61,10 +61,6 @@ class PurchaseordersComponent extends BaseComponent
 
 				$purchaseOrder = $this->getAddress($purchaseOrder);
 
-				$purchaseOrder['activityLogs'] = $this->purchaseOrdersPackage->getActivityLogs($this->getData()['id']);
-
-				$purchaseOrder['notes'] = $this->notes->getNotes('purchaseorders', $this->getData()['id']);
-
 				if ($this->vendors->searchByVendorId($purchaseOrder['vendor_id'])) {
 					$vendor = $this->vendors->packagesData->vendor;
 					unset($vendor['address_ids']);

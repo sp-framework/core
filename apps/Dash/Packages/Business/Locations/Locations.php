@@ -141,6 +141,7 @@ class Locations extends BasePackage
             // $this->basepackages->addressbook->getById($location['address_id']);
 
         // unset($location['address_id']);
+        $location['activityLogs'] = $this->getActivityLogs($location['id']);
 
         $this->addResponse('Ok', 0, $location);
 

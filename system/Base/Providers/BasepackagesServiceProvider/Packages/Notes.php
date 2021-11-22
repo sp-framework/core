@@ -159,20 +159,30 @@ class Notes extends BasePackage
         }
     }
 
-    public function getNotes($packageName, int $packageRowId, bool $newFirst = true)
+    public function getNotes($packageName, int $packageRowId, bool $newFirst = true, $page = 1)
     {
-        $notesArr = $this->getByParams(
+        $notesArr = [];
+
+        if ($newFirst) {
+            $order = 'id desc';
+        } else {
+            $order = 'id asc';
+        }
+
+        $pagedNotes = $this->getPaged(
             [
-                'conditions'    => 'package_name = :packageName: AND package_row_id = :packageRowId:',
-                'bind'          =>
-                    [
-                        'packageName'   => $packageName,
-                        'packageRowId'  => $packageRowId,
-                    ]
+                'conditions'    => '-|package_name|equals|' . $packageName . '&and|package_row_id|equals|' . $packageRowId . '&',
+                'order'         => $order,
+                'limit'         => 10,
+                'page'          => $page
             ]
         );
 
-        if ($notesArr && count($notesArr) > 0) {
+        if ($pagedNotes) {
+            $notesArr = $pagedNotes->getItems();
+        }
+
+        if (count($notesArr) > 0) {
             foreach ($notesArr as $key => &$note) {
                 unset($note['id']);
                 unset($note['package_name']);
@@ -231,8 +241,8 @@ class Notes extends BasePackage
                 }
             }
 
-            if ($newFirst && count($notesArr) > 1) {
-                return array_reverse($notesArr);
+            if ($this->packagesData->paginationCounters) {
+                $notesArr = array_replace($notesArr, ['paginationCounters' => $this->packagesData->paginationCounters]);
             }
 
             return $notesArr;

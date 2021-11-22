@@ -46,10 +46,6 @@ class CustomersComponent extends BaseComponent
                     return $this->throwIdNotFound();
                 }
 
-                $customer['activityLogs'] = $this->customers->getActivityLogs($this->getData()['id']);
-
-                $customer['notes'] = $this->notes->getNotes('customers', $this->getData()['id']);
-
                 $storages = $this->basepackages->storages;
 
                 if ($customer['portrait'] && $customer['portrait'] !== '') {
