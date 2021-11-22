@@ -1284,7 +1284,7 @@
                             var thead = $('#' + thisOptions.listOptions.tableName).children('thead').children('tr');
 
                             if (thead) {
-                                thead.addClass(datatableOptions.headerClass).css({'position':'relative','z-index':9999});
+                                thead.addClass(datatableOptions.headerClass).css({'position':'relative','z-index':999});
                             }
                         }
 
