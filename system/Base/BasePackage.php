@@ -330,6 +330,14 @@ abstract class BasePackage extends Controller
 						'order'	=> $this->postData()['order']
 					]
 				);
+		} else if (isset($params['order'])) {
+			$params =
+				array_merge(
+					$params,
+					[
+						'order'	=> $params['order']
+					]
+				);
 		}
 
 		if ($pageParams['currentPage'] > 1) {
@@ -1552,9 +1560,13 @@ abstract class BasePackage extends Controller
 		return $this->basepackages->activityLogs->addLog($this->packageName, $data, $oldData);
 	}
 
-	public function getActivityLogs(int $id, $newFirst = true)
+	public function getActivityLogs(int $id, $newFirst = true, $page = 1, $packageName = null)
 	{
-		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst);
+		if ($packageName) {
+			return $this->basepackages->activityLogs->getLogs($packageName, $id, $newFirst, $page);
+		}
+
+		return $this->basepackages->activityLogs->getLogs($this->packageName, $id, $newFirst, $page);
 	}
 
 	protected function useStorage($storageType)

@@ -47,7 +47,9 @@ class ActivityLogs extends BasePackage
             $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
         }
 
-        if ($this->auth) {
+        if (PHP_SAPI === 'cli') {
+            $log['account_id'] = 0;//System
+        } else {
             $account = $this->auth->account();
 
             if ($account) {
@@ -78,20 +80,30 @@ class ActivityLogs extends BasePackage
         }
     }
 
-    public function getLogs($packageName, int $packageRowId, bool $newFirst)
+    public function getLogs($packageName, int $packageRowId, bool $newFirst, $page = 1)
     {
-        $logsArr = $this->getByParams(
+        $logsArr = [];
+
+        if ($newFirst) {
+            $order = 'id desc';
+        } else {
+            $order = 'id asc';
+        }
+
+        $pagedLogs = $this->getPaged(
             [
-                'conditions'    => 'package_name = :packageName: AND package_row_id = :packageRowId:',
-                'bind'          =>
-                    [
-                        'packageName'   => $packageName,
-                        'packageRowId'  => $packageRowId,
-                    ]
+                'conditions'    => '-|package_name|equals|' . $packageName . '&and|package_row_id|equals|' . $packageRowId . '&',
+                'order'         => $order,
+                'limit'         => 10,
+                'page'          => $page
             ]
         );
 
-        if ($logsArr && count($logsArr) > 0) {
+        if ($pagedLogs) {
+            $logsArr = $pagedLogs->getItems();
+        }
+
+        if (count($logsArr) > 0) {
             foreach ($logsArr as $key => &$log) {
                 unset($log['id']);
                 unset($log['package_name']);
@@ -115,8 +127,8 @@ class ActivityLogs extends BasePackage
                 }
             }
 
-            if ($newFirst && count($logsArr) > 1) {
-                return array_reverse($logsArr);
+            if ($this->packagesData->paginationCounters) {
+                $logsArr = array_replace($logsArr, ['paginationCounters' => $this->packagesData->paginationCounters]);
             }
 
             return $logsArr;

@@ -1,103 +1,155 @@
 <?php
 
-namespace Apps\Dash\Packages\AdminLTETags\Tags;
+namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 
-use Apps\Dash\Packages\AdminLTETags\AdminLTETags;
-use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
+use System\Base\BasePackage;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
 
-class Activitylogs extends AdminLTETags
+class ActivityLogs extends BasePackage
 {
-    protected $params;
+    protected $modelToUse = BasepackagesActivityLogs::class;
 
-    protected $activityLogsParams;
+    protected $packageNameS = 'activitylogs';
 
-    protected $content = '';
+    public $activityLogs;
 
-    public function getContent(array $params)
+    const ACTIVITY_TYPE_ADD = 1;
+
+    const ACTIVITY_TYPE_UPDATE = 2;
+
+    public function init(bool $resetCache = false)
     {
-        $this->params = $params;
-
-        $this->activityLogsParams = [];
-
-        $this->generateContent();
-
-        return $this->content;
+        return $this;
     }
 
-    protected function generateContent()
+    public function addLog($packageName, array $data, array $oldData = null)
     {
-        if (!isset($this->params['activityLogs'])) {
-            throw new \Exception('Error: activityLogs (array) missing');
+        $dataId = $data['id'];
+        unset($data['id']);
+
+        $data = $this->removeSessionToken($data);
+        if (isset($data['package_name'])) {
+            unset($data['package_name']);
         }
 
-        $this->content .=
-            '<div class="row">
-                <div class="col">
-                    <div class="timeline">';
-
-        foreach ($this->params['activityLogs'] as $logsKey => $logs) {
-            if ($logs['activity_type'] === '1') {
-                $icon = 'plus';
-                $bg = 'primary';
-            } else if ($logs['activity_type'] === '2') {
-                $icon = 'edit';
-                $bg = 'warning';
+        if ($oldData) {
+            if (isset($oldData['id'])) {
+                unset($oldData['id']);
             }
+            if (isset($oldData['package_name'])) {
+                unset($oldData['package_name']);
+            }
+            $data = $this->getDifference($data, $oldData);
 
-            if (isset($logs['account_id']) && $logs['account_id'] == 0) {
-                $title = '<span><i class="fas fa-fw fa-robot"></i> ' . $logs['account_full_name'] . ' </span>';
+            $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
+        } else {
+            $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
+        }
+
+        if (PHP_SAPI === 'cli') {
+            $log['account_id'] = 0;//System
+        } else {
+            $account = $this->auth->account();
+
+            if ($account) {
+                $log['account_id'] = $account['id'];//User
             } else {
-                $title = '<span><i class="fas fa-fw fa-user"></i> ' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+                $log['account_id'] = 0;//System
             }
+        }
 
-            $logContent = '<dl class="row">';
+        $log['package_name'] = $packageName;
 
-            foreach ($logs['log'] as $logKey => $log) {
-                if (!in_array($logKey, $this->params['disableKeys'])) {
-                    if (array_key_exists($logKey, $this->params['replaceValues'])) {
-                        $log = $this->params['replaceValues'][$logKey][$log];
-                    }
-                    if (array_key_exists($logKey, $this->params['replaceKeys'])) {
-                        $logKey = $this->params['replaceKeys'][$logKey];
-                    }
+        $log['package_row_id'] = $dataId;
 
-                    $logKey = str_replace('_', ' ', $logKey);
+        if (isset($data['created_at'])) {
+            $log['created_at'] = $data['created_at'];
+        }
 
-                    if (is_array($log)) {
-                        $log = Json::encode($log);
+        $log['log'] = Json::encode($data);
 
-                        if ($log === '[]') {
-                            $log = '';
-                        }
-                    }
+        if ($this->add($log, false)) {
+            $this->packagesData->responseCode = 0;
 
-                    $logContent .=
-                        '<dt class="col-md-4 text-uppercase">' . $logKey . '</dt>
-                        <dd class="col-md-8">: ' . $log . '</dd>';
+            $this->packagesData->responseMessage = 'Activity Log Added';
+        } else {
+            $this->packagesData->responseCode = 1;
+
+            $this->packagesData->responseMessage = 'Error Adding Activity Log';
+        }
+    }
+
+    public function getLogs($packageName, int $packageRowId, bool $newFirst, $page = 1)
+    {
+        $logsArr = [];
+
+        if ($newFirst) {
+            $order = 'id desc';
+        } else {
+            $order = 'id asc';
+        }
+
+        $pagedLogs = $this->getPaged(
+            [
+                'conditions'    => '-|package_name|equals|' . $packageName . '&and|package_row_id|equals|' . $packageRowId . '&',
+                'order'         => $order,
+                'limit'         => 10,
+                'page'          => $page
+            ]
+        );
+
+        if ($pagedLogs) {
+            $logsArr = $pagedLogs->getItems();
+        }
+
+        if (count($logsArr) > 0) {
+            foreach ($logsArr as $key => &$log) {
+                unset($log['id']);
+                unset($log['package_name']);
+                unset($log['package_row_id']);
+
+                if ($log['account_id'] != 0) {
+                    $account = $this->basepackages->accounts->getById($log['account_id']);
+                    $log['account_email'] = $account['email'];
+
+                    $profile = $this->basepackages->profile->getProfile($log['account_id']);
+                    $log['account_full_name'] = $profile['full_name'];
+
+                    unset($log['account_id']);
+                } else {
+                    $log['account_email'] = 'N/A';
+                    $log['account_full_name'] = 'System';
+                }
+
+                if ($log['log'] !== '') {
+                    $log['log'] = Json::decode($log['log'], true);
                 }
             }
 
-            $logContent .= '</dl>';
+            if ($this->packagesData->paginationCounters) {
+                $logsArr = array_replace($logsArr, ['paginationCounters' => $this->packagesData->paginationCounters]);
+            }
 
-            $this->content .=
-                '<div>
-                    <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '"></i>
-                    <div class="timeline-item">
-                        <span class="time"><i class="fas fa-clock"></i> ' . $logs['created_at'] .'</span>
-                        <h6 class="timeline-header text-secondary">' .  $title . '</h6>
-                        <div class="timeline-body">' . $logContent . '</div>
-                        <div class="timeline-footer"></div>
-                    </div>
-                </div>';
+            return $logsArr;
         }
 
-        $this->content .=
-                        '<div>
-                            <i class="fas fa-fw fa-clock bg-secondary"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>';
+        return [];
+    }
+
+    protected function getDifference(array $data, array $oldData)
+    {
+        return array_diff_assoc($data, $oldData);
+    }
+
+    protected function removeSessionToken($data)
+    {
+        $token = array_keys($data, $this->security->getRequestToken());
+
+        if ($token) {
+            unset($data[$token[0]]);
+        }
+
+        return $data;
     }
 }
