@@ -12,6 +12,8 @@ class Notes extends AdminLTETags
 
     protected $notesParams;
 
+    protected $notesPaginationCounters;
+
     protected $content = '';
 
     public function getContent(array $params)
@@ -59,9 +61,17 @@ class Notes extends AdminLTETags
 
         $this->useStorage($this->notesSettings['useStorage']);
 
+        if ($this->params['notes'] && count($this->params['notes']) > 0) {
+            $formHidden = 'hidden';
+            $icon = 'eye';
+        } else {
+            $formHidden = '';
+            $icon = 'eye-slash';
+        }
+
         if (!isset($this->params['onlyHistory'])) {
             $this->content .=
-            '<div id="notes-form" class="row vdivide" hidden>
+            '<div id="notes-form" class="row vdivide" ' . $formHidden . '>
                 <div class="col">' .
                     '<div class="row">
                         <div class="col">' .
@@ -212,7 +222,7 @@ class Notes extends AdminLTETags
                                                     'title'             => 'Form',
                                                     'size'              => 'xs',
                                                     'type'              => 'info',
-                                                    'icon'              => 'eye'
+                                                    'icon'              => $icon
                                                 ]
                                             ]
                                     ]
@@ -223,6 +233,12 @@ class Notes extends AdminLTETags
 
         if (count($this->params['notes']) > 0) {
             $this->generateNotesContent();
+        }
+
+        if (isset($this->params['notes']['paginationCounters'])) {
+            $this->notesPaginationCounters = Json::encode($this->params['notes']['paginationCounters']);
+        } else {
+            $this->notesPaginationCounters = Json::encode([]);
         }
 
         $this->content .= $this->inclNotesJs();
@@ -550,7 +566,7 @@ class Notes extends AdminLTETags
                     }
                 });
 
-                var paginationCounters = JSON.parse(\'' . Json::encode($this->params['notes']['paginationCounters']) . '\');
+                var paginationCounters = JSON.parse(\'' . $this->notesPaginationCounters . '\');
 
                 $(".notes-previous, .notes-next").click(function(e) {
                     e.preventDefault();
