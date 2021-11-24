@@ -128,6 +128,10 @@ class Domains extends BasePackage
 
 	public function getNamedDomain($name)
 	{
+		if (!$this->domains) {
+			$this->init();
+		}
+
 		foreach($this->domains as $domain) {
 			if ($domain['name'] === $name) {
 				return $domain;
@@ -139,8 +143,12 @@ class Domains extends BasePackage
 
 	public function getIdDomain($id)
 	{
+		if (!$this->domains) {
+			$this->init();
+		}
+
 		foreach($this->domains as $domain) {
-			if ($domain['id'] === $id) {
+			if ($domain['id'] == $id) {
 				return $domain;
 			}
 		}
