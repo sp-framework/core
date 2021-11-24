@@ -80,7 +80,7 @@ class Radio
 
             $this->content .=
                 '<div class="icheck-' . $radioButton['type'] . '">
-                    <input type="radio" id="' . $radioButtonKey . '" data-value="' . $radioButton['dataValue'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $radioChecked . '>';
+                    <input type="radio" id="' . $radioButtonKey . '" data-value="' . $radioButton['dataValue'] . '" ' . $this->fieldParams['fieldName'] . '" ' . $radioChecked . ' ' . $this->fieldParams['fieldDisabled']  . '>';
 
                     if (isset($radioButton['icon'])) {
                         if (!isset($radioButton['iconPosition']) ||
