@@ -129,7 +129,6 @@ class Notifications extends BasePackage
         $notificationDetails = null,
         $domainId = null,
         $appId = null,
-        $accountId = null,
         $createdBy = 0,
         $packageName = null,
         $packageRowId = null,
@@ -156,12 +155,18 @@ class Notifications extends BasePackage
             $body .= 'Notification By: System (' . $now . ')<br>';
         }
 
+        if ($domainId) {
+            $domain = $this->domains->getIdDomain($id);
+        } else {
+            $domain = $this->domains->getDomain();
+        }
+
         $email['domain_id'] = $domainId;
         $email['app_id'] = $appId;
         $email['status'] = 1;
         $email['priority'] = 3;
         $email['to_addresses'] = Json::encode($emailAddresses);
-        $email['subject'] = 'Notification for ' . $this->domains->getDomain()['name'];
+        $email['subject'] = 'Notification for ' . $domain['name'];
         $email['body'] = $body;
 
         $this->basepackages->emailqueue->addToQueue($email);
