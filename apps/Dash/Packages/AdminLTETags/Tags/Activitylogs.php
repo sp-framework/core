@@ -1,155 +1,223 @@
 <?php
 
-namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
+namespace Apps\Dash\Packages\AdminLTETags\Tags;
 
+use Apps\Dash\Packages\AdminLTETags\AdminLTETags;
+use Phalcon\Helper\Arr;
 use Phalcon\Helper\Json;
-use System\Base\BasePackage;
-use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesActivityLogs;
 
-class ActivityLogs extends BasePackage
+class Activitylogs extends AdminLTETags
 {
-    protected $modelToUse = BasepackagesActivityLogs::class;
+    protected $params;
 
-    protected $packageNameS = 'activitylogs';
+    protected $activityLogsParams;
 
-    public $activityLogs;
+    protected $content = '';
 
-    const ACTIVITY_TYPE_ADD = 1;
-
-    const ACTIVITY_TYPE_UPDATE = 2;
-
-    public function init(bool $resetCache = false)
+    public function getContent(array $params)
     {
-        return $this;
+        $this->params = $params;
+
+        $this->activityLogsParams = [];
+
+        $this->generateContent();
+
+        return $this->content;
     }
 
-    public function addLog($packageName, array $data, array $oldData = null)
+    protected function generateContent()
     {
-        $dataId = $data['id'];
-        unset($data['id']);
-
-        $data = $this->removeSessionToken($data);
-        if (isset($data['package_name'])) {
-            unset($data['package_name']);
+        if (!isset($this->params['activityLogs'])) {
+            throw new \Exception('Error: activityLogs (array) missing');
         }
 
-        if ($oldData) {
-            if (isset($oldData['id'])) {
-                unset($oldData['id']);
-            }
-            if (isset($oldData['package_name'])) {
-                unset($oldData['package_name']);
-            }
-            $data = $this->getDifference($data, $oldData);
-
-            $log['activity_type'] = self::ACTIVITY_TYPE_UPDATE;
-        } else {
-            $log['activity_type'] = self::ACTIVITY_TYPE_ADD;
-        }
-
-        if (PHP_SAPI === 'cli') {
-            $log['account_id'] = 0;//System
-        } else {
-            $account = $this->auth->account();
-
-            if ($account) {
-                $log['account_id'] = $account['id'];//User
+        if (isset($this->params['activityLogs']['paginationCounters'])) {
+            if ($this->params['activityLogs']['paginationCounters']['first'] === $this->params['activityLogs']['paginationCounters']['current']) {
+                $start = 1;
+                $to = $this->params['activityLogs']['paginationCounters']['limit'];
             } else {
-                $log['account_id'] = 0;//System
+                $start = (($this->params['activityLogs']['paginationCounters']['current'] * $this->params['activityLogs']['paginationCounters']['limit']) - $this->params['activityLogs']['paginationCounters']['limit']) + 1;
+                $to = $this->params['activityLogs']['paginationCounters']['current'] * $this->params['activityLogs']['paginationCounters']['limit'];
             }
+
+            if ($to > $this->params['activityLogs']['paginationCounters']['filtered_items'] &&
+                $this->params['activityLogs']['paginationCounters']['last'] === $this->params['activityLogs']['paginationCounters']['current']
+            ) {
+                $start = (($this->params['activityLogs']['paginationCounters']['current'] * $this->params['activityLogs']['paginationCounters']['limit']) - $this->params['activityLogs']['paginationCounters']['limit']) + 1;
+                $to = $this->params['activityLogs']['paginationCounters']['filtered_items'];
+            }
+
+            $this->content .=
+                '<div class="row ml-4 mr-4">
+                    <div class="col">
+                        Showing <span class="activityLogs-shown">' . $start . ' to ' . $to . '</span> out of <span class="active-logs-total">' . $this->params['activityLogs']['paginationCounters']['filtered_items'] . '</span>
+                    </div>
+                    <div class="col">';
+
+            $leftDisabled = '';
+            $rightDisabled = '';
+
+            if ($this->params['activityLogs']['paginationCounters']['first'] === 1 &&
+                $this->params['activityLogs']['paginationCounters']['current'] === 1 &&
+                $this->params['activityLogs']['paginationCounters']['last'] === 1
+            ) {
+                $leftDisabled = 'disabled';
+                $rightDisabled = 'disabled';
+            } else if ($this->params['activityLogs']['paginationCounters']['first'] === 1 &&
+                       $this->params['activityLogs']['paginationCounters']['current'] === 1 &&
+                       $this->params['activityLogs']['paginationCounters']['last'] > 1
+            ) {
+                $leftDisabled = 'disabled';
+                $rightDisabled = '';
+            } else if ($this->params['activityLogs']['paginationCounters']['current'] === $this->params['activityLogs']['paginationCounters']['last']) {
+                $leftDisabled = '';
+                $rightDisabled = 'disabled';
+            }
+
+            $this->content .=
+                '<ul class="pagination pagination-sm float-right">
+                    <li class="page-item">
+                        <a class="page-link activity-logs-previous ' . $leftDisabled . '" href="#"><i class="fas fa-chevron-left"></i></a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link activity-logs-next ' . $rightDisabled . '" href="#"><i class="fas fa-chevron-right"></i></a>
+                    </li>
+                </ul>';
+
+            $this->content .=
+                    '</div>
+                </div>';
         }
 
-        $log['package_name'] = $packageName;
+        $this->content .=
+            '<div class="row">
+                <div class="col">
+                    <div class="timeline">';
 
-        $log['package_row_id'] = $dataId;
+        foreach ($this->params['activityLogs'] as $logsKey => $logs) {
+            if ($logsKey === 'paginationCounters') {
+                continue;
+            }
 
-        if (isset($data['created_at'])) {
-            $log['created_at'] = $data['created_at'];
-        }
+            if ($logs['activity_type'] === '1') {
+                $icon = 'plus';
+                $bg = 'primary';
+            } else if ($logs['activity_type'] === '2') {
+                $icon = 'edit';
+                $bg = 'warning';
+            }
 
-        $log['log'] = Json::encode($data);
+            if (isset($logs['account_id']) && $logs['account_id'] == 0) {
+                $title = '<span><i class="fas fa-fw fa-robot"></i> ' . $logs['account_full_name'] . ' </span>';
+            } else {
+                $title = '<span><i class="fas fa-fw fa-user"></i> ' . $logs['account_full_name'] . ' (' . $logs['account_email'] . ') </span>';
+            }
 
-        if ($this->add($log, false)) {
-            $this->packagesData->responseCode = 0;
+            $logContent = '<dl class="row">';
 
-            $this->packagesData->responseMessage = 'Activity Log Added';
-        } else {
-            $this->packagesData->responseCode = 1;
+            foreach ($logs['log'] as $logKey => $log) {
+                if (!in_array($logKey, $this->params['disableKeys'])) {
+                    if (array_key_exists($logKey, $this->params['replaceValues'])) {
+                        $log = $this->params['replaceValues'][$logKey][$log];
+                    }
+                    if (array_key_exists($logKey, $this->params['replaceKeys'])) {
+                        $logKey = $this->params['replaceKeys'][$logKey];
+                    }
 
-            $this->packagesData->responseMessage = 'Error Adding Activity Log';
-        }
-    }
+                    $logKey = str_replace('_', ' ', $logKey);
 
-    public function getLogs($packageName, int $packageRowId, bool $newFirst, $page = 1)
-    {
-        $logsArr = [];
+                    if (is_array($log)) {
+                        $log = Json::encode($log);
 
-        if ($newFirst) {
-            $order = 'id desc';
-        } else {
-            $order = 'id asc';
-        }
+                        if ($log === '[]') {
+                            $log = '';
+                        }
 
-        $pagedLogs = $this->getPaged(
-            [
-                'conditions'    => '-|package_name|equals|' . $packageName . '&and|package_row_id|equals|' . $packageRowId . '&',
-                'order'         => $order,
-                'limit'         => 10,
-                'page'          => $page
-            ]
-        );
+                        $jsonLog = $log;
 
-        if ($pagedLogs) {
-            $logsArr = $pagedLogs->getItems();
-        }
+                        $log = $log . '<br><br><button class="btn btn-xs btn-info mr-1" id="format-data-' . $logsKey . '" data-toggle="tooltip" data-html="true" data-placement="auto" title="" role="button" data-original-title=""><i class="fas fa-fw fa-magic"></i> FORMAT DATA</button>';
 
-        if (count($logsArr) > 0) {
-            foreach ($logsArr as $key => &$log) {
-                unset($log['id']);
-                unset($log['package_name']);
-                unset($log['package_row_id']);
+                            $log .=
+                                '<script type="text/javascript">
+                                    $("#format-data-' . $logsKey . '").click(function(e) {
+                                        e.preventDefault();
 
-                if ($log['account_id'] != 0) {
-                    $account = $this->basepackages->accounts->getById($log['account_id']);
-                    $log['account_email'] = $account['email'];
+                                        var html = \'' . $jsonLog . '\';
+                                        var regex = /{.*}/g;
+                                        var found = html.match(regex);
 
-                    $profile = $this->basepackages->profile->getProfile($log['account_id']);
-                    $log['account_full_name'] = $profile['full_name'];
+                                        if (found) {
+                                            var data = found[0].replaceAll(\'\"\', \'"\');
 
-                    unset($log['account_id']);
-                } else {
-                    $log['account_email'] = 'N/A';
-                    $log['account_full_name'] = 'System';
+                                            var obj = JSON.parse(data);
+
+                                            if (obj) {
+                                                $("#' . $logKey . '-' . $logsKey . '").html(BazHelpers.createHtmlList({"obj": obj}));
+                                            }
+                                        }
+                                    });
+                                </script>';
+                    }
+
+                    $logContent .=
+                        '<dt class="col-md-4 text-uppercase">' . $logKey . '</dt>
+                        <dd id="' . $logKey . '-' . $logsKey . '" class="col-md-8">: ' . $log . '</dd>';
                 }
-
-                if ($log['log'] !== '') {
-                    $log['log'] = Json::decode($log['log'], true);
-                }
             }
 
-            if ($this->packagesData->paginationCounters) {
-                $logsArr = array_replace($logsArr, ['paginationCounters' => $this->packagesData->paginationCounters]);
-            }
+            $logContent .= '</dl>';
 
-            return $logsArr;
+            $this->content .=
+                '<div>
+                    <i class="fas fa-fw fa-' . $icon . ' bg-' . $bg . '"></i>
+                    <div class="timeline-item">
+                        <span class="time"><i class="fas fa-clock"></i> ' . $logs['created_at'] .'</span>
+                        <h6 class="timeline-header text-secondary">' .  $title . '</h6>
+                        <div class="timeline-body">' . $logContent . '</div>
+                        <div class="timeline-footer"></div>
+                    </div>
+                </div>';
         }
 
-        return [];
-    }
+        $this->content .=
+                        '<div>
+                            <i class="fas fa-fw fa-clock bg-secondary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>';
 
-    protected function getDifference(array $data, array $oldData)
-    {
-        return array_diff_assoc($data, $oldData);
-    }
-
-    protected function removeSessionToken($data)
-    {
-        $token = array_keys($data, $this->security->getRequestToken());
-
-        if ($token) {
-            unset($data[$token[0]]);
+        if (!isset($this->params['activityLogs']['paginationCounters'])) {
+            return;
         }
 
-        return $data;
+        $this->content .=
+            '<script type="text/javascript">
+                var paginationCounters = JSON.parse(\'' . Json::encode($this->params['activityLogs']['paginationCounters']) . '\');
+
+                $(".activity-logs-previous, .activity-logs-next").click(function(e) {
+                    e.preventDefault();
+
+                    var url = "' . $this->links->url('crypto/trades/getActivityLogs') . '";
+
+                    var postData = { };
+                    postData[$("#security-token").attr("name")] = $("#security-token").val();
+                    postData["id"] = $("#' . $this->params['componentId'] . '-main-id").val();
+
+                    if ($(this).is(".activity-logs-previous")) {
+                        postData["page"] = paginationCounters["previous"];
+                    } else if ($(this).is(".activity-logs-next")) {
+                        postData["page"] = paginationCounters["next"];
+                    }
+
+                    $.post(url, postData, function(response) {
+                        if (response.responseCode == 0) {
+                            if (response.responseData) {
+                                $("#activity-logs").empty().html(response.responseData.logs);
+                            }
+                        }
+                    }, "json");
+                });
+            </script>';
     }
 }
