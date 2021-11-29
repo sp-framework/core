@@ -1699,8 +1699,8 @@ abstract class BasePackage extends Controller
 					}
 				}
 			}
-		} else {
-			throw new \Exception('Package ' . $this->packageName . ' for notification not found');
+		// } else {
+		// 	throw new \Exception('Package ' . $this->packageName . ' for notification not found');
 		}
 	}
 
