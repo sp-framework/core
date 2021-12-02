@@ -35,8 +35,13 @@ class Fields extends AdminLTETags
         if (isset($this->params['fieldBazJstreeSearch']) &&
             $this->params['fieldBazJstreeSearch'] === true
         ) {
-            $this->content .=
-                '<div ' . $this->fieldParams['jstreeSearchId'] . ' jstree-search="' . strtoupper($this->fieldParams['fieldLabel']) . '">';
+            if ($this->params['fieldType'] === 'checkbox' && $this->fieldParams['fieldLabel'] === false && $this->params['fieldCheckboxLabel'] !== '') {
+                $this->content .=
+                    '<div ' . $this->fieldParams['jstreeSearchId'] . ' jstree-search="' . strtoupper($this->params['fieldCheckboxLabel']) . '">';
+            } else {
+                $this->content .=
+                    '<div ' . $this->fieldParams['jstreeSearchId'] . ' jstree-search="' . strtoupper($this->fieldParams['fieldLabel']) . '">';
+            }
         }
 
         $this->content .=
