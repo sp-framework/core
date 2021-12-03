@@ -824,8 +824,6 @@ class Auth
         }
 
         if ($this->verifyTwoFa($code, $security->two_fa_secret)) {
-            $security->two_fa_secret = null;
-
             $security->two_fa_status = '1';
 
             $security->update();
