@@ -125,7 +125,7 @@ class Notifications extends BasePackage
 
     public function emailNotification(
         $emailAddresses,
-        $notificationTitle,
+        $notificationTitle = null,
         $notificationDetails = null,
         $domainId = null,
         $appId = null,
@@ -136,12 +136,11 @@ class Notifications extends BasePackage
         $subject = null,
         $body = null
     ) {
-        //Do something with notificationType when we have Templates for email.
-        if (!$notificationTitle) {
-            throw new \Exception('Notification title missing');
-        }
-
         if (!$body) {
+            if (!$notificationTitle) {
+                throw new \Exception('Notification requires title if body is not provided.');
+            }
+
             $body = '';
 
             $body .= 'Notification Title: ' . $notificationTitle . '<br>';
