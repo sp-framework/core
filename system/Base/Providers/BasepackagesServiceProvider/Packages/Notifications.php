@@ -132,27 +132,36 @@ class Notifications extends BasePackage
         $createdBy = 0,
         $packageName = null,
         $packageRowId = null,
-        $notificationType = 0
+        $notificationType = 0,
+        $body = null
     ) {
         //Do something with notificationType when we have Templates for email.
         if (!$notificationTitle) {
             throw new \Exception('Notification title missing');
         }
 
-        $body = 'Notification Title: ' . $notificationTitle . '<br>Notification Details: ' . $notificationDetails . '<br>';
+        if (!$body) {
+            $body = '';
 
-        $now = date("F j, Y, g:i a");
+            $body .= 'Notification Title: ' . $notificationTitle . '<br>';
 
-        if ($createdBy != 0) {
-            $profile = $this->basepackages->profile->getProfile($createdBy);
+            if ($notificationDetails) {
+                $body .= 'Notification Details: ' . $notificationDetails . '<br>';
+            }
 
-            if ($profile) {
-                $body .= 'Notification By: ' . $profile['full_name'] . ' (' . $now . ')<br>';
+            $now = date("F j, Y, g:i a");
+
+            if ($createdBy != 0) {
+                $profile = $this->basepackages->profile->getProfile($createdBy);
+
+                if ($profile) {
+                    $body .= 'Notification By: ' . $profile['full_name'] . ' (' . $now . ')<br>';
+                } else {
+                    $body .= 'Notification By: System (' . $now . ')<br>';
+                }
             } else {
                 $body .= 'Notification By: System (' . $now . ')<br>';
             }
-        } else {
-            $body .= 'Notification By: System (' . $now . ')<br>';
         }
 
         if ($domainId) {
