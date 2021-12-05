@@ -133,6 +133,7 @@ class Notifications extends BasePackage
         $packageName = null,
         $packageRowId = null,
         $notificationType = 0,
+        $subject = null,
         $body = null
     ) {
         //Do something with notificationType when we have Templates for email.
@@ -175,7 +176,11 @@ class Notifications extends BasePackage
         $email['status'] = 1;
         $email['priority'] = 3;
         $email['to_addresses'] = Json::encode($emailAddresses);
-        $email['subject'] = 'Notification for ' . $domain['name'];
+        if ($subject) {
+            $email['subject'] = $subject;
+        } else {
+            $email['subject'] = 'Notification for ' . $domain['name'];
+        }
         $email['body'] = $body;
 
         $this->basepackages->emailqueue->addToQueue($email);
