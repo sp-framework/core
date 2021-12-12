@@ -38,6 +38,8 @@ abstract class BasePackage extends Controller
 
 	protected $transaction = null;
 
+	protected $transactionErrors = null;
+
 	private $filterConditions = null;
 
 	public function onConstruct()
@@ -815,17 +817,17 @@ abstract class BasePackage extends Controller
 
 				return true;
 			} else {
-				$errMessages = [];
+				$this->transactionErrors = [];
 
 				foreach (${$this->packageName}->getMessages() as $value) {
-					array_push($errMessages, $value->getMessage());
+					array_push($this->transactionErrors, $value->getMessage());
 				}
 
-				array_push($errMessages, $data);
+				array_push($this->transactionErrors, $data);
 
 				throw new \Exception(
 					"Could not add {$this->packageNameS}. Reasons: <br>" .
-					join(',', $this->jsonData($errMessages))
+					join(',', $this->jsonData($this->transactionErrors))
 				);
 			}
 		} else {
@@ -852,18 +854,7 @@ abstract class BasePackage extends Controller
 
 			$update = ${$this->packageName}->update();
 
-			if (!$update) {
-				$errMessages = [];
-
-				foreach (${$this->packageName}->getMessages() as $value) {
-					array_push($errMessages, $value->getMessage());
-				}
-
-				throw new \Exception(
-					"Could not update {$this->packageNameS}. Reasons: <br>" .
-					join(',', $errMessages)
-				);
-			} else {
+			if ($update) {
 				$this->packagesData->responseCode = 0;
 
 				$this->packagesData->responseMessage = "{$this->packageNameS} Updated!";
@@ -875,6 +866,17 @@ abstract class BasePackage extends Controller
 				}
 
 				return true;
+			} else {
+				$this->transactionErrors = [];
+
+				foreach (${$this->packageName}->getMessages() as $value) {
+					array_push($this->transactionErrors, $value->getMessage());
+				}
+
+				throw new \Exception(
+					"Could not update {$this->packageNameS}. Reasons: <br>" .
+					join(',', $this->transactionErrors)
+				);
 			}
 		} else {
 			throw new \Exception('Data array missing. Cannot update!');
