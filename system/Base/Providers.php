@@ -27,11 +27,12 @@ return
 				'System\Base\Providers\WidgetServiceProvider',
 				'System\Base\Providers\ValidationServiceProvider',
 				'System\Base\Providers\AccessServiceProvider',
+				'System\Base\Providers\WebSocketServiceProvider',
 			],
 		'cli'	=>
 			[
 				'System\Base\Providers\ConfigServiceProvider',
-				// 'System\Base\Providers\EventsServiceProvider',
+				'System\Base\Providers\EventsServiceProvider',
 				// 'System\Base\Providers\AnnotationsServiceProvider',
 				'System\Base\Providers\SecurityServiceProvider',
 				'System\Base\Providers\SessionServiceProvider',
@@ -47,7 +48,8 @@ return
 				'System\Base\Providers\ContentServiceProvider',
 				// 'System\Base\Providers\RouterServiceProvider',
 				// 'System\Base\Providers\DispatcherServiceProvider',
-				// 'System\Base\Providers\ViewServiceProvider',
+				'System\Base\Providers\ViewServiceProvider',
+				'System\Base\Providers\WebSocketServiceProvider',
 				// 'System\Base\Providers\FlashServiceProvider',
 				// 'System\Base\Providers\ErrorServiceProvider',
 				// 'System\Base\Providers\WidgetServiceProvider',
@@ -79,5 +81,6 @@ return
 				'System\Base\Providers\WidgetServiceProvider',
 				'System\Base\Providers\ValidationServiceProvider',
 				'System\Base\Providers\AccessServiceProvider',
+				'System\Base\Providers\WebSocketServiceProvider',
 			]
 	];

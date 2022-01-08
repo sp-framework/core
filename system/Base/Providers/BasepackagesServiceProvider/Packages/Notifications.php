@@ -5,7 +5,6 @@ namespace System\Base\Providers\BasepackagesServiceProvider\Packages;
 use Phalcon\Helper\Json;
 use System\Base\BasePackage;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Model\BasepackagesNotifications;
-use ZMQContext;
 
 class Notifications extends BasePackage
 {
@@ -100,12 +99,7 @@ class Notifications extends BasePackage
             );
 
             if ($count && $count > 0) {
-                $context = new ZMQContext();
-
-                $socket = $context->getSocket(\ZMQ::SOCKET_PUSH, 'New Notification');
-                $socket->connect("tcp://localhost:5555");
-
-                $data =
+                $this->wss->send(
                     [
                         'type'              => 'systemNotifications',
                         'to'                => $tunnels['notifications_tunnel'],
@@ -116,9 +110,8 @@ class Notifications extends BasePackage
                                     "count" => $count
                                 ]
                         ]
-                    ];
-
-                $socket->send(Json::encode($data));
+                    ]
+                );
             }
         }
     }
