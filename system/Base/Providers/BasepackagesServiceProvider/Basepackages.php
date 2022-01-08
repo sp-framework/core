@@ -18,6 +18,7 @@ use System\Base\Providers\BasepackagesServiceProvider\Packages\Notes;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Notifications;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Pusher;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Storages;
+use System\Base\Providers\BasepackagesServiceProvider\Packages\Templates;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Accounts;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Profile;
 use System\Base\Providers\BasepackagesServiceProvider\Packages\Users\Roles;
@@ -66,6 +67,8 @@ class Basepackages
 	protected $pusher;
 
 	protected $importexport;
+
+	protected $templates;
 
 	public function __construct()
 	{
@@ -220,5 +223,12 @@ class Basepackages
 		$this->importexport = (new ImportExport())->init();
 
 		return $this->importexport;
+	}
+
+	protected function initTemplates()
+	{
+		$this->templates = (new Templates())->init();
+
+		return $this->templates;
 	}
 }

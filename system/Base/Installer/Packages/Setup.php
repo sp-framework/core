@@ -46,6 +46,7 @@ use System\Base\Installer\Packages\Setup\Schema\Basepackages\Notifications;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Settings;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Storages\StoragesLocal;
+use System\Base\Installer\Packages\Setup\Schema\Basepackages\Templates;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\Agents;
 use System\Base\Installer\Packages\Setup\Schema\Basepackages\Users\Accounts\CanLogin;
@@ -216,6 +217,7 @@ class Setup
 		$this->db->createTable('basepackages_workers_tasks', $dbName, (new Tasks)->columns());
 		$this->db->createTable('basepackages_workers_jobs', $dbName, (new Jobs)->columns());
 		$this->db->createTable('basepackages_import_export', $dbName, (new ImportExport)->columns());
+		$this->db->createTable('basepackages_templates', $dbName, (new Templates)->columns());
 	}
 
 	public function registerRepository()

@@ -1,0 +1,71 @@
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'test_data',
+                'fieldLabel'                     : 'Test Data',
+                'fieldType'                      : 'textarea',
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Json Format variable data',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldBazPostOnCreate'           : true,
+                'fieldBazPostOnUpdate'           : true,
+                'fieldDataInputMaxLength'        : 65535,
+                'fieldTextareaRows'              : 10,
+                'fieldValue'                     : ''
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col mt-1">
+        {{adminltetags.useTag('buttons',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'buttonType'                     : 'button',
+                'buttons'                        :
+                    {
+                        'test-template' : {
+                            'title'                   : 'Test Template',
+                            'size'                    : 'sm',
+                            'type'                    : 'primary',
+                            'icon'                    : 'cog fa-spin',
+                            'iconHidden'              : true,
+                            'buttonAdditionalClass'   : 'mb-4',
+                            'url'                     : links.url('system/templates/testTemplate')
+                        }
+                    }
+            ]
+        )}}
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        {{adminltetags.useTag('fields',
+            [
+                'component'                      : component,
+                'componentName'                  : componentName,
+                'componentId'                    : componentId,
+                'sectionId'                      : sectionId,
+                'fieldId'                        : 'result',
+                'fieldLabel'                     : 'Result',
+                'fieldType'                      : 'html',
+                'fieldHidden'                    : true,
+                'fieldHelp'                      : true,
+                'fieldHelpTooltipContent'        : 'Test Template',
+                'fieldRequired'                  : false,
+                'fieldBazScan'                   : true,
+                'fieldHtmlAdditionalClass'       : 'border p-3',
+                'fieldHtmlContent'               : ''
+            ]
+        )}}
+    </div>
+</div>

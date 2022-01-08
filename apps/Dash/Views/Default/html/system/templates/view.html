@@ -1,0 +1,34 @@
+{% if template['id'] is defined %}
+    {% set templateId = template['id'] %}
+    {% set title = 'Template (' ~ template['name'] ~ ')' %}
+{% else %}
+    {% set templateId = '' %}
+    {% set title = 'New Template' %}
+{% endif %}
+{{adminltetags.useTag('content',
+    [
+        'component'                     : component,
+        'componentName'                 : componentName,
+        'componentId'                   : componentId,
+        'parentComponentId'             : parent,
+        'sectionId'                     : 'main',
+        'contentType'                   : 'sectionWithForm',
+        'cardHeader'                    : true,
+        'cardFooter'                    : true,
+        'cardType'                      : 'primary',
+        'cardIcon'                      : 'file-code',
+        'cardTitle'                     : title,
+        'cardAdditionalClass'           : 'rounded-0',
+        'cardBodyInclude'               : 'templates/form',
+        'formButtons'                   :
+        [
+            'updateButtonId'                : templateId,
+            'addActionUrl'                  : 'system/templates/add',
+            'addSuccessRedirectUrl'         : 'system/templates',
+            'updateActionUrl'               : 'system/templates/update',
+            'updateSuccessRedirectUrl'      : 'system/templates',
+            'cancelActionUrl'               : 'system/templates',
+            'closeActionUrl'                : 'system/templates'
+        ]
+    ]
+)}}
