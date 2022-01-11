@@ -191,6 +191,21 @@ class Tasks extends BasePackage
         return $sorted;
     }
 
+    public function getRunningTasks()
+    {
+        $this->init(true);
+
+        $taskArr = [];
+
+        foreach ($this->tasks as $taskKey => $task) {
+            if ($task['status'] == 2) {
+                array_push($taskArr, $task);
+            }
+        }
+
+        return $taskArr;
+    }
+
     public function findByParameter($parameterValue, $parameterKey = null, $function = null)
     {
         if (!$this->tasks) {
