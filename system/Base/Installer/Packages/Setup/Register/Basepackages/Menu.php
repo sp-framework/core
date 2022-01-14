@@ -6,8 +6,15 @@ use Phalcon\Helper\Json;
 
 class Menu
 {
-    public function register($db, array $menu, int $sequence)
+    public function register($db, array $menu)
     {
+        if (isset($menu['seq'])) {
+            $sequence = $menu['seq'];
+            unset($menu['seq']);
+        } else {
+            $sequence = 99;
+        }
+
         $insertMenu = $db->insertAsDict(
             'basepackages_menus',
             [

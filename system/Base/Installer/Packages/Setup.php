@@ -361,14 +361,7 @@ class Setup
 
 	protected function registerAdminMenu(array $menu)
 	{
-		if (isset($menu['seq'])) {
-			$sequence = $menu['seq'];
-			unset($menu['seq']);
-		} else {
-			$sequence = 99;
-		}
-
-		return (new RegisterMenu())->register($this->db, $menu, $sequence);
+		return (new RegisterMenu())->register($this->db, $menu);
 	}
 
 	protected function registerAdminPackage(array $packageFile)
