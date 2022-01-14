@@ -106,7 +106,7 @@ class EmailQueue
                     new Column(
                         'body',
                         [
-                            'type'    => Column::TYPE_TEXT,
+                            'type'    => Column::TYPE_MEDIUMTEXT,
                             'notNull' => true
                         ]
                     ),
