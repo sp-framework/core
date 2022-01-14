@@ -30,6 +30,7 @@ trait DynamicTable {
         if (count($columnsForTable) > 0) {
             $columnsForTable = array_merge($columnsForTable, ['id']);
         }
+
         if (count($columnsForFilter) > 0) {
             $columnsForFilter = array_merge($columnsForFilter, ['id']);
         } else {
@@ -144,33 +145,29 @@ trait DynamicTable {
             $this->view->table = $table;
 
         } else if ($this->request->isPost()) {
+            $conditions =
+                [
+                    'columns' => $columnsForTable
+                ];
+
+            if ($postUrlParams) {
+                $conditions = array_replace($conditions, $postUrlParams);
+            }
+
             try {
+                $pagedData =
+                    $package->getPaged(
+                        $conditions,
+                        $resetCache,
+                        $enableCache
+                    );
+
+                $rows = $pagedData->getItems();
+
                 if (is_callable($dtReplaceColumns)) {
-                        $pagedData =
-                            $package->getPaged(
-                                [
-                                    'columns' => $columnsForTable
-                                ],
-                                $resetCache,
-                                $enableCache
-                            );
+                    $rows = $this->extractColumnsForTable($columnsForTable, $dtReplaceColumns($rows));//Call & extract columnsTable
 
-                        $rows = $pagedData->getItems();
-
-                        $rows = $this->extractColumnsForTable($columnsForTable, $dtReplaceColumns($rows));//Call & extract columnsTable
-
-                        $dtReplaceColumns = null;//Remove function before its passed to Table
-                } else {
-                    $pagedData =
-                        $package->getPaged(
-                            [
-                                'columns' => $columnsForTable
-                            ],
-                            $resetCache,
-                            $enableCache
-                        );
-
-                    $rows = $pagedData->getItems();
+                    $dtReplaceColumns = null;//Remove function before its passed to Table
                 }
             } catch (\Exception $e) {
                 $rows = [];
