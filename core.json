@@ -2,7 +2,7 @@
 	"name" 								: "Core",
 	"displayName" 						: "Bazaari Core",
 	"description" 						: "Bazaari Framework Core Module",
-	"version" 							: "0.0.1",
+	"version" 							: "22.2.1",
 	"repo" 								: "https://dev.bazaari.com.au/sp-dev/core",
 	"settings"      					: {
 		"debug"							: true,
