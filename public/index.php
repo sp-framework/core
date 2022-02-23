@@ -1,8 +1,4 @@
 <?php
-if (PHP_SAPI === 'cli') {
-	echo "Cannot use cli on index.php";
-	exit();
-}
 // require_once "../vendor/autoload.php";
 
 // $config = array(
@@ -68,7 +64,16 @@ if (PHP_SAPI === 'cli') {
 // }
 
 try {
-	require_once "../system/bootstrap.php";
+	require_once (__DIR__ . '/../system/Bootstrap.php');
+
+	$bootstrap = new \System\Bootstrap;
+
+	if (PHP_SAPI === 'cli') {
+		$bootstrap->cli($argv);
+	} else if (PHP_SAPI !== 'cli') {
+		$bootstrap->mvc();
+	}
+
 } catch (Exception $exception) {
 	if (isset($error)) {
 		$error->handle($exception);
